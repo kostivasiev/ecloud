@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Jobs\Kingpin\HostGroup;
 
-use App\Jobs\Nsx\HostGroup\CreateTransportNode;
+use App\Jobs\Nsx\HostGroup\CreateTransportNodeProfile;
 use App\Models\V2\HostGroup;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -29,7 +29,7 @@ class CreateTransportNodeTest extends TestCase
                 'windows_enabled' => true,
             ]);
         });
-        $this->job = \Mockery::mock(CreateTransportNode::class, [$this->hostGroup])->makePartial();
+        $this->job = \Mockery::mock(CreateTransportNodeProfile::class, [$this->hostGroup])->makePartial();
     }
 
     public function testNoTransportNodeProfiles()

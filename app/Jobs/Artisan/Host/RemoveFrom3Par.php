@@ -31,24 +31,15 @@ class RemoveFrom3Par extends Job
                 '/api/v2/san/' . $availabilityZone->san_name . '/host/' . $host->id
             );
         } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
-                $this->fail($exception);
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() == 404) {
+                Log::info("Host doesn't exist on 3PAR, skipping");
+                return true;
             }
-            Log::warning(get_class($this) . ' : 3Par for Host ' . $host->id . ' could not be retrieved, skipping.');
-            return false;
+            throw $exception;
         }
 
-        try {
-            $availabilityZone->artisanService()->delete(
-                '/api/v2/san/' . $availabilityZone->san_name . '/host/' . $host->id
-            );
-        } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
-                $this->fail($exception);
-                throw $exception;
-            }
-            Log::warning(get_class($this) . ' : Host ' . $host->id . ' was not removed from 3Par.');
-            return;
-        }
+        $availabilityZone->artisanService()->delete(
+            '/api/v2/san/' . $availabilityZone->san_name . '/host/' . $host->id
+        );
     }
 }

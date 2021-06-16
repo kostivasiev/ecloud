@@ -236,7 +236,7 @@ Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
 ### Get a list of transport-node-profiles
-GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-hg-9fd79532
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-hg-c6568cf7
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
@@ -264,3 +264,39 @@ Content-Type:  application/json
 GET https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/Reference_for_catchall_rule
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+
+
+
+
+
+
+
+
+
+
+### Get the UUID of a Host / Transport node
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportNode%20AND%20display_name:172.19.0.57
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+###
+GET https://185.197.63.88/api/v1/ns-groups?member_types=TransportNode
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+###
+GET https://185.197.63.88/api/v1/ns-groups/fc23f2fc-6a45-4dc7-90d2-64db975c1527
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+### GET the ns-groups that have the host as a member
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:NSGroup%20AND%20members.value:ebe3adf5-c920-4442-b7fb-573e28d543c1
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+# ebe3adf5-c920-4442-b7fb-573e28d543c1

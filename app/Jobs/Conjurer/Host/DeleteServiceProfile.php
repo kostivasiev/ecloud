@@ -31,24 +31,15 @@ class DeleteServiceProfile extends Job
                 '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id . '/host/' . $host->id
             );
         } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
-                $this->fail($exception);
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() == 404) {
+                Log::info("Service profile doesn't exist, skipping");
+                return true;
             }
-            Log::warning(get_class($this) . ' : Service Profile for Host ' . $host->id . ' not found, skipping.');
-            return false;
+            throw $exception;
         }
 
-        try {
-            $availabilityZone->conjurerService()->delete(
-                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id . '/host/' . $host->id
-            );
-        } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
-                $this->fail($exception);
-                throw $exception;
-            }
-            Log::warning(get_class($this) . ' : Service Profile for Host ' . $host->id . ' was not found.');
-            return;
-        }
+        $availabilityZone->conjurerService()->delete(
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $host->hostGroup->vpc->id . '/host/' . $host->id
+        );
     }
 }
