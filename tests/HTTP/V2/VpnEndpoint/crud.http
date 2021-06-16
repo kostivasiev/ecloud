@@ -47,7 +47,7 @@ Content-Type:  application/json
 {
     "name": "Endpoint Test",
     "vpn_id": "{{vpn_id}}",
-    "fip_id": "{{fip_id}}"
+    "floating_ip_id": "{{fip_id}}"
 }
 
 > {%
