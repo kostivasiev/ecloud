@@ -56,6 +56,8 @@ components:
 #      $ref: 'components/schemas/lbc.yaml'
     Volume:
       $ref: 'components/schemas/volume.yaml'
+    VpnSession:
+      $ref: 'components/schemas/vpnSession.yaml'
     RouterThroughput:
       $ref: 'components/schemas/routerThroughput.yaml'
     HostSpec:
@@ -95,6 +97,8 @@ components:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
     VpnId:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
+    VpnSessionId:
+      $ref: 'resources/VpnSession/parameters/vpnSessionId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     RegionId:
@@ -116,6 +120,8 @@ components:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
     VpnIdResponse:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
+    VpnSessionIdResponse:
+      $ref: 'resources/VpnSession/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     RouterIdResponse:
@@ -161,6 +167,14 @@ paths:
 #    $ref: 'resources/Vpn/collection.yaml'
 #  '/ecloud/v2/vpns/{vpnId}':
 #    $ref: 'resources/Vpn/item.yaml'
+  '/ecloud/v2/vpn-sessions':
+    $ref: 'resources/VpnSession/collection.yaml'
+  '/ecloud/v2/vpn-sessions/{vpnSessionId}':
+    $ref: 'resources/VpnSession/item.yaml'
+  '/ecloud/v2/vpn-sessions/{vpnSessionId}/endpoints':
+    $ref: 'resources/VpnSession/endpoints.yaml'
+  '/ecloud/v2/vpn-sessions/{vpnSessionId}/services':
+    $ref: 'resources/VpnSession/services.yaml'
   '/ecloud/v2/instances':
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':

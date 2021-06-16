@@ -122,4 +122,37 @@ class CreateTest extends TestCase
             ]
         )->assertResponseStatus(422);
     }
+
+    public function testCreateResourceWithInvalidIps()
+    {
+        $service = factory(VpnService::class)->create([
+            'name' => 'test-service',
+            'router_id' => $this->router()->id,
+        ]);
+
+        $this->post(
+            '/v2/vpn-sessions',
+            [
+                'name' => 'vpn session test',
+                'vpn_service_id' => [
+                    $service->id,
+                ],
+                'vpn_endpoint_id' => [
+                    $this->vpnEndpoint->id,
+                ],
+                'remote_ip' => 'INVALID',
+                'remote_networks' => 'INVALID',
+                'local_networks' => 'INVALID',
+            ]
+        )->seeJson([
+            'detail' => 'The remote ip must be a valid IPv4 address',
+            'source' => 'remote_ip',
+        ])->seeJson([
+            'detail' => 'The remote networks must contain a valid comma separated list of CIDR subnets',
+            'source' => 'remote_networks',
+        ])->seeJson([
+            'detail' => 'The local networks must contain a valid comma separated list of CIDR subnets',
+            'source' => 'local_networks',
+        ])->assertResponseStatus(422);
+    }
 }

@@ -23,6 +23,7 @@ class UpdateTest extends TestCase
         $this->floatingIp = FloatingIp::withoutEvents(function () {
             return factory(FloatingIp::class)->create([
                 'id' => 'fip-abc123xyz',
+                'vpc_id' => $this->vpc()->id,
             ]);
         });
         $this->vpnService = factory(VpnService::class)->create([
@@ -39,19 +40,81 @@ class UpdateTest extends TestCase
                 'local_networks' => '127.1.1.1/32,127.1.10.1/24',
             ]
         );
-        $this->vpnSession->vpnServices()->attach($this->vpnService);
-        $this->vpnSession->vpnEndpoints()->attach($this->vpnEndpoint);
     }
 
     public function testUpdateResource()
     {
+        $this->vpnSession->vpnServices()->attach($this->vpnService);
+        $this->vpnSession->vpnEndpoints()->attach($this->vpnEndpoint);
+        $data = [
+            'name' => 'Updated Test Session',
+        ];
         $this->patch(
             '/v2/vpn-sessions/' . $this->vpnSession->id,
-            []
-        );
-        dd(
-            $this->response->getStatusCode(),
-            json_decode($this->response->getContent(), true)
-        );
+            $data
+        )->seeInDatabase(
+            'vpn_sessions',
+            $data,
+            'ecloud'
+        )->assertResponseStatus(202);
+    }
+
+    public function testUpdateResourceServiceUsed()
+    {
+        $this->vpnSession->vpnServices()->attach($this->vpnService);
+        $this->patch(
+            '/v2/vpn-sessions/' . $this->vpnSession->id,
+            [
+                'vpn_service_id' => [
+                    $this->vpnService->id,
+                ]
+            ]
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The vpn_service_id.0 is already in use for this session',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testUpdateResourceEndpointUsed()
+    {
+        $this->vpnSession->vpnEndpoints()->attach($this->vpnEndpoint);
+        $this->patch(
+            '/v2/vpn-sessions/' . $this->vpnSession->id,
+            [
+                'vpn_endpoint_id' => [
+                    $this->vpnEndpoint->id,
+                ]
+            ]
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The vpn_endpoint_id.0 is already in use for this session',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testUpdateResourceInvalidRemoteIp()
+    {
+        $this->patch(
+            '/v2/vpn-sessions/' . $this->vpnSession->id,
+            [
+                'remote_ip' => 'INVALID_IP',
+            ]
+        )->seeJson([
+            'detail' => 'The remote ip must be a valid IPv4 address',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testUpdateResourceInvalidRemoteAndLocalNetworks()
+    {
+        $this->patch(
+            '/v2/vpn-sessions/' . $this->vpnSession->id,
+            [
+                'remote_networks' => 'INVALID_IP',
+                'local_networks' => 'INVALID_IP',
+            ]
+        )->seeJson([
+            'detail' => 'The remote networks must contain a valid comma separated list of CIDR subnets',
+        ])->seeJson([
+            'detail' => 'The local networks must contain a valid comma separated list of CIDR subnets',
+        ])->assertResponseStatus(422);
     }
 }

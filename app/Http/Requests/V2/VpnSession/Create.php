@@ -2,7 +2,9 @@
 namespace App\Http\Requests\V2\VpnSession;
 
 use App\Models\V2\VpnEndpoint;
+use App\Models\V2\VpnEndpointVpnSession;
 use App\Models\V2\VpnService;
+use App\Models\V2\VpnServiceVpnSession;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidCidrNetworkCsvString;
@@ -42,7 +44,7 @@ class Create extends FormRequest
             'remote_ip' => [
                 'required',
                 'string',
-                new ValidIpv4(),
+                new ValidIpv4()
             ],
             'remote_networks' => [
                 'required',

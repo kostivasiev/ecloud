@@ -31,8 +31,6 @@ class VpnSession extends Model implements Filterable, Sortable
         $this->fillable = [
             'id',
             'name',
-//            'vpn_service_id',
-//            'vpn_endpoint_id',
             'remote_ip',
             'remote_networks',
             'local_networks',

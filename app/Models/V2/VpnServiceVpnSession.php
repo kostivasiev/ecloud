@@ -5,5 +5,5 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class VpnServiceVpnSession extends Pivot
 {
-    //
+    protected $connection = 'ecloud';
 }

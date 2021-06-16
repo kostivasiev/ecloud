@@ -1,0 +1,33 @@
+properties:
+  id:
+    type: string
+    example: 'vpns-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    required: false
+    example: 'vpns-2b66bb79'
+  remote_ip:
+    type: string
+    required: true
+    example: '211.12.13.1'
+    readOnly: false
+  remote_networks:
+    type: string
+    required: true
+    example: '172.12.23.11/32'
+    readOnly: false
+  local_networks:
+    type: string
+    required: true
+    example: '172.11.11.11/32,176.18.22.11/24'
+    readOnly: false
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Vpn Sessions'

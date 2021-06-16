@@ -24,24 +24,26 @@ class Update extends FormRequest
         $vpnSessionId = $this->route()[2]['vpnSessionId'];
         return [
             'name' => 'sometimes|required|string',
-            'vpn_service_id' => 'required|array|min:1',
+            'vpn_service_id' => 'sometimes|required|array|min:1',
             'vpn_service_id.*' => [
+                'sometimes',
                 'required',
                 'string',
                 Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
                 Rule::unique(VpnServiceVpnSession::class, 'vpn_service_id')
-                    ->ignore($vpnSessionId, 'vpn_session_id'),
+                    ->where('vpn_session_id', $vpnSessionId),
                 'distinct',
                 new ExistsForUser(VpnService::class),
                 new IsResourceAvailable(VpnService::class),
             ],
-            'vpn_endpoint_id' => 'required|array|min:1',
+            'vpn_endpoint_id' => 'sometimes|required|array|min:1',
             'vpn_endpoint_id.*' => [
+                'sometimes',
                 'required',
                 'string',
                 Rule::exists(VpnEndpoint::class, 'id')->whereNull('deleted_at'),
                 Rule::unique(VpnEndpointVpnSession::class, 'vpn_endpoint_id')
-                    ->ignore($vpnSessionId, 'vpn_session_id'),
+                    ->where('vpn_session_id', $vpnSessionId),
                 'distinct',
                 new ExistsForUser(VpnEndpoint::class),
                 new IsResourceAvailable(VpnEndpoint::class),
@@ -66,4 +68,13 @@ class Update extends FormRequest
             ],
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'vpn_service_id.*.unique' => 'The :attribute is already in use for this session',
+            'vpn_endpoint_id.*.unique' => 'The :attribute is already in use for this session',
+        ];
+    }
+
 }
