@@ -64,9 +64,9 @@ class CreateTest extends TestCase
                 'vpn_endpoint_id' => [
                     $this->vpnEndpoint->id,
                 ],
-                'remote_ip' => 'test',
-                'remote_networks' => 'test',
-                'local_networks' => 'test',
+                'remote_ip' => '211.12.13.1',
+                'remote_networks' => '172.12.23.11/32',
+                'local_networks' => '172.11.11.11/32,176.18.22.11/24',
             ]
         )->assertResponseStatus(202);
 
@@ -96,9 +96,9 @@ class CreateTest extends TestCase
                 'vpn_endpoint_id' => [
                     $this->vpnEndpoint->id,
                 ],
-                'remote_ip' => 'test',
-                'remote_networks' => 'test',
-                'local_networks' => 'test',
+                'remote_ip' => '211.12.13.1',
+                'remote_networks' => '172.12.23.11/32',
+                'local_networks' => '172.11.11.11/32,176.18.22.11/24',
             ]
         )->seeJson(
             [

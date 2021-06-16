@@ -5,6 +5,8 @@ use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\ValidCidrNetworkCsvString;
+use App\Rules\V2\ValidIpv4;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
@@ -37,9 +39,21 @@ class Create extends FormRequest
                 new ExistsForUser(VpnEndpoint::class),
                 new IsResourceAvailable(VpnEndpoint::class),
             ],
-            'remote_ip' => 'sometimes|required|string',
-            'remote_networks' => 'sometimes|required|string',
-            'local_networks' => 'sometimes|required|string',
+            'remote_ip' => [
+                'required',
+                'string',
+                new ValidIpv4(),
+            ],
+            'remote_networks' => [
+                'required',
+                'string',
+                new ValidCidrNetworkCsvString()
+            ],
+            'local_networks' => [
+                'required',
+                'string',
+                new ValidCidrNetworkCsvString()
+            ],
         ];
     }
 }

@@ -8,12 +8,13 @@ use App\Models\V2\VpnSession;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
-class GetTest extends TestCase
+class DeleteTest extends TestCase
 {
+
+    protected FloatingIp $floatingIp;
     protected VpnService $vpnService;
     protected VpnEndpoint $vpnEndpoint;
     protected VpnSession $vpnSession;
-    protected FloatingIp $floatingIp;
 
     public function setUp(): void
     {
@@ -43,45 +44,9 @@ class GetTest extends TestCase
         $this->vpnSession->vpnEndpoints()->attach($this->vpnEndpoint);
     }
 
-    public function testGetCollection()
+    public function testDeleteResource()
     {
-        $this->get('/v2/vpn-sessions')
-            ->seeJson(
-                [
-                    'id' => $this->vpnSession->id,
-                ]
-            )->assertResponseStatus(200);
-    }
-
-    public function testGetResource()
-    {
-        $this->get('/v2/vpn-sessions/' . $this->vpnSession->id)
-            ->seeJson(
-                [
-                    'id' => $this->vpnSession->id,
-                ]
-            )->assertResponseStatus(200);
-    }
-
-    public function testGetEndpointsCollection()
-    {
-        $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/endpoints')
-            ->seeJson(
-                [
-                    'id' => $this->vpnEndpoint->id,
-                    'name' => $this->vpnEndpoint->name,
-                ]
-            )->assertResponseStatus(200);
-    }
-
-    public function testGetServicesCollection()
-    {
-        $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/services')
-            ->seeJson(
-                [
-                    'id' => $this->vpnService->id,
-                    'name' => $this->vpnService->name,
-                ]
-            )->assertResponseStatus(200);
+        $this->delete('/v2/vpn-sessions/' . $this->vpnSession->id)
+            ->assertResponseStatus(204);
     }
 }
