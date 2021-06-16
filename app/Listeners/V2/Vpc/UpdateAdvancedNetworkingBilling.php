@@ -14,7 +14,8 @@ class UpdateAdvancedNetworkingBilling
 {
     public function handle(Updated $event)
     {
-        Log::info(get_class($this) . ' : Started', ['model' => $event->model]);
+        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
+
         if (!($event->model instanceof Task) || !($event->model->resource instanceof Instance)) {
             return;
         }
@@ -69,6 +70,6 @@ class UpdateAdvancedNetworkingBilling
             $billingMetric->save();
         });
 
-        Log::info(get_class($this) . ' : Finished', ['model' => $event->model]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Jobs\Conjurer\Host;
 use App\Jobs\Job;
 use App\Models\V2\Host;
 use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -23,31 +24,34 @@ class CreateAutoDeployRule extends Job
     {
         $availabilityZone = $this->model->hostGroup->availabilityZone;
 
+        // Check whether host exists
+        try {
+            $availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $this->model->hostGroup->vpc_id .'/hostgroup/' . $this->model->hostGroup->id . '/host/' . $this->model->mac_address
+            );
+
+            Log::debug('Host already exists, skipping');
+            return true;
+        } catch (RequestException $exception) {
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() != 404) {
+                throw $exception;
+            }
+        }
+
         // Get the host spec from Conjurer
         $response = $availabilityZone->conjurerService()->get(
             '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $this->model->hostGroup->vpc->id .'/host/' . $this->model->id
         );
         $response = json_decode($response->getBody()->getContents());
 
-        $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
-
-        if (empty($macAddress)) {
-            $message = 'Failed to load eth0 address for host ' . $this->model->id;
-            Log::error($message);
-            $this->fail(new \Exception($message));
-            return false;
-        }
-
-        Log::info(get_class($this) . 'Host MAC address: ' . $macAddress);
-
         // Add the host to the host group on VMWare
         $availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->model->hostGroup->vpc_id .'/hostgroup/' . $this->model->hostGroup->id .'/host',
+            '/api/v2/vpc/' . $this->model->hostGroup->vpc_id .'/hostgroup/' . $this->model->hostGroup->id . '/host',
             [
                 'json' => [
                     'hostId' => $this->model->id,
                     'hardwareVersion' => $response->hardwareVersion,
-                    'macAddress' => $macAddress,
+                    'macAddress' => $this->model->mac_address,
                 ],
             ]
         );
