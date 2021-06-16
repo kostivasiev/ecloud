@@ -70,7 +70,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('floatingIp.router.vpc', function ($query) use ($user) {
+        return $query->whereHas('floatingIp.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }

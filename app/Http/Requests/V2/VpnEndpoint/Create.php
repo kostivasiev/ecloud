@@ -2,6 +2,7 @@
 namespace App\Http\Requests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
+use App\Models\V2\VpnEndpointVpnService;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnEndpoint;
 use App\Rules\V2\ExistsForUser;
@@ -18,15 +19,15 @@ class Create extends FormRequest
             'vpn_service_id' => [
                 'required',
                 Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnEndpoint::class, 'vpn_service_id')->whereNull('deleted_at'),
+                Rule::unique(VpnEndpointVpnService::class, 'vpn_service_id'),
                 new ExistsForUser(VpnService::class),
                 new IsResourceAvailable(VpnService::class),
             ],
-            'fip_id' => [
+            'floating_ip_id' => [
                 'sometimes',
                 'required',
                 Rule::exists(FloatingIp::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnEndpoint::class, 'fip_id')->whereNull('deleted_at'),
+                Rule::unique(VpnEndpoint::class, 'floating_ip_id')->whereNull('deleted_at'),
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
             ],

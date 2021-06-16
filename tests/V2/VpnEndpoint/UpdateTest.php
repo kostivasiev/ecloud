@@ -30,10 +30,11 @@ class UpdateTest extends TestCase
         $this->vpnEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Update Test',
-                'vpn_service_id' => $this->vpnService->id,
-                'fip_id' => $this->floatingIp->id,
+                'floating_ip_id' => $this->floatingIp->id,
             ]
         );
+        $this->vpnEndpoint->vpnServices()->attach($this->vpnService->id);
+        $this->vpnEndpoint->save();
     }
 
     public function testUpdateResource()
@@ -56,8 +57,7 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => $this->vpnEndpoint->name,
-            'vpn_service_id' => $this->vpnEndpoint->vpn_service_id,
-            'fip_id' => $this->vpnEndpoint->fip_id,
+            'floating_ip_id' => $this->vpnEndpoint->floating_ip_id,
         ];
         $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
             ->assertResponseStatus(202);
@@ -78,17 +78,19 @@ class UpdateTest extends TestCase
             ]);
         });
         // Create Local Endpoint
-        factory(VpnEndpoint::class)->create(
+        factory(VpnEndpoint::class, 1)->create(
             [
                 'name' => 'Other LE Test',
-                'vpn_service_id' => $vpnService->id,
-                'fip_id' => $floatingIp->id,
+                'floating_ip_id' => $floatingIp->id,
             ]
-        );
+        )->each(function ($endpoint) use ($vpnService) {
+            $endpoint->vpnServices()->attach($vpnService->id);
+            $endpoint->save();
+        });
         // Update original local endpoint
         $data = [
             'vpn_service_id' => $vpnService->id,
-            'fip_id' => $floatingIp->id,
+            'floating_ip_id' => $floatingIp->id,
         ];
         $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
             ->seeJson(
@@ -101,8 +103,8 @@ class UpdateTest extends TestCase
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A vpn endpoint already exists for the specified fip id',
-                    'source' => 'fip_id',
+                    'detail' => 'A vpn endpoint already exists for the specified floating ip id',
+                    'source' => 'floating_ip_id',
                 ]
             )
             ->assertResponseStatus(422);

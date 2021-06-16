@@ -9,7 +9,7 @@ use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-    protected VpnEndpoint $localEndpoint;
+    protected VpnEndpoint $vpnEndpoint;
     protected VpnService $vpnService;
 
     public function setUp(): void
@@ -26,25 +26,26 @@ class DeleteTest extends TestCase
         $this->vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->localEndpoint = factory(VpnEndpoint::class)->create(
+        $this->vpnEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Get Test',
-                'vpn_service_id' => $this->vpnService->id,
-                'fip_id' => $floatingIp->id,
+                'floating_ip_id' => $floatingIp->id,
             ]
         );
+        $this->vpnEndpoint->vpnServices()->attach($this->vpnService->id);
+        $this->vpnEndpoint->save();
     }
 
     public function testDeleteResource()
     {
-        $this->delete('/v2/vpn-endpoints/' . $this->localEndpoint->id)
+        $this->delete('/v2/vpn-endpoints/' . $this->vpnEndpoint->id)
             ->assertResponseStatus(204);
     }
 
     public function testDeleteResourceWrongUser()
     {
         $this->be(new Consumer(999, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->delete('/v2/vpn-endpoints/' . $this->localEndpoint->id)
+        $this->delete('/v2/vpn-endpoints/' . $this->vpnEndpoint->id)
             ->seeJson(
                 [
                     'title' => 'Not found',

@@ -40,7 +40,14 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../public-openapi.yaml#/components/schemas/VpnEndpoint'
+          allOf:
+            - $ref: '../../public-openapi.yaml#/components/schemas/VpnEndpoint'
+            - properties:
+                vpn_service_id :
+                  type : string
+                  required : true
+                  example : 'vpn-2b66bb79'
+                  readOnly : false
   responses:
     201:
       $ref: '../../public-openapi.yaml#/components/responses/VpnEndpointIdResponse'

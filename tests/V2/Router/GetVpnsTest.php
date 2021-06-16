@@ -6,9 +6,8 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetVpnsTest extends TestCase
@@ -17,7 +16,7 @@ class GetVpnsTest extends TestCase
     protected Region $region;
     protected Router $router;
     protected Vpc $vpc;
-    protected Vpn $vpn;
+    protected VpnService $vpnService;
     protected AvailabilityZone $availabilityZone;
 
     public function setUp(): void
@@ -33,27 +32,26 @@ class GetVpnsTest extends TestCase
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
-        $this->vpn = factory(Vpn::class)->create([
+        $this->vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router->id,
         ]);
     }
 
-// todo readd test when vpn service routes are updated
-//    public function testGetCollection()
-//    {
-//        $this->get(
-//            '/v2/routers/'.$this->router->id.'/vpns',
-//            [
-//                'X-consumer-custom-id' => '0-0',
-//                'X-consumer-groups'    => 'ecloud.read',
-//            ]
-//        )
-//            ->seeJson([
-//                'id'                   => $this->vpn->id,
-//                'router_id'            => $this->vpn->router_id,
-//                'availability_zone_id' => $this->vpn->availability_zone_id,
-//            ])
-//            ->assertResponseStatus(200);
-//    }
+    public function testGetCollection()
+    {
+        $this->get(
+            '/v2/routers/'.$this->router->id.'/vpns',
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups'    => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id'                   => $this->vpnService->id,
+                'router_id'            => $this->vpnService->router_id,
+                'availability_zone_id' => $this->vpnService->availability_zone_id,
+            ])
+            ->assertResponseStatus(200);
+    }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\VpnService;
 
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
@@ -8,10 +8,10 @@ use App\Rules\V2\IsResourceAvailable;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class UpdateVpnsRequest
+ * Class Create
  * @package App\Http\Requests\V2
  */
-class UpdateVpnRequest extends FormRequest
+class Create extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,7 +32,6 @@ class UpdateVpnRequest extends FormRequest
     {
         return [
             'router_id' => [
-                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.routers,id,deleted_at,NULL',
@@ -50,7 +49,7 @@ class UpdateVpnRequest extends FormRequest
     public function messages()
     {
         return [
-            'router_id.required' => 'The :attribute field, when specified, cannot be null',
+            'router_id.required' => 'The :attribute field is required',
         ];
     }
 }

@@ -33,7 +33,7 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpnService->id,
-            'fip_id' => $this->floatingIp->id,
+            'floating_ip_id' => $this->floatingIp->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
             ->assertResponseStatus(202);
@@ -48,15 +48,17 @@ class CreateTest extends TestCase
                 'ip_address' => '203.0.113.2',
             ]);
         });
-        factory(VpnEndpoint::class)->create([
+        factory(VpnEndpoint::class, 1)->create([
             'name' => 'Original Endpoint',
-            'vpn_service_id' => $this->vpnService->id,
-            'fip_id' => $floatingIp->id,
-        ]);
+            'floating_ip_id' => $floatingIp->id,
+        ])->each(function ($endpoint) {
+            $endpoint->vpnServices()->attach($this->vpnService->id);
+            $endpoint->save();
+        });
         $data = [
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpnService->id,
-            'fip_id' => $this->floatingIp->id,
+            'floating_ip_id' => $this->floatingIp->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
             ->seeJson(
@@ -73,21 +75,23 @@ class CreateTest extends TestCase
         $vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        factory(VpnEndpoint::class)->create([
+        factory(VpnEndpoint::class, 1)->create([
             'name' => 'Original Endpoint',
-            'vpn_service_id' => $vpnService->id,
-            'fip_id' => $this->floatingIp->id,
-        ]);
+            'floating_ip_id' => $this->floatingIp->id,
+        ])->each(function ($endpoint) use ($vpnService) {
+            $endpoint->vpnServices()->attach($vpnService->id);
+            $endpoint->save();
+        });
         $data = [
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpnService->id,
-            'fip_id' => $this->floatingIp->id,
+            'floating_ip_id' => $this->floatingIp->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A vpn endpoint already exists for the specified fip id',
+                    'detail' => 'A vpn endpoint already exists for the specified floating ip id',
                 ]
             )
             ->assertResponseStatus(422);
@@ -114,7 +118,7 @@ class CreateTest extends TestCase
             ->assertResponseStatus(202);
 
         $id = json_decode($this->response->getContent())->data->id;
-        $localEndpoint = VpnEndpoint::findOrFail($id);
-        $this->assertEquals($floatingIp->id, $localEndpoint->fip_id);
+        $vpnEndpoint = VpnEndpoint::findOrFail($id);
+        $this->assertEquals($floatingIp->id, $vpnEndpoint->floating_ip_id);
     }
 }

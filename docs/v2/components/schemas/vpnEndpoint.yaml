@@ -7,12 +7,7 @@ properties:
     type: string
     required: false
     example: 'vpni-2b66bb79'
-  vpn_service_id:
-    type: string
-    required: true
-    example: 'vpn-2b66bb79'
-    readOnly: false
-  fip_id:
+  floating_ip_id:
     type: string
     required: true
     example: 'fip-2b66bb79'
