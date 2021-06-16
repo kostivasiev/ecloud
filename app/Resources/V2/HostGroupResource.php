@@ -20,6 +20,7 @@ class HostGroupResource extends UKFastResource
                 'hosts' => $this->hosts->count(),
                 'ram' => [
                     'capacity' => $this->ram_capacity,
+                    'reserved' => $this->ram_reserved,
                     'used' => $this->ram_used,
                     'available' => $this->ram_available,
                 ],
