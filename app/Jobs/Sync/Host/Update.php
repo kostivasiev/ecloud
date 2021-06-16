@@ -13,7 +13,6 @@ use App\Jobs\Kingpin\Host\CheckProfileApplied;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
-use GuzzleHttp\Exception\RequestException;
 
 class Update extends Job
 {
@@ -37,6 +36,7 @@ class Update extends Job
                 new ArtisanHostDeploy($host),
                 new PowerOn($host),
                 new CheckOnline($host),
+                new CheckProfileApplied($host),
             ],
         ])->dispatch();
     }

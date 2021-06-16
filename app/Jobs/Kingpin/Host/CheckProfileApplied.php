@@ -28,19 +28,20 @@ class CheckProfileApplied extends Job
         $availabilityZone = $this->model->hostGroup->availabilityZone;
         $hostGroup = $this->model->hostGroup;
 
-        // Get the host spec from Conjurer
-        $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id .'/host/' . $this->model->id
-        );
-        $response = json_decode($response->getBody()->getContents());
-        $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
-
-        Log::debug('MAC address: ' . $macAddress);
-
-        $response = $availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $hostGroup->vpc_id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress
-        );
-        $response = json_decode($response->getBody()->getContents());
+        try {
+            $response = $availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $hostGroup->vpc_id . '/hostgroup/' . $hostGroup->id . '/host/' . $this->model->mac_address
+            );
+            $response = json_decode($response->getBody()->getContents());
+        } catch (RequestException $exception) {
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() == 404) {
+                Log::warning(
+                    'Host ' . $this->model->id . ' not found, retrying in ' . $this->backoff . ' seconds'
+                );
+                return $this->release($this->backoff);
+            }
+            throw $exception;
+        }
         if (!$response->networkProfileApplied) {
             Log::info('Host ' . $this->model->id . ' found. Waiting for network profile to be applied...');
             return $this->release($this->backoff);
