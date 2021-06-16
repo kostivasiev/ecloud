@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVpnEndpointVpnServiceTable extends Migration
+class CreateVpnServiceVpnEndpointTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateVpnEndpointVpnServiceTable extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->create('vpn_endpoint_vpn_service', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('vpn_service_vpn_endpoint', function (Blueprint $table) {
             $table->uuid('vpn_endpoint_id')->index();
             $table->uuid('vpn_service_id')->index();
         });
@@ -26,6 +26,6 @@ class CreateVpnEndpointVpnServiceTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->dropIfExists('vpn_endpoint_vpn_service');
+        Schema::connection('ecloud')->dropIfExists('vpn_service_vpn_endpoint');
     }
 }
