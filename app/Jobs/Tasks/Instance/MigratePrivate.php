@@ -4,6 +4,7 @@ namespace App\Jobs\Tasks\Instance;
 
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
+use App\Jobs\Instance\EndPublicBilling;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Instance\MoveToPrivateHostGroup;
 use App\Models\V2\HostGroup;
@@ -35,6 +36,7 @@ class MigratePrivate extends Job
         $this->updateTaskBatch([
             [
                 new MoveToPrivateHostGroup($this->model, $newHostGroup->id),
+                new EndPublicBilling($this->model),
             ]
         ], function () use ($task, $newHostGroup) {
             $task->resource->hostGroup()->associate($newHostGroup);
