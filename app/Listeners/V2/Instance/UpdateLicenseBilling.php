@@ -3,7 +3,6 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Task\Updated;
-use App\Jobs\Instance\StartWindowsBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Resource;
@@ -49,6 +48,27 @@ class UpdateLicenseBilling
             }
             $currentActiveMetric->setEndDate();
         }
-        dispatch(new StartWindowsBilling($instance));
+
+        $billingMetric = app()->make(BillingMetric::class);
+        $billingMetric->resource_id = $instance->id;
+        $billingMetric->vpc_id = $instance->vpc->id;
+        $billingMetric->reseller_id = $instance->vpc->reseller_id;
+        $billingMetric->key = 'license.windows';
+        $billingMetric->value = $instance->vcpu_cores;
+        $billingMetric->start = Carbon::now();
+
+        $product = $instance->availabilityZone->products()
+            ->where('product_name', $instance->availabilityZone->id . ': windows-os-license')
+            ->first();
+        if (empty($product)) {
+            Log::error(
+                'Failed to load \'windows\' billing product for availability zone ' . $instance->availabilityZone->id
+            );
+        } else {
+            $billingMetric->category = $product->category;
+            $billingMetric->price = $product->getPrice($instance->vpc->reseller_id);
+        }
+
+        $billingMetric->save();
     }
 }
