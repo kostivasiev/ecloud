@@ -40,7 +40,7 @@ class MigratePrivateTest extends TestCase
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 1;
+            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 2;
         });
     }
 
@@ -77,7 +77,7 @@ class MigratePrivateTest extends TestCase
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 1;
+            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 2;
         });
     }
 
@@ -119,7 +119,7 @@ class MigratePrivateTest extends TestCase
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 1;
+            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 2;
         });
     }
 }
