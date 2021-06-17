@@ -23,6 +23,10 @@ class StartVcpuBilling extends Job
     public function handle()
     {
         $instance = $this->model;
+        if (!empty($instance->host_group_id)) {
+            Log::warning(get_class($this) . ': Instance ' . $this->model->id . ' is in the host group ' . $instance->host_group_id . ', nothing to do');
+            return;
+        }
 
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->resource_id = $instance->id;
