@@ -9,7 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class StartWindowsBilling extends Job
+class StartLicenseBilling extends Job
 {
     use Batchable, LoggableModelJob;
 

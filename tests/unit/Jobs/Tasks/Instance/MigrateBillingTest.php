@@ -4,7 +4,7 @@ namespace Tests\unit\Jobs\Tasks\Instance;
 use App\Jobs\Instance\EndPublicBilling;
 use App\Jobs\Instance\StartRamBilling;
 use App\Jobs\Instance\StartVcpuBilling;
-use App\Jobs\Instance\StartWindowsBilling;
+use App\Jobs\Instance\StartLicenseBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use Carbon\Carbon;
@@ -71,7 +71,7 @@ class MigrateBillingTest extends TestCase
 
         (new StartRamBilling($this->instance()))->handle();
         (new StartVcpuBilling($this->instance()))->handle();
-        (new StartWindowsBilling($this->instance()))->handle();
+        (new StartLicenseBilling($this->instance()))->handle();
 
         $this->instance()->refresh();
 
