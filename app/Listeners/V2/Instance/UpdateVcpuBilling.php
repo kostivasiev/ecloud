@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Task\Updated;
+use App\Jobs\Instance\StartVcpuBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Sync;
@@ -42,25 +43,6 @@ class UpdateVcpuBilling
             }
             $currentActiveMetric->setEndDate($time);
         }
-
-        $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $instance->id;
-        $billingMetric->vpc_id = $instance->vpc->id;
-        $billingMetric->reseller_id = $instance->vpc->reseller_id;
-        $billingMetric->key = 'vcpu.count';
-        $billingMetric->value = $instance->vcpu_cores;
-        $billingMetric->start = $time;
-
-        $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'vcpu');
-        if (empty($product)) {
-            Log::error(
-                'Failed to load \'vcpu\' billing product for availability zone ' . $instance->availabilityZone->id
-            );
-        } else {
-            $billingMetric->category = $product->category;
-            $billingMetric->price = $product->getPrice($instance->vpc->reseller_id);
-        }
-
-        $billingMetric->save();
+        dispatch(new StartVcpuBilling($instance));
     }
 }
