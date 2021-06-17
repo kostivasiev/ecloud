@@ -2,8 +2,6 @@
 
 namespace App\Jobs\Tasks\Instance;
 
-use App\Jobs\Instance\PowerOff;
-use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\EndPublicBilling;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Instance\MoveToPrivateHostGroup;
