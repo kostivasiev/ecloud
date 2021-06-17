@@ -12,8 +12,7 @@ Content-Type:  application/json
     "requires_floating_ip": true,
     "network_id": "{{dev_network_id}}",
     "volume_capacity": 30,
-    "volume_iops": 600,
-    "host_group_id": "{{dev_host_group_id}}"
+    "volume_iops": 600
 }
 
 > {%
@@ -88,6 +87,12 @@ Content-Type:  application/json
 
 ###
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### Check credentials
+GET https://{{host}}/{{version}}/credentials?resource_id:eq={{instance_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
