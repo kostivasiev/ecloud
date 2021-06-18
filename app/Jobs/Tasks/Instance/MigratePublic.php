@@ -2,9 +2,6 @@
 
 namespace App\Jobs\Tasks\Instance;
 
-use App\Jobs\Instance\StartRamBilling;
-use App\Jobs\Instance\StartVcpuBilling;
-use App\Jobs\Instance\StartLicenseBilling;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Instance\MoveToPublicHostGroup;
 use App\Models\V2\Instance;
@@ -33,13 +30,10 @@ class MigratePublic extends Job
         $this->updateTaskBatch([
             [
                 new MoveToPublicHostGroup($this->model),
-                new StartRamBilling($this->model),
-                new StartVcpuBilling($this->model),
-                new StartLicenseBilling($this->model),
             ]
         ], function () use ($task) {
             $task->resource->hostGroup()->dissociate();
-            $task->resource->saveQuietly();
+            $task->resource->save();
         })->dispatch();
     }
 }
