@@ -144,7 +144,6 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
         $floatingIp->withTaskLock(function ($floatingIp) {
-
             if ($floatingIp->sourceNat()->exists()) {
                 $floatingIp->sourceNat->delete();
             }

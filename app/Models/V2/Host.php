@@ -46,6 +46,7 @@ class Host extends Model implements Filterable, Sortable, ResellerScopeable
             'id',
             'name',
             'host_group_id',
+            'mac_address',
         ]);
 
         $this->dispatchesEvents = [

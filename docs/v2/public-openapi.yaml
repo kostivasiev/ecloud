@@ -195,6 +195,8 @@ paths:
     $ref: 'resources/Instance/tasks-collection.yaml'
   '/ecloud/v2/instances/{instanceId}/create-image':
     $ref: 'resources/Instance/create-image.yaml'
+  '/ecloud/v2/instances/{instanceId}/migrate':
+    $ref: 'resources/Instance/migrate.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':

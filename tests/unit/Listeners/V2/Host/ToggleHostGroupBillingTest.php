@@ -106,16 +106,13 @@ class ToggleHostGroupBillingTest extends TestCase
         $this->host();
 
         // Create a 2nd host
-        $this->conjurerServiceMock()->expects('get')
-            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test-2'])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-        factory(\App\Models\V2\Host::class)->create([
-            'id' => 'h-test-2',
-            'name' => 'h-test-2',
-            'host_group_id' => $this->hostGroup()->id,
-        ]);
+        $newHost = Model::withoutEvents(function() {
+            return factory(\App\Models\V2\Host::class)->create([
+                'id' => 'h-test-2',
+                'name' => 'h-test-2',
+                'host_group_id' => $this->hostGroup()->id,
+            ]);
+        });
 
         $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');
         $this->assertNull($metric);
