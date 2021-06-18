@@ -30,20 +30,6 @@ class DeleteImageTest extends TestCase
         $this->assertNull($this->job->handle());
     }
 
-    public function testNoInstancesSkip()
-    {
-        // Attach availability zone to image
-        $this->image()->availabilityZones()->sync([$this->availabilityZone()->id]);
-        $this->image()->saveQuietly();
-        Log::shouldReceive('info')->zeroOrMoreTimes();
-        Log::shouldReceive('warning')->with(\Mockery::on(function ($arg) {
-            return stripos($arg, 'No Instances found for Image img-test, skipping') !== false;
-        }));
-        // The job should not fail
-        $this->job->shouldNotReceive('fail');
-        $this->assertNull($this->job->handle());
-    }
-
     public function testDeleteImageDoesNotExist()
     {
         // Attach availability zone to image
