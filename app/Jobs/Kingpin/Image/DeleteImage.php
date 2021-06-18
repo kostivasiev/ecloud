@@ -29,16 +29,9 @@ class DeleteImage extends Job
             return;
         }
         $availabilityZone = $image->availabilityZones()->first();
-        if ($image->instances()->count() <= 0) {
-            Log::warning(
-                get_class($this) . ' : No Instances found for Image ' . $image->id . ', skipping'
-            );
-            return;
-        }
-        $vpc = $image->instances()->first()->vpc;
         try {
             $availabilityZone->kingpinService()->delete(
-                '/api/v2/vpc/' . $vpc->id . '/template/' . $image->id
+                '/api/v2/vpc/' . $image->vpc_id . '/template/' . $image->id
             );
         } catch (\Exception $exception) {
             Log::info('Exception Code: ' . $exception->getCode());
