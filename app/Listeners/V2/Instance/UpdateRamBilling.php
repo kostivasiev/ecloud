@@ -32,6 +32,11 @@ class UpdateRamBilling
             return;
         }
 
+        if (!empty($instance->host_group_id)) {
+            Log::warning(get_class($this) . ': Instance ' . $this->model->id . ' is in the host group ' . $instance->host_group_id . ', nothing to do');
+            return;
+        }
+
         $currentActiveMetrics = BillingMetric::where('resource_id', $instance->id)
             ->whereNull('end')
             ->whereIn('key', ['ram.capacity', 'ram.capacity.high'])

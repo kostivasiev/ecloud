@@ -41,6 +41,11 @@ class UpdateLicenseBilling
             return;
         }
 
+        if (!empty($instance->host_group_id)) {
+            Log::warning(get_class($this) . ': Instance ' . $this->model->id . ' is in the host group ' . $instance->host_group_id . ', nothing to do');
+            return;
+        }
+
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.windows');
         if (!empty($currentActiveMetric)) {
             if ($currentActiveMetric->value == $instance->vcpu_cores) {
