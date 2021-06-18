@@ -9,10 +9,10 @@ use App\Jobs\Conjurer\Host\CreateProfile;
 use App\Jobs\Conjurer\Host\PowerOn;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Host\CheckOnline;
+use App\Jobs\Kingpin\Host\CheckProfileApplied;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
-use GuzzleHttp\Exception\RequestException;
 
 class Update extends Job
 {
@@ -28,7 +28,6 @@ class Update extends Job
     public function handle()
     {
         $host = $this->task->resource;
-
         $this->updateTaskBatch([
             [
                 new CreateLanPolicy($host),
@@ -37,6 +36,7 @@ class Update extends Job
                 new ArtisanHostDeploy($host),
                 new PowerOn($host),
                 new CheckOnline($host),
+                new CheckProfileApplied($host),
             ],
         ])->dispatch();
     }

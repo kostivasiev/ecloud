@@ -9,7 +9,7 @@ X-Reseller-Id: 1
 
 {
     "name": "test host",
-    "host_group_id" : "hg-2d3280ab"
+    "host_group_id" : "{{dev_host_group_id}}"
 }
 
 > {%
