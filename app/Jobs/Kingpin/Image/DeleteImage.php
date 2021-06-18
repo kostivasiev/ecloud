@@ -28,21 +28,23 @@ class DeleteImage extends Job
             );
             return;
         }
-        $availabilityZone = $image->availabilityZones()->first();
-        try {
-            $availabilityZone->kingpinService()->delete(
-                '/api/v2/vpc/' . $image->vpc_id . '/template/' . $image->id
-            );
-        } catch (\Exception $exception) {
-            Log::info('Exception Code: ' . $exception->getCode());
-            if ($exception->getCode() !== 404) {
-                $this->fail($exception);
+
+        $image->availabilityZones()->each(function ($availabilityZone) use ($image) {
+            try {
+                $availabilityZone->kingpinService()->delete(
+                    '/api/v2/vpc/' . $image->vpc_id . '/template/' . $image->id
+                );
+            } catch (\Exception $exception) {
+                Log::info('Exception Code: ' . $exception->getCode());
+                if ($exception->getCode() !== 404) {
+                    $this->fail($exception);
+                    return;
+                }
+                Log::warning(
+                    get_class($this) . ' : Failed to delete Image ' . $image->id . ' in az:' . $availabilityZone->id . '. Image was not found, skipping'
+                );
                 return;
             }
-            Log::warning(
-                get_class($this) . ' : Failed to delete Image ' . $image->id . '. Image was not found, skipping'
-            );
-            return;
-        }
+        });
     }
 }
