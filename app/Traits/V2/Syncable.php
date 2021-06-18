@@ -64,9 +64,6 @@ trait Syncable
     public function syncSave($data = null)
     {
         return $this->withTaskLock(function ($model) use ($data) {
-            if (!$model->canCreateTask()) {
-                throw new TaskException();
-            }
             $model->save();
             return $this->createSync(Sync::TYPE_UPDATE, $data);
         });
@@ -75,9 +72,6 @@ trait Syncable
     public function syncDelete($data = null)
     {
         return $this->withTaskLock(function ($model) use ($data) {
-            if (!$model->canCreateTask()) {
-                throw new TaskException();
-            }
             return $this->createSync(Sync::TYPE_DELETE, $data);
         });
     }

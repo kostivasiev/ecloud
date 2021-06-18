@@ -44,9 +44,6 @@ class NetworkRule extends Model implements Filterable, Sortable
             'sequence' => 'integer',
             'enabled' => 'boolean',
         ];
-        $this->dispatchesEvents = [
-            'deleted' => Deleted::class,
-        ];
         parent::__construct($attributes);
     }
 

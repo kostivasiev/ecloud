@@ -39,7 +39,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### show
-GET https://{{host}}/{{version}}/host-groups/{{host_group_id}}
+GET https://{{host}}/{{version}}/host-groups/h-a9241086
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0

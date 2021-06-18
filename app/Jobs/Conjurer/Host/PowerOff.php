@@ -24,7 +24,7 @@ class PowerOff extends Job
     {
         $host = $this->model;
         $hostGroup = $host->hostGroup;
-        $availabilityZone = $host->hostGroup->availabilityZone;
+        $availabilityZone = $hostGroup->availabilityZone;
 
         // Check Exists
         try {
@@ -32,24 +32,15 @@ class PowerOff extends Job
                 '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $host->id
             );
         } catch (RequestException $exception) {
-            if ($exception->getCode() !== 404) {
-                $this->fail($exception);
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() == 404) {
+                Log::info("Host doesn't exist, skipping");
+                return;
             }
-            Log::warning(get_class($this) . ' : Host ' . $host->id . ' was not found, skipping.');
-            return;
+            throw $exception;
         }
 
-        // Turn Power Off
-        try {
-            $availabilityZone->conjurerService()->delete(
-                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $host->id . '/power'
-            );
-        } catch (RequestException $exception) {
-            Log::warning(get_class($this) . ' : Host ' . $host->id . ' was not powered off.');
-            if ($exception->getCode() !== 404) {
-                $this->fail($exception);
-            }
-            return;
-        }
+        $availabilityZone->conjurerService()->delete(
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $host->id . '/power'
+        );
     }
 }
