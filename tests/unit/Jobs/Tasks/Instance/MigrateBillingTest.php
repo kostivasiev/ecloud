@@ -2,17 +2,16 @@
 namespace Tests\unit\Jobs\Tasks\Instance;
 
 use App\Jobs\Instance\EndPublicBilling;
-use App\Jobs\Instance\StartRamBilling;
-use App\Jobs\Instance\StartVcpuBilling;
-use App\Jobs\Instance\StartLicenseBilling;
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Instance;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Bus;
+use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 
 class MigrateBillingTest extends TestCase
 {
+    private Task $task;
 
     public function setUp(): void
     {
@@ -67,12 +66,23 @@ class MigrateBillingTest extends TestCase
     {
         $this->instance()->host_group_id = '';
         $this->instance()->platform = 'Windows';
-        $this->instance()->saveQuietly();
 
-        (new StartRamBilling($this->instance()))->handle();
-        (new StartVcpuBilling($this->instance()))->handle();
-        (new StartLicenseBilling($this->instance()))->handle();
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE
+            ]);
+            $this->task->resource()->associate($this->instance());
+        });
 
+        // Check that the ram billing metric is added
+        $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
+        $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
+        $updateVcpuBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
+        $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
+        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
+        $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $this->instance()->refresh();
 
         $metrics = $this->instance()->billingMetrics()->get()->toArray();
