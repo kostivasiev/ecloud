@@ -504,7 +504,7 @@ class InstanceController extends BaseController
                 'name'
             ]));
         $image->visibility = 'private';
-        $image->reseller_id = Auth::user()->resellerId();
+        $image->vpc_id = $instance->vpc_id;
         $image->save();
 
         $instance->image->imageMetadata->each(function ($imageMetadata) use ($image) {

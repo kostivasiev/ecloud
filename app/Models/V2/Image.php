@@ -49,6 +49,7 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
         $this->fillable([
             'id',
             'name',
+            'vpc_id',
             'reseller_id',
             'logo_uri',
             'documentation_uri',
@@ -145,6 +146,7 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('logo_uri', Filter::$stringDefaults),
             $factory->create('documentation_uri', Filter::$stringDefaults),
@@ -171,6 +173,7 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('vpc_id'),
             $factory->create('reseller_id'),
             $factory->create('logo_uri'),
             $factory->create('documentation_uri'),
@@ -203,6 +206,7 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
         return [
             'id' => 'id',
             'name' => 'name',
+            'vpc_id' => 'vpc_id',
             'reseller_id' => 'reseller_id',
             'logo_uri' => 'logo_uri',
             'documentation_uri' => 'documentation_uri',
