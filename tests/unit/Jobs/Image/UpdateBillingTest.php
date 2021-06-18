@@ -102,7 +102,7 @@ class UpdateBillingTest extends TestCase
             'resource_id' => $this->image->id,
             'vpc_id' => $this->vpc()->id,
             'reseller_id' => '1',
-            'key' => 'private.image',
+            'key' => 'image.private',
             'value' => '20',
             'start' => Carbon::now(),
             'category' => 'Storage',
