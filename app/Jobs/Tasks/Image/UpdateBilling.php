@@ -42,7 +42,7 @@ class UpdateBilling extends Job
         $volumeCapacity = (int)$metaData->value;
 
         $currentActiveMetric = BillingMetric::where('resource_id', $image->id)
-            ->where('key', '=', 'private.image')
+            ->where('key', '=', 'image.private')
             ->whereNull('end')
             ->first();
 
@@ -60,7 +60,7 @@ class UpdateBilling extends Job
             'resource_id' => $image->id,
             'vpc_id' => $this->instance->vpc->id,
             'reseller_id' => $this->instance->vpc->reseller_id,
-            'key' => 'private.image',
+            'key' => 'image.private',
             'value' => $volumeCapacity,
             'start' => $time,
         ]);
