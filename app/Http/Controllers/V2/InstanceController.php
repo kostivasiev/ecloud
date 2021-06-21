@@ -504,6 +504,8 @@ class InstanceController extends BaseController
             ['image_id' => $image->id, 'key' => 'ukfast.spec.volume.min', 'value' => $volumeCapacity]
         );
 
+        $image->availabilityZones()->sync($instance->availabilityZone);
+
         $task = $instance->createTaskWithLock(
             'image_create',
             \App\Jobs\Tasks\Instance\CreateImage::class,
