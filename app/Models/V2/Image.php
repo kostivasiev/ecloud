@@ -113,16 +113,13 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
         $query->where('public', true)->where('active', true);
 
         $query->where(function ($query) use ($user) {
-            $query->where('reseller_id', $user->resellerId());
+            $query->whereHas('vpc', function ($query) use ($user) {
+                $query->where('reseller_id', $user->resellerId());
+            });
             $query->orWhere('visibility', Image::VISIBILITY_PUBLIC);
         });
 
         return $query;
-    }
-
-    public function isOwner(): bool
-    {
-        return $this->reseller_id == Auth::user()->resellerId();
     }
 
     /**
@@ -147,7 +144,6 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('logo_uri', Filter::$stringDefaults),
             $factory->create('documentation_uri', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),
@@ -174,7 +170,6 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
-            $factory->create('reseller_id'),
             $factory->create('logo_uri'),
             $factory->create('documentation_uri'),
             $factory->create('description'),
@@ -207,7 +202,6 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
             'id' => 'id',
             'name' => 'name',
             'vpc_id' => 'vpc_id',
-            'reseller_id' => 'reseller_id',
             'logo_uri' => 'logo_uri',
             'documentation_uri' => 'documentation_uri',
             'description' => 'description',

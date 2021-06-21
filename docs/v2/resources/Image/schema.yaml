@@ -15,6 +15,11 @@ properties:
     type: string
     example: 'https://example.com/docs'
     readOnly: true
+  vpc_id:
+    type: string
+    description: ID of the VPC that the image is assigned to for private images
+    example: 'vpc-abc123'
+    readOnly: true
   description:
     type: string
     example: 'Linux operating system'

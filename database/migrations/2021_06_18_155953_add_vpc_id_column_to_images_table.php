@@ -16,6 +16,10 @@ class AddVpcIdColumnToImagesTable extends Migration
         Schema::connection('ecloud')->table('images', function (Blueprint $table) {
             $table->uuid('vpc_id')->after('name')->nullable();
         });
+
+        Schema::connection('ecloud')->table('images', function (Blueprint $table) {
+            $table->dropColumn(['reseller_id']);
+        });
     }
 
     /**
@@ -25,6 +29,10 @@ class AddVpcIdColumnToImagesTable extends Migration
      */
     public function down()
     {
+        Schema::connection('ecloud')->table('images', function (Blueprint $table) {
+            $table->bigInteger('reseller_id')->nullable();
+        });
+
         Schema::connection('ecloud')->table('images', function (Blueprint $table) {
             $table->dropColumn(['vpc_id']);
         });

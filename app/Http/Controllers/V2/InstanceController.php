@@ -14,6 +14,7 @@ use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
+use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
@@ -486,7 +487,7 @@ class InstanceController extends BaseController
             ->fill($request->only([
                 'name'
             ]));
-        $image->visibility = 'private';
+        $image->visibility = Image::VISIBILITY_PRIVATE;
         $image->vpc_id = $instance->vpc_id;
         $image->save();
 
