@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\V2\TaskException;
+use App\Http\Requests\V2\Instance\CreateImageRequest;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
@@ -14,7 +14,8 @@ use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
-use App\Models\V2\HostGroup;
+use App\Models\V2\Image;
+use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
@@ -470,11 +471,47 @@ class InstanceController extends BaseController
         ));
     }
 
-    public function createImage(Request $request, $instanceId)
+    public function createImage(CreateImageRequest $request, $instanceId)
     {
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
 
-        // TODO - create an image from an instance
-        return response('', 202);
+        if (!$instance->volumes()->count()) {
+            return response()->json([
+                'title' => 'Validation Error',
+                'detail' => 'Cannot create an image of an Instance with no attached volumes',
+                'status' => 422,
+            ], 422);
+        }
+
+        $image = $instance->image->replicate(['vm_template', 'script_template'])
+            ->fill($request->only([
+                'name'
+            ]));
+        $image->visibility = Image::VISIBILITY_PRIVATE;
+        $image->vpc_id = $instance->vpc_id;
+        $image->save();
+
+        $instance->image->imageMetadata->each(function ($imageMetadata) use ($image) {
+            $meta = $imageMetadata->replicate();
+            $meta->image_id = $image->id;
+            $meta->save();
+        });
+
+        $volumeCapacity = $instance->volumes->where('os_volume', '=', true)->first()->capacity;
+
+        ImageMetadata::updateOrCreate(
+            ['image_id' => $image->id, 'key' => 'ukfast.spec.volume.min'],
+            ['image_id' => $image->id, 'key' => 'ukfast.spec.volume.min', 'value' => $volumeCapacity]
+        );
+
+        $image->availabilityZones()->sync($instance->availabilityZone);
+
+        $task = $instance->createTaskWithLock(
+            'image_create',
+            \App\Jobs\Tasks\Instance\CreateImage::class,
+            ['image_id' => $image->id]
+        );
+        return $this->responseIdMeta($request, $image->id, 202, $task->id);
     }
 
     public function migrate(MigrateRequest $request, $instanceId)
