@@ -50,7 +50,6 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
             'id',
             'name',
             'vpc_id',
-            'reseller_id',
             'logo_uri',
             'documentation_uri',
             'description',
