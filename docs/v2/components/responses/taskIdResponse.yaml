@@ -12,4 +12,7 @@ content:
               example : task-abc123xyz
         meta:
           type: object
-
+          properties:
+            location:
+              type: string
+              example: 'https://api.ukfast.io/ecloud/v2/tasks/task-abc123'

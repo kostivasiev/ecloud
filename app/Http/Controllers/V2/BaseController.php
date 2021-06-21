@@ -71,7 +71,9 @@ class BaseController extends Controller
                 'data' => [
                     'task_id' => $taskId
                 ],
-                'meta' => (object)[],
+                'meta' => [
+                    'location' => env('APP_URL') . '/tasks/' . $taskId,
+                ],
             ],
             $statusCode
         );

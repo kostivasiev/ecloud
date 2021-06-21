@@ -511,7 +511,8 @@ class InstanceController extends BaseController
             \App\Jobs\Tasks\Instance\CreateImage::class,
             ['image_id' => $image->id]
         );
-        return $this->responseIdMeta($request, $image->id, 202, $task->id);
+
+        return $this->responseTaskId($task->id);
     }
 
     public function migrate(MigrateRequest $request, $instanceId)

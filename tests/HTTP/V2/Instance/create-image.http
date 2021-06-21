@@ -35,7 +35,7 @@ client.global.set('instance_id', response.body.data.id);
 %}
 
 ### Create an Image for it
-POST https://{{host}}/{{version}}/instances/{{instance_id}}/create-image
+POST https://{{host}}/{{version}}/instances/i-c9e30b96/create-image
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
