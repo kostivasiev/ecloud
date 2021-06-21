@@ -42,7 +42,13 @@ class UpdateLicenseBilling
         }
 
         if (!empty($instance->host_group_id)) {
-            Log::warning(get_class($this) . ': Instance ' . $this->model->id . ' is in the host group ' . $instance->host_group_id . ', nothing to do');
+            $instance->billingMetrics()
+                ->where('key', '=', 'license.windows')
+                ->each(function ($billingMetric) use ($instance) {
+                    $billingMetric->setEndDate();
+                    Log::debug('End billing of `' . $billingMetric->key . '` for Instance ' . $instance->id);
+                });
+            Log::warning(get_class($this) . ': Instance ' . $instance->id . ' is in the host group ' . $instance->host_group_id . ', nothing to do');
             return;
         }
 

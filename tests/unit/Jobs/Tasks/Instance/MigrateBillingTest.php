@@ -50,8 +50,26 @@ class MigrateBillingTest extends TestCase
             'start' => Carbon::now(),
         ]);
 
-        $job = new EndPublicBilling($this->instance(), 'hg-aaabbbccc');
-        $job->handle();
+        $this->instance()->host_group_id = 'hg-aaabbbccc';
+        $this->instance()->platform = 'Windows';
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE
+            ]);
+            $this->task->resource()->associate($this->instance());
+        });
+
+        // Check that the ram billing metric is added
+        $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
+        $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
+        $updateVcpuBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
+        $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
+        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
+        $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
+        $this->instance()->refresh();
 
         $originalVcpuMetric->refresh();
         $originalRamMetric->refresh();

@@ -34,11 +34,10 @@ class MigratePrivate extends Job
         $this->updateTaskBatch([
             [
                 new MoveToPrivateHostGroup($this->model, $newHostGroup->id),
-                new EndPublicBilling($this->model, $newHostGroup->id),
             ]
         ], function () use ($task, $newHostGroup) {
             $task->resource->hostGroup()->associate($newHostGroup);
-            $task->resource->saveQuietly();
+            $task->resource->save();
         })->dispatch();
     }
 }
