@@ -76,7 +76,7 @@ class CreateProfile extends Job
             }
 
             $this->model->mac_address = $macAddress;
-            $this->model->saveQuietly();
+            $this->model->save();
         } finally {
             $lock->release();
         }

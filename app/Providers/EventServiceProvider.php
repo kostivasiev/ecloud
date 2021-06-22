@@ -92,29 +92,11 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Host
-        \App\Events\V2\Host\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Host\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Host\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\Host\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // HostGroup
-        \App\Events\V2\HostGroup\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\HostGroup\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\HostGroup\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\HostGroup\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],

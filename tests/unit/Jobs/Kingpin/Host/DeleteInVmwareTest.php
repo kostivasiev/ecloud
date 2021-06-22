@@ -24,27 +24,26 @@ class DeleteInVmwareTest extends TestCase
     {
         parent::setUp();
 
-        $this->host = Host::withoutEvents(function () {
-            $hostGroup = factory(HostGroup::class)->create([
-                'id' => 'hg-test',
-                'name' => 'hg-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-                'host_spec_id' => $this->hostSpec()->id,
-            ]);
-            return factory(Host::class)->create([
-                'id' => 'h-test',
-                'name' => 'h-test',
-                'host_group_id' => $hostGroup->id,
-                'mac_address' => 'aa:bb:cc:dd:ee:ff',
-            ]);
-        });
+        $hostGroup = factory(HostGroup::class)->create([
+            'id' => 'hg-test',
+            'name' => 'hg-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'host_spec_id' => $this->hostSpec()->id,
+        ]);
+
+        $this->host = factory(Host::class)->create([
+            'id' => 'h-test',
+            'name' => 'h-test',
+            'host_group_id' => $hostGroup->id,
+            'mac_address' => 'aa:bb:cc:dd:ee:ff',
+        ]);
     }
 
     public function testSkipIfMacAddressNotSet()
     {
         $this->host->mac_address = '';
-        $this->host->saveQuietly();
+        $this->host->save();
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
