@@ -37,6 +37,22 @@ class ToggleHostGroupBillingTest extends TestCase
             'product_price_product_id' => $this->product->id,
             'product_price_sale_price' => 0.0000115314,
         ]);
+
+        $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+        $mockAdminCustomerClient = \Mockery::mock(\UKFast\Admin\Account\AdminCustomerClient::class)->makePartial();
+        $mockAdminCustomerClient->shouldReceive('getById')->andReturn(
+            new \UKFast\Admin\Account\Entities\Customer(
+                [
+                    'accountStatus' => ''
+                ]
+            )
+        );
+        $mockAccountAdminClient->shouldReceive('customers')->andReturn(
+            $mockAdminCustomerClient
+        );
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
+            return $mockAccountAdminClient;
+        });
     }
 
     public function testCreatingHostEndsHostGroupBilling()
