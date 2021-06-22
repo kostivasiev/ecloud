@@ -27,6 +27,7 @@ use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Support\Sync;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -483,12 +484,17 @@ class InstanceController extends BaseController
             ], 422);
         }
 
-        $image = $instance->image->replicate(['vm_template', 'script_template'])
+        $image = $instance->image->replicate(['vm_template', 'script_template', 'logo_uri', 'description'])
             ->fill($request->only([
                 'name'
             ]));
         $image->visibility = Image::VISIBILITY_PRIVATE;
         $image->vpc_id = $instance->vpc_id;
+        $image->description = $request->input(
+            'description',
+            "Image taken from instance $instance->id on " . Carbon::now(new \DateTimeZone(config('app.timezone')))->toDayDateTimeString()
+        );
+
         $image->save();
 
         $instance->image->imageMetadata->each(function ($imageMetadata) use ($image) {
@@ -512,7 +518,19 @@ class InstanceController extends BaseController
             ['image_id' => $image->id]
         );
 
-        return $this->responseTaskId($task->id);
+        return response()->json(
+            [
+                'data' => [
+                    'id' => $image->id,
+                    'task_id' => $task->id
+                ],
+                'meta' => [
+                    'location' => config('app.url') . '/images/' . $image->id,
+                    'task_location' => config('app.url') . '/tasks/' . $task->id
+                ],
+            ],
+            202
+        );
     }
 
     public function migrate(MigrateRequest $request, $instanceId)

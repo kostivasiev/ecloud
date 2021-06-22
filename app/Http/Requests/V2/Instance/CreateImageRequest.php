@@ -19,6 +19,11 @@ class CreateImageRequest extends FormRequest
                 'required',
                 'string'
             ],
+            'description' => [
+                'sometimes',
+                'nullable',
+                'string'
+            ],
         ];
     }
 }
