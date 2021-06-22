@@ -8,7 +8,6 @@ use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -54,7 +53,7 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
-        \Illuminate\Support\Facades\Event::fake([Created::class]);
+        Event::fake([Created::class]);
 
         $data = [
             'name' => 'h-test',
@@ -94,7 +93,7 @@ class CrudTest extends TestCase
 
     public function testUpdate()
     {
-        \Illuminate\Support\Facades\Event::fake([Created::class]);
+        Event::fake([Created::class]);
         $this->host();
 
         $this->patch('/v2/hosts/h-test', [
@@ -111,7 +110,7 @@ class CrudTest extends TestCase
 
     public function testDestroy()
     {
-        \Illuminate\Support\Facades\Event::fake([Created::class]);
+        Event::fake([Created::class]);
         $this->host();
 
         $this->delete('/v2/hosts/h-test')

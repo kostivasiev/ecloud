@@ -2,14 +2,12 @@
 
 namespace Tests\V2\HostGroup;
 
-use App\Events\Event;
 use App\Events\V2\Task\Created;
 use App\Models\V2\Host;
-use App\Models\V2\HostGroup;
+use Illuminate\Support\Facades\Event;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -54,7 +52,7 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
-        \Illuminate\Support\Facades\Event::fake([Created::class]);
+        Event::fake([Created::class]);
 
         $data = [
             'name' => 'hg-test',
@@ -122,7 +120,7 @@ class CrudTest extends TestCase
 
     public function testStoreWithNoWindowsEnabledFlag()
     {
-        \Illuminate\Support\Facades\Event::fake([Created::class]);
+        Event::fake([Created::class]);
 
         $data = [
             'name' => 'hg-test',
@@ -139,7 +137,7 @@ class CrudTest extends TestCase
 
     public function testStoreWitFalseWindowsEnabledFlag()
     {
-        \Illuminate\Support\Facades\Event::fake([Created::class]);
+        Event::fake([Created::class]);
 
         $data = [
             'name' => 'hg-test',
@@ -157,7 +155,7 @@ class CrudTest extends TestCase
 
     public function testUpdate()
     {
-        \Illuminate\Support\Facades\Event::fake([Created::class]);
+        Event::fake([Created::class]);
         $this->hostGroup();
 
         $this->patch('/v2/host-groups/hg-test', [
@@ -174,7 +172,7 @@ class CrudTest extends TestCase
 
     public function testUpdateCantChangeHostSpecId()
     {
-        \Illuminate\Support\Facades\Event::fake([Created::class]);
+        Event::fake([Created::class]);
         $this->hostGroup();
 
         $this->patch('/v2/host-groups/hg-test', [
@@ -191,7 +189,7 @@ class CrudTest extends TestCase
 
     public function testDestroy()
     {
-        \Illuminate\Support\Facades\Event::fake([Created::class]);
+        Event::fake([Created::class]);
         $this->hostGroup();
 
         $this->delete('/v2/host-groups/hg-test')
