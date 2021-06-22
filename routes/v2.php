@@ -443,11 +443,11 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Builder Configurations */
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('builder-configurations', 'BuilderConfigurationController@index');
-        $router->get('builder-configurations/{configurationId}', 'BuilderConfigurationController@show');
-        $router->get('builder-configurations/{configurationId}/data', 'BuilderConfigurationController@data');
-        $router->post('builder-configurations', 'BuilderConfigurationController@store');
-        $router->patch('builder-configurations/{configurationId}', 'BuilderConfigurationController@update');
-        $router->delete('builder-configurations/{configurationId}', 'BuilderConfigurationController@destroy');
+        $router->get('orchestrator-configs', 'OrchestratorConfigController@index');
+        $router->get('orchestrator-configs/{configId}', 'OrchestratorConfigController@show');
+        $router->get('orchestrator-configs/{configId}/data', 'OrchestratorConfigController@data');
+        $router->post('orchestrator-configs', 'OrchestratorConfigController@store');
+        $router->patch('orchestrator-configs/{configId}', 'OrchestratorConfigController@update');
+        $router->delete('orchestrator-configs/{configId}', 'OrchestratorConfigController@destroy');
     });
 });

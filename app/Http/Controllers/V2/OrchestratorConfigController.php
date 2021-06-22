@@ -14,7 +14,7 @@ use UKFast\DB\Ditto\QueryTransformer;
  * Class BuilderConfigurationController
  * @package App\Http\Controllers\V2
  */
-class BuilderConfigurationController extends BaseController
+class OrchestratorConfigController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
