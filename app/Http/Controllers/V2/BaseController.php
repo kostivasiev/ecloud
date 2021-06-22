@@ -51,7 +51,6 @@ class BaseController extends Controller
 
         if ($taskId) {
             $data['task_id'] = $taskId;
-            $location = config('app.url') . '/tasks/' . $taskId;
         }
 
         return response()->json(
