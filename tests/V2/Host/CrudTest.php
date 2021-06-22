@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Host;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\Host;
 use App\Models\V2\Task;
 use App\Support\Sync;
@@ -53,7 +54,7 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
-        Event::fake();
+        \Illuminate\Support\Facades\Event::fake([Created::class]);
 
         $data = [
             'name' => 'h-test',
@@ -66,8 +67,6 @@ class CrudTest extends TestCase
 
     public function testStoreWithFailedHostGroup()
     {
-        Event::fake();
-
         // Force failure
         Model::withoutEvents(function () {
             $model = new Task([
@@ -95,8 +94,8 @@ class CrudTest extends TestCase
 
     public function testUpdate()
     {
+        \Illuminate\Support\Facades\Event::fake([Created::class]);
         $this->host();
-        Event::fake();
 
         $this->patch('/v2/hosts/h-test', [
             'name' => 'new name',
@@ -112,12 +111,8 @@ class CrudTest extends TestCase
 
     public function testDestroy()
     {
-        /**
-         * Switch out the seeInDatabase/notSeeInDatabase with assertSoftDeleted(...) when we switch to Laravel
-         * @see https://laravel.com/docs/5.8/database-testing#available-assertions
-         */
+        \Illuminate\Support\Facades\Event::fake([Created::class]);
         $this->host();
-        Event::fake();
 
         $this->delete('/v2/hosts/h-test')
             ->seeInDatabase(
@@ -126,13 +121,6 @@ class CrudTest extends TestCase
                     'id' => 'h-test',
                 ],
                 'ecloud'
-            )->notSeeInDatabase(
-                'hosts',
-                [
-                    'id' => 'h-test',
-                    'deleted_at' => null,
-                ],
-                'ecloud'
-            )->assertResponseStatus(204);
+            )->assertResponseStatus(202);
     }
 }

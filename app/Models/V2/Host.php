@@ -29,13 +29,6 @@ class Host extends Model implements Filterable, Sortable, ResellerScopeable
 
     public string $keyPrefix = 'h';
 
-    protected $dispatchesEvents = [
-        'deleted' => Deleted::class,
-        'deleting' => Deleting::class,
-        'saved' => Saved::class,
-        'saving' => Saving::class,
-    ];
-
     public function __construct(array $attributes = [])
     {
         $this->incrementing = false;
@@ -50,9 +43,6 @@ class Host extends Model implements Filterable, Sortable, ResellerScopeable
         ]);
 
         $this->dispatchesEvents = [
-            'saving' => Saving::class,
-            'saved' => Saved::class,
-            'deleting' => Deleting::class,
             'deleted' => Deleted::class,
         ];
 

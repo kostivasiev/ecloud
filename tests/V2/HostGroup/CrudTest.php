@@ -3,6 +3,7 @@
 namespace Tests\V2\HostGroup;
 
 use App\Events\Event;
+use App\Events\V2\Task\Created;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
@@ -53,13 +54,7 @@ class CrudTest extends TestCase
 
     public function testStore()
     {
-        app()->bind(HostGroup::class, function () {
-            return new HostGroup([
-                'id' => 'hg-test',
-            ]);
-        });
-
-        \Illuminate\Support\Facades\Event::fake();
+        \Illuminate\Support\Facades\Event::fake([Created::class]);
 
         $data = [
             'name' => 'hg-test',
@@ -127,13 +122,7 @@ class CrudTest extends TestCase
 
     public function testStoreWithNoWindowsEnabledFlag()
     {
-        app()->bind(HostGroup::class, function () {
-            return new HostGroup([
-                'id' => 'hg-test',
-            ]);
-        });
-
-        \Illuminate\Support\Facades\Event::fake();
+        \Illuminate\Support\Facades\Event::fake([Created::class]);
 
         $data = [
             'name' => 'hg-test',
@@ -150,13 +139,7 @@ class CrudTest extends TestCase
 
     public function testStoreWitFalseWindowsEnabledFlag()
     {
-        app()->bind(HostGroup::class, function () {
-            return new HostGroup([
-                'id' => 'hg-test',
-            ]);
-        });
-
-        \Illuminate\Support\Facades\Event::fake();
+        \Illuminate\Support\Facades\Event::fake([Created::class]);
 
         $data = [
             'name' => 'hg-test',
@@ -174,9 +157,8 @@ class CrudTest extends TestCase
 
     public function testUpdate()
     {
+        \Illuminate\Support\Facades\Event::fake([Created::class]);
         $this->hostGroup();
-
-        \Illuminate\Support\Facades\Event::fake();
 
         $this->patch('/v2/host-groups/hg-test', [
             'name' => 'new name',
@@ -192,9 +174,8 @@ class CrudTest extends TestCase
 
     public function testUpdateCantChangeHostSpecId()
     {
+        \Illuminate\Support\Facades\Event::fake([Created::class]);
         $this->hostGroup();
-
-        \Illuminate\Support\Facades\Event::fake();
 
         $this->patch('/v2/host-groups/hg-test', [
             'host_spec_id' => 'hs-new',
@@ -210,13 +191,8 @@ class CrudTest extends TestCase
 
     public function testDestroy()
     {
-        /**
-         * Switch out the seeInDatabase/notSeeInDatabase with assertSoftDeleted(...) when we switch to Laravel
-         * @see https://laravel.com/docs/5.8/database-testing#available-assertions
-         */
+        \Illuminate\Support\Facades\Event::fake([Created::class]);
         $this->hostGroup();
-
-        \Illuminate\Support\Facades\Event::fake();
 
         $this->delete('/v2/host-groups/hg-test')
             ->seeInDatabase(
@@ -225,14 +201,7 @@ class CrudTest extends TestCase
                     'id' => 'hg-test',
                 ],
                 'ecloud'
-            )->notSeeInDatabase(
-                'host_groups',
-                [
-                    'id' => 'hg-test',
-                    'deleted_at' => null,
-                ],
-                'ecloud'
-            )->assertResponseStatus(204);
+            )->assertResponseStatus(202);
     }
 
     public function testDestroyCantDeleteHostGroupWhenItHasHost()
