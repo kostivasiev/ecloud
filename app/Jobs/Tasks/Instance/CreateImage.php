@@ -26,11 +26,9 @@ class CreateImage extends Job
         $instance = $task->resource;
         $image = Image::findOrFail($task->data['image_id']);
 
-
         $this->updateTaskBatch([
             [
-                new \App\Jobs\Kingpin\Instance\CreateImage($instance, $image),
-                new \App\Jobs\Tasks\Image\UpdateBilling($image, $instance),
+                new \App\Jobs\Kingpin\Instance\CreateImage($instance, $image)
             ]
         ])->dispatch();
     }
