@@ -15,8 +15,8 @@ class CanUpdate
     {
         $image = Image::forUser($request->user())->findOrFail($request->route('imageId'));
 
-        // Only allow private images to be deleted by non-admins
-        if ($request->user()->isScoped() && !$image->isOwner()) {
+        // Only allow non-admins to update private images
+        if ($request->user()->isScoped() && $image->visibility != Image::VISIBILITY_PRIVATE) {
             return response()->json([
                 'errors' => [
                     [

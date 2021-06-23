@@ -2,6 +2,7 @@
 
 namespace App\Resources\V2;
 
+use App\Models\V2\Image;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
@@ -35,20 +36,17 @@ class ImageResource extends UKFastResource
             $data['active'] = $this->active;
             $data['public'] = $this->public;
             $data['license_id'] = $this->license_id;
-            $data['reseller_id'] = $this->reseller_id;
             $data['script_template'] = $this->script_template;
             $data['vm_template'] = $this->vm_template;
         }
 
         $tz = new \DateTimeZone(config('app.timezone'));
 
-        if ($request->user()->isAdmin() || $this->isOwner()) {
+        if ($request->user()->isAdmin() || $this->visibility == Image::VISIBILITY_PRIVATE) {
+            $data['vpc_id'] = $this->vpc_id;
+            $data['sync'] = $this->sync;
             $data['created_at'] = $this->created_at === null ? null : Carbon::parse($this->created_at, $tz)->toIso8601String();
             $data['updated_at'] = $this->updated_at === null ? null : Carbon::parse($this->updated_at, $tz)->toIso8601String();
-        }
-
-        if ($this->isOwner()) {
-            $data['sync'] = $this->sync;
         }
 
         return $data;

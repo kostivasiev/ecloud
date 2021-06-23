@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../resources/Image/parameters/id.yaml'
+    - $ref: '../../resources/ImageParameter/parameters/id.yaml'
   responses:
     200:
       description: success
@@ -10,15 +10,15 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../resources/Image/admin-schema.yaml'
+                $ref: '../../resources/ImageParameter/schema.yaml'
               meta:
                 type: object
   tags:
-    - Images
+    - Image Parameters
 
 patch:
   parameters:
-    - $ref: '../../resources/Image/parameters/id.yaml'
+    - $ref: '../../resources/ImageParameter/parameters/id.yaml'
   requestBody:
     required: true
     content:
@@ -26,33 +26,33 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../resources/Image/admin-schema.yaml'
+            - $ref: '../../resources/ImageParameter/schema.yaml'
             - type: object
               properties:
                 name:
                   readOnly: false
-                logo_uri:
+                key:
                   readOnly: false
-                documentation_uri:
+                type:
                   readOnly: false
                 description:
                   readOnly: false
-                is_public:
+                required:
                   readOnly: false
-                active:
+                validation_rule:
                   readOnly: false
   responses:
-    202:
+    200:
       description: Accepted
-      $ref: '../../resources/Image/responses/idResponse.yaml'
+      $ref: '../../resources/ImageParameter/responses/idResponse.yaml'
   tags:
-    - Images
+    - Image Parameters
 
 delete:
   parameters:
-    - $ref: '../../resources/Image/parameters/id.yaml'
+    - $ref: '../../resources/ImageParameter/parameters/id.yaml'
   responses:
-    202:
+    204:
       description: Success
   tags:
-    - Images
+    - Image Parameters

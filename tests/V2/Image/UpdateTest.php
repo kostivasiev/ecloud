@@ -63,7 +63,7 @@ class UpdateTest extends TestCase
     {
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
@@ -111,7 +111,7 @@ class UpdateTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
@@ -143,7 +143,7 @@ class UpdateTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
@@ -185,7 +185,7 @@ class UpdateTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 

@@ -7,12 +7,12 @@ content:
         data:
           type: object
           properties:
-            task_id :
-              type : string
-              example : task-abc123xyz
+            id:
+              type: string
+              example: imgmeta-2b66bb79
         meta:
           type: object
           properties:
             location:
               type: string
-              example: 'https://api.ukfast.io/ecloud/v2/tasks/task-abc123'
+              example: 'https://api.ukfast.io/ecloud/v2/image-metadata/imgmeta-2b66bb79'

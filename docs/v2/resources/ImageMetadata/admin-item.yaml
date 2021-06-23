@@ -1,0 +1,50 @@
+get:
+  parameters:
+    - $ref: '../../resources/ImageMetadata/parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../resources/ImageMetadata/schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Image Metadata
+
+patch:
+  parameters:
+    - $ref: '../../resources/ImageMetadata/parameters/id.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../resources/ImageMetadata/schema.yaml'
+            - type: object
+              properties:
+                key:
+                  readOnly: false
+                value:
+                  readOnly: false
+  responses:
+    200:
+      description: Accepted
+      $ref: '../../resources/ImageMetadata/responses/idResponse.yaml'
+  tags:
+    - Image Metadata
+
+delete:
+  parameters:
+    - $ref: '../../resources/ImageMetadata/parameters/id.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Image Metadata
