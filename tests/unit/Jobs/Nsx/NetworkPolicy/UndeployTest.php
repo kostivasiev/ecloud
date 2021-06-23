@@ -6,6 +6,8 @@ use App\Events\V2\NetworkRule\Deleted;
 use App\Jobs\Nsx\NetworkPolicy\Undeploy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
@@ -49,6 +51,27 @@ class UndeployTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
+
+        Event::fake([JobFailed::class, Deleted::class]);
+
+        dispatch(new Undeploy($this->networkPolicy()));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testPolicyDeleted404Response()
+    {
+        $this->nsxServiceMock()->shouldReceive('delete')
+            ->withArgs([
+                'policy/api/v1/infra/domains/default/security-policies/np-test',
+            ])
+            ->andThrow(
+                new RequestException(
+                    'Not Found',
+                    new Request('delete', ''),
+                    new Response(404, [], '')
+                )
+            );
 
         Event::fake([JobFailed::class, Deleted::class]);
 
