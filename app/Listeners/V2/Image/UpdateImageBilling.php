@@ -27,7 +27,7 @@ class UpdateImageBilling
             return;
         }
 
-        if (!$event->model->vpc_id) {
+        if (!$event->model->resource->vpc_id) {
             return;
         }
 

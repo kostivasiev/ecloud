@@ -14,7 +14,7 @@ class UpdateBillingTest extends TestCase
 {
     private $sync;
     public Image $image;
-    public ImageMetadata $metadata;
+    public ImageMetadata $metaData;
 
     public function setUp(): void
     {
@@ -25,7 +25,7 @@ class UpdateBillingTest extends TestCase
                 'name' => 'Test Image',
             ]);
         $this->image->visibility = Image::VISIBILITY_PRIVATE;
-        $this->image->vpc_id = $this->instance()->vpc_id;
+        $this->image->vpc_id = $this->vpc()->id;
         $this->image->description = "Image taken from instance " . $this->instance()->id . " on " .
             Carbon::now(new \DateTimeZone(config('app.timezone')))->toDayDateTimeString();
         $this->image->save();
@@ -70,6 +70,8 @@ class UpdateBillingTest extends TestCase
             'value' => 1,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
+        $this->metaData->value = 4;
+        $this->metaData->save();
 
         Model::withoutEvents(function () {
             $this->sync = new Task([
@@ -79,8 +81,6 @@ class UpdateBillingTest extends TestCase
             ]);
             $this->sync->resource()->associate($this->image);
         });
-        $this->metaData->value = 4;
-        $this->metaData->save();
 
         // Check that the image billing metric is added
         $updateImageBillingListener = new \App\Listeners\V2\Image\UpdateImageBilling();
