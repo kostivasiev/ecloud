@@ -6,7 +6,9 @@ use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\NetworkRule\Create;
 use App\Http\Requests\V2\NetworkRule\Update;
 use App\Models\V2\NetworkRule;
+use App\Models\V2\NetworkRulePort;
 use App\Resources\V2\NetworkRuleResource;
+use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -44,9 +46,19 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
 
-        $networkRule->save();
+        $task = $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
+            $networkRule->save();
 
-        $task = $networkRule->networkPolicy->syncSave();
+            if ($request->has('ports')) {
+                foreach ($request->input('ports') as $port) {
+                    $port['network_rule_id'] = $networkRule->id;
+                    $networkRulePort = new NetworkRulePort($port);
+                    $networkRulePort->save();
+                }
+            }
+
+            return $networkRule->networkPolicy->createSync(Sync::TYPE_UPDATE);
+        });
 
         return $this->responseIdMeta($request, $networkRule->id, 202, $task->id);
     }
@@ -71,9 +83,22 @@ class NetworkRuleController extends BaseController
 
         $networkRule->fill($request->only($fillable));
 
-        $networkRule->save();
+        $task = $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
+            $networkRule->save();
 
-        $task = $networkRule->networkPolicy->syncSave();
+            if ($request->filled('ports')) {
+                $networkRule->networkRulePorts->each(function ($port) {
+                    $port->delete();
+                });
+                foreach ($request->input('ports') as $port) {
+                    $port['network_rule_id'] = $networkRule->id;
+                    $networkRulePort = new NetworkRulePort($port);
+                    $networkRulePort->save();
+                }
+            }
+
+            return $networkRule->networkPolicy->createSync(Sync::TYPE_UPDATE);
+        });
 
         return $this->responseIdMeta($request, $networkRule->id, 202, $task->id);
     }
@@ -82,15 +107,15 @@ class NetworkRuleController extends BaseController
     {
         $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
 
-        $networkRule->networkRulePorts->each(function ($port) {
-            $port->delete();
+        $task = $networkRule->networkPolicy->withTaskLock(function () use ($networkRule) {
+            $networkRule->networkRulePorts->each(function ($port) {
+                $port->delete();
+            });
+
+            $networkRule->delete();
+
+            return $networkRule->networkPolicy->createSync(Sync::TYPE_UPDATE);
         });
-
-        $networkRule->delete();
-
-        // We don't actually need to do this due to the delete listener deleting the rule,
-        // but that logic needs to be moved into the resource non-sync job (task) so lets keep this for now.
-        $task = $networkRule->networkPolicy->syncSave();
 
         return $this->responseTaskId($task->id);
     }

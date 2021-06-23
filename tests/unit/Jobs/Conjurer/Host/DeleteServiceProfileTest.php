@@ -2,6 +2,7 @@
 namespace Tests\unit\Jobs\Conjurer\Host;
 
 use App\Jobs\Conjurer\Host\DeleteServiceProfile;
+use App\Jobs\Kingpin\Host\MaintenanceMode;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
@@ -10,6 +11,9 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -22,12 +26,7 @@ class DeleteServiceProfileTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        app()->bind(Task::class, function () {
-            return new Task([
-                'id' => 'sync-test',
-                'name' => Sync::TASK_NAME_DELETE,
-            ]);
-        });
+
         $this->host = Host::withoutEvents(function () {
             $hostGroup = factory(HostGroup::class)->create([
                 'id' => 'hg-test',
@@ -42,7 +41,7 @@ class DeleteServiceProfileTest extends TestCase
                 'host_group_id' => $hostGroup->id,
             ]);
         });
-        $this->job = new DeleteServiceProfile($this->host);
+
     }
 
     public function testDeleteHostDoesNotExist()
@@ -50,9 +49,16 @@ class DeleteServiceProfileTest extends TestCase
         $this->conjurerServiceMock()
             ->expects('get')
             ->withSomeOfArgs('/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test')
-            ->andThrow(RequestException::create(new Request('DELETE', ''), new Response(404)));
+            ->andThrow(RequestException::create(new Request('GET', ''), new Response(404)));
 
-        $this->assertFalse($this->job->handle());
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
+        dispatch(new DeleteServiceProfile($this->host));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
     }
 
     public function testDeleteHost500Error()
@@ -69,10 +75,12 @@ class DeleteServiceProfileTest extends TestCase
             ->andThrow(RequestException::create(new Request('DELETE', ''), new Response(500)));
 
         $this->expectException(ServerException::class);
-        $this->expectExceptionCode(500);
-        $this->expectExceptionMessage('500 Internal Server Error');
 
-        $this->job->handle();
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
+        dispatch(new DeleteServiceProfile($this->host));
+
+        Event::assertDispatched(JobFailed::class);
     }
 
     public function testDeleteHostSuccess()
@@ -89,6 +97,11 @@ class DeleteServiceProfileTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(204);
             });
-        $this->assertNull($this->job->handle());
+
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
+        dispatch(new DeleteServiceProfile($this->host));
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 }

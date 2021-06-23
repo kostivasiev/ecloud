@@ -45,6 +45,28 @@ properties:
     required: true
     readOnly: false
     example: true
+  ports:
+    writeOnly: true
+    description: Array of port mappings for the network rule. This is a full replace. All the port mappings are replaced. Use network-rule-ports endpoints to modify individual port mappings.
+    type: array
+    items:
+      type: object
+      properties:
+        protocol:
+          required: true
+          description: The protocol to use for the port map. TCP or UDP.
+          type: string
+          example: TCP
+        source:
+          required: false
+          description: '"ANY" or comma separated list of ports and/or port ranges'
+          type: string
+          example: '443'
+        destination:
+          required: false
+          description: '"ANY" or comma separated list of ports and/or port ranges'
+          type: string
+          example: '555'
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

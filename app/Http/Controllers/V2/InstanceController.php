@@ -2,17 +2,20 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\V2\TaskException;
+use App\Http\Requests\V2\Instance\CreateImageRequest;
 use App\Http\Requests\V2\Instance\CreateRequest;
+use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
-use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
+use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Jobs\Instance\GuestRestart;
 use App\Jobs\Instance\GuestShutdown;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
+use App\Models\V2\Image;
+use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
@@ -24,6 +27,7 @@ use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Support\Sync;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -143,7 +147,6 @@ class InstanceController extends BaseController
             'name',
             'vcpu_cores',
             'ram_capacity',
-            'host_group_id',
         ]));
 
         if ($request->has('backup_enabled') && $this->isAdmin) {
@@ -166,11 +169,9 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $instance->delete();
-        });
+        $task = $instance->syncDelete();
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     /**
@@ -246,9 +247,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new PowerOn($instance));
         });
 
@@ -261,9 +259,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new PowerOff($instance));
         });
 
@@ -276,9 +271,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new GuestRestart($instance));
         });
 
@@ -291,9 +283,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new GuestShutdown($instance));
         });
 
@@ -306,9 +295,6 @@ class InstanceController extends BaseController
             ->findOrFail($instanceId);
 
         $instance->withTaskLock(function ($instance) {
-            if (!$instance->canCreateTask()) {
-                throw new TaskException();
-            }
             $this->dispatch(new PowerReset($instance));
         });
 
@@ -486,10 +472,83 @@ class InstanceController extends BaseController
         ));
     }
 
-    public function createImage(Request $request, $instanceId)
+    public function createImage(CreateImageRequest $request, $instanceId)
     {
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
 
-        // TODO - create an image from an instance
-        return response('', 202);
+        if (!$instance->volumes()->count()) {
+            return response()->json([
+                'title' => 'Validation Error',
+                'detail' => 'Cannot create an image of an Instance with no attached volumes',
+                'status' => 422,
+            ], 422);
+        }
+
+        $image = $instance->image->replicate(['vm_template', 'script_template', 'logo_uri', 'description'])
+            ->fill($request->only([
+                'name'
+            ]));
+        $image->visibility = Image::VISIBILITY_PRIVATE;
+        $image->vpc_id = $instance->vpc_id;
+        $image->description = $request->input(
+            'description',
+            "Image taken from instance $instance->id on " . Carbon::now(new \DateTimeZone(config('app.timezone')))->toDayDateTimeString()
+        );
+
+        $image->save();
+
+        $instance->image->imageMetadata->each(function ($imageMetadata) use ($image) {
+            $meta = $imageMetadata->replicate();
+            $meta->image_id = $image->id;
+            $meta->save();
+        });
+
+        $volumeCapacity = $instance->volumes->where('os_volume', '=', true)->first()->capacity;
+
+        ImageMetadata::updateOrCreate(
+            ['image_id' => $image->id, 'key' => 'ukfast.spec.volume.min'],
+            ['image_id' => $image->id, 'key' => 'ukfast.spec.volume.min', 'value' => $volumeCapacity]
+        );
+
+        $image->availabilityZones()->sync($instance->availabilityZone);
+
+        $task = $instance->createTaskWithLock(
+            'image_create',
+            \App\Jobs\Tasks\Instance\CreateImage::class,
+            ['image_id' => $image->id]
+        );
+
+        return response()->json(
+            [
+                'data' => [
+                    'id' => $image->id,
+                    'task_id' => $task->id
+                ],
+                'meta' => [
+                    'location' => config('app.url') . '/images/' . $image->id,
+                    'task_location' => config('app.url') . '/tasks/' . $task->id
+                ],
+            ],
+            202
+        );
+    }
+
+    public function migrate(MigrateRequest $request, $instanceId)
+    {
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
+        if ($request->has('host_group_id')) {
+            $task = $instance->createTaskWithLock(
+                'instance_migrate_private',
+                \App\Jobs\Tasks\Instance\MigratePrivate::class,
+                ['host_group_id' => $request->input('host_group_id')]
+            );
+        } else {
+            $task = $instance->createTaskWithLock(
+                'instance_migrate_public',
+                \App\Jobs\Tasks\Instance\MigratePublic::class
+            );
+        }
+
+        return $this->responseTaskId($task->id);
     }
 }

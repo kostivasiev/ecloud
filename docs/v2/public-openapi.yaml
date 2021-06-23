@@ -176,13 +176,13 @@ paths:
   '/ecloud/v2/instances/{instanceId}/power-off':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/volume-attach':
-    $ref: 'resources/Instance/poweronoff.yaml'
+    $ref: 'resources/Instance/volume-attachdetach.yaml'
   '/ecloud/v2/instances/{instanceId}/volume-detach':
-    $ref: 'resources/Instance/poweronoff.yaml'
+    $ref: 'resources/Instance/volume-attachdetach.yaml'
   '/ecloud/v2/instances/{instanceId}/power-reset':
-    $ref: 'resources/Instance/volume-attachdetach.yaml'
+    $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-shutdown':
-    $ref: 'resources/Instance/volume-attachdetach.yaml'
+    $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-restart':
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/lock':
@@ -193,6 +193,10 @@ paths:
     $ref: 'resources/Instance/console.yaml'
   '/ecloud/v2/instances/{instanceId}/tasks':
     $ref: 'resources/Instance/tasks-collection.yaml'
+  '/ecloud/v2/instances/{instanceId}/create-image':
+    $ref: 'resources/Instance/create-image.yaml'
+  '/ecloud/v2/instances/{instanceId}/migrate':
+    $ref: 'resources/Instance/migrate.yaml'
   '/ecloud/v2/floating-ips':
     $ref: 'resources/FloatingIp/collection.yaml'
   '/ecloud/v2/floating-ips/{fipId}':

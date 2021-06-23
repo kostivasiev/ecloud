@@ -1,0 +1,148 @@
+###
+POST https://{{host}}/{{version}}/builder-configurations
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "reseller_id": 1,
+    "employee_id": 1,
+    "data": "{\"name\": \"test\"}"
+}
+
+> {%
+
+client.global.set("builder_configuration_id", response.body.data.id);
+client.log("Builder Configuration ID: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 201");
+});
+%}
+
+####
+GET https://{{host}}/{{version}}/builder-configurations
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+####
+GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.reseller_id === 1);
+  client.assert(response.body.data.employee_id === 1);
+});
+%}
+
+
+####
+GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}/data
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(JSON.stringify(response.body) === "{\"name\":\"test\"}");
+});
+%}
+
+###
+PATCH https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "reseller_id": 2,
+    "employee_id": 2,
+    "data": "{\"foo\": \"bar\"}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+####
+GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.reseller_id === 2);
+  client.assert(response.body.data.employee_id === 2);
+});
+%}
+
+####
+GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}/data
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(JSON.stringify(response.body) === "{\"foo\":\"bar\"}");
+});
+%}
+
+###
+DELETE https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 204);
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 404, "Response status is not 404");
+});
+%}

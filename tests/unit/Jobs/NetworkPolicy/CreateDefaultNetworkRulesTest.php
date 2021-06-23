@@ -28,7 +28,7 @@ class CreateDefaultNetworkRulesTest extends TestCase
         $this->assertEquals($this->networkPolicy()->networkRules()->count(), 3);
 
         $this->seeInDatabase('network_rules', [
-            'name' => NetworkRule::TYPE_DHCP_INGRESS,
+            'name' => 'dhcp_ingress',
             'sequence' => 10000,
             'network_policy_id' => $this->networkPolicy()->id,
             'source' => '10.0.0.2',
@@ -36,11 +36,11 @@ class CreateDefaultNetworkRulesTest extends TestCase
             'action' => 'ALLOW',
             'direction' => 'IN',
             'enabled' => true,
-            'type' => NetworkRule::TYPE_DHCP_INGRESS
+            'type' => NetworkRule::TYPE_DHCP
         ], 'ecloud');
 
         $this->seeInDatabase('network_rules', [
-            'name' => NetworkRule::TYPE_DHCP_EGRESS,
+            'name' => 'dhcp_egress',
             'sequence' => 10001,
             'network_policy_id' => $this->networkPolicy()->id,
             'source' => 'ANY',
@@ -48,7 +48,7 @@ class CreateDefaultNetworkRulesTest extends TestCase
             'action' => 'ALLOW',
             'direction' => 'OUT',
             'enabled' => true,
-            'type' => NetworkRule::TYPE_DHCP_EGRESS
+            'type' => NetworkRule::TYPE_DHCP
         ], 'ecloud');
 
         $this->seeInDatabase('network_rules', [

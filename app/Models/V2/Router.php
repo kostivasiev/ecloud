@@ -32,7 +32,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $routerUuid)
  * @method static forUser(string $user)
  */
-class Router extends Model implements Filterable, Sortable
+class Router extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DeletionRules, Syncable, Taskable;
 
@@ -50,10 +50,6 @@ class Router extends Model implements Filterable, Sortable
         'router_throughput_id',
     ];
 
-    protected $appends = [
-        'available'
-    ];
-
     protected $dispatchesEvents = [
         'creating' => Creating::class,
         'saving' => Saving::class,
@@ -67,6 +63,11 @@ class Router extends Model implements Filterable, Sortable
         'networks'
     ];
 
+    public function getResellerId(): int
+    {
+        return $this->vpc->getResellerId();
+    }
+
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
@@ -74,7 +75,7 @@ class Router extends Model implements Filterable, Sortable
 
     public function vpns()
     {
-        return $this->hasMany(Vpn::class);
+        return $this->hasMany(VpnService::class);
     }
 
     public function firewallPolicies()
@@ -95,36 +96,6 @@ class Router extends Model implements Filterable, Sortable
     public function routerThroughput()
     {
         return $this->belongsTo(RouterThroughput::class);
-    }
-
-    /**
-     * @return bool
-     * @throws \Exception
-     * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/9e1c6bcc-85db-46b6-bc38-d6d2431e7c17/30af91b5-3a91-4d5d-8ed5-a7d806764a16/api_includes/types_LogicalRouterState.html
-     * When the configuration is actually in effect, the state will change to "success".
-     */
-    public function getAvailableAttribute()
-    {
-        if (is_null($this->availabilityZone)) {
-            return false;
-        }
-
-        try {
-            $response = $this->availabilityZone->nsxService()->get(
-                'policy/api/v1/infra/tier-1s/' . $this->id . '/state'
-            );
-            $response = json_decode($response->getBody()->getContents());
-            if (!isset($response->tier1_state->state)) {
-                throw new \Exception('Failed to get state for ' . $this->id);
-            }
-            return $response->tier1_state->state == 'in_sync';
-        } catch (GuzzleException $exception) {
-            Log::info('Router available state response', [
-                'id' => $this->id,
-                'response' => json_decode($exception->getResponse()->getBody()->getContents())->details,
-            ]);
-            return false;
-        }
     }
 
     /**

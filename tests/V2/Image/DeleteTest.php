@@ -2,6 +2,7 @@
 namespace Tests\V2\Image;
 
 use App\Models\V2\Image;
+use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -27,7 +28,7 @@ class DeleteTest extends TestCase
 
     public function testNotAdminDeletePublicFails()
     {
-        $this->delete('/v2/images/' . $this->image()->id,)->assertResponseStatus(403);
+        $this->delete('/v2/images/' . $this->image()->id)->assertResponseStatus(403);
     }
 
     public function testAdminDeletePrivateSucceeds()
@@ -36,7 +37,7 @@ class DeleteTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
@@ -51,7 +52,7 @@ class DeleteTest extends TestCase
     {
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
@@ -66,9 +67,15 @@ class DeleteTest extends TestCase
 
     public function testNotAdminDeletePrivateNotOwnerFails()
     {
+        Event::fake();
+        $vpc = factory(Vpc::class)->create([
+            'id' => 'vpc-' . uniqid(),
+            'reseller_id' => 2
+        ]);
+
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 2,
+            'vpc_id' => $vpc->id,
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 

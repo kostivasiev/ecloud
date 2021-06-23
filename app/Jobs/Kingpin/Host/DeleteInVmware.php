@@ -13,8 +13,8 @@ class DeleteInVmware extends Job
 {
     use Batchable, LoggableModelJob;
 
-    public $tries = 60;
-    public $backoff = 60;
+    public $tries = 3;
+    public $backoff = 5;
 
     private Host $model;
 
@@ -25,43 +25,30 @@ class DeleteInVmware extends Job
 
     public function handle()
     {
-        $availabilityZone = $this->model->hostGroup->availabilityZone;
-        $hostGroup = $this->model->hostGroup;
+        $host = $this->model;
+        $hostGroup = $host->hostGroup;
+        $availabilityZone = $hostGroup->availabilityZone;
 
-        // Get the host spec from Conjurer
-        try {
-            $response = $availabilityZone->conjurerService()->get(
-                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host/' . $this->model->id
-            );
-            $response = json_decode($response->getBody()->getContents());
-        } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
-                $this->fail($exception);
-            }
-            Log::warning(get_class($this) . ' : Host was not found on UCS, skipping.');
-            return false;
+        if (empty($host->mac_address)) {
+            Log::warning("MAC address empty, skipping");
+            return true;
         }
 
-        $macAddress = collect($response->interfaces)->firstWhere('name', '=', 'eth0')->address;
-        if (empty($macAddress)) {
-            $message = 'Failed to load eth0 address for host ' . $this->model->id;
-            Log::error($message);
-            $this->fail(new \Exception($message));
-            return false;
-        }
-
-        Log::debug('MAC address: ' . $macAddress);
-
+        // Check Exists
         try {
-            $availabilityZone->kingpinService()->delete(
-                '/api/v2/vpc/' . $hostGroup->vpc_id . '/hostgroup/' . $hostGroup->id . '/host/' . $macAddress
+            $availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id . '/host/' . $host->mac_address
             );
         } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
-                throw $exception;
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() == 404) {
+                Log::info("Host doesn't exist, skipping");
+                return true;
             }
-            Log::warning(get_class($this) . ' : Host could not be deleted, skipping.');
-            return false;
+            throw $exception;
         }
+
+        $availabilityZone->kingpinService()->delete(
+            '/api/v2/vpc/' . $hostGroup->vpc_id . '/hostgroup/' . $hostGroup->id . '/host/' . $host->mac_address
+        );
     }
 }

@@ -21,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class Image
  * @package App\Models\V2
  */
-class Image extends Model implements Filterable, Sortable
+class Image extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DeletionRules, DefaultName, Syncable, Taskable;
 
@@ -49,7 +49,7 @@ class Image extends Model implements Filterable, Sortable
         $this->fillable([
             'id',
             'name',
-            'reseller_id',
+            'vpc_id',
             'logo_uri',
             'documentation_uri',
             'description',
@@ -62,6 +62,11 @@ class Image extends Model implements Filterable, Sortable
             'publisher'
         ]);
         parent::__construct($attributes);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->vpc !== null ? $this->vpc->getResellerId() : 0;
     }
 
     public function vpc()
@@ -97,30 +102,28 @@ class Image extends Model implements Filterable, Sortable
      * @param $query
      * @param $user
      * @return mixed
-     * @deprecated
      */
     public function scopeForUser($query, Consumer $user)
     {
-        if (!$user->isScoped()) {
+        if ($user->isAdmin()) {
             return $query;
         }
 
         $query->where('public', true)->where('active', true);
 
         $query->where(function ($query) use ($user) {
-            $query->where('reseller_id', $user->resellerId());
+            $query->whereHas('vpc', function ($query) use ($user) {
+                $query->where('reseller_id', $user->resellerId());
+            });
             $query->orWhere('visibility', Image::VISIBILITY_PUBLIC);
         });
 
         return $query;
     }
 
-    public function isOwner(): bool
-    {
-        return $this->reseller_id == Auth::user()->resellerId();
-    }
-
-
+    /**
+     * @return int|null
+     */
     public function getLicenseIDAttribute()
     {
         if ($this->imageMetadata()->where('key', 'ukfast.license.id')->exists()) {
@@ -139,7 +142,7 @@ class Image extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('reseller_id', Filter::$stringDefaults),
+            $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('logo_uri', Filter::$stringDefaults),
             $factory->create('documentation_uri', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),
@@ -165,7 +168,7 @@ class Image extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('reseller_id'),
+            $factory->create('vpc_id'),
             $factory->create('logo_uri'),
             $factory->create('documentation_uri'),
             $factory->create('description'),
@@ -197,7 +200,7 @@ class Image extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
-            'reseller_id' => 'reseller_id',
+            'vpc_id' => 'vpc_id',
             'logo_uri' => 'logo_uri',
             'documentation_uri' => 'documentation_uri',
             'description' => 'description',

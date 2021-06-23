@@ -37,6 +37,22 @@ class ToggleHostGroupBillingTest extends TestCase
             'product_price_product_id' => $this->product->id,
             'product_price_sale_price' => 0.0000115314,
         ]);
+
+        $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+        $mockAdminCustomerClient = \Mockery::mock(\UKFast\Admin\Account\AdminCustomerClient::class)->makePartial();
+        $mockAdminCustomerClient->shouldReceive('getById')->andReturn(
+            new \UKFast\Admin\Account\Entities\Customer(
+                [
+                    'accountStatus' => ''
+                ]
+            )
+        );
+        $mockAccountAdminClient->shouldReceive('customers')->andReturn(
+            $mockAdminCustomerClient
+        );
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
+            return $mockAccountAdminClient;
+        });
     }
 
     public function testCreatingHostEndsHostGroupBilling()
@@ -106,16 +122,13 @@ class ToggleHostGroupBillingTest extends TestCase
         $this->host();
 
         // Create a 2nd host
-        $this->conjurerServiceMock()->expects('get')
-            ->withArgs(['/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-test/host/h-test-2'])
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
-        factory(\App\Models\V2\Host::class)->create([
-            'id' => 'h-test-2',
-            'name' => 'h-test-2',
-            'host_group_id' => $this->hostGroup()->id,
-        ]);
+        $newHost = Model::withoutEvents(function() {
+            return factory(\App\Models\V2\Host::class)->create([
+                'id' => 'h-test-2',
+                'name' => 'h-test-2',
+                'host_group_id' => $this->hostGroup()->id,
+            ]);
+        });
 
         $metric = BillingMetric::getActiveByKey($this->hostGroup(), 'hostgroup');
         $this->assertNull($metric);

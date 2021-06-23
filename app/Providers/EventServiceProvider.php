@@ -76,22 +76,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
-        // FirewallPolicy
-        \App\Events\V2\FirewallPolicy\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\FirewallPolicy\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\FirewallPolicy\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
-
-        // FirewallRule
-        \App\Events\V2\FirewallRule\Deleted::class => [
-            \App\Listeners\V2\FirewallRule\Undeploy::class,
-        ],
-
         // FloatingIp
         \App\Events\V2\FloatingIp\Saving::class => [
             \App\Listeners\V2\ResourceSyncSaving::class,
@@ -108,29 +92,11 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Host
-        \App\Events\V2\Host\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Host\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Host\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\Host\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // HostGroup
-        \App\Events\V2\HostGroup\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\HostGroup\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\HostGroup\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\HostGroup\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
@@ -171,11 +137,6 @@ class EventServiceProvider extends ServiceProvider
         ],
         \App\Events\V2\Network\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
-        ],
-
-        // NetworkRule
-        \App\Events\V2\NetworkRule\Deleted::class => [
-            \App\Listeners\V2\NetworkRule\Undeploy::class,
         ],
 
         // Nat
@@ -275,6 +236,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
             \App\Listeners\V2\Host\UpdateLicenseBilling::class,
             \App\Listeners\V2\FloatingIp\UpdateBilling::class,
+            \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling::class,
         ],
     ];
 }

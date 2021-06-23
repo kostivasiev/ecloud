@@ -11,5 +11,6 @@ $factory->define(NetworkRule::class, function () {
         'destination' => '10.0.2.0/32',
         'action' => 'ALLOW',
         'enabled' => true,
+        'direction' => 'IN_OUT',
     ];
 });

@@ -3,9 +3,11 @@
 namespace App\Traits\V2;
 
 use App\Exceptions\V2\TaskException;
+use App\Models\V2\ResellerScopeable;
 use App\Models\V2\Task;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use UKFast\Api\Auth\Consumer;
 
 trait Taskable
 {
@@ -14,6 +16,14 @@ trait Taskable
         return $this->morphMany(Task::class, 'resource');
     }
 
+
+    /**
+     * Attempts to obtain an exclusive task lock whilst validating that a new task can be created
+     *
+     * @param $callback
+     * @return mixed
+     * @throws TaskException
+     */
     public function withTaskLock($callback)
     {
         $lock = Cache::lock($this->getTaskLockKey(), 60);
@@ -22,13 +32,17 @@ trait Taskable
             Log::debug(get_class($this) . ' : Attempting to obtain task lock for 60s', ['resource_id' => $this->id]);
             $lock->block(60);
 
+            if (!$this->canCreateTask()) {
+                throw new TaskException();
+            }
+
             return $callback($this);
         } finally {
             $lock->release();
         }
     }
 
-    public function getTaskLockKey()
+    protected function getTaskLockKey()
     {
         return 'task.' . $this->id;
     }
@@ -57,6 +71,9 @@ trait Taskable
         $task->name = $name;
         $task->job = $job;
         $task->data = $data;
+        if ($this instanceof ResellerScopeable) {
+            $task->reseller_id = $this->getResellerId();
+        }
         $task->save();
 
         Log::debug(get_class($this) . ' : Creating new task - Finished', [
@@ -69,9 +86,6 @@ trait Taskable
     public function createTaskWithLock($name, $job, $data = null)
     {
         return $this->withTaskLock(function ($model) use ($name, $job, $data) {
-            if (!$model->canCreateTask()) {
-                throw new TaskException();
-            }
             return $this->createTask($name, $job, $data);
         });
     }

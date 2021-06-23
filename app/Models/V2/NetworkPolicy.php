@@ -2,9 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\NetworkPolicy\Deleting;
-use App\Events\V2\NetworkPolicy\Saved;
-use App\Events\V2\NetworkPolicy\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -18,7 +15,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class NetworkPolicy extends Model implements Filterable, Sortable
+class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable;
 
@@ -36,6 +33,11 @@ class NetworkPolicy extends Model implements Filterable, Sortable
             'name',
         ];
         parent::__construct($attributes);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->network->getResellerId();
     }
 
     public function network()

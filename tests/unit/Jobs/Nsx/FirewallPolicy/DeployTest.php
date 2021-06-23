@@ -4,6 +4,8 @@ namespace Tests\unit\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\Nsx\FirewallPolicy\Deploy;
 use App\Models\V2\FirewallPolicy;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
@@ -55,23 +57,21 @@ class DeployTest extends TestCase
 
     public function testPolicyWithRulesDeploys()
     {
-        Model::withoutEvents(function () {
-            $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-                'id' => 'fwp-test',
-                'router_id' => $this->router()->id,
-            ]);
+        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
+            'id' => 'fwp-test',
+            'router_id' => $this->router()->id,
+        ]);
 
-            $this->firewallPolicy->firewallRules()->create([
-                'id' => 'fwr-test-1',
-                'name' => 'fwr-test-1',
-                'sequence' => 2,
-                'source' => '192.168.1.1',
-                'destination' => '192.168.1.2',
-                'action' => 'REJECT',
-                'direction' => 'IN',
-                'enabled' => true,
-            ]);
-        });
+        $this->firewallPolicy->firewallRules()->create([
+            'id' => 'fwr-test-1',
+            'name' => 'fwr-test-1',
+            'sequence' => 2,
+            'source' => '192.168.1.1',
+            'destination' => '192.168.1.2',
+            'action' => 'REJECT',
+            'direction' => 'IN',
+            'enabled' => true,
+        ]);
 
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withArgs([

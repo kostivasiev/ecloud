@@ -37,6 +37,7 @@ class GetTest extends TestCase
                 'sequence' => 1,
                 'source' => '10.0.1.0/32',
                 'destination' => '10.0.2.0/32',
+                'direction' => 'IN_OUT',
             ])->assertResponseStatus(200);
     }
 
@@ -49,6 +50,7 @@ class GetTest extends TestCase
                 'sequence' => 1,
                 'source' => '10.0.1.0/32',
                 'destination' => '10.0.2.0/32',
+                'direction' => 'IN_OUT',
             ])->assertResponseStatus(200);
     }
 }

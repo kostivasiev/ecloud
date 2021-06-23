@@ -1,31 +1,9 @@
 GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices
-X-consumer-custom-id:  1-1
+X-consumer-custom-id:  7052-1
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
-###
-
-
-GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices?category:lk=Compute
-X-consumer-custom-id:  1-1
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
-###
-
-# Test standard pricing
+###Test standard pricing
 GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices?name:eq=vcpu
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -35,13 +13,29 @@ Content-Type:  application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data[0].price === 0.0069452);
+  client.assert(response.body.data[0].price === 0.00694444);
 
 });
 %}
 ###
 
 # Test custom pricing
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices?name:eq=vcpu
+X-consumer-custom-id:  2-1
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].price === 0.00694444);
+
+});
+%}
+###
+
+# 'Internal Account' prices (should be 0)
 GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices?name:eq=vcpu
 X-consumer-custom-id:  1-1
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -51,8 +45,39 @@ Content-Type:  application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data[0].price === 99.99);
+  client.assert(response.body.data[0].price === 0);
 
+});
+%}
+###
+
+## Reseller 786 marked as 'Staff' account prices
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices?name:eq=vcpu
+X-consumer-custom-id:  786-1
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].price === 0.00263849);
+
+});
+%}
+###
+
+## Customer account prices
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/prices?name:eq=vcpu
+X-consumer-custom-id:  7052-1
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].price === 0.00694444);
 });
 %}
 ###

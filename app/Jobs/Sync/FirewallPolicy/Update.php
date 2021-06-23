@@ -5,6 +5,7 @@ namespace App\Jobs\Sync\FirewallPolicy;
 use App\Jobs\Job;
 use App\Jobs\Nsx\FirewallPolicy\Deploy;
 use App\Jobs\Nsx\FirewallPolicy\DeployCheck;
+use App\Jobs\Nsx\FirewallPolicy\UndeployTrashedRules;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -25,6 +26,7 @@ class Update extends Job
         $this->updateTaskBatch([
             [
                 new Deploy($this->task->resource),
+                new UndeployTrashedRules($this->task->resource),
                 new DeployCheck($this->task->resource),
             ]
         ])->dispatch();

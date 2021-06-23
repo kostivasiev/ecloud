@@ -23,18 +23,11 @@ use UKFast\DB\Ditto\Sortable;
  * Class Host
  * @package App\Models\V2
  */
-class Host extends Model implements Filterable, Sortable
+class Host extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public string $keyPrefix = 'h';
-
-    protected $dispatchesEvents = [
-        'deleted' => Deleted::class,
-        'deleting' => Deleting::class,
-        'saved' => Saved::class,
-        'saving' => Saving::class,
-    ];
 
     public function __construct(array $attributes = [])
     {
@@ -46,12 +39,10 @@ class Host extends Model implements Filterable, Sortable
             'id',
             'name',
             'host_group_id',
+            'mac_address',
         ]);
 
         $this->dispatchesEvents = [
-            'saving' => Saving::class,
-            'saved' => Saved::class,
-            'deleting' => Deleting::class,
             'deleted' => Deleted::class,
         ];
 
@@ -61,6 +52,11 @@ class Host extends Model implements Filterable, Sortable
     public function hostGroup()
     {
         return $this->belongsTo(HostGroup::class);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->hostGroup->getResellerId();
     }
 
     /**

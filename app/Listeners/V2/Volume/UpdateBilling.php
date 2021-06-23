@@ -19,7 +19,7 @@ class UpdateBilling
      */
     public function handle($event)
     {
-        Log::info(get_class($this) . ' : Started', ['model' => $event->model]);
+        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
         if ($event->model instanceof Volume) {
             $volume = $event->model;
