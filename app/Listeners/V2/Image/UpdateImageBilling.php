@@ -27,6 +27,10 @@ class UpdateImageBilling
             return;
         }
 
+        if (!$event->model->vpc_id) {
+            return;
+        }
+
         $image = $event->model->resource;
         $availabilityZone = ($image->vpc->instances()->first())->availabilityZone;
 
