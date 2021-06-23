@@ -19,7 +19,7 @@ class UpdateLicenseBilling
      */
     public function handle(Updated $event)
     {
-        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+        if ($event->model->name == Sync::TASK_NAME_DELETE) {
             return;
         }
 
