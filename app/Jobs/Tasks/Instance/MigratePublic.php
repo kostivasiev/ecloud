@@ -33,7 +33,7 @@ class MigratePublic extends Job
             ]
         ], function () use ($task) {
             $task->resource->hostGroup()->dissociate();
-            $task->resource->save();
+            $task->resource->saveQuietly();
         })->dispatch();
     }
 }

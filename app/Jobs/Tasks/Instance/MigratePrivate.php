@@ -37,7 +37,7 @@ class MigratePrivate extends Job
             ]
         ], function () use ($task, $newHostGroup) {
             $task->resource->hostGroup()->associate($newHostGroup);
-            $task->resource->save();
+            $task->resource->saveQuietly();
         })->dispatch();
     }
 }
