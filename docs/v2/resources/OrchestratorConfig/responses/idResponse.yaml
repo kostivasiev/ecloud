@@ -9,10 +9,10 @@ content:
           properties:
             id:
               type: string
-              example: builder-6ui8gt89
+              example: oconf-6ui8gt89
         meta:
           type: object
           properties:
             location:
               type: string
-              example: 'https://api.ukfast.io/ecloud/v2/builder-specifications/builder-6ui8gt89'
+              example: 'https://api.ukfast.io/ecloud/v2/orchestrator-configs/oconf-6ui8gt89'

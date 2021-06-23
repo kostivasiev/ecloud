@@ -1,26 +1,25 @@
 <?php
 
-namespace Tests\V2\BuilderConfiguration;
+namespace Tests\V2\OrchestratorConfig;
 
-use App\Models\V2\BuilderConfiguration;
+use App\Models\V2\OrchestratorConfig;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class GetTest extends TestCase
 {
-    protected BuilderConfiguration $builderConfiguration;
+    protected OrchestratorConfig $orchestratorConfig;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->builderConfiguration = factory(BuilderConfiguration::class)->create();
+        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
+        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
     }
 
     public function testIndexAdminSucceeds()
     {
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-
-        $this->get('/v2/builder-configurations')
+        $this->get('/v2/orchestrator-configs')
             ->seeJson([
                 'reseller_id' => 1,
                 'employee_id' => 1,
@@ -31,13 +30,12 @@ class GetTest extends TestCase
     public function testIndexNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->get('/v2/builder-configurations')->assertResponseStatus(401);
+        $this->get('/v2/orchestrator-configs')->assertResponseStatus(401);
     }
 
     public function testShowAdminSucceeds()
     {
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->get('/v2/builder-configurations/' . $this->builderConfiguration->id)
+        $this->get('/v2/orchestrator-configs/' . $this->orchestratorConfig->id)
             ->seeJson([
                 'reseller_id' => 1,
                 'employee_id' => 1,
@@ -48,13 +46,12 @@ class GetTest extends TestCase
     public function testShowNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->get('/v2/builder-configurations/' . $this->builderConfiguration->id)->assertResponseStatus(401);
+        $this->get('/v2/orchestrator-configs/' . $this->orchestratorConfig->id)->assertResponseStatus(401);
     }
 
     public function testGetDataAdminSucceeds()
     {
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->get('/v2/builder-configurations/' . $this->builderConfiguration->id. '/data')
+        $this->get('/v2/orchestrator-configs/' . $this->orchestratorConfig->id. '/data')
             ->seeJson([
                 'foo' => 'bar'
             ])
@@ -64,6 +61,6 @@ class GetTest extends TestCase
     public function testGetDataNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->get('/v2/builder-configurations/' . $this->builderConfiguration->id. '/data')->assertResponseStatus(401);
+        $this->get('/v2/orchestrator-configs/' . $this->orchestratorConfig->id. '/data')->assertResponseStatus(401);
     }
 }

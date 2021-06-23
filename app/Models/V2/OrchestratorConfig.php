@@ -14,14 +14,14 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class BuilderConfiguration
+ * Class OrchestratorConfig
  * @package App\Models\V2
  */
-class BuilderConfiguration extends Model implements Filterable, Sortable
+class OrchestratorConfig extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes;
 
-    public string $keyPrefix = 'builder';
+    public string $keyPrefix = 'oconf';
 
     public function __construct(array $attributes = [])
     {
@@ -38,7 +38,7 @@ class BuilderConfiguration extends Model implements Filterable, Sortable
 
         $this->casts = [
             'reseller_id' => 'integer',
-            'employee_id' => 'integer'
+            'employee_id' => 'integer',
         ];
         parent::__construct($attributes);
     }
