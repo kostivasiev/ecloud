@@ -43,7 +43,7 @@ class DeleteImage extends Job
                 Log::warning(
                     get_class($this) . ' : Failed to delete Image ' . $image->id . ' in az:' . $availabilityZone->id . '. Image was not found, skipping'
                 );
-                return;
+                throw $exception;
             }
         });
     }
