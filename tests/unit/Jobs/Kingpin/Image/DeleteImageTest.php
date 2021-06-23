@@ -49,7 +49,7 @@ class DeleteImageTest extends TestCase
 
         Log::shouldReceive('info')->zeroOrMoreTimes();
         Log::shouldReceive('warning')->with(\Mockery::on(function ($arg) {
-            return stripos($arg, 'Failed to delete Image img-test. Image was not found, skipping') !== false;
+            return stripos($arg, 'Failed to delete Image ' . $this->image()->id . ' in az:' . $this->availabilityZone()->id . '. Image was not found, skipping') !== false;
         }));
         $this->assertNull($this->job->handle());
     }
