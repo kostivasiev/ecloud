@@ -59,9 +59,6 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
         ];
 
         $this->dispatchesEvents = [
-            'saving' => Saving::class,
-            'saved' => Saved::class,
-            'deleting' => Deleting::class,
             'deleted' => Deleted::class,
         ];
 

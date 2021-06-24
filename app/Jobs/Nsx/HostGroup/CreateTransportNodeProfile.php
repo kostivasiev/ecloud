@@ -11,7 +11,7 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CreateTransportNode extends Job
+class CreateTransportNodeProfile extends Job
 {
     use Batchable, LoggableModelJob;
 

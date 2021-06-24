@@ -28,7 +28,7 @@ class GetTest extends TestCase
                 'platform' => 'Linux',
             ])
             ->dontSeeJson([
-                'reseller_id' => null,
+                'vpc_id' => null,
                 'script_template' => '',
                 'vm_template' => 'CentOS7 x86_64',
                 'active' => true,
@@ -44,7 +44,6 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => 'img-test',
                 'name' => 'Test Image',
-                'reseller_id' => null,
                 'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
                 'documentation_uri' => 'https://docs.centos.org/en-US/docs/',
                 'description' => 'CentOS (Community enterprise Operating System)',
@@ -63,7 +62,7 @@ class GetTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'public' => false,
         ]);
 
@@ -80,7 +79,7 @@ class GetTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE,
         ]);
 
@@ -97,7 +96,7 @@ class GetTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'public' => false,
         ]);
 
@@ -137,7 +136,6 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => 'img-test',
                 'name' => 'Test Image',
-                'reseller_id' => null,
                 'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
                 'documentation_uri' => 'https://docs.centos.org/en-US/docs/',
                 'description' => 'CentOS (Community enterprise Operating System)',
@@ -156,7 +154,7 @@ class GetTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'public' => false,
         ]);
 
@@ -169,7 +167,7 @@ class GetTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
+            'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE,
         ]);
 
@@ -186,13 +184,14 @@ class GetTest extends TestCase
 
         factory(Image::class)->create([
             'id' => 'img-private-test',
-            'reseller_id' => 1,
-            'public' => false,
+            'vpc_id' => $this->vpc()->id,
+            'visibility' => Image::VISIBILITY_PRIVATE,
         ]);
 
         $this->get('/v2/images/img-private-test')
             ->seeJson([
-                'img-private-test'
+                'img-private-test',
+                'vpc_id' => $this->vpc()->id,
             ])
             ->assertResponseStatus(200);
     }

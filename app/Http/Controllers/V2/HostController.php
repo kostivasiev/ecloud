@@ -40,8 +40,9 @@ class HostController extends BaseController
             'name',
             'host_group_id',
         ]));
-        $model->save();
-        return $this->responseIdMeta($request, $model->id, 202);
+
+        $task = $model->syncSave();
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $id)
@@ -51,10 +52,8 @@ class HostController extends BaseController
             'name',
         ]));
 
-        $model->withTaskLock(function ($model) {
-            $model->save();
-        });
-        return $this->responseIdMeta($request, $model->id, 202);
+        $task = $model->syncSave();
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $id)
@@ -70,10 +69,8 @@ class HostController extends BaseController
 //            ], 422);
 //        }
 
-        $model->withTaskLock(function ($model) {
-            $model->delete();
-        });
-        return response('', 204);
+        $task = $model->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 
     public function tasks(Request $request, QueryTransformer $queryTransformer, string $id)

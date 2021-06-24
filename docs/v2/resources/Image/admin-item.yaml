@@ -16,11 +16,43 @@ get:
   tags:
     - Images
 
+patch:
+  parameters:
+    - $ref: '../../resources/Image/parameters/id.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../resources/Image/admin-schema.yaml'
+            - type: object
+              properties:
+                name:
+                  readOnly: false
+                logo_uri:
+                  readOnly: false
+                documentation_uri:
+                  readOnly: false
+                description:
+                  readOnly: false
+                is_public:
+                  readOnly: false
+                active:
+                  readOnly: false
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/Image/responses/idResponse.yaml'
+  tags:
+    - Images
+
 delete:
   parameters:
     - $ref: '../../resources/Image/parameters/id.yaml'
   responses:
-    204:
+    202:
       description: Success
   tags:
     - Images
