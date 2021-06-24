@@ -5,7 +5,7 @@ namespace App\Resources\V2;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
-class BuilderConfigurationResource extends UKFastResource
+class OrchestratorConfigResource extends UKFastResource
 {
     /**
      * @param \Illuminate\Http\Request $request

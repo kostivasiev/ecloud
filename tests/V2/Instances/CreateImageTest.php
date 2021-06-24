@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\Image;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
@@ -44,6 +45,16 @@ class CreateImageTest extends TestCase
     {
         $this->instance()->volumes()->attach($this->volume);
         $this->instance()->saveQuietly();
+
+        // Bind so that we can use the image id
+        app()->bind(Image::class, function () {
+            return $this->image();
+        });
+
+        $this->kingpinServiceMock()
+            ->expects('get')->andReturnUsing(function () {
+                return new Response(404);
+            });
 
         $this->kingpinServiceMock()
             ->expects('post')

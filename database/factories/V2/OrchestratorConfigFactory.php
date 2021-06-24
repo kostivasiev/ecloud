@@ -2,9 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Models\V2\BuilderConfiguration;
+use App\Models\V2\OrchestratorConfig;
 
-$factory->define(BuilderConfiguration::class, function () {
+$factory->define(OrchestratorConfig::class, function () {
     return [
         'reseller_id' => 1,
         'employee_id' => 1,
