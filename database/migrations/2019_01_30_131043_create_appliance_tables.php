@@ -32,7 +32,7 @@ class CreateApplianceTables extends Migration
             $table->string('appliance_version_uuid');
             $table->integer('appliance_version_appliance_id');
             $table->integer('appliance_version_version');
-            $table->text('appliance_version_description');
+            $table->text('appliance_version_description')->nullable();
             $table->text('appliance_version_script_template');
             $table->text('appliance_version_vm_template');
             $table->integer('appliance_version_server_license_id')->nullable();
