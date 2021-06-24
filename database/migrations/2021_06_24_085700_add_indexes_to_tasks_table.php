@@ -25,7 +25,7 @@ class AddIndexesToTasksTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->table('images', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('tasks', function (Blueprint $table) {
             $table->dropIndex(['resource_id', 'resource_type']);
         });
     }
