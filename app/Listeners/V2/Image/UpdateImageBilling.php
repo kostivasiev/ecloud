@@ -32,7 +32,7 @@ class UpdateImageBilling
         }
 
         $image = $event->model->resource;
-        $availabilityZone = ($image->vpc->instances()->first())->availabilityZone;
+        $availabilityZone = $image->availabilityZones()->first();
 
         if (get_class($image) != Image::class) {
             return;
