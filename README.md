@@ -2,7 +2,11 @@
 
 # eCloud API
 
-eCloud API for managing Public/Hybrid/Private/Burst
+eCloud API for managing our private cloud infrastructure and customer resources
+
+v1 endpoints are for managing our legacy cloud, aka Public/Hybrid/Private solutions
+
+v2 endpoints for managing our new VPC based resources
 
 
 ### Getting Started
@@ -12,7 +16,7 @@ See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
 
-- PHP v7.1
+- PHP v7.4
 - Composer
 
 
@@ -47,8 +51,35 @@ mv .env-testing .env
 
 ### Deployment
 
-Production: auto deployment via Gitlab + gitoverhere, triggered on Tag from master
-- https://api.ukfast.io/ecloud/ (public facing)
+Deployment is managed automatically by our CI pipelines
+
+
+UAT:
+
+all changes pushed to a remote branch with an active Merge Request will trigger a UAT build.
+this environment contains all changes on teh branch but connected to our dev database to allow for easier UAT.
+
+- https://uat-ecloud-{mrID}.rndcloud-k3s-1.rnd.ukfast/
+
+
+
+Staging: 
+
+all changes merged to master are auto-deployed to our rndcloud staging environment to allow for internal development
+
+- https://kong.staging.rnd.ukfast/ecloud/
+
+
+Production:
+
+Deployment to production is made on master branch tag, tags must follow semver 
+
+- https://api.ukfast.io/ecloud/ 
+
+
+If for some reason a rollback is required on production, we can auto-roll back to any previous deployment, if the image is still avaialble this is a near instant rollback, otherwise this may take a momment while the image rebuilds
+
+to roll back, please see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/environments/2131
 
 
 ### Contributing
