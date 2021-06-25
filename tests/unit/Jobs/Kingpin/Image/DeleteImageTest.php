@@ -32,9 +32,6 @@ class DeleteImageTest extends TestCase
 
     public function testDeleteImageDoesNotExist()
     {
-        $this->expectException(RequestException::class);
-        $this->expectExceptionCode(404);
-
         // Attach availability zone to image
         $this->image()->availabilityZones()->sync([$this->availabilityZone()->id]);
         // Attach instance to image
@@ -59,7 +56,7 @@ class DeleteImageTest extends TestCase
 
     public function testDeleteImageServerException()
     {
-        $exception = null;
+        $this->expectException(ServerException::class);
         $message = 'Server Error';
         $code = 500;
         // Attach availability zone to image
@@ -74,13 +71,7 @@ class DeleteImageTest extends TestCase
             ->expects('delete')
             ->withSomeOfArgs('/api/v2/vpc/vpc-test/template/img-test')
             ->andThrow(new ServerException('Server Error', new Request('delete', '', []), new Response(500)));
-        // Fail should be called
-        $this->job->expects('fail')->with(\Mockery::capture($exception));
 
         $this->assertNull($this->job->handle());
-
-        // but we do expect a fail to be called with exception info
-        $this->assertEquals($message, $exception->getMessage());
-        $this->assertEquals($code, $exception->getCode());
     }
 }
