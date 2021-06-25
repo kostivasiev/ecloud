@@ -32,6 +32,9 @@ class DeleteImageTest extends TestCase
 
     public function testDeleteImageDoesNotExist()
     {
+        $this->expectException(RequestException::class);
+        $this->expectExceptionCode(404);
+
         // Attach availability zone to image
         $this->image()->availabilityZones()->sync([$this->availabilityZone()->id]);
         // Attach instance to image
