@@ -445,11 +445,16 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Builder Configurations */
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('builder-configurations', 'BuilderConfigurationController@index');
-        $router->get('builder-configurations/{configurationId}', 'BuilderConfigurationController@show');
-        $router->get('builder-configurations/{configurationId}/data', 'BuilderConfigurationController@data');
-        $router->post('builder-configurations', 'BuilderConfigurationController@store');
-        $router->patch('builder-configurations/{configurationId}', 'BuilderConfigurationController@update');
-        $router->delete('builder-configurations/{configurationId}', 'BuilderConfigurationController@destroy');
+        $router->get('orchestrator-configs', 'OrchestratorConfigController@index');
+        $router->get('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@show');
+        $router->post('orchestrator-configs', 'OrchestratorConfigController@store');
+        $router->patch('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@update');
+        $router->delete('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@destroy');
+
+        $router->get('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@showData');
+
+        $router->group(['middleware' => 'orchestrator-config-is-valid'], function () use ($router) {
+            $router->post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
+        });
     });
 });

@@ -1,0 +1,49 @@
+get:
+  parameters:
+    - $ref: '../../components/parameters/perPage.yaml'
+    - $ref: '../../components/parameters/page.yaml'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: 'schema.yaml'
+              meta:
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/orchestrator-configs?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/orchestrator-configs?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/orchestrator-configs?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/orchestrator-configs?page=2'
+  tags:
+    - Orchestrator Configs
+post:
+  description: Create an Orchestrator Configuration
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: 'schema.yaml'
+  responses:
+    201:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Orchestrator Configs

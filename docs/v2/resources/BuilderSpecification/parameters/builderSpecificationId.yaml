@@ -1,6 +1,0 @@
-in: path
-name: builderSpecificationId
-required: true
-schema:
-  type: string
-example: builder-2b66bb79

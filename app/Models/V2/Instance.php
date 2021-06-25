@@ -136,6 +136,11 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable
         return $this->belongsTo(HostGroup::class);
     }
 
+    public function billingMetrics()
+    {
+        return $this->hasMany(BillingMetric::class, 'resource_id', 'id');
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
