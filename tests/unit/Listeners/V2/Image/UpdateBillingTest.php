@@ -29,6 +29,7 @@ class UpdateBillingTest extends TestCase
         $this->image->description = "Image taken from instance " . $this->instance()->id . " on " .
             Carbon::now(new \DateTimeZone(config('app.timezone')))->toDayDateTimeString();
         $this->image->save();
+        $this->image->availabilityZones()->attach($this->availabilityZone());
 
         $this->metaData = new ImageMetadata([
             'image_id' => $this->image->id,
@@ -36,7 +37,6 @@ class UpdateBillingTest extends TestCase
             'value' => 2,
         ]);
         $this->metaData->save();
-        $this->image->refresh();
     }
 
     public function testStartBilling()
