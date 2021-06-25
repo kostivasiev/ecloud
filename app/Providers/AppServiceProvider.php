@@ -7,6 +7,7 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -58,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
             'vpc' => Vpc::class,
             'dhcp' => Dhcp::class,
             'net' => Network::class,
+            'obuild' => OrchestratorBuild::class
         ]);
 
         Queue::exceptionOccurred(function (JobExceptionOccurred $event) {

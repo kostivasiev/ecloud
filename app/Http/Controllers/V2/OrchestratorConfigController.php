@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\OrchestratorConfig\StoreRequest;
 use App\Http\Requests\V2\OrchestratorConfig\UpdateRequest;
+use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Resources\V2\OrchestratorConfigResource;
 use Illuminate\Http\Request;
@@ -83,5 +84,21 @@ class OrchestratorConfigController extends BaseController
         $model->save();
 
         return response('', 200);
+    }
+
+    public function deploy(Request $request, string $orchestratorConfigId)
+    {
+        $orchestratorConfig = OrchestratorConfig::forUser(Auth::user())->findOrFail($orchestratorConfigId);
+
+        $orchestratorBuild = app()->make(OrchestratorBuild::class);
+        $orchestratorBuild->orchestratorConfig()->associate($orchestratorConfig);
+        $orchestratorBuild->save();
+
+        $task = $orchestratorBuild->createTaskWithLock(
+            'orchestrator_deploy',
+            \App\Jobs\Tasks\Orchestrator\Deploy::class,
+        );
+
+        return $this->responseTaskId($task->id);
     }
 }
