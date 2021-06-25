@@ -60,6 +60,11 @@ class BillingMetric extends Model implements Filterable, Sortable
         return $query->where('reseller_id', '=', $user->resellerId());
     }
 
+    public function instance()
+    {
+        return $this->belongsTo(Instance::class, 'resource_id', 'id');
+    }
+
     /**
      * @param $resource
      * @param $key

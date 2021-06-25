@@ -19,7 +19,7 @@ class UpdateLicenseBilling
      */
     public function handle(Updated $event)
     {
-        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+        if ($event->model->name == Sync::TASK_NAME_DELETE) {
             return;
         }
 
@@ -38,6 +38,17 @@ class UpdateLicenseBilling
         }
 
         if ($instance->platform != 'Windows') {
+            return;
+        }
+
+        if (!empty($instance->host_group_id)) {
+            $instance->billingMetrics()
+                ->where('key', '=', 'license.windows')
+                ->each(function ($billingMetric) use ($instance) {
+                    $billingMetric->setEndDate();
+                    Log::debug('End billing of `' . $billingMetric->key . '` for Instance ' . $instance->id);
+                });
+            Log::warning(get_class($this) . ': Instance ' . $instance->id . ' is in the host group ' . $instance->host_group_id . ', nothing to do');
             return;
         }
 
