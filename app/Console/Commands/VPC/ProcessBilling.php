@@ -46,6 +46,7 @@ class ProcessBilling extends Command
         'disk.capacity.600',
         'disk.capacity.1200',
         'disk.capacity.2500',
+        'image.private',
         // Networking
         'throughput.20Mb',
         'throughput.50Mb',
