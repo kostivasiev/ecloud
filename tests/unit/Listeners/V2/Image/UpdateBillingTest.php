@@ -50,7 +50,7 @@ class UpdateBillingTest extends TestCase
             $this->sync->resource()->associate($this->image);
         });
 
-        // Check that the vcpu billing metric is added
+        // Check that billing metric is added
         $updateImageBillingListener = new \App\Listeners\V2\Image\UpdateImageBilling();
         $updateImageBillingListener->handle(new \App\Events\V2\Task\Updated($this->sync));
 
@@ -61,7 +61,7 @@ class UpdateBillingTest extends TestCase
 
     public function testUpdateBilling()
     {
-        // compute metrics created on deploy
+        // metrics created on deploy
         $originalImageMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test1',
             'resource_id' => $this->image->id,
