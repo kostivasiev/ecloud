@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V2\BuilderConfiguration;
+namespace App\Http\Requests\V2\OrchestratorConfig;
 
 use UKFast\FormRequests\FormRequest;
 

@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/builderSpecificationId.yaml'
+    - $ref: 'parameters/orchestratorConfigId.yaml'
   responses:
     200:
       description: success
@@ -14,11 +14,11 @@ get:
               meta:
                 type: object
   tags:
-    - Builder Specifications
+    - Orchestrator Configs
 
 patch:
   parameters:
-    - $ref: 'parameters/builderSpecificationId.yaml'
+    - $ref: 'parameters/orchestratorConfigId.yaml'
   requestBody:
     required: true
     content:
@@ -31,7 +31,7 @@ patch:
     200:
       $ref: 'responses/idResponse.yaml'
   tags:
-    - Builder Specifications
+    - Orchestrator Configs
 
 delete:
   description: Delete a host spec
@@ -41,4 +41,4 @@ delete:
     204:
       description: Success
   tags:
-    - Builder Specifications
+    - Orchestrator Configs

@@ -1,5 +1,5 @@
 ###
-POST https://{{host}}/{{version}}/builder-configurations
+POST https://{{host}}/{{version}}/orchestrator-configs
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -8,13 +8,12 @@ Content-Type: application/json
 
 {
     "reseller_id": 1,
-    "employee_id": 1,
-    "data": "{\"name\": \"test\"}"
+    "employee_id": 1
 }
 
 > {%
 
-client.global.set("builder_configuration_id", response.body.data.id);
+client.global.set("orchestrator_config_id", response.body.data.id);
 client.log("Builder Configuration ID: " + response.body.data.id);
 
 client.test("Request executed successfully", function() {
@@ -23,7 +22,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ####
-GET https://{{host}}/{{version}}/builder-configurations
+GET https://{{host}}/{{version}}/orchestrator-configs
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -37,7 +36,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ####
-GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+GET https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -53,8 +52,28 @@ client.test("Request executed successfully", function() {
 %}
 
 
+###
+POST https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/data
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "test"
+}
+
+> {%
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+
 ####
-GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}/data
+GET https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/data
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -69,7 +88,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-PATCH https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+PATCH https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -78,8 +97,7 @@ Content-Type: application/json
 
 {
     "reseller_id": 2,
-    "employee_id": 2,
-    "data": "{\"foo\": \"bar\"}"
+    "employee_id": 2
 }
 
 > {%
@@ -89,7 +107,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ####
-GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+GET https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -104,8 +122,28 @@ client.test("Request executed successfully", function() {
 });
 %}
 
+
+###
+POST https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/data
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "foo": "bar"
+}
+
+> {%
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
 ####
-GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}/data
+GET https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/data
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -120,7 +158,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-DELETE https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+DELETE https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -134,7 +172,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/builder-configurations/{{builder_configuration_id}}
+GET https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

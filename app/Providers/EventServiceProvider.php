@@ -227,6 +227,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Task\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
+            \App\Listeners\V2\Image\UpdateImageBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,

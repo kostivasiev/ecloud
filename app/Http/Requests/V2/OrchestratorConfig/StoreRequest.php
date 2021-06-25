@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V2\BuilderConfiguration;
+namespace App\Http\Requests\V2\OrchestratorConfig;
 
 use UKFast\FormRequests\FormRequest;
 
@@ -18,10 +18,6 @@ class StoreRequest extends FormRequest
                 'sometimes',
                 'required',
                 'integer'
-            ],
-            'data' => [
-                'required',
-                'json'
             ],
         ];
     }

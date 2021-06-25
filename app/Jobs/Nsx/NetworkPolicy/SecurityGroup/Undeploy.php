@@ -5,7 +5,9 @@ namespace App\Jobs\Nsx\NetworkPolicy\SecurityGroup;
 use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
 use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
@@ -20,8 +22,16 @@ class Undeploy extends Job
 
     public function handle()
     {
-        $this->model->network->router->availabilityZone->nsxService()->delete(
-            'policy/api/v1/infra/domains/default/groups/' . $this->model->id
-        );
+        try {
+            $this->model->network->router->availabilityZone->nsxService()->delete(
+                'policy/api/v1/infra/domains/default/groups/' . $this->model->id
+            );
+        } catch (RequestException $exception) {
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() == 404) {
+                Log::info("Security group not found, skipping");
+                return true;
+            }
+            throw $exception;
+        }
     }
 }
