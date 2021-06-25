@@ -104,6 +104,7 @@ $app->routeMiddleware([
     'network-rule-port-can-delete' => \App\Http\Middleware\NetworkRulePort\CanDelete::class,
     'can-update-image' => \App\Http\Middleware\image\CanUpdate::class,
     'can-delete-image' => \App\Http\Middleware\image\CanDelete::class,
+    'orchestrator-config-is-valid' => \App\Http\Middleware\OrchestratorConfig\IsValid::class,
 ]);
 
 /*

@@ -13,9 +13,4 @@ properties:
     required: false
     readonly: false
     example: 54321
-  data:
-    description: JSON formatted builder configuration
-    type: string
-    required: true
-    writeOnly: true
 description: 'Builder Configuration'
