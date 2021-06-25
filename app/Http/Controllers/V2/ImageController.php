@@ -103,9 +103,6 @@ class ImageController extends BaseController
     {
         $model = Image::forUser(Auth::user())->findOrFail($imageId);
 
-        // Delete from pivot table
-        $model->availabilityZones()->sync([]);
-
         $task = $model->syncDelete();
         return $this->responseTaskId($task->id);
     }

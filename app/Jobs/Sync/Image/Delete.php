@@ -2,7 +2,9 @@
 
 namespace App\Jobs\Sync\Image;
 
+use App\Jobs\Image\SyncAvailabilityZones;
 use App\Jobs\Job;
+use App\Jobs\Kingpin\Image\DeleteImage;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -20,8 +22,10 @@ class Delete extends Job
 
     public function handle()
     {
-        $this->task->resource->delete();
-        $this->task->completed = true;
-        $this->task->save();
+        $image = $this->task->resource;
+        $this->deleteTaskBatch([
+            new DeleteImage($image),
+            new SyncAvailabilityZones($image),
+        ])->dispatch();
     }
 }
