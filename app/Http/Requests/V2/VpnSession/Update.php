@@ -83,5 +83,4 @@ class Update extends FormRequest
             'vpn_endpoint_id.*.unique' => 'The :attribute is already in use for this session',
         ];
     }
-
 }
