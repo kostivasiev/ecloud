@@ -45,7 +45,7 @@ class Create extends FormRequest
                 'string',
                 Rule::exists(VpnEndpoint::class, 'id')->whereNull('deleted_at'),
                 'distinct',
-                new ExistsForUser(VpnEndpoint::class),
+//                new ExistsForUser(VpnEndpoint::class),@todo - needs uncommenting and testing when #908 in master
                 new IsResourceAvailable(VpnEndpoint::class),
             ],
             'remote_ip' => [

@@ -32,7 +32,7 @@ class CreateTest extends TestCase
             'router_id' => $this->router()->id,
         ]);
         $this->vpnEndpoint = factory(VpnEndpoint::class)->create([
-            'floating_ip_id' => $this->floatingIp->id,
+            'fip_id' => $this->floatingIp->id,
         ]);
         $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
             'ike_profile_id' => 'ike-abc123xyz',
@@ -41,6 +41,7 @@ class CreateTest extends TestCase
         ]);
         $this->vpnSession = factory(VpnSession::class)->create(
             [
+                'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '127.1.1.1/32',
                 'local_networks' => '127.1.1.1/32,127.1.10.1/24',
@@ -76,18 +77,6 @@ class CreateTest extends TestCase
                 'local_networks' => '172.11.11.11/32,176.18.22.11/24',
             ]
         )->assertResponseStatus(202);
-
-        $vnpSessionId = (json_decode($this->response->getContent()))->data->id;
-        $this->get('/v2/vpn-sessions/' . $vnpSessionId . '/services')
-            ->seeJson(
-                [
-                    'id' => $services[0]->id,
-                ]
-            )->seeJson(
-                [
-                    'id' => $services[1]->id,
-                ]
-            )->assertResponseStatus(200);
     }
 
     public function testCreateResourceInvalidAndDuplicateService()

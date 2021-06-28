@@ -32,7 +32,7 @@ class UpdateTest extends TestCase
             'router_id' => $this->router()->id,
         ]);
         $this->vpnEndpoint = factory(VpnEndpoint::class)->create([
-            'floating_ip_id' => $this->floatingIp->id,
+            'fip_id' => $this->floatingIp->id,
         ]);
         $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
             'ike_profile_id' => 'ike-abc123xyz',

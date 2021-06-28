@@ -31,7 +31,7 @@ class GetTest extends TestCase
             'router_id' => $this->router()->id,
         ]);
         $this->vpnEndpoint = factory(VpnEndpoint::class)->create([
-            'floating_ip_id' => $this->floatingIp->id,
+            'fip_id' => $this->floatingIp->id,
         ]);
         $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
             'ike_profile_id' => 'ike-abc123xyz',
@@ -68,28 +68,6 @@ class GetTest extends TestCase
                 [
                     'id' => $this->vpnSession->id,
                     'vpn_profile_group_id' => $this->vpnProfileGroup->id,
-                ]
-            )->assertResponseStatus(200);
-    }
-
-    public function testGetEndpointsCollection()
-    {
-        $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/endpoints')
-            ->seeJson(
-                [
-                    'id' => $this->vpnEndpoint->id,
-                    'name' => $this->vpnEndpoint->name,
-                ]
-            )->assertResponseStatus(200);
-    }
-
-    public function testGetServicesCollection()
-    {
-        $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/services')
-            ->seeJson(
-                [
-                    'id' => $this->vpnService->id,
-                    'name' => $this->vpnService->name,
                 ]
             )->assertResponseStatus(200);
     }
