@@ -456,5 +456,13 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
 
         $router->post('orchestrator-configs/{orchestratorConfigId}/deploy', 'OrchestratorConfigController@deploy');
+
+        $router->get('orchestrator-configs/{orchestratorConfigId}/builds', 'OrchestratorConfigController@builds');
+    });
+
+    /** Orchestrator Builds */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('orchestrator-builds', 'OrchestratorBuildController@index');
+        $router->get('orchestrator-builds/{orchestratorBuildId}', 'OrchestratorBuildController@show');
     });
 });
