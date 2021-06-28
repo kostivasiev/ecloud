@@ -63,6 +63,8 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
     ImageMetadata:
       $ref: 'resources/ImageMetadata/schema.yaml'
+    VpnProfileGroup:
+      $ref: 'components/schemas/vpnProfileGroup.yaml'
 
   parameters:
     # Query Parameters
@@ -95,6 +97,8 @@ components:
       $ref: 'resources/Router/parameters/routerId.yaml'
     VolumeId:
       $ref: 'resources/Volume/parameters/volumeId.yaml'
+    VpnProfileGroupId:
+      $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
 
   responses:
     VirtualPrivateCloudsIdResponse:
@@ -121,6 +125,8 @@ components:
       $ref: 'resources/Region/responses/idResponse.yaml'
     VolumeIdResponse:
       $ref: 'resources/Volume/responses/idResponse.yaml'
+    VpnProfileGroupIdResponse:
+      $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
 
 paths:
   '/ecloud/v2/availability-zones':
@@ -219,3 +225,7 @@ paths:
     $ref: 'resources/OrchestratorConfig/data.yaml'
   '/ecloud/v2/orchestrator-configs/{configId}/deploy':
     $ref: 'resources/OrchestratorConfig/deploy.yaml'
+  '/ecloud/v2/vpn-profile-groups':
+    $ref: 'resources/VpnProfileGroup/admin-collection.yaml'
+  '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':
+    $ref: 'resources/VpnProfileGroup/admin-item.yaml'

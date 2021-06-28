@@ -1,0 +1,12 @@
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../admin-openapi.yaml#/components/schemas/VpnProfileGroup'
+  responses:
+    201:
+      $ref: '../../admin-openapi.yaml#/components/responses/VpnProfileGroupIdResponse'
+  tags:
+    - Vpn Profile Groups
