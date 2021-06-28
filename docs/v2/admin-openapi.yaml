@@ -217,3 +217,5 @@ paths:
     $ref: 'resources/OrchestratorConfig/admin-item.yaml'
   '/ecloud/v2/orchestrator-configs/{configId}/data':
     $ref: 'resources/OrchestratorConfig/data.yaml'
+  '/ecloud/v2/orchestrator-configs/{configId}/deploy':
+    $ref: 'resources/OrchestratorConfig/deploy.yaml'

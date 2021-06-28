@@ -3,6 +3,7 @@
 namespace Tests\V2\OrchestratorConfig;
 
 use App\Models\V2\OrchestratorConfig;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -53,5 +54,17 @@ class CreateTest extends TestCase
     {
         $this->json('POST', '/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/data', [])
             ->assertResponseStatus(422);
+    }
+
+    public function testDeploy()
+    {
+        Event::fake([\App\Events\V2\Task\Created::class]);
+
+        $this->json('POST', '/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/deploy', [])
+            ->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'orchestrator_deploy';
+        });
     }
 }

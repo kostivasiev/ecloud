@@ -443,7 +443,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('tasks/{taskId}', 'TaskController@show');
     });
 
-    /** Builder Configurations */
+    /** Orchestrator Configurations */
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('orchestrator-configs', 'OrchestratorConfigController@index');
         $router->get('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@show');
@@ -456,5 +456,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'orchestrator-config-is-valid'], function () use ($router) {
             $router->post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
         });
+
+        $router->post('orchestrator-configs/{orchestratorConfigId}/deploy', 'OrchestratorConfigController@deploy');
     });
 });
