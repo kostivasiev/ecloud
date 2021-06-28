@@ -39,6 +39,7 @@ class VpnSessionController extends BaseController
         $vpnSession = new VpnSession($request->only([
             'id',
             'name',
+            'vpn_profile_group_id',
             'remote_ip',
             'remote_networks',
             'local_networks',
@@ -58,6 +59,7 @@ class VpnSessionController extends BaseController
         $vpnSession->fill($request->only([
             'id',
             'name',
+            'vpn_profile_group_id',
             'remote_ip',
             'remote_networks',
             'local_networks',

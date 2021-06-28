@@ -7,6 +7,10 @@ properties:
     type: string
     required: false
     example: 'vpns-2b66bb79'
+  vpn_profile_group_id:
+    type: string
+    required: true
+    example: 'vpnpg-abc123xyz'
   remote_ip:
     type: string
     required: true

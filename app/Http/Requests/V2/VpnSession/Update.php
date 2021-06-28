@@ -3,6 +3,7 @@ namespace App\Http\Requests\V2\VpnSession;
 
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnEndpointVpnSession;
+use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnServiceVpnSession;
 use App\Rules\V2\ExistsForUser;
@@ -24,6 +25,12 @@ class Update extends FormRequest
         $vpnSessionId = $this->route()[2]['vpnSessionId'];
         return [
             'name' => 'sometimes|required|string',
+            'vpn_profile_group_id' => [
+                'sometimes',
+                'required',
+                'string',
+                Rule::exists(VpnProfileGroup::class, 'id')->whereNull('deleted_at'),
+            ],
             'vpn_service_id' => 'sometimes|required|array|min:1',
             'vpn_service_id.*' => [
                 'sometimes',

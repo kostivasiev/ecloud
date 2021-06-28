@@ -10,6 +10,7 @@ use UKFast\Responses\UKFastResource;
  * @package App\Resources\V2
  * @property string id
  * @property string name
+ * @property string vpn_profile_group_id
  * @property string remote_ip
  * @property string remote_networks
  * @property string local_networks
@@ -27,6 +28,7 @@ class VpnSessionResource extends UKFastResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'vpn_profile_group_id' => $this->vpn_profile_group_id,
             'remote_ip' => $this->remote_ip,
             'remote_networks' => $this->remote_networks,
             'local_networks' => $this->local_networks,

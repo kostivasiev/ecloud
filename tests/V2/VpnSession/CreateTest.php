@@ -3,6 +3,7 @@ namespace Tests\V2\VpnSession;
 
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
+use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
 use Tests\TestCase;
@@ -13,6 +14,7 @@ class CreateTest extends TestCase
     protected VpnService $vpnService;
     protected VpnEndpoint $vpnEndpoint;
     protected VpnSession $vpnSession;
+    protected VpnProfileGroup $vpnProfileGroup;
     protected FloatingIp $floatingIp;
 
     public function setUp(): void
@@ -32,9 +34,13 @@ class CreateTest extends TestCase
         $this->vpnEndpoint = factory(VpnEndpoint::class)->create([
             'floating_ip_id' => $this->floatingIp->id,
         ]);
+        $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+            'ike_profile_id' => 'ike-abc123xyz',
+            'ipsec_profile_id' => 'ipsec-abc123xyz',
+            'dpd_profile_id' => 'dpd-abc123xyz',
+        ]);
         $this->vpnSession = factory(VpnSession::class)->create(
             [
-                'name' => '',
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '127.1.1.1/32',
                 'local_networks' => '127.1.1.1/32,127.1.10.1/24',
@@ -57,6 +63,7 @@ class CreateTest extends TestCase
             '/v2/vpn-sessions',
             [
                 'name' => 'vpn session test',
+                'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => [
                     $services[0]->id,
                     $services[1]->id,
@@ -89,6 +96,7 @@ class CreateTest extends TestCase
             '/v2/vpn-sessions',
             [
                 'name' => 'vpn session test',
+                'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => [
                     'vnps-00000000',
                     'vnps-00000000',
@@ -134,6 +142,7 @@ class CreateTest extends TestCase
             '/v2/vpn-sessions',
             [
                 'name' => 'vpn session test',
+                'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => [
                     $service->id,
                 ],
