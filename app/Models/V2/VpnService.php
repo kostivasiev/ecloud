@@ -62,7 +62,7 @@ class VpnService extends Model implements Filterable, Sortable
         return $this->belongsToMany(VpnSession::class);
     }
 
-    /**-
+    /**
      * @param $query
      * @param $user
      * @return mixed
