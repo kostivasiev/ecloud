@@ -25,21 +25,24 @@ class VpnProfileGroupResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'ike_profile_id' => $this->ike_profile_id,
-            'ipsec_profile_id' => $this->ipsec_profile_id,
-            'dpd_profile_id' => $this->dpd_profile_id,
-            'created_at' => $this->created_at === null ? null : Carbon::parse(
-                $this->created_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
-            'updated_at' => $this->updated_at === null ? null : Carbon::parse(
-                $this->updated_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
         ];
+        if ($request->user()->isAdmin()) {
+            $data['ike_profile_id'] = $this->ike_profile_id;
+            $data['ipsec_profile_id'] = $this->ipsec_profile_id;
+            $data['dpd_profile_id'] = $this->dpd_profile_id;
+        }
+        $data['created_at'] = $this->created_at === null ? null : Carbon::parse(
+            $this->created_at,
+            new \DateTimeZone(config('app.timezone'))
+        )->toIso8601String();
+        $data['updated_at'] = $this->updated_at === null ? null : Carbon::parse(
+            $this->updated_at,
+            new \DateTimeZone(config('app.timezone'))
+        )->toIso8601String();
+        return $data;
     }
 }
