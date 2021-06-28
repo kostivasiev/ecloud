@@ -16,6 +16,7 @@ class CreateVpnSessionsTable extends Migration
         Schema::connection('ecloud')->create('vpn_sessions', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->uuid('vpn_profile_group_id')->index();
             $table->string('remote_ip');
             $table->text('remote_networks');
             $table->text('local_networks');
