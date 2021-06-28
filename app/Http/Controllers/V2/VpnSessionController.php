@@ -78,26 +78,4 @@ class VpnSessionController extends BaseController
         VpnSession::forUser($request->user())->findOrFail($vpnSessionId)->delete();
         return response('', 204);
     }
-
-    public function endpoints(Request $request, QueryTransformer $queryTransformer, string $vpnSessionId)
-    {
-        $collection = VpnSession::forUser($request->user())->findOrFail($vpnSessionId)->vpnEndpoints();
-        $queryTransformer->config(VpnEndpoint::class)
-            ->transform($collection);
-
-        return VpnEndpointResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
-    }
-
-    public function services(Request $request, QueryTransformer $queryTransformer, string $vpnSessionId)
-    {
-        $collection = VpnSession::forUser($request->user())->findOrFail($vpnSessionId)->vpnServices();
-        $queryTransformer->config(VpnService::class)
-            ->transform($collection);
-
-        return VpnServiceResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
-    }
 }

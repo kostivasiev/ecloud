@@ -171,10 +171,6 @@ paths:
     $ref: 'resources/VpnSession/collection.yaml'
   '/ecloud/v2/vpn-sessions/{vpnSessionId}':
     $ref: 'resources/VpnSession/item.yaml'
-  '/ecloud/v2/vpn-sessions/{vpnSessionId}/endpoints':
-    $ref: 'resources/VpnSession/endpoints.yaml'
-  '/ecloud/v2/vpn-sessions/{vpnSessionId}/services':
-    $ref: 'resources/VpnSession/services.yaml'
   '/ecloud/v2/instances':
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':
