@@ -157,6 +157,17 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
     });
 
+    /** Vpn Profile Groups */
+    $router->group([], function () use ($router) {
+        $router->get('vpn-profile-groups', 'VpnProfileGroupController@index');
+        $router->get('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@show');
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('vpn-profile-groups', 'VpnProfileGroupController@create');
+            $router->patch('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@update');
+            $router->delete('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@destroy');
+        });
+    });
+
     /** Routers */
     $router->group([], function () use ($router) {
         $router->get('routers', 'RouterController@index');
