@@ -1,0 +1,63 @@
+### GET VPN Session Collection
+GET https://{{host}}/{{version}}/vpn-sessions
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Create VPN Session
+POST https://{{host}}/{{version}}/vpn-sessions
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "vpn session test",
+    "vpn_profile_group_id": "vpnpg-aaaaaaaa",
+    "vpn_service_id": [
+        "vpn-aaaaaaaa"
+    ],
+    "vpn_endpoint_id": [
+        "vpne-aaaaaaaa"
+    ],
+    "remote_ip": "211.12.13.1",
+    "remote_networks": "172.12.23.11/32",
+    "local_networks": "172.11.11.11/32,176.18.22.11/24"
+}
+
+> {%
+client.test('Create VPN Session', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('vpn_session_id', response.body.data.id);
+client.log('VPN Session ID: ' + response.body.data.id);
+%}
+
+### Get Resource
+GET https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Delete Resource
+DELETE https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete Resource', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
