@@ -121,7 +121,7 @@ components:
     VpnIdResponse:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
     VpnProfileGroupIdResponse:
-      $ref: 'resources/VpnProfileGroup/responses/idResponse'
+      $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     RouterIdResponse:
