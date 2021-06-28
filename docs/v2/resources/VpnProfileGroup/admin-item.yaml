@@ -1,3 +1,20 @@
+get:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/VpnProfileGroupId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../admin-openapi.yaml#/components/schemas/VpnProfileGroup'
+              meta:
+                type: object
+  tags:
+    - Vpn Profile Groups
 patch:
   parameters:
     - $ref: '../../admin-openapi.yaml#/components/parameters/VpnProfileGroupId'

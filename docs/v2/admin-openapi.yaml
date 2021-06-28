@@ -64,7 +64,7 @@ components:
     ImageMetadata:
       $ref: 'resources/ImageMetadata/schema.yaml'
     VpnProfileGroup:
-      $ref: 'components/schemas/vpnProfileGroup.yaml'
+      $ref: 'components/schemas/vpnProfileGroupAdmin.yaml'
 
   parameters:
     # Query Parameters
