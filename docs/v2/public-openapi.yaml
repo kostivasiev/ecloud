@@ -38,6 +38,8 @@ components:
       $ref: 'components/schemas/discountPlan.yaml'
     Vpn:
       $ref: 'components/schemas/vpn.yaml'
+    VpnProfile:
+      $ref: 'components/schemas/vpnProfile.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
     FloatingIP:
@@ -95,6 +97,8 @@ components:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
     VpnId:
       $ref: 'resources/Vpn/parameters/vpnId.yaml'
+    VpnProfileId:
+      $ref: 'resources/VpnProfile/parameters/vpnProfileId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     RegionId:
@@ -116,6 +120,8 @@ components:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
     VpnIdResponse:
       $ref: 'resources/Vpn/responses/idResponse.yaml'
+    VpnProfileIdResponse:
+      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     RouterIdResponse:
@@ -161,6 +167,10 @@ paths:
 #    $ref: 'resources/Vpn/collection.yaml'
 #  '/ecloud/v2/vpns/{vpnId}':
 #    $ref: 'resources/Vpn/item.yaml'
+  '/ecloud/v2/vpn-profiles':
+    $ref: 'resources/VpnProfile/collection.yaml'
+  '/ecloud/v2/vpn-profiles/{vpnProfileId}':
+    $ref: 'resources/VpnProfile/item.yaml'
   '/ecloud/v2/instances':
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':

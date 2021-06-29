@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnProfileId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/VpnProfile'
+              meta:
+                type: object
+  tags:
+    - Vpn Profiles

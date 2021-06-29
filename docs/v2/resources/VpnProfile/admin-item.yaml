@@ -1,0 +1,28 @@
+patch:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/VpnProfileId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "../../admin-openapi.yaml#/components/schemas/VpnProfile"
+            - type: object
+              properties:
+                router_id:
+                  required: false
+  responses:
+    200:
+      $ref: '../../admin-openapi.yaml#/components/responses/VpnProfileIdResponse'
+  tags:
+    - Vpn Profiles
+delete:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/VpnProfileId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Vpn Profiles
