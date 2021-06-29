@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\OrchestratorBuild;
 
 use App\Jobs\Job;
+use App\Jobs\OrchestratorBuild\AwaitVpcs;
 use App\Jobs\OrchestratorBuild\CreateVpcs;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
@@ -24,6 +25,7 @@ class Update extends Job
         $this->updateTaskBatch([
             [
                 new CreateVpcs($this->task->resource),
+                new AwaitVpcs($this->task->resource),
             ]
         ])->dispatch();
     }

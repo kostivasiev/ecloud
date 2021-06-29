@@ -35,6 +35,11 @@ class OrchestratorBuild extends Model implements Filterable, Sortable
             'orchestrator_config_id',
             'state'
         ]);
+
+        $this->casts = [
+            'state' => 'array',
+        ];
+
         parent::__construct($attributes);
     }
 
@@ -94,14 +99,17 @@ class OrchestratorBuild extends Model implements Filterable, Sortable
         ];
     }
 
-    public function updateState($resourceKey, $id)
+    /**
+     * Update the state JSON, re-serealize and save
+     * @param $resource
+     * @param $index
+     * @param $id
+     */
+    public function updateState($resource, $index, $id)
     {
-        $this->attributes['state'][$resourceKey] = $id;
+        $state = $this->state;
+        $state[$resource][$index] = $id;
+        $this->state = $state;
         $this->save();
-
-//        $state = json_decode($this->attributes['state'], true);
-//        $state[$resourceKey] = $id;
-//        $this->attributes['state'] = json_encode($state);
-//        $this->save();
     }
 }

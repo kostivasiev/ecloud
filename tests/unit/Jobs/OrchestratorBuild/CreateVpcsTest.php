@@ -5,11 +5,6 @@ use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateVpcs;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
-use App\Models\V2\Task;
-use App\Support\Sync;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -26,23 +21,14 @@ class CreateVpcsTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->availabilityZone();
-
         $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
 
         $this->orchestratorBuild = factory(OrchestratorBuild::class)->make();
         $this->orchestratorBuild->orchestratorConfig()->associate($this->orchestratorConfig);
         $this->orchestratorBuild->save();
-
-        $this->task = new Task([
-            'id' => 'sync-1',
-            'name' => Sync::TASK_NAME_UPDATE,
-            'data' => []
-        ]);
-        $this->task->resource()->associate($this->orchestratorBuild);
     }
 
-    public function testNoVpcDataFails()
+    public function testNoVpcDataSkips()
     {
         $this->orchestratorConfig->data = null;
         $this->orchestratorConfig->save();
@@ -51,24 +37,31 @@ class CreateVpcsTest extends TestCase
 
         dispatch(new CreateVpcs($this->orchestratorBuild));
 
-        Event::assertDispatched(JobFailed::class);
-    }
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });    }
 
     public function testVpcAlreadyExistsSkips()
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
+        $this->orchestratorBuild->updateState('vpc', 0, 'vpc-testing');
 
-        // TODO
         dispatch(new CreateVpcs($this->orchestratorBuild));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
+
+        $this->orchestratorBuild->refresh();
+
+        $this->assertNotNull($this->orchestratorBuild->state['vpc']);
+
+        // 2 VPC's in the build data, one already exists so only one more should be created
+        $this->assertEquals(2, count($this->orchestratorBuild->state['vpc']));
     }
-
-
 
     public function testSuccess()
     {
@@ -76,11 +69,17 @@ class CreateVpcsTest extends TestCase
 
         dispatch(new CreateVpcs($this->orchestratorBuild));
 
-
-
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
+
+        Event::assertDispatched(Created::class);
+
+        $this->orchestratorBuild->refresh();
+
+        $this->assertNotNull($this->orchestratorBuild->state['vpc']);
+
+        $this->assertEquals(2, count($this->orchestratorBuild->state['vpc']));
     }
 }

@@ -95,11 +95,8 @@ class VpcController extends BaseController
             return $vpc->getDeletionError();
         }
 
-        $vpc->withTaskLock(function ($vpc) {
-            $vpc->delete();
-        });
-
-        return response('', 202);
+        $task = $vpc->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 
     public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)
