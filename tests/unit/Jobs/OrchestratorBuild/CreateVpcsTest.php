@@ -1,6 +1,8 @@
 <?php
 namespace Tests\unit\Jobs\OrchestratorBuild;
 
+use App\Events\V2\Task\Created;
+use App\Jobs\OrchestratorBuild\CreateVpcs;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Task;
@@ -8,20 +10,23 @@ use App\Support\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Symfony\Component\VarDumper\Dumper\ContextProvider\RequestContextProvider;
 use Tests\TestCase;
 
 class CreateVpcsTest extends TestCase
 {
     protected $job;
 
+    protected OrchestratorConfig $orchestratorConfig;
+
+    protected OrchestratorBuild $orchestratorBuild;
+
     public function setUp(): void
     {
         parent::setUp();
+        $this->availabilityZone();
 
         $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
 
@@ -37,34 +42,25 @@ class CreateVpcsTest extends TestCase
         $this->task->resource()->associate($this->orchestratorBuild);
     }
 
-    public function testSkipIfMacAddressNotSet()
+    public function testNoVpcDataFails()
     {
-        exit(print_r($this));
-
-
-
-//        $this->host->mac_address = '';
-//        $this->host->save();
-//
-//        Event::fake([JobFailed::class, JobProcessed::class]);
-//
-//        dispatch(new DeleteInVmware($this->host));
-//
-//        Event::assertNotDispatched(JobFailed::class);
-//        Event::assertDispatched(JobProcessed::class, function ($event) {
-//            return !$event->job->isReleased();
-//        });
-    }
-
-    public function testHostNotFoundSkips()
-    {
-        $this->kingpinServiceMock()->expects('get')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/aa:bb:cc:dd:ee:ff')
-            ->andThrow(RequestException::create(new Request('GET', ''), new Response(404)));
+        $this->orchestratorConfig->data = null;
+        $this->orchestratorConfig->save();
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new DeleteInVmware($this->host));
+        dispatch(new CreateVpcs($this->orchestratorBuild));
+
+        Event::assertDispatched(JobFailed::class);
+    }
+
+    public function testVpcAlreadyExistsSkips()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+
+        // TODO
+        dispatch(new CreateVpcs($this->orchestratorBuild));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -72,88 +68,19 @@ class CreateVpcsTest extends TestCase
         });
     }
 
-    public function testUnableToDelete()
+
+
+    public function testSuccess()
     {
-        $this->kingpinServiceMock()->expects('get')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/aa:bb:cc:dd:ee:ff')
-            ->andReturnUsing(function () {
-                return new Response('200', [], json_encode([]));
-            });
-        $this->kingpinServiceMock()
-            ->expects('delete')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/aa:bb:cc:dd:ee:ff')
-            ->andThrow(RequestException::create(new Request('DELETE', ''), new Response(500)));
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        Event::fake([JobFailed::class]);
+        dispatch(new CreateVpcs($this->orchestratorBuild));
 
-        $this->expectException(RequestException::class);
 
-        dispatch(new DeleteInVmware($this->host));
-
-        Event::assertDispatched(JobFailed::class);
-    }
-
-    public function testDeleteSuccess()
-    {
-        $this->kingpinServiceMock()->expects('get')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/aa:bb:cc:dd:ee:ff')
-            ->andReturnUsing(function () {
-                return new Response('200', [], json_encode([]));
-            });
-        $this->kingpinServiceMock()
-            ->expects('delete')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/hostgroup/hg-test/host/aa:bb:cc:dd:ee:ff')
-            ->andReturnUsing(function () {
-                return new Response('200', [], json_encode([]));
-            });
-
-        Event::fake([JobFailed::class]);
-
-        dispatch(new DeleteInVmware($this->host));
 
         Event::assertNotDispatched(JobFailed::class);
-    }
-
-
-    protected function getBuildData()
-    {
-        return <<<EOM
-            {
-                "vpc": [
-                    {
-                        "name": "vpc-1",
-                        "region_id": "reg-aaaaaaaa"
-                    },
-                    {
-                        "name": "vpc-2",
-                        "region_id": "reg-aaaaaaaa",
-                        "console_enabled": true,
-                        "advanced_networking": true
-                    }
-                ],
-                "router": [
-                    {
-                        "vpc_id": "{vpc.0}",
-                        "name": "router-1"
-                    },
-                    {
-                        "vpc_id": "{vpc.1}",
-                        "name": "router-2",
-                        "router_throughput_id": "rtp-ec393951"
-                    }
-                ],
-                "network": [
-                    {
-                        "router_id": "{router.0}",
-                        "name": "network-1"
-                    },
-                    {
-                        "router_id": "{router.1}",
-                        "name": "network-2",
-                        "subnet": "10.0.0.0\/24"
-                    }
-                ]
-            }
-        EOM;
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
     }
 }

@@ -5,17 +5,16 @@
 use App\Models\V2\OrchestratorConfig;
 
 $factory->define(OrchestratorConfig::class, function () {
-
     $data = <<<EOM
             {
                 "vpc": [
                     {
                         "name": "vpc-1",
-                        "region_id": "reg-aaaaaaaa"
+                        "region_id": "reg-test"
                     },
                     {
                         "name": "vpc-2",
-                        "region_id": "reg-aaaaaaaa",
+                        "region_id": "reg-test",
                         "console_enabled": true,
                         "advanced_networking": true
                     }
@@ -43,7 +42,7 @@ $factory->define(OrchestratorConfig::class, function () {
                     }
                 ]
             }
-        EOM;
+EOM;
 
     return [
         'reseller_id' => 1,

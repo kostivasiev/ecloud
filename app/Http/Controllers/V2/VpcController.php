@@ -59,9 +59,8 @@ class VpcController extends BaseController
         }
         $vpc->reseller_id = $this->resellerId;
 
-        $vpc->save();
-
-        return $this->responseIdMeta($request, $vpc->id, 202);
+        $task = $vpc->syncSave();
+        return $this->responseIdMeta($request, $vpc->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $vpcId)
@@ -85,11 +84,8 @@ class VpcController extends BaseController
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
         }
 
-        $vpc->withTaskLock(function ($vpc) {
-            $vpc->save();
-        });
-
-        return $this->responseIdMeta($request, $vpc->id, 202);
+        $task = $vpc->syncSave();
+        return $this->responseIdMeta($request, $vpc->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $vpcId)

@@ -7,7 +7,6 @@ use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Vpc;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class CreateVpcs extends Job
 {
@@ -22,18 +21,34 @@ class CreateVpcs extends Job
 
     public function handle()
     {
-        $data = json_decode($this->model->orchestratorConfig->data, true);
+        $orchestratorBuild = $this->model;
 
-        if (!isset($data['vpc'])) {
+        $data = collect(json_decode($orchestratorBuild->orchestratorConfig->data));
+
+        if (!$data->has('vpc')) {
             $this->fail(new \Exception('Orchestrator Build ' . $this->model->id . ' failed. Build data did not contain any VPC\'s'));
             return;
         }
 
+        collect($data->get('vpc'))->each(function ($definition, $index) use ($orchestratorBuild) {
+//            exit(print_r([
+//                $definition,
+//                $index
+//            ]));
+
+            $vpc = app()->make(Vpc::class);
+            $vpc->fill(collect($definition)->only(['name', 'region_id', 'advanced_networking', 'console_enabled'])->toArray());
+            $vpc->reseller_id = $orchestratorBuild->orchestratorConfig->reseller_id;
+            $vpc->save();
+
+            exit(print_r($vpc));
+
+        });
 
 
-//        $vpc = app()->make(Vpc::class);
-//
-//        $vpc->save();
+
+
+
 
 
     }

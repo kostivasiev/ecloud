@@ -206,12 +206,6 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Vpc
-        \App\Events\V2\Vpc\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Vpc\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
         \App\Events\V2\Vpc\Deleting::class => [
             \App\Listeners\V2\ResourceSyncDeleting::class,
         ],

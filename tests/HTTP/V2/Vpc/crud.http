@@ -5,7 +5,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "TEST VPC",
+    "name": "TEST VPC-eee",
     "region_id": "{{dev_region_id}}"
 }
 

@@ -93,4 +93,15 @@ class OrchestratorBuild extends Model implements Filterable, Sortable
             'updated_at' => 'updated_at',
         ];
     }
+
+    public function updateState($resourceKey, $id)
+    {
+        $this->attributes['state'][$resourceKey] = $id;
+        $this->save();
+
+//        $state = json_decode($this->attributes['state'], true);
+//        $state[$resourceKey] = $id;
+//        $this->attributes['state'] = json_encode($state);
+//        $this->save();
+    }
 }
