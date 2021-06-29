@@ -1,8 +1,10 @@
-[![build status](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/badges/master/build.svg)](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/commits/master)
+[![pipeline status](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/badges/master/pipeline.svg)](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/commits/master)
+[![coverage report](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/badges/master/coverage.svg)](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/commits/master)
+
 
 # eCloud API
 
-eCloud API for managing our private cloud infrastructure and customer resources
+Customer facing API for our private cloud infrastructure and resources management
 
 v1 endpoints are for managing our legacy cloud, aka Public/Hybrid/Private solutions
 
