@@ -10,10 +10,10 @@ use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class UpdateVpnsRequest
+ * Class CreateVpnsRequest
  * @package App\Http\Requests\V2
  */
-class Update extends FormRequest
+class CreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,17 +32,13 @@ class Update extends FormRequest
      */
     public function rules()
     {
-        $vpnServiceId = $this->route()[2]['vpnServiceId'];
         return [
-            'name' => 'sometimes|required|string',
+            'name' => 'required|string',
             'router_id' => [
-                'sometimes',
                 'required',
                 'string',
                 Rule::exists(Router::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnService::class, 'router_id')
-                    ->whereNull('deleted_at')
-                    ->ignore($vpnServiceId),
+                Rule::unique(VpnService::class, 'router_id')->whereNull('deleted_at'),
                 new ExistsForUser(Router::class),
                 new IsResourceAvailable(Router::class),
             ],
