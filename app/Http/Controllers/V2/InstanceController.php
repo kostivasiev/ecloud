@@ -250,7 +250,9 @@ class InstanceController extends BaseController
             $this->dispatch(new PowerOn($instance));
         });
 
-        return response('', 202);
+        $task = $instance->createTaskWithLock('power_on', \App\Jobs\Tasks\Instance\PowerOn::class);
+
+        return $this->responseTaskId($task->id);
     }
 
     public function powerOff(Request $request, $instanceId)
@@ -258,11 +260,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new PowerOff($instance));
-        });
+        $task = $instance->createTaskWithLock('power_off', \App\Jobs\Tasks\Instance\PowerOff::class);
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function guestRestart(Request $request, $instanceId)
@@ -270,11 +270,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new GuestRestart($instance));
-        });
+        $task = $instance->createTaskWithLock('guest_restart', \App\Jobs\Tasks\Instance\GuestRestart::class);
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function guestShutdown(Request $request, $instanceId)
@@ -282,11 +280,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new GuestShutdown($instance));
-        });
+        $task = $instance->createTaskWithLock('guest_shutdown', \App\Jobs\Tasks\Instance\GuestShutdown::class);
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function powerReset(Request $request, $instanceId)
@@ -294,11 +290,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new PowerReset($instance));
-        });
+        $task = $instance->createTaskWithLock('power_reset', \App\Jobs\Tasks\Instance\PowerReset::class);
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function lock(Request $request, $instanceId)

@@ -19,6 +19,7 @@ trait TaskableBatch
         };
     }
 
+    // TODO: Rename to taskBatch
     public function updateTaskBatch($jobs, ...$callbacks)
     {
         $task = $this->task;
@@ -42,6 +43,7 @@ trait TaskableBatch
         return $batch;
     }
 
+    // TODO: Move this to SyncableBatch trait, utilising renamed taskBatch function above
     public function deleteTaskBatch($jobs)
     {
         $task = $this->task;

@@ -52,7 +52,9 @@ trait Taskable
         if ($this->tasks->filter(function ($task) {
                 return $task->status == Task::STATUS_INPROGRESS;
         })->count()) {
-            Log::warning(get_class($this) . ' : Cannot create task, resource has task in progress', ['resource_id' => $this->id]);
+            Log::warning(get_class($this) . ' : Cannot create task, resource has task in progress', ['resource_id' => $this->id, 'count'=>$this->tasks->filter(function ($task) {
+                return $task->status == Task::STATUS_INPROGRESS;
+            })->count() ]);
             return false;
         }
 
