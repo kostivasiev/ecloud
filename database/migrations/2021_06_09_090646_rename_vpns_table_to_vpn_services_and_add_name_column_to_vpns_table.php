@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class RemoveAvailabilityZoneIdAndAddNameColumnToVpnsTable extends Migration
+class RenameVpnsTableToVpnServicesAndAddNameColumnToVpnsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,6 +14,7 @@ class RemoveAvailabilityZoneIdAndAddNameColumnToVpnsTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('vpns', function (Blueprint $table) {
+            $table->rename('vpn_services');
             $table->string('name')->nullable()->after('router_id');
         });
     }
@@ -25,8 +26,9 @@ class RemoveAvailabilityZoneIdAndAddNameColumnToVpnsTable extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->table('vpns', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('vpn_services', function (Blueprint $table) {
             $table->dropColumn('name');
+            $table->rename('vpns');
         });
     }
 }
