@@ -448,13 +448,21 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('orchestrator-configs', 'OrchestratorConfigController@store');
         $router->patch('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@update');
         $router->delete('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@destroy');
-
         $router->get('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@showData');
+        $router->get('orchestrator-configs/{orchestratorConfigId}/builds', 'OrchestratorConfigController@builds');
 
         $router->group(['middleware' => 'orchestrator-config-is-valid'], function () use ($router) {
             $router->post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
         });
 
-        $router->post('orchestrator-configs/{orchestratorConfigId}/deploy', 'OrchestratorConfigController@deploy');
+        $router->group(['middleware' => 'orchestrator-config-has-reseller-id'], function () use ($router) {
+            $router->post('orchestrator-configs/{orchestratorConfigId}/deploy', 'OrchestratorConfigController@deploy');
+        });
+    });
+
+    /** Orchestrator Builds */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('orchestrator-builds', 'OrchestratorBuildController@index');
+        $router->get('orchestrator-builds/{orchestratorBuildId}', 'OrchestratorBuildController@show');
     });
 });

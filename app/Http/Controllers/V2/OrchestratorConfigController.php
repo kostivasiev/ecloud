@@ -6,6 +6,7 @@ use App\Http\Requests\V2\OrchestratorConfig\StoreRequest;
 use App\Http\Requests\V2\OrchestratorConfig\UpdateRequest;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
+use App\Resources\V2\OrchestratorBuildResource;
 use App\Resources\V2\OrchestratorConfigResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -92,13 +93,29 @@ class OrchestratorConfigController extends BaseController
 
         $orchestratorBuild = app()->make(OrchestratorBuild::class);
         $orchestratorBuild->orchestratorConfig()->associate($orchestratorConfig);
-        $orchestratorBuild->save();
+        $orchestratorBuild->syncSave();
 
-        $task = $orchestratorBuild->createTaskWithLock(
-            'orchestrator_deploy',
-            \App\Jobs\Tasks\Orchestrator\Deploy::class,
+        return response()->json(
+            [
+                'data' => [
+                    'id' => $orchestratorBuild->id,
+                ],
+                'meta' => [
+                    'location' => config('app.url') . '/orchestrator-builds/' . $orchestratorBuild->id,
+                ],
+            ],
+            202
         );
+    }
 
-        return $this->responseTaskId($task->id);
+    public function builds(Request $request, QueryTransformer $queryTransformer, string $orchestratorConfigId)
+    {
+        $collection = OrchestratorConfig::forUser($request->user())->findOrFail($orchestratorConfigId)->orchestratorBuilds();
+        $queryTransformer->config(OrchestratorBuild::class)
+            ->transform($collection);
+
+        return OrchestratorBuildResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

@@ -205,17 +205,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
-        // Vpc
-        \App\Events\V2\Vpc\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Vpc\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Vpc\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
-
         // Vpn
         \App\Events\V2\Vpn\Creating::class => [
         ],

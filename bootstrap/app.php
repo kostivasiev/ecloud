@@ -105,6 +105,7 @@ $app->routeMiddleware([
     'can-update-image' => \App\Http\Middleware\image\CanUpdate::class,
     'can-delete-image' => \App\Http\Middleware\image\CanDelete::class,
     'orchestrator-config-is-valid' => \App\Http\Middleware\OrchestratorConfig\IsValid::class,
+    'orchestrator-config-has-reseller-id' => \App\Http\Middleware\OrchestratorConfig\HasResellerId::class,
 ]);
 
 /*
