@@ -53,8 +53,9 @@ class GetTest extends TestCase
     public function testGetDataAdminSucceeds()
     {
         $this->get('/v2/orchestrator-configs/' . $this->orchestratorConfig->id. '/data')
-            ->seeJson([
-                'foo' => 'bar'
+            ->seeJsonContains([
+                'name' => 'vpc-1',
+                'region_id' => 'reg-test',
             ])
             ->assertResponseStatus(200);
     }

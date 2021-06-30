@@ -89,21 +89,6 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-
-###
-GET https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/builds
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
-
 ###
 GET https://{{host}}/{{version}}/orchestrator-builds/{{orchestrator_build_id}}
 Accept: */*
@@ -113,8 +98,8 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 > {%
-client.global.set("orchestrator_build_id", response.body.data.id);
-client.log("orchestrator_build_id: " + response.body.data.id);
+client.global.set("first_vpc_id", response.body.data.state.vpc[0]);
+client.log("first_vpc_id: " + response.body.data.state.vpc[0]);
 
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
@@ -122,7 +107,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/vpcs/vpc-c84875b3
+GET https://{{host}}/{{version}}/vpcs/{{first_vpc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
