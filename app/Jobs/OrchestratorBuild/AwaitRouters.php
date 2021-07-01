@@ -9,7 +9,7 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class AwaitVpcs extends Job
+class AwaitRouters extends Job
 {
     use Batchable, LoggableModelJob, AwaitResources;
 
@@ -25,11 +25,11 @@ class AwaitVpcs extends Job
         $orchestratorBuild = $this->model;
 
         $state = collect($orchestratorBuild->state);
-        if (!$state->has('vpc')) {
-            Log::info(get_class($this) . ' : No VPC\'s detected in build state, skipping', ['id' => $this->model->id]);
+        if (!$state->has('router')) {
+            Log::info(get_class($this) . ' : No Routers\'s detected in build state, skipping', ['id' => $this->model->id]);
             return;
         }
 
-        $this->awaitSyncableResources($state->get('vpc'));
+        $this->awaitSyncableResources($state->get('router'));
     }
 }

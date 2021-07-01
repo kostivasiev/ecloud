@@ -44,9 +44,9 @@ class RouterController extends BaseController
     public function create(CreateRequest $request)
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
-        $router->save();
 
-        return $this->responseIdMeta($request, $router->id, 202);
+        $task = $router->syncSave();
+        return $this->responseIdMeta($request, $router->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $routerId)
@@ -54,11 +54,8 @@ class RouterController extends BaseController
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
         $router->fill($request->only(['name', 'router_throughput_id']));
 
-        $router->withTaskLock(function ($router) {
-            $router->save();
-        });
-
-        return $this->responseIdMeta($request, $router->id, 200);
+        $task = $router->syncSave();
+        return $this->responseIdMeta($request, $router->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $routerId)
@@ -69,11 +66,8 @@ class RouterController extends BaseController
             return $router->getDeletionError();
         }
 
-        $router->withTaskLock(function ($router) {
-            $router->delete();
-        });
-
-        return response('', 204);
+        $task = $router->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 
     public function vpns(Request $request, QueryTransformer $queryTransformer, string $routerId)
