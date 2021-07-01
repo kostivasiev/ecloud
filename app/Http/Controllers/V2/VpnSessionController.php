@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\VpnSession\Create;
-use App\Http\Requests\V2\VpnSession\Update;
+use App\Http\Requests\V2\VpnSession\CreateRequest;
+use App\Http\Requests\V2\VpnSession\UpdateRequest;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
@@ -34,7 +34,7 @@ class VpnSessionController extends BaseController
         );
     }
 
-    public function create(Create $request)
+    public function create(CreateRequest $request)
     {
         $vpnSession = new VpnSession($request->only([
             'id',
@@ -53,7 +53,7 @@ class VpnSessionController extends BaseController
         return $this->responseIdMeta($request, $vpnSession->id, 202);
     }
 
-    public function update(Update $request, string $vpnSessionId)
+    public function update(UpdateRequest $request, string $vpnSessionId)
     {
         $vpnSession = VpnSession::forUser(Auth::user())->findOrFail($vpnSessionId);
         $vpnSession->fill($request->only([
@@ -66,8 +66,9 @@ class VpnSessionController extends BaseController
         ]));
         $vpnSession->save();
 
-        $vpnSession->vpnEndpoints()->attach($request->get('vpn_endpoint_id'));
-        $vpnSession->vpnServices()->attach($request->get('vpn_service_id'));
+        if ($request->has('vpn_endpoint_id')) {
+            $vpnSession->vpnEndpoints()->attach($request->get('vpn_endpoint_id'));
+        }
         $vpnSession->refresh();
 
         return $this->responseIdMeta($request, $vpnSession->id, 202);

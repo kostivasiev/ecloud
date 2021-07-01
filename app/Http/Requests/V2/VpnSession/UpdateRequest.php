@@ -4,8 +4,6 @@ namespace App\Http\Requests\V2\VpnSession;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnEndpointVpnSession;
 use App\Models\V2\VpnProfileGroup;
-use App\Models\V2\VpnService;
-use App\Models\V2\VpnServiceVpnSession;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidCidrNetworkCsvString;
@@ -13,7 +11,7 @@ use App\Rules\V2\ValidIpv4;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
-class Update extends FormRequest
+class UpdateRequest extends FormRequest
 {
     public function authorize()
     {
@@ -30,18 +28,6 @@ class Update extends FormRequest
                 'required',
                 'string',
                 Rule::exists(VpnProfileGroup::class, 'id')->whereNull('deleted_at'),
-            ],
-            'vpn_service_id' => 'sometimes|required|array|min:1',
-            'vpn_service_id.*' => [
-                'sometimes',
-                'required',
-                'string',
-                Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnServiceVpnSession::class, 'vpn_service_id')
-                    ->where('vpn_session_id', $vpnSessionId),
-                'distinct',
-                new ExistsForUser(VpnService::class),
-                new IsResourceAvailable(VpnService::class),
             ],
             'vpn_endpoint_id' => 'sometimes|required|array|min:1',
             'vpn_endpoint_id.*' => [

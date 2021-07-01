@@ -26,6 +26,10 @@ patch:
           type: object
           allOf:
             - $ref: "../../public-openapi.yaml#/components/schemas/VpnSession"
+            - type: object
+              properties:
+                vpn_service_id:
+                  readOnly: true
   responses:
     200:
       $ref: '../../public-openapi.yaml#/components/responses/VpnSessionIdResponse'
