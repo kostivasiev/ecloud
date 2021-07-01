@@ -66,22 +66,6 @@ class UpdateTest extends TestCase
         )->assertResponseStatus(202);
     }
 
-    public function testUpdateResourceServiceUsed()
-    {
-        $this->vpnSession->vpnServices()->attach($this->vpnService);
-        $this->patch(
-            '/v2/vpn-sessions/' . $this->vpnSession->id,
-            [
-                'vpn_service_id' => [
-                    $this->vpnService->id,
-                ]
-            ]
-        )->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'The vpn_service_id.0 is already in use for this session',
-        ])->assertResponseStatus(422);
-    }
-
     public function testUpdateResourceEndpointUsed()
     {
         $this->vpnSession->vpnEndpoints()->attach($this->vpnEndpoint);
