@@ -89,21 +89,13 @@ class UpdateTest extends TestCase
         });
         // Update original local endpoint
         $data = [
-            'vpn_service_id' => $vpnService->id,
             'floating_ip_id' => $floatingIp->id,
         ];
         $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A vpn endpoint already exists for the specified vpn service id',
-                    'source' => 'vpn_service_id',
-                ]
-            )
-            ->seeJson(
-                [
-                    'title' => 'Validation Error',
-                    'detail' => 'A vpn endpoint already exists for the specified floating ip id',
+                    'detail' => 'The floating ip id has already been taken',
                     'source' => 'floating_ip_id',
                 ]
             )
