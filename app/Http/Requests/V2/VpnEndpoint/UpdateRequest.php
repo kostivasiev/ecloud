@@ -10,34 +10,22 @@ use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
-class Create extends FormRequest
+class UpdateRequest extends FormRequest
 {
     public function rules()
     {
+        $id = $this->route()[2]['vpnEndpointId'];
         return [
-            'name' => 'required|string',
-            'vpn_service_id' => [
-                'required',
-                Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnServiceVpnEndpoint::class, 'vpn_service_id'),
-                new ExistsForUser(VpnService::class),
-                new IsResourceAvailable(VpnService::class),
-            ],
+            'name' => 'sometimes|required|string',
             'floating_ip_id' => [
                 'sometimes',
                 'required',
                 Rule::exists(FloatingIp::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnEndpoint::class, 'floating_ip_id')->whereNull('deleted_at'),
+                Rule::unique(VpnEndpoint::class, 'floating_ip_id')
+                    ->ignore($id, 'id'),
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
             ],
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'unique' => 'A vpn endpoint already exists for the specified :attribute',
         ];
     }
 }

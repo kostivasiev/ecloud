@@ -2,27 +2,24 @@
 namespace App\Http\Requests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
-use App\Models\V2\VpnServiceVpnEndpoint;
-use App\Models\V2\VpnService;
 use App\Models\V2\VpnEndpoint;
+use App\Models\V2\VpnService;
+use App\Models\V2\VpnServiceVpnEndpoint;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
-class Update extends FormRequest
+class CreateRequest extends FormRequest
 {
     public function rules()
     {
-        $id = $this->route()[2]['vpnEndpointId'];
         return [
-            'name' => 'sometimes|required|string',
+            'name' => 'required|string',
             'vpn_service_id' => [
-                'sometimes',
                 'required',
                 Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnServiceVpnEndpoint::class, 'vpn_service_id')
-                    ->ignore($id, 'vpn_endpoint_id'),
+                Rule::unique(VpnServiceVpnEndpoint::class, 'vpn_service_id'),
                 new ExistsForUser(VpnService::class),
                 new IsResourceAvailable(VpnService::class),
             ],
@@ -30,8 +27,7 @@ class Update extends FormRequest
                 'sometimes',
                 'required',
                 Rule::exists(FloatingIp::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnEndpoint::class, 'floating_ip_id')
-                    ->ignore($id, 'id'),
+                Rule::unique(VpnEndpoint::class, 'floating_ip_id')->whereNull('deleted_at'),
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
             ],

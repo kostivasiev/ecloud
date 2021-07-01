@@ -1,8 +1,8 @@
 <?php
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\VpnEndpoint\Create;
-use App\Http\Requests\V2\VpnEndpoint\Update;
+use App\Http\Requests\V2\VpnEndpoint\CreateRequest;
+use App\Http\Requests\V2\VpnEndpoint\UpdateRequest;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
@@ -32,7 +32,7 @@ class VpnEndpointController extends BaseController
         );
     }
 
-    public function store(Create $request)
+    public function store(CreateRequest $request)
     {
         $vpnEndpoint = new VpnEndpoint(
             $request->only(['name', 'floating_ip_id'])
@@ -54,10 +54,10 @@ class VpnEndpointController extends BaseController
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
     }
 
-    public function update(Update $request, string $vpnEndpointId)
+    public function update(UpdateRequest $request, string $vpnEndpointId)
     {
         $vpnEndpoint = VpnEndpoint::forUser(Auth::user())->findOrFail($vpnEndpointId);
-        $vpnEndpoint->fill($request->only(['name', 'vpn_service_id', 'fip_id']));
+        $vpnEndpoint->fill($request->only(['name', 'fip_id']));
         $vpnEndpoint->save();
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
     }
