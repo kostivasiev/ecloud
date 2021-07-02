@@ -108,6 +108,7 @@ class DiscountPlanController extends BaseController
 
         if ($this->isAdmin) {
             $discountPlan->reseller_id = $request->input('reseller_id', $discountPlan->reseller_id);
+            $discountPlan->orderform_id = $request->input('orderform_id', $discountPlan->orderform_id);
         }
 
         // if start date specified then use existing term_length or newly submitted one
