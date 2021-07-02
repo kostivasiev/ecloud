@@ -5,6 +5,7 @@ use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ScheduledDeploy extends Command
 {
@@ -12,31 +13,31 @@ class ScheduledDeploy extends Command
     protected $description = 'Scheduled Orchestration Deployments';
 
     public \DateTimeZone $timeZone;
-    public Carbon $startDate;
-    public Carbon $endDate;
+    public $startDate;
+    public $endDate;
 
     public function __construct()
     {
         parent::__construct();
-        $this->timeZone = new \DateTimeZone(config('app.timezone'));
-        $this->endDate = Carbon::now($this->timeZone);
-        $this->startDate = $this->endDate->subSeconds(59);
+        $this->endDate = date('Y-m-d H:i:s', strtotime('now'));
+        $this->startDate = date('Y-m-d H:i:s', strtotime('now - 59 seconds'));
     }
 
     public function handle()
     {
-        $this->info('Processing Orchestrations Start');
+        Log::info('Processing Orchestrations Start');
         OrchestratorConfig::doesntHave('orchestratorBuilds')
+            ->whereNotNull('deploy_on')
             ->whereBetween('deploy_on', [$this->startDate, $this->endDate])
             ->each(function ($orchestratorConfig) {
-                $this->info('Deploying Config ' . $orchestratorConfig->id);
+                Log::info('Deploying Config ' . $orchestratorConfig->id);
                 if (!$this->option('test-run')) {
                     $orchestratorBuild = app()->make(OrchestratorBuild::class);
                     $orchestratorBuild->orchestratorConfig()->associate($orchestratorConfig);
                     $orchestratorBuild->syncSave();
                 }
             });
-        $this->info('Processing Orchestrations End');
+        Log::info('Processing Orchestrations End');
 
         return Command::SUCCESS;
     }

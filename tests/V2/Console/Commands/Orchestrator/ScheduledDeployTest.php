@@ -5,6 +5,7 @@ use App\Console\Commands\Orchestrator\ScheduledDeploy;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class ScheduledDeployTest extends TestCase
@@ -49,10 +50,10 @@ class ScheduledDeployTest extends TestCase
         });
     }
 
-    public function assertConfigProcessed($configId)
+    public function assertConfigProcessed($arguments, $configId)
     {
         $configFound = false;
-        foreach ($this->lineArgument as $lineArgument) {
+        foreach ($arguments as $lineArgument) {
             if (strpos($lineArgument, $configId) !== -1) {
                 $configFound = true;
                 break;
@@ -63,13 +64,13 @@ class ScheduledDeployTest extends TestCase
 
     public function testWithConfigs()
     {
-        $orchestratorConfigs = factory(OrchestratorConfig::class, 3)->create([
+        $orchestratorConfig = factory(OrchestratorConfig::class)->create([
             'deploy_on' => $this->startDate,
         ]);
-        $this->command->handle();
-        foreach ($orchestratorConfigs as $orchestratorConfig) {
-            $this->assertConfigProcessed($orchestratorConfig->id);
-        }
+        Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations Start');
+        Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations End');
+        Log::shouldReceive('info')->withSomeOfArgs('Deploying Config ' . $orchestratorConfig->id);
+        $this->assertEquals(0, $this->command->handle());
     }
 
     public function testWithConfigNotDue()
@@ -77,15 +78,15 @@ class ScheduledDeployTest extends TestCase
         factory(OrchestratorConfig::class)->create([
             'deploy_on' => Carbon::createFromTimeString('2031-07-02 13:40:00')
         ]);
-        $this->command->handle();
-        $this->assertEquals('Processing Orchestrations Start', $this->lineArgument[0]);
-        $this->assertEquals('Processing Orchestrations End', $this->lineArgument[1]);
+        Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations Start');
+        Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations End');
+        $this->assertEquals(0, $this->command->handle());
     }
 
     public function testWithNoConfig()
     {
-        $this->command->handle();
-        $this->assertEquals('Processing Orchestrations Start', $this->lineArgument[0]);
-        $this->assertEquals('Processing Orchestrations End', $this->lineArgument[1]);
+        Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations Start');
+        Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations End');
+        $this->assertEquals(0, $this->command->handle());
     }
 }
