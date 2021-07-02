@@ -26,7 +26,7 @@ class AwaitDefaultFirewallPolicies extends Job
 
         $state = collect($orchestratorBuild->state);
         if (!$state->has('default_firewall_policies')) {
-            Log::info(get_class($this) . ' : No firewall policies detected in build state, skipping', ['id' => $this->model->id]);
+            Log::info(get_class($this) . ' : No default firewall policies detected in build state, skipping', ['id' => $this->model->id]);
             return;
         }
 
