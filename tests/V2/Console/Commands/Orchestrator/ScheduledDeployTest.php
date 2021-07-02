@@ -34,11 +34,7 @@ class ScheduledDeployTest extends TestCase
 
         $this->command->shouldReceive('info')
             ->with(\Mockery::capture($this->infoArgument))->andReturnUsing(function () {
-                return true;
-            });
-        $this->command->shouldReceive('line')
-            ->with(\Mockery::capture($this->lineArgumentItem))->andReturnUsing(function () {
-                $this->lineArgument[] = $this->lineArgumentItem;
+                $this->lineArgument[] = $this->infoArgument;
                 return true;
             });
         $this->command->shouldReceive('option')->with('test-run')->andReturnTrue();
@@ -82,12 +78,14 @@ class ScheduledDeployTest extends TestCase
             'deploy_on' => Carbon::createFromTimeString('2031-07-02 13:40:00')
         ]);
         $this->command->handle();
-        $this->assertEmpty($this->lineArgument);
+        $this->assertEquals('Processing Orchestrations Start', $this->lineArgument[0]);
+        $this->assertEquals('Processing Orchestrations End', $this->lineArgument[1]);
     }
 
     public function testWithNoConfig()
     {
         $this->command->handle();
-        $this->assertEmpty($this->lineArgument);
+        $this->assertEquals('Processing Orchestrations Start', $this->lineArgument[0]);
+        $this->assertEquals('Processing Orchestrations End', $this->lineArgument[1]);
     }
 }

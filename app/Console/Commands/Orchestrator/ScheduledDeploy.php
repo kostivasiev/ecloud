@@ -29,7 +29,7 @@ class ScheduledDeploy extends Command
         OrchestratorConfig::doesntHave('orchestratorBuilds')
             ->whereBetween('deploy_on', [$this->startDate, $this->endDate])
             ->each(function ($orchestratorConfig) {
-                $this->line('Deploying Config ' . $orchestratorConfig->id);
+                $this->info('Deploying Config ' . $orchestratorConfig->id);
                 if (!$this->option('test-run')) {
                     $orchestratorBuild = app()->make(OrchestratorBuild::class);
                     $orchestratorBuild->orchestratorConfig()->associate($orchestratorConfig);
