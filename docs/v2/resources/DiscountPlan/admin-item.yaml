@@ -35,6 +35,8 @@ patch:
                   required: false
                 datacentre_site_id:
                   required: false
+                orderform_id:
+                  readOnly: true
                 region_id:
                   required: false
                 is_public:

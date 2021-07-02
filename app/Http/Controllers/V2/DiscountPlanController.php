@@ -57,7 +57,24 @@ class DiscountPlanController extends BaseController
         if ($this->isAdmin && empty($this->resellerId)) {
             throw new BadRequestException('Missing Reseller scope');
         }
-        $discountPlan = new DiscountPlan($request->only($this->getAllowedFields()));
+        $discountPlan = new DiscountPlan($request->only([
+            'name',
+            'commitment_amount',
+            'commitment_before_discount',
+            'discount_rate',
+            'term_length',
+            'term_start_date',
+            'term_end_date',
+        ]));
+        if ($this->isAdmin) {
+            $discountPlan->fill($request->only([
+                'contact_id',
+                'employee_id',
+                'orderform_id',
+                'reseller_id',
+                'status'
+            ]));
+        }
         if (!$request->has('term_end_date')) {
             $discountPlan->term_end_date = $this->calculateNewEndDate(
                 $request->get('term_start_date'),
@@ -79,7 +96,15 @@ class DiscountPlanController extends BaseController
     public function update(Update $request, string $discountPlanId)
     {
         $discountPlan = DiscountPlan::forUser(Auth::user())->findOrFail($discountPlanId);
-        $discountPlan->update($request->only($this->getAllowedFields()));
+        $discountPlan->update($request->only([
+            'name',
+            'commitment_amount',
+            'commitment_before_discount',
+            'discount_rate',
+            'term_length',
+            'term_start_date',
+            'term_end_date',
+        ]));
 
         if ($this->isAdmin) {
             $discountPlan->reseller_id = $request->input('reseller_id', $discountPlan->reseller_id);
@@ -141,29 +166,6 @@ class DiscountPlanController extends BaseController
         $discountPlan = DiscountPlan::forUser($request->user())->findOrFail($discountPlanId);
         $discountPlan->reject();
         return response(null, 200);
-    }
-
-    /**
-     * @return string[]
-     */
-    private function getAllowedFields(): array
-    {
-        $allowedFields = [
-            'name',
-            'commitment_amount',
-            'commitment_before_discount',
-            'discount_rate',
-            'term_length',
-            'term_start_date',
-            'term_end_date',
-        ];
-        if (Auth::user()->isAdmin()) {
-            $allowedFields[] = 'contact_id';
-            $allowedFields[] = 'employee_id';
-            $allowedFields[] = 'reseller_id';
-            $allowedFields[] = 'status';
-        }
-        return $allowedFields;
     }
 
     /**

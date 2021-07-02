@@ -40,6 +40,7 @@ class DiscountPlanResource extends UKFastResource
                 'contact_id' => $this->contact_id,
                 'employee_id' => $this->employee_id,
                 'reseller_id' => $this->reseller_id,
+                'orderform_id' => $this->orderform_id,
             ];
         }
 

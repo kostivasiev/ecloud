@@ -40,6 +40,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'contact_id' => 1,
+            'orderform_id' => '84bfdc19-977e-462b-a14b-0c4b907fff55',
             'name' => 'test-commitment',
             'commitment_amount' => '2000',
             'commitment_before_discount' => '1000',
@@ -75,6 +76,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'contact_id' => 1,
+            'orderform_id' => '84bfdc19-977e-462b-a14b-0c4b907fff55',
             'commitment_amount' => '2000',
             'commitment_before_discount' => '1000',
             'discount_rate' => '5',
