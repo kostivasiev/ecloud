@@ -21,7 +21,7 @@ class CreateTest extends TestCase
             'digest_algorithm' => [
                 'sha2 256',
             ],
-            'diffie_-_hellman' => [
+            'diffie_hellman' => [
                 'group 14',
             ],
         ];
@@ -46,7 +46,7 @@ class CreateTest extends TestCase
         $transformed = $this->data;
         $transformed['encryption_algorithm'] = implode(',', $this->data['encryption_algorithm']);
         $transformed['digest_algorithm'] = implode(',', $this->data['digest_algorithm']);
-        $transformed['diffie_-_hellman'] = implode(',', $this->data['diffie_-_hellman']);
+        $transformed['diffie_hellman'] = implode(',', $this->data['diffie_hellman']);
 
         $this->post('/v2/vpn-profiles', $this->data)
             ->seeInDatabase('vpn_profiles', $transformed, 'ecloud')
@@ -70,7 +70,7 @@ class CreateTest extends TestCase
                 'digest_algorithm' => [
                     'INVALID',
                 ],
-                'diffie_-_hellman' => [
+                'diffie_hellman' => [
                     'INVALID',
                 ],
             ]
@@ -92,8 +92,8 @@ class CreateTest extends TestCase
             ])
             ->seeJson([
                 'title' => 'Validation Error',
-                'detail' => 'The selected diffie_-_hellman.0 is invalid',
-                'source' => 'diffie_-_hellman.0',
+                'detail' => 'The selected diffie_hellman.0 is invalid',
+                'source' => 'diffie_hellman.0',
             ])
             ->assertResponseStatus(422);
     }

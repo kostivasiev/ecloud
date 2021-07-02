@@ -23,7 +23,7 @@ class GetTest extends TestCase
             'digest_algorithm' => [
                 'sha2 256',
             ],
-            'diffie_-_hellman' => [
+            'diffie_hellman' => [
                 'group 14',
             ],
         ];
