@@ -25,7 +25,7 @@ properties:
       required: true
       example: 'sha2 512'
       readOnly: false
-  diffie_-_hellman:
+  diffie_hellman:
     type: array
     items:
       type: string
