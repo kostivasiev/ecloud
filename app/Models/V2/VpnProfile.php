@@ -34,7 +34,7 @@ class VpnProfile extends Model implements Filterable, Sortable
             'ike_version',
             'encryption_algorithm',
             'digest_algorithm',
-            'diffie_-_hellman',
+            'diffie_hellman',
         ];
         parent::__construct($attributes);
     }
@@ -51,7 +51,7 @@ class VpnProfile extends Model implements Filterable, Sortable
             $factory->create('ike_version', Filter::$stringDefaults),
             $factory->create('encryption_algorithm', Filter::$enumDefaults),
             $factory->create('digest_algorithm', Filter::$enumDefaults),
-            $factory->create('diffie_-_hellman', Filter::$enumDefaults),
+            $factory->create('diffie_hellman', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -70,7 +70,7 @@ class VpnProfile extends Model implements Filterable, Sortable
             $factory->create('ike_version'),
             $factory->create('encryption_algorithm'),
             $factory->create('digest_algorithm'),
-            $factory->create('diffie_-_hellman'),
+            $factory->create('diffie_hellman'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -98,7 +98,7 @@ class VpnProfile extends Model implements Filterable, Sortable
             'ike_version' => 'ike_version',
             'encryption_algorithm' => 'encryption_algorithm',
             'digest_algorithm' => 'digest_algorithm',
-            'diffie_-_hellman' => 'diffie_-_hellman',
+            'diffie_hellman' => 'diffie_hellman',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
@@ -126,11 +126,11 @@ class VpnProfile extends Model implements Filterable, Sortable
 
     public function getDiffieHellmanAttribute()
     {
-        return explode(',', $this->attributes['diffie_-_hellman']);
+        return explode(',', $this->attributes['diffie_hellman']);
     }
 
     public function setDiffieHellmanAttribute($value)
     {
-        $this->attributes['diffie_-_hellman'] = implode(',', $value);
+        $this->attributes['diffie_hellman'] = implode(',', $value);
     }
 }
