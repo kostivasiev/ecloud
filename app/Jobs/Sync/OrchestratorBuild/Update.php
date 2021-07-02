@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\OrchestratorBuild;
 
 use App\Jobs\Job;
+use App\Jobs\OrchestratorBuild\AwaitDefaultFirewallPolicies;
 use App\Jobs\OrchestratorBuild\AwaitRouters;
 use App\Jobs\OrchestratorBuild\AwaitVpcs;
 use App\Jobs\OrchestratorBuild\ConfigureDefaultFirewallPolicies;
@@ -32,6 +33,7 @@ class Update extends Job
                 new CreateRouters($this->task->resource),
                 new AwaitRouters($this->task->resource),
                 new ConfigureDefaultFirewallPolicies($this->task->resource),
+                new AwaitDefaultFirewallPolicies($this->task->resource),
             ]
         ])->dispatch();
     }
