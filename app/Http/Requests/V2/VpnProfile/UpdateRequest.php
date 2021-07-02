@@ -45,8 +45,8 @@ class UpdateRequest extends FormRequest
                 'string',
                 'in:sha1,sha2 256,sha2 384,sha2 512',
             ],
-            'diffie_-_hellman' => 'sometimes|required|array|min:1',
-            'diffie_-_hellman.*' => [
+            'diffie_hellman' => 'sometimes|required|array|min:1',
+            'diffie_hellman.*' => [
                 'sometimes',
                 'required',
                 'string',

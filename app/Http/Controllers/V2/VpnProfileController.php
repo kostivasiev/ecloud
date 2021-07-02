@@ -37,7 +37,7 @@ class VpnProfileController extends BaseController
             'ike_version',
             'encryption_algorithm',
             'digest_algorithm',
-            'diffie_-_hellman',
+            'diffie_hellman',
         ]));
         $vpnProfile->save();
         $vpnProfile->refresh();
@@ -52,7 +52,7 @@ class VpnProfileController extends BaseController
             'ike_version',
             'encryption_algorithm',
             'digest_algorithm',
-            'diffie_-_hellman',
+            'diffie_hellman',
         ]));
         $vpnProfile->save();
         return $this->responseIdMeta($request, $vpnProfile->id, 200);

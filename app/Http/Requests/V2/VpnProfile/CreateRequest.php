@@ -42,8 +42,8 @@ class CreateRequest extends FormRequest
                 'string',
                 'in:sha1,sha2 256,sha2 384,sha2 512',
             ],
-            'diffie_-_hellman' => 'required|array|min:1',
-            'diffie_-_hellman.*' => [
+            'diffie_hellman' => 'required|array|min:1',
+            'diffie_hellman.*' => [
                 'required',
                 'string',
                 'in:group 2,group 5,group 14,group 15,group 16,group 19,group 20,group 21',

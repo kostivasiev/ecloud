@@ -31,7 +31,7 @@ class VpnProfileResource extends UKFastResource
             'ike_version' => $this->ike_version,
             'encryption_algorithm' => $this->encryption_algorithm,
             'digest_algorithm' => $this->digest_algorithm,
-            'diffie_-_hellman' => $this->diffieHellman,
+            'diffie_hellman' => $this->diffieHellman,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

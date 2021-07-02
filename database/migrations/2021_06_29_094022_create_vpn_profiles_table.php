@@ -19,7 +19,7 @@ class CreateVpnProfilesTable extends Migration
             $table->string('ike_version');
             $table->text('encryption_algorithm');
             $table->text('digest_algorithm');
-            $table->text('diffie_-_hellman');
+            $table->text('diffie_hellman');
             $table->timestamps();
             $table->softDeletes();
         });
