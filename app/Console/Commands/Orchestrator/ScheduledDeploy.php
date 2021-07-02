@@ -40,5 +40,4 @@ class ScheduledDeploy extends Command
 
         return Command::SUCCESS;
     }
-
 }
