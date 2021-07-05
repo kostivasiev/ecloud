@@ -42,6 +42,7 @@ class UpdateTest extends TestCase
         $this->vpnSession = factory(VpnSession::class)->create(
             [
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
+                'vpn_service_id' => $this->vpnService->id,
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '127.1.1.1/32',
                 'local_networks' => '127.1.1.1/32,127.1.10.1/24',
@@ -51,7 +52,6 @@ class UpdateTest extends TestCase
 
     public function testUpdateResource()
     {
-        $this->vpnSession->vpnServices()->attach($this->vpnService);
         $this->vpnSession->vpnEndpoints()->attach($this->vpnEndpoint);
         $data = [
             'name' => 'Updated Test Session',

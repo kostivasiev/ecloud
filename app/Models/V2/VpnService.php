@@ -57,9 +57,9 @@ class VpnService extends Model implements Filterable, Sortable
         return $this->belongsToMany(VpnEndpoint::class);
     }
 
-    public function vpnSessions()
+    public function vpnSession()
     {
-        return $this->belongsToMany(VpnSession::class);
+        return $this->hasOne(VpnSession::class);
     }
 
     /**

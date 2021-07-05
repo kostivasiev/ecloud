@@ -32,6 +32,7 @@ class VpnSession extends Model implements Filterable, Sortable
             'id',
             'name',
             'vpn_profile_group_id',
+            'vpn_service_id',
             'remote_ip',
             'remote_networks',
             'local_networks',
@@ -44,9 +45,9 @@ class VpnSession extends Model implements Filterable, Sortable
         return $this->belongsTo(VpnProfileGroup::class);
     }
 
-    public function vpnServices()
+    public function vpnService()
     {
-        return $this->belongsToMany(VpnService::class);
+        return $this->belongsTo(VpnService::class);
     }
 
     public function vpnEndpoints()
@@ -64,7 +65,7 @@ class VpnSession extends Model implements Filterable, Sortable
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('vpnServices.router.vpc', function ($query) use ($user) {
+        return $query->whereHas('vpnService.router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }
@@ -80,7 +81,6 @@ class VpnSession extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpn_profile_group_id', Filter::$stringDefaults),
             $factory->create('vpn_service_id', Filter::$stringDefaults),
-            $factory->create('vpn_endpoint_id', Filter::$stringDefaults),
             $factory->create('remote_ip', Filter::$stringDefaults),
             $factory->create('remote_networks', Filter::$stringDefaults),
             $factory->create('local_networks', Filter::$stringDefaults),
@@ -101,7 +101,6 @@ class VpnSession extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('vpn_profile_group_id'),
             $factory->create('vpn_service_id'),
-            $factory->create('vpn_endpoint_id'),
             $factory->create('remote_ip'),
             $factory->create('remote_networks'),
             $factory->create('local_networks'),
@@ -131,7 +130,6 @@ class VpnSession extends Model implements Filterable, Sortable
             'name' => 'name',
             'vpn_profile_group_id' => 'vpn_profile_group_id',
             'vpn_service_id' => 'vpn_service_id',
-            'vpn_endpoint_id' => 'vpn_endpoint_id',
             'remote_ip' => 'remote_ip',
             'remote_networks' => 'remote_networks',
             'local_networks' => 'local_networks',

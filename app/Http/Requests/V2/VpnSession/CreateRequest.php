@@ -27,12 +27,10 @@ class CreateRequest extends FormRequest
                 'string',
                 Rule::exists(VpnProfileGroup::class, 'id')->whereNull('deleted_at'),
             ],
-            'vpn_service_id' => 'required|array|min:1',
-            'vpn_service_id.*' => [
+            'vpn_service_id' => [
                 'required',
                 'string',
                 Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
-                'distinct',
                 new ExistsForUser(VpnService::class),
                 new IsResourceAvailable(VpnService::class),
             ],

@@ -11,6 +11,10 @@ properties:
     type: string
     required: true
     example: 'vpnpg-abc123xyz'
+  vpn_service_id:
+    type: string
+    required: true
+    example: 'vpn-abc123xyz'
   remote_ip:
     type: string
     required: true

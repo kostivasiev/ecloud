@@ -43,13 +43,6 @@ post:
           allOf:
             - $ref: '../../public-openapi.yaml#/components/schemas/VpnSession'
             - properties:
-                vpn_service_id:
-                  type : array
-                  items:
-                    type: string
-                    required : true
-                    example : 'vpn-2b66bb79'
-                    readOnly : false
                 vpn_endpoint_id:
                   type : array
                   items:

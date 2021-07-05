@@ -52,23 +52,17 @@ class CreateTest extends TestCase
     public function testCreateResource()
     {
         $counter = 0;
-        $services = factory(VpnService::class, 2)->create([
+        $vpnService = factory(VpnService::class)->create([
+            'name' => 'test-service',
             'router_id' => $this->router()->id,
-        ])->each(function ($service) use ($counter) {
-            $counter++;
-            $service->name = 'test-service-' . $counter;
-            $service->save();
-        });
+        ]);
 
         $this->post(
             '/v2/vpn-sessions',
             [
                 'name' => 'vpn session test',
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
-                'vpn_service_id' => [
-                    $services[0]->id,
-                    $services[1]->id,
-                ],
+                'vpn_service_id' => $vpnService->id,
                 'vpn_endpoint_id' => [
                     $this->vpnEndpoint->id,
                 ],
@@ -79,17 +73,14 @@ class CreateTest extends TestCase
         )->assertResponseStatus(202);
     }
 
-    public function testCreateResourceInvalidAndDuplicateService()
+    public function testCreateResourceInvalidService()
     {
         $this->post(
             '/v2/vpn-sessions',
             [
                 'name' => 'vpn session test',
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
-                'vpn_service_id' => [
-                    'vnps-00000000',
-                    'vnps-00000000',
-                ],
+                'vpn_service_id' => 'vnps-00000000',
                 'vpn_endpoint_id' => [
                     $this->vpnEndpoint->id,
                 ],
@@ -100,22 +91,7 @@ class CreateTest extends TestCase
         )->seeJson(
             [
                 'title' => 'Validation Error',
-                'detail' => 'The selected vpn_service_id.0 is invalid',
-            ]
-        )->seeJson(
-            [
-                'title' => 'Validation Error',
-                'detail' => 'The selected vpn_service_id.1 is invalid',
-            ]
-        )->seeJson(
-            [
-                'title' => 'Validation Error',
-                'detail' => 'The vpn_service_id.0 field has a duplicate value',
-            ]
-        )->seeJson(
-            [
-                'title' => 'Validation Error',
-                'detail' => 'The vpn_service_id.1 field has a duplicate value',
+                'detail' => 'The selected vpn service id is invalid',
             ]
         )->assertResponseStatus(422);
     }
@@ -132,9 +108,7 @@ class CreateTest extends TestCase
             [
                 'name' => 'vpn session test',
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
-                'vpn_service_id' => [
-                    $service->id,
-                ],
+                'vpn_service_id' => $service->id,
                 'vpn_endpoint_id' => [
                     $this->vpnEndpoint->id,
                 ],
