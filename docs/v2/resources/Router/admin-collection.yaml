@@ -42,7 +42,7 @@ post:
         schema:
           $ref: '../../admin-openapi.yaml#/components/schemas/Routers'
   responses:
-    201:
+    202:
       $ref: '../../admin-openapi.yaml#/components/responses/RouterIdResponse'
   tags:
     - Routers

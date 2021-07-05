@@ -2,21 +2,15 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Network\Created;
 use App\Events\V2\Network\Creating;
 use App\Events\V2\Network\Deleted;
-use App\Events\V2\Network\Deleting;
-use App\Events\V2\Network\Saved;
-use App\Events\V2\Network\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -45,11 +39,7 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable
     ];
     protected $dispatchesEvents = [
         'creating' => Creating::class,
-        'created' => Created::class,
-        'saving' => Saving::class,
-        'saved' => Saved::class,
         'deleted' => Deleted::class,
-        'deleting' => Deleting::class,
     ];
 
     public function getResellerId(): int

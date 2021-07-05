@@ -21,7 +21,7 @@ class CreateRoutersTest extends TestCase
         parent::setUp();
         $this->orchestratorConfig = factory(OrchestratorConfig::class)->create([
             'data' => json_encode([
-                'router' => [
+                'routers' => [
                     [
                         'vpc_id' => '{vpc.0}',
                         'name' => 'test router',
@@ -104,7 +104,7 @@ class CreateRoutersTest extends TestCase
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
         $this->orchestratorConfig->data = json_encode([
-                'router' => [
+                'routers' => [
                     [
                         'vpc_id' => '{vpc.0}',
                         'name' => 'test router',
@@ -138,7 +138,7 @@ class CreateRoutersTest extends TestCase
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
         $this->orchestratorConfig->data = json_encode([
-            'router' => [
+            'routers' => [
                 [
                     'vpc_id' => '{vpc.0}',
                     'name' => 'test router',
