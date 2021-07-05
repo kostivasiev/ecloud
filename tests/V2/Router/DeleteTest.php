@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Router;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\Region;
@@ -48,13 +49,11 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        Event::fake();
-        $this->assertNull($this->router->deleted_at);
+        Event::fake(Created::class);
         $this->delete('/v2/routers/' . $this->router->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(204);
-        $this->router->refresh();
-        $this->assertNotNull($this->router->deleted_at);
+        ])->assertResponseStatus(202);
+        Event::assertDispatched(Created::class);
     }
 }

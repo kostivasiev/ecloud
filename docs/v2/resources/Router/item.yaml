@@ -36,7 +36,7 @@ patch:
                 availability_zone_id:
                   readOnly: true
   responses:
-    200:
+    202:
       $ref: '../../public-openapi.yaml#/components/responses/RouterIdResponse'
   tags:
     - Routers
@@ -44,7 +44,8 @@ delete:
   parameters:
     - $ref: '../../public-openapi.yaml#/components/parameters/RouterId'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
+      $ref : '../../components/responses/taskIdResponse.yaml'
   tags:
     - Routers

@@ -43,6 +43,11 @@ class OrchestratorConfig extends Model implements Filterable, Sortable
         parent::__construct($attributes);
     }
 
+    public function orchestratorBuilds()
+    {
+        return $this->hasMany(OrchestratorBuild::class);
+    }
+
     public function scopeForUser($query, Consumer $user)
     {
         return $query;

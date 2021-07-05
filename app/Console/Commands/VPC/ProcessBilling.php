@@ -90,7 +90,6 @@ class ProcessBilling extends Command
 
                 $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
                     if (!in_array($key, $this->billableMetrics)) {
-                        Log::info('Metric `' . $key . '` not found in billableMetrics');
                         return true;
                     }
 
@@ -409,7 +408,8 @@ class ProcessBilling extends Command
      */
     protected function getSupportMinimumProduct($vpcId): Product
     {
-        $availabilityZone = Vpc::findorFail($vpcId)
+        $availabilityZone = Vpc::withTrashed()
+            ->findorFail($vpcId)
             ->region
             ->availabilityZones
             ->first();

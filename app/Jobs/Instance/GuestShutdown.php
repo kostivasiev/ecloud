@@ -5,10 +5,11 @@ namespace App\Jobs\Instance;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
+use Illuminate\Bus\Batchable;
 
 class GuestShutdown extends Job
 {
-    use LoggableModelJob;
+    use Batchable, LoggableModelJob;
 
     private $model;
 
