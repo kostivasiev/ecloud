@@ -57,7 +57,7 @@ class VpnEndpointController extends BaseController
     public function update(UpdateRequest $request, string $vpnEndpointId)
     {
         $vpnEndpoint = VpnEndpoint::forUser(Auth::user())->findOrFail($vpnEndpointId);
-        $vpnEndpoint->fill($request->only(['name', 'fip_id']));
+        $vpnEndpoint->fill($request->only(['name', 'floating_ip_id']));
         $vpnEndpoint->save();
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
     }
