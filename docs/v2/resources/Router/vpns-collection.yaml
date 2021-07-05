@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/Vpn'
+                  $ref: '../../public-openapi.yaml#/components/schemas/VpnService'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

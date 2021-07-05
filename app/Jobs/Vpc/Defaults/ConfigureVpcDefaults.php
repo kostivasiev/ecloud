@@ -29,7 +29,7 @@ class ConfigureVpcDefaults extends Job
         $router = app()->make(Router::class);
         $router->vpc()->associate($this->model);
         $router->availabilityZone()->associate($availabilityZone);
-        $router->save();
+        $router->syncSave();
 
         dispatch((new AwaitRouterSync($router))->chain([
             new CreateNetwork($router),

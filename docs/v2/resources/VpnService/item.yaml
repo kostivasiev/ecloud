@@ -1,0 +1,45 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnServiceId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/VpnService'
+              meta:
+                type: object
+  tags:
+    - Vpn Service
+patch:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnServiceId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "../../public-openapi.yaml#/components/schemas/VpnService"
+            - type: object
+              properties:
+                router_id:
+                  readOnly: true
+  responses:
+    200:
+      $ref: '../../public-openapi.yaml#/components/responses/VpnServiceIdResponse'
+  tags:
+    - Vpn Service
+delete:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnServiceId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Vpn Service
