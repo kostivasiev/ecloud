@@ -20,7 +20,7 @@ class Create extends Job
 
     public function handle()
     {
-        $this->model->router->availabilityZone->nsxService()->put(
+        $this->model->router->availabilityZone->nsxService()->patch(
             '/policy/api/v1/infra/tier-1s/' . $this->model->router->id .
             '/locale-services/' . $this->model->router->id .
             '/ipsec-vpn-services/' . $this->model->id,
