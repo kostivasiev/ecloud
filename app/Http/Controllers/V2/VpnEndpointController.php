@@ -37,17 +37,6 @@ class VpnEndpointController extends BaseController
         $vpnEndpoint = new VpnEndpoint(
             $request->only(['name', 'floating_ip_id'])
         );
-        // if no fip_id supplied then create one
-        if (!$request->has('floating_ip_id')) {
-            $vpn = VpnService::forUser($request->user())->findOrFail($request->get('vpn_service_id'));
-            $floatingIp = app()->make(FloatingIp::class, [
-                'attributes' => [
-                    'vpc_id' => $vpn->router->vpc_id,
-                ]
-            ]);
-            $floatingIp->save();
-            $vpnEndpoint->floating_ip_id = $floatingIp->id;
-        }
         $vpnEndpoint->save();
         $vpnEndpoint->vpnServices()->sync([$request->get('vpn_service_id')]);
         $vpnEndpoint->refresh();
