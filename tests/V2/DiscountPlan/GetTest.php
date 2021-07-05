@@ -7,7 +7,7 @@ use App\Models\V2\DiscountPlan;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
