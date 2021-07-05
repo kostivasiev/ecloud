@@ -14,7 +14,8 @@ class AddVpnServiceColumnToVpnSessionsTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('vpn_sessions', function (Blueprint $table) {
-            $table->uuid('vpn_service_id')->index()->nullable()->after('vpn_profile_group_id');
+            $table->uuid('vpn_profile_group_id')->index()->after('name');
+            $table->uuid('vpn_service_id')->index()->after('vpn_profile_group_id');
         });
     }
 
