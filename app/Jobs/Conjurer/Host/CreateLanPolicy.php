@@ -29,29 +29,30 @@ class CreateLanPolicy extends Job
         $availabilityZone = $this->model->hostGroup->availabilityZone;
 
         if (empty($availabilityZone->ucs_compute_name)) {
-            $message = 'Failed to load UCS compute name for availability zone ' . $availabilityZone->id;
-            Log::error($message);
-            $this->fail(new \Exception($message));
+            $this->fail(new \Exception('Failed to load UCS compute name for availability zone ' . $availabilityZone->id));
             return false;
         }
 
         // Check whether a LAN connectivity policy exists on the UCS for the VPC
         try {
             $availabilityZone->conjurerService()->get('/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $vpc->id);
+
+            Log::debug('LAN connectivity policy already exists, skipping');
+            return true;
         } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
+            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() != 404) {
                 throw $exception;
             }
-
-            $availabilityZone->conjurerService()->post(
-                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc',
-                [
-                    'json' => [
-                        'vpcId' => $vpc->id,
-                    ],
-                ]
-            );
-            Log::info(get_class($this) . ' : LAN policy created on UCS for VPC', ['id' => $this->model->id]);
         }
+
+        $availabilityZone->conjurerService()->post(
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc',
+            [
+                'json' => [
+                    'vpcId' => $vpc->id,
+                ],
+            ]
+        );
+        Log::info(get_class($this) . ' : LAN policy created on UCS for VPC', ['id' => $this->model->id]);
     }
 }

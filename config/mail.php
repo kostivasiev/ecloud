@@ -36,6 +36,13 @@ return [
     'mailers' => [
         'smtp' => [
             'transport' => 'smtp',
+            'host' => env('MAIL_HOST', 'smtp.zippymail.co.uk'),
+            'port' => env('MAIL_PORT', 25),
+            'encryption' => env('MAIL_ENCRYPTION', ''),
+            'username' => env('MAIL_USERNAME'),
+            'password' => env('MAIL_PASSWORD'),
+            'timeout' => null,
+            'auth_mode' => null,
         ],
 
         'ses' => [
@@ -53,11 +60,6 @@ return [
         'sendmail' => [
             'transport' => 'sendmail',
             'path' => '/usr/sbin/sendmail -bs',
-            'host' => env('MAIL_HOST', 'smtp.zippymail.co.uk'),
-            'port' => env('MAIL_PORT', 25),
-            'encryption' => env('MAIL_ENCRYPTION', ''),
-            'username' => env('MAIL_USERNAME'),
-            'password' => env('MAIL_PASSWORD'),
         ],
 
         'log' => [

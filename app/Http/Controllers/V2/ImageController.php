@@ -78,7 +78,7 @@ class ImageController extends BaseController
         ];
 
         // Private images
-        if (Auth::user()->isScoped() && !empty($model->reseller_id)) {
+        if (Auth::user()->isScoped() && !empty($model->vpc_id)) {
             $fillable = [
                 'name',
                 'logo_uri',
@@ -102,9 +102,6 @@ class ImageController extends BaseController
     public function destroy(string $imageId)
     {
         $model = Image::forUser(Auth::user())->findOrFail($imageId);
-
-        // Delete from pivot table
-        $model->availabilityZones()->sync([]);
 
         $task = $model->syncDelete();
         return $this->responseTaskId($task->id);

@@ -1,9 +1,9 @@
 <?php
 namespace Tests\V2\Vpc;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -12,7 +12,6 @@ class AdvancedNetworkingTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        Event::fake();
         $this->vpc()->advanced_networking = true;
         $this->vpc()->save();
     }
@@ -52,6 +51,8 @@ class AdvancedNetworkingTest extends TestCase
      */
     public function testCreateAVpcWithAdvancedNetworking()
     {
+        Event::fake(Created::class);
+
         app()->bind(Vpc::class, function () {
             return factory(Vpc::class)->create([
                 'id' => 'vpc-test2',

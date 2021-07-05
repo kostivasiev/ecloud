@@ -46,6 +46,7 @@ class ProcessBilling extends Command
         'disk.capacity.600',
         'disk.capacity.1200',
         'disk.capacity.2500',
+        'image.private',
         // Networking
         'throughput.20Mb',
         'throughput.50Mb',
@@ -89,7 +90,6 @@ class ProcessBilling extends Command
 
                 $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
                     if (!in_array($key, $this->billableMetrics)) {
-                        Log::info('Metric `' . $key . '` not found in billableMetrics');
                         return true;
                     }
 
@@ -408,7 +408,8 @@ class ProcessBilling extends Command
      */
     protected function getSupportMinimumProduct($vpcId): Product
     {
-        $availabilityZone = Vpc::findorFail($vpcId)
+        $availabilityZone = Vpc::withTrashed()
+            ->findorFail($vpcId)
             ->region
             ->availabilityZones
             ->first();

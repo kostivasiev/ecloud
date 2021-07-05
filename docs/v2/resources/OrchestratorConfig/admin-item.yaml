@@ -1,0 +1,44 @@
+get:
+  parameters:
+    - $ref: 'parameters/orchestratorConfigId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: 'schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Orchestrator Configs
+
+patch:
+  parameters:
+    - $ref: 'parameters/orchestratorConfigId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: 'schema.yaml'
+  responses:
+    200:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Orchestrator Configs
+
+delete:
+  description: Delete a host spec
+  parameters:
+    - $ref: 'schema.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Orchestrator Configs

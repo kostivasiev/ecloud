@@ -22,10 +22,17 @@ class GpuProfileTable extends Migration
             $table->timestamp('updated_at');
             $table->timestamp('deleted_at')->nullable();
         });
+
+        Schema::connection('ecloud')->create('gpu_profile_pod_availability', function ($table) {
+            $table->increments('id');
+            $table->integer('gpu_profile_id')->index();
+            $table->integer('ucs_datacentre_id');
+        });
     }
 
     public function down()
     {
         Schema::connection('ecloud')->dropIfExists('gpu_profile');
+        Schema::connection('ecloud')->dropIfExists('gpu_profile_pod_availability');
     }
 }

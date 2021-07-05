@@ -1,0 +1,16 @@
+properties:
+  id:
+    type: string
+    example: builder-2b66bb79
+    readOnly: true
+  reseller_id:
+    type: integer
+    required: false
+    readonly: false
+    example: 12345
+  employee_id:
+    type: integer
+    required: false
+    readonly: false
+    example: 54321
+description: 'Builder Configuration'

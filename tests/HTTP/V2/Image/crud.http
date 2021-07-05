@@ -16,6 +16,7 @@ Content-Type: application/json
     "platform": "Linux",
     "active": true,
     "public": true,
+    "visibility": "private",
     "availability_zone_ids": [
         "az-aaaaaaaa"
     ],

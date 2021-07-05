@@ -7,6 +7,7 @@ use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
 use App\Jobs\Instance\Undeploy\AwaitVolumeRemoval;
 use App\Jobs\Instance\Undeploy\DeleteNics;
 use App\Jobs\Instance\Undeploy\DeleteVolumes;
+use App\Jobs\Instance\Undeploy\RemoveCredentials;
 use App\Jobs\Instance\Undeploy\Undeploy;
 use App\Jobs\Job;
 use App\Models\V2\Task;
@@ -34,6 +35,7 @@ class Delete extends Job
                 new DeleteNics($this->task->resource),
                 new AwaitVolumeRemoval($this->task->resource),
                 new AwaitNicRemoval($this->task->resource),
+                new RemoveCredentials($this->task->resource),
             ],
         ])->dispatch();
     }

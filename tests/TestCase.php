@@ -167,7 +167,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             Model::withoutEvents(function() {
                 $this->routerThroughput = factory(RouterThroughput::class)->create([
                     'id' => 'rtp-test',
-                    'committed_bandwidth' => '1024'
+                    'committed_bandwidth' => '1024',
+                    'availability_zone_id' => $this->availabilityZone()->id
                 ]);
             });
         }
@@ -284,6 +285,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         if (!$this->image) {
             $this->image = factory(Image::class)->create([
                 'id' => 'img-test',
+                'vpc_id' => $this->vpc()->id,
             ]);
         }
         return $this->image;

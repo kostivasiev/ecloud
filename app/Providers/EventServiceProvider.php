@@ -92,29 +92,11 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Host
-        \App\Events\V2\Host\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Host\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Host\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\Host\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // HostGroup
-        \App\Events\V2\HostGroup\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\HostGroup\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\HostGroup\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\HostGroup\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
@@ -193,15 +175,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Router\Creating::class => [
             \App\Listeners\V2\Router\DefaultRouterThroughput::class
         ],
-        \App\Events\V2\Router\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Router\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Router\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\Router\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
@@ -223,17 +196,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
-        // Vpc
-        \App\Events\V2\Vpc\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Vpc\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Vpc\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
-
         // Vpn
         \App\Events\V2\Vpn\Creating::class => [
         ],
@@ -245,6 +207,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Task\Updated::class => [
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
+            \App\Listeners\V2\Image\UpdateImageBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,

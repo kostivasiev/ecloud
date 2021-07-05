@@ -49,10 +49,16 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
             'windows_enabled' => 'boolean'
         ];
 
+        $this->appends = [
+            'ram_capacity',
+            'ram_used',
+            'ram_available',
+            'vcpu_capacity',
+            'vcpu_used',
+            'vcpu_available',
+        ];
+
         $this->dispatchesEvents = [
-            'saving' => Saving::class,
-            'saved' => Saved::class,
-            'deleting' => Deleting::class,
             'deleted' => Deleted::class,
         ];
 
@@ -165,5 +171,40 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
+    }
+
+    public function getRamCapacityAttribute()
+    {
+        return ($this->hosts->count() * $this->hostSpec->ram_capacity) - ($this->hosts->count() * 2);
+    }
+
+    public function getRamUsedAttribute()
+    {
+        return $this->instances->sum('ram_capacity') / 1024;
+    }
+
+    public function getRamAvailableAttribute()
+    {
+        return ($this->ram_capacity - $this->ram_used) - $this->ram_reserved;
+    }
+
+    public function getRamReservedAttribute()
+    {
+        return $this->hosts->count() * 2;
+    }
+
+    public function getVcpuCapacityAttribute()
+    {
+        return ($this->hostSpec->cpu_cores * 8) * $this->hosts->count();
+    }
+
+    public function getVcpuUsedAttribute()
+    {
+        return $this->instances->sum('vcpu_cores');
+    }
+
+    public function getVcpuAvailableAttribute()
+    {
+        return $this->vcpu_capacity - $this->vcpu_used;
     }
 }

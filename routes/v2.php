@@ -159,6 +159,17 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
     });
 
+    /** Vpn Profile Groups */
+    $router->group([], function () use ($router) {
+        $router->get('vpn-profile-groups', 'VpnProfileGroupController@index');
+        $router->get('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@show');
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('vpn-profile-groups', 'VpnProfileGroupController@create');
+            $router->patch('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@update');
+            $router->delete('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@destroy');
+        });
+    });
+
     /** Routers */
     $router->group([], function () use ($router) {
         $router->get('routers', 'RouterController@index');
@@ -443,13 +454,28 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('tasks/{taskId}', 'TaskController@show');
     });
 
-    /** Builder Configurations */
+    /** Orchestrator Configurations */
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('builder-configurations', 'BuilderConfigurationController@index');
-        $router->get('builder-configurations/{configurationId}', 'BuilderConfigurationController@show');
-        $router->get('builder-configurations/{configurationId}/data', 'BuilderConfigurationController@data');
-        $router->post('builder-configurations', 'BuilderConfigurationController@store');
-        $router->patch('builder-configurations/{configurationId}', 'BuilderConfigurationController@update');
-        $router->delete('builder-configurations/{configurationId}', 'BuilderConfigurationController@destroy');
+        $router->get('orchestrator-configs', 'OrchestratorConfigController@index');
+        $router->get('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@show');
+        $router->post('orchestrator-configs', 'OrchestratorConfigController@store');
+        $router->patch('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@update');
+        $router->delete('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@destroy');
+        $router->get('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@showData');
+        $router->get('orchestrator-configs/{orchestratorConfigId}/builds', 'OrchestratorConfigController@builds');
+
+        $router->group(['middleware' => 'orchestrator-config-is-valid'], function () use ($router) {
+            $router->post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
+        });
+
+        $router->group(['middleware' => 'orchestrator-config-has-reseller-id'], function () use ($router) {
+            $router->post('orchestrator-configs/{orchestratorConfigId}/deploy', 'OrchestratorConfigController@deploy');
+        });
+    });
+
+    /** Orchestrator Builds */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('orchestrator-builds', 'OrchestratorBuildController@index');
+        $router->get('orchestrator-builds/{orchestratorBuildId}', 'OrchestratorBuildController@show');
     });
 });

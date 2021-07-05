@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\V2\TaskException;
+use App\Http\Requests\V2\Instance\CreateImageRequest;
 use App\Http\Requests\V2\Instance\CreateRequest;
 use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
@@ -14,7 +14,8 @@ use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
-use App\Models\V2\HostGroup;
+use App\Models\V2\Image;
+use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
@@ -26,6 +27,7 @@ use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Support\Sync;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -248,7 +250,9 @@ class InstanceController extends BaseController
             $this->dispatch(new PowerOn($instance));
         });
 
-        return response('', 202);
+        $task = $instance->createTaskWithLock('power_on', \App\Jobs\Tasks\Instance\PowerOn::class);
+
+        return $this->responseTaskId($task->id);
     }
 
     public function powerOff(Request $request, $instanceId)
@@ -256,11 +260,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new PowerOff($instance));
-        });
+        $task = $instance->createTaskWithLock('power_off', \App\Jobs\Tasks\Instance\PowerOff::class);
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function guestRestart(Request $request, $instanceId)
@@ -268,11 +270,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new GuestRestart($instance));
-        });
+        $task = $instance->createTaskWithLock('guest_restart', \App\Jobs\Tasks\Instance\GuestRestart::class);
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function guestShutdown(Request $request, $instanceId)
@@ -280,11 +280,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new GuestShutdown($instance));
-        });
+        $task = $instance->createTaskWithLock('guest_shutdown', \App\Jobs\Tasks\Instance\GuestShutdown::class);
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function powerReset(Request $request, $instanceId)
@@ -292,11 +290,9 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new PowerReset($instance));
-        });
+        $task = $instance->createTaskWithLock('power_reset', \App\Jobs\Tasks\Instance\PowerReset::class);
 
-        return response('', 202);
+        return $this->responseTaskId($task->id);
     }
 
     public function lock(Request $request, $instanceId)
@@ -470,11 +466,65 @@ class InstanceController extends BaseController
         ));
     }
 
-    public function createImage(Request $request, $instanceId)
+    public function createImage(CreateImageRequest $request, $instanceId)
     {
+        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
 
-        // TODO - create an image from an instance
-        return response('', 202);
+        if (!$instance->volumes()->count()) {
+            return response()->json([
+                'title' => 'Validation Error',
+                'detail' => 'Cannot create an image of an Instance with no attached volumes',
+                'status' => 422,
+            ], 422);
+        }
+
+        $image = $instance->image->replicate(['vm_template', 'script_template', 'logo_uri', 'description'])
+            ->fill($request->only([
+                'name'
+            ]));
+        $image->visibility = Image::VISIBILITY_PRIVATE;
+        $image->vpc_id = $instance->vpc_id;
+        $image->description = $request->input(
+            'description',
+            "Image taken from instance $instance->id on " . Carbon::now(new \DateTimeZone(config('app.timezone')))->toDayDateTimeString()
+        );
+
+        $image->save();
+
+        $instance->image->imageMetadata->each(function ($imageMetadata) use ($image) {
+            $meta = $imageMetadata->replicate();
+            $meta->image_id = $image->id;
+            $meta->save();
+        });
+
+        $volumeCapacity = $instance->volumes->where('os_volume', '=', true)->first()->capacity;
+
+        ImageMetadata::updateOrCreate(
+            ['image_id' => $image->id, 'key' => 'ukfast.spec.volume.min'],
+            ['image_id' => $image->id, 'key' => 'ukfast.spec.volume.min', 'value' => $volumeCapacity]
+        );
+
+        $image->availabilityZones()->sync($instance->availabilityZone);
+
+        $task = $instance->createTaskWithLock(
+            'image_create',
+            \App\Jobs\Tasks\Instance\CreateImage::class,
+            ['image_id' => $image->id]
+        );
+
+        return response()->json(
+            [
+                'data' => [
+                    'id' => $image->id,
+                    'task_id' => $task->id
+                ],
+                'meta' => [
+                    'location' => config('app.url') . '/images/' . $image->id,
+                    'task_location' => config('app.url') . '/tasks/' . $task->id
+                ],
+            ],
+            202
+        );
     }
 
     public function migrate(MigrateRequest $request, $instanceId)

@@ -1,0 +1,6 @@
+in: path
+name: configId
+required: true
+schema:
+  type: string
+example: oconf-2b66bb79

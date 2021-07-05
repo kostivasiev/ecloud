@@ -2,16 +2,17 @@
 
 namespace Tests\V2\Router;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
+use App\Events\V2\Task\Created;
 use App\Models\V2\Router;
-use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
     public function testValidDataIsSuccessful()
     {
+        Event::fake(Created::class);
+
         $this->patch(
             '/v2/routers/' . $this->router()->id,
             [
@@ -22,7 +23,7 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(202);
         $this->assertEquals('expected', Router::findOrFail($this->router()->id)->name);
     }
 }

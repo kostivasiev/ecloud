@@ -1,0 +1,109 @@
+### Get an instance with no volumes
+GET https://{{host}}/{{version}}/instances/i-3b673f47
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.global.set('instance_id', response.body.data[0].id);
+%}
+
+### Create an Image for it
+POST https://{{host}}/{{version}}/instances/{{instance_id}}/create-image
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "Test Image"
+}
+
+> {%
+client.test('API: Image did not create', function () {
+    client.assert(response.status === 422, '422 response not received');
+});
+%}
+
+### Get an Instance that has volumes
+GET https://{{host}}/{{version}}/instances/i-c9e30b96
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.global.set('instance_id', response.body.data.id);
+%}
+
+### Create an Image for it
+POST https://{{host}}/{{version}}/instances/{{instance_id}}/create-image
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('API: Image Created', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('image_id', response.body.data.id);
+%}
+
+
+###
+GET https://{{host}}/{{version}}/images/{{image_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 7052-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### Verify image directly via Kingpin
+GET https://compute-20.ecloud-service.ukfast.co.uk:8443/api/v2/vpc/{{dev_vpc_id}}/template/{{image_id}}
+Authorization: Basic a2luZ3BpbmFwaTp0S20/Yzc/T3Yhb2Y=
+Content-Type:  application/json
+
+> {%
+client.test('Kingpin: Image Verified', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Verify the image can be retrieved
+GET https://{{host}}/{{version}}/images/{{image_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('API: Image Verified', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Delete image on Kingpin
+DELETE https://compute-20.ecloud-service.ukfast.co.uk:8443/api/v2/vpc/{{dev_vpc_id}}/template/{{image_id}}
+Authorization: Basic a2luZ3BpbmFwaTp0S20/Yzc/T3Yhb2Y=
+Content-Type:  application/json
+
+> {%
+client.test('Kingpin: Image Deleted', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Cleanup image in DB
+DELETE https://{{host}}/{{version}}/images/{{image_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('API: Image Deleted', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}

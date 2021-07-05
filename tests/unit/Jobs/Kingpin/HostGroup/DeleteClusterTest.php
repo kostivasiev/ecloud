@@ -21,16 +21,14 @@ class DeleteClusterTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->hostGroup = HostGroup::withoutEvents(function () {
-            return factory(HostGroup::class)->create([
-                'id' => 'hg-test',
-                'name' => 'hg-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-                'host_spec_id' => $this->hostSpec()->id,
-                'windows_enabled' => true,
-            ]);
-        });
+        $this->hostGroup = factory(HostGroup::class)->create([
+            'id' => 'hg-test',
+            'name' => 'hg-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'host_spec_id' => $this->hostSpec()->id,
+            'windows_enabled' => true,
+        ]);
         $this->job = \Mockery::mock(DeleteCluster::class, [$this->hostGroup])->makePartial();
     }
 
