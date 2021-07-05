@@ -63,6 +63,8 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
     ImageMetadata:
       $ref: 'resources/ImageMetadata/schema.yaml'
+    VpnProfileGroup:
+      $ref: 'components/schemas/vpnProfileGroupAdmin.yaml'
 
   parameters:
     # Query Parameters
@@ -79,8 +81,8 @@ components:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     DiscountPlanId:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
-    VpnId:
-      $ref: 'resources/Vpn/parameters/vpnId.yaml'
+    VpnServiceId:
+      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
     InstanceId:
       $ref: 'resources/Instance/parameters/instanceId.yaml'
     FipId:
@@ -95,6 +97,8 @@ components:
       $ref: 'resources/Router/parameters/routerId.yaml'
     VolumeId:
       $ref: 'resources/Volume/parameters/volumeId.yaml'
+    VpnProfileGroupId:
+      $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
 
   responses:
     VirtualPrivateCloudsIdResponse:
@@ -105,8 +109,8 @@ components:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountIdResponse:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
-    VpnIdResponse:
-      $ref: 'resources/Vpn/responses/idResponse.yaml'
+    VpnServiceIdResponse:
+      $ref: 'resources/VpnService/responses/idResponse.yaml'
     InstanceIdResponse:
       $ref: 'resources/Instance/responses/idResponse.yaml'
     FipIdResponse:
@@ -121,6 +125,8 @@ components:
       $ref: 'resources/Region/responses/idResponse.yaml'
     VolumeIdResponse:
       $ref: 'resources/Volume/responses/idResponse.yaml'
+    VpnProfileGroupIdResponse:
+      $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
 
 paths:
   '/ecloud/v2/availability-zones':
@@ -219,3 +225,7 @@ paths:
     $ref: 'resources/OrchestratorConfig/data.yaml'
   '/ecloud/v2/orchestrator-configs/{configId}/deploy':
     $ref: 'resources/OrchestratorConfig/deploy.yaml'
+  '/ecloud/v2/vpn-profile-groups':
+    $ref: 'resources/VpnProfileGroup/admin-collection.yaml'
+  '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':
+    $ref: 'resources/VpnProfileGroup/admin-item.yaml'

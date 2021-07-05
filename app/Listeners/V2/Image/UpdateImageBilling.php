@@ -32,11 +32,11 @@ class UpdateImageBilling
         }
 
         $image = $event->model->resource;
-        $availabilityZone = $image->availabilityZones()->first();
 
         if (get_class($image) != Image::class) {
             return;
         }
+
 
         $time = Carbon::now();
 
@@ -66,6 +66,7 @@ class UpdateImageBilling
             'start' => $time,
         ]);
 
+        $availabilityZone = $image->availabilityZones()->first();
         $productName = $availabilityZone->id . ': volume-1gb';
         /** @var Product $product */
         $product = $availabilityZone->products()

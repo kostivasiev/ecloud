@@ -9,12 +9,12 @@ use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\NetworkResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\TaskResource;
-use App\Resources\V2\VpnResource;
+use App\Resources\V2\VpnServiceResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -44,9 +44,9 @@ class RouterController extends BaseController
     public function create(CreateRequest $request)
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
-        $router->save();
 
-        return $this->responseIdMeta($request, $router->id, 202);
+        $task = $router->syncSave();
+        return $this->responseIdMeta($request, $router->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $routerId)
@@ -54,11 +54,8 @@ class RouterController extends BaseController
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
         $router->fill($request->only(['name', 'router_throughput_id']));
 
-        $router->withTaskLock(function ($router) {
-            $router->save();
-        });
-
-        return $this->responseIdMeta($request, $router->id, 200);
+        $task = $router->syncSave();
+        return $this->responseIdMeta($request, $router->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $routerId)
@@ -69,20 +66,17 @@ class RouterController extends BaseController
             return $router->getDeletionError();
         }
 
-        $router->withTaskLock(function ($router) {
-            $router->delete();
-        });
-
-        return response('', 204);
+        $task = $router->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 
     public function vpns(Request $request, QueryTransformer $queryTransformer, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->vpns();
-        $queryTransformer->config(Vpn::class)
+        $queryTransformer->config(VpnService::class)
             ->transform($collection);
 
-        return VpnResource::collection($collection->paginate(
+        return VpnServiceResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

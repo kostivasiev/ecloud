@@ -6,7 +6,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use App\Rules\V2\ExistsForUser;
 use UKFast\FormRequests\FormRequest;
 
@@ -22,7 +22,7 @@ class CreateRequest extends FormRequest
                     Instance::class,
                     Router::class,
                     Volume::class,
-                    Vpn::class,
+                    VpnService::class,
                 ]),
             ],
             'vpc_id' => [

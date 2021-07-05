@@ -11,7 +11,7 @@ use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
-use App\Models\V2\Vpn;
+use App\Models\V2\VpnService;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Queue\Events\JobExceptionOccurred;
@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
             'i' => Instance::class,
             'rtr' => Router::class,
             'vol' => Volume::class,
-            'vpn' => Vpn::class,
+            'vpn' => VpnService::class,
             'vpc' => Vpc::class,
             'dhcp' => Dhcp::class,
             'net' => Network::class,

@@ -2,27 +2,16 @@
 
 namespace Tests\V2\Router;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
+use App\Events\V2\Task\Created;
 use App\Models\V2\RouterThroughput;
 use App\Models\V2\Task;
-use App\Models\V2\Vpc;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    private Region $region;
-
-    private AvailabilityZone $availabilityZone;
-
-    private Vpc $vpc;
-
-    private Router $router;
-
     private RouterThroughput $routerThroughput;
 
     public function setUp(): void
@@ -92,6 +81,7 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
+        Event::fake(Created::class);
         $data = [
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc()->id,
@@ -108,5 +98,6 @@ class CreateTest extends TestCase
         )
            ->seeInDatabase('routers', $data, 'ecloud')
             ->assertResponseStatus(202);
+        Event::assertDispatched(Created::class);
     }
 }
