@@ -43,6 +43,7 @@ delete:
   responses:
     202:
       description: Accepted
+      $ref : '../../components/responses/taskIdResponse.yaml'
   parameters:
     - $ref: '../../resources/Vpc/parameters/vpcId.yaml'
   tags:

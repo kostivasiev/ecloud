@@ -1,5 +1,5 @@
 in: path
-name: vpnId
+name: vpnServiceId
 required: true
 schema:
   type: string
