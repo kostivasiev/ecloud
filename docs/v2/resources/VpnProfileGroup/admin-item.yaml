@@ -1,0 +1,45 @@
+get:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/VpnProfileGroupId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../admin-openapi.yaml#/components/schemas/VpnProfileGroup'
+              meta:
+                type: object
+  tags:
+    - Vpn Profile Groups
+patch:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/VpnProfileGroupId'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "../../admin-openapi.yaml#/components/schemas/VpnProfileGroup"
+            - type: object
+              properties:
+                router_id:
+                  required: false
+  responses:
+    200:
+      $ref: '../../admin-openapi.yaml#/components/responses/VpnProfileGroupIdResponse'
+  tags:
+    - Vpn Profile Groups
+delete:
+  parameters:
+    - $ref: '../../admin-openapi.yaml#/components/parameters/VpnProfileGroupId'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Vpn Profile Groups
