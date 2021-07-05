@@ -15,8 +15,6 @@ use Tests\TestCase;
 
 class AwaitRoutersTest extends TestCase
 {
-    protected $job;
-
     protected OrchestratorConfig $orchestratorConfig;
 
     protected OrchestratorBuild $orchestratorBuild;

@@ -2,7 +2,7 @@
 namespace Tests\unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\OrchestratorBuild\AwaitVpcs;
+use App\Jobs\OrchestratorBuild\AwaitDefaultFirewallPolicies;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Task;
@@ -13,7 +13,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class AwaitVpcsTest extends TestCase
+class AwaitDefaultFirewallPoliciesTest extends TestCase
 {
     protected OrchestratorConfig $orchestratorConfig;
 
@@ -35,20 +35,22 @@ class AwaitVpcsTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
+        $this->orchestratorBuild->updateState('default_firewall_policies', 'rtr-test', [
+            'fwp-test'
+        ]);
 
-        // Put the VPC sync in-progress
+        // Put the sync in-progress
         Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'sync-test',
                 'completed' => false,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $task->resource()->associate($this->vpc());
+            $task->resource()->associate($this->firewallPolicy());
             $task->save();
         });
 
-        dispatch(new AwaitVpcs($this->orchestratorBuild));
+        dispatch(new AwaitDefaultFirewallPolicies($this->orchestratorBuild));
 
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return $event->job->isReleased();
@@ -59,7 +61,10 @@ class AwaitVpcsTest extends TestCase
     {
         Event::fake(JobFailed::class);
 
-        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
+        $this->firewallPolicy();
+        $this->orchestratorBuild->updateState('default_firewall_policies', $this->router()->id, [
+            'fwp-test'
+        ]);
 
         Model::withoutEvents(function () {
             $task = new Task([
@@ -68,11 +73,11 @@ class AwaitVpcsTest extends TestCase
                 'failure_reason' => 'some failure reason',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $task->resource()->associate($this->vpc());
+            $task->resource()->associate($this->firewallPolicy());
             $task->save();
         });
 
-        dispatch(new AwaitVpcs($this->orchestratorBuild));
+        dispatch(new AwaitDefaultFirewallPolicies($this->orchestratorBuild));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -81,21 +86,22 @@ class AwaitVpcsTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
+        $this->firewallPolicy();
+        $this->orchestratorBuild->updateState('default_firewall_policies', $this->router()->id, [
+            'fwp-test'
+        ]);
 
-        // Put the VPC sync in-progress
         Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'sync-test',
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $task->resource()->associate($this->vpc());
+            $task->resource()->associate($this->firewallPolicy());
             $task->save();
         });
 
-
-        dispatch(new AwaitVpcs($this->orchestratorBuild));
+        dispatch(new AwaitDefaultFirewallPolicies($this->orchestratorBuild));
 
         Event::assertNotDispatched(JobFailed::class);
 

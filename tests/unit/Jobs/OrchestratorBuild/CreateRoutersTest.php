@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class CreateRoutersTest extends TestCase
 {
-    protected $job;
-
     protected OrchestratorConfig $orchestratorConfig;
 
     protected OrchestratorBuild $orchestratorBuild;
