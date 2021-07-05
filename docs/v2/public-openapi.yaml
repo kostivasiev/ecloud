@@ -72,6 +72,8 @@ components:
       $ref: 'resources/ImageMetadata/schema.yaml'
     Task:
       $ref: 'components/schemas/task.yaml'
+    VpnService:
+      $ref: 'components/schemas/vpnService.yaml'
     SSHKeyPair:
       $ref: 'resources/SSHKeyPair/schema.yaml'
   parameters:
