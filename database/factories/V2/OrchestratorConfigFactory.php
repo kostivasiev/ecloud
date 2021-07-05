@@ -7,7 +7,7 @@ use App\Models\V2\OrchestratorConfig;
 $factory->define(OrchestratorConfig::class, function () {
     $data = <<<EOM
             {
-                "vpc": [
+                "vpcs": [
                     {
                         "name": "vpc-1",
                         "region_id": "reg-test"
@@ -19,7 +19,7 @@ $factory->define(OrchestratorConfig::class, function () {
                         "advanced_networking": true
                     }
                 ],
-                "router": [
+                "routers": [
                     {
                         "vpc_id": "{vpc.0}",
                         "name": "router-1"
@@ -31,7 +31,7 @@ $factory->define(OrchestratorConfig::class, function () {
                         "configure_default_policies": true
                     }
                 ],
-                "network": [
+                "networks": [
                     {
                         "router_id": "{router.0}",
                         "name": "network-1"

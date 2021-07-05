@@ -44,10 +44,6 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
         'nodes' => 'integer',
     ];
 
-    protected $dispatchesEvents = [
-        'creating' => Creating::class,
-    ];
-
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);

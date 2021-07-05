@@ -49,5 +49,6 @@ delete:
   responses:
     202:
       description: Accepted
+      $ref : '../../components/responses/taskIdResponse.yaml'
   tags:
     - Networks
