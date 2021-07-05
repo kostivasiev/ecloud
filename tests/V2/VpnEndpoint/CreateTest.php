@@ -96,29 +96,4 @@ class CreateTest extends TestCase
             )
             ->assertResponseStatus(422);
     }
-
-    public function testCreateWithoutFloatingIp()
-    {
-        $floatingIp = FloatingIp::withoutEvents(function () {
-            return factory(FloatingIp::class)->create([
-                'id' => 'fip-aaa111bbb',
-                'vpc_id' => $this->vpc()->id,
-                'ip_address' => '203.0.113.2',
-            ]);
-        });
-        app()->bind(FloatingIp::class, function () use ($floatingIp) {
-            return $floatingIp;
-        });
-
-        $data = [
-            'name' => 'Create Test',
-            'vpn_service_id' => $this->vpnService->id,
-        ];
-        $this->post('/v2/vpn-endpoints', $data)
-            ->assertResponseStatus(202);
-
-        $id = json_decode($this->response->getContent())->data->id;
-        $vpnEndpoint = VpnEndpoint::findOrFail($id);
-        $this->assertEquals($floatingIp->id, $vpnEndpoint->floating_ip_id);
-    }
 }
