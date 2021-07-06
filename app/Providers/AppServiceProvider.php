@@ -61,6 +61,7 @@ class AppServiceProvider extends ServiceProvider
             'dhcp' => Dhcp::class,
             'net' => Network::class,
             'obuild' => OrchestratorBuild::class,
+            'vpn' => VpnService::class,
             'vpnp' => VpnProfile::class,
         ]);
 
