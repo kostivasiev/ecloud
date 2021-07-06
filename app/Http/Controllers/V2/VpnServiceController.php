@@ -48,7 +48,12 @@ class VpnServiceController extends BaseController
 
     public function destroy(Request $request, string $vpnServiceId)
     {
-        VpnService::forUser($request->user())->findOrFail($vpnServiceId)->delete();
-        return response('', 202);
+        $vpnService = VpnService::forUser($request->user())->findOrFail($vpnServiceId);
+        if (!$vpnService->canDelete()) {
+            return $vpnService->getDeletionError();
+        }
+
+        $task = $vpnService->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 }
