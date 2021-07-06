@@ -51,13 +51,9 @@ $factory->define(OrchestratorConfig::class, function () {
                         "ram_capacity": 1024,
                         "locked": false,
                         "backup_enabled": false,
-                        "network_id": "",
-                        "floating_ip_id": "",
-                        "requires_floating_ip": "",
-                        "user_script": "",
-                        "volume_capacity": "",
-                        "volume_iops": "",
-                        "ssh_key_pair_ids": "",
+                        "requires_floating_ip": true,
+                        "volume_capacity": 50,
+                        "volume_iops": 300
                     }
                 ]
             }
