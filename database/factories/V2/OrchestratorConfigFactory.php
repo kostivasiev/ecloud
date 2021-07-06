@@ -59,8 +59,6 @@ $factory->define(OrchestratorConfig::class, function () {
             }
 EOM;
 
-    //TODO: Dedicated hosts support "host_group_id": "",
-
     return [
         'reseller_id' => 1,
         'employee_id' => 1,
