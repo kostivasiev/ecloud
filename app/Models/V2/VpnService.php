@@ -29,6 +29,8 @@ class VpnService extends Model implements Filterable, Sortable
 
     public $keyPrefix = 'vpn';
 
+    public $children = [];
+
     public function __construct(array $attributes = [])
     {
         $this->timestamps = true;
