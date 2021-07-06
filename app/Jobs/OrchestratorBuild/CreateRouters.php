@@ -34,7 +34,7 @@ class CreateRouters extends Job
 
         collect($data->get('routers'))->each(function ($definition, $index) use ($orchestratorBuild) {
             // Check if a resource has already been created
-            if (isset($orchestratorBuild->state['routers']) && isset($orchestratorBuild->state['routers'][$index])) {
+            if (isset($orchestratorBuild->state['router']) && isset($orchestratorBuild->state['router'][$index])) {
                 Log::info(get_class($this) . ' : OrchestratorBuild router. ' . $index . ' has already been initiated, skipping', ['id' => $this->model->id]);
                 return;
             }
@@ -55,7 +55,7 @@ class CreateRouters extends Job
 
             Log::info(get_class($this) . ' : OrchestratorBuild created router ' . $router->id, ['id' => $this->model->id]);
 
-            $orchestratorBuild->updateState('routers', $index, $router->id);
+            $orchestratorBuild->updateState('router', $index, $router->id);
         });
     }
 }

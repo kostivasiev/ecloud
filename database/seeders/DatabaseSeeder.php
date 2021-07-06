@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RegionSeeder::class);
         $this->call(AvailabilityZoneSeeder::class);
+        $this->call(RouterThroughputSeeder::class);
     }
 }
 

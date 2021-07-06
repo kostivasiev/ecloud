@@ -35,7 +35,7 @@ class AwaitVpcsTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        $this->orchestratorBuild->updateState('vpcs', 0, $this->vpc()->id);
+        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
 
         // Put the VPC sync in-progress
         Model::withoutEvents(function () {
@@ -59,7 +59,7 @@ class AwaitVpcsTest extends TestCase
     {
         Event::fake(JobFailed::class);
 
-        $this->orchestratorBuild->updateState('vpcs', 0, $this->vpc()->id);
+        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
 
         Model::withoutEvents(function () {
             $task = new Task([

@@ -45,7 +45,7 @@ class CreateVpcs extends Job
 
             Log::info(get_class($this) . ' : OrchestratorBuild created VPC ' . $vpc->id, ['id' => $this->model->id]);
 
-            $orchestratorBuild->updateState('vpcs', $index, $vpc->id);
+            $orchestratorBuild->updateState('vpc', $index, $vpc->id);
         });
     }
 }
