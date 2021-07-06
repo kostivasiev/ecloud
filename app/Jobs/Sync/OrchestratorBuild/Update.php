@@ -4,8 +4,8 @@ namespace App\Jobs\Sync\OrchestratorBuild;
 
 use App\Jobs\Job;
 use App\Jobs\OrchestratorBuild\AwaitDefaultFirewallPolicies;
-use App\Jobs\OrchestratorBuild\AwaitInstances;
 use App\Jobs\OrchestratorBuild\AwaitNetworks;
+use App\Jobs\OrchestratorBuild\AwaitInstances;
 use App\Jobs\OrchestratorBuild\AwaitRouters;
 use App\Jobs\OrchestratorBuild\AwaitVpcs;
 use App\Jobs\OrchestratorBuild\ConfigureDefaultFirewallPolicies;

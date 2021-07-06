@@ -18,6 +18,6 @@ class RouterThroughputSeeder extends Seeder
             'id' => 'rtp-aaaaaaaa',
             'availability_zone_id' => 'az-aaaaaaaa',
             'committed_bandwidth' => config('router.throughput.default.bandwidth')
-        ]);
+    ]);
     }
 }
