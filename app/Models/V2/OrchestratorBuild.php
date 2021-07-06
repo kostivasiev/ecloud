@@ -2,11 +2,15 @@
 
 namespace App\Models\V2;
 
+use App\Support\Resource;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -111,5 +115,29 @@ class OrchestratorBuild extends Model implements Filterable, Sortable
         $state[$resource][$index] = $id;
         $this->state = $state;
         $this->save();
+    }
+
+
+    public function render($definition) : Collection
+    {
+        return collect($definition)->map(function ($item) {
+            if (preg_match('/^\{(\w+)\.(\d+)\}$/', $item, $matches) === 1) {
+                list($placeholder, $resource, $index) = $matches;
+
+                if (isset($this->state[$resource]) && isset($this->state[$resource][$index])) {
+                    //Check the resource exists - not sure this belongs in here really
+                    $id = $this->state[$resource][$index];
+                    $resource = Resource::classFromId($id)::find($id);
+                    if (empty($resource)) {
+                        throw new \Exception('Resource for placeholder ' . $placeholder .' was found in build state, but associated resource ' . $id . ' does not exist');
+                    }
+
+                    return $id;
+                }
+
+                throw new \Exception('Failed to render placeholder ' . $placeholder . ', resource was not found in the current build state.');
+            }
+            return $item;
+        });
     }
 }

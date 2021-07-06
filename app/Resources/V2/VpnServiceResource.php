@@ -10,11 +10,11 @@ use UKFast\Responses\UKFastResource;
  * @package App\Http\Resources\V2
  * @property string id
  * @property string router_id
- * @property string availability_zone_id
+ * @property string name
  * @property string created_at
  * @property string updated_at
  */
-class VpnResource extends UKFastResource
+class VpnServiceResource extends UKFastResource
 {
     /**
      * @param \Illuminate\Http\Request $request
@@ -25,7 +25,8 @@ class VpnResource extends UKFastResource
         return [
             'id' => $this->id,
             'router_id' => $this->router_id,
-            'availability_zone_id' => $this->availability_zone_id,
+            'name' => $this->name,
+            'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

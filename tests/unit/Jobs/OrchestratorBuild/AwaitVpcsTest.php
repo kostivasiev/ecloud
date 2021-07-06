@@ -3,7 +3,6 @@ namespace Tests\unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\AwaitVpcs;
-use App\Jobs\OrchestratorBuild\CreateVpcs;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Task;
@@ -16,8 +15,6 @@ use Tests\TestCase;
 
 class AwaitVpcsTest extends TestCase
 {
-    protected $job;
-
     protected OrchestratorConfig $orchestratorConfig;
 
     protected OrchestratorBuild $orchestratorBuild;

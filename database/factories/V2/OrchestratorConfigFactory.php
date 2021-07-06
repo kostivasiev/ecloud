@@ -27,7 +27,8 @@ $factory->define(OrchestratorConfig::class, function () {
                     {
                         "vpc_id": "{vpc.1}",
                         "name": "router-2",
-                        "router_throughput_id": "rtp-ec393951"
+                        "router_throughput_id": "rtp-ec393951",
+                        "configure_default_policies": true
                     }
                 ],
                 "network": [

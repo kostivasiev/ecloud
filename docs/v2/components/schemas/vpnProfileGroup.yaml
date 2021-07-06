@@ -1,13 +1,16 @@
 properties:
   id:
     type: string
-    example: 'dhcp-2b66bb79'
+    example: 'vpnpg-2b66bb79'
     readOnly: true
-  router_id:
+  name:
     type: string
     required: true
-    example: 'rtr-2b66bb79'
-    readOnly: false
+    example: 'My Profile Group'
+  description:
+    type: string
+    required: true
+    example: 'Description of my profile group'
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

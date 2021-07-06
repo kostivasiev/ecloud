@@ -1,0 +1,6 @@
+in: path
+name: vpnProfileGroupId
+required: true
+schema:
+  type: string
+example: vpnpg-2b66bb79

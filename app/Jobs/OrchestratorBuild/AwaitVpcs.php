@@ -30,6 +30,6 @@ class AwaitVpcs extends Job
             return;
         }
 
-        $this->awaitResources($state->get('vpc'));
+        $this->awaitSyncableResources($state->get('vpc'));
     }
 }

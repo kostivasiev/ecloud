@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/Vpn'
+                  $ref: '../../public-openapi.yaml#/components/schemas/VpnProfileGroup'
               meta:
                 allOf:
                   - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
@@ -25,24 +25,12 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpns?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpn-profile-groups?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpns?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpn-profile-groups?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpns?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpn-profile-groups?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpns?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpn-profile-groups?page=2'
   tags:
-    - Vpns
-post:
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          $ref: '../../public-openapi.yaml#/components/schemas/Vpn'
-  responses:
-    201:
-      $ref: '../../public-openapi.yaml#/components/responses/VpnIdResponse'
-  tags:
-    - Vpns
+    - Vpn Profile Groups

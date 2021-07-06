@@ -36,8 +36,8 @@ components:
       $ref: 'components/schemas/dhcp.yaml'
     DiscountPlan:
       $ref: 'components/schemas/discountPlan.yaml'
-    Vpn:
-      $ref: 'components/schemas/vpn.yaml'
+    VpnProfileGroup:
+      $ref: 'components/schemas/vpnProfileGroup.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
     FloatingIP:
@@ -72,6 +72,8 @@ components:
       $ref: 'resources/ImageMetadata/schema.yaml'
     Task:
       $ref: 'components/schemas/task.yaml'
+    VpnService:
+      $ref: 'components/schemas/vpnService.yaml'
     SSHKeyPair:
       $ref: 'resources/SSHKeyPair/schema.yaml'
   parameters:
@@ -93,8 +95,10 @@ components:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     DiscountPlanId:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
-    VpnId:
-      $ref: 'resources/Vpn/parameters/vpnId.yaml'
+    VpnProfileGroupId:
+      $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
+    VpnServiceId:
+      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     RegionId:
@@ -114,8 +118,10 @@ components:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
-    VpnIdResponse:
-      $ref: 'resources/Vpn/responses/idResponse.yaml'
+    VpnProfileGroupIdResponse:
+      $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
+    VpnServiceIdResponse:
+      $ref: 'resources/VpnService/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     RouterIdResponse:
@@ -157,10 +163,14 @@ paths:
     $ref: 'resources/Dhcp/item.yaml'
   '/ecloud/v2/dhcps/{dhcpId}/tasks':
     $ref: 'resources/Dhcp/tasks-collection.yaml'
-#  '/ecloud/v2/vpns':
-#    $ref: 'resources/Vpn/collection.yaml'
-#  '/ecloud/v2/vpns/{vpnId}':
-#    $ref: 'resources/Vpn/item.yaml'
+  '/ecloud/v2/vpn-profile-groups':
+    $ref: 'resources/VpnProfileGroup/collection.yaml'
+  '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':
+    $ref: 'resources/VpnProfileGroup/item.yaml'
+  '/ecloud/v2/vpn-services':
+    $ref: 'resources/VpnService/collection.yaml'
+  '/ecloud/v2/vpn-services/{vpnServiceId}':
+    $ref: 'resources/VpnService/item.yaml'
   '/ecloud/v2/instances':
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':
