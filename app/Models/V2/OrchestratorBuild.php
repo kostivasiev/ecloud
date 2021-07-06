@@ -121,7 +121,7 @@ class OrchestratorBuild extends Model implements Filterable, Sortable
     public function render($definition) : Collection
     {
         return collect($definition)->map(function ($item) {
-            if (preg_match('/^\{(\w+)\.(\d+)\}$/', $item, $matches) === 1) {
+            if (is_string($item) && preg_match('/^\{(\w+)\.(\d+)\}$/', $item, $matches) === 1) {
                 list($placeholder, $resource, $index) = $matches;
 
                 if (isset($this->state[$resource]) && isset($this->state[$resource][$index])) {

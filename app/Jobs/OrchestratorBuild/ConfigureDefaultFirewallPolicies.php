@@ -36,7 +36,7 @@ class ConfigureDefaultFirewallPolicies extends Job
 
         collect($data->get('routers'))->each(function ($definition, $index) use ($orchestratorBuild) {
             if (isset($definition->configure_default_policies) && $definition->configure_default_policies === true) {
-                $router = Router::findOrFail($orchestratorBuild->state['routers'][$index]);
+                $router = Router::findOrFail($orchestratorBuild->state['router'][$index]);
 
                 $firewallPolicyIds = [];
                 foreach (config('firewall.policies') as $policy) {

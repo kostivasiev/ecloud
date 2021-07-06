@@ -41,9 +41,29 @@ $factory->define(OrchestratorConfig::class, function () {
                         "name": "network-2",
                         "subnet": "10.0.0.0\/24"
                     }
+                ],
+                "instances": [
+                    {
+                        "name": "Builder Test Instance",
+                        "vpc_id": "{vpc.0}",
+                        "image_id": "img-aaaaaaaa",
+                        "vcpu_cores": 1,
+                        "ram_capacity": 1024,
+                        "locked": false,
+                        "backup_enabled": false,
+                        "network_id": "",
+                        "floating_ip_id": "",
+                        "requires_floating_ip": "",
+                        "user_script": "",
+                        "volume_capacity": "",
+                        "volume_iops": "",
+                        "ssh_key_pair_ids": "",
+                    }
                 ]
             }
 EOM;
+
+    //TODO: Dedicated hosts support "host_group_id": "",
 
     return [
         'reseller_id' => 1,
@@ -51,3 +71,5 @@ EOM;
         'data' => $data
     ];
 });
+
+
