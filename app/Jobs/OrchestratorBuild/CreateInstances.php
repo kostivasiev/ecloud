@@ -119,5 +119,4 @@ class CreateInstances extends Job
 
         return $vpc->region()->first()->availabilityZones()->first()->id;
     }
-
 }
