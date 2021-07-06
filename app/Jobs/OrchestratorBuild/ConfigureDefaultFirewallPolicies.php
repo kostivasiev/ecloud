@@ -29,12 +29,12 @@ class ConfigureDefaultFirewallPolicies extends Job
 
         $data = collect(json_decode($orchestratorBuild->orchestratorConfig->data));
 
-        if (!$data->has('router')) {
+        if (!$data->has('routers')) {
             Log::info(get_class($this) . ' : OrchestratorBuild does not contain any routers, skipping', ['id' => $this->model->id]);
             return;
         }
 
-        collect($data->get('router'))->each(function ($definition, $index) use ($orchestratorBuild) {
+        collect($data->get('routers'))->each(function ($definition, $index) use ($orchestratorBuild) {
             if (isset($definition->configure_default_policies) && $definition->configure_default_policies === true) {
                 $router = Router::findOrFail($orchestratorBuild->state['router'][$index]);
 

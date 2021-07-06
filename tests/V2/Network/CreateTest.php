@@ -92,18 +92,4 @@ class CreateTest extends TestCase
             ]
         )->assertResponseStatus(422);
     }
-
-    public function testCreateDispatchesEvent()
-    {
-        Event::fake();
-
-        $network = factory(Network::class)->create([
-            'id' => 'net-abc123',
-            'router_id' => 'x',
-        ]);
-
-        Event::assertDispatched(\App\Events\V2\Network\Created::class, function ($event) use ($network) {
-            return $event->model->id === $network->id;
-        });
-    }
 }

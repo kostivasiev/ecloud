@@ -26,12 +26,12 @@ class CreateVpcs extends Job
 
         $data = collect(json_decode($orchestratorBuild->orchestratorConfig->data));
 
-        if (!$data->has('vpc')) {
+        if (!$data->has('vpcs')) {
             Log::info(get_class($this) . ' : OrchestratorBuild does not contain any VPC\'s, skipping', ['id' => $this->model->id]);
             return;
         }
 
-        collect($data->get('vpc'))->each(function ($definition, $index) use ($orchestratorBuild) {
+        collect($data->get('vpcs'))->each(function ($definition, $index) use ($orchestratorBuild) {
             // Check if a resource has already been created
             if (isset($orchestratorBuild->state['vpc']) && isset($orchestratorBuild->state['vpc'][$index])) {
                 Log::info(get_class($this) . ' : OrchestratorBuild vpc. ' . $index . ' has already been initiated, skipping', ['id' => $this->model->id]);
