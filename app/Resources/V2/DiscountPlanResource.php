@@ -16,6 +16,7 @@ class DiscountPlanResource extends UKFastResource
         $data = [
             'id' => $this->id,
             'name' => $this->name,
+            'orderform_id' => $this->orderform_id,
             'commitment_amount' => $this->commitment_amount,
             'commitment_before_discount' => $this->commitment_before_discount,
             'discount_rate' => $this->discount_rate,
@@ -40,7 +41,6 @@ class DiscountPlanResource extends UKFastResource
                 'contact_id' => $this->contact_id,
                 'employee_id' => $this->employee_id,
                 'reseller_id' => $this->reseller_id,
-                'orderform_id' => $this->orderform_id,
             ];
         }
 
