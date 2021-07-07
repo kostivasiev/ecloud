@@ -8,7 +8,7 @@ class DatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     * php artisan db:seed --database=ecloud
+     * php artisan db:seed
      *
      * @return void
      */
@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call(RegionSeeder::class);
         $this->call(AvailabilityZoneSeeder::class);
         $this->call(RouterThroughputSeeder::class);
+        $this->call(ImageSeeder::class);
+        $this->call(SshKeyPairSeeder::class);
     }
 }
 

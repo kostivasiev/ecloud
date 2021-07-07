@@ -64,6 +64,24 @@ Content-Type: application/json
             "name": "network-2",
             "subnet": "10.0.0.0\/24"
         }
+    ],
+    "instances": [
+        {
+            "name": "Builder Test Instance",
+            "vpc_id": "{vpc.0}",
+            "image_id": "img-aaaaaaaa",
+            "vcpu_cores": 1,
+            "ram_capacity": 1024,
+            "locked": false,
+            "backup_enabled": false,
+            "network_id": "{network.0}",
+            "requires_floating_ip": true,
+            "volume_capacity": 30,
+            "volume_iops": 300,
+            "ssh_key_pair_ids": [
+                "ssh-aaaaaaaa"
+            ]
+        }
     ]
 }
 > {%

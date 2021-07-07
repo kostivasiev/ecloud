@@ -41,6 +41,20 @@ $factory->define(OrchestratorConfig::class, function () {
                         "name": "network-2",
                         "subnet": "10.0.0.0\/24"
                     }
+                ],
+                "instances": [
+                    {
+                        "name": "Builder Test Instance",
+                        "vpc_id": "{vpc.0}",
+                        "image_id": "img-aaaaaaaa",
+                        "vcpu_cores": 1,
+                        "ram_capacity": 1024,
+                        "locked": false,
+                        "backup_enabled": false,
+                        "requires_floating_ip": true,
+                        "volume_capacity": 50,
+                        "volume_iops": 300
+                    }
                 ]
             }
 EOM;
@@ -51,3 +65,5 @@ EOM;
         'data' => $data
     ];
 });
+
+
