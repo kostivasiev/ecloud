@@ -3,6 +3,7 @@ namespace App\Console\Commands\Orchestrator;
 
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -12,7 +13,7 @@ class ScheduledDeploy extends Command
     protected $description = 'Scheduled Orchestration Deployments';
 
     public \DateTimeZone $timeZone;
-    public $now;
+    public string $now;
 
     public function __construct()
     {
@@ -23,8 +24,8 @@ class ScheduledDeploy extends Command
     public function handle()
     {
         OrchestratorConfig::doesntHave('orchestratorBuilds')
-            ->whereNotNull('deploy_on')
             ->where('deploy_on', '<=', $this->now)
+            ->whereNotNull('deploy_on')
             ->each(function ($orchestratorConfig) {
                 Log::info('Deploying Config ' . $orchestratorConfig->id);
                 if (!$this->option('test-run')) {
