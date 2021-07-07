@@ -29,7 +29,6 @@ class Create extends FormRequest
                 'required',
                 'string',
                 'max:36',
-                'unique:ecloud.discount_plans,orderform_id,NULL,id,deleted_at,NULL',
             ],
             'reseller_id' => 'sometimes|required|integer',
             'name' => 'sometimes|required|string|max:255',
