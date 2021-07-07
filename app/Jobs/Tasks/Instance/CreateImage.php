@@ -4,6 +4,7 @@ namespace App\Jobs\Tasks\Instance;
 
 use App\Jobs\Job;
 use App\Models\V2\Image;
+use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -23,12 +24,12 @@ class CreateImage extends Job
     public function handle()
     {
         $task = $this->task;
-        $instance = $task->resource;
+        $instance = Instance::findOrFail($task->data['instance_id']);
         $image = Image::findOrFail($task->data['image_id']);
 
         $this->updateTaskBatch([
             [
-                new \App\Jobs\Kingpin\Instance\CreateImage($instance, $image)
+                new \App\Jobs\Kingpin\Instance\CreateImage($image, $instance)
             ]
         ])->dispatch();
     }

@@ -2,7 +2,6 @@
 
 namespace App\Listeners\V2\Image;
 
-use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Image;
 use App\Models\V2\Product;
@@ -12,14 +11,10 @@ use Illuminate\Support\Facades\Log;
 
 class UpdateImageBilling
 {
-    /**
-     * @param Updated $event
-     * @return void
-     * @throws \Exception
-     */
-    public function handle(Updated $event)
+    public function handle($event)
     {
-        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
+        if ($event->model->name !== 'image_create' && $event->model->name !== Sync::TASK_NAME_DELETE) {
             return;
         }
 
@@ -31,42 +26,39 @@ class UpdateImageBilling
             return;
         }
 
-        $image = $event->model->resource;
+        $model = $event->model->resource;
 
-        if (get_class($image) != Image::class) {
+        if (get_class($model) != Image::class) {
             return;
         }
 
-
         $time = Carbon::now();
 
-        $metaData = $image->imageMetadata()
+        $metaData = $model->imageMetadata()
             ->where('key', '=', 'ukfast.spec.volume.min')
             ->first();
         $volumeCapacity = (int)$metaData->value;
 
-        $currentActiveMetric = BillingMetric::where('resource_id', $image->id)
+        $currentActiveMetric = BillingMetric::where('resource_id', $model->id)
             ->where('key', '=', 'image.private')
             ->whereNull('end')
             ->first();
 
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value === $volumeCapacity) {
-                return;
-            }
             $currentActiveMetric->setEndDate($time);
+            return;
         }
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->fill([
-            'resource_id' => $image->id,
-            'vpc_id' => $image->vpc_id,
-            'reseller_id' => $image->vpc->reseller_id,
+            'resource_id' => $model->id,
+            'vpc_id' => $model->vpc_id,
+            'reseller_id' => $model->vpc->reseller_id,
             'key' => 'image.private',
             'value' => $volumeCapacity,
             'start' => $time,
         ]);
 
-        $availabilityZone = $image->availabilityZones()->first();
+        $availabilityZone = $model->availabilityZones()->first();
         $productName = $availabilityZone->id . ': volume-1gb';
         /** @var Product $product */
         $product = $availabilityZone->products()
@@ -78,9 +70,11 @@ class UpdateImageBilling
             );
         } else {
             $billingMetric->category = $product->category;
-            $billingMetric->price = $product->getPrice($image->vpc->reseller_id);
+            $billingMetric->price = $product->getPrice($model->vpc->reseller_id);
         }
 
         $billingMetric->save();
+
+        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
 }
