@@ -25,7 +25,6 @@ class ScheduledDeploy extends Command
 
     public function handle()
     {
-        Log::info('Processing Orchestrations Start');
         OrchestratorConfig::doesntHave('orchestratorBuilds')
             ->whereNotNull('deploy_on')
             ->whereBetween('deploy_on', [$this->startDate, $this->endDate])
@@ -37,7 +36,6 @@ class ScheduledDeploy extends Command
                     $orchestratorBuild->syncSave();
                 }
             });
-        Log::info('Processing Orchestrations End');
 
         return Command::SUCCESS;
     }
