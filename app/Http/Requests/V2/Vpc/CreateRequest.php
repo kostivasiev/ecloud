@@ -29,7 +29,7 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string',
+            'name' => 'nullable|string|max:255',
             'region_id' => [
                 'required',
                 'string',
