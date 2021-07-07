@@ -14,7 +14,7 @@ class UpdateFirewallPolicyRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'sometimes|required|string|max:50',
+            'name' => 'sometimes|required|string|max:255',
             'sequence' => 'sometimes|required|integer',
         ];
     }

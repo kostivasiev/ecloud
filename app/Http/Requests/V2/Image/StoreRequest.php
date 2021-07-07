@@ -12,7 +12,8 @@ class StoreRequest extends FormRequest
         return [
             'name' => [
                 'nullable',
-                'string'
+                'string',
+                'max:255'
             ],
             'availability_zone_ids' => [
                 'required',

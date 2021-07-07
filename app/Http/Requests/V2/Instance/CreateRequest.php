@@ -43,7 +43,7 @@ class CreateRequest extends FormRequest
         $this->platform = strtolower($this->image->platform);
 
         $rules = [
-            'name' => 'nullable|string',
+            'name' => 'nullable|string|max:255',
             'vpc_id' => [
                 'required',
                 'string',

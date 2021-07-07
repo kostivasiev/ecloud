@@ -15,7 +15,7 @@ class Update extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'sometimes|nullable|string|max:50',
+            'name' => 'sometimes|nullable|string|max:255',
             'sequence' => [
                 'sometimes',
                 'required',

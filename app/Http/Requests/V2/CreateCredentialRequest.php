@@ -25,7 +25,7 @@ class CreateCredentialRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'name' => ['nullable', 'string'],
+            'name' => ['nullable', 'string', 'max:255'],
             'resource_id' => ['required', 'string'],
             'host' => ['nullable', 'string'],
             'username' => ['nullable', 'string'],
