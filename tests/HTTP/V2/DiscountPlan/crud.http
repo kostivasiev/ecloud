@@ -113,7 +113,7 @@ Content-Type: application/json
 
 > {%
 client.test('Test no reseller_id, contact_id or employee_id in response', function() {
-    client.assert(!response.body.data.hasOwnProperty('orderform_id'), 'Cannot find orderform_id in output');
+    client.assert(response.body.data.hasOwnProperty('orderform_id'), 'Cannot find orderform_id in output');
     client.assert(!response.body.data.hasOwnProperty('reseller_id'), 'Cannot find reseller_id in output');
     client.assert(!response.body.data.hasOwnProperty('contact_id'), 'Cannot find contact_id in output');
     client.assert(!response.body.data.hasOwnProperty('employee_id'), 'Cannot find employee_id in output');
