@@ -144,7 +144,7 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
             return true;
         }
 
-        $vpcSupport = $this->vpcSupports->filter(function($vpcSupport) {
+        $vpcSupport = $this->vpcSupports->filter(function ($vpcSupport) {
             return $vpcSupport->active;
         })->first();
         $vpcSupport->end_date = Carbon::now(new \DateTimeZone(config('app.timezone')));
