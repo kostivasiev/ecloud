@@ -69,7 +69,7 @@ client.test("Request executed successfully", function() {
 
 ###
 # Delete Policy
-DELETE https://{{host}}/{{version}}/firewall-policies/fwp-0ea37710
+DELETE https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
