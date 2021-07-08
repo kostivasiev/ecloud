@@ -23,6 +23,9 @@ X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
+> {%
+client.assert(response.body.data.support_enabled === true, "Support was not enabled");
+%}
 
 ###
 PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
@@ -35,8 +38,9 @@ Content-Type:  application/json
 }
 
 > {%
-client.global.set('vpc_id', response.body.data.id);
-client.log('VPC Id : ' + response.body.data.id);
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
 %}
 
 ###
@@ -46,6 +50,10 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
+> {%
+client.assert(response.body.data.support_enabled === false, "Support was not enabled");
+%}
 
 ###
 PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
@@ -54,12 +62,13 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "support_enabled": false
+    "support_enabled": true
 }
 
 > {%
-client.global.set('vpc_id', response.body.data.id);
-client.log('VPC Id : ' + response.body.data.id);
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
 %}
 
 ###
@@ -69,6 +78,10 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
+> {%
+client.assert(response.body.data.support_enabled === true, "Support was not enabled");
+%}
 
 
 ### Delete VPC

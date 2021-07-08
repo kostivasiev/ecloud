@@ -121,7 +121,7 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
      */
     public function getSupportEnabledAttribute(): bool
     {
-        return $this->vpcSupports->filter(function($vpcSupport) {
+        return $this->vpcSupports->filter(function ($vpcSupport) {
             return $vpcSupport->active;
         })->count() > 0;
     }
