@@ -28,7 +28,6 @@ class Update extends FormRequest
                 'required',
                 'string',
                 'max:36',
-                'unique:ecloud.discount_plans,orderform_id,'.$discountPlanId.',id,deleted_at,NULL',
             ],
             'commitment_amount' => [
                 'sometimes',
