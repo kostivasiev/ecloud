@@ -27,7 +27,8 @@ class UpdateRequest extends FormRequest
             'name' => [
                 'sometimes',
                 'required',
-                'string'
+                'string',
+                'max:255'
             ],
             'availability_zone_id' => [
                 'sometimes',

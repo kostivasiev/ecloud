@@ -140,9 +140,8 @@ class NetworkController extends BaseController
             'subnet',
         ]));
 
-        $network->save();
-
-        return $this->responseIdMeta($request, $network->id, 202);
+        $task = $network->syncSave();
+        return $this->responseIdMeta($request, $network->id, 202, $task->id);
     }
 
     /**
@@ -157,11 +156,8 @@ class NetworkController extends BaseController
             'name',
         ]));
 
-        $network->withTaskLock(function ($network) {
-            $network->save();
-        });
-
-        return $this->responseIdMeta($request, $network->id, 202);
+        $task = $network->syncSave();
+        return $this->responseIdMeta($request, $network->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $networkId)
@@ -172,11 +168,8 @@ class NetworkController extends BaseController
             return $network->getDeletionError();
         }
 
-        $network->withTaskLock(function ($network) {
-            $network->delete();
-        });
-
-        return response('', 202);
+        $task = $network->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 
     /**

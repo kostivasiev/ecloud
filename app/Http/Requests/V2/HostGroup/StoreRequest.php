@@ -13,7 +13,7 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string|max:50',
+            'name' => 'nullable|string|max:255',
             'vpc_id' => [
                 'required',
                 'string',

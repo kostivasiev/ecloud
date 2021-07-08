@@ -25,7 +25,7 @@ class CreateFirewallPolicyRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string|max:50',
+            'name' => 'nullable|string|max:255',
             'sequence' => 'required|integer',
             'router_id' => [
                 'required',

@@ -28,7 +28,7 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['nullable', 'string'],
+            'name' => ['nullable', 'string', 'max:255'],
             'vpc_id' => [
                 'required',
                 'string',

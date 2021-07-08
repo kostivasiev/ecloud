@@ -36,7 +36,7 @@ class UpdateRequest extends FormRequest
         }
 
         return [
-            'name' => 'sometimes|required|string',
+            'name' => 'sometimes|required|string|max:255',
             'router_throughput_id' => [
                 'sometimes',
                 'required',

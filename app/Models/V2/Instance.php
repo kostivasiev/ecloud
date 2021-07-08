@@ -2,13 +2,8 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Instance\Created;
 use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
-use App\Events\V2\Instance\Deleting;
-use App\Events\V2\Instance\Saved;
-use App\Events\V2\Instance\Updated;
-use App\Events\V2\Instance\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
@@ -62,11 +57,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
-        'saving' => Saving::class,
-        'saved' => Saved::class,
-        'updated' => Updated::class,
-        'created' => Created::class,
-        'deleting' => Deleting::class,
         'deleted' => Deleted::class,
     ];
 
