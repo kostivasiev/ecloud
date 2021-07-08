@@ -462,7 +462,12 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@showData');
         $router->get('orchestrator-configs/{orchestratorConfigId}/builds', 'OrchestratorConfigController@builds');
 
-        $router->group(['middleware' => 'orchestrator-config-is-valid'], function () use ($router) {
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->put('orchestrator-configs/{orchestratorConfigId}/lock', 'OrchestratorConfigController@lock');
+            $router->put('orchestrator-configs/{orchestratorConfigId}/unlock', 'OrchestratorConfigController@unlock');
+        });
+
+        $router->group(['middleware' => ['is-locked', 'orchestrator-config-is-valid']], function () use ($router) {
             $router->post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
         });
 

@@ -13,4 +13,9 @@ properties:
     required: false
     readonly: false
     example: 54321
+  locked:
+    type: boolean
+    required: false
+    example: false
+    readOnly: false
 description: 'Builder Configuration'
