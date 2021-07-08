@@ -17,7 +17,7 @@ $factory->define(OrchestratorConfig::class, function () {
                         "region_id": "reg-test",
                         "console_enabled": true,
                         "advanced_networking": true,
-                        "support": true
+                        "support_enabled": true
                     }
                 ],
                 "routers": [

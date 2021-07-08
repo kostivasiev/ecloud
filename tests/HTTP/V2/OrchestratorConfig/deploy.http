@@ -40,7 +40,7 @@ Content-Type: application/json
             "region_id": "reg-aaaaaaaa",
             "console_enabled": true,
             "advanced_networking": true,
-            "support": true
+            "support_enabled": true
         }
     ],
     "routers": [
