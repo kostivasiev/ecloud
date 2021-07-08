@@ -1,0 +1,80 @@
+### Create VPC
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "test-vpc-support-enabled",
+    "region_id": "{{dev_region_id}}",
+    "support_enabled": true
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC Id : ' + response.body.data.id);
+%}
+
+###
+GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+
+###
+PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "support_enabled": false
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC Id : ' + response.body.data.id);
+%}
+
+###
+GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "support_enabled": false
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC Id : ' + response.body.data.id);
+%}
+
+###
+GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+
+### Delete VPC
+DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json

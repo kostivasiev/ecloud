@@ -84,7 +84,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-DELETE https://{{host}}/{{version}}/networks/{{network_id}}
+DELETE https://{{host}}/{{version}}/networks/net-ed33b006
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
