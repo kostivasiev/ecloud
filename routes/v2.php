@@ -199,7 +199,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('instances/{instanceId}/create-image', 'InstanceController@createImage');
         $router->post('instances/{instanceId}/migrate', 'InstanceController@migrate');
 
-        $router->group(['middleware' => 'is-locked'], function () use ($router) {
+        $router->group(['middleware' => 'instance-is-locked'], function () use ($router) {
             $router->patch('instances/{instanceId}', 'InstanceController@update');
             $router->delete('instances/{instanceId}', 'InstanceController@destroy');
             $router->put('instances/{instanceId}/power-on', 'InstanceController@powerOn');
@@ -467,7 +467,7 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->put('orchestrator-configs/{orchestratorConfigId}/unlock', 'OrchestratorConfigController@unlock');
         });
 
-        $router->group(['middleware' => ['is-locked', 'orchestrator-config-is-valid']], function () use ($router) {
+        $router->group(['middleware' => ['orchestrator-config-is-locked', 'orchestrator-config-is-valid']], function () use ($router) {
             $router->post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
         });
 
