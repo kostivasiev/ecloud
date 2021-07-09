@@ -38,7 +38,7 @@ class LockConfigurationTest extends TestCase
         });
 
         $this->orchestratorConfig->refresh();
-        dd($this->orchestratorConfig->getAttributes());
+        $this->assertTrue($this->orchestratorConfig->locked);
     }
 
 }
