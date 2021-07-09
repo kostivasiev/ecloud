@@ -35,6 +35,7 @@ class OrchestratorConfig extends Model implements Filterable, Sortable
             'employee_id',
             'data',
             'locked',
+            'deploy_on',
         ]);
 
         $this->casts = [
@@ -66,6 +67,7 @@ class OrchestratorConfig extends Model implements Filterable, Sortable
             $factory->create('reseller_id', Filter::$numericDefaults),
             $factory->create('employee_id', Filter::$numericDefaults),
             $factory->create('locked', Filter::$numericDefaults),
+            $factory->create('deploy_on', Filter::$dateDefaults),
         ];
     }
 
@@ -79,7 +81,9 @@ class OrchestratorConfig extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('reseller_id'),
+            $factory->create('employee_id'),
             $factory->create('locked'),
+            $factory->create('deploy_on'),
         ];
     }
 
@@ -103,6 +107,7 @@ class OrchestratorConfig extends Model implements Filterable, Sortable
             'employee_id' => 'employee_id',
             'data' => 'data',
             'locked' => 'locked',
+            'deploy_on' => 'deploy_on',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

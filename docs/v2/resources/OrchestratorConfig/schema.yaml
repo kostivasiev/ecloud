@@ -18,4 +18,8 @@ properties:
     required: false
     example: false
     readOnly: false
+  deploy_on:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    required: false
 description: 'Builder Configuration'

@@ -40,6 +40,7 @@ Content-Type: application/json
 
 {
     "contact_id": 1,
+    "orderform_id": "59f38285-faa3-4be9-bab5-b0f0cf31f187",
     "name": "test-commitment",
     "commitment_amount": 2000,
     "commitment_before_discount": 1000,
@@ -67,6 +68,7 @@ Content-Type: application/json
 
 {
     "contact_id": 1,
+    "orderform_id": "2add21ef-c30d-4086-83d5-8a5214bca003",
     "name": "test-commitment",
     "commitment_amount": 2000,
     "commitment_before_discount": 1000,
@@ -94,6 +96,7 @@ Content-Type: application/json
 
 > {%
 client.test('Test reseller_id, contact_id or employee_id in response', function() {
+    client.assert(response.body.data.hasOwnProperty('orderform_id'), 'Cannot find orderform_id in output');
     client.assert(response.body.data.hasOwnProperty('reseller_id'), 'Cannot find reseller_id in output');
     client.assert(response.body.data.hasOwnProperty('contact_id'), 'Cannot find contact_id in output');
     client.assert(response.body.data.hasOwnProperty('employee_id'), 'Cannot find employee_id in output');
@@ -110,6 +113,7 @@ Content-Type: application/json
 
 > {%
 client.test('Test no reseller_id, contact_id or employee_id in response', function() {
+    client.assert(response.body.data.hasOwnProperty('orderform_id'), 'Cannot find orderform_id in output');
     client.assert(!response.body.data.hasOwnProperty('reseller_id'), 'Cannot find reseller_id in output');
     client.assert(!response.body.data.hasOwnProperty('contact_id'), 'Cannot find contact_id in output');
     client.assert(!response.body.data.hasOwnProperty('employee_id'), 'Cannot find employee_id in output');
@@ -142,6 +146,7 @@ Content-Type: application/json
 {
     "contact_id": 1,
     "reseller_id": 1,
+    "orderform_id": "f5ff7433-b19c-4bf3-b432-c9bfd66e0df0",
     "name": "test-commitment",
     "commitment_amount": 2000,
     "commitment_before_discount": 1000,

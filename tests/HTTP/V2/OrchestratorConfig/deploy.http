@@ -92,6 +92,31 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
+POST https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/data
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "vpcs": [
+        {
+            "name": "vpc-2",
+            "region_id": "reg-aaaaaaaa",
+            "console_enabled": true,
+            "advanced_networking": true
+        }
+    ]
+}
+> {%
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
 POST https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/deploy
 Accept: */*
 Cache-Control: no-cache
