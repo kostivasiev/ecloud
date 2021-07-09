@@ -33,6 +33,7 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
+                new LockConfiguration($this->task->resource),
                 new CreateVpcs($this->task->resource),
                 new AwaitVpcs($this->task->resource),
                 new CreateRouters($this->task->resource),
@@ -43,7 +44,6 @@ class Update extends Job
                 new AwaitNetworks($this->task->resource),
                 new CreateInstances($this->task->resource),
                 new AwaitInstances($this->task->resource),
-                new LockConfiguration($this->task->resource),
             ]
         ])->dispatch();
     }
