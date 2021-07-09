@@ -21,6 +21,7 @@ class LockConfiguration extends Job
 
     public function handle()
     {
-        $this->model->saveQuietly(['locked' => true]);
+        $this->model->locked = true;
+        $this->model->saveQuietly();
     }
 }
