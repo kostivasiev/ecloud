@@ -11,7 +11,7 @@ class IsLocked
     {
         $model = OrchestratorConfig::forUser($request->user())
             ->findOrFail($request->route('orchestratorConfigId'));
-        if ($request->user()->isScoped() && $model->locked === true) {
+        if ($model->locked === true) {
             return response()->json([
                 'errors' => [
                     [
