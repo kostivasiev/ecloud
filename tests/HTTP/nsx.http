@@ -300,3 +300,47 @@ Content-Type:  application/json
 
 
 # ebe3adf5-c920-4442-b7fb-573e28d543c1
+
+
+### Create VPN Service
+PATCH https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-timtest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVpnService",
+    "enabled": true
+}
+
+### GET VPN Service
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-timtest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Delete VPN Service
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-timtest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get Local Endpoint
+GET https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+POST https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVPNLocalEndpoint",
+    "display_name": "timtest-vpn-local-endpoint",
+    "local_address": "203.0.113.76",
+    "local_id": "203.0.113.76",
+    "ipsec_vpn_service_id": {
+        "target_id": "7e03f0ca-17cb-49e6-8728-55d7ab935235",
+        "target_type": "IPSecVpnService"
+    },
+    "trust_ca_ids": [],
+    "trust_crl_ids": []
+}
