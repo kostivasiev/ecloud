@@ -34,7 +34,7 @@ class AvailabilityZoneSeeder extends Seeder
             'resource_id'=> 'az-aaaaaaaa',
             'host'=> 'https://mgmt-20.ecloud-service.ukfast.co.uk',
             'username'=> 'kingpinapi',
-            'password'=> env('DEV_KINGPIN_PASSWORD'),
+            'password'=> env('KINGPIN_PASSWORD'),
             'port'=> '8443',
             'is_hidden'=> false,
         ]);
