@@ -137,19 +137,19 @@ class CreateRequest extends FormRequest
         // So, we need to retrieve the validation rules
         $parameters = $this->image->imageParameters;
         foreach ($parameters as $parameterKey => $parameter) {
-            $key = 'image_data.' . $parameter->appliance_script_parameters_key;
-            $scriptRules[$key][] = ($parameter->appliance_script_parameters_required == 'Yes') ? 'required' : 'nullable';
+            $key = 'image_data.' . $parameter->key;
+            $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
             //validation rules regex
-            if (!empty($parameter->appliance_script_parameters_validation_rule)) {
-                $scriptRules[$key][] = 'regex:' . $parameter->appliance_script_parameters_validation_rule;
+            if (!empty($parameter->validation_rule)) {
+                $scriptRules[$key][] = 'regex:' . $parameter->validation_rule;
             }
 
             // For data types String,Numeric,Boolean we can use Laravel validation
-            switch ($parameter->appliance_script_parameters_type) {
+            switch ($parameter->type) {
                 case 'String':
                 case 'Numeric':
                 case 'Boolean':
-                    $scriptRules[$key][] = strtolower($parameter->appliance_script_parameters_type);
+                    $scriptRules[$key][] = strtolower($parameter->type);
                     break;
                 case 'Password':
                     $scriptRules[$key][] = 'string';
