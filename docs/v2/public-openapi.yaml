@@ -97,8 +97,6 @@ components:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     DiscountPlanId:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
-    VpnProfileId:
-      $ref: 'resources/VpnProfile/parameters/vpnProfileId.yaml'
     VpnProfileGroupId:
       $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
     VpnServiceId:
