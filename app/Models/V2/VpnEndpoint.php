@@ -40,9 +40,9 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         parent::__construct($attributes);
     }
 
-    public function vpnServices()
+    public function vpnService()
     {
-        return $this->belongsToMany(VpnService::class, 'vpn_service_vpn_endpoint');
+        return $this->belongsTo(VpnService::class);
     }
 
     public function vpnSessions()
