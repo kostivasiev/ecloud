@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpnProfileId'
+    - $ref: '../../resources/VpnProfile/parameters/vpnProfileId.yaml'
   responses:
     200:
       description: success
