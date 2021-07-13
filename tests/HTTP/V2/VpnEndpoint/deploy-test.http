@@ -1,0 +1,13 @@
+### VPN Service
+GET https://{{host}}/{{version}}/vpn-services/vpn-timtest
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Get Vpn Service', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+client.global.set('vpn_service_id', response.body.data.id);
+client.log('VPN Service ID: ' + response.body.data.id);
+%}

@@ -312,6 +312,11 @@ Content-Type:  application/json
     "enabled": true
 }
 
+### GET VPN Services - ffad7a64-9e54-4dd7-a2db-00f6d1abf5a4
+GET https://185.197.63.88/api/v1/vpn/ipsec/services
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
 ### GET VPN Service
 GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-timtest
 Authorization: Basic {{nsx_username}} {{nsx_password}}
@@ -338,9 +343,15 @@ Content-Type:  application/json
     "local_address": "203.0.113.76",
     "local_id": "203.0.113.76",
     "ipsec_vpn_service_id": {
-        "target_id": "7e03f0ca-17cb-49e6-8728-55d7ab935235",
+        "target_id": "04d4c278-113f-4d95-ade7-650aec147645",
         "target_type": "IPSecVpnService"
     },
     "trust_ca_ids": [],
     "trust_crl_ids": []
 }
+
+
+###
+GET https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints/4a3871e6-2f6e-44de-95b8-63dfeab27fc1
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

@@ -19,16 +19,8 @@ class CreateEndpoint extends Job
 
     public function handle()
     {
-        $vpnService = $this->model->vpnServices()->first();
-        // Get VPN Service UUID from NSX
-        $vpnServiceResponse = $vpnService->router->availabilityZone->nsxService()->get(
-            '/policy/api/v1/infra/tier-1s/' . $vpnService->router->id .
-            '/locale-services/' . $vpnService->router->id .
-            '/ipsec-vpn-services/' . $vpnService->id
-        );
-
-        $vpnServiceData = json_decode($vpnServiceResponse->getBody()->getContents());
-        if (!$vpnServiceData) {
+        $vpnServiceUuid = $this->getVpnServiceUuid();
+        if (!$vpnServiceUuid) {
             throw new \Exception(
                 'Create endpoint failed for ' . $this->model->id . ', could not decode vpn service response'
             );
@@ -39,11 +31,11 @@ class CreateEndpoint extends Job
             [
                 'json' => [
                     'resource_type' => 'IPSecVPNLocalEndpoint',
-                    'display_name' => 'timtest-vpn-local-endpoint',
-                    'local_address' => '203.0.113.76',
-                    'local_id' => '203.0.113.76',
+                    'display_name' => $this->model->id,
+                    'local_address' => $this->model->floatingIp->ip_address,
+                    'local_id' => $this->model->floatingIp->ip_address,
                     'ipsec_vpn_service_id' => [
-                        'target_id' => '33c25391-7ff7-4e0c-b20d-b4e3ec196921',
+                        'target_id' => $vpnServiceUuid,
                         'target_type' => 'IPSecVpnService',
                     ],
                     'trust_ca_ids' => [],
@@ -51,5 +43,24 @@ class CreateEndpoint extends Job
                 ]
             ]
         );
+    }
+
+    public function getVpnServiceUuid()
+    {
+        $vpnService = $this->model->vpnServices()->first();
+        // Get VPN Service UUID from NSX
+        $response = $vpnService->router->availabilityZone->nsxService()
+            ->get(
+                '/api/v1/vpn/ipsec/services'
+            );
+        $vpnServiceData = (json_decode($response->getBody()->getContents()))->results;
+        if ($vpnServiceData) {
+            foreach ($vpnServiceData as $vpnServiceItem) {
+                if ($vpnServiceItem->display_name === $vpnService->id) {
+                    return $vpnServiceItem->id;
+                }
+            }
+        }
+        return false;
     }
 }

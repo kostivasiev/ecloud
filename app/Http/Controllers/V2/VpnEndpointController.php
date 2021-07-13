@@ -3,9 +3,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\VpnEndpoint\CreateRequest;
 use App\Http\Requests\V2\VpnEndpoint\UpdateRequest;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
-use App\Models\V2\VpnService;
 use App\Resources\V2\VpnEndpointResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
