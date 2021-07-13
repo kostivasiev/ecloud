@@ -137,7 +137,6 @@ class CreateRequest extends FormRequest
         // So, we need to retrieve the validation rules
         $parameters = $this->image->imageParameters;
         foreach ($parameters as $parameterKey => $parameter) {
-            $parameter = json_decode($parameter);
             $key = 'image_data.' . $parameter->key;
             $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
             //validation rules regex
