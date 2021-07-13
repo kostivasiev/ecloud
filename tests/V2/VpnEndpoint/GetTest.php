@@ -29,11 +29,10 @@ class GetTest extends TestCase
         $this->vpnEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Get Test',
+                'vpn_service_id' => $this->vpnService->id,
                 'floating_ip_id' => $floatingIp->id,
             ]
         );
-        $this->vpnEndpoint->vpnServices()->attach($this->vpnService->id);
-        $this->vpnEndpoint->save();
     }
 
     public function testGetCollection()
@@ -66,15 +65,5 @@ class GetTest extends TestCase
                     'detail' => 'No Vpn Endpoint with that ID was found',
                 ]
             )->assertResponseStatus(404);
-    }
-
-    public function testGetVpnCollection()
-    {
-        $this->get('/v2/vpn-services/' . $this->vpnService->id . '/endpoints')
-            ->seeJson(
-                [
-                    'id' => $this->vpnEndpoint->id,
-                ]
-            )->assertResponseStatus(200);
     }
 }

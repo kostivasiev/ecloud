@@ -19,7 +19,6 @@ class CreateRequest extends FormRequest
             'vpn_service_id' => [
                 'required',
                 Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnServiceVpnEndpoint::class, 'vpn_service_id'),
                 new ExistsForUser(VpnService::class),
                 new IsResourceAvailable(VpnService::class),
             ],

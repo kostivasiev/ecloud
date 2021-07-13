@@ -34,6 +34,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         $this->fillable([
             'id',
             'name',
+            'vpn_service_id',
             'floating_ip_id',
         ]);
 
@@ -84,6 +85,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('vpn_service_id', Filter::$stringDefaults),
             $factory->create('floating_ip_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -100,6 +102,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('vpn_service_id'),
             $factory->create('floating_ip_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -126,6 +129,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
         return [
             'id' => 'id',
             'name' => 'name',
+            'vpn_service_id' => 'vpn_service_id',
             'floating_ip_id' => 'floating_ip_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

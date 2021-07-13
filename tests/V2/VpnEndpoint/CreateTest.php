@@ -39,37 +39,6 @@ class CreateTest extends TestCase
             ->assertResponseStatus(202);
     }
 
-    public function testCreateResourceVpnAlreadyUsed()
-    {
-        $floatingIp = FloatingIp::withoutEvents(function () {
-            return factory(FloatingIp::class)->create([
-                'id' => 'fip-aaa111bbb',
-                'vpc_id' => $this->vpc()->id,
-                'ip_address' => '203.0.113.2',
-            ]);
-        });
-        factory(VpnEndpoint::class, 1)->create([
-            'name' => 'Original Endpoint',
-            'floating_ip_id' => $floatingIp->id,
-        ])->each(function ($endpoint) {
-            $endpoint->vpnServices()->attach($this->vpnService->id);
-            $endpoint->save();
-        });
-        $data = [
-            'name' => 'Create Test',
-            'vpn_service_id' => $this->vpnService->id,
-            'floating_ip_id' => $this->floatingIp->id,
-        ];
-        $this->post('/v2/vpn-endpoints', $data)
-            ->seeJson(
-                [
-                    'title' => 'Validation Error',
-                    'detail' => 'A vpn endpoint already exists for the specified vpn service id',
-                ]
-            )
-            ->assertResponseStatus(422);
-    }
-
     public function testCreateResourceFipInUse()
     {
         $vpnService = factory(VpnService::class)->create([
@@ -77,11 +46,9 @@ class CreateTest extends TestCase
         ]);
         factory(VpnEndpoint::class, 1)->create([
             'name' => 'Original Endpoint',
+            'vpn_service_id' => $this->vpnService->id,
             'floating_ip_id' => $this->floatingIp->id,
-        ])->each(function ($endpoint) use ($vpnService) {
-            $endpoint->vpnServices()->attach($vpnService->id);
-            $endpoint->save();
-        });
+        ]);
         $data = [
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpnService->id,

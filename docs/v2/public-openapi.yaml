@@ -37,7 +37,7 @@ components:
     DiscountPlan:
       $ref: 'components/schemas/discountPlan.yaml'
     VpnEndpoint:
-      $ref: 'components/schemas/vpnEndpoint.yaml'
+      $ref: 'resources/VpnEndpoint/schema.yaml'
     VpnProfileGroup:
       $ref: 'components/schemas/vpnProfileGroup.yaml'
     Instance:

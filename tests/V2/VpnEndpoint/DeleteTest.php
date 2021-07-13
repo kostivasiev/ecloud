@@ -29,11 +29,10 @@ class DeleteTest extends TestCase
         $this->vpnEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Get Test',
+                'vpn_service_id' => $this->vpnService->id,
                 'floating_ip_id' => $floatingIp->id,
             ]
         );
-        $this->vpnEndpoint->vpnServices()->attach($this->vpnService->id);
-        $this->vpnEndpoint->save();
     }
 
     public function testDeleteResource()

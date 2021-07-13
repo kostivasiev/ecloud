@@ -30,11 +30,10 @@ class UpdateTest extends TestCase
         $this->vpnEndpoint = factory(VpnEndpoint::class)->create(
             [
                 'name' => 'Update Test',
+                'vpn_service_id' => $this->vpnService->id,
                 'floating_ip_id' => $this->floatingIp->id,
             ]
         );
-        $this->vpnEndpoint->vpnServices()->attach($this->vpnService->id);
-        $this->vpnEndpoint->save();
     }
 
     public function testUpdateResource()
@@ -81,12 +80,10 @@ class UpdateTest extends TestCase
         factory(VpnEndpoint::class, 1)->create(
             [
                 'name' => 'Other LE Test',
+                'vpn_service_id' => $vpnService->id,
                 'floating_ip_id' => $floatingIp->id,
             ]
-        )->each(function ($endpoint) use ($vpnService) {
-            $endpoint->vpnServices()->attach($vpnService->id);
-            $endpoint->save();
-        });
+        );
         // Update original local endpoint
         $data = [
             'floating_ip_id' => $floatingIp->id,
