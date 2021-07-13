@@ -9,10 +9,6 @@ patch:
           type: object
           allOf:
             - $ref: "../../admin-openapi.yaml#/components/schemas/VpnProfile"
-            - type: object
-              properties:
-                router_id:
-                  required: false
   responses:
     200:
       $ref: '../../admin-openapi.yaml#/components/responses/VpnProfileIdResponse'
