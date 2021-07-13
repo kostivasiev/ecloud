@@ -26,6 +26,6 @@ class CreateNetwork extends Job
         // Create a new network
         $network = app()->make(Network::class);
         $network->router()->associate($this->model);
-        $network->save();
+        $network->syncSave();
     }
 }
