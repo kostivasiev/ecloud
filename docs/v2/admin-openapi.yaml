@@ -63,6 +63,8 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
     ImageMetadata:
       $ref: 'resources/ImageMetadata/schema.yaml'
+    VpnProfile:
+      $ref: 'resources/VpnProfile/schema.yaml'
     VpnProfileGroup:
       $ref: 'components/schemas/vpnProfileGroupAdmin.yaml'
 
@@ -97,6 +99,8 @@ components:
       $ref: 'resources/Router/parameters/routerId.yaml'
     VolumeId:
       $ref: 'resources/Volume/parameters/volumeId.yaml'
+    VpnProfileId:
+      $ref: 'resources/VpnProfile/parameters/vpnProfileId.yaml'
     VpnProfileGroupId:
       $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
 
@@ -125,6 +129,8 @@ components:
       $ref: 'resources/Region/responses/idResponse.yaml'
     VolumeIdResponse:
       $ref: 'resources/Volume/responses/idResponse.yaml'
+    VpnProfileIdResponse:
+      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
     VpnProfileGroupIdResponse:
       $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
 
@@ -225,6 +231,10 @@ paths:
     $ref: 'resources/OrchestratorConfig/data.yaml'
   '/ecloud/v2/orchestrator-configs/{configId}/deploy':
     $ref: 'resources/OrchestratorConfig/deploy.yaml'
+  '/ecloud/v2/vpn-profiles':
+    $ref: 'resources/VpnProfile/admin-collection.yaml'
+  '/ecloud/v2/vpn-profiles/{vpnProfileId}':
+    $ref: 'resources/VpnProfile/admin-item.yaml'
   '/ecloud/v2/vpn-profile-groups':
     $ref: 'resources/VpnProfileGroup/admin-collection.yaml'
   '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':

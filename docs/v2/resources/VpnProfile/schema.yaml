@@ -1,0 +1,43 @@
+properties:
+  id:
+    type: string
+    example: 'vpnp-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    example: 'My VPN Profile'
+  ike_version:
+    type: string
+    required: true
+    example: 'ike_v2'
+    readOnly: false
+  encryption_algorithm:
+    type: array
+    items:
+      type: string
+      required: true
+      example: 'aes 128'
+      readOnly: false
+  digest_algorithm:
+    type: array
+    items:
+      type: string
+      required: true
+      example: 'sha2 512'
+      readOnly: false
+  diffie_hellman:
+    type: array
+    items:
+      type: string
+      required: true
+      example: 'group 14'
+      readOnly: false
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Vpns'
