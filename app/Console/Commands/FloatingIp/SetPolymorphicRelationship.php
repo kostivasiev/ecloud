@@ -27,7 +27,6 @@ class SetPolymorphicRelationship extends Command
                     $fip->resource()->associate($nat->translated);
                     $fip->save();
                 }
-
             } catch (\Throwable $exception) {
                 Log::error('Failed setting polymorphic relationship for ' . $nat->destination_id, [
                     'router_id' => $nat->destination_id,
