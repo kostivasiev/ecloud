@@ -37,24 +37,12 @@ class AssignFloatingIp extends Job
         } else if ($this->model->deploy_data['requires_floating_ip']) {
             $floatingIp = app()->make(FloatingIp::class);
             $floatingIp->vpc_id = $this->model->vpc->id;
-            $floatingIp->save();
+            $floatingIp->syncSave();
         }
 
         if (!empty($floatingIp)) {
             $nic = $this->model->nics()->first();
-
-            $nat = app()->make(Nat::class);
-            $nat->destination()->associate($floatingIp);
-            $nat->translated()->associate($nic);
-            $nat->action = Nat::ACTION_DNAT;
-            $nat->save();
-
-            $nat = app()->make(Nat::class);
-            $nat->source()->associate($nic);
-            $nat->translated()->associate($floatingIp);
-            $nat->action = NAT::ACTION_SNAT;
-            $nat->save();
-
+            $floatingIp->assign($nic);
             Log::info('Floating IP (' . $floatingIp->id . ') assigned to NIC (' . $nic->id . ')');
         }
     }
