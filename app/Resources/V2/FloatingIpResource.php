@@ -29,7 +29,7 @@ class FloatingIpResource extends UKFastResource
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
             'ip_address' => $this->ip_address,
-            'resource_id' => $this->resource_id ?? null,
+            'resource_id' => $this->resource_id,
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,

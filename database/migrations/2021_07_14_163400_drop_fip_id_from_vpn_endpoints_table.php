@@ -26,7 +26,7 @@ class DropFipIdFromVpnEndpointsTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('vpn_endpoints', function (Blueprint $table) {
-            $table->uuid('fip_id');
+            $table->uuid('fip_id')->nullable();
         });
     }
 }
