@@ -5,15 +5,17 @@ use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateVpcs;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
+use App\Models\V2\Vpc;
+use App\Models\V2\VpcSupport;
+use DateTimeZone;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class CreateVpcsTest extends TestCase
 {
-    protected $job;
-
     protected OrchestratorConfig $orchestratorConfig;
 
     protected OrchestratorBuild $orchestratorBuild;
@@ -82,4 +84,42 @@ class CreateVpcsTest extends TestCase
 
         $this->assertEquals(2, count($this->orchestratorBuild->state['vpc']));
     }
+    public function testEnableSupport()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        $this->orchestratorConfig->data = json_encode([
+            'vpcs' => [
+                [
+                    'name' => 'vpc-2',
+                        'region_id' => 'reg-test',
+                        'console_enabled' => true,
+                        'advanced_networking' => true,
+                        'support_enabled' => true
+                ]
+            ]
+        ]);
+        $this->orchestratorConfig->save();
+
+        dispatch(new CreateVpcs($this->orchestratorBuild));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+
+        Event::assertDispatched(Created::class);
+
+        $this->orchestratorBuild->refresh();
+
+        $vpc = Vpc::findOrFail($this->orchestratorBuild->state['vpc'][0]);
+
+        $this->assertEquals(1, $vpc->vpcSupports->count());
+
+        $this->assertEquals(
+            Carbon::parse($vpc->created_at, new DateTimeZone(config('app.timezone')))->format('Y-m-d'),
+            Carbon::parse($vpc->vpcSupports->first()->start_date, new DateTimeZone(config('app.timezone')))->format('Y-m-d')
+        );
+    }
+
 }

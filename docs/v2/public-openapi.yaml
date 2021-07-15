@@ -36,6 +36,8 @@ components:
       $ref: 'components/schemas/dhcp.yaml'
     DiscountPlan:
       $ref: 'components/schemas/discountPlan.yaml'
+    VpnProfile:
+      $ref: 'resources/VpnProfile/schema.yaml'
     VpnProfileGroup:
       $ref: 'components/schemas/vpnProfileGroup.yaml'
     Instance:
@@ -124,6 +126,8 @@ components:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
     VpnSessionIdResponse:
       $ref: 'resources/VpnSession/responses/idResponse.yaml'
+    VpnProfileIdResponse:
+      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
     VpnProfileGroupIdResponse:
       $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
     VpnServiceIdResponse:
@@ -173,6 +177,10 @@ paths:
     $ref: 'resources/VpnSession/collection.yaml'
   '/ecloud/v2/vpn-sessions/{vpnSessionId}':
     $ref: 'resources/VpnSession/item.yaml'
+  '/ecloud/v2/vpn-profiles':
+    $ref: 'resources/VpnProfile/collection.yaml'
+  '/ecloud/v2/vpn-profiles/{vpnProfileId}':
+    $ref: 'resources/VpnProfile/item.yaml'
   '/ecloud/v2/vpn-profile-groups':
     $ref: 'resources/VpnProfileGroup/collection.yaml'
   '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':

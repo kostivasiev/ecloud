@@ -11,7 +11,7 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string|max:50',
+            'name' => 'nullable|string|max:255',
             'host_group_id' => [
                 'required',
                 'string',

@@ -44,7 +44,7 @@ class CreateRequest extends FormRequest
         }
 
         return [
-            'name' => 'nullable|string',
+            'name' => 'nullable|string|max:255',
             'vpc_id' => [
                 'required',
                 'string',

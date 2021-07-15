@@ -12,8 +12,6 @@ use Tests\TestCase;
 
 class CreateRoutersTest extends TestCase
 {
-    protected $job;
-
     protected OrchestratorConfig $orchestratorConfig;
 
     protected OrchestratorBuild $orchestratorBuild;
@@ -23,7 +21,7 @@ class CreateRoutersTest extends TestCase
         parent::setUp();
         $this->orchestratorConfig = factory(OrchestratorConfig::class)->create([
             'data' => json_encode([
-                'router' => [
+                'routers' => [
                     [
                         'vpc_id' => '{vpc.0}',
                         'name' => 'test router',
@@ -106,7 +104,7 @@ class CreateRoutersTest extends TestCase
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
         $this->orchestratorConfig->data = json_encode([
-                'router' => [
+                'routers' => [
                     [
                         'vpc_id' => '{vpc.0}',
                         'name' => 'test router',
@@ -140,7 +138,7 @@ class CreateRoutersTest extends TestCase
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
         $this->orchestratorConfig->data = json_encode([
-            'router' => [
+            'routers' => [
                 [
                     'vpc_id' => '{vpc.0}',
                     'name' => 'test router',
@@ -149,6 +147,43 @@ class CreateRoutersTest extends TestCase
         ]);
         $this->orchestratorConfig->save();
 
+        $this->vpc();
+        $this->orchestratorBuild->updateState('vpc', 0, 'vpc-test');
+
+        dispatch(new CreateRouters($this->orchestratorBuild));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+
+        Event::assertDispatched(Created::class);
+
+        $this->orchestratorBuild->refresh();
+
+        $this->assertNotNull($this->orchestratorBuild->state['router']);
+
+        $this->assertEquals(1, count($this->orchestratorBuild->state['router']));
+    }
+
+    public function testIdPlaceholdersIgnoredSuccess()
+    {
+        $this->orchestratorConfig->data = json_encode([
+            'routers' => [
+                [
+                    'id' => '{router.0}',
+                    'vpc_id' => '{vpc.0}',
+                    'name' => 'test router',
+                    'router_throughput_id' => "rtp-test",
+                    'availability_zone_id' => "az-test"
+                ]
+            ]
+        ]);
+        $this->orchestratorConfig->save();
+
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        $this->availabilityZone();
         $this->vpc();
         $this->orchestratorBuild->updateState('vpc', 0, 'vpc-test');
 

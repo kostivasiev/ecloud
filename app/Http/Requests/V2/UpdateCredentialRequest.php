@@ -25,7 +25,7 @@ class UpdateCredentialRequest extends FormRequest
     public function rules()
     {
         $rules = [
-            'name' => ['sometimes', 'required', 'string'],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
             'resource_id' => ['sometimes', 'nullable', 'string'],
             'host' => ['sometimes', 'nullable', 'string'],
             'username' => ['sometimes', 'nullable', 'string'],

@@ -29,7 +29,8 @@ class Update extends FormRequest
             'name' => [
                 'sometimes',
                 'nullable',
-                'string'
+                'string',
+                'max:255'
             ],
             'protocol' => [
                 'sometimes',

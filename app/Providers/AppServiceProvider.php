@@ -11,6 +11,7 @@ use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use App\Models\V2\VpnProfile;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
 use GuzzleHttp\Client;
@@ -62,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
             'net' => Network::class,
             'obuild' => OrchestratorBuild::class,
             'vpns' => VpnSession::class,
+            'vpnp' => VpnProfile::class,
         ]);
 
         Queue::exceptionOccurred(function (JobExceptionOccurred $event) {

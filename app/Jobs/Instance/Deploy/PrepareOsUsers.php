@@ -143,7 +143,7 @@ class PrepareOsUsers extends Job
                         continue;
                     }
 
-                    $sshKeys[] = $sshKeyPair->first()->public_key;
+                    $sshKeys[] = $sshKeyPair->public_key;
                 }
 
                 if (count($sshKeys) > 0) {

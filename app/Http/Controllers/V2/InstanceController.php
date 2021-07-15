@@ -117,9 +117,11 @@ class InstanceController extends BaseController
             'host_group_id',
         ]));
 
+        $image = Image::forUser(Auth::user())->findOrFail($request->input('image_id'));
+
         $instance->locked = $request->input('locked', false);
         $instance->deploy_data = [
-            'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.' . strtolower($instance->platform) . '.min')),
+            'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.' . strtolower($image->platform) . '.min')),
             'volume_iops' => $request->input('volume_iops', config('volume.iops.default')),
             'network_id' => $request->input('network_id', $defaultNetworkId),
             'floating_ip_id' => $request->input('floating_ip_id'),
@@ -129,9 +131,8 @@ class InstanceController extends BaseController
             'ssh_key_pair_ids' => $request->input('ssh_key_pair_ids'),
         ];
 
-        $instance->save();
-
-        return $this->responseIdMeta($request, $instance->id, 202);
+        $task = $instance->syncSave();
+        return $this->responseIdMeta($request, $instance->id, 202, $task->id);
     }
 
     /**
@@ -153,11 +154,8 @@ class InstanceController extends BaseController
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
         }
 
-        $instance->withTaskLock(function ($instance) {
-            $instance->save();
-        });
-
-        return $this->responseIdMeta($request, $instance->id, 202);
+        $task = $instance->syncSave();
+        return $this->responseIdMeta($request, $instance->id, 202, $task->id);
     }
 
     /**
