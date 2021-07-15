@@ -12,6 +12,10 @@ properties:
   employee_id:
     type: integer
     example: 123456
+  orderform_id:
+    type: string
+    example: 84bfdc19-977e-462b-a14b-0c4b907fff55
+    required: false
   name:
     type: string
     example: 'Discount Plan Name'

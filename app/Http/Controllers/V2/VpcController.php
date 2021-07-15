@@ -10,11 +10,13 @@ use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use App\Models\V2\VpcSupport;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -57,9 +59,15 @@ class VpcController extends BaseController
             }
             $vpc->console_enabled = $request->input('console_enabled', true);
         }
+
         $vpc->reseller_id = $this->resellerId;
 
         $task = $vpc->syncSave();
+
+        if ($request->has('support_enabled') && $request->input('support_enabled') === true) {
+            $vpc->enableSupport($vpc->created_at);
+        }
+
         return $this->responseIdMeta($request, $vpc->id, 202, $task->id);
     }
 
@@ -82,6 +90,16 @@ class VpcController extends BaseController
         }
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
+        }
+
+        if ($request->has('support_enabled')) {
+            if ($request->input('support_enabled') === true && !$vpc->support_enabled) {
+                $vpc->enableSupport();
+            }
+
+            if ($request->input('support_enabled') === false && $vpc->support_enabled) {
+                $vpc->disableSupport();
+            }
         }
 
         $task = $vpc->syncSave();

@@ -37,6 +37,7 @@ class CreateRequest extends FormRequest
             ],
             'console_enabled' => 'sometimes|boolean',
             'advanced_networking' => 'sometimes|boolean',
+            'support_enabled' => 'sometimes|boolean',
         ];
     }
 }

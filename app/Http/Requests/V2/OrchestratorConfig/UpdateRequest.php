@@ -19,6 +19,12 @@ class UpdateRequest extends FormRequest
                 'nullable',
                 'integer'
             ],
+            'deploy_on' => [
+                'sometimes',
+                'required',
+                'date_format:Y-m-d H:i:s',
+                'after:now',
+            ],
             'data' => [
                 'sometimes',
                 'required',
