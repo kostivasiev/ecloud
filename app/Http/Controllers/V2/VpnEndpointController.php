@@ -39,14 +39,14 @@ class VpnEndpointController extends BaseController
         );
         $vpnEndpoint->save();
         $floatingIp = FloatingIp::findOrFail($request->get('floating_ip_id'));
-        $floatingIp::assign($vpnEndpoint);
+        $floatingIp->assign($vpnEndpoint);
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
     }
 
     public function update(UpdateRequest $request, string $vpnEndpointId)
     {
         $vpnEndpoint = VpnEndpoint::forUser(Auth::user())->findOrFail($vpnEndpointId);
-        $vpnEndpoint->fill($request->only(['name', 'floating_ip_id']));
+        $vpnEndpoint->fill($request->only(['name']));
         $vpnEndpoint->save();
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
     }

@@ -17,15 +17,6 @@ class UpdateRequest extends FormRequest
         $id = $this->route()[2]['vpnEndpointId'];
         return [
             'name' => 'sometimes|required|string',
-            'floating_ip_id' => [
-                'sometimes',
-                'required',
-                Rule::exists(FloatingIp::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnEndpoint::class, 'floating_ip_id')
-                    ->ignore($id, 'id'),
-                new ExistsForUser(FloatingIp::class),
-                new IsResourceAvailable(FloatingIp::class),
-            ],
         ];
     }
 }
