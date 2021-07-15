@@ -72,6 +72,11 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable
         return $this->morphOne(Nat::class, 'translatedable', null, 'translated_id');
     }
 
+    public function floatingIp()
+    {
+        return $this->morphOne(FloatingIp::class, 'resource');
+    }
+
     /**
      * @param $query
      * @param Consumer $user
