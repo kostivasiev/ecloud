@@ -71,7 +71,10 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
         $resource = Resource::classFromId($request->resource_id)::findOrFail($request->resource_id);
-        $floatingIp->assign($resource);
+
+        $floatingIp->withTaskLock(function ($floatingIp) use ($resource) {
+            $floatingIp->assign($resource);
+        });
 
         return response('', 202);
     }
@@ -80,7 +83,9 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->unassign();
+        $floatingIp->withTaskLock(function ($floatingIp) {
+            $floatingIp->unassign();
+        });
 
         return response('', 202);
     }

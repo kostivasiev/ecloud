@@ -85,47 +85,43 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             throw new AssignException();
         }
 
-        $this->withTaskLock(function ($model) use ($resource) {
-            $this->resource()->associate($resource);
+        $this->resource()->associate($resource);
 
-            if ($resource instanceof Nic) {
-                if (!$this->destinationNat()->exists()) {
-                    $nat = app()->make(Nat::class);
-                    $nat->destination()->associate($this);
-                    $nat->translated()->associate($resource);
-                    $nat->action = Nat::ACTION_DNAT;
-                    $nat->save();
-                }
-
-                if (!$this->sourceNat()->exists()) {
-                    $nat = app()->make(Nat::class);
-                    $nat->source()->associate($resource);
-                    $nat->translated()->associate($this);
-                    $nat->action = NAT::ACTION_SNAT;
-                    $nat->save();
-                }
+        if ($resource instanceof Nic) {
+            if (!$this->destinationNat()->exists()) {
+                $nat = app()->make(Nat::class);
+                $nat->destination()->associate($this);
+                $nat->translated()->associate($resource);
+                $nat->action = Nat::ACTION_DNAT;
+                $nat->save();
             }
 
-            $this->save();
-        });
+            if (!$this->sourceNat()->exists()) {
+                $nat = app()->make(Nat::class);
+                $nat->source()->associate($resource);
+                $nat->translated()->associate($this);
+                $nat->action = NAT::ACTION_SNAT;
+                $nat->save();
+            }
+        }
+
+        $this->save();
     }
 
     public function unassign()
     {
-        $this->withTaskLock(function ($model) {
-            if ($this->resource instanceof Nic) {
-                if ($this->sourceNat()->exists()) {
-                    $this->sourceNat->delete();
-                }
-                if ($this->destinationNat()->exists()) {
-                    $this->destinationNat->delete();
-                }
+        if ($this->resource instanceof Nic) {
+            if ($this->sourceNat()->exists()) {
+                $this->sourceNat->delete();
             }
+            if ($this->destinationNat()->exists()) {
+                $this->destinationNat->delete();
+            }
+        }
 
-            $this->resource()->dissociate();
+        $this->resource()->dissociate();
 
-            $this->save();
-        });
+        $this->save();
     }
 
     /**
