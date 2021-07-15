@@ -44,11 +44,11 @@ class CreateTest extends TestCase
         $vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        factory(VpnEndpoint::class, 1)->create([
+        $vpnEndpoint = factory(VpnEndpoint::class)->create([
             'name' => 'Original Endpoint',
             'vpn_service_id' => $this->vpnService->id,
-            'floating_ip_id' => $this->floatingIp->id,
         ]);
+        $this->floatingIp->assign($vpnEndpoint);
         $data = [
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpnService->id,
@@ -58,7 +58,7 @@ class CreateTest extends TestCase
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'A vpn endpoint already exists for the specified floating ip id',
+                    'detail' => 'The floating ip id is already assigned to a resource',
                 ]
             )
             ->assertResponseStatus(422);

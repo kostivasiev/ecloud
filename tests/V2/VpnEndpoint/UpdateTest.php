@@ -31,9 +31,9 @@ class UpdateTest extends TestCase
             [
                 'name' => 'Update Test',
                 'vpn_service_id' => $this->vpnService->id,
-                'floating_ip_id' => $this->floatingIp->id,
             ]
         );
+        $this->floatingIp->assign($this->vpnEndpoint);
     }
 
     public function testUpdateResource()
@@ -56,46 +56,8 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => $this->vpnEndpoint->name,
-            'floating_ip_id' => $this->vpnEndpoint->floating_ip_id,
         ];
         $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
             ->assertResponseStatus(202);
-    }
-
-    public function testUpdateWithDataThatIsAlreadyInUse()
-    {
-        // Create VPN
-        $vpnService = factory(VpnService::class)->create([
-            'router_id' => $this->router()->id,
-        ]);
-        // Create Floating Ip
-        $floatingIp = FloatingIp::withoutEvents(function () {
-            return factory(FloatingIp::class)->create([
-                'id' => 'fip-aaa111aaa',
-                'vpc_id' => $this->vpc()->id,
-                'ip_address' => '203.0.113.5',
-            ]);
-        });
-        // Create Local Endpoint
-        factory(VpnEndpoint::class, 1)->create(
-            [
-                'name' => 'Other LE Test',
-                'vpn_service_id' => $vpnService->id,
-                'floating_ip_id' => $floatingIp->id,
-            ]
-        );
-        // Update original local endpoint
-        $data = [
-            'floating_ip_id' => $floatingIp->id,
-        ];
-        $this->patch('/v2/vpn-endpoints/' . $this->vpnEndpoint->id, $data)
-            ->seeJson(
-                [
-                    'title' => 'Validation Error',
-                    'detail' => 'The floating ip id has already been taken',
-                    'source' => 'floating_ip_id',
-                ]
-            )
-            ->assertResponseStatus(422);
     }
 }

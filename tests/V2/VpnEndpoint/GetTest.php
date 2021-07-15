@@ -30,9 +30,9 @@ class GetTest extends TestCase
             [
                 'name' => 'Get Test',
                 'vpn_service_id' => $this->vpnService->id,
-                'floating_ip_id' => $floatingIp->id,
             ]
         );
+        $floatingIp->assign($this->vpnEndpoint);
     }
 
     public function testGetCollection()
