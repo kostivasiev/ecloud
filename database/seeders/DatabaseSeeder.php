@@ -14,11 +14,17 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        // API level resources
         $this->call(RegionSeeder::class);
         $this->call(AvailabilityZoneSeeder::class);
         $this->call(RouterThroughputSeeder::class);
         $this->call(ImageSeeder::class);
+
+        // Create some dev resources for test reseller 7052
         $this->call(SshKeyPairSeeder::class);
+        $this->call(VpcSeeder::class);
+        $this->call(RouterSeeder::class);
+        $this->call(NetworkSeeder::class);
     }
 }
 
