@@ -13,7 +13,7 @@ class VpnEndpointResource extends UKFastResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'floating_ip_id' => $this->floating_ip_id,
+            'floating_ip_id' => $this->floatingIp->id,
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
