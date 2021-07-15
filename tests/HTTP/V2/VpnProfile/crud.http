@@ -1,0 +1,84 @@
+### Create Profile
+POST https://{{host}}/{{version}}/vpn-profiles
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "Vpn Test Profile",
+    "ike_version": "ike_v2",
+    "encryption_algorithm": [
+        "aes 128",
+        "aes 256"
+    ],
+    "digest_algorithm": [
+        "sha2 256"
+    ],
+    "diffie_hellman": [
+        "group 14"
+    ]
+}
+
+> {%
+client.test('Create Profile', function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('vpn_profile_id', response.body.data.id);
+client.log('VPN Profile ID: ' + response.body.data.id);
+%}
+
+### Get Collection
+GET https://{{host}}/{{version}}/vpn-profiles
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Get Collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Update Collection
+PATCH https://{{host}}/{{version}}/vpn-profiles/{{vpn_profile_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "Vpn Test Profile (Updated)",
+    "ike_version": "ike_flex",
+    "digest_algorithm": [
+        "sha2 512"
+    ]
+}
+
+> {%
+client.test('Update resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Get Resource
+GET https://{{host}}/{{version}}/vpn-profiles/{{vpn_profile_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Get Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Delete Resource
+DELETE https://{{host}}/{{version}}/vpn-profiles/{{vpn_profile_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Delete Resource', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
