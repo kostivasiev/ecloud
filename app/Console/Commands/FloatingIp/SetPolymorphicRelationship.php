@@ -2,11 +2,8 @@
 
 namespace App\Console\Commands\FloatingIp;
 
-use App\Events\V2\Router\Creating;
-use App\Listeners\V2\Router\DefaultRouterThroughput;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
-use App\Models\V2\Router;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
@@ -29,7 +26,7 @@ class SetPolymorphicRelationship extends Command
                 }
             } catch (\Throwable $exception) {
                 Log::error('Failed setting polymorphic relationship for ' . $nat->destination_id, [
-                    'router_id' => $nat->destination_id,
+                    'resource_id' => $nat->destination_id,
                     'exception' => $exception,
                 ]);
             }

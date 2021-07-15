@@ -128,7 +128,6 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         });
     }
 
-
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
