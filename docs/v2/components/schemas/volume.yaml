@@ -13,8 +13,9 @@ properties:
     example: 'vpc-2b66bb79'
   availability_zone_id:
     type: string
-    required: false
-    example: az-2b66bb79
+    required: true
+    example: 'az-2b66bb79'
+    readOnly : false
   capacity:
     type: integer
     required: true
