@@ -504,7 +504,7 @@ class InstanceController extends BaseController
 
         $image->availabilityZones()->sync($instance->availabilityZone);
 
-        $task = $image->createTaskWithLock(
+        $task = $instance->createTaskWithLock(
             'image_create',
             \App\Jobs\Tasks\Instance\CreateImage::class,
             [

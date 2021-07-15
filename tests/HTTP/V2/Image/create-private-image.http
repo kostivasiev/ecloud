@@ -13,8 +13,7 @@ Content-Type:  application/json
     "requires_floating_ip": true,
     "network_id": "{{dev_network_id}}",
     "volume_capacity": 30,
-    "volume_iops": 600,
-    "host_group_id": "{{dev_host_group_id}}"
+    "volume_iops": 600
 }
 
 > {%

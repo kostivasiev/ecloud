@@ -4,6 +4,7 @@ namespace App\Listeners\V2\Image;
 
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Image;
+use App\Models\V2\Instance;
 use App\Models\V2\Product;
 use App\Support\Sync;
 use Carbon\Carbon;
@@ -27,6 +28,13 @@ class UpdateImageBilling
         }
 
         $model = $event->model->resource;
+
+        if (get_class($model) === Instance::class) {
+            if (is_null($event->model->data) || !array_key_exists('image_id', $event->model->data)) {
+                return;
+            }
+            $model = Image::find($event->model->data['image_id']);
+        }
 
         if (get_class($model) != Image::class) {
             return;
