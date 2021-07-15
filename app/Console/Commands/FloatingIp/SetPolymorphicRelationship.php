@@ -26,7 +26,7 @@ class SetPolymorphicRelationship extends Command
                 }
             } catch (\Throwable $exception) {
                 Log::error('Failed setting polymorphic relationship for ' . $nat->destination_id, [
-                    'router_id' => $nat->destination_id,
+                    'resource_id' => $nat->destination_id,
                     'exception' => $exception,
                 ]);
             }
