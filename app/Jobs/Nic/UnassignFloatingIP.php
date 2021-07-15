@@ -25,13 +25,9 @@ class UnassignFloatingIP extends Job
         $logMessage = 'UnassignFloatingIp for NIC ' . $nic->id . ': ';
         Log::info($logMessage . 'Started');
 
-        if ($this->model->sourceNat()->exists()) {
-            Log::info($logMessage . 'Floating IP ' . $this->model->sourceNat->translated_id . ' unassigned');
-            $this->model->sourceNat->delete();
-        }
-        if ($this->model->destinationNat()->exists()) {
-            Log::info($logMessage . 'Floating IP ' . $this->model->sourceNat->translated_id . ' unassigned');
-            $this->model->destinationNat->delete();
+        if ($nic->floatingIp()->exists()) {
+            Log::info($logMessage . 'Floating IP ' . $nic->floatingIp->id . ' unassigning');
+            $nic->floatingIp->unassign();
         }
     }
 }
