@@ -20,120 +20,129 @@ components:
       in: header
       name: Authorization
   schemas:
-    NetworkPolicy:
-      $ref: 'components/schemas/networkPolicy.yaml'
-    NetworkRule:
-      $ref : 'components/schemas/networkRule.yaml'
-    NetworkRulePort :
-      $ref : 'components/schemas/networkRulePort.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
-    VirtualPrivateCloud:
-      $ref: 'components/schemas/vpc.yaml'
-    Network:
-      $ref: 'components/schemas/network.yaml'
     Dhcp:
       $ref: 'components/schemas/dhcp.yaml'
     DiscountPlan:
       $ref: 'components/schemas/discountPlan.yaml'
-    VpnProfile:
-      $ref: 'resources/VpnProfile/schema.yaml'
-    VpnProfileGroup:
-      $ref: 'components/schemas/vpnProfileGroup.yaml'
-    Instance:
-      $ref: 'components/schemas/instance.yaml'
     FloatingIP:
       $ref: 'components/schemas/floatingIp.yaml'
     FirewallRule:
       $ref: 'components/schemas/firewallRule.yaml'
     FirewallPolicy:
       $ref: 'components/schemas/firewallPolicy.yaml'
+    HostGroup:
+      $ref: 'resources/HostGroup/schema.yaml'
+    HostSpec:
+      $ref: 'resources/HostSpec/schema.yaml'
+    Image:
+      $ref: 'resources/Image/schema.yaml'
+    ImageMetadata:
+      $ref: 'resources/ImageMetadata/schema.yaml'
+    ImageParameter:
+      $ref: 'resources/ImageParameter/schema.yaml'
+    Instance:
+      $ref: 'components/schemas/instance.yaml'
+#    LoadBalancerCluster:
+#      $ref: 'components/schemas/lbc.yaml'
+    Meta:
+      $ref: 'components/schemas/meta.yaml'
+    Network:
+      $ref: 'components/schemas/network.yaml'
+    NetworkPolicy:
+      $ref: 'components/schemas/networkPolicy.yaml'
+    NetworkRule:
+      $ref : 'components/schemas/networkRule.yaml'
+    NetworkRulePort :
+      $ref : 'components/schemas/networkRulePort.yaml'
     Nics:
       $ref: 'components/schemas/nic.yaml'
     Region:
       $ref: 'components/schemas/region.yaml'
     Router:
       $ref: 'components/schemas/router.yaml'
-    #    LoadBalancerCluster:
-    #      $ref: 'components/schemas/lbc.yaml'
-    Volume:
-      $ref: 'components/schemas/volume.yaml'
     RouterThroughput:
       $ref: 'components/schemas/routerThroughput.yaml'
-    HostSpec:
-      $ref: 'resources/HostSpec/schema.yaml'
-    Meta:
-      $ref: 'components/schemas/meta.yaml'
-    HostGroup:
-      $ref: 'resources/HostGroup/schema.yaml'
-    Image:
-      $ref: 'resources/Image/schema.yaml'
-    ImageParameter:
-      $ref: 'resources/ImageParameter/schema.yaml'
-    ImageMetadata:
-      $ref: 'resources/ImageMetadata/schema.yaml'
-    Task:
-      $ref: 'components/schemas/task.yaml'
-    VpnService:
-      $ref: 'components/schemas/vpnService.yaml'
     SSHKeyPair:
       $ref: 'resources/SSHKeyPair/schema.yaml'
+    Task:
+      $ref: 'components/schemas/task.yaml'
+    VirtualPrivateCloud:
+      $ref: 'components/schemas/vpc.yaml'
+    Volume:
+      $ref: 'components/schemas/volume.yaml'
+    VpnProfile:
+      $ref: 'resources/VpnProfile/schema.yaml'
+    VpnProfileGroup:
+      $ref: 'components/schemas/vpnProfileGroup.yaml'
+    VpnService:
+      $ref: 'components/schemas/vpnService.yaml'
+#    When adding a schema, add it to the list alphabetically using the following format:-
+#    Reference:
+#      $ref: 'resource/References/schema.yaml'
   parameters:
-    # Query Parameters
-    PerPage:
-      $ref: 'components/parameters/perPage.yaml'
-    Page:
-      $ref: 'components/parameters/page.yaml'
     # Path Parameters
-    VpcId:
-      $ref: 'resources/Vpc/parameters/vpcId.yaml'
-    NetworkPolicyId:
-      $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
-    NetworkRuleId:
-      $ref: 'resources/NetworkRule/parameters/networkRuleId.yaml'
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     DhcpId:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     DiscountPlanId:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
-    VpnProfileGroupId:
-      $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
-    VpnServiceId:
-      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+#    LbcId:
+#      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
+    NetworkPolicyId:
+      $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
+    NetworkRulePortId:
+      $ref: 'resources/NetworkRulePort/parameters/networkRulePortId.yaml'
+    NetworkRuleId:
+      $ref: 'resources/NetworkRule/parameters/networkRuleId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
-    #    LbcId:
-    #      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
-    NetworkRulePortId:
-      $ref: 'resources/NetworkRulePort/parameters/networkRulePortId.yaml'
+    VpcId:
+      $ref: 'resources/Vpc/parameters/vpcId.yaml'
+    VpnProfileGroupId:
+      $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
+    VpnServiceId:
+      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
+#    When adding a path parameter use the following format, and remember to add it alphabetically to the list!
+#    ReferenceId:
+#      $ref: 'resources/References/parameters/id.yaml'
+    # Query Parameters
+    PerPage:
+      $ref: 'components/parameters/perPage.yaml'
+    Page:
+      $ref: 'components/parameters/page.yaml'
   responses:
-    NetworkPolicyIdResponse:
-      $ref: 'resources/NetworkPolicy/responses/idResponse.yaml'
-    NetworkRuleIdResponse:
-      $ref: 'resources/NetworkRule/responses/idResponse.yaml'
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
-    VpnProfileIdResponse:
-      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
-    VpnProfileGroupIdResponse:
-      $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
-    VpnServiceIdResponse:
-      $ref: 'resources/VpnService/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
-    RouterIdResponse:
-      $ref: 'resources/Router/responses/idResponse.yaml'
-    #    LbcIdResponse:
-    #      $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
+#    LbcIdResponse:
+#      $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
+    NetworkPolicyIdResponse:
+      $ref: 'resources/NetworkPolicy/responses/idResponse.yaml'
     NetworkRulePortIdResponse:
       $ref: 'resources/NetworkRulePort/responses/idResponse.yaml'
+    NetworkRuleIdResponse:
+      $ref: 'resources/NetworkRule/responses/idResponse.yaml'
+    RouterIdResponse:
+      $ref: 'resources/Router/responses/idResponse.yaml'
+    VpnProfileGroupIdResponse:
+      $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
+    VpnProfileIdResponse:
+      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
+    VpnServiceIdResponse:
+      $ref: 'resources/VpnService/responses/idResponse.yaml'
+#    When adding a new response id, use the following format
+#    ReferenceIdResponse:
+#      $ref: 'resources/References/responses/idResponse.yaml'
 paths:
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
@@ -343,3 +352,8 @@ paths:
     $ref: 'resources/VpnService/collection.yaml'
   '/ecloud/v2/vpn-services/{vpnServiceId}':
     $ref: 'resources/VpnService/item.yaml'
+# When adding endpoints, add them to the list alphabetically using the following format:-
+#  '/ecloud/v2/references':
+#    $ref: 'resources/Reference/collection.yaml'
+#  '/ecloud/v2/references/{referenceId}':
+#    $ref: 'resources/Reference/item.yaml'
