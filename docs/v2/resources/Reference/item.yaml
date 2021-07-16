@@ -1,0 +1,53 @@
+get:
+  parameters:
+    # Change path in $ref below
+    - $ref: '../../resources/Reference/parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                # Change path in $ref below
+                $ref: '../../resources/Reference/schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Rename This Tag
+patch:
+  parameters:
+    # Change path in $ref below
+    - $ref: '../../resources/Reference/parameters/id.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            # Change path in $ref below
+            - $ref: '../../resources/Reference/schema.yaml'
+            # Change column properties here
+            - type : object
+              properties :
+                foreign_key_id :
+                  readOnly : true
+  responses:
+    202:
+      # Change path in $ref below
+      $ref: '../../resources/Reference/responses/idResponse.yaml'
+  tags:
+    - Rename This Tag
+delete:
+  parameters:
+    # Change path in $ref below
+    - $ref: '../../resources/Reference/parameters/id.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Rename This Tag
+
