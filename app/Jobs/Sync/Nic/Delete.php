@@ -3,7 +3,7 @@
 namespace App\Jobs\Sync\Nic;
 
 use App\Jobs\Job;
-use App\Jobs\Nic\AwaitFloatingIpSync;
+use App\Jobs\Nic\AwaitFloatingIpUnassign;
 use App\Jobs\Nic\UnassignFloatingIP;
 use App\Jobs\Nsx\Nic\RemoveDHCPLease;
 use App\Models\V2\Task;
@@ -27,7 +27,7 @@ class Delete extends Job
             [
                 new RemoveDHCPLease($this->task->resource),
                 new UnassignFloatingIP($this->task->resource),
-                new AwaitFloatingIpSync($this->task->resource)
+                new AwaitFloatingIpUnassign($this->task->resource)
             ]
         ])->dispatch();
     }
