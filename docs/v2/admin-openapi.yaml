@@ -23,6 +23,26 @@ components:
   schemas:
     AvailabilityZones:
       $ref: 'components/schemas/admin/availabilityZone.yaml'
+    Credentials:
+      $ref: 'components/schemas/admin/credential.yaml'
+    Dhcps :
+      $ref : 'components/schemas/dhcp.yaml'
+    DiscountPlan:
+      $ref: 'components/schemas/admin/discountPlan.yaml'
+    HostSpec:
+      $ref: 'resources/HostSpec/schema.yaml'
+    Image:
+      $ref: 'resources/Image/schema.yaml'
+    ImageMetadata:
+      $ref: 'resources/ImageMetadata/schema.yaml'
+    ImageParameter:
+      $ref: 'resources/ImageParameter/schema.yaml'
+#    LoadBalancerCluster:
+#      $ref: 'components/schemas/lbc.yaml'
+    Meta:
+      $ref: 'components/schemas/meta.yaml'
+    Nics:
+      $ref: 'components/schemas/nic.yaml'
     Routers:
       $ref: 'components/schemas/admin/router.yaml'
     Regions:
@@ -34,8 +54,6 @@ components:
               required: false
               type: boolean
               example: 'true'
-#    LoadBalancerCluster:
-#      $ref: 'components/schemas/lbc.yaml'
     Volume:
       allOf:
         - $ref: 'components/schemas/volume.yaml'
@@ -45,94 +63,85 @@ components:
               required: false
               type: string
               example: '03747ccf-d56b-45a9-b589-177f3cb9936e'
-    Nics:
-      $ref: 'components/schemas/nic.yaml'
-    Dhcps :
-      $ref : 'components/schemas/dhcp.yaml'
-    Meta:
-      $ref: 'components/schemas/meta.yaml'
-    Credentials:
-      $ref: 'components/schemas/admin/credential.yaml'
-    DiscountPlan:
-      $ref: 'components/schemas/admin/discountPlan.yaml'
-    HostSpec:
-      $ref: 'resources/HostSpec/schema.yaml'
-    Image:
-      $ref: 'resources/Image/schema.yaml'
-    ImageParameter:
-      $ref: 'resources/ImageParameter/schema.yaml'
-    ImageMetadata:
-      $ref: 'resources/ImageMetadata/schema.yaml'
     VpnProfile:
       $ref: 'resources/VpnProfile/schema.yaml'
     VpnProfileGroup:
       $ref: 'components/schemas/vpnProfileGroupAdmin.yaml'
+#    When adding a new Schema use the following reference, and add to the list above alphabetically
+#    Reference:
+#      $ref: 'resources/Reference/schema.yaml'
 
   parameters:
-    # Query Parameters
-    PerPage:
-      $ref: 'components/parameters/perPage.yaml'
-    Page:
-      $ref: 'components/parameters/page.yaml'
     # Path Parameters
-    VpcId:
-      $ref: 'resources/Vpc/parameters/vpcId.yaml'
-    NetworkId:
-      $ref: 'resources/Network/parameters/networkId.yaml'
     DhcpId:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     DiscountPlanId:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
-    VpnServiceId:
-      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
-    InstanceId:
-      $ref: 'resources/Instance/parameters/instanceId.yaml'
     FipId:
       $ref: 'resources/FloatingIp/parameters/fipId.yaml'
-    FirewallRuleId:
-      $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+    FirewallRuleId:
+      $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
+    InstanceId:
+      $ref: 'resources/Instance/parameters/instanceId.yaml'
+    NetworkId:
+      $ref: 'resources/Network/parameters/networkId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
     VolumeId:
       $ref: 'resources/Volume/parameters/volumeId.yaml'
+    VpcId:
+      $ref: 'resources/Vpc/parameters/vpcId.yaml'
     VpnProfileId:
       $ref: 'resources/VpnProfile/parameters/vpnProfileId.yaml'
     VpnProfileGroupId:
       $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
+    VpnServiceId:
+      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
+#    When adding a new parameter use the following reference, and add to the list above alphabetically
+#    ReferenceId:
+#      $ref: 'resources/References/parameters/id.yaml'
+    # Query Parameters
+    PerPage:
+      $ref: 'components/parameters/perPage.yaml'
+    Page:
+      $ref: 'components/parameters/page.yaml'
 
   responses:
-    VirtualPrivateCloudsIdResponse:
-      $ref: 'resources/Vpc/responses/idResponse.yaml'
-    NetworksIdResponse:
-      $ref: 'resources/Network/responses/idResponse.yaml'
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountIdResponse:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
-    VpnServiceIdResponse:
-      $ref: 'resources/VpnService/responses/idResponse.yaml'
-    InstanceIdResponse:
-      $ref: 'resources/Instance/responses/idResponse.yaml'
     FipIdResponse:
       $ref: 'resources/FloatingIp/responses/idResponse.yaml'
     FirewallRuleIdResponse:
       $ref: 'resources/FirewallRule/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
-    RouterIdResponse:
-      $ref: 'resources/Router/responses/idResponse.yaml'
+    InstanceIdResponse:
+      $ref: 'resources/Instance/responses/idResponse.yaml'
+    NetworksIdResponse:
+      $ref: 'resources/Network/responses/idResponse.yaml'
     RegionIdResponse:
       $ref: 'resources/Region/responses/idResponse.yaml'
+    RouterIdResponse:
+      $ref: 'resources/Router/responses/idResponse.yaml'
+    VirtualPrivateCloudsIdResponse:
+      $ref: 'resources/Vpc/responses/idResponse.yaml'
     VolumeIdResponse:
       $ref: 'resources/Volume/responses/idResponse.yaml'
     VpnProfileIdResponse:
       $ref: 'resources/VpnProfile/responses/idResponse.yaml'
     VpnProfileGroupIdResponse:
       $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
+    VpnServiceIdResponse:
+      $ref: 'resources/VpnService/responses/idResponse.yaml'
+#    When adding a new response use the following reference, and add to the list above alphabetically
+#    ReferenceIdResponse:
+#      $ref: 'resources/Reference/responses/idResponse.yaml'
 
 paths:
   '/ecloud/v2/availability-zone-capacities':
@@ -239,3 +248,8 @@ paths:
     $ref: 'resources/VpnProfile/admin-collection.yaml'
   '/ecloud/v2/vpn-profiles/{vpnProfileId}':
     $ref: 'resources/VpnProfile/admin-item.yaml'
+#  When adding a new response use the following reference, and add to the list above alphabetically
+#  '/ecloud/v2/references':
+#    $ref: 'resources/Reference/collection.yaml'
+#  '/ecloud/v2/references/{ReferenceId}':
+#    $ref: 'resources/Reference/item.yaml'
