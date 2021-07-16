@@ -8,6 +8,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
@@ -125,6 +126,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var Nic */
     private $nic;
+
+    /** @var FloatingIp */
+    private $floatingIp;
 
     /**
      * Creates the application.
@@ -343,6 +347,17 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->hostGroup;
+    }
+
+    public function floatingIp()
+    {
+        if (!$this->floatingIp) {
+            $this->floatingIp = factory(FloatingIp::class)->create([
+                'id' => 'fip-test',
+                'vpc_id' => $this->vpc()->id,
+            ]);
+        }
+        return $this->floatingIp;
     }
 
 //    public function hostGroupJobMocks($id = 'hg-test')
@@ -635,8 +650,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,
-            \App\Events\V2\Network\Created::class,
-            \App\Events\V2\Router\Created::class,
             \App\Events\V2\Nat\Created::class,
 
             // Deleting
@@ -650,16 +663,11 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\Router\Deleted::class,
 
             // Saved
-            \App\Events\V2\Router\Saved::class,
-            \App\Events\V2\Network\Saved::class,
             \App\Events\V2\Nat\Saved::class,
             \App\Events\V2\AvailabilityZoneCapacity\Saved::class,
 
             // Saving
-            \App\Events\V2\Router\Saving::class,
-            \App\Events\V2\Network\Saving::class,
             \App\Events\V2\Nat\Saving::class,
-
         ]);
     }
 

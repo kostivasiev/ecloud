@@ -5,8 +5,10 @@ namespace App\Jobs\OrchestratorBuild;
 use App\Jobs\Job;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Vpc;
+use App\Models\V2\VpcSupport;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class CreateVpcs extends Job
@@ -38,10 +40,16 @@ class CreateVpcs extends Job
                 return;
             }
 
+            $definition = collect($definition);
+
             $vpc = app()->make(Vpc::class);
-            $vpc->fill(collect($definition)->only(['name', 'region_id', 'advanced_networking', 'console_enabled'])->toArray());
+            $vpc->fill($definition->only(['name', 'region_id', 'advanced_networking', 'console_enabled'])->toArray());
             $vpc->reseller_id = $orchestratorBuild->orchestratorConfig->reseller_id;
             $vpc->syncSave();
+
+            if ($definition->has('support_enabled') && $definition->get('support_enabled') === true) {
+                $vpc->enableSupport();
+            }
 
             Log::info(get_class($this) . ' : OrchestratorBuild created VPC ' . $vpc->id, ['id' => $this->model->id]);
 

@@ -31,6 +31,7 @@ class UpdateRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'reseller_id' => 'sometimes|required|integer',
             'console_enabled' => 'sometimes|boolean',
+            'support_enabled' => 'sometimes|boolean',
         ];
     }
 }
