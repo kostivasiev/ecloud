@@ -9,7 +9,6 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-// TODO: NAT state should be exposed seperately, rather than this being part of floating IP update sync
 class AwaitNatSync extends Job
 {
     use Batchable, LoggableModelJob;

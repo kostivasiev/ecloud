@@ -2,11 +2,9 @@
 
 namespace App\Jobs\Instance\Deploy;
 
-use App\Jobs\FloatingIp\Assign;
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
-use App\Models\V2\Nat;
 use App\Traits\V2\LoggableModelJob;
 use Exception;
 use Illuminate\Bus\Batchable;
@@ -32,18 +30,19 @@ class AssignFloatingIp extends Job
             return;
         }
 
+        $nic = $this->model->nics()->first();
+
         if (!empty($this->model->deploy_data['floating_ip_id'])) {
             $floatingIp = FloatingIp::findOrFail($this->model->deploy_data['floating_ip_id']);
+            $floatingIp->resource()->associate($nic);
+            $floatingIp->syncSave();
+            Log::info('Floating IP (' . $floatingIp->id . ') assigned to NIC (' . $nic->id . ')');
         } else if ($this->model->deploy_data['requires_floating_ip']) {
             $floatingIp = app()->make(FloatingIp::class);
             $floatingIp->vpc_id = $this->model->vpc->id;
+            $floatingIp->resource()->associate($nic);
             $floatingIp->syncSave();
-        }
-
-        if (!empty($floatingIp)) {
-            $nic = $this->model->nics()->first();
-            $floatingIp->assign($nic);
-            Log::info('Floating IP (' . $floatingIp->id . ') assigned to NIC (' . $nic->id . ')');
+            Log::info('New Floating IP (' . $floatingIp->id . ') was created and assigned to NIC (' . $nic->id . ')');
         }
     }
 }
