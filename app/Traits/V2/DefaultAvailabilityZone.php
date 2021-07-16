@@ -35,6 +35,7 @@ trait DefaultAvailabilityZone
             ->findOrFail($model->vpc_id)
             ->region
             ->availabilityZones
+            ->sortBy('created_at')
             ->first();
         if ($availabilityZone) {
             $model->availability_zone_id = $availabilityZone->id;

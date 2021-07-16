@@ -107,6 +107,8 @@ $app->routeMiddleware([
     'orchestrator-config-is-valid' => \App\Http\Middleware\OrchestratorConfig\IsValid::class,
     'orchestrator-config-has-reseller-id' => \App\Http\Middleware\OrchestratorConfig\HasResellerId::class,
     'orchestrator-config-is-locked' => \App\Http\Middleware\OrchestratorConfig\IsLocked::class,
+    'floating-ip-can-be-unassigned' => \App\Http\Middleware\FloatingIp\CanBeUnassigned::class,
+    'floating-ip-can-be-deleted' => \App\Http\Middleware\FloatingIp\CanBeDeleted::class,
 ]);
 
 /*

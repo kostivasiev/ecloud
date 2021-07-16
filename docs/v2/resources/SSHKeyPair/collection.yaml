@@ -41,9 +41,9 @@ post:
       application/json:
         schema:
           $ref: 'schema.yaml'
-          responses:
-            200:
-              description: success
-              $ref: 'responses/idResponse.yaml'
+  responses:
+    200:
+      description: success
+      $ref: 'responses/idResponse.yaml'
   tags:
     - SSH Key Pairs

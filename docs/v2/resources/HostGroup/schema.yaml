@@ -14,7 +14,7 @@ properties:
     readOnly : false
   availability_zone_id:
     type: string
-    required: false
+    required: true
     example: 'az-2b66bb79'
     readOnly : false
   host_spec_id:

@@ -2,12 +2,12 @@
 
 namespace Tests\V2\Vpc;
 
+use App\Events\V2\Task\Created;
 use App\Events\V2\Vpc\Saved;
-use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
@@ -87,5 +87,45 @@ class UpdateTest extends TestCase
         ]);
 
         Event::assertDispatched(Saved::class);
+    }
+
+    public function testSupportToggledOn()
+    {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
+        Event::fake(Created::class);
+
+        $this->assertFalse($this->vpc()->support_enabled);
+
+        $this->patch(
+            '/v2/vpcs/' . $this->vpc()->id,
+            [
+                'support_enabled' => true,
+            ]
+        )->assertResponseStatus(202);
+
+        $this->vpc()->refresh();
+
+        $this->assertTrue($this->vpc()->support_enabled);
+    }
+
+    public function testSupportToggledOff()
+    {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
+        Event::fake(Created::class);
+
+        $this->vpc()->enableSupport();
+
+        $this->assertTrue($this->vpc()->refresh()->support_enabled);
+
+        $this->patch(
+            '/v2/vpcs/' . $this->vpc()->id,
+            [
+                'support_enabled' => false,
+            ]
+        )->assertResponseStatus(202);
+
+        $this->vpc()->refresh();
+
+        $this->assertFalse($this->vpc()->support_enabled);
     }
 }

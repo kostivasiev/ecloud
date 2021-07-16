@@ -19,7 +19,7 @@ class CreateCredentialsTable extends Migration
             $table->uuid('resource_id')->nullable();
             $table->string('host')->nullable();
             $table->string('user')->nullable();
-            $table->string('password')->nullable();
+            $table->text('password')->nullable();
             $table->string('port')->nullable();
             $table->timestamps();
             $table->softDeletes();

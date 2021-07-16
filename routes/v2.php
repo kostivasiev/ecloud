@@ -157,6 +157,17 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
     });
 
+    /** Vpn Profiles */
+    $router->group([], function () use ($router) {
+        $router->get('vpn-profiles', 'VpnProfileController@index');
+        $router->get('vpn-profiles/{vpnProfileId}', 'VpnProfileController@show');
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('vpn-profiles', 'VpnProfileController@create');
+            $router->patch('vpn-profiles/{vpnProfileId}', 'VpnProfileController@update');
+            $router->delete('vpn-profiles/{vpnProfileId}', 'VpnProfileController@destroy');
+        });
+    });
+
     /** Vpn Profile Groups */
     $router->group([], function () use ($router) {
         $router->get('vpn-profile-groups', 'VpnProfileGroupController@index');
@@ -221,9 +232,16 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('floating-ips/{fipId}/tasks', 'FloatingIpController@tasks');
         $router->post('floating-ips', 'FloatingIpController@store');
         $router->post('floating-ips/{fipId}/assign', 'FloatingIpController@assign');
-        $router->post('floating-ips/{fipId}/unassign', 'FloatingIpController@unassign');
+
+        $router->group(['middleware' => 'floating-ip-can-be-unassigned'], function () use ($router) {
+            $router->post('floating-ips/{fipId}/unassign', 'FloatingIpController@unassign');
+        });
+
         $router->patch('floating-ips/{fipId}', 'FloatingIpController@update');
-        $router->delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
+
+        $router->group(['middleware' => 'floating-ip-can-be-deleted'], function () use ($router) {
+            $router->delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
+        });
     });
 
     /** Firewall Policy */
