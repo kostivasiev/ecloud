@@ -2,6 +2,7 @@
 namespace App\Jobs\Nsx\VpnEndpoint;
 
 use App\Jobs\Job;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -26,14 +27,17 @@ class CreateEndpoint extends Job
             );
         }
 
+        // Check if there is a floating ip attached, if not, create one
+        $floatingIp = $this->getOrCreateFloatingIp();
+
         $this->model->vpnServices()->first()->router->availabilityZone->nsxService()->post(
             '/api/v1/vpn/ipsec/local-endpoints',
             [
                 'json' => [
                     'resource_type' => 'IPSecVPNLocalEndpoint',
                     'display_name' => $this->model->id,
-                    'local_address' => $this->model->floatingIp->ip_address,
-                    'local_id' => $this->model->floatingIp->ip_address,
+                    'local_address' => $floatingIp->ip_address,
+                    'local_id' => $floatingIp->ip_address,
                     'ipsec_vpn_service_id' => [
                         'target_id' => $vpnServiceUuid,
                         'target_type' => 'IPSecVpnService',
@@ -47,7 +51,7 @@ class CreateEndpoint extends Job
 
     public function getVpnServiceUuid()
     {
-        $vpnService = $this->model->vpnServices()->first();
+        $vpnService = $this->model->vpnService;
         // Get VPN Service UUID from NSX
         $response = $vpnService->router->availabilityZone->nsxService()
             ->get(
@@ -62,5 +66,19 @@ class CreateEndpoint extends Job
             }
         }
         return false;
+    }
+
+    public function getOrCreateFloatingIp()
+    {
+        if (!$this->model->floatingIp) {
+            $floatingIp = app()->make(FloatingIp::class, [
+                'attributes' => [
+                    'vpc_id' => $this->model->vpnService->router->vpc->id,
+                ]
+            ]);
+            $floatingIp->assign($this->model);
+            $floatingIp->save();
+        }
+        return $this->model->floatingIp;
     }
 }
