@@ -33,6 +33,8 @@ patch:
                   required: false
                 network_id:
                   readOnly: true
+                catchall_rule_action:
+                  readOnly: true
   responses:
     202:
       description: Accepted
