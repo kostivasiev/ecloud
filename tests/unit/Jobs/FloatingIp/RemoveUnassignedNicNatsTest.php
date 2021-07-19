@@ -29,17 +29,17 @@ class RemoveUnassignedNicNatsTest extends TestCase
 
     public function testUnassignedNicTriggersNatDelete()
     {
-        $nat = app()->make(Nat::class);
-        $nat->destination()->associate($this->floatingIp());
-        $nat->translated()->associate($this->nic());
-        $nat->action = Nat::ACTION_DNAT;
-        $nat->save();
+        $destinationNat = app()->make(Nat::class);
+        $destinationNat->destination()->associate($this->floatingIp());
+        $destinationNat->translated()->associate($this->nic());
+        $destinationNat->action = Nat::ACTION_DNAT;
+        $destinationNat->save();
 
-        $nat = app()->make(Nat::class);
-        $nat->source()->associate($this->nic());
-        $nat->translated()->associate($this->floatingIp());
-        $nat->action = NAT::ACTION_SNAT;
-        $nat->save();
+        $sourceNat = app()->make(Nat::class);
+        $sourceNat->source()->associate($this->nic());
+        $sourceNat->translated()->associate($this->floatingIp());
+        $sourceNat->action = NAT::ACTION_SNAT;
+        $sourceNat->save();
 
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
@@ -50,8 +50,14 @@ class RemoveUnassignedNicNatsTest extends TestCase
             return !$event->job->isReleased();
         });
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == 'sync_delete';
+        Event::assertDispatched(Created::class, function ($event) use ($destinationNat) {
+            return $event->model->name == 'sync_delete'
+                && $event->model->resource->id == $destinationNat->id;
+        });
+
+        Event::assertDispatched(Created::class, function ($event) use ($sourceNat) {
+            return $event->model->name == 'sync_delete'
+                && $event->model->resource->id == $sourceNat->id;
         });
     }
 }

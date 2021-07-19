@@ -69,6 +69,10 @@ class NicController extends BaseController
     {
         $nic = Nic::forUser($request->user())->findOrFail($nicId);
 
+        if (!$nic->canDelete()) {
+            return $nic->getDeletionError();
+        }
+
         $nic->withTaskLock(function ($nic) {
             $nic->delete();
         });

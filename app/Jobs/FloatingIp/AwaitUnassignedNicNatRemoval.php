@@ -51,7 +51,7 @@ class AwaitUnassignedNicNatRemoval extends Job
                     return;
                 }
 
-                Log::warning('NAT(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
+                Log::warning('NAT(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $floatingIp->id]);
                 return $this->release($this->backoff);
             }
         }

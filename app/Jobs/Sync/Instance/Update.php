@@ -21,6 +21,7 @@ use App\Jobs\Instance\Deploy\RunBootstrapScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
+use App\Jobs\Instance\Undeploy\AwaitFloatingIpSync;
 use App\Jobs\Job;
 use App\Jobs\Tasks\Instance\MigratePrivate;
 use App\Models\V2\Task;
@@ -50,6 +51,7 @@ class Update extends Job
                     new ConfigureNics($this->task->resource),
                     new AwaitNicSync($this->task->resource),
                     new AssignFloatingIp($this->task->resource),
+                    new AwaitFloatingIpSync($this->task->resource),
                     new UpdateNetworkAdapter($this->task->resource),
                     new OsCustomisation($this->task->resource),
                     new PowerOn($this->task->resource),
