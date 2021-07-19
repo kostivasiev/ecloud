@@ -24,12 +24,12 @@ class Delete extends Job
     public function handle()
     {
         $floatingIp = $this->task->resource;
-        $this->deleteTaskBatch(
+        $this->deleteTaskBatch([
             [
                 new DeleteNats($floatingIp),
                 new AwaitNatRemoval($floatingIp),
             ]
-        )
+        ])
             // TODO: Remove this once atomic db constraint removed
         ->then(function (Batch $batch) use ($floatingIp) {
             $floatingIp->deleted = time();

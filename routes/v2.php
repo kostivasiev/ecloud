@@ -231,7 +231,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('floating-ips/{fipId}', 'FloatingIpController@show');
         $router->get('floating-ips/{fipId}/tasks', 'FloatingIpController@tasks');
         $router->post('floating-ips', 'FloatingIpController@store');
-        $router->post('floating-ips/{fipId}/assign', 'FloatingIpController@assign');
+
+        $router->group(['middleware' => 'floating-ip-is-assigned'], function () use ($router) {
+            $router->post('floating-ips/{fipId}/assign', 'FloatingIpController@assign');
+        });
 
         $router->group(['middleware' => 'floating-ip-can-be-unassigned'], function () use ($router) {
             $router->post('floating-ips/{fipId}/unassign', 'FloatingIpController@unassign');

@@ -72,22 +72,20 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
         $resource = Resource::classFromId($request->resource_id)::findOrFail($request->resource_id);
 
-        $floatingIp->withTaskLock(function ($floatingIp) use ($resource) {
-            $floatingIp->assign($resource);
-        });
+        $floatingIp->resource()->associate($resource);
+        $task = $floatingIp->syncSave();
 
-        return response('', 202);
+        return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }
 
     public function unassign(Request $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->withTaskLock(function ($floatingIp) {
-            $floatingIp->unassign();
-        });
+        $floatingIp->resource()->dissociate();
+        $task = $floatingIp->syncSave();
 
-        return response('', 202);
+        return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }
 
     public function tasks(Request $request, QueryTransformer $queryTransformer, string $fipId)

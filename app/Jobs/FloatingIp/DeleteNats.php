@@ -21,10 +21,10 @@ class DeleteNats extends Job
     public function handle()
     {
         if ($this->model->sourceNat()->exists()) {
-            $this->model->sourceNat->delete();
+            $this->model->sourceNat->syncDelete();
         }
         if ($this->model->destinationNat()->exists()) {
-            $this->model->destinationNat->delete();
+            $this->model->destinationNat->syncDelete();
         }
     }
 }

@@ -9,6 +9,7 @@ use App\Models\V2\Network;
 use App\Models\V2\SshKeyPair;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\FloatingIp\IsAssigned;
 use App\Rules\V2\HasHosts;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
@@ -94,6 +95,7 @@ class CreateRequest extends FormRequest
                 'required_without:requires_floating_ip',
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
+                new IsAssigned()
             ],
             'requires_floating_ip' => [
                 'sometimes',

@@ -26,8 +26,11 @@ class UnassignFloatingIP extends Job
         Log::info($logMessage . 'Started');
 
         if ($nic->floatingIp()->exists()) {
-            Log::info($logMessage . 'Floating IP ' . $nic->floatingIp->id . ' unassigning');
-            $nic->floatingIp->unassign();
+            $floatingIp = $nic->floatingIp;
+            Log::info($logMessage . 'Floating IP ' . $floatingIp->id . ' unassigning');
+
+            $floatingIp->resource()->dissociate();
+            $floatingIp->syncSave();
         }
     }
 }

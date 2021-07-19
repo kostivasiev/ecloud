@@ -2,7 +2,9 @@
 
 namespace Tests\V2\FloatingIp;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\VpnEndpoint;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -14,24 +16,10 @@ class UnassignTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 
-    public function testNicUnAssignsDeletesNats()
-    {
-        $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/assign', [
-            'resource_id' => $this->nic()->id
-        ]);
-        $this->assertTrue($this->floatingIp()->sourceNat()->exists());
-        $this->assertTrue($this->floatingIp()->destinationNat()->exists());
-
-        $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/unassign')
-            ->assertResponseStatus(202);
-
-        // Check nats were created
-        $this->assertFalse($this->floatingIp()->sourceNat()->exists());
-        $this->assertFalse($this->floatingIp()->destinationNat()->exists());
-    }
-
     public function testSuccess()
     {
+        Event::fake([Created::class]);
+
         $this->floatingIp()->resource()->associate($this->nic())->save();
 
         $this->seeInDatabase('floating_ips', [
@@ -44,6 +32,10 @@ class UnassignTest extends TestCase
                 'resource_id' => $this->nic()->id
             ], 'ecloud')
             ->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testVpnEndpointFloatingIpCanNotBeUnassigned()
