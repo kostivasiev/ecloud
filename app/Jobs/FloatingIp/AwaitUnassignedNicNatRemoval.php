@@ -30,20 +30,27 @@ class AwaitUnassignedNicNatRemoval extends Job
     {
         $floatingIp = $this->model;
 
-        if (!$floatingIp->resource_id) {
-            if ($this->model->sourceNat()->exists() && $this->model->sourceNat->sync->status == Sync::STATUS_FAILED) {
-                Log::error('Source NAT in failed sync state, abort', ['id' => $this->model->id, 'nat_id' => $this->model->sourceNat->id]);
-                $this->fail(new \Exception("Source NAT '" . $this->model->sourceNat->id . "' in failed sync state"));
-                return;
-            }
+        if ($floatingIp->sourceNat()->exists()) {
+            if (empty($floatingIp->resource_id) || $floatingIp->sourceNat->source->id != $floatingIp->resource_id) {
+                if ($floatingIp->sourceNat->sync->status == Sync::STATUS_FAILED) {
+                    Log::error('Source NAT in failed sync state, abort', ['id' => $this->model->id, 'nat_id' => $floatingIp->sourceNat->id]);
+                    $this->fail(new \Exception("Source NAT '" . $floatingIp->sourceNat->id . "' in failed sync state"));
+                    return;
+                }
 
-            if ($this->model->destinationNat()->exists() && $this->model->destinationNat->sync->status == Sync::STATUS_FAILED) {
-                Log::error('Destination NAT in failed sync state, abort', ['id' => $this->model->id, 'nat_id' => $this->model->destinationNat->id]);
-                $this->fail(new \Exception("Destination NAT '" . $this->model->destinationNat->id . "' in failed sync state"));
-                return;
+                Log::warning('NAT(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
+                return $this->release($this->backoff);
             }
+        }
 
-            if ($this->model->sourceNat()->exists() || $this->model->destinationNat()->exists()) {
+        if ($floatingIp->destinationNat()->exists()) {
+            if (empty($floatingIp->resource_id) || $floatingIp->destinationNat->translated->id != $floatingIp->resource_id) {
+                if ($floatingIp->destinationNat->sync->status == Sync::STATUS_FAILED) {
+                    Log::error('Destination NAT in failed sync state, abort', ['id' => $floatingIp->id, 'nat_id' => $floatingIp->destinationNat->id]);
+                    $this->fail(new \Exception("Destination NAT '" . $floatingIp->destinationNat->id . "' in failed sync state"));
+                    return;
+                }
+
                 Log::warning('NAT(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
                 return $this->release($this->backoff);
             }

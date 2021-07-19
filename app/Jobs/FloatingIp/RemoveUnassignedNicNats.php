@@ -26,15 +26,17 @@ class RemoveUnassignedNicNats extends Job
     {
         $floatingIp = $this->model;
 
-        if (!$floatingIp->resource_id) {
-            if ($floatingIp->sourceNat()->exists()) {
+        if ($floatingIp->sourceNat()->exists()) {
+            if (empty($floatingIp->resource_id) || $floatingIp->sourceNat->source->id != $floatingIp->resource_id) {
                 Log::info(get_class($this) . ' : Deleting SNAT ' . $floatingIp->sourceNat->id . ' from unassigned floating IP');
                 $floatingIp->sourceNat->syncDelete();
             }
+        }
 
-            if ($floatingIp->destinationNat()->exists()) {
-                Log::info(get_class($this) . ' : Deleting DNAT ' . $floatingIp->sourceNat->id . ' from unassigned floating IP');
-                $floatingIp->destinationNat->syncDelete();
+        if ($floatingIp->destinationNat()->exists()) {
+            if (empty($floatingIp->resource_id) || $floatingIp->destinationNat->translated->id != $floatingIp->resource_id) {
+                Log::info(get_class($this) . ' : Deleting SNAT ' . $floatingIp->sourceNat->id . ' from unassigned floating IP');
+                $floatingIp->sourceNat->syncDelete();
             }
         }
     }

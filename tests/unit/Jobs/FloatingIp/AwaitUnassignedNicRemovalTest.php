@@ -2,9 +2,7 @@
 
 namespace Tests\unit\Jobs\FloatingIp;
 
-use App\Jobs\FloatingIp\AwaitNatSync;
 use App\Jobs\FloatingIp\AwaitUnassignedNicNatRemoval;
-use App\Jobs\FloatingIp\RemoveUnassignedNicNats;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
