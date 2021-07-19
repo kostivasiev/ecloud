@@ -26,7 +26,7 @@ class UnassignFloatingIP extends Job
         $instance->nics()->each(function ($nic) {
             if ($nic->floatingIp()->exists()) {
                 $floatingIp = $nic->floatingIp;
-                Log::info(get_class($this) . ' : Unassigning floating IP '. $floatingIp->id . 'for NIC ' . $nic->id);
+                Log::info(get_class($this) . ' : Unassigning floating IP '. $floatingIp->id . ' for NIC ' . $nic->id);
                 $floatingIp->resource()->dissociate();
                 $floatingIp->syncSave();
             }
