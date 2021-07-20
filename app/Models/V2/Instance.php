@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Instance extends Model implements Filterable, Sortable, ResellerScopeable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public $keyPrefix = 'i';
     public $incrementing = false;
