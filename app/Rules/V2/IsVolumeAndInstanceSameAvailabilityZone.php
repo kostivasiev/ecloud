@@ -27,5 +27,4 @@ class IsVolumeAndInstanceSameAvailabilityZone implements Rule
     {
         return 'The volume is not in the same availability zone as the instance';
     }
-
 }
