@@ -8,7 +8,6 @@ use App\Events\V2\Dhcp\Deleting;
 use App\Events\V2\Dhcp\Saved;
 use App\Events\V2\Dhcp\Saving;
 use App\Traits\V2\CustomKey;
-use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;

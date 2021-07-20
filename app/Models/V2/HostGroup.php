@@ -7,7 +7,6 @@ use App\Events\V2\HostGroup\Deleting;
 use App\Events\V2\HostGroup\Saved;
 use App\Events\V2\HostGroup\Saving;
 use App\Traits\V2\CustomKey;
-use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
