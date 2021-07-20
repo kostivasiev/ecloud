@@ -28,7 +28,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Dhcp extends Model implements Filterable, Sortable, ResellerScopeable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public $keyPrefix = 'dhcp';
     public $incrementing = false;
