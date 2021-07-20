@@ -26,7 +26,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable, DefaultAvailabilityZone;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public string $keyPrefix = 'hg';
 
