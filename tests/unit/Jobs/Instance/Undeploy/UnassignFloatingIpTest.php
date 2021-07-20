@@ -9,7 +9,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class UnassignFloatingIpTestTest extends TestCase
+class UnassignFloatingIpTest extends TestCase
 {
     public function testJobCompletesAssignedFloatingIps()
     {
@@ -26,9 +26,8 @@ class UnassignFloatingIpTestTest extends TestCase
         });
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == 'sync_update'
-                && $event->model->resource->id == $this->floatingIp()->id
-                && $event->model->resource->resource_id === null;
+            return $event->model->name == 'floating_ip_unassign'
+                && $event->model->resource->id == $this->floatingIp()->id;
         });
     }
 

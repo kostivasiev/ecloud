@@ -25,10 +25,12 @@ class UnassignFloatingIP extends Job
 
         $instance->nics()->each(function ($nic) {
             if ($nic->floatingIp()->exists()) {
-                $floatingIp = $nic->floatingIp;
-                Log::info(get_class($this) . ' : Unassigning floating IP '. $floatingIp->id . ' for NIC ' . $nic->id);
-                $floatingIp->resource()->dissociate();
-                $floatingIp->syncSave();
+                $nic->floatingIp->createTaskWithLock(
+                    'floating_ip_unassign',
+                    \App\Jobs\Tasks\FloatingIp\UnAssign::class
+                );
+
+                Log::info(get_class($this) . ' : Unassigning floating IP '. $nic->floatingIp->id . ' for NIC ' . $nic->id);
             }
         });
     }

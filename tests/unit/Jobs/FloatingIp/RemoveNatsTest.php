@@ -3,14 +3,14 @@
 namespace Tests\unit\Jobs\FloatingIp;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\FloatingIp\RemoveUnassignedNicNats;
+use App\Jobs\FloatingIp\RemoveNats;
 use App\Models\V2\Nat;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class RemoveUnassignedNicNatsTest extends TestCase
+class RemoveNatsTest extends TestCase
 {
     public function testJobCompletesWithNicAttached()
     {
@@ -19,7 +19,7 @@ class RemoveUnassignedNicNatsTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class, ]);
 
-        dispatch(new RemoveUnassignedNicNats($this->floatingIp()));
+        dispatch(new RemoveNats($this->floatingIp()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -43,7 +43,7 @@ class RemoveUnassignedNicNatsTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        dispatch(new RemoveUnassignedNicNats($this->floatingIp()));
+        dispatch(new RemoveNats($this->floatingIp()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {

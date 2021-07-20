@@ -232,7 +232,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('floating-ips/{fipId}/tasks', 'FloatingIpController@tasks');
         $router->post('floating-ips', 'FloatingIpController@store');
 
-        $router->group(['middleware' => 'floating-ip-is-assigned'], function () use ($router) {
+        $router->group(['middleware' => 'floating-ip-can-be-assigned'], function () use ($router) {
             $router->post('floating-ips/{fipId}/assign', 'FloatingIpController@assign');
         });
 

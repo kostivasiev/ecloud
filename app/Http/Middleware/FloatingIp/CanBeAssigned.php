@@ -5,7 +5,7 @@ use App\Models\V2\FloatingIp;
 use Closure;
 use Symfony\Component\HttpFoundation\Response;
 
-class IsAssigned
+class CanBeAssigned
 {
     /**
      * @param $request

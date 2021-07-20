@@ -174,7 +174,7 @@ Content-Type: application/json
 
 ###
 
-DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+DELETE https://{{host}}/{{version}}/instances/i-42d79e2b
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
