@@ -37,7 +37,7 @@ class AssignFloatingIp extends Job
             ['resource_id' => $nic->id]
         );
 
-        Log::info('Triggered floating_ip_assign job for Floating IP (' . $floatingIp->id . '), assigning to NIC (' . $nic->id . ')');
+        Log::info('Triggered floating_ip_assign task for Floating IP (' . $floatingIp->id . '), assigning to NIC (' . $nic->id . ')');
 
         $this->awaitTask($task);
     }

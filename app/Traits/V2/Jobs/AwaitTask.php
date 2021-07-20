@@ -7,11 +7,15 @@ use Illuminate\Support\Facades\Log;
 
 trait AwaitTask
 {
-    public function awaitTask(Task $task, $timeoutSeconds = 600)
+    public function awaitTask(Task $task, $timeoutSeconds = 600, $sleep = 10)
     {
         $end = Carbon::now()->addSeconds($timeoutSeconds);
 
+        Log::info(get_class($this) . ': Waiting for task to complete... ', ['id' => $this->model->id, 'resource' => $task->id]);
+
         do {
+            $task->refresh();
+
             if ($task->completed == true) {
                 return true;
             }
@@ -21,6 +25,9 @@ trait AwaitTask
                 $this->fail(new \Exception("Task '" . $task->id . "' in failed state"));
                 return false;
             }
+
+            Log::info(get_class($this) . ': Waiting for task to complete - task is not ready yet, trying again in  ' . $sleep . ' seconds.', ['id' => $this->model->id, 'resource' => $task->id]);
+            sleep($sleep);
         } while (Carbon::now() < $end);
 
         Log::error(get_class($this) . ': Timed out waiting for task to complete', ['id' => $this->model->id, 'resource' => $task->id]);
