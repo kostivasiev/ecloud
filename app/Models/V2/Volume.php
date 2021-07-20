@@ -24,7 +24,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Volume extends Model implements Filterable, Sortable, ResellerScopeable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public $keyPrefix = 'vol';
     protected $keyType = 'string';
