@@ -39,8 +39,9 @@ patch:
     - Floating IPs
 delete:
   responses:
-    204:
-      description: Success
+    202 :
+      description : Accepted
+      $ref : '../../components/responses/taskIdResponse.yaml'
   tags:
     - Floating IPs
 

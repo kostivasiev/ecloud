@@ -61,9 +61,8 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->delete();
-
-        return response('', 204);
+        $task = $floatingIp->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 
     public function assign(AssignRequest $request, string $fipId)
@@ -83,7 +82,7 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $task = $floatingIp->createTaskWithLock('floating_ip_unassign', \App\Jobs\Tasks\FloatingIp\UnAssign::class);
+        $task = $floatingIp->createTaskWithLock('floating_ip_unassign', \App\Jobs\Tasks\FloatingIp\Unassign::class);
 
         return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }

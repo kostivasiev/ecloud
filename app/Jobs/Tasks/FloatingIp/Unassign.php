@@ -11,7 +11,7 @@ use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 use Illuminate\Bus\Batchable;
 
-class UnAssign extends Job
+class Unassign extends Job
 {
     use Batchable, TaskableBatch, LoggableTaskJob;
 

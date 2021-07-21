@@ -27,7 +27,7 @@ class UnassignFloatingIP extends Job
             if ($nic->floatingIp()->exists()) {
                 $nic->floatingIp->createTaskWithLock(
                     'floating_ip_unassign',
-                    \App\Jobs\Tasks\FloatingIp\UnAssign::class
+                    \App\Jobs\Tasks\FloatingIp\Unassign::class
                 );
 
                 Log::info(get_class($this) . ' : Unassigning floating IP '. $nic->floatingIp->id . ' for NIC ' . $nic->id);

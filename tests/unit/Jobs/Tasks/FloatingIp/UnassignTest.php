@@ -2,14 +2,14 @@
 
 namespace Tests\unit\Jobs\Tasks\FloatingIp;
 
-use App\Jobs\Tasks\FloatingIp\UnAssign;
+use App\Jobs\Tasks\FloatingIp\Unassign;
 use App\Models\V2\Task;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Facades\Bus;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class UnAssignTest extends TestCase
+class UnassignTest extends TestCase
 {
     use DatabaseMigrations;
 
@@ -32,7 +32,7 @@ class UnAssignTest extends TestCase
         $this->task->resource()->associate($this->floatingIp());
 
         Bus::fake();
-        $job = new UnAssign($this->task);
+        $job = new Unassign($this->task);
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
