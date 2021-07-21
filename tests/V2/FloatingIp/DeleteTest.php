@@ -21,7 +21,7 @@ class DeleteTest extends TestCase
         Event::fake(Created::class);
 
         $this->delete('/v2/floating-ips/' . $this->floatingIp()->id)
-            ->assertResponseStatus(204);
+            ->assertResponseStatus(202);
     }
 
     public function testAssignedFloatingIpCanNotBeDeleted()
