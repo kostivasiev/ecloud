@@ -3,7 +3,8 @@
 namespace App\Jobs\Sync\VpnService;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\VpnService\Create;
+use App\Jobs\Nsx\VpnService\CreateService;
+use App\Jobs\Nsx\VpnService\RetrieveServiceUuid;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -23,7 +24,8 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
-                new Create($this->task->resource),
+                new CreateService($this->task->resource),
+                new RetrieveServiceUuid($this->task->resource),
             ],
         ])->dispatch();
     }
