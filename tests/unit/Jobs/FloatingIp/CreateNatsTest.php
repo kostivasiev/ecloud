@@ -20,7 +20,7 @@ class CreateNatsTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        dispatch(new CreateNats($this->floatingIp()));
+        dispatch(new CreateNats($this->floatingIp(), $this->nic()));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -44,18 +44,7 @@ class CreateNatsTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        dispatch(new CreateNats($this->floatingIp()));
-
-        Event::assertNotDispatched(JobFailed::class);
-
-        Event::assertNotDispatched(Created::class);
-    }
-
-    public function testNoAttachedResourceCompletes()
-    {
-        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
-
-        dispatch(new CreateNats($this->floatingIp()));
+        dispatch(new CreateNats($this->floatingIp(), $this->router()));
 
         Event::assertNotDispatched(JobFailed::class);
 
