@@ -8,7 +8,6 @@ use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Mockery\MockInterface;
 use Tests\TestCase;
 
 class AssignFloatingIpTest extends TestCase

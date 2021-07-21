@@ -3,7 +3,6 @@
 namespace App\Jobs\Sync\Instance;
 
 use App\Jobs\Instance\PowerOff;
-use App\Jobs\Instance\Undeploy\AwaitFloatingIpSync;
 use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
 use App\Jobs\Instance\Undeploy\AwaitVolumeRemoval;
 use App\Jobs\Instance\Undeploy\DeleteNics;
@@ -35,7 +34,6 @@ class Delete extends Job
                 new Undeploy($this->task->resource),
                 new DeleteVolumes($this->task->resource),
                 new UnassignFloatingIP($this->task->resource),
-                new AwaitFloatingIpSync($this->task->resource),
                 new DeleteNics($this->task->resource),
                 new AwaitVolumeRemoval($this->task->resource),
                 new AwaitNicRemoval($this->task->resource),
