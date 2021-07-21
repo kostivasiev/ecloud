@@ -17,6 +17,7 @@ trait AwaitTask
             $task->refresh();
 
             if ($task->completed == true) {
+                Log::info(get_class($this) . ': Waiting for task to complete - COMPLETED', ['id' => $this->model->id, 'resource' => $task->id]);
                 return true;
             }
 
