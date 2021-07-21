@@ -9,7 +9,7 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class Create extends Job
+class CreateService extends Job
 {
     use Batchable, LoggableModelJob;
 
