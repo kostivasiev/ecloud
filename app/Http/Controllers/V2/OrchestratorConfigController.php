@@ -43,6 +43,7 @@ class OrchestratorConfigController extends BaseController
             'id',
             'reseller_id',
             'employee_id',
+            'deploy_on',
         ]));
         $model->save();
 
@@ -57,6 +58,7 @@ class OrchestratorConfigController extends BaseController
             'id',
             'reseller_id',
             'employee_id',
+            'deploy_on',
         ]));
         $model->save();
 

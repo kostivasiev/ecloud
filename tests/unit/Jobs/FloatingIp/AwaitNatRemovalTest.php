@@ -3,7 +3,6 @@
 namespace Tests\unit\Jobs\FloatingIp;
 
 use App\Jobs\FloatingIp\AwaitNatRemoval;
-use App\Jobs\Nat\AwaitIPAddressAllocation;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
@@ -13,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AwaitNatRemovalTest extends TestCase
@@ -27,23 +25,14 @@ class AwaitNatRemovalTest extends TestCase
         parent::setUp();
     }
 
-    public function testJobSucceedsWhenNoNatsExist()
+    public function testJobCompletesWithNicAttached()
     {
-        Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
-                'id' => 'fip-test',
-                'ip_address' => '10.2.3.4',
-            ]);
-            $this->nic = factory(Nic::class)->create([
-                'id' => 'nic-test',
-                'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
-            ]);
-        });
+        $this->floatingIp()->resource()->associate($this->nic());
+        $this->floatingIp()->save();
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new AwaitNatRemoval($this->floatingIp));
+        dispatch(new AwaitNatRemoval($this->floatingIp()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -75,7 +64,7 @@ class AwaitNatRemovalTest extends TestCase
                 'id' => 'task-1',
                 'completed' => false,
                 'failure_reason' => 'test',
-                'name' => Sync::TASK_NAME_DELETE,
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $task->resource()->associate($nat);
             $task->save();
@@ -112,7 +101,7 @@ class AwaitNatRemovalTest extends TestCase
                 'id' => 'task-1',
                 'completed' => false,
                 'failure_reason' => 'test',
-                'name' => Sync::TASK_NAME_DELETE,
+                'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $task->resource()->associate($nat);
             $task->save();
@@ -125,7 +114,7 @@ class AwaitNatRemovalTest extends TestCase
         Event::assertDispatched(JobFailed::class);
     }
 
-    public function testJobReleasedWhenSourceNatExists()
+    public function testJobReleasedWhenSourceNatExistsAndSyncInProgress()
     {
         Model::withoutEvents(function() {
             $this->floatingIp = factory(FloatingIp::class)->create([
@@ -137,12 +126,20 @@ class AwaitNatRemovalTest extends TestCase
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.3.4.5',
             ]);
-            $this->nat = app()->make(Nat::class);
-            $this->nat->id = 'nat-test';
-            $this->nat->source()->associate($this->nic);
-            $this->nat->translated()->associate($this->floatingIp);
-            $this->nat->action = NAT::ACTION_SNAT;
-            $this->nat->save();
+            $nat = app()->make(Nat::class);
+            $nat->id = 'nat-test';
+            $nat->source()->associate($this->nic);
+            $nat->translated()->associate($this->floatingIp);
+            $nat->action = NAT::ACTION_SNAT;
+            $nat->save();
+
+            $task = new Task([
+                'id' => 'task-1',
+                'completed' => false,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $task->resource()->associate($nat);
+            $task->save();
         });
 
         Event::fake([JobFailed::class, JobProcessed::class]);
@@ -155,7 +152,7 @@ class AwaitNatRemovalTest extends TestCase
         });
     }
 
-    public function testJobReleasedWhenDestinationNatExists()
+    public function testJobReleasedWhenDestinationNatExistsAndSyncInProgress()
     {
         Model::withoutEvents(function() {
             $this->floatingIp = factory(FloatingIp::class)->create([
@@ -167,12 +164,20 @@ class AwaitNatRemovalTest extends TestCase
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.3.4.5',
             ]);
-            $this->nat = app()->make(Nat::class);
-            $this->nat->id = 'nat-test';
-            $this->nat->destination()->associate($this->floatingIp);
-            $this->nat->translated()->associate($this->nic);
-            $this->nat->action = NAT::ACTION_DNAT;
-            $this->nat->save();
+            $nat = app()->make(Nat::class);
+            $nat->id = 'nat-test';
+            $nat->destination()->associate($this->floatingIp);
+            $nat->translated()->associate($this->nic);
+            $nat->action = NAT::ACTION_SNAT;
+            $nat->save();
+
+            $task = new Task([
+                'id' => 'task-1',
+                'completed' => false,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $task->resource()->associate($nat);
+            $task->save();
         });
 
         Event::fake([JobFailed::class, JobProcessed::class]);

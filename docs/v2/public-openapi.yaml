@@ -36,6 +36,8 @@ components:
       $ref: 'components/schemas/dhcp.yaml'
     DiscountPlan:
       $ref: 'components/schemas/discountPlan.yaml'
+    VpnProfile:
+      $ref: 'resources/VpnProfile/schema.yaml'
     VpnProfileGroup:
       $ref: 'components/schemas/vpnProfileGroup.yaml'
     Instance:
@@ -118,6 +120,8 @@ components:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
+    VpnProfileIdResponse:
+      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
     VpnProfileGroupIdResponse:
       $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
     VpnServiceIdResponse:
@@ -143,12 +147,12 @@ paths:
     $ref: 'resources/Vpc/instances-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/tasks':
     $ref: 'resources/Vpc/tasks-collection.yaml'
-#  '/ecloud/v2/availability-zones':
-#    $ref: 'resources/AvailabilityZone/collection.yaml'
-#  '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
-#    $ref: 'resources/AvailabilityZone/item.yaml'
-#  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/router-throughputs':
-#    $ref: 'resources/AvailabilityZone/router-throughputs-collection.yaml'
+  '/ecloud/v2/availability-zones':
+    $ref: 'resources/AvailabilityZone/collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
+    $ref: 'resources/AvailabilityZone/item.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/router-throughputs':
+    $ref: 'resources/AvailabilityZone/router-throughputs-collection.yaml'
   '/ecloud/v2/networks':
     $ref: 'resources/Network/collection.yaml'
   '/ecloud/v2/networks/{networkId}':
@@ -163,6 +167,10 @@ paths:
     $ref: 'resources/Dhcp/item.yaml'
   '/ecloud/v2/dhcps/{dhcpId}/tasks':
     $ref: 'resources/Dhcp/tasks-collection.yaml'
+  '/ecloud/v2/vpn-profiles':
+    $ref: 'resources/VpnProfile/collection.yaml'
+  '/ecloud/v2/vpn-profiles/{vpnProfileId}':
+    $ref: 'resources/VpnProfile/item.yaml'
   '/ecloud/v2/vpn-profile-groups':
     $ref: 'resources/VpnProfileGroup/collection.yaml'
   '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':

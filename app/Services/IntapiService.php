@@ -115,7 +115,7 @@ class IntapiService
 
     public function getFriendlyError($error)
     {
-        Log::error('IntAPI error: ' . $error);
+        Log::info('IntAPI error: ' . $error);
         $pregResult = preg_match(
             '/^(?:.*): no available \'(.*)\' ip addresses(?:.*)(?: for \((.*)\))?$/',
             $error,

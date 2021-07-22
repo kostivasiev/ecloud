@@ -2,13 +2,11 @@
 
 namespace Tests\V2\Vpc;
 
-use App\Events\V2\DhcpCreated;
-use App\Events\V2\VpcCreated;
-use App\Models\V2\Dhcp;
+use App\Events\V2\Task\Created;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class CreateTest extends TestCase
 {
@@ -135,5 +133,33 @@ class CreateTest extends TestCase
                 'detail' => 'The maximum number of ' . config('defaults.vpc.max_count') . ' VPCs has been reached',
             ]
         )->assertResponseStatus(422);
+    }
+
+    public function testSupportEnabled()
+    {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
+        Event::fake(Created::class);
+
+        app()->bind(Vpc::class, function () {
+            return factory(Vpc::class)->create([
+                'id' => 'vpc-test2',
+            ]);
+        });
+        $this->post(
+            '/v2/vpcs',
+            [
+                'name' => 'CreateTest Name',
+                'reseller_id' => 1,
+                'region_id' => $this->region()->id,
+                'support_enabled' => true,
+            ]
+        )->assertResponseStatus(202);
+
+        $vpc = Vpc::findOrFail('vpc-test2');
+        $this->assertTrue($vpc->support_enabled);
+
+        $this->assertEquals(1, $vpc->vpcSupports->count());
+
+        $this->assertEquals($vpc->created_at, $vpc->vpcSupports->first()->start_date);
     }
 }

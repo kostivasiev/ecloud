@@ -13,7 +13,7 @@ class Create extends FormRequest
     protected function rules()
     {
         return [
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|max:255',
             'ike_profile_id' => 'required|string',
             'ipsec_profile_id' => 'required|string',

@@ -10,7 +10,7 @@ class UpdateRequest extends FormRequest
     {
 
         return [
-            'name' => 'sometimes|nullable|string|max:50',
+            'name' => 'sometimes|nullable|string|max:255',
         ];
     }
 }

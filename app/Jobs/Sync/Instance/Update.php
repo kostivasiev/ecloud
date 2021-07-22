@@ -5,11 +5,13 @@ namespace App\Jobs\Sync\Instance;
 use App\Jobs\Instance\ComputeUpdate;
 use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
+use App\Jobs\Instance\Deploy\AwaitFloatingIpCreation;
 use App\Jobs\Instance\Deploy\AwaitNicSync;
 use App\Jobs\Instance\Deploy\AwaitVolumeSync;
 use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
+use App\Jobs\Instance\Deploy\CreateFloatingIp;
 use App\Jobs\Instance\Deploy\Deploy;
 use App\Jobs\Instance\Deploy\DeployCompleted;
 use App\Jobs\Instance\Deploy\ExpandOsDisk;
@@ -22,7 +24,6 @@ use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
 use App\Jobs\Job;
-use App\Jobs\Tasks\Instance\MigratePrivate;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -49,6 +50,8 @@ class Update extends Job
                     new AwaitVolumeSync($this->task->resource),
                     new ConfigureNics($this->task->resource),
                     new AwaitNicSync($this->task->resource),
+                    new CreateFloatingIp($this->task->resource),
+                    new AwaitFloatingIpCreation($this->task->resource),
                     new AssignFloatingIp($this->task->resource),
                     new UpdateNetworkAdapter($this->task->resource),
                     new OsCustomisation($this->task->resource),

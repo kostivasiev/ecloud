@@ -35,7 +35,7 @@ class UpdateRequest extends FormRequest
     {
         $networkId = app()->make('request')->route('networkId');
         return [
-            'name' => 'sometimes|required|string',
+            'name' => 'sometimes|required|string|max:255',
             'subnet' => [
                 'sometimes',
                 'string',

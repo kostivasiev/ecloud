@@ -1,6 +1,6 @@
 ###
 POST https://{{host}}/{{version}}/vpcs
-X-consumer-custom-id:  7052-0
+X-consumer-custom-id:  1-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 

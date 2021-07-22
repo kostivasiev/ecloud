@@ -53,7 +53,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
 
     public function floatingIp()
     {
-        return $this->belongsTo(FloatingIp::class);
+        return $this->morphOne(FloatingIp::class, 'resource');
     }
 
     public function getResellerId(): int

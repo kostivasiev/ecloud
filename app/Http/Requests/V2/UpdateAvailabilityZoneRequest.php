@@ -25,7 +25,7 @@ class UpdateAvailabilityZoneRequest extends FormRequest
     {
         return [
             'code' => 'sometimes|required|string',
-            'name' => 'sometimes|required|string',
+            'name' => 'sometimes|required|string|max:255',
             'datacentre_site_id' => 'sometimes|required|integer',
             'ucs_compute_name' => 'sometimes|required|string',
             'is_public' => 'sometimes|required|boolean',

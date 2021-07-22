@@ -6,11 +6,9 @@ use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Nat;
 use App\Models\V2\Task;
 use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\TaskResource;
-use App\Support\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -23,44 +21,7 @@ class FloatingIpController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        // "resource_id" filtering hack - start
-        if ($request->has('resource_id:eq')) {
-            if ($request->get('resource_id:eq') === 'null') {
-                $floatingIpIds = FloatingIp::forUser($request->user())->get()
-                    ->reject(function ($floatingIp) {
-                        return $floatingIp->resource_id != null;
-                    })
-                    ->map(function ($floatingIp) {
-                        return $floatingIp->id;
-                    });
-                $collection = FloatingIp::whereIn('id', $floatingIpIds);
-            } else {
-                $resourceId = $request->get('resource_id:eq');
-                $floatingIpIds = FloatingIp::forUser($request->user())->get()
-                    ->reject(function ($floatingIp) use ($resourceId) {
-                        return $floatingIp->resource_id != $resourceId;
-                    })
-                    ->map(function ($floatingIp) {
-                        return $floatingIp->id;
-                    });
-                $collection = FloatingIp::whereIn('id', $floatingIpIds);
-            }
-            $request->query->remove('resource_id:eq');  // So Ditto doesn't try to filter by resource_id
-        } elseif ($request->has('resource_id:in')) {
-            $ids = explode(',', $request->get('resource_id:in'));
-            $floatingIpIds = FloatingIp::forUser($request->user())->get()
-                ->reject(function ($floatingIp) use ($ids) {
-                    return !in_array($floatingIp->resource_id, $ids);
-                })
-                ->map(function ($floatingIp) {
-                    return $floatingIp->id;
-                });
-            $collection = FloatingIp::whereIn('id', $floatingIpIds);
-            $request->query->remove('resource_id:in');  // So Ditto doesn't try to filter by resource_id
-        } else {
-            $collection = FloatingIp::forUser($request->user());
-        }
-        // "resource_id" filtering hack - end
+        $collection = FloatingIp::forUser($request->user());
 
         $queryTransformer->config(FloatingIp::class)
             ->transform($collection);
@@ -83,9 +44,8 @@ class FloatingIpController extends BaseController
             $request->only(['vpc_id', 'name'])
         );
 
-        $floatingIp->save();
-
-        return $this->responseIdMeta($request, $floatingIp->id, 202);
+        $task = $floatingIp->syncSave();
+        return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $fipId)
@@ -93,68 +53,38 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
         $floatingIp->fill($request->only(['name']));
 
-        $floatingIp->withTaskLock(function ($floatingIp) {
-            $floatingIp->save();
-        });
-
-        return $this->responseIdMeta($request, $floatingIp->id, 202);
+        $task = $floatingIp->syncSave();
+        return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->withTaskLock(function ($floatingIp) {
-            $floatingIp->delete();
-        });
-
-        return response('', 202);
+        $task = $floatingIp->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 
     public function assign(AssignRequest $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
-        $resource = Resource::classFromId($request->resource_id)::findOrFail($request->resource_id);
 
-        $floatingIp->withTaskLock(function ($floatingIp) use ($resource) {
-            if (!$floatingIp->destinationNat()->exists()) {
-                $nat = app()->make(Nat::class);
-                $nat->destination()->associate($floatingIp);
-                $nat->translated()->associate($resource);
-                $nat->action = Nat::ACTION_DNAT;
-                $nat->save();
-            }
+        $task = $floatingIp->createTaskWithLock(
+            'floating_ip_assign',
+            \App\Jobs\Tasks\FloatingIp\Assign::class,
+            ['resource_id' => $request->resource_id]
+        );
 
-            if (!$floatingIp->sourceNat()->exists()) {
-                $nat = app()->make(Nat::class);
-                $nat->source()->associate($resource);
-                $nat->translated()->associate($floatingIp);
-                $nat->action = NAT::ACTION_SNAT;
-                $nat->save();
-            }
-
-            $floatingIp->save();
-        });
-
-        return response('', 202);
+        return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }
 
     public function unassign(Request $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->withTaskLock(function ($floatingIp) {
-            if ($floatingIp->sourceNat()->exists()) {
-                $floatingIp->sourceNat->delete();
-            }
-            if ($floatingIp->destinationNat()->exists()) {
-                $floatingIp->destinationNat->delete();
-            }
+        $task = $floatingIp->createTaskWithLock('floating_ip_unassign', \App\Jobs\Tasks\FloatingIp\Unassign::class);
 
-            $floatingIp->save();
-        });
-
-        return response('', 202);
+        return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }
 
     public function tasks(Request $request, QueryTransformer $queryTransformer, string $fipId)
