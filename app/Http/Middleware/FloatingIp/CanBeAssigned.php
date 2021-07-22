@@ -3,8 +3,9 @@ namespace App\Http\Middleware\FloatingIp;
 
 use App\Models\V2\FloatingIp;
 use Closure;
+use Symfony\Component\HttpFoundation\Response;
 
-class CanBeDeleted
+class CanBeAssigned
 {
     /**
      * @param $request
@@ -19,12 +20,12 @@ class CanBeDeleted
             return response()->json([
                 'errors' => [
                     [
-                        'title' => 'Forbidden',
-                        'detail' => 'Floating IP\'s assigned to a resource can not be deleted',
-                        'status' => 403,
+                        'title' => 'Conflict',
+                        'detail' => "The Floating IP is already assigned to a resource.",
+                        'status' => Response::HTTP_CONFLICT,
                     ]
                 ]
-            ], 403);
+            ], Response::HTTP_CONFLICT);
         }
 
         return $next($request);

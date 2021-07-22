@@ -2,8 +2,6 @@
 namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
-use App\Jobs\Instance\GuestShutdown;
-use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\UndeployCheck;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Support\Sync;
@@ -11,8 +9,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CheckNetworkAvailableTest extends TestCase

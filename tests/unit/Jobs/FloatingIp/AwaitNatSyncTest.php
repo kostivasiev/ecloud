@@ -2,9 +2,7 @@
 
 namespace Tests\unit\Jobs\FloatingIp;
 
-use App\Jobs\FloatingIp\AwaitNatRemoval;
 use App\Jobs\FloatingIp\AwaitNatSync;
-use App\Jobs\Nat\AwaitIPAddressAllocation;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
@@ -14,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AwaitNatSyncTest extends TestCase
@@ -28,23 +25,11 @@ class AwaitNatSyncTest extends TestCase
         parent::setUp();
     }
 
-    public function testJobSucceedsWithNoNats()
+    public function testSkipsIfNotNic()
     {
-        Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
-                'id' => 'fip-test',
-                'ip_address' => '10.2.3.4',
-            ]);
-            $this->nic = factory(Nic::class)->create([
-                'id' => 'nic-test',
-                'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
-            ]);
-        });
-
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new AwaitNatSync($this->floatingIp));
+        dispatch(new AwaitNatSync($this->floatingIp(), $this->instance()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -66,10 +51,17 @@ class AwaitNatSyncTest extends TestCase
             ]);
 
             $nat = app()->make(Nat::class);
-            $nat->id = 'nat-test';
+            $nat->id = 'nat-test-snat';
             $nat->source()->associate($this->nic);
             $nat->translated()->associate($this->floatingIp);
             $nat->action = NAT::ACTION_SNAT;
+            $nat->save();
+
+            $nat = app()->make(Nat::class);
+            $nat->id = 'nat-test-dnat';
+            $nat->destination()->associate($this->floatingIp);
+            $nat->translated()->associate($this->nic);
+            $nat->action = NAT::ACTION_DNAT;
             $nat->save();
 
             $task = new Task([
@@ -84,7 +76,7 @@ class AwaitNatSyncTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new AwaitNatSync($this->floatingIp));
+        dispatch(new AwaitNatSync($this->floatingIp, $this->nic));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -103,7 +95,14 @@ class AwaitNatSyncTest extends TestCase
             ]);
 
             $nat = app()->make(Nat::class);
-            $nat->id = 'nat-test';
+            $nat->id = 'nat-test-snat';
+            $nat->source()->associate($this->nic);
+            $nat->translated()->associate($this->floatingIp);
+            $nat->action = NAT::ACTION_SNAT;
+            $nat->save();
+
+            $nat = app()->make(Nat::class);
+            $nat->id = 'nat-test-dnat';
             $nat->destination()->associate($this->floatingIp);
             $nat->translated()->associate($this->nic);
             $nat->action = NAT::ACTION_DNAT;
@@ -121,7 +120,7 @@ class AwaitNatSyncTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new AwaitNatSync($this->floatingIp));
+        dispatch(new AwaitNatSync($this->floatingIp, $this->nic));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -138,11 +137,19 @@ class AwaitNatSyncTest extends TestCase
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.3.4.5',
             ]);
+
             $nat = app()->make(Nat::class);
-            $nat->id = 'nat-test';
+            $nat->id = 'nat-test-snat';
             $nat->source()->associate($this->nic);
             $nat->translated()->associate($this->floatingIp);
             $nat->action = NAT::ACTION_SNAT;
+            $nat->save();
+
+            $nat = app()->make(Nat::class);
+            $nat->id = 'nat-test-dnat';
+            $nat->destination()->associate($this->floatingIp);
+            $nat->translated()->associate($this->nic);
+            $nat->action = NAT::ACTION_DNAT;
             $nat->save();
 
             $task = new Task([
@@ -156,7 +163,7 @@ class AwaitNatSyncTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new AwaitNatSync($this->floatingIp));
+        dispatch(new AwaitNatSync($this->floatingIp, $this->nic));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -177,10 +184,17 @@ class AwaitNatSyncTest extends TestCase
                 'ip_address' => '10.3.4.5',
             ]);
             $nat = app()->make(Nat::class);
-            $nat->id = 'nat-test';
+            $nat->id = 'nat-test-snat';
+            $nat->source()->associate($this->nic);
+            $nat->translated()->associate($this->floatingIp);
+            $nat->action = NAT::ACTION_SNAT;
+            $nat->save();
+
+            $nat = app()->make(Nat::class);
+            $nat->id = 'nat-test-dnat';
             $nat->destination()->associate($this->floatingIp);
             $nat->translated()->associate($this->nic);
-            $nat->action = NAT::ACTION_SNAT;
+            $nat->action = NAT::ACTION_DNAT;
             $nat->save();
 
             $task = new Task([
@@ -194,7 +208,7 @@ class AwaitNatSyncTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new AwaitNatSync($this->floatingIp));
+        dispatch(new AwaitNatSync($this->floatingIp, $this->nic));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
