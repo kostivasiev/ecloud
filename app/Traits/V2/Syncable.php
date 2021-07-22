@@ -29,14 +29,7 @@ trait Syncable
         $type = 'n/a';
 
         if ($this->tasks()->count()) {
-            $latest = $this->tasks()
-                ->where(function ($query) {
-                    return $query
-                        ->where('name', '=', Sync::TASK_NAME_UPDATE)
-                        ->orWhere('name', '=', Sync::TASK_NAME_DELETE);
-                })
-                ->latest()
-                ->first();
+            $latest = $this->tasks()->latest()->first();
 
             if ($latest) {
                 $status = $latest->status;
