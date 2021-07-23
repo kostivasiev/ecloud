@@ -38,9 +38,16 @@ class VpnEndpointController extends BaseController
             $request->only(['name', 'vpn_service_id'])
         );
         $vpnEndpoint->save();
-        $floatingIp = FloatingIp::findOrFail($request->get('floating_ip_id'));
-        $floatingIp->assign($vpnEndpoint);
-        return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
+
+        $task = $vpnEndpoint->createTaskWithLock(
+            'floating_ip_create_assign',
+            \App\Jobs\Tasks\VpnEndpoint\CreateAssignFloatingIp::class,
+            [
+                'resource_id' => $request->get('floating_ip_id'),
+                'vpc_id' => $request->get('vpc_id'),
+            ]
+        );
+        return $this->responseIdMeta($request, $vpnEndpoint->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $vpnEndpointId)
@@ -54,7 +61,7 @@ class VpnEndpointController extends BaseController
     public function destroy(Request $request, string $vpnEndpointId)
     {
         $vpnEndpoint = VpnEndpoint::forUser($request->user())->findOrFail($vpnEndpointId);
-        $vpnEndpoint->floatingIp->unassign($vpnEndpoint);
+//        $vpnEndpoint->floatingIp->unassign($vpnEndpoint);
         $vpnEndpoint->delete();
         return response('', 204);
     }

@@ -2,10 +2,12 @@
 namespace App\Http\Requests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Vpc;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnServiceVpnEndpoint;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
@@ -24,13 +26,21 @@ class CreateRequest extends FormRequest
             ],
             'floating_ip_id' => [
                 'sometimes',
-                'required',
+                'required_without:vpc_id',
                 Rule::exists(FloatingIp::class, 'id')->where(function ($query) {
                     $query->whereNull('resource_id');
                     $query->whereNull('deleted_at');
                 }),
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
+            ],
+            'vpc_id' => [
+                'sometimes',
+                'required_without:floating_ip_id',
+                'exists:ecloud.vpcs,id,deleted_at,NULL',
+                new ExistsForUser(Vpc::class),
+                new IsMaxInstanceForVpc(),
+                new IsResourceAvailable(Vpc::class),
             ],
         ];
     }

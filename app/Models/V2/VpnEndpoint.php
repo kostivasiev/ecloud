@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeable
+class VpnEndpoint extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -35,6 +35,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
             'id',
             'name',
             'vpn_service_id',
+            'nsx_uuid',
         ]);
 
         parent::__construct($attributes);
@@ -85,6 +86,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpn_service_id', Filter::$stringDefaults),
+            $factory->create('nsx_uuid', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -101,6 +103,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpn_service_id'),
+            $factory->create('nsx_uuid'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -127,6 +130,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, ResellerScopeab
             'id' => 'id',
             'name' => 'name',
             'vpn_service_id' => 'vpn_service_id',
+            'nsx_uuid' => 'nsx_uuid',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
