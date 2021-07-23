@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\V2\Vpc;
 
-use App\Rules\V2\IsMaxVpcLimitReached;
 use UKFast\FormRequests\FormRequest;
 
 /**
