@@ -1,7 +1,7 @@
 get:
   parameters:
     # Change path in $ref below
-    - $ref: '../../resources/Reference/parameters/id.yaml'
+    - $ref: 'parameters/id.yaml'
   responses:
     200:
       description: success
@@ -20,7 +20,7 @@ get:
 patch:
   parameters:
     # Change path in $ref below
-    - $ref: '../../resources/Reference/parameters/id.yaml'
+    - $ref: 'parameters/id.yaml'
   requestBody:
     required: true
     content:
