@@ -33,7 +33,8 @@ class UpdateTest extends TestCase
                 'vpn_service_id' => $this->vpnService->id,
             ]
         );
-        $this->floatingIp->assign($this->vpnEndpoint);
+        $this->floatingIp->resource()->associate($this->vpnEndpoint);
+        $this->floatingIp->save();
     }
 
     public function testUpdateResource()

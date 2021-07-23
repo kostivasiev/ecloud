@@ -32,7 +32,8 @@ class DeleteTest extends TestCase
                 'vpn_service_id' => $this->vpnService->id,
             ]
         );
-        $floatingIp->assign($this->vpnEndpoint);
+        $floatingIp->resource()->associate($this->vpnEndpoint);
+        $floatingIp->save();
     }
 
     public function testDeleteResource()

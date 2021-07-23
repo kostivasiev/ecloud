@@ -61,7 +61,7 @@ class VpnEndpointController extends BaseController
     public function destroy(Request $request, string $vpnEndpointId)
     {
         $vpnEndpoint = VpnEndpoint::forUser($request->user())->findOrFail($vpnEndpointId);
-//        $vpnEndpoint->floatingIp->unassign($vpnEndpoint);
+        $vpnEndpoint->floatingIp->resource()->disassociate($vpnEndpoint);
         $vpnEndpoint->delete();
         return response('', 204);
     }

@@ -36,5 +36,4 @@ class CreateAssignFloatingIp extends Job
             $floatingIp->save();
         })->dispatch();
     }
-
 }

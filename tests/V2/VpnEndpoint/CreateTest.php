@@ -48,7 +48,8 @@ class CreateTest extends TestCase
             'name' => 'Original Endpoint',
             'vpn_service_id' => $this->vpnService->id,
         ]);
-        $this->floatingIp->assign($vpnEndpoint);
+        $this->floatingIp->resource()->associate($vpnEndpoint);
+        $this->floatingIp->save();
         $data = [
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpnService->id,
