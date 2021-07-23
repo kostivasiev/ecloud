@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Vpc\CreateRequest;
-use App\Http\Requests\V2\Vpc\DefaultsRequest;
+use App\Http\Requests\V2\Vpc\DeployDefaultsRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
 use App\Models\V2\AvailabilityZone;
@@ -161,7 +161,7 @@ class VpcController extends BaseController
         ));
     }
 
-    public function deployDefaults(DefaultsRequest $request, string $vpcId)
+    public function deployDefaults(DeployDefaultsRequest $request, string $vpcId)
     {
         $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
         $availabilityZone = AvailabilityZone::forUser($request->user())
