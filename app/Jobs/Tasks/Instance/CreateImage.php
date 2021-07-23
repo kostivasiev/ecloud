@@ -24,7 +24,7 @@ class CreateImage extends Job
     public function handle()
     {
         $task = $this->task;
-        $instance = Instance::findOrFail($task->data['instance_id']);
+        $instance = $task->resource;
         $image = Image::findOrFail($task->data['image_id']);
 
         $this->updateTaskBatch([

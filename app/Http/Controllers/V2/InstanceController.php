@@ -508,7 +508,6 @@ class InstanceController extends BaseController
             'image_create',
             \App\Jobs\Tasks\Instance\CreateImage::class,
             [
-                'instance_id' => $instance->id,
                 'image_id' => $image->id
             ]
         );
