@@ -28,9 +28,10 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'sometimes|required|string',
+            'name' => 'sometimes|required|string|max:255',
             'reseller_id' => 'sometimes|required|integer',
             'console_enabled' => 'sometimes|boolean',
+            'support_enabled' => 'sometimes|boolean',
         ];
     }
 }

@@ -28,7 +28,8 @@ class Create extends FormRequest
         return [
             'name' => [
                 'nullable',
-                'string'
+                'string',
+                'max:255'
             ],
             'firewall_rule_id' => [
                 'required',

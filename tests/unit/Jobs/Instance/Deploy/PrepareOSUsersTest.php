@@ -44,7 +44,7 @@ class PrepareOSUsersTest extends TestCase
     {
         $this->instance()->deploy_data =[
             'ssh_key_pair_ids' => [
-                $this->keypair
+                $this->keypair->id
             ]
         ];
         $this->instance()->saveQuietly();

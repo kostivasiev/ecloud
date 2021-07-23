@@ -53,7 +53,7 @@ class UpdateRequest extends FormRequest
         $this->config = $instance->image->imageMetadata->pluck('key', 'value')->flip();
 
         $rules = [
-            'name' => 'nullable|string',
+            'name' => 'nullable|string|max:255',
             'vcpu_cores' => [
                 'sometimes',
                 'required',

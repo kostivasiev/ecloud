@@ -16,6 +16,7 @@ class SshKeyPairSeeder extends Seeder
     {
         factory(SshKeyPair::class)->create([
             'id' => 'ssh-aaaaaaaa',
+            'reseller_id' => 7052
         ]);
     }
 }

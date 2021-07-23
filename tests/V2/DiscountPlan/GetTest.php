@@ -23,6 +23,7 @@ class GetTest extends TestCase
         $this->faker = Faker::create();
         $this->discountPlan = factory(DiscountPlan::class)->create([
             'contact_id' => 1,
+            'orderform_id' => '84bfdc19-977e-462b-a14b-0c4b907fff55',
         ]);
     }
 
@@ -36,6 +37,7 @@ class GetTest extends TestCase
             ]
         )->seeJson([
             'name' => $this->discountPlan->name,
+            'orderform_id' => $this->discountPlan->orderform_id,
             'commitment_amount' => $this->discountPlan->commitment_amount,
             'commitment_before_discount' => $this->discountPlan->commitment_before_discount,
             'discount_rate' => $this->discountPlan->discount_rate,
@@ -53,6 +55,7 @@ class GetTest extends TestCase
             ]
         )->seeJson([
             'name' => $this->discountPlan->name,
+            'orderform_id' => $this->discountPlan->orderform_id,
             'commitment_amount' => $this->discountPlan->commitment_amount,
             'commitment_before_discount' => $this->discountPlan->commitment_before_discount,
             'discount_rate' => $this->discountPlan->discount_rate,

@@ -28,6 +28,8 @@ patch:
             - $ref: '../../components/schemas/vpc.yaml'
             - type: object
               properties:
+                advanced_networking:
+                  readOnly: true
                 region_id :
                   type : string
                   required : true

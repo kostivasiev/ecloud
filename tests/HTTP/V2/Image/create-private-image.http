@@ -26,13 +26,13 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 2. Take an image of that instance
-POST https://{{host}}/{{version}}/instances/{{instance_id}}/create-image
+POST https://{{host}}/{{version}}/instances/i-83da7536/create-image
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "issue-761-test"
+    "name": "issue-761-test - pm"
 }
 
 > {%

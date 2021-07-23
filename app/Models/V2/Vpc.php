@@ -10,6 +10,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -118,19 +119,36 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
     /**
      * @return bool
      */
-    public function getSupportEnabledAttribute()
+    public function getSupportEnabledAttribute(): bool
     {
-        if ($this->vpcSupports()->count() == 0) {
-            return false;
+        return $this->vpcSupports->filter(function ($vpcSupport) {
+            return $vpcSupport->active;
+        })->count() > 0;
+    }
+
+    public function enableSupport($date = null)
+    {
+        if ($this->supportEnabled) {
+            return true;
         }
 
-        foreach ($this->vpcSupports as $support) {
-            if ($support->active) {
-                return true;
-            }
+        $vpcSupport = app()->make(VpcSupport::class);
+        $vpcSupport->start_date = $date ?? Carbon::now(new \DateTimeZone(config('app.timezone')));
+        $vpcSupport->vpc()->associate($this);
+        return $vpcSupport->save();
+    }
+
+    public function disableSupport()
+    {
+        if (!$this->supportEnabled) {
+            return true;
         }
 
-        return false;
+        $vpcSupport = $this->vpcSupports->filter(function ($vpcSupport) {
+            return $vpcSupport->active;
+        })->first();
+        $vpcSupport->end_date = Carbon::now(new \DateTimeZone(config('app.timezone')));
+        return $vpcSupport->save();
     }
 
     /**

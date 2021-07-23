@@ -9,6 +9,7 @@ use App\Models\V2\Network;
 use App\Models\V2\SshKeyPair;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\FloatingIp\IsAssigned;
 use App\Rules\V2\HasHosts;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
@@ -43,7 +44,7 @@ class CreateRequest extends FormRequest
         $this->platform = strtolower($this->image->platform);
 
         $rules = [
-            'name' => 'nullable|string',
+            'name' => 'nullable|string|max:255',
             'vpc_id' => [
                 'required',
                 'string',
@@ -94,6 +95,7 @@ class CreateRequest extends FormRequest
                 'required_without:requires_floating_ip',
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
+                new IsAssigned()
             ],
             'requires_floating_ip' => [
                 'sometimes',
@@ -137,19 +139,19 @@ class CreateRequest extends FormRequest
         // So, we need to retrieve the validation rules
         $parameters = $this->image->imageParameters;
         foreach ($parameters as $parameterKey => $parameter) {
-            $key = 'image_data.' . $parameter->appliance_script_parameters_key;
-            $scriptRules[$key][] = ($parameter->appliance_script_parameters_required == 'Yes') ? 'required' : 'nullable';
+            $key = 'image_data.' . $parameter->key;
+            $scriptRules[$key][] = ($parameter->required == 'Yes') ? 'required' : 'nullable';
             //validation rules regex
-            if (!empty($parameter->appliance_script_parameters_validation_rule)) {
-                $scriptRules[$key][] = 'regex:' . $parameter->appliance_script_parameters_validation_rule;
+            if (!empty($parameter->validation_rule)) {
+                $scriptRules[$key][] = 'regex:' . $parameter->validation_rule;
             }
 
             // For data types String,Numeric,Boolean we can use Laravel validation
-            switch ($parameter->appliance_script_parameters_type) {
+            switch ($parameter->type) {
                 case 'String':
                 case 'Numeric':
                 case 'Boolean':
-                    $scriptRules[$key][] = strtolower($parameter->appliance_script_parameters_type);
+                    $scriptRules[$key][] = strtolower($parameter->type);
                     break;
                 case 'Password':
                     $scriptRules[$key][] = 'string';

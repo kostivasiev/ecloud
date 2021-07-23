@@ -39,7 +39,8 @@ Content-Type: application/json
             "name": "vpc-2",
             "region_id": "reg-aaaaaaaa",
             "console_enabled": true,
-            "advanced_networking": true
+            "advanced_networking": true,
+            "support_enabled": true
         }
     ],
     "routers": [

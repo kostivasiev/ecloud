@@ -2,6 +2,7 @@
 namespace Tests\V2\OrchestratorConfig;
 
 use App\Models\V2\OrchestratorConfig;
+use Carbon\Carbon;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -32,6 +33,34 @@ class UpdateTest extends TestCase
             ],
             'ecloud'
         )->assertResponseStatus(200);
+    }
+
+    public function testStoreDeployDateInPastFails()
+    {
+        $data = [
+            'reseller_id' => 1,
+            'employee_id' => 1,
+            'deploy_on' => Carbon::yesterday()->format('Y-m-d H:i:s')
+        ];
+        $this->patch('/v2/orchestrator-configs/' . $this->orchestratorConfig->id, $data)
+            ->seeJson(
+                [
+                    'title' => 'Validation Error',
+                    'detail' => 'The deploy on must be a date after now',
+                ]
+            )->assertResponseStatus(422);
+    }
+
+    public function testStoreDeployDateInFuturePasses()
+    {
+        $data = [
+            'reseller_id' => 1,
+            'employee_id' => 1,
+            'deploy_on' => Carbon::tomorrow()->format('Y-m-d H:i:s')
+        ];
+        $this->patch('/v2/orchestrator-configs/' . $this->orchestratorConfig->id, $data)
+            ->seeInDatabase('orchestrator_configs', $data, 'ecloud')
+            ->assertResponseStatus(200);
     }
 
     public function testUpdateNotAdminFails()

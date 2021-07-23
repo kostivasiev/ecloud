@@ -9,6 +9,7 @@ use App\Events\V2\Nic\Deleting;
 use App\Events\V2\Nic\Saved;
 use App\Events\V2\Nic\Saving;
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +25,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Nic extends Model implements Filterable, Sortable, ResellerScopeable
 {
-    use CustomKey, SoftDeletes, Syncable, Taskable;
+    use CustomKey, SoftDeletes, Syncable, Taskable, DeletionRules;
 
     public $keyPrefix = 'nic';
     public $incrementing = false;
@@ -70,6 +71,20 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable
     public function destinationNat()
     {
         return $this->morphOne(Nat::class, 'translatedable', null, 'translated_id');
+    }
+
+    public function floatingIp()
+    {
+        return $this->morphOne(FloatingIp::class, 'resource');
+    }
+
+    /**
+     * Override method from DeletionRules trait.
+     * @return bool
+     */
+    public function canDelete()
+    {
+        return $this->floatingIp()->exists() == false;
     }
 
     /**

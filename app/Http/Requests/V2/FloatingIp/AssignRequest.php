@@ -27,10 +27,6 @@ class AssignRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => [
-                'unique:ecloud.nats,destination_id,NULL,id,deleted_at,NULL',
-                'unique:ecloud.nats,source_id,NULL,id,deleted_at,NULL'
-            ],
             'resource_id' =>
                 [
                     'required',
