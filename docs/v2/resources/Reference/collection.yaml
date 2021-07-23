@@ -14,7 +14,7 @@ get:
                 type: array
                 items:
                   # Change path in $ref below
-                  $ref: '../../resources/Reference/schema.yaml'
+                  $ref: 'schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -46,11 +46,11 @@ post:
       application/json:
         schema:
           # Change path in $ref below
-          $ref: '../../resources/Reference/schema.yaml'
+          $ref: 'schema.yaml'
   responses:
     202:
       description: Accepted
       # Change path in $ref below
-      $ref: '../../resources/Reference/responses/idResponse.yaml'
+      $ref: 'responses/idResponse.yaml'
   tags:
     - Rename This Tag
