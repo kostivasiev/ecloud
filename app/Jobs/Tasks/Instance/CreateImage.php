@@ -4,7 +4,6 @@ namespace App\Jobs\Tasks\Instance;
 
 use App\Jobs\Job;
 use App\Models\V2\Image;
-use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
