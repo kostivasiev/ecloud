@@ -3,9 +3,6 @@
 namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Deleted;
-use App\Events\V2\FloatingIp\Deleting;
-use App\Events\V2\FloatingIp\Saved;
-use App\Events\V2\FloatingIp\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -36,19 +33,8 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
     ];
 
     protected $dispatchesEvents = [
-        'saving' => Saving::class,
-        'saved' => Saved::class,
-        'deleting' => Deleting::class,
         'deleted' => Deleted::class
     ];
-
-    /**
-     * @deprecated Use sourceNat (aka SNAT) or destinationNat (aka DNAT)
-     */
-    public function getResourceIdAttribute()
-    {
-        return ($this->destinationNat()->exists()) ? $this->destinationNat->translated_id : null;
-    }
 
     public function getResellerId(): int
     {
@@ -87,6 +73,11 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         });
     }
 
+    public function resource()
+    {
+        return $this->morphTo();
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
@@ -98,6 +89,7 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('ip_address', Filter::$stringDefaults),
+            $factory->create('resource_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -115,6 +107,7 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             $factory->create('name'),
             $factory->create('vpc_id'),
             $factory->create('ip_address'),
+            $factory->create('resource_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -141,6 +134,7 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             'name' => 'name',
             'vpc_id' => 'vpc_id',
             'ip_address' => 'ip_address',
+            'resource_id' => 'resource_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

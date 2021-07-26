@@ -11,6 +11,7 @@ use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
+use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfile;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
@@ -61,6 +62,7 @@ class AppServiceProvider extends ServiceProvider
             'vpc' => Vpc::class,
             'dhcp' => Dhcp::class,
             'net' => Network::class,
+            'vpne' => VpnEndpoint::class,
             'obuild' => OrchestratorBuild::class,
             'vpns' => VpnSession::class,
             'vpnp' => VpnProfile::class,

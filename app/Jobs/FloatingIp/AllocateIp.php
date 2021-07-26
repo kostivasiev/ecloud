@@ -29,7 +29,7 @@ class AllocateIp extends Job
     public function handle()
     {
         if (!empty($this->model->ip_address)) {
-            log::info("IP address already allocated for floating IP address");
+            log::info("Floating IP already has an IP address allocated, skipping");
             return;
         }
 

@@ -3,21 +3,13 @@
 namespace Tests\unit\Jobs\Instance\Undeploy;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\FloatingIp\AwaitNatRemoval;
-use App\Jobs\FloatingIp\AwaitNatSync;
-use App\Jobs\FloatingIp\DeleteNats;
 use App\Jobs\Instance\Undeploy\DeleteVolumes;
-use App\Jobs\Nat\AwaitIPAddressAllocation;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
-use App\Models\V2\Nat;
-use App\Models\V2\Nic;
 use App\Models\V2\Volume;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteVolumesTest extends TestCase

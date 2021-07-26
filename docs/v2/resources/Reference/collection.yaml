@@ -1,0 +1,56 @@
+get:
+  parameters:
+    - $ref: '../../components/parameters/perPage.yaml'
+    - $ref: '../../components/parameters/page.yaml'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  # Change path in $ref below
+                  $ref: 'schema.yaml'
+              meta:
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                # Change path in example below
+                                example: 'https://api.ukfast.io/ecloud/v2/references?page=1'
+                              previous:
+                                # Change path in example below
+                                example: 'https://api.ukfast.io/ecloud/v2/references?page=1'
+                              next:
+                                # Change path in example below
+                                example: 'https://api.ukfast.io/ecloud/v2/references?page=2'
+                              last:
+                                # Change path in example below
+                                example: 'https://api.ukfast.io/ecloud/v2/references?page=2'
+  tags:
+    - Rename This Tag
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          # Change path in $ref below
+          $ref: 'schema.yaml'
+  responses:
+    202:
+      description: Accepted
+      # Change path in $ref below
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Rename This Tag

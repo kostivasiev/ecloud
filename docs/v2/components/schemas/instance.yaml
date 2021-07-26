@@ -13,11 +13,11 @@ properties:
     required: true
     example: vpc-2b66bb79
     readOnly: false
-#  availability_zone_id:
-#    readOnly: false
-#    type: string
-#    required: false
-#    example: 'az-2b66bb79'
+  availability_zone_id:
+    readOnly: false
+    type: string
+    required: true
+    example: 'az-2b66bb79'
   image_id:
     type: string
     required: true
@@ -81,7 +81,7 @@ properties:
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
   network_id:
-    required: false
+    required: true
     writeOnly: true
     type: string
     example: 'net-912345'

@@ -14,5 +14,6 @@ post:
   responses:
     202:
       description: Accepted
+      $ref: '../../resources/FloatingIp/responses/idResponse.yaml'
   tags:
     - Floating IPs

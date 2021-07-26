@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Vpc\CreateRequest;
+use App\Http\Requests\V2\Vpc\DeployDefaultsRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
-use App\Models\V2\VpcSupport;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerClusterResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -161,12 +161,14 @@ class VpcController extends BaseController
         ));
     }
 
-    public function deployDefaults(Request $request, string $vpcId)
+    public function deployDefaults(DeployDefaultsRequest $request, string $vpcId)
     {
         $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
+        $availabilityZone = AvailabilityZone::forUser($request->user())
+            ->findOrFail($request->get('availability_zone_id'));
 
         // Configure VPC defaults (Rincewind)
-        $this->dispatch(new ConfigureVpcDefaults($vpc));
+        $this->dispatch(new ConfigureVpcDefaults($vpc, $availabilityZone));
 
         return response('', 202);
     }

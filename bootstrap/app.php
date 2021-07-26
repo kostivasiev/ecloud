@@ -106,6 +106,9 @@ $app->routeMiddleware([
     'can-delete-image' => \App\Http\Middleware\image\CanDelete::class,
     'orchestrator-config-is-valid' => \App\Http\Middleware\OrchestratorConfig\IsValid::class,
     'orchestrator-config-has-reseller-id' => \App\Http\Middleware\OrchestratorConfig\HasResellerId::class,
+    'floating-ip-can-be-assigned' => \App\Http\Middleware\FloatingIp\CanBeAssigned::class,
+    'floating-ip-can-be-unassigned' => \App\Http\Middleware\FloatingIp\CanBeUnassigned::class,
+    'floating-ip-can-be-deleted' => \App\Http\Middleware\FloatingIp\CanBeDeleted::class,
 ]);
 
 /*

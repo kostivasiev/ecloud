@@ -9,6 +9,7 @@ use App\Models\V2\Network;
 use App\Models\V2\SshKeyPair;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\FloatingIp\IsAssigned;
 use App\Rules\V2\HasHosts;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
@@ -81,7 +82,7 @@ class CreateRequest extends FormRequest
                 new HasHosts(),
             ],
             'network_id' => [
-                'sometimes',
+                'required',
                 'string',
                 'exists:ecloud.networks,id,deleted_at,NULL',
                 new ExistsForUser(Network::class),
@@ -94,6 +95,7 @@ class CreateRequest extends FormRequest
                 'required_without:requires_floating_ip',
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
+                new IsAssigned()
             ],
             'requires_floating_ip' => [
                 'sometimes',
@@ -173,8 +175,6 @@ class CreateRequest extends FormRequest
             'image_id.exists' => 'The :attribute is not a valid Image',
             'vcpu_cores.required' => 'The :attribute field is required',
             'availability_zone_id.exists' => 'No valid Availability Zone exists for :attribute',
-            'network_id.required' => 'The :attribute field, when specified, cannot be null',
-            'network_id.exists' => 'The specified :attribute was not found',
             'floating_ip_id.required' => 'The :attribute field, when specified, cannot be null',
             'floating_ip_id.exists' => 'The specified :attribute was not found',
             'image_data.required' => 'The :attribute field, when specified, cannot be null',
