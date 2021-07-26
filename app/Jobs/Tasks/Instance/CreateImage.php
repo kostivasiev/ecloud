@@ -29,7 +29,7 @@ class CreateImage extends Job
 
         $this->updateTaskBatch([
             [
-                new \App\Jobs\Kingpin\Instance\CreateImage($image, $instance)
+                new \App\Jobs\Kingpin\Instance\CreateImage($instance, $image)
             ]
         ])->dispatch();
     }
