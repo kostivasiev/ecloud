@@ -31,8 +31,8 @@ class AddAvailabilityZoneIdToInstancesTable extends Migration
     {
         if (Schema::connection('ecloud')->hasTable('instances')) {
             Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-                if (!Schema::connection('ecloud')->hasColumn('instances', 'availability_zone_id')) {
-                    $table->dropColumn('vpc_id');
+                if (Schema::connection('ecloud')->hasColumn('instances', 'availability_zone_id')) {
+                    $table->dropColumn('availability_zone_id');
                 }
             });
         }

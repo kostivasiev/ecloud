@@ -41,7 +41,7 @@ class FloatingIpController extends BaseController
     public function store(CreateRequest $request)
     {
         $floatingIp = new FloatingIp(
-            $request->only(['vpc_id', 'name'])
+            $request->only(['vpc_id', 'name', 'availability_zone_id'])
         );
 
         $task = $floatingIp->syncSave();
