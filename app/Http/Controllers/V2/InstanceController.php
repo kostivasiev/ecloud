@@ -84,28 +84,6 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->input('vpc_id'));
-
-        // Use the default network if there is only one and no network_id was passed in
-        $defaultNetworkId = null;
-        if (!$request->has('network_id')) {
-            if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1 && $vpc->routers->first()->sync->status !== Sync::STATUS_FAILED) {
-                $defaultNetworkId = $vpc->routers->first()->networks->first()->id;
-            }
-            if (!$defaultNetworkId) {
-                return response()->json([
-                    'errors' => [
-                        [
-                            'title' => 'Not Found',
-                            'detail' => 'No network_id provided and could not find a default network',
-                            'status' => 404,
-                            'source' => 'network_id'
-                        ]
-                    ]
-                ], 404);
-            }
-        }
-
         $instance = new Instance($request->only([
             'name',
             'vpc_id',
@@ -123,7 +101,7 @@ class InstanceController extends BaseController
         $instance->deploy_data = [
             'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.' . strtolower($image->platform) . '.min')),
             'volume_iops' => $request->input('volume_iops', config('volume.iops.default')),
-            'network_id' => $request->input('network_id', $defaultNetworkId),
+            'network_id' => $request->input('network_id'),
             'floating_ip_id' => $request->input('floating_ip_id'),
             'requires_floating_ip' => $request->input('requires_floating_ip', false),
             'image_data' => $request->input('image_data'),
