@@ -14,24 +14,24 @@ class CreateImage extends Job
 {
     use Batchable, LoggableModelJob;
 
-    private Instance $instance;
-    private Image $model;
+    private Instance $model;
+    private Image $image;
 
-    public function __construct(Image $image, Instance $instance)
+    public function __construct(Instance $instance, Image $image)
     {
-        $this->instance = $instance;
-        $this->model = $image;
+        $this->model = $instance;
+        $this->image = $image;
     }
 
     public function handle()
     {
         try {
-            $response = $this->instance->availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/' . $this->instance->vpc->id . '/template/' . $this->model->id
+            $response = $this->model->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $this->model->vpc->id . '/template/' . $this->image->id
             );
 
             if ($response->getStatusCode() == 200) {
-                Log::debug(get_class($this) . ' : Image already exists, nothing to do.', ['id' => $this->instance->id]);
+                Log::debug(get_class($this) . ' : Image already exists, nothing to do.', ['id' => $this->model->id]);
                 return true;
             }
         } catch (RequestException $exception) {
@@ -40,16 +40,16 @@ class CreateImage extends Job
             }
         }
 
-        $this->instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->instance->vpc->id . '/template',
+        $this->model->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $this->model->vpc->id . '/template',
             [
                 'json' => [
-                    'instanceId' => $this->instance->id,
-                    'templateName' => $this->model->id,
-                    'annotation' => $this->model->name,
+                    'instanceId' => $this->model->id,
+                    'templateName' => $this->image->id,
+                    'annotation' => $this->image->name,
                 ]
             ]
         );
-        Log::debug('Image ' . $this->model->id . ' has been created for instance ' . $this->instance->id);
+        Log::debug('Image ' . $this->image->id . ' has been created for instance ' . $this->model->id);
     }
 }
