@@ -56,4 +56,8 @@ X-consumer-custom-id:  1-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
+{
+    "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
 ###
