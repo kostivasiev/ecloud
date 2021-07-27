@@ -11,6 +11,11 @@ properties:
     type: string
     example: vpc-2b66bb79
     readOnly: false
+  availability_zone_id:
+    type: string
+    example: az-2b66bb79
+    readOnly: false
+    required: true
   ip_address:
     description: The external IP address assigned to the floating IP.
     type: string
