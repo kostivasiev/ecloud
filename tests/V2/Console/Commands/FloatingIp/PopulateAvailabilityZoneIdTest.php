@@ -54,6 +54,6 @@ class PopulateAvailabilityZoneIdTest extends TestCase
 
         $this->command->handle();
 
-        $this->assertEquals('1 errors found, id\'s: fip-test', $this->infoArgument[0]);
+        $this->assertEquals('1 errors found, id\'s: ' . $this->floatingIp()->id, $this->infoArgument[0]);
     }
 }
