@@ -13,18 +13,24 @@ class PopulateAvailabilityZoneId extends Command
 
     public function handle()
     {
-        foreach (FloatingIp::all() as $floatingIp) {
-            $availabilityZone = $floatingIp->vpc->region->availabilityZones->first();
+        $errors = [];
 
-            if (!$availabilityZone) {
-                $this->error('Failed to set availability zone ID for floating IP ' . $floatingIp->id);
-                return Command::FAILURE;
+        foreach (FloatingIp::all() as $floatingIp) {
+            try {
+                $availabilityZone = $floatingIp->vpc->region->availabilityZones->first();
+            } catch (\Exception $exception) {
+                $this->error('Failed to set availability zone ID for floating IP ' . $floatingIp->id . ': ' . $exception->getMessage());
+                $errors[] = $floatingIp->id;
             }
 
             $floatingIp->availabilityZone()->associate($availabilityZone);
             $floatingIp->save();
 
             $this->line('FloatingIp ' . $floatingIp->id . ' availability zone updated to ' . $availabilityZone->id);
+        }
+
+        if (count($errors) > 0) {
+            $this->info(count($errors) . ' errors found, id\'s: '  . implode(',', $errors));
         }
 
         return Command::SUCCESS;
