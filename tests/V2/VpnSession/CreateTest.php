@@ -31,9 +31,11 @@ class CreateTest extends TestCase
         $this->vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
-        $this->vpnEndpoint = factory(VpnEndpoint::class)->create([
-            'fip_id' => $this->floatingIp->id,
-        ]);
+
+        $this->vpnEndpoint = factory(VpnEndpoint::class)->create();
+        $this->floatingIp->resource()->associate($this->vpnEndpoint);
+        $this->floatingIp->save();
+
         $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz',
