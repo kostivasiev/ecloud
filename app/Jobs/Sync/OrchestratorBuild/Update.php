@@ -13,6 +13,7 @@ use App\Jobs\OrchestratorBuild\CreateInstances;
 use App\Jobs\OrchestratorBuild\CreateNetworks;
 use App\Jobs\OrchestratorBuild\CreateRouters;
 use App\Jobs\OrchestratorBuild\CreateVpcs;
+use App\Jobs\OrchestratorBuild\LockConfiguration;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -32,6 +33,7 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
+                new LockConfiguration($this->task->resource),
                 new CreateVpcs($this->task->resource),
                 new AwaitVpcs($this->task->resource),
                 new CreateRouters($this->task->resource),

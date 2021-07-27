@@ -17,6 +17,7 @@ class OrchestratorConfigResource extends UKFastResource
             'id' => $this->id,
             'reseller_id' => $this->reseller_id,
             'employee_id' => $this->employee_id,
+            'locked' => $this->locked,
             'deploy_on' => $this->deploy_on === null ? null : Carbon::parse(
                 $this->deploy_on,
                 new \DateTimeZone(config('app.timezone'))
