@@ -21,12 +21,12 @@ class PopulateAvailabilityZoneId extends Command
             } catch (\Exception $exception) {
                 $this->error('Failed to set availability zone ID for floating IP ' . $floatingIp->id . ': ' . $exception->getMessage());
                 $errors[] = $floatingIp->id;
+                continue;
             }
 
             if ($availabilityZone) {
                 $floatingIp->availabilityZone()->associate($availabilityZone);
                 $floatingIp->save();
-
                 $this->line('FloatingIp ' . $floatingIp->id . ' availability zone updated to ' . $availabilityZone->id);
             }
         }
