@@ -23,10 +23,12 @@ class PopulateAvailabilityZoneId extends Command
                 $errors[] = $floatingIp->id;
             }
 
-            $floatingIp->availabilityZone()->associate($availabilityZone);
-            $floatingIp->save();
+            if ($availabilityZone) {
+                $floatingIp->availabilityZone()->associate($availabilityZone);
+                $floatingIp->save();
 
-            $this->line('FloatingIp ' . $floatingIp->id . ' availability zone updated to ' . $availabilityZone->id);
+                $this->line('FloatingIp ' . $floatingIp->id . ' availability zone updated to ' . $availabilityZone->id);
+            }
         }
 
         if (count($errors) > 0) {
