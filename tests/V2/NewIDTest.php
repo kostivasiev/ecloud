@@ -108,6 +108,6 @@ class NewIDTest extends TestCase
 
     public function generateDevRegExp($model): string
     {
-        return "/^".(new $model())->keyPrefix."\-[a-f0-9]{8}-dev$/i";
+        return "/^".(new $model())->keyPrefix."\-[a-f0-9]{8}\-dev$/i";
     }
 }
