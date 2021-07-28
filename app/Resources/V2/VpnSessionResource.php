@@ -26,7 +26,7 @@ class VpnSessionResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $retVal = [
             'id' => $this->id,
             'name' => $this->name,
             'vpn_profile_group_id' => $this->vpn_profile_group_id,
@@ -34,15 +34,18 @@ class VpnSessionResource extends UKFastResource
             'remote_ip' => $this->remote_ip,
             'remote_networks' => $this->remote_networks,
             'local_networks' => $this->local_networks,
-            'psk' => $this->credential ? $this->credential->password : null,
-            'created_at' => $this->created_at === null ? null : Carbon::parse(
-                $this->created_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
-            'updated_at' => $this->updated_at === null ? null : Carbon::parse(
-                $this->updated_at,
-                new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
         ];
+        if ($request->user()->isAdmin()) {
+            $retVal['psk'] = $this->credential ? $this->credential->password : null;
+        }
+        $retVal['created_at'] = $this->created_at === null ? null : Carbon::parse(
+            $this->created_at,
+            new \DateTimeZone(config('app.timezone'))
+        )->toIso8601String();
+        $retVal['updated_at'] = $this->updated_at === null ? null : Carbon::parse(
+            $this->updated_at,
+            new \DateTimeZone(config('app.timezone'))
+        )->toIso8601String();
+        return $retVal;
     }
 }
