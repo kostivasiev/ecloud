@@ -55,6 +55,11 @@ class VpnSession extends Model implements Filterable, Sortable
         return $this->belongsToMany(VpnEndpoint::class);
     }
 
+    public function credential()
+    {
+        return $this->hasOne(Credential::class, 'resource_id', 'id');
+    }
+
     /**
      * @param $query
      * @param $user
