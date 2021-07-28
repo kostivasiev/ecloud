@@ -37,6 +37,7 @@ class CreateFloatingIp extends Job
 
         $floatingIp = app()->make(FloatingIp::class);
         $floatingIp->vpc_id = $this->model->vpc->id;
+        $floatingIp->availability_zone_id = $this->model->availability_zone_id;
         $floatingIp->syncSave();
         // Not very nice this, but we need some way of passing the fip id to the AwaitFloatingIpSync job.
         $deploy_data = $this->model->deploy_data;
