@@ -76,25 +76,37 @@ class NewIDTest extends TestCase
 
     public function testDevEnvironmentId()
     {
-        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturnUsing(function () {
-            return 'local';
-        });
-        $region = factory(Region::class)->create();
+        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
+        $this->post('/v2/routers', [
+            'name' => 'Manchester Router 1',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone->id,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(202);
+
         $this->assertMatchesRegularExpression(
-            $this->generateDevRegExp(Region::class),
-            $region->id
+            $this->generateDevRegExp(Router::class),
+            (json_decode($this->response->getContent()))->data->id
         );
     }
 
     public function testProductionEnvironmentId()
     {
-        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturnUsing(function () {
-            return 'production';
-        });
-        $region = factory(Region::class)->create();
+        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('production');
+        $this->post('/v2/routers', [
+            'name' => 'Manchester Router 1',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone->id,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(202);
+
         $this->assertMatchesRegularExpression(
-            $this->generateRegExp(Region::class),
-            $region->id
+            $this->generateRegExp(Router::class),
+            (json_decode($this->response->getContent()))->data->id
         );
     }
 
