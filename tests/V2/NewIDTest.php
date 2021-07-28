@@ -76,7 +76,9 @@ class NewIDTest extends TestCase
 
     public function testDevEnvironmentId()
     {
-        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
+        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturnUsing(function () {
+            return 'local';
+        });
         $region = factory(Region::class)->create();
         $this->assertMatchesRegularExpression(
             $this->generateDevRegExp(Region::class),
@@ -86,7 +88,9 @@ class NewIDTest extends TestCase
 
     public function testProductionEnvironmentId()
     {
-        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('production');
+        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturnUsing(function () {
+            return 'production';
+        });
         $region = factory(Region::class)->create();
         $this->assertMatchesRegularExpression(
             $this->generateRegExp(Region::class),
