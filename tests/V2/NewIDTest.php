@@ -6,6 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -73,6 +74,26 @@ class NewIDTest extends TestCase
         );
     }
 
+    public function testDevEnvironmentId()
+    {
+        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
+        $region = factory(Region::class)->create();
+        $this->assertMatchesRegularExpression(
+            $this->generateDevRegExp(Region::class),
+            $region->id
+        );
+    }
+
+    public function testProductionEnvironmentId()
+    {
+        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('production');
+        $region = factory(Region::class)->create();
+        $this->assertMatchesRegularExpression(
+            $this->generateRegExp(Region::class),
+            $region->id
+        );
+    }
+
     /**
      * Generates a regular expression based on the specified model's prefix
      *
@@ -83,5 +104,10 @@ class NewIDTest extends TestCase
     public function generateRegExp($model): string
     {
         return "/^".(new $model())->keyPrefix."\-[a-f0-9]{8}$/i";
+    }
+
+    public function generateDevRegExp($model): string
+    {
+        return "/^".(new $model())->keyPrefix."\-[a-f0-9]{8}-dev$/i";
     }
 }

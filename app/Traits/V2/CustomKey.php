@@ -2,6 +2,7 @@
 
 namespace App\Traits\V2;
 
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 
 trait CustomKey
