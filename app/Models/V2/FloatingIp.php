@@ -72,19 +72,6 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         });
     }
 
-    /**
-     * @param $query
-     * @param $regionId
-     * @return mixed
-     * @deprecated Fips are linked to an availability zone now
-     */
-    public function scopeWithRegion($query, $regionId)
-    {
-        return $query->whereHas('vpc.region', function ($query) use ($regionId) {
-            $query->where('id', '=', $regionId);
-        });
-    }
-
     public function resource()
     {
         return $this->morphTo();
