@@ -45,12 +45,12 @@ class DeleteTest extends TestCase
             [
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => $this->vpnService->id,
+                'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '127.1.1.1/32',
                 'local_networks' => '127.1.1.1/32,127.1.10.1/24',
             ]
         );
-        $this->vpnSession->vpnEndpoints()->attach($this->vpnEndpoint);
     }
 
     public function testDeleteResource()

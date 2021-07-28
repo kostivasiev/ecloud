@@ -45,6 +45,7 @@ class UpdateTest extends TestCase
             [
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => $this->vpnService->id,
+                'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '127.1.1.1/32',
                 'local_networks' => '127.1.1.1/32,127.1.10.1/24',
@@ -54,7 +55,6 @@ class UpdateTest extends TestCase
 
     public function testUpdateResource()
     {
-        $this->vpnSession->vpnEndpoints()->attach($this->vpnEndpoint);
         $data = [
             'name' => 'Updated Test Session',
         ];
@@ -66,22 +66,6 @@ class UpdateTest extends TestCase
             $data,
             'ecloud'
         )->assertResponseStatus(202);
-    }
-
-    public function testUpdateResourceEndpointUsed()
-    {
-        $this->vpnSession->vpnEndpoints()->attach($this->vpnEndpoint);
-        $this->patch(
-            '/v2/vpn-sessions/' . $this->vpnSession->id,
-            [
-                'vpn_endpoint_id' => [
-                    $this->vpnEndpoint->id,
-                ]
-            ]
-        )->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'The vpn_endpoint_id.0 is already in use for this session',
-        ])->assertResponseStatus(422);
     }
 
     public function testUpdateResourceInvalidRemoteIp()

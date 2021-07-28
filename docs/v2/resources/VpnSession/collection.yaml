@@ -42,14 +42,6 @@ post:
         schema:
           allOf:
             - $ref: '../../public-openapi.yaml#/components/schemas/VpnSession'
-            - properties:
-                vpn_endpoint_id:
-                  type : array
-                  items:
-                    type : string
-                    required : true
-                    example : 'vpne-2b66bb79'
-                    readOnly : false
   responses:
     201:
       $ref: '../../public-openapi.yaml#/components/responses/VpnSessionIdResponse'

@@ -8,9 +8,7 @@ Content-Type: application/json
     "name": "vpn session test",
     "vpn_profile_group_id": "vpnpg-aaaaaaaa",
     "vpn_service_id": "vpn-aaaaaaaa",
-    "vpn_endpoint_id": [
-        "vpne-aaaaaaaa"
-    ],
+    "vpn_endpoint_id": "vpne-aaaaaaaa",
     "remote_ip": "211.12.13.1",
     "remote_networks": "172.12.23.11/32",
     "local_networks": "172.11.11.11/32,176.18.22.11/24"

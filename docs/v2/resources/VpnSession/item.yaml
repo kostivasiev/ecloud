@@ -30,6 +30,8 @@ patch:
               properties:
                 vpn_service_id:
                   readOnly: true
+                vpn_endpoint_id:
+                  readOnly: true
   responses:
     200:
       $ref: '../../public-openapi.yaml#/components/responses/VpnSessionIdResponse'

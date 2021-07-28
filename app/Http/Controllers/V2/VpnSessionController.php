@@ -41,14 +41,12 @@ class VpnSessionController extends BaseController
             'name',
             'vpn_profile_group_id',
             'vpn_service_id',
+            'vpn_endpoint_id',
             'remote_ip',
             'remote_networks',
             'local_networks',
         ]));
         $vpnSession->save();
-
-        $vpnSession->vpnEndpoints()->attach($request->get('vpn_endpoint_id'));
-        $vpnSession->refresh();
 
         return $this->responseIdMeta($request, $vpnSession->id, 202);
     }
@@ -65,11 +63,6 @@ class VpnSessionController extends BaseController
             'local_networks',
         ]));
         $vpnSession->save();
-
-        if ($request->has('vpn_endpoint_id')) {
-            $vpnSession->vpnEndpoints()->attach($request->get('vpn_endpoint_id'));
-        }
-        $vpnSession->refresh();
 
         return $this->responseIdMeta($request, $vpnSession->id, 202);
     }

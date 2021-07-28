@@ -16,6 +16,7 @@ class AddVpnServiceAndVpnProfileGroupIdColumnsToVpnSessionsTable extends Migrati
         Schema::connection('ecloud')->table('vpn_sessions', function (Blueprint $table) {
             $table->uuid('vpn_profile_group_id')->index()->nullable()->after('name');
             $table->uuid('vpn_service_id')->index()->nullable()->after('vpn_profile_group_id');
+            $table->uuid('vpn_endpoint_id')->index()->nullable()->after('vpn_service_id');
         });
     }
 

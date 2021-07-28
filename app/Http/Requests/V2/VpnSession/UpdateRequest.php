@@ -29,18 +29,6 @@ class UpdateRequest extends FormRequest
                 'string',
                 Rule::exists(VpnProfileGroup::class, 'id')->whereNull('deleted_at'),
             ],
-            'vpn_endpoint_id' => 'sometimes|required|array|min:1',
-            'vpn_endpoint_id.*' => [
-                'sometimes',
-                'required',
-                'string',
-                Rule::exists(VpnEndpoint::class, 'id')->whereNull('deleted_at'),
-                Rule::unique(VpnEndpointVpnSession::class, 'vpn_endpoint_id')
-                    ->where('vpn_session_id', $vpnSessionId),
-                'distinct',
-                new ExistsForUser(VpnEndpoint::class),
-                new IsResourceAvailable(VpnEndpoint::class),
-            ],
             'remote_ip' => [
                 'sometimes',
                 'required',
@@ -65,8 +53,8 @@ class UpdateRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpn_service_id.*.unique' => 'The :attribute is already in use for this session',
-            'vpn_endpoint_id.*.unique' => 'The :attribute is already in use for this session',
+            'vpn_service_id.unique' => 'The :attribute is already in use for this session',
+            'vpn_endpoint_id.unique' => 'The :attribute is already in use for this session',
         ];
     }
 }

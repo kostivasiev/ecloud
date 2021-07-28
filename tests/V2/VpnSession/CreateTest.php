@@ -65,9 +65,7 @@ class CreateTest extends TestCase
                 'name' => 'vpn session test',
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => $vpnService->id,
-                'vpn_endpoint_id' => [
-                    $this->vpnEndpoint->id,
-                ],
+                'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '172.12.23.11/32',
                 'local_networks' => '172.11.11.11/32,176.18.22.11/24',
@@ -83,9 +81,7 @@ class CreateTest extends TestCase
                 'name' => 'vpn session test',
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => 'vnps-00000000',
-                'vpn_endpoint_id' => [
-                    $this->vpnEndpoint->id,
-                ],
+                'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '172.12.23.11/32',
                 'local_networks' => '172.11.11.11/32,176.18.22.11/24',
@@ -111,9 +107,7 @@ class CreateTest extends TestCase
                 'name' => 'vpn session test',
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => $service->id,
-                'vpn_endpoint_id' => [
-                    $this->vpnEndpoint->id,
-                ],
+                'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => 'INVALID',
                 'remote_networks' => 'INVALID',
                 'local_networks' => 'INVALID',
