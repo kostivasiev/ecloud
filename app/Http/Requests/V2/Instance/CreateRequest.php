@@ -53,7 +53,6 @@ class CreateRequest extends FormRequest
                 new IsMaxInstanceForVpc(),
                 new IsResourceAvailable(Vpc::class),
             ],
-            'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
             'image_id' => [
                 'required',
                 'string',
