@@ -5,7 +5,6 @@ use App\Models\V2\AvailabilityZoneable;
 use App\Support\Resource;
 use Illuminate\Contracts\Validation\Rule;
 
-
 /**
  * If the two passed in resource types implement the AvailabilityZoneable interface
  * check that the two resources reside in the same availability zone.

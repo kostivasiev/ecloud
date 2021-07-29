@@ -49,6 +49,7 @@ class ImageParameterTest extends TestCase
             'ram_capacity' => 1024,
             'volume_capacity' => 20,
             'image_id' => $this->image()->id,
+            'network_id' => $this->network()->id
         ];
         $this->createRequest = new CreateRequest([], $data);
         $this->setProtectedProperty($this->createRequest, 'image', $this->image());
