@@ -82,7 +82,7 @@ class CreateRequest extends FormRequest
                 new HasHosts(),
             ],
             'network_id' => [
-                'sometimes',
+                'required',
                 'string',
                 'exists:ecloud.networks,id,deleted_at,NULL',
                 new ExistsForUser(Network::class),

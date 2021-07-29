@@ -17,6 +17,7 @@ use App\Models\V2\Credential;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
@@ -118,6 +119,8 @@ class InstanceController extends BaseController
         ]));
 
         $image = Image::forUser(Auth::user())->findOrFail($request->input('image_id'));
+        $network = Network::forUser(Auth::user())->findOrFail($defaultNetworkId);
+        $instance->availabilityZone()->associate($network->router->availabilityZone);
 
         $instance->locked = $request->input('locked', false);
         $instance->deploy_data = [
