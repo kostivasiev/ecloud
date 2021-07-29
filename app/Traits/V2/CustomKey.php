@@ -29,6 +29,7 @@ trait CustomKey
             throw new \Exception('Invalid key prefix');
         }
 
+        $suffix = App::environment() === 'production' ? '' : '-dev';
         if (!empty($model->id)) {
             Log::info('ID already set to "' . $model->id . '" for ' . get_class($model));
             return;
@@ -36,7 +37,7 @@ trait CustomKey
 
         try {
             do {
-                $model->id = $model->keyPrefix . '-' . bin2hex(random_bytes(4));
+                $model->id = $model->keyPrefix . '-' . bin2hex(random_bytes(4)) . $suffix;
             } while ($model->find($model->id));
         } catch (\Exception $exception) {
             Log::error('Failed to set Custom Key on ' . get_class($model), [
