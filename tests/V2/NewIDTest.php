@@ -41,6 +41,7 @@ class NewIDTest extends TestCase
 
     public function testFormatOfAvailabilityZoneID()
     {
+        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
         $this->post('/v2/availability-zones', [
             'code' => 'MAN1',
             'name' => 'Manchester Zone 1',
@@ -52,13 +53,14 @@ class NewIDTest extends TestCase
         ])->assertResponseStatus(201);
 
         $this->assertMatchesRegularExpression(
-            $this->generateDevRegExp(AvailabilityZone::class),
+            $this->generateRegExp(AvailabilityZone::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
 
     public function testFormatOfRoutersId()
     {
+        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
         $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc()->id,
@@ -69,7 +71,7 @@ class NewIDTest extends TestCase
         ])->assertResponseStatus(202);
 
         $this->assertMatchesRegularExpression(
-            $this->generateDevRegExp(Router::class),
+            $this->generateRegExp(Router::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
@@ -105,7 +107,7 @@ class NewIDTest extends TestCase
         ])->assertResponseStatus(202);
 
         $this->assertMatchesRegularExpression(
-            $this->generateDevRegExp(Router::class),
+            $this->generateRegExp(Router::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
@@ -119,11 +121,9 @@ class NewIDTest extends TestCase
      */
     public function generateRegExp($model): string
     {
+        if (App::environment() === 'local') {
+            return "/^".(new $model())->keyPrefix."\-[a-f0-9]{8}\-dev$/i";
+        }
         return "/^".(new $model())->keyPrefix."\-[a-f0-9]{8}$/i";
-    }
-
-    public function generateDevRegExp($model): string
-    {
-        return "/^".(new $model())->keyPrefix."\-[a-f0-9]{8}\-dev$/i";
     }
 }

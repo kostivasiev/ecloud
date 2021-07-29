@@ -29,7 +29,7 @@ trait CustomKey
             throw new \Exception('Invalid key prefix');
         }
 
-        $suffix = App::environment() !== 'local' ? '-dev' : '';
+        $suffix = App::environment() === 'local' ? '-dev' : '';
         if (!empty($model->id)) {
             Log::info('ID already set to "' . $model->id . '" for ' . get_class($model));
             return;
