@@ -52,7 +52,7 @@ class NewIDTest extends TestCase
         ])->assertResponseStatus(201);
 
         $this->assertMatchesRegularExpression(
-            $this->generateRegExp(AvailabilityZone::class),
+            $this->generateDevRegExp(AvailabilityZone::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
@@ -69,7 +69,7 @@ class NewIDTest extends TestCase
         ])->assertResponseStatus(202);
 
         $this->assertMatchesRegularExpression(
-            $this->generateRegExp(Router::class),
+            $this->generateDevRegExp(Router::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
@@ -87,7 +87,7 @@ class NewIDTest extends TestCase
         ])->assertResponseStatus(202);
 
         $this->assertMatchesRegularExpression(
-            $this->generateDevRegExp(Router::class),
+            $this->generateRegExp(Router::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
@@ -105,7 +105,7 @@ class NewIDTest extends TestCase
         ])->assertResponseStatus(202);
 
         $this->assertMatchesRegularExpression(
-            $this->generateRegExp(Router::class),
+            $this->generateDevRegExp(Router::class),
             (json_decode($this->response->getContent()))->data->id
         );
     }
