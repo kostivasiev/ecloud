@@ -2,30 +2,39 @@
 namespace App\Rules\V2;
 
 use App\Models\V2\AvailabilityZoneable;
-use App\Models\V2\Instance;
-use App\Models\V2\Volume;
 use App\Support\Resource;
 use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Support\Facades\Auth;
 
+
+/**
+ * If the two passed in resource types implement the AvailabilityZoneable interface
+ * check that the two resources reside in the same availability zone.
+ *
+ * Class IsSameAvailabilityZone
+ * @package App\Rules\V2
+ */
 class IsSameAvailabilityZone implements Rule
 {
-    private $resource;
+    private $resource1;
 
-    public function __construct(AvailabilityZoneable $resource)
+    public function __construct($resourceId)
     {
-        $this->resource = $resource;
+        $this->resource1 = Resource::classFromId($resourceId)::findOrFail($resourceId);
     }
 
     public function passes($attribute, $value)
     {
-        $resource = Resource::classFromId($value)::findOrFail($value);
-
-        if (!($resource instanceof AvailabilityZoneable)) {
-            return false;
+        if (!($this->resource1 instanceof AvailabilityZoneable)) {
+            return true;
         }
 
-        return $this->resource->availabilityZone->id == $resource->availabilityZone->id;
+        $resource2 = Resource::classFromId($value)::findOrFail($value);
+
+        if (!($resource2 instanceof AvailabilityZoneable)) {
+            return true;
+        }
+
+        return $this->resource1->availabilityZone->id == $resource2->availabilityZone->id;
     }
 
     public function message()

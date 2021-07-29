@@ -97,7 +97,7 @@ class CreateRequest extends FormRequest
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
                 new IsAssigned(),
-                new IsSameAvailabilityZone(Network::findOrFail($this->request->get('network_id')))
+                new IsSameAvailabilityZone($this->request->get('network_id'))
             ],
             'requires_floating_ip' => [
                 'sometimes',

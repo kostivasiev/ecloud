@@ -64,7 +64,7 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
 
     public function availabilityZone()
     {
-        return $this->hasOneThrough(AvailabilityZone::class, Router::class);
+        return $this->router->availabilityZone();
     }
 
     /**
