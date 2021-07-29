@@ -115,7 +115,6 @@ class InstanceController extends BaseController
             'locked',
             'backup_enabled',
             'host_group_id',
-            'availability_zone_id',
         ]));
 
         $image = Image::forUser(Auth::user())->findOrFail($request->input('image_id'));
