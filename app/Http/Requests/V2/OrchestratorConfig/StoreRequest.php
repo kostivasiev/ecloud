@@ -9,9 +9,13 @@ class StoreRequest extends FormRequest
 {
     public function rules()
     {
+        $resellerRequired = 'sometimes|required';
+        if ($this->request->has('deploy_on')) {
+            $resellerRequired = 'required';
+        }
         return [
             'reseller_id' => [
-                'sometimes',
+                $resellerRequired,
                 'required',
                 'integer'
             ],
@@ -27,5 +31,14 @@ class StoreRequest extends FormRequest
                 'after:now',
             ]
         ];
+    }
+
+    public function messages()
+    {
+        $messages = [];
+        if ($this->request->has('deploy_on')) {
+            $messages['reseller_id.required'] = 'The :attribute is required when specifying deploy on property';
+        }
+        return $messages;
     }
 }

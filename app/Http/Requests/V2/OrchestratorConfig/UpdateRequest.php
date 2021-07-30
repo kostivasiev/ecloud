@@ -2,16 +2,29 @@
 
 namespace App\Http\Requests\V2\OrchestratorConfig;
 
+use App\Models\V2\OrchestratorConfig;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
+    protected string $resellerRequired;
+
     public function rules()
     {
+        $orchestratorConfig = OrchestratorConfig::forUser(Auth::user())
+            ->findOrFail(Request::route('orchestratorConfigId'));
+        $this->resellerRequired = 'sometimes|nullable';
+        if ($this->request->has('deploy_on')) {
+            if (!$orchestratorConfig->reseller_id || !$this->request->has('reseller_id')) {
+                $this->resellerRequired = 'required';
+            }
+        }
+
         return [
             'reseller_id' => [
-                'sometimes',
-                'nullable',
+                $this->resellerRequired,
                 'integer'
             ],
             'employee_id' => [
@@ -31,5 +44,14 @@ class UpdateRequest extends FormRequest
                 'json'
             ],
         ];
+    }
+
+    public function messages()
+    {
+        $messages = [];
+        if ($this->resellerRequired == 'required') {
+            $messages['reseller_id.required'] = 'The :attribute is required when specifying deploy on property';
+        }
+        return $messages;
     }
 }
