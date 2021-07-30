@@ -9,7 +9,7 @@ class StoreRequest extends FormRequest
 {
     public function rules()
     {
-        $resellerRequired = 'sometimes|required';
+        $resellerRequired = 'sometimes';
         if ($this->request->has('deploy_on')) {
             $resellerRequired = 'required';
         }

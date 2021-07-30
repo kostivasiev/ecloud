@@ -15,7 +15,7 @@ class UpdateRequest extends FormRequest
     {
         $orchestratorConfig = OrchestratorConfig::forUser(Auth::user())
             ->findOrFail(Request::route('orchestratorConfigId'));
-        $this->resellerRequired = 'sometimes|nullable';
+        $this->resellerRequired = 'sometimes';
         if ($this->request->has('deploy_on')) {
             if (!$orchestratorConfig->reseller_id || !$this->request->has('reseller_id')) {
                 $this->resellerRequired = 'required';
@@ -25,6 +25,7 @@ class UpdateRequest extends FormRequest
         return [
             'reseller_id' => [
                 $this->resellerRequired,
+                ($this->resellerRequired == 'required') ? '' : 'nullable',
                 'integer'
             ],
             'employee_id' => [
