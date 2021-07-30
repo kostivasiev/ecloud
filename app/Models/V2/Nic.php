@@ -23,7 +23,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Nic extends Model implements Filterable, Sortable, ResellerScopeable
+class Nic extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, Syncable, Taskable, DeletionRules;
 
@@ -76,6 +76,11 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable
     public function floatingIp()
     {
         return $this->morphOne(FloatingIp::class, 'resource');
+    }
+
+    public function availabilityZone()
+    {
+        return $this->network->router->availabilityZone();
     }
 
     /**

@@ -16,7 +16,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeable
+class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
@@ -69,19 +69,6 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         }
         return $query->whereHas('vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
-        });
-    }
-
-    /**
-     * @param $query
-     * @param $regionId
-     * @return mixed
-     * @deprecated Fips are linked to an availability zone now
-     */
-    public function scopeWithRegion($query, $regionId)
-    {
-        return $query->whereHas('vpc.region', function ($query) use ($regionId) {
-            $query->where('id', '=', $regionId);
         });
     }
 

@@ -20,7 +20,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Network extends Model implements Filterable, Sortable, ResellerScopeable
+class Network extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -60,6 +60,11 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable
     public function networkPolicy()
     {
         return $this->hasOne(NetworkPolicy::class);
+    }
+
+    public function availabilityZone()
+    {
+        return $this->router->availabilityZone();
     }
 
     /**
