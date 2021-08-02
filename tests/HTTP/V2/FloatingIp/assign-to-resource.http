@@ -12,7 +12,7 @@ Content-Type:  application/json
   "vcpu_cores": 1,
   "ram_capacity": 1024,
   "image_id": "{{dev_image_id}}",
-  "floating_ip_id": "fip-8103af51",
+  "requires_floating_ip": true,
   "network_id": "{{dev_network_id}}",
   "volume_capacity": 30
 }
@@ -34,6 +34,42 @@ Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
+###
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+
+### Create an instance so that we have a nic to play with
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}",
+  "name": "Test",
+  "vcpu_cores": 1,
+  "ram_capacity": 1024,
+  "image_id": "{{dev_image_id}}",
+  "requires_floating_ip": true,
+  "network_id": "{{dev_network_id}}",
+  "volume_capacity": 30
+}
+
+> {%
+client.global.set('instance_id', response.body.data.id);
+client.log('Instance ID: ' + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### Wait for instance to deploy before NIC will be available...
 
 ###
 GET https://{{host}}/{{version}}/nics
@@ -138,7 +174,7 @@ Content-Type: application/json
 
 ###
 
-DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+DELETE https://{{host}}/{{version}}/instances/i-f193fa5f
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

@@ -6,6 +6,7 @@ use App\Models\V2\Instance;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsMaxVolumeLimitReached;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\VolumeNotAttached;
 use UKFast\FormRequests\FormRequest;
 
@@ -30,6 +31,7 @@ class AttachRequest extends FormRequest
                 new VolumeNotAttached($this->route()[2]['volumeId']),
                 new IsMaxVolumeLimitReached(),
                 new IsResourceAvailable(Instance::class),
+                new IsSameAvailabilityZone(app('request')->route('volumeId'))
             ]
         ];
     }

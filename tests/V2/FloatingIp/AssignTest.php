@@ -25,7 +25,7 @@ class AssignTest extends TestCase
             ->assertResponseStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == 'sync_update';
+            return $event->model->name == 'floating_ip_assign';
         });
     }
 
@@ -35,15 +35,10 @@ class AssignTest extends TestCase
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/assign', [
             'resource_id' => $this->nic()->id
-        ])
-            ->seeInDatabase('floating_ips', [
-                'id' => $this->floatingIp()->id,
-                'resource_id' => $this->nic()->id
-            ], 'ecloud')
-            ->assertResponseStatus(202);
+        ])->assertResponseStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == 'sync_update';
+            return $event->model->name == 'floating_ip_assign';
         });
     }
 

@@ -24,7 +24,7 @@ class Sync
             case static::TASK_NAME_DELETE:
                 return static::TYPE_DELETE;
             default:
-                return 'unknown';
+                return $name;
         }
     }
 }

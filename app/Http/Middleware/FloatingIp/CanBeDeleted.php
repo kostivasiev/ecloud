@@ -2,7 +2,6 @@
 namespace App\Http\Middleware\FloatingIp;
 
 use App\Models\V2\FloatingIp;
-use App\Models\V2\VpnEndpoint;
 use Closure;
 
 class CanBeDeleted
@@ -16,12 +15,12 @@ class CanBeDeleted
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($request->route('fipId'));
 
-        if (!empty($floatingIp->resource_id) && $floatingIp->resource instanceof VpnEndpoint) {
+        if (!empty($floatingIp->resource_id)) {
             return response()->json([
                 'errors' => [
                     [
                         'title' => 'Forbidden',
-                        'detail' => 'Floating IP\'s assigned to a VPN endpoint can not be deleted',
+                        'detail' => 'Floating IP\'s assigned to a resource can not be deleted',
                         'status' => 403,
                     ]
                 ]

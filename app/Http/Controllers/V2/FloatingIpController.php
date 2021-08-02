@@ -9,7 +9,6 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\Task;
 use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\TaskResource;
-use App\Support\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -42,7 +41,7 @@ class FloatingIpController extends BaseController
     public function store(CreateRequest $request)
     {
         $floatingIp = new FloatingIp(
-            $request->only(['vpc_id', 'name'])
+            $request->only(['vpc_id', 'name', 'availability_zone_id'])
         );
 
         $task = $floatingIp->syncSave();
@@ -63,17 +62,18 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
         $task = $floatingIp->syncDelete();
-
         return $this->responseTaskId($task->id);
     }
 
     public function assign(AssignRequest $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
-        $resource = Resource::classFromId($request->resource_id)::findOrFail($request->resource_id);
 
-        $floatingIp->resource()->associate($resource);
-        $task = $floatingIp->syncSave();
+        $task = $floatingIp->createTaskWithLock(
+            'floating_ip_assign',
+            \App\Jobs\Tasks\FloatingIp\Assign::class,
+            ['resource_id' => $request->resource_id]
+        );
 
         return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }
@@ -82,8 +82,7 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $floatingIp->resource()->dissociate();
-        $task = $floatingIp->syncSave();
+        $task = $floatingIp->createTaskWithLock('floating_ip_unassign', \App\Jobs\Tasks\FloatingIp\Unassign::class);
 
         return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }

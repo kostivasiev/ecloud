@@ -5,7 +5,7 @@
 $factory->define(\App\Models\V2\AvailabilityZoneCapacity::class, function () {
     return [
         'type' => 'floating_ip',
-        'current' => 20,
+        'current' => 0,
         'alert_warning' => 60,
         'alert_critical' => 80,
         'max' => 95,

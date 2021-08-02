@@ -1,0 +1,7 @@
+in: path
+name: id
+required: true
+schema:
+  type: string
+# Change prefix in example below
+example: ref-3f112f25
