@@ -5,7 +5,6 @@ namespace App\Http\Requests\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
-use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest

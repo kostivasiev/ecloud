@@ -18,7 +18,9 @@ class IsSameAvailabilityZone implements Rule
 
     public function __construct($resourceId)
     {
-        $this->resource1 = Resource::classFromId($resourceId)::findOrFail($resourceId);
+         if (!empty($resourceId)) {
+             $this->resource1 = Resource::classFromId($resourceId)::findOrFail($resourceId);
+         }
     }
 
     public function passes($attribute, $value)

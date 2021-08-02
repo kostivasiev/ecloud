@@ -80,8 +80,6 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->input('vpc_id'));
-
         $instance = new Instance($request->only([
             'name',
             'vpc_id',
