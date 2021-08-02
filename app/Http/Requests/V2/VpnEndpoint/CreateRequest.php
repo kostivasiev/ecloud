@@ -24,21 +24,13 @@ class CreateRequest extends FormRequest
             ],
             'floating_ip_id' => [
                 'sometimes',
-                'required_without:vpc_id',
+                'required',
                 Rule::exists(FloatingIp::class, 'id')->where(function ($query) {
                     $query->whereNull('resource_id');
                     $query->whereNull('deleted_at');
                 }),
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
-            ],
-            'vpc_id' => [
-                'sometimes',
-                'required_without:floating_ip_id',
-                'exists:ecloud.vpcs,id,deleted_at,NULL',
-                new ExistsForUser(Vpc::class),
-                new IsMaxInstanceForVpc(),
-                new IsResourceAvailable(Vpc::class),
             ],
         ];
     }
