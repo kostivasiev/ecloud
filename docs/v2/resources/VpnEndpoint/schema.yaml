@@ -1,12 +1,12 @@
 properties:
   id:
     type: string
-    example: 'vpni-2b66bb79'
+    example: 'vpne-2b66bb79'
     readOnly: true
   name:
     type: string
     required: false
-    example: 'vpni-2b66bb79'
+    example: 'vpne-2b66bb79'
   vpn_service_id:
     type: string
     required: true

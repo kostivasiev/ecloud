@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/VpnEndpoint'
+                  $ref: 'schema.yaml'
               meta:
                 allOf:
                   - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
@@ -40,16 +40,9 @@ post:
     content:
       application/json:
         schema:
-          allOf:
-            - $ref: '../../public-openapi.yaml#/components/schemas/VpnEndpoint'
-            - properties:
-                vpn_service_id :
-                  type : string
-                  required : true
-                  example : 'vpn-2b66bb79'
-                  readOnly : false
+          $ref: 'schema.yaml'
   responses:
-    201:
-      $ref: '../../public-openapi.yaml#/components/responses/VpnEndpointIdResponse'
+    202:
+      $ref: 'responses/idResponse.yaml'
   tags:
     - Vpn Endpoints

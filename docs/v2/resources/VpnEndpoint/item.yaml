@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/VpnEndpoint'
+                $ref: 'schema.yaml'
               meta:
                 type: object
   tags:
     - Vpn Endpoints
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpnEndpointId'
+    - $ref: 'parameters/vpnEndpointId.yaml'
   requestBody:
     required: true
     content:
@@ -25,25 +25,23 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/VpnEndpoint"
+            - $ref: "schema.yaml"
             - type: object
               properties:
-                router_id:
-                  required: false
                 vpn_service_id:
                   readOnly: true
                 floating_ip_id:
                   readOnly: true
   responses:
-    200:
+    202:
       $ref: '../../public-openapi.yaml#/components/responses/VpnEndpointIdResponse'
   tags:
     - Vpn Endpoints
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpnEndpointId'
+    - $ref: 'parameters/vpnEndpointId.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Vpn Endpoints
