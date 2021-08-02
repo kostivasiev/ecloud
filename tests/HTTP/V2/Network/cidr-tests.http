@@ -1,4 +1,36 @@
 ###
+# Get Router
+GET https://{{host}}/{{version}}/routers?per_page=1&sort=created_at:desc
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.global.set('router_id', response.body.data[0].id);
+client.log('Router ID: ' + response.body.data[0].id);
+%}
+
+###
+# Create a network with small subnet
+POST https://{{host}}/{{version}}/networks
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "cidr-tests",
+    "router_id": "{{router_id}}",
+    "subnet": "192.168.0.0/16"
+}
+
+> {%
+client.test("Test 192.168.0.0/16 is disallowed", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[1].detail === "The subnet must be a valid private CIDR range", "Error message not found");
+});
+%}
+
+###
 # Create a network with small subnet
 POST https://{{host}}/{{version}}/networks
 X-consumer-custom-id:  1-0
