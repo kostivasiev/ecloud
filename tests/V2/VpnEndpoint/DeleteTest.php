@@ -39,7 +39,7 @@ class DeleteTest extends TestCase
     public function testDeleteResource()
     {
         $this->delete('/v2/vpn-endpoints/' . $this->vpnEndpoint->id)
-            ->assertResponseStatus(204);
+            ->assertResponseStatus(202);
     }
 
     public function testDeleteResourceWrongUser()

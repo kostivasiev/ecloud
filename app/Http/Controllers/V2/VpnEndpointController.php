@@ -54,6 +54,7 @@ class VpnEndpointController extends BaseController
     {
         $vpnEndpoint = VpnEndpoint::forUser($request->user())->findOrFail($vpnEndpointId);
         $task = $vpnEndpoint->syncDelete();
-        return response('', 202, $task->id);
+
+        return $this->responseTaskId($task->id);
     }
 }
