@@ -3,9 +3,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\VpnEndpoint\CreateRequest;
 use App\Http\Requests\V2\VpnEndpoint\UpdateRequest;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
-use App\Models\V2\VpnService;
 use App\Resources\V2\VpnEndpointResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,15 +36,9 @@ class VpnEndpointController extends BaseController
             $request->only(['name', 'vpn_service_id'])
         );
         $vpnEndpoint->save();
-
-        $task = $vpnEndpoint->createTaskWithLock(
-            'floating_ip_create_assign',
-            \App\Jobs\Tasks\VpnEndpoint\CreateAssignFloatingIp::class,
-            [
-                'resource_id' => $request->get('floating_ip_id'),
-                'vpc_id' => $request->get('vpc_id'),
-            ]
-        );
+        $task = $vpnEndpoint->syncSave([
+            'floating_ip_id' => $request->get('floating_ip_id'),
+        ]);
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202, $task->id);
     }
 
@@ -54,15 +46,14 @@ class VpnEndpointController extends BaseController
     {
         $vpnEndpoint = VpnEndpoint::forUser(Auth::user())->findOrFail($vpnEndpointId);
         $vpnEndpoint->fill($request->only(['name']));
-        $vpnEndpoint->save();
-        return $this->responseIdMeta($request, $vpnEndpoint->id, 202);
+        $task = $vpnEndpoint->syncSave();
+        return $this->responseIdMeta($request, $vpnEndpoint->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $vpnEndpointId)
     {
         $vpnEndpoint = VpnEndpoint::forUser($request->user())->findOrFail($vpnEndpointId);
-        $vpnEndpoint->floatingIp->resource()->disassociate($vpnEndpoint);
-        $vpnEndpoint->delete();
-        return response('', 204);
+        $task = $vpnEndpoint->syncDelete();
+        return response('', 202, $task->id);
     }
 }
