@@ -27,20 +27,19 @@ class CreateFloatingIp extends Job
     public function handle()
     {
         $floatingIp = null;
-        // Create new floating ip if one not supplied
-        if (empty($this->task->data['resource_id'])) {
+        if (empty($this->task->data['floating_ip_id'])) {
             $floatingIp = app()->make(FloatingIp::class);
-            $floatingIp->vpc_id = $this->task->data['vpc_id'];
+            $floatingIp->vpc_id = $this->task->resource->vpnService->router->vpc->id;
             $floatingIp->syncSave();
 
             // Add floating ip id to task
             $this->task->data = [
-                'resource_id' => $floatingIp->id,
+                'floating_ip_id' => $floatingIp->id,
             ];
             $this->task->saveQuietly();
         }
         if (!$floatingIp) {
-            $floatingIp = FloatingIp::findOrFail($this->task->data['resource_id']);
+            $floatingIp = FloatingIp::findOrFail($this->task->data['floating_ip_id']);
         }
 
         $this->awaitSyncableResources([
