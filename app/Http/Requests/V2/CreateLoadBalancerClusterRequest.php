@@ -32,7 +32,7 @@ class CreateLoadBalancerClusterRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string',
-            'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
+            'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
             'vpc_id' => [
                 'required',
                 'string',
