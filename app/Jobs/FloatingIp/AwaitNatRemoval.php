@@ -4,17 +4,13 @@ namespace App\Jobs\FloatingIp;
 
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
-use App\Support\Sync;
+use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class AwaitNatRemoval extends Job
 {
-    use Batchable, LoggableModelJob;
-
-    public $tries = 30;
-    public $backoff = 5;
+    use Batchable, LoggableModelJob, AwaitResources;
 
     private FloatingIp $model;
 
@@ -23,23 +19,19 @@ class AwaitNatRemoval extends Job
         $this->model = $floatingIp;
     }
 
+    /**
+     * Await the deletion of any NATs that were created as part of assigning the floating IP to a NIC.
+     */
     public function handle()
     {
-        if ($this->model->sourceNat()->exists() && $this->model->sourceNat->sync->status == Sync::STATUS_FAILED) {
-            Log::error('Source NAT in failed sync state, abort', ['id' => $this->model->id, 'nat_id' => $this->model->sourceNat->id]);
-            $this->fail(new \Exception("Source NAT '" . $this->model->sourceNat->id . "' in failed sync state"));
-            return;
+        $floatingIp = $this->model;
+
+        if ($floatingIp->sourceNat()->exists()) {
+            $this->awaitSyncableResources([$floatingIp->sourceNat->id]);
         }
 
-        if ($this->model->destinationNat()->exists() != null && $this->model->destinationNat->sync->status == Sync::STATUS_FAILED) {
-            Log::error('Destination NAT in failed sync state, abort', ['id' => $this->model->id, 'nat_id' => $this->model->destinationNat->id]);
-            $this->fail(new \Exception("Destination NAT '" . $this->model->destinationNat->id . "' in failed sync state"));
-            return;
-        }
-
-        if ($this->model->sourceNat()->exists() || $this->model->destinationNat()->exists()) {
-            Log::warning('NAT(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
-            return $this->release($this->backoff);
+        if ($floatingIp->destinationNat()->exists()) {
+            $this->awaitSyncableResources([$floatingIp->destinationNat->id]);
         }
     }
 }

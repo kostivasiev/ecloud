@@ -8,15 +8,12 @@ use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Http\Requests\V2\Instance\VolumeDetachRequest;
-use App\Jobs\Instance\GuestRestart;
-use App\Jobs\Instance\GuestShutdown;
-use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
-use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
@@ -26,7 +23,6 @@ use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
-use App\Support\Sync;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
@@ -84,28 +80,6 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->input('vpc_id'));
-
-        // Use the default network if there is only one and no network_id was passed in
-        $defaultNetworkId = null;
-        if (!$request->has('network_id')) {
-            if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1 && $vpc->routers->first()->sync->status !== Sync::STATUS_FAILED) {
-                $defaultNetworkId = $vpc->routers->first()->networks->first()->id;
-            }
-            if (!$defaultNetworkId) {
-                return response()->json([
-                    'errors' => [
-                        [
-                            'title' => 'Not Found',
-                            'detail' => 'No network_id provided and could not find a default network',
-                            'status' => 404,
-                            'source' => 'network_id'
-                        ]
-                    ]
-                ], 404);
-            }
-        }
-
         $instance = new Instance($request->only([
             'name',
             'vpc_id',
@@ -118,12 +92,14 @@ class InstanceController extends BaseController
         ]));
 
         $image = Image::forUser(Auth::user())->findOrFail($request->input('image_id'));
+        $network = Network::forUser(Auth::user())->findOrFail($request->input('network_id'));
+        $instance->availabilityZone()->associate($network->router->availabilityZone);
 
         $instance->locked = $request->input('locked', false);
         $instance->deploy_data = [
             'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.' . strtolower($image->platform) . '.min')),
             'volume_iops' => $request->input('volume_iops', config('volume.iops.default')),
-            'network_id' => $request->input('network_id', $defaultNetworkId),
+            'network_id' => $request->input('network_id', $network->id),
             'floating_ip_id' => $request->input('floating_ip_id'),
             'requires_floating_ip' => $request->input('requires_floating_ip', false),
             'image_data' => $request->input('image_data'),

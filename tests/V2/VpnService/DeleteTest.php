@@ -34,7 +34,7 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(202);
+            ->assertResponseStatus(204);
         $vpnItem = VpnService::withTrashed()->findOrFail($this->vpn->id);
         $this->assertNotNull($vpnItem->deleted_at);
     }

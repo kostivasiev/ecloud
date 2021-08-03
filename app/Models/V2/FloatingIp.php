@@ -3,7 +3,6 @@
 namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Deleted;
-use App\Exceptions\V2\FloatingIp\AssignException;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -17,7 +16,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeable
+class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
@@ -30,7 +29,8 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         'id',
         'name',
         'vpc_id',
-        'deleted'
+        'availability_zone_id',
+        'deleted',
     ];
 
     protected $dispatchesEvents = [
@@ -45,6 +45,11 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
+    }
+
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
     }
 
     public function sourceNat()
@@ -67,61 +72,9 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         });
     }
 
-    public function scopeWithRegion($query, $regionId)
-    {
-        return $query->whereHas('vpc.region', function ($query) use ($regionId) {
-            $query->where('id', '=', $regionId);
-        });
-    }
-
     public function resource()
     {
         return $this->morphTo();
-    }
-
-    public function assign($resource)
-    {
-        if (!empty($this->resource_id)) {
-            throw new AssignException();
-        }
-
-        $this->resource()->associate($resource);
-
-        if ($resource instanceof Nic) {
-            if (!$this->destinationNat()->exists()) {
-                $nat = app()->make(Nat::class);
-                $nat->destination()->associate($this);
-                $nat->translated()->associate($resource);
-                $nat->action = Nat::ACTION_DNAT;
-                $nat->save();
-            }
-
-            if (!$this->sourceNat()->exists()) {
-                $nat = app()->make(Nat::class);
-                $nat->source()->associate($resource);
-                $nat->translated()->associate($this);
-                $nat->action = NAT::ACTION_SNAT;
-                $nat->save();
-            }
-        }
-
-        $this->save();
-    }
-
-    public function unassign()
-    {
-        if ($this->resource instanceof Nic) {
-            if ($this->sourceNat()->exists()) {
-                $this->sourceNat->delete();
-            }
-            if ($this->destinationNat()->exists()) {
-                $this->destinationNat->delete();
-            }
-        }
-
-        $this->resource()->dissociate();
-
-        $this->save();
     }
 
     /**
@@ -134,6 +87,7 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('ip_address', Filter::$stringDefaults),
             $factory->create('resource_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -152,6 +106,7 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
+            $factory->create('availability_zone_id'),
             $factory->create('ip_address'),
             $factory->create('resource_id'),
             $factory->create('created_at'),
@@ -179,6 +134,7 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             'id' => 'id',
             'name' => 'name',
             'vpc_id' => 'vpc_id',
+            'availability_zone_id' => 'availability_zone_id',
             'ip_address' => 'ip_address',
             'resource_id' => 'resource_id',
             'created_at' => 'created_at',

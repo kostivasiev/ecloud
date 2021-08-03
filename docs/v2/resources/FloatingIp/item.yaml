@@ -30,6 +30,8 @@ patch:
               properties :
                 vpc_id :
                   readOnly : true
+                availability_zone_id :
+                  readOnly : true
 
   responses:
     202:
@@ -38,12 +40,10 @@ patch:
   tags:
     - Floating IPs
 delete:
-  202:
-    description: Accepted
-    $ref : '../../components/responses/taskIdResponse.yaml'
   responses:
-    202:
-      description: Accepted
+    202 :
+      description : Accepted
+      $ref : '../../components/responses/taskIdResponse.yaml'
   tags:
     - Floating IPs
 

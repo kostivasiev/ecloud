@@ -29,11 +29,10 @@ class AllocateIp extends Job
     public function handle()
     {
         if (!empty($this->model->ip_address)) {
-            log::info("IP address already allocated for floating IP address");
+            log::info("Floating IP already has an IP address allocated, skipping");
             return;
         }
 
-        $datacentreSiteIds = $this->model->vpc->region->availabilityZones->pluck('datacentre_site_id')->unique();
         $networkingAdminClient = app()->make(AdminClient::class);
 
         $ipRanges = collect();
@@ -42,7 +41,7 @@ class AllocateIp extends Job
             $currentPage++;
             $page = $networkingAdminClient->ipRanges()->getPage($currentPage, 15, [
                 'auto_deploy_environment:eq' => 'ecloud nsx',
-                'auto_deploy_datacentre_id:in' => implode(',', $datacentreSiteIds->toArray()),
+                'auto_deploy_datacentre_id:eq' => $this->model->availabilityZone->datacentre_site_id,
                 'type:eq' => 'External'
             ]);
             $ipRanges = $ipRanges->merge($page->getItems());
@@ -83,9 +82,8 @@ class AllocateIp extends Job
 
                     Log::info('Success. IP ' . $this->model->ip_address . ' was assigned.', ['id' => $this->model->id]);
 
-                    $this->model->vpc->region->availabilityZones->each(function ($availabilityZone) {
-                        dispatch(new UpdateFloatingIpCapacity($availabilityZone));
-                    });
+                    dispatch(new UpdateFloatingIpCapacity($this->model->availabilityZone));
+
                     break 2;
                 }
             } finally {

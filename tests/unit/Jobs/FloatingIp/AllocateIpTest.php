@@ -3,21 +3,13 @@
 namespace Tests\unit\Jobs\FloatingIp;
 
 use App\Jobs\FloatingIp\AllocateIp;
-use App\Jobs\Nat\AwaitIPAddressAllocation;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Nat;
-use App\Models\V2\Nic;
-use App\Services\V2\KingpinService;
-use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
-use UKFast\Admin\Networking\AdminClient;
-use UKFast\Admin\Networking\IpRangeClient;
 
 class AllocateIpTest extends TestCase
 {
@@ -48,6 +40,7 @@ class AllocateIpTest extends TestCase
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '',
             ]);
         });
@@ -107,16 +100,19 @@ class AllocateIpTest extends TestCase
             factory(FloatingIp::class)->create([
                 'id' => 'fip-existing1',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.1',
             ]);
             factory(FloatingIp::class)->create([
                 'id' => 'fip-existing2',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.2',
             ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '',
             ]);
         });
@@ -176,16 +172,19 @@ class AllocateIpTest extends TestCase
             factory(FloatingIp::class)->create([
                 'id' => 'fip-existing1',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.110.1',
             ]);
             factory(FloatingIp::class)->create([
                 'id' => 'fip-existing2',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.110.2',
             ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '',
             ]);
         });
@@ -270,6 +269,7 @@ class AllocateIpTest extends TestCase
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '',
             ]);
         });
@@ -354,16 +354,19 @@ class AllocateIpTest extends TestCase
             factory(FloatingIp::class)->create([
                 'id' => 'fip-existing1',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.110.1',
             ]);
             factory(FloatingIp::class)->create([
                 'id' => 'fip-existing2',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.110.2',
             ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '',
             ]);
         });

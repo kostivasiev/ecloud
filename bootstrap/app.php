@@ -90,7 +90,7 @@ $app->routeMiddleware([
     'is-admin' => \UKFast\Api\Auth\Middleware\IsAdmin::class,
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
-    'is-locked' => \App\Http\Middleware\IsLocked::class,
+    'instance-is-locked' => \App\Http\Middleware\Instance\IsLocked::class,
     'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
     'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class,
     'customer-max-vpc' => \App\Http\Middleware\IsMaxVpcForCustomer::class,
@@ -106,6 +106,8 @@ $app->routeMiddleware([
     'can-delete-image' => \App\Http\Middleware\image\CanDelete::class,
     'orchestrator-config-is-valid' => \App\Http\Middleware\OrchestratorConfig\IsValid::class,
     'orchestrator-config-has-reseller-id' => \App\Http\Middleware\OrchestratorConfig\HasResellerId::class,
+    'orchestrator-config-is-locked' => \App\Http\Middleware\OrchestratorConfig\IsLocked::class,
+    'floating-ip-can-be-assigned' => \App\Http\Middleware\FloatingIp\CanBeAssigned::class,
     'floating-ip-can-be-unassigned' => \App\Http\Middleware\FloatingIp\CanBeUnassigned::class,
     'floating-ip-can-be-deleted' => \App\Http\Middleware\FloatingIp\CanBeDeleted::class,
 ]);

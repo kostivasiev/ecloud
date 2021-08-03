@@ -109,15 +109,6 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Nat
-        \App\Events\V2\Nat\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Nat\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Nat\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\Nat\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],

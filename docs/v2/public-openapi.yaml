@@ -20,217 +20,160 @@ components:
       in: header
       name: Authorization
   schemas:
-    NetworkPolicy:
-      $ref: 'components/schemas/networkPolicy.yaml'
-    NetworkRule:
-      $ref : 'components/schemas/networkRule.yaml'
-    NetworkRulePort :
-      $ref : 'components/schemas/networkRulePort.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
-    VirtualPrivateCloud:
-      $ref: 'components/schemas/vpc.yaml'
-    Network:
-      $ref: 'components/schemas/network.yaml'
     Dhcp:
       $ref: 'components/schemas/dhcp.yaml'
     DiscountPlan:
       $ref: 'components/schemas/discountPlan.yaml'
-    VpnProfile:
-      $ref: 'resources/VpnProfile/schema.yaml'
-    VpnProfileGroup:
-      $ref: 'components/schemas/vpnProfileGroup.yaml'
-    Instance:
-      $ref: 'components/schemas/instance.yaml'
     FloatingIP:
       $ref: 'components/schemas/floatingIp.yaml'
     FirewallRule:
       $ref: 'components/schemas/firewallRule.yaml'
     FirewallPolicy:
       $ref: 'components/schemas/firewallPolicy.yaml'
+    HostGroup:
+      $ref: 'resources/HostGroup/schema.yaml'
+    HostSpec:
+      $ref: 'resources/HostSpec/schema.yaml'
+    Image:
+      $ref: 'resources/Image/schema.yaml'
+    ImageMetadata:
+      $ref: 'resources/ImageMetadata/schema.yaml'
+    ImageParameter:
+      $ref: 'resources/ImageParameter/schema.yaml'
+    Instance:
+      $ref: 'components/schemas/instance.yaml'
+    #    LoadBalancerCluster:
+    #      $ref: 'components/schemas/lbc.yaml'
+    Meta:
+      $ref: 'components/schemas/meta.yaml'
+    Network:
+      $ref: 'components/schemas/network.yaml'
+    NetworkPolicy:
+      $ref: 'components/schemas/networkPolicy.yaml'
+    NetworkRule:
+      $ref : 'components/schemas/networkRule.yaml'
+    NetworkRulePort :
+      $ref : 'components/schemas/networkRulePort.yaml'
     Nics:
       $ref: 'components/schemas/nic.yaml'
     Region:
       $ref: 'components/schemas/region.yaml'
     Router:
       $ref: 'components/schemas/router.yaml'
-#    LoadBalancerCluster:
-#      $ref: 'components/schemas/lbc.yaml'
-    Volume:
-      $ref: 'components/schemas/volume.yaml'
     RouterThroughput:
       $ref: 'components/schemas/routerThroughput.yaml'
-    HostSpec:
-      $ref: 'resources/HostSpec/schema.yaml'
-    Meta:
-      $ref: 'components/schemas/meta.yaml'
-    HostGroup:
-      $ref: 'resources/HostGroup/schema.yaml'
-    Image:
-      $ref: 'resources/Image/schema.yaml'
-    ImageParameter:
-      $ref: 'resources/ImageParameter/schema.yaml'
-    ImageMetadata:
-      $ref: 'resources/ImageMetadata/schema.yaml'
-    Task:
-      $ref: 'components/schemas/task.yaml'
-    VpnService:
-      $ref: 'components/schemas/vpnService.yaml'
     SSHKeyPair:
       $ref: 'resources/SSHKeyPair/schema.yaml'
+    Task:
+      $ref: 'components/schemas/task.yaml'
+    VirtualPrivateCloud:
+      $ref: 'components/schemas/vpc.yaml'
+    Volume:
+      $ref: 'components/schemas/volume.yaml'
+    VpnEndpoint:
+      $ref: 'resources/VpnEndpoint/schema.yaml'
+    VpnProfile:
+      $ref: 'resources/VpnProfile/schema.yaml'
+    VpnProfileGroup:
+      $ref: 'components/schemas/vpnProfileGroup.yaml'
+    VpnService:
+      $ref: 'components/schemas/vpnService.yaml'
+  #    When adding a schema, add it to the list alphabetically using the following format:-
+  #    Reference:
+  #      $ref: 'resource/References/schema.yaml'
   parameters:
-    # Query Parameters
-    PerPage:
-      $ref: 'components/parameters/perPage.yaml'
-    Page:
-      $ref: 'components/parameters/page.yaml'
     # Path Parameters
-    VpcId:
-      $ref: 'resources/Vpc/parameters/vpcId.yaml'
-    NetworkPolicyId:
-      $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
-    NetworkRuleId:
-      $ref: 'resources/NetworkRule/parameters/networkRuleId.yaml'
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     DhcpId:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     DiscountPlanId:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
-    VpnProfileGroupId:
-      $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
-    VpnServiceId:
-      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+    #    LbcId:
+    #      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
+    NetworkPolicyId:
+      $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
+    NetworkRulePortId:
+      $ref: 'resources/NetworkRulePort/parameters/networkRulePortId.yaml'
+    NetworkRuleId:
+      $ref: 'resources/NetworkRule/parameters/networkRuleId.yaml'
     RegionId:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
-#    LbcId:
-#      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
-    NetworkRulePortId:
-      $ref: 'resources/NetworkRulePort/parameters/networkRulePortId.yaml'
+    VpcId:
+      $ref: 'resources/Vpc/parameters/vpcId.yaml'
+    VpnEndpointId:
+      $ref: 'resources/VpnEndpoint/parameters/vpnEndpointId.yaml'
+    VpnProfileGroupId:
+      $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
+    VpnServiceId:
+      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
+    #    When adding a path parameter use the following format, and remember to add it alphabetically to the list!
+    #    ReferenceId:
+    #      $ref: 'resources/References/parameters/id.yaml'
+    # Query Parameters
+    PerPage:
+      $ref: 'components/parameters/perPage.yaml'
+    Page:
+      $ref: 'components/parameters/page.yaml'
   responses:
-    NetworkPolicyIdResponse:
-      $ref: 'resources/NetworkPolicy/responses/idResponse.yaml'
-    NetworkRuleIdResponse:
-      $ref: 'resources/NetworkRule/responses/idResponse.yaml'
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
-    VpnProfileIdResponse:
-      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
-    VpnProfileGroupIdResponse:
-      $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
-    VpnServiceIdResponse:
-      $ref: 'resources/VpnService/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
-    RouterIdResponse:
-      $ref: 'resources/Router/responses/idResponse.yaml'
-#    LbcIdResponse:
-#      $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
+    #    LbcIdResponse:
+    #      $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
+    NetworkPolicyIdResponse:
+      $ref: 'resources/NetworkPolicy/responses/idResponse.yaml'
     NetworkRulePortIdResponse:
       $ref: 'resources/NetworkRulePort/responses/idResponse.yaml'
+    NetworkRuleIdResponse:
+      $ref: 'resources/NetworkRule/responses/idResponse.yaml'
+    RouterIdResponse:
+      $ref: 'resources/Router/responses/idResponse.yaml'
+    VpnEndpointIdResponse:
+      $ref: 'resources/VpnEndpoint/responses/idResponse.yaml'
+    VpnProfileGroupIdResponse:
+      $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
+    VpnProfileIdResponse:
+      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
+    VpnServiceIdResponse:
+      $ref: 'resources/VpnService/responses/idResponse.yaml'
+#    When adding a new response id, use the following format
+#    ReferenceIdResponse:
+#      $ref: 'resources/References/responses/idResponse.yaml'
 paths:
-  '/ecloud/v2/vpcs':
-    $ref: 'resources/Vpc/collection.yaml'
-  '/ecloud/v2/vpcs/{vpcId}':
-    $ref: 'resources/Vpc/item.yaml'
-  '/ecloud/v2/vpcs/{vpcId}/deploy-defaults':
-    $ref: 'resources/Vpc/deploy-defaults.yaml'
-  '/ecloud/v2/vpcs/{vpcId}/volumes':
-    $ref: 'resources/Vpc/volumes-collection.yaml'
-  '/ecloud/v2/vpcs/{vpcId}/instances':
-    $ref: 'resources/Vpc/instances-collection.yaml'
-  '/ecloud/v2/vpcs/{vpcId}/tasks':
-    $ref: 'resources/Vpc/tasks-collection.yaml'
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
     $ref: 'resources/AvailabilityZone/item.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/router-throughputs':
     $ref: 'resources/AvailabilityZone/router-throughputs-collection.yaml'
-  '/ecloud/v2/networks':
-    $ref: 'resources/Network/collection.yaml'
-  '/ecloud/v2/networks/{networkId}':
-    $ref: 'resources/Network/item.yaml'
-  '/ecloud/v2/networks/{networkId}/nics':
-    $ref: 'resources/Network/nic-collection.yaml'
-  '/ecloud/v2/networks/{networkId}/tasks':
-    $ref: 'resources/Network/tasks-collection.yaml'
+  '/ecloud/v2/billing-metrics':
+    $ref: 'resources/BillingMetric/public_collection.yaml'
+  '/ecloud/v2/billing-metrics/{billingMetricsId}':
+    $ref: 'resources/BillingMetric/public_item.yaml'
   '/ecloud/v2/dhcps':
     $ref: 'resources/Dhcp/collection.yaml'
   '/ecloud/v2/dhcps/{dhcpId}':
     $ref: 'resources/Dhcp/item.yaml'
   '/ecloud/v2/dhcps/{dhcpId}/tasks':
     $ref: 'resources/Dhcp/tasks-collection.yaml'
-  '/ecloud/v2/vpn-profiles':
-    $ref: 'resources/VpnProfile/collection.yaml'
-  '/ecloud/v2/vpn-profiles/{vpnProfileId}':
-    $ref: 'resources/VpnProfile/item.yaml'
-  '/ecloud/v2/vpn-profile-groups':
-    $ref: 'resources/VpnProfileGroup/collection.yaml'
-  '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':
-    $ref: 'resources/VpnProfileGroup/item.yaml'
-  '/ecloud/v2/vpn-services':
-    $ref: 'resources/VpnService/collection.yaml'
-  '/ecloud/v2/vpn-services/{vpnServiceId}':
-    $ref: 'resources/VpnService/item.yaml'
-  '/ecloud/v2/instances':
-    $ref: 'resources/Instance/collection.yaml'
-  '/ecloud/v2/instances/{instanceId}':
-    $ref: 'resources/Instance/item.yaml'
-  '/ecloud/v2/instances/{instanceId}/credentials':
-    $ref: 'resources/Instance/credentials.yaml'
-  '/ecloud/v2/instances/{instanceId}/volumes':
-    $ref: 'resources/Instance/volumes.yaml'
-  '/ecloud/v2/instances/{instanceId}/nics':
-    $ref: 'resources/Instance/nics.yaml'
-  '/ecloud/v2/instances/{instanceId}/power-on':
-    $ref: 'resources/Instance/poweronoff.yaml'
-  '/ecloud/v2/instances/{instanceId}/power-off':
-    $ref: 'resources/Instance/poweronoff.yaml'
-  '/ecloud/v2/instances/{instanceId}/volume-attach':
-    $ref: 'resources/Instance/volume-attachdetach.yaml'
-  '/ecloud/v2/instances/{instanceId}/volume-detach':
-    $ref: 'resources/Instance/volume-attachdetach.yaml'
-  '/ecloud/v2/instances/{instanceId}/power-reset':
-    $ref: 'resources/Instance/poweronoff.yaml'
-  '/ecloud/v2/instances/{instanceId}/power-shutdown':
-    $ref: 'resources/Instance/poweronoff.yaml'
-  '/ecloud/v2/instances/{instanceId}/power-restart':
-    $ref: 'resources/Instance/poweronoff.yaml'
-  '/ecloud/v2/instances/{instanceId}/lock':
-    $ref: 'resources/Instance/lockUnlock.yaml'
-  '/ecloud/v2/instances/{instanceId}/unlock':
-    $ref: 'resources/Instance/lockUnlock.yaml'
-  '/ecloud/v2/instances/{instanceId}/console-session':
-    $ref: 'resources/Instance/console.yaml'
-  '/ecloud/v2/instances/{instanceId}/tasks':
-    $ref: 'resources/Instance/tasks-collection.yaml'
-  '/ecloud/v2/instances/{instanceId}/create-image':
-    $ref: 'resources/Instance/create-image.yaml'
-  '/ecloud/v2/instances/{instanceId}/migrate':
-    $ref: 'resources/Instance/migrate.yaml'
-  '/ecloud/v2/floating-ips':
-    $ref: 'resources/FloatingIp/collection.yaml'
-  '/ecloud/v2/floating-ips/{fipId}':
-    $ref: 'resources/FloatingIp/item.yaml'
-  '/ecloud/v2/floating-ips/{fipId}/assign':
-    $ref: 'resources/FloatingIp/assign.yaml'
-  '/ecloud/v2/floating-ips/{fipId}/unassign':
-    $ref: 'resources/FloatingIp/unassign.yaml'
-  '/ecloud/v2/floating-ips/{fipId}/tasks':
-    $ref: 'resources/FloatingIp/tasks-collection.yaml'
-  '/ecloud/v2/firewall-rules':
-    $ref: 'resources/FirewallRule/collection.yaml'
-  '/ecloud/v2/firewall-rules/{firewallRuleId}':
-    $ref: 'resources/FirewallRule/item.yaml'
-  '/ecloud/v2/firewall-rules/{firewallRuleId}/ports':
-    $ref: 'resources/FirewallRule/ports.yaml'
+  '/ecloud/v2/discount-plans':
+    $ref: 'resources/DiscountPlan/public_collection.yaml'
+  '/ecloud/v2/discount-plans/{discountPlanId}':
+    $ref: 'resources/DiscountPlan/public_item.yaml'
+  '/ecloud/v2/discount-plans/{discountPlanId}/approve':
+    $ref: 'resources/DiscountPlan/approve-item.yaml'
+  '/ecloud/v2/discount-plans/{discountPlanId}/reject':
+    $ref: 'resources/DiscountPlan/reject-item.yaml'
   '/ecloud/v2/firewall-policies':
     $ref: 'resources/FirewallPolicy/collection.yaml'
   '/ecloud/v2/firewall-policies/{firewallPolicyId}':
@@ -243,62 +186,86 @@ paths:
     $ref: 'resources/FirewallRulePort/collection.yaml'
   '/ecloud/v2/firewall-rule-ports/{firewallRulePortId}':
     $ref: 'resources/FirewallRulePort/item.yaml'
-  '/ecloud/v2/regions':
-    $ref: 'resources/Region/collection.yaml'
-  '/ecloud/v2/regions/{regionId}':
-    $ref: 'resources/Region/item.yaml'
-  '/ecloud/v2/routers':
-    $ref: 'resources/Router/collection.yaml'
-  '/ecloud/v2/routers/{routerId}':
-    $ref: 'resources/Router/item.yaml'
-  '/ecloud/v2/routers/{routerId}/firewall-policies':
-    $ref: 'resources/Router/firewall-policies-collection.yaml'
-  '/ecloud/v2/routers/{routerId}/networks':
-    $ref: 'resources/Router/network-collection.yaml'
-  '/ecloud/v2/routers/{routerId}/vpns':
-    $ref: 'resources/Router/vpns-collection.yaml'
-  '/ecloud/v2/routers/{routerId}/configure-default-policies':
-    $ref: 'resources/Router/configureDefaults.yaml'
-  '/ecloud/v2/routers/{routerId}/tasks':
-    $ref: 'resources/Router/tasks-collection.yaml'
-#  '/ecloud/v2/lbcs':
-#    $ref: 'resources/LoadBalancerCluster/collection.yaml'
-#  '/ecloud/v2/lbcs/{lbcId}':
-#    $ref: 'resources/LoadBalancerCluster/item.yaml'
-  '/ecloud/v2/nics':
-    $ref: 'resources/Nic/public_collection.yaml'
-  '/ecloud/v2/nics/{nicId}':
-    $ref: 'resources/Nic/public_item.yaml'
-  '/ecloud/v2/nics/{nicId}/tasks':
-    $ref: 'resources/Nic/tasks-collection.yaml'
-  '/ecloud/v2/volumes':
-    $ref: 'resources/Volume/collection.yaml'
-  '/ecloud/v2/volumes/{volumeId}':
-    $ref: 'resources/Volume/item.yaml'
-  '/ecloud/v2/volumes/{volumeId}/instances':
-    $ref: 'resources/Volume/instance.yaml'
-  '/ecloud/v2/volumes/{volumeId}/tasks':
-    $ref: 'resources/Volume/tasks-collection.yaml'
-  '/ecloud/v2/support':
-    $ref: 'resources/VpcSupport/collection.yaml'
-  '/ecloud/v2/support/{supportId}':
-    $ref: 'resources/VpcSupport/item.yaml'
-  '/ecloud/v2/billing-metrics':
-    $ref: 'resources/BillingMetric/public_collection.yaml'
-  '/ecloud/v2/billing-metrics/{billingMetricsId}':
-    $ref: 'resources/BillingMetric/public_item.yaml'
-  '/ecloud/v2/discount-plans':
-    $ref: 'resources/DiscountPlan/public_collection.yaml'
-  '/ecloud/v2/discount-plans/{discountPlanId}':
-    $ref: 'resources/DiscountPlan/public_item.yaml'
-  '/ecloud/v2/discount-plans/{discountPlanId}/approve':
-    $ref: 'resources/DiscountPlan/approve-item.yaml'
-  '/ecloud/v2/discount-plans/{discountPlanId}/reject':
-    $ref: 'resources/DiscountPlan/reject-item.yaml'
-  '/ecloud/v2/router-throughputs':
-    $ref: 'resources/RouterThroughput/collection.yaml'
-  '/ecloud/v2/router-throughputs/{routerThroughputId}':
-    $ref: 'resources/RouterThroughput/item.yaml'
+  '/ecloud/v2/firewall-rules':
+    $ref: 'resources/FirewallRule/collection.yaml'
+  '/ecloud/v2/firewall-rules/{firewallRuleId}':
+    $ref: 'resources/FirewallRule/item.yaml'
+  '/ecloud/v2/firewall-rules/{firewallRuleId}/ports':
+    $ref: 'resources/FirewallRule/ports.yaml'
+  '/ecloud/v2/floating-ips':
+    $ref: 'resources/FloatingIp/collection.yaml'
+  '/ecloud/v2/floating-ips/{fipId}':
+    $ref: 'resources/FloatingIp/item.yaml'
+  '/ecloud/v2/floating-ips/{fipId}/assign':
+    $ref: 'resources/FloatingIp/assign.yaml'
+  '/ecloud/v2/floating-ips/{fipId}/tasks':
+    $ref: 'resources/FloatingIp/tasks-collection.yaml'
+  '/ecloud/v2/floating-ips/{fipId}/unassign':
+    $ref: 'resources/FloatingIp/unassign.yaml'
+  #  '/ecloud/v2/hosts':
+  #    $ref: 'resources/Host/collection.yaml'
+  #  '/ecloud/v2/hosts/{id}':
+  #    $ref: 'resources/Host/item.yaml'
+  #  '/ecloud/v2/hosts/{id}/tasks':
+  #    $ref: 'resources/Host/tasks-collection.yaml'
+  #  '/ecloud/v2/host-specs':
+  #    $ref: 'resources/HostSpec/collection.yaml'
+  #  '/ecloud/v2/host-specs/{hostSpecId}':
+  #    $ref: 'resources/HostSpec/item.yaml'
+  #  '/ecloud/v2/host-groups':
+  #    $ref: 'resources/HostGroup/collection.yaml'
+  #  '/ecloud/v2/host-groups/{id}':
+  #    $ref: 'resources/HostGroup/item.yaml'
+  #  '/ecloud/v2/host-groups/{id}/tasks':
+  #    $ref: 'resources/HostGroup/tasks-collection.yaml'
+  '/ecloud/v2/images':
+    $ref: 'resources/Image/collection.yaml'
+  '/ecloud/v2/images/{id}':
+    $ref: 'resources/Image/item.yaml'
+  '/ecloud/v2/image/{id}/metadata':
+    $ref: 'resources/Image/metadata-collection.yaml'
+  '/ecloud/v2/image/{id}/parameters':
+    $ref: 'resources/Image/parameters-collection.yaml'
+  '/ecloud/v2/instances':
+    $ref: 'resources/Instance/collection.yaml'
+  '/ecloud/v2/instances/{instanceId}':
+    $ref: 'resources/Instance/item.yaml'
+  '/ecloud/v2/instances/{instanceId}/console-session':
+    $ref: 'resources/Instance/console.yaml'
+  '/ecloud/v2/instances/{instanceId}/create-image':
+    $ref: 'resources/Instance/create-image.yaml'
+  '/ecloud/v2/instances/{instanceId}/credentials':
+    $ref: 'resources/Instance/credentials.yaml'
+  '/ecloud/v2/instances/{instanceId}/lock':
+    $ref: 'resources/Instance/lockUnlock.yaml'
+  '/ecloud/v2/instances/{instanceId}/migrate':
+    $ref: 'resources/Instance/migrate.yaml'
+  '/ecloud/v2/instances/{instanceId}/nics':
+    $ref: 'resources/Instance/nics.yaml'
+  '/ecloud/v2/instances/{instanceId}/power-off':
+    $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/power-on':
+    $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/power-reset':
+    $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/power-restart':
+    $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/power-shutdown':
+    $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/tasks':
+    $ref: 'resources/Instance/tasks-collection.yaml'
+  '/ecloud/v2/instances/{instanceId}/unlock':
+    $ref: 'resources/Instance/lockUnlock.yaml'
+  '/ecloud/v2/instances/{instanceId}/volume-attach':
+    $ref: 'resources/Instance/volume-attachdetach.yaml'
+  '/ecloud/v2/instances/{instanceId}/volume-detach':
+    $ref: 'resources/Instance/volume-attachdetach.yaml'
+  '/ecloud/v2/instances/{instanceId}/volumes':
+    $ref: 'resources/Instance/volumes.yaml'
+  #  '/ecloud/v2/lbcs':
+  #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
+  #  '/ecloud/v2/lbcs/{lbcId}':
+  #    $ref: 'resources/LoadBalancerCluster/item.yaml'
   '/ecloud/v2/network-policies':
     $ref: 'resources/NetworkPolicy/collection.yaml'
   '/ecloud/v2/network-policies/{networkPolicyId}':
@@ -315,31 +282,88 @@ paths:
     $ref: 'resources/NetworkRule/collection.yaml'
   '/ecloud/v2/network-rules/{networkRuleId}':
     $ref: 'resources/NetworkRule/item.yaml'
-#  '/ecloud/v2/hosts':
-#    $ref: 'resources/Host/collection.yaml'
-#  '/ecloud/v2/hosts/{id}':
-#    $ref: 'resources/Host/item.yaml'
-#  '/ecloud/v2/hosts/{id}/tasks':
-#    $ref: 'resources/Host/tasks-collection.yaml'
-#  '/ecloud/v2/host-specs':
-#    $ref: 'resources/HostSpec/collection.yaml'
-#  '/ecloud/v2/host-specs/{hostSpecId}':
-#    $ref: 'resources/HostSpec/item.yaml'
-#  '/ecloud/v2/host-groups':
-#    $ref: 'resources/HostGroup/collection.yaml'
-#  '/ecloud/v2/host-groups/{id}':
-#    $ref: 'resources/HostGroup/item.yaml'
-#  '/ecloud/v2/host-groups/{id}/tasks':
-#    $ref: 'resources/HostGroup/tasks-collection.yaml'
-  '/ecloud/v2/images':
-    $ref: 'resources/Image/collection.yaml'
-  '/ecloud/v2/images/{id}':
-    $ref: 'resources/Image/item.yaml'
-  '/ecloud/v2/image/{id}/parameters':
-    $ref: 'resources/Image/parameters-collection.yaml'
-  '/ecloud/v2/image/{id}/metadata':
-    $ref: 'resources/Image/metadata-collection.yaml'
+  '/ecloud/v2/networks':
+    $ref: 'resources/Network/collection.yaml'
+  '/ecloud/v2/networks/{networkId}':
+    $ref: 'resources/Network/item.yaml'
+  '/ecloud/v2/networks/{networkId}/nics':
+    $ref: 'resources/Network/nic-collection.yaml'
+  '/ecloud/v2/networks/{networkId}/tasks':
+    $ref: 'resources/Network/tasks-collection.yaml'
+  '/ecloud/v2/nics':
+    $ref: 'resources/Nic/public_collection.yaml'
+  '/ecloud/v2/nics/{nicId}':
+    $ref: 'resources/Nic/public_item.yaml'
+  '/ecloud/v2/nics/{nicId}/tasks':
+    $ref: 'resources/Nic/tasks-collection.yaml'
+  '/ecloud/v2/regions':
+    $ref: 'resources/Region/collection.yaml'
+  '/ecloud/v2/regions/{regionId}':
+    $ref: 'resources/Region/item.yaml'
+  '/ecloud/v2/routers':
+    $ref: 'resources/Router/collection.yaml'
+  '/ecloud/v2/routers/{routerId}':
+    $ref: 'resources/Router/item.yaml'
+  '/ecloud/v2/routers/{routerId}/configure-default-policies':
+    $ref: 'resources/Router/configureDefaults.yaml'
+  '/ecloud/v2/routers/{routerId}/firewall-policies':
+    $ref: 'resources/Router/firewall-policies-collection.yaml'
+  '/ecloud/v2/routers/{routerId}/networks':
+    $ref: 'resources/Router/network-collection.yaml'
+  '/ecloud/v2/routers/{routerId}/tasks':
+    $ref: 'resources/Router/tasks-collection.yaml'
+  '/ecloud/v2/routers/{routerId}/vpns':
+    $ref: 'resources/Router/vpns-collection.yaml'
+  '/ecloud/v2/router-throughputs':
+    $ref: 'resources/RouterThroughput/collection.yaml'
+  '/ecloud/v2/router-throughputs/{routerThroughputId}':
+    $ref: 'resources/RouterThroughput/item.yaml'
   '/ecloud/v2/ssh-key-pairs':
     $ref: 'resources/SSHKeyPair/collection.yaml'
   '/ecloud/v2/ssh-key-pairs/{keypairId}':
     $ref: 'resources/SSHKeyPair/item.yaml'
+  '/ecloud/v2/support':
+    $ref: 'resources/VpcSupport/collection.yaml'
+  '/ecloud/v2/support/{supportId}':
+    $ref: 'resources/VpcSupport/item.yaml'
+  '/ecloud/v2/vpcs':
+    $ref: 'resources/Vpc/collection.yaml'
+  '/ecloud/v2/vpcs/{vpcId}':
+    $ref: 'resources/Vpc/item.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/deploy-defaults':
+    $ref: 'resources/Vpc/deploy-defaults.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/instances':
+    $ref: 'resources/Vpc/instances-collection.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/tasks':
+    $ref: 'resources/Vpc/tasks-collection.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/volumes':
+    $ref: 'resources/Vpc/volumes-collection.yaml'
+  '/ecloud/v2/volumes':
+    $ref: 'resources/Volume/collection.yaml'
+  '/ecloud/v2/volumes/{volumeId}':
+    $ref: 'resources/Volume/item.yaml'
+  '/ecloud/v2/volumes/{volumeId}/instances':
+    $ref: 'resources/Volume/instance.yaml'
+  '/ecloud/v2/volumes/{volumeId}/tasks':
+    $ref: 'resources/Volume/tasks-collection.yaml'
+  '/ecloud/v2/vpn-endpoints':
+    $ref: 'resources/VpnEndpoint/collection.yaml'
+  '/ecloud/v2/vpn-endpoints/{vpnEndpointId}':
+    $ref: 'resources/VpnEndpoint/item.yaml'
+  '/ecloud/v2/vpn-profile-groups':
+    $ref: 'resources/VpnProfileGroup/collection.yaml'
+  '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':
+    $ref: 'resources/VpnProfileGroup/item.yaml'
+  '/ecloud/v2/vpn-profiles':
+    $ref: 'resources/VpnProfile/collection.yaml'
+  '/ecloud/v2/vpn-profiles/{vpnProfileId}':
+    $ref: 'resources/VpnProfile/item.yaml'
+  '/ecloud/v2/vpn-services':
+    $ref: 'resources/VpnService/collection.yaml'
+  '/ecloud/v2/vpn-services/{vpnServiceId}':
+    $ref: 'resources/VpnService/item.yaml'
+# When adding endpoints, add them to the list alphabetically using the following format:-
+#  '/ecloud/v2/references':
+#    $ref: 'resources/Reference/collection.yaml'
+#  '/ecloud/v2/references/{referenceId}':
+#    $ref: 'resources/Reference/item.yaml'

@@ -33,18 +33,19 @@ class VpnEndpointController extends BaseController
     public function store(CreateRequest $request)
     {
         $vpnEndpoint = new VpnEndpoint(
-            $request->only(['name', 'floating_ip_id'])
+            $request->only(['name', 'vpn_service_id'])
         );
         $vpnEndpoint->save();
-        $vpnEndpoint->vpnServices()->sync([$request->get('vpn_service_id')]);
-        $task = $vpnEndpoint->syncSave();
+        $task = $vpnEndpoint->syncSave([
+            'floating_ip_id' => $request->get('floating_ip_id'),
+        ]);
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $vpnEndpointId)
     {
         $vpnEndpoint = VpnEndpoint::forUser(Auth::user())->findOrFail($vpnEndpointId);
-        $vpnEndpoint->fill($request->only(['name', 'floating_ip_id']));
+        $vpnEndpoint->fill($request->only(['name']));
         $task = $vpnEndpoint->syncSave();
         return $this->responseIdMeta($request, $vpnEndpoint->id, 202, $task->id);
     }
@@ -52,8 +53,7 @@ class VpnEndpointController extends BaseController
     public function destroy(Request $request, string $vpnEndpointId)
     {
         $vpnEndpoint = VpnEndpoint::forUser($request->user())->findOrFail($vpnEndpointId);
-        $vpnEndpoint->vpnServices()->detach();
-        $vpnEndpoint->delete();
-        return response('', 204);
+        $task = $vpnEndpoint->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 }

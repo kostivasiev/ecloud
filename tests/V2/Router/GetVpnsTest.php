@@ -8,7 +8,6 @@ use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Models\V2\VpnService;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetVpnsTest extends TestCase
@@ -53,4 +52,5 @@ class GetVpnsTest extends TestCase
             ])
             ->assertResponseStatus(200);
     }
+
 }
