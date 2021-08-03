@@ -35,6 +35,50 @@ class CreateTest extends TestCase
         ]);
     }
 
+    public function testRestrictedSubnetFails()
+    {
+        $this->post(
+            '/v2/networks',
+            [
+                'name' => 'Manchester Network',
+                'router_id' => $this->router->id,
+                'subnet' => '192.168.0.0/16'
+            ],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The subnet must be a valid private CIDR range',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testRestrictedSubnetPasses()
+    {
+        $this->post(
+            '/v2/networks',
+            [
+                'name' => 'Manchester Network',
+                'router_id' => $this->router->id,
+                'subnet' => '192.168.0.0/16'
+            ],
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )  ->seeInDatabase(
+            'networks',
+            [
+                'name' => 'Manchester Network',
+                'router_id' => $this->router->id,
+                'subnet' => '192.168.0.0/16'
+            ],
+            'ecloud'
+        )
+            ->assertResponseStatus(202);
+    }
+
     public function testValidDataSucceeds()
     {
         $this->post(

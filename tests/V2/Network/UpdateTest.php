@@ -25,4 +25,22 @@ class UpdateTest extends TestCase
         $network = Network::findOrFail($this->network()->id);
         $this->assertEquals('expected', $network->name);
     }
+
+    public function testRestrictedSubnetFails()
+    {
+        $this->patch(
+            '/v2/networks/' . $this->network()->id,
+            [
+                'name' => 'expected',
+                'subnet' => '192.168.0.0/24'
+            ],
+            [
+                'X-consumer-custom-id' => '1-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The subnet must be a valid private CIDR range',
+        ])->assertResponseStatus(422);
+    }
 }
