@@ -20,6 +20,7 @@ class Update extends Job
 
     public function handle()
     {
-        // @todo - See https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/911
+        $this->task->completed = true;
+        $this->task->save();
     }
 }
