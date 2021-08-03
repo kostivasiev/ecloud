@@ -19,6 +19,6 @@ class IsRestrictedSubnet implements Rule
 
     public function message()
     {
-        return 'The :attribute must be a valid private CIDR range';
+        return 'The :attribute is in a restricted CIDR range';
     }
 }

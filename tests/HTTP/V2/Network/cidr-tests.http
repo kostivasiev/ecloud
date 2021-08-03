@@ -26,7 +26,7 @@ Content-Type:  application/json
 > {%
 client.test("Test 192.168.0.0/16 is disallowed", function () {
     client.assert(response.status === 422, "Response was not 422");
-    client.assert(response.body.errors[1].detail === "The subnet must be a valid private CIDR range", "Error message not found");
+    client.assert(response.body.errors[1].detail === "The subnet is in a restricted CIDR range", "Error message not found");
 });
 %}
 
