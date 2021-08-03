@@ -40,7 +40,6 @@ class VpnSessionTestData extends Seeder
                 'id' => 'vpne-aaaaaaaa',
                 'name' => 'Test VPN Endpoint',
 //                'vpn_service_id' => 'vpn-aaaaaaaa',
-                'fip_id' => 'fip-aaaaaaaa',
             ]);
         VpnSession::on('ecloud')
             ->create([

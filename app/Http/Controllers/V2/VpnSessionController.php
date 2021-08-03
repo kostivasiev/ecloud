@@ -4,11 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\VpnSession\CreateRequest;
 use App\Http\Requests\V2\VpnSession\UpdateRequest;
-use App\Models\V2\VpnEndpoint;
-use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
-use App\Resources\V2\VpnEndpointResource;
-use App\Resources\V2\VpnServiceResource;
 use App\Resources\V2\VpnSessionResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
