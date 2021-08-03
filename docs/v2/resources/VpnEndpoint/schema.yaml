@@ -14,7 +14,7 @@ properties:
     readOnly: false
   floating_ip_id:
     type: string
-    required: true
+    required: false
     example: 'fip-2b66bb79'
     readOnly: false
   created_at:
