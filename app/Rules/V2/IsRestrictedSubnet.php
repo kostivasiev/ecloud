@@ -21,5 +21,4 @@ class IsRestrictedSubnet implements Rule
     {
         return 'The :attribute must be a valid private CIDR range';
     }
-
 }
