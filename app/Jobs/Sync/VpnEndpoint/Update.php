@@ -2,6 +2,7 @@
 
 namespace App\Jobs\Sync\VpnEndpoint;
 
+use App\Jobs\FloatingIp\CreateFloatingIp;
 use App\Jobs\Job;
 use App\Jobs\Nsx\VpnEndpoint\CreateEndpoint;
 use App\Models\V2\Task;
@@ -12,7 +13,7 @@ class Update extends Job
 {
     use TaskableBatch, LoggableTaskJob;
 
-    private $task;
+    private Task $task;
 
     public function __construct(Task $task)
     {
@@ -23,7 +24,8 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
-                new CreateEndpoint($this->task->resource),
+                new CreateFloatingIp($this->task),
+                new CreateEndpoint($this->task),
             ],
         ])->dispatch();
     }
