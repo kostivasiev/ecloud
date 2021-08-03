@@ -355,6 +355,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
             ]);
         }
         return $this->floatingIp;

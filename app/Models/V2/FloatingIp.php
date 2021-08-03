@@ -16,7 +16,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeable
+class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
@@ -29,7 +29,8 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         'id',
         'name',
         'vpc_id',
-        'deleted'
+        'availability_zone_id',
+        'deleted',
     ];
 
     protected $dispatchesEvents = [
@@ -44,6 +45,11 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
+    }
+
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
     }
 
     public function sourceNat()
@@ -66,13 +72,6 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         });
     }
 
-    public function scopeWithRegion($query, $regionId)
-    {
-        return $query->whereHas('vpc.region', function ($query) use ($regionId) {
-            $query->where('id', '=', $regionId);
-        });
-    }
-
     public function resource()
     {
         return $this->morphTo();
@@ -88,6 +87,7 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
+            $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('ip_address', Filter::$stringDefaults),
             $factory->create('resource_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -106,6 +106,7 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpc_id'),
+            $factory->create('availability_zone_id'),
             $factory->create('ip_address'),
             $factory->create('resource_id'),
             $factory->create('created_at'),
@@ -133,6 +134,7 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
             'id' => 'id',
             'name' => 'name',
             'vpc_id' => 'vpc_id',
+            'availability_zone_id' => 'availability_zone_id',
             'ip_address' => 'ip_address',
             'resource_id' => 'resource_id',
             'created_at' => 'created_at',

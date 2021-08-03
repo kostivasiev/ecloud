@@ -2,14 +2,7 @@
 
 namespace Tests\unit\Traits\V2;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Nic;
-use App\Rules\V2\IpAvailable;
-use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
-use Faker\Factory as Faker;
-use Illuminate\Database\QueryException;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DefaultNameTest extends TestCase

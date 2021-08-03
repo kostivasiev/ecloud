@@ -1,0 +1,48 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/PerPage'
+    - $ref: '../../public-openapi.yaml#/components/parameters/Page'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: 'schema.yaml'
+              meta:
+                allOf:
+                  - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpn-endpoints?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpn-endpoints?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpn-endpoints?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpn-endpoints?page=2'
+  tags:
+    - Vpn Endpoints
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: 'schema.yaml'
+  responses:
+    202:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Vpn Endpoints

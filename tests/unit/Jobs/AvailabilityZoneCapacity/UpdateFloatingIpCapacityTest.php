@@ -3,16 +3,13 @@
 namespace Tests\unit\Jobs\AvailabilityZoneCapacity;
 
 use App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity;
-use App\Jobs\FloatingIp\AllocateIp;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\FloatingIp;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateFloatingIpCapacityTest extends TestCase
@@ -26,7 +23,6 @@ class UpdateFloatingIpCapacityTest extends TestCase
     {
         parent::setUp();
 
-        //$this->mockAdminClient = \Mockery::mock(\UKFast\Admin\Devices\AdminClient::class);
         $this->mockNetworkAdminClient = \Mockery::mock(\UKFast\Admin\Networking\AdminClient::class);
         $this->mockAdminIpRangeClient = \Mockery::mock(\UKFast\Admin\Networking\IpRangeClient::class);
 
@@ -45,11 +41,13 @@ class UpdateFloatingIpCapacityTest extends TestCase
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test1',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.5',
             ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test2',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.6',
             ]);
 
@@ -118,16 +116,19 @@ class UpdateFloatingIpCapacityTest extends TestCase
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test1',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.5',
             ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test2',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.6',
             ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test3',
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.110.6',
             ]);
 

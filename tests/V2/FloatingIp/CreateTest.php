@@ -20,7 +20,8 @@ class CreateTest extends TestCase
         Event::fake([\App\Events\V2\Task\Created::class]);
 
         $data = [
-            'vpc_id' => $this->vpc()->id
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id
         ];
 
         $this->post('/v2/floating-ips', $data)

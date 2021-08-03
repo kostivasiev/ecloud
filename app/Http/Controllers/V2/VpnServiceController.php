@@ -4,7 +4,9 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\VpnService\CreateRequest;
 use App\Http\Requests\V2\VpnService\UpdateRequest;
+use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
+use App\Resources\V2\VpnEndpointResource;
 use App\Resources\V2\VpnServiceResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -49,6 +51,17 @@ class VpnServiceController extends BaseController
     public function destroy(Request $request, string $vpnServiceId)
     {
         VpnService::forUser($request->user())->findOrFail($vpnServiceId)->delete();
-        return response('', 202);
+        return response('', 204);
+    }
+
+    public function endpoints(Request $request, QueryTransformer $queryTransformer, string $vpnServiceId)
+    {
+        $collection = VpnService::forUser($request->user())->findOrFail($vpnServiceId)->vpnEndpoints();
+        $queryTransformer->config(VpnEndpoint::class)
+            ->transform($collection);
+
+        return VpnEndpointResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

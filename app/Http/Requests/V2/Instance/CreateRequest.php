@@ -13,6 +13,7 @@ use App\Rules\V2\FloatingIp\IsAssigned;
 use App\Rules\V2\HasHosts;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
+use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\IsValidRamMultiple;
 use UKFast\FormRequests\FormRequest;
 
@@ -95,7 +96,8 @@ class CreateRequest extends FormRequest
                 'required_without:requires_floating_ip',
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
-                new IsAssigned()
+                new IsAssigned(),
+                new IsSameAvailabilityZone($this->request->get('network_id'))
             ],
             'requires_floating_ip' => [
                 'sometimes',

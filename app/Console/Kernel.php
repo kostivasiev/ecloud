@@ -31,7 +31,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Billing\ProductCreate::class,
         \App\Console\Commands\Image\Populate::class,
         \App\Console\Commands\Orchestrator\ScheduledDeploy::class,
-        \App\Console\Commands\FloatingIp\SetPolymorphicRelationship::class
+        \App\Console\Commands\FloatingIp\SetPolymorphicRelationship::class,
+        \App\Console\Commands\FloatingIp\PopulateAvailabilityZoneId::class,
     ];
 
     /**

@@ -5,7 +5,6 @@ namespace App\Models\V2;
 use App\Events\V2\Router\Creating;
 use App\Events\V2\Router\Deleted;
 use App\Traits\V2\CustomKey;
-use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
@@ -28,7 +27,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Router extends Model implements Filterable, Sortable, ResellerScopeable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, DeletionRules, Syncable, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'rtr';
     public $incrementing = false;

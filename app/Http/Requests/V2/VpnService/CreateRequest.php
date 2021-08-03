@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class CreateVpnsRequest
+ * Class Create
  * @package App\Http\Requests\V2
  */
 class CreateRequest extends FormRequest

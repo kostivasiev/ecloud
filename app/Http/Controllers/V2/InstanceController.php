@@ -8,15 +8,12 @@ use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Http\Requests\V2\Instance\VolumeDetachRequest;
-use App\Jobs\Instance\GuestRestart;
-use App\Jobs\Instance\GuestShutdown;
-use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\PowerOn;
-use App\Jobs\Instance\PowerReset;
 use App\Models\V2\Credential;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
+use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
@@ -26,7 +23,6 @@ use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
-use App\Support\Sync;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
@@ -96,12 +92,14 @@ class InstanceController extends BaseController
         ]));
 
         $image = Image::forUser(Auth::user())->findOrFail($request->input('image_id'));
+        $network = Network::forUser(Auth::user())->findOrFail($request->input('network_id'));
+        $instance->availabilityZone()->associate($network->router->availabilityZone);
 
         $instance->locked = $request->input('locked', false);
         $instance->deploy_data = [
             'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.' . strtolower($image->platform) . '.min')),
             'volume_iops' => $request->input('volume_iops', config('volume.iops.default')),
-            'network_id' => $request->input('network_id'),
+            'network_id' => $request->input('network_id', $network->id),
             'floating_ip_id' => $request->input('floating_ip_id'),
             'requires_floating_ip' => $request->input('requires_floating_ip', false),
             'image_data' => $request->input('image_data'),
