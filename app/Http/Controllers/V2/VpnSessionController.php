@@ -42,9 +42,9 @@ class VpnSessionController extends BaseController
             'remote_networks',
             'local_networks',
         ]));
-        $vpnSession->save();
+        $task = $vpnSession->syncSave();
 
-        return $this->responseIdMeta($request, $vpnSession->id, 202);
+        return $this->responseIdMeta($request, $vpnSession->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $vpnSessionId)
@@ -58,14 +58,15 @@ class VpnSessionController extends BaseController
             'remote_networks',
             'local_networks',
         ]));
-        $vpnSession->save();
+        $task = $vpnSession->syncSave();
 
-        return $this->responseIdMeta($request, $vpnSession->id, 202);
+        return $this->responseIdMeta($request, $vpnSession->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $vpnSessionId)
     {
-        VpnSession::forUser($request->user())->findOrFail($vpnSessionId)->delete();
-        return response('', 204);
+        $vpnSession = VpnSession::forUser($request->user())->findOrFail($vpnSessionId);
+        $task = $vpnSession->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 }
