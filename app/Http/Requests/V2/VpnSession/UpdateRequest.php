@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\VpnSession;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnEndpointVpnSession;
 use App\Models\V2\VpnProfileGroup;
+use App\Rules\V2\EitherOrNotBoth;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidCidrNetworkCsvString;
@@ -39,12 +40,14 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string',
+                new EitherOrNotBoth('local_networks'),
                 new ValidCidrNetworkCsvString()
             ],
             'local_networks' => [
                 'sometimes',
                 'required',
                 'string',
+                new EitherOrNotBoth('remote_networks'),
                 new ValidCidrNetworkCsvString()
             ],
         ];

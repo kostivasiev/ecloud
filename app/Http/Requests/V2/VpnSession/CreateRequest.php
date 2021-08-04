@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\VpnSession;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
+use App\Rules\V2\EitherOrNotBoth;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidCidrNetworkCsvString;
@@ -18,7 +19,7 @@ class CreateRequest extends FormRequest
         return true;
     }
 
-    protected function rules()
+    public function rules()
     {
         return [
             'name' => 'sometimes|required|string',
@@ -39,7 +40,7 @@ class CreateRequest extends FormRequest
                 'string',
                 Rule::exists(VpnEndpoint::class, 'id')->whereNull('deleted_at'),
                 'distinct',
-//                new ExistsForUser(VpnEndpoint::class),@todo - needs uncommenting and testing when #908 in master
+                new ExistsForUser(VpnEndpoint::class),
                 new IsResourceAvailable(VpnEndpoint::class),
             ],
             'remote_ip' => [
@@ -48,13 +49,17 @@ class CreateRequest extends FormRequest
                 new ValidIpv4()
             ],
             'remote_networks' => [
+                'sometimes',
                 'required',
                 'string',
+                new EitherOrNotBoth('local_networks'),
                 new ValidCidrNetworkCsvString()
             ],
             'local_networks' => [
+                'sometimes',
                 'required',
                 'string',
+                new EitherOrNotBoth('remote_networks'),
                 new ValidCidrNetworkCsvString()
             ],
         ];
