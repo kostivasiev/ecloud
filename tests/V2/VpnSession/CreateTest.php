@@ -15,26 +15,22 @@ class CreateTest extends TestCase
     protected VpnEndpoint $vpnEndpoint;
     protected VpnSession $vpnSession;
     protected VpnProfileGroup $vpnProfileGroup;
-    protected FloatingIp $floatingIp;
 
     public function setUp(): void
     {
         parent::setUp();
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->floatingIp = FloatingIp::withoutEvents(function () {
-            return factory(FloatingIp::class)->create([
-                'id' => 'fip-abc123xyz',
-                'vpc_id' => $this->vpc()->id,
-            ]);
-        });
         $this->vpnService = factory(VpnService::class)->create([
             'router_id' => $this->router()->id,
         ]);
 
-        $this->vpnEndpoint = factory(VpnEndpoint::class)->create();
-        $this->floatingIp->resource()->associate($this->vpnEndpoint);
-        $this->floatingIp->save();
+        $this->vpnEndpoint = factory(VpnEndpoint::class)->create([
+            'name' => 'Create Test',
+            'vpn_service_id' => $this->vpnService->id,
+        ]);
+        $this->floatingIp()->resource()->associate($this->vpnEndpoint);
+        $this->floatingIp()->save();
 
         $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
             'ike_profile_id' => 'ike-abc123xyz',
@@ -68,7 +64,6 @@ class CreateTest extends TestCase
                 'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '172.12.23.11/32',
-                'local_networks' => '172.11.11.11/32,176.18.22.11/24',
             ]
         )->assertResponseStatus(202);
     }
@@ -84,7 +79,6 @@ class CreateTest extends TestCase
                 'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '172.12.23.11/32',
-                'local_networks' => '172.11.11.11/32,176.18.22.11/24',
             ]
         )->seeJson(
             [
@@ -120,6 +114,12 @@ class CreateTest extends TestCase
             'source' => 'remote_networks',
         ])->seeJson([
             'detail' => 'The local networks must contain a valid comma separated list of CIDR subnets',
+            'source' => 'local_networks',
+        ])->seeJson([
+            'detail' => 'Either the remote networks value or the local_networks value can be used, but not both',
+            'source' => 'remote_networks',
+        ])->seeJson([
+            'detail' => 'Either the local networks value or the remote_networks value can be used, but not both',
             'source' => 'local_networks',
         ])->assertResponseStatus(422);
     }
