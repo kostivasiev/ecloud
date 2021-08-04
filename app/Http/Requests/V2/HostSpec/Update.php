@@ -12,7 +12,8 @@ class Update extends FormRequest
             'name' => [
                 'sometimes',
                 'required',
-                'string'
+                'string',
+                'max:255'
             ],
             'cpu_sockets' => [
                 'sometimes',

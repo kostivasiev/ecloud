@@ -13,7 +13,7 @@ class Create extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string|max:50',
+            'name' => 'nullable|string|max:255',
             'network_rule_id' => [
                 'bail',
                 'required',

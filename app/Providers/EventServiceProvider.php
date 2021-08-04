@@ -77,15 +77,6 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // FloatingIp
-        \App\Events\V2\FloatingIp\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\FloatingIp\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\FloatingIp\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\FloatingIp\Deleted::class => [
             \App\Listeners\V2\AvailabilityZoneCapacity\UpdateFloatingIpCapacity::class,
             \App\Listeners\V2\BillingMetric\End::class,
@@ -105,50 +96,19 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Instance\Creating::class => [
             \App\Listeners\V2\Instance\DefaultPlatform::class,
         ],
-        \App\Events\V2\Instance\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Instance\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Instance\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\Instance\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
-        ],
-
-        // LoadBalancerCluster
-        \App\Events\V2\LoadBalancerCluster\Creating::class => [
         ],
 
         // Network
         \App\Events\V2\Network\Creating::class => [
             \App\Listeners\V2\Network\DefaultSubnet::class,
         ],
-        \App\Events\V2\Network\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Network\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Network\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\Network\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // Nat
-        \App\Events\V2\Nat\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Nat\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Nat\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\Nat\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],

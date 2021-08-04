@@ -3,6 +3,8 @@
 namespace Database\Seeders;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\AvailabilityZoneCapacity;
+use App\Models\V2\Credential;
 use Illuminate\Database\Seeder;
 
 class AvailabilityZoneSeeder extends Seeder
@@ -27,6 +29,41 @@ class AvailabilityZoneSeeder extends Seeder
             'is_public' => true,
         ]);
 
-        // TODO az credentials
+        /**
+         * Credentials
+         */
+        factory(Credential::class)->create([
+            'id' => 'cred-kingpin',
+            'name' => 'Kingpin (G0)',
+            'resource_id'=> 'az-aaaaaaaa',
+            'host'=> 'https://mgmt-20.ecloud-service.ukfast.co.uk',
+            'username'=> 'kingpinapi',
+            'password'=> env('KINGPIN_PASSWORD'),
+            'port'=> '8443',
+            'is_hidden'=> false,
+        ]);
+
+        factory(Credential::class)->create([
+            'id' => 'cred-nsx',
+            'name' => 'NSX',
+            'resource_id'=> 'az-aaaaaaaa',
+            'host'=> 'https://185.197.63.88',
+            'username'=> 'ecloud.api@ecloudgov.dev',
+            'password'=> env('NSX_PASSWORD'),
+            'port'=> null,
+            'is_hidden'=> false,
+        ]);
+
+        /**
+         * Capacity Alerting
+         */
+        factory(AvailabilityZoneCapacity::class)->create([
+            'id' => 'azc-aaaaaaaa',
+            'availability_zone_id' => 'az-aaaaaaaa',
+            'type' => 'floating_ip',
+            'alert_warning' => 60,
+            'alert_critical' => 80,
+            'max' => 95,
+        ]);
     }
 }

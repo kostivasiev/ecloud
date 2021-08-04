@@ -3,8 +3,10 @@
 namespace App\Http\Requests\V2\FloatingIp;
 
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsSameAvailabilityZone;
 use UKFast\FormRequests\FormRequest;
 
 class AssignRequest extends FormRequest
@@ -27,10 +29,6 @@ class AssignRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => [
-                'unique:ecloud.nats,destination_id,NULL,id,deleted_at,NULL',
-                'unique:ecloud.nats,source_id,NULL,id,deleted_at,NULL'
-            ],
             'resource_id' =>
                 [
                     'required',
@@ -38,7 +36,8 @@ class AssignRequest extends FormRequest
                     new ExistsForUser([
                         Nic::class,
                         FloatingIp::class,
-                    ])
+                    ]),
+                    new IsSameAvailabilityZone(app('request')->route('fipId'))
                 ],
         ];
     }

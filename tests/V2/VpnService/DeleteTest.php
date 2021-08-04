@@ -31,5 +31,6 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertResponseStatus(202);
+        Event::assertDispatched(Created::class);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\DiscountPlan;
 
 use App\Rules\V2\CommitmentIsGreater;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -22,6 +23,12 @@ class Update extends FormRequest
         $discountPlanId = app('request')->route('discountPlanId');
         $rules = [
             'name' => 'sometimes|required|string|max:255',
+            'orderform_id' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:36',
+            ],
             'commitment_amount' => [
                 'sometimes',
                 'required',

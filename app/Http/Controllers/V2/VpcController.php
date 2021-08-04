@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Vpc\CreateRequest;
+use App\Http\Requests\V2\Vpc\DeployDefaultsRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Task;
@@ -57,9 +59,15 @@ class VpcController extends BaseController
             }
             $vpc->console_enabled = $request->input('console_enabled', true);
         }
+
         $vpc->reseller_id = $this->resellerId;
 
         $task = $vpc->syncSave();
+
+        if ($request->has('support_enabled') && $request->input('support_enabled') === true) {
+            $vpc->enableSupport($vpc->created_at);
+        }
+
         return $this->responseIdMeta($request, $vpc->id, 202, $task->id);
     }
 
@@ -82,6 +90,16 @@ class VpcController extends BaseController
         }
         if ($this->isAdmin) {
             $vpc->reseller_id = $request->input('reseller_id', $vpc->reseller_id);
+        }
+
+        if ($request->has('support_enabled')) {
+            if ($request->input('support_enabled') === true && !$vpc->support_enabled) {
+                $vpc->enableSupport();
+            }
+
+            if ($request->input('support_enabled') === false && $vpc->support_enabled) {
+                $vpc->disableSupport();
+            }
         }
 
         $task = $vpc->syncSave();
@@ -143,12 +161,14 @@ class VpcController extends BaseController
         ));
     }
 
-    public function deployDefaults(Request $request, string $vpcId)
+    public function deployDefaults(DeployDefaultsRequest $request, string $vpcId)
     {
         $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
+        $availabilityZone = AvailabilityZone::forUser($request->user())
+            ->findOrFail($request->get('availability_zone_id'));
 
         // Configure VPC defaults (Rincewind)
-        $this->dispatch(new ConfigureVpcDefaults($vpc));
+        $this->dispatch(new ConfigureVpcDefaults($vpc, $availabilityZone));
 
         return response('', 202);
     }

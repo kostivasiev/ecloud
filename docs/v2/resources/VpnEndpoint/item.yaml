@@ -1,0 +1,47 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpnEndpointId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: 'schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Vpn Endpoints
+patch:
+  parameters:
+    - $ref: 'parameters/vpnEndpointId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: "schema.yaml"
+            - type: object
+              properties:
+                vpn_service_id:
+                  readOnly: true
+                floating_ip_id:
+                  readOnly: true
+  responses:
+    202:
+      $ref: '../../public-openapi.yaml#/components/responses/VpnEndpointIdResponse'
+  tags:
+    - Vpn Endpoints
+delete:
+  parameters:
+    - $ref: 'parameters/vpnEndpointId.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Vpn Endpoints

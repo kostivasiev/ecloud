@@ -12,8 +12,7 @@ class ScheduledDeployTest extends TestCase
 {
 
     protected $command;
-    protected string $startDate;
-    protected string $endDate;
+    protected string $now;
     protected OrchestratorConfig $orchestratorConfig;
 
     protected $infoArgument;
@@ -23,15 +22,13 @@ class ScheduledDeployTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->startDate = '2021-07-01 13:39:00';
-        $this->endDate = '2021-07-02 13:40:00';
+        $this->now = '2021-07-01 13:39:00';
         $this->lineArgument = [];
 
         $this->command = \Mockery::mock(ScheduledDeploy::class)
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
-        $this->command->startDate = Carbon::createFromTimeString($this->startDate);
-        $this->command->endDate = Carbon::createFromTimeString($this->endDate);
+        $this->command->now = Carbon::createFromTimeString($this->now);
 
         $this->command->shouldReceive('info')
             ->with(\Mockery::capture($this->infoArgument))->andReturnUsing(function () {
@@ -65,7 +62,7 @@ class ScheduledDeployTest extends TestCase
     public function testWithConfigs()
     {
         $orchestratorConfig = factory(OrchestratorConfig::class)->create([
-            'deploy_on' => $this->startDate,
+            'deploy_on' => $this->now,
         ]);
         Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations Start');
         Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations End');

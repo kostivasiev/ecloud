@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class CreateVpnsRequest
+ * Class Create
  * @package App\Http\Requests\V2
  */
 class CreateRequest extends FormRequest
@@ -33,7 +33,7 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'router_id' => [
                 'required',
                 'string',

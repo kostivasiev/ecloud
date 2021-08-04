@@ -31,6 +31,7 @@ class VpnSession extends Model implements Filterable, Sortable
         $this->fillable = [
             'id',
             'name',
+            'vpn_profile_group_id',
             'vpn_service_id',
             'vpn_endpoint_id',
             'remote_ip',
@@ -40,14 +41,24 @@ class VpnSession extends Model implements Filterable, Sortable
         parent::__construct($attributes);
     }
 
+    public function vpnProfileGroup()
+    {
+        return $this->belongsTo(VpnProfileGroup::class);
+    }
+
     public function vpnService()
     {
-        return $this->belongsToMany(VpnService::class);
+        return $this->belongsTo(VpnService::class);
     }
 
     public function vpnEndpoints()
     {
         return $this->belongsToMany(VpnEndpoint::class);
+    }
+
+    public function credential()
+    {
+        return $this->hasOne(Credential::class, 'resource_id', 'id');
     }
 
     /**
@@ -74,6 +85,7 @@ class VpnSession extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('vpn_profile_group_id', Filter::$stringDefaults),
             $factory->create('vpn_service_id', Filter::$stringDefaults),
             $factory->create('vpn_endpoint_id', Filter::$stringDefaults),
             $factory->create('remote_ip', Filter::$stringDefaults),
@@ -94,6 +106,7 @@ class VpnSession extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
+            $factory->create('vpn_profile_group_id'),
             $factory->create('vpn_service_id'),
             $factory->create('vpn_endpoint_id'),
             $factory->create('remote_ip'),
@@ -123,6 +136,7 @@ class VpnSession extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
+            'vpn_profile_group_id' => 'vpn_profile_group_id',
             'vpn_service_id' => 'vpn_service_id',
             'vpn_endpoint_id' => 'vpn_endpoint_id',
             'remote_ip' => 'remote_ip',

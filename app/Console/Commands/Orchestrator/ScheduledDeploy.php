@@ -13,22 +13,19 @@ class ScheduledDeploy extends Command
     protected $description = 'Scheduled Orchestration Deployments';
 
     public \DateTimeZone $timeZone;
-    public $startDate;
-    public $endDate;
+    public string $now;
 
     public function __construct()
     {
         parent::__construct();
-        $this->endDate = date('Y-m-d H:i:s', strtotime('now'));
-        $this->startDate = date('Y-m-d H:i:s', strtotime('now - 59 seconds'));
+        $this->now = date('Y-m-d H:i:s', strtotime('now'));
     }
 
     public function handle()
     {
-        Log::info('Processing Orchestrations Start');
         OrchestratorConfig::doesntHave('orchestratorBuilds')
+            ->where('deploy_on', '<=', $this->now)
             ->whereNotNull('deploy_on')
-            ->whereBetween('deploy_on', [$this->startDate, $this->endDate])
             ->each(function ($orchestratorConfig) {
                 Log::info('Deploying Config ' . $orchestratorConfig->id);
                 if (!$this->option('test-run')) {
@@ -37,7 +34,6 @@ class ScheduledDeploy extends Command
                     $orchestratorBuild->syncSave();
                 }
             });
-        Log::info('Processing Orchestrations End');
 
         return Command::SUCCESS;
     }

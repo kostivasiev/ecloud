@@ -3,7 +3,6 @@ namespace Tests\unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\ConfigureDefaultFirewallPolicies;
-use App\Jobs\OrchestratorBuild\CreateRouters;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use Illuminate\Queue\Events\JobFailed;
@@ -22,7 +21,7 @@ class ConfigureDefaultPoliciesTest extends TestCase
         parent::setUp();
         $this->orchestratorConfig = factory(OrchestratorConfig::class)->create([
             'data' => json_encode([
-                'router' => [
+                'routers' => [
                     [
                         'vpc_id' => '{vpc.0}',
                         'name' => 'test router',

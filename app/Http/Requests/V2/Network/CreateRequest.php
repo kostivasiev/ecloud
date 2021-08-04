@@ -7,6 +7,7 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsNotOverlappingSubnet;
 use App\Rules\V2\IsPrivateSubnet;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\IsRestrictedSubnet;
 use App\Rules\V2\IsSubnetBigEnough;
 use App\Rules\V2\ValidCidrSubnet;
 use UKFast\FormRequests\FormRequest;
@@ -35,7 +36,7 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string',
+            'name' => 'nullable|string|max:255',
             'router_id' => [
                 'required',
                 'string',
@@ -50,6 +51,7 @@ class CreateRequest extends FormRequest
                 new isPrivateSubnet(),
                 new isNotOverlappingSubnet(),
                 new IsSubnetBigEnough(),
+                new IsRestrictedSubnet(),
             ]
         ];
     }

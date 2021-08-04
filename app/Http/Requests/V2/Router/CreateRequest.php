@@ -29,22 +29,8 @@ class CreateRequest extends FormRequest
      */
     public function rules()
     {
-        $availabilityZoneId = null;
-        if ($this->request->has('availability_zone_id')) {
-            $availabilityZoneId = $this->request->get('availability_zone_id');
-        }
-        // Default AZ
-        if (empty($availabilityZoneId) && $this->request->has('vpc_id')) {
-            $vpc = Vpc::forUser(Auth::user())->find($this->request->get('vpc_id'));
-            if (!empty($vpc)) {
-                $availabilityZoneId = $vpc->region
-                    ->availabilityZones
-                    ->first()->id;
-            }
-        }
-
         return [
-            'name' => 'nullable|string',
+            'name' => 'nullable|string|max:255',
             'vpc_id' => [
                 'required',
                 'string',
@@ -52,11 +38,12 @@ class CreateRequest extends FormRequest
                 new ExistsForUser(Vpc::class),
                 new IsResourceAvailable(Vpc::class),
             ],
+            'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
             'router_throughput_id' => [
                 'sometimes',
                 'required',
                 'exists:ecloud.router_throughputs,id,deleted_at,NULL',
-                new ExistsForAvailabilityZone($availabilityZoneId)
+                new ExistsForAvailabilityZone($this->request->get('availability_zone_id'))
             ]
         ];
     }

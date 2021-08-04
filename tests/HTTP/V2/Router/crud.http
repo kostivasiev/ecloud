@@ -2,15 +2,14 @@
 POST https://{{host}}/{{version}}/routers
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
   "name": "test router",
   "vpc_id": "{{dev_vpc_id}}",
-  "availability_zone_id" : "{{dev_availability_zone_id}}",
-  "router_throughput_id": "rtp-3b54fdfe"
+  "availability_zone_id" : "{{dev_availability_zone_id}}"
 }
 
 > {%

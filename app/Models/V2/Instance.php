@@ -2,15 +2,9 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Instance\Created;
 use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
-use App\Events\V2\Instance\Deleting;
-use App\Events\V2\Instance\Saved;
-use App\Events\V2\Instance\Updated;
-use App\Events\V2\Instance\Saving;
 use App\Traits\V2\CustomKey;
-use App\Traits\V2\DefaultAvailabilityZone;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
@@ -25,9 +19,9 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Instance extends Model implements Filterable, Sortable, ResellerScopeable
+class Instance extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
-    use CustomKey, SoftDeletes, DefaultName, DefaultAvailabilityZone, Syncable, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public $keyPrefix = 'i';
     public $incrementing = false;
@@ -62,11 +56,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable
 
     protected $dispatchesEvents = [
         'creating' => Creating::class,
-        'saving' => Saving::class,
-        'saved' => Saved::class,
-        'updated' => Updated::class,
-        'created' => Created::class,
-        'deleting' => Deleting::class,
         'deleted' => Deleted::class,
     ];
 

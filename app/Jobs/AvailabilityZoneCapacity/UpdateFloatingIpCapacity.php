@@ -46,8 +46,7 @@ class UpdateFloatingIpCapacity extends Job
             $ipRanges = $ipRanges->merge($page->getItems());
         } while ($currentPage < $page->totalPages());
 
-        // As the ip ranges are loaded from all az's for the region we need to load all fips associated with the region
-        $floatingIps = FloatingIp::withRegion($this->model->region->id)->whereNotNull('ip_address');
+        $floatingIps = FloatingIp::where('availability_zone_id', $this->model->id)->whereNotNull('ip_address');
 
         $runningTotal = [
             'total' => 0,

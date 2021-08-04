@@ -5,7 +5,6 @@ namespace App\Http\Requests\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
-use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -28,7 +27,7 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => ['nullable', 'string'],
+            'name' => ['nullable', 'string', 'max:255'],
             'vpc_id' => [
                 'required',
                 'string',
@@ -37,7 +36,6 @@ class CreateRequest extends FormRequest
                 new IsResourceAvailable(Vpc::class),
             ],
             'availability_zone_id' => [
-                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',

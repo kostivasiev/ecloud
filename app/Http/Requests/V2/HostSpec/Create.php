@@ -11,7 +11,8 @@ class Create extends FormRequest
         return [
             'name' => [
                 'nullable',
-                'string'
+                'string',
+                'max:255'
             ],
             'cpu_sockets' => [
                 'required',

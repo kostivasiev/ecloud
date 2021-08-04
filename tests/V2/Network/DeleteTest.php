@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Network;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\Network;
@@ -89,7 +90,7 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        Event::fake();
+        Event::fake(Created::class);
         $this->delete(
             '/v2/networks/' . $this->network->id,
             [],
@@ -99,7 +100,5 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(202);
-        $network = Network::withTrashed()->findOrFail($this->network->id);
-        $this->assertNotNull($network->deleted_at);
     }
 }

@@ -13,7 +13,7 @@ class StoreRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string|max:50',
+            'name' => 'nullable|string|max:255',
             'vpc_id' => [
                 'required',
                 'string',
@@ -22,7 +22,6 @@ class StoreRequest extends FormRequest
                 new IsResourceAvailable(Vpc::class),
             ],
             'availability_zone_id' => [
-                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
