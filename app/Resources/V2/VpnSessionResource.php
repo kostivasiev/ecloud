@@ -36,10 +36,8 @@ class VpnSessionResource extends UKFastResource
             'remote_ip' => $this->remote_ip,
             'remote_networks' => $this->remote_networks,
             'local_networks' => $this->local_networks,
+            'sync' => $this->sync,
         ];
-        if ($request->user()->isAdmin()) {
-            $retVal['psk'] = $this->credential ? $this->credential->password : null;
-        }
         $retVal['created_at'] = $this->created_at === null ? null : Carbon::parse(
             $this->created_at,
             new \DateTimeZone(config('app.timezone'))
