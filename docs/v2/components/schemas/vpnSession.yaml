@@ -26,7 +26,7 @@ properties:
     readOnly: false
   remote_networks:
     type: string
-    required: true
+    required: false
     example: '172.12.23.11/32'
     readOnly: false
   local_networks:
