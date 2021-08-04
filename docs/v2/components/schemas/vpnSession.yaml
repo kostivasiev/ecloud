@@ -31,7 +31,7 @@ properties:
     readOnly: false
   local_networks:
     type: string
-    required: true
+    required: false
     example: '172.11.11.11/32,176.18.22.11/24'
     readOnly: false
   sync:
