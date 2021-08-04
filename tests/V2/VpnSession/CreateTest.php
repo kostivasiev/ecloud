@@ -115,12 +115,6 @@ class CreateTest extends TestCase
         ])->seeJson([
             'detail' => 'The local networks must contain a valid comma separated list of CIDR subnets',
             'source' => 'local_networks',
-        ])->seeJson([
-            'detail' => 'Either the remote networks value or the local_networks value can be used, but not both',
-            'source' => 'remote_networks',
-        ])->seeJson([
-            'detail' => 'Either the local networks value or the remote_networks value can be used, but not both',
-            'source' => 'local_networks',
         ])->assertResponseStatus(422);
     }
 }

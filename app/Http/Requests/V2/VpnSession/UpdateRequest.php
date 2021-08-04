@@ -38,16 +38,14 @@ class UpdateRequest extends FormRequest
             ],
             'remote_networks' => [
                 'sometimes',
-                'required',
+                'required_without:local_networks',
                 'string',
-                new EitherOrNotBoth('local_networks'),
                 new ValidCidrNetworkCsvString()
             ],
             'local_networks' => [
                 'sometimes',
-                'required',
+                'required_without:remote_networks',
                 'string',
-                new EitherOrNotBoth('remote_networks'),
                 new ValidCidrNetworkCsvString()
             ],
         ];
