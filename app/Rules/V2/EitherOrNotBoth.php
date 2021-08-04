@@ -23,5 +23,4 @@ class EitherOrNotBoth implements Rule
     {
         return 'Either the :attribute value or the ' . $this->field . ' value can be used, but not both';
     }
-
 }
