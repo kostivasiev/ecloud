@@ -14,6 +14,7 @@ use App\Models\V2\Vpc;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfile;
 use App\Models\V2\VpnService;
+use App\Models\V2\VpnSession;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Queue\Events\JobExceptionOccurred;
@@ -63,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
             'net' => Network::class,
             'vpne' => VpnEndpoint::class,
             'obuild' => OrchestratorBuild::class,
+            'vpns' => VpnSession::class,
             'vpnp' => VpnProfile::class,
         ]);
 
