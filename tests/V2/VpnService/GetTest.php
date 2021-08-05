@@ -32,6 +32,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->vpn->id,
                 'router_id' => $this->vpn->router_id,
+                'vpc_id' => $this->vpn->router->vpc->id,
             ])
             ->assertResponseStatus(200);
     }
@@ -48,6 +49,7 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->vpn->id,
                 'router_id' => $this->vpn->router_id,
+                'vpc_id' => $this->vpn->router->vpc->id,
             ])
             ->assertResponseStatus(200);
     }

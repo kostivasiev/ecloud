@@ -25,6 +25,7 @@ class VpnServiceResource extends UKFastResource
         return [
             'id' => $this->id,
             'router_id' => $this->router_id,
+            'vpc_id' => $this->router->vpc->id,
             'name' => $this->name,
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
