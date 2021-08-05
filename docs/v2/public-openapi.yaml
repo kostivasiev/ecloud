@@ -80,6 +80,8 @@ components:
       $ref: 'components/schemas/vpnProfileGroup.yaml'
     VpnService:
       $ref: 'components/schemas/vpnService.yaml'
+    VpnSession:
+      $ref: 'components/schemas/vpnSession.yaml'
   #    When adding a schema, add it to the list alphabetically using the following format:-
   #    Reference:
   #      $ref: 'resource/References/schema.yaml'
@@ -113,6 +115,8 @@ components:
       $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
     VpnServiceId:
       $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
+    VpnSessionId:
+      $ref: 'resources/VpnSession/parameters/vpnSessionId.yaml'
     #    When adding a path parameter use the following format, and remember to add it alphabetically to the list!
     #    ReferenceId:
     #      $ref: 'resources/References/parameters/id.yaml'
@@ -146,6 +150,8 @@ components:
       $ref: 'resources/VpnProfile/responses/idResponse.yaml'
     VpnServiceIdResponse:
       $ref: 'resources/VpnService/responses/idResponse.yaml'
+    VpnSessionIdResponse:
+      $ref: 'resources/VpnSession/responses/idResponse.yaml'
 #    When adding a new response id, use the following format
 #    ReferenceIdResponse:
 #      $ref: 'resources/References/responses/idResponse.yaml'
@@ -362,6 +368,10 @@ paths:
     $ref: 'resources/VpnService/collection.yaml'
   '/ecloud/v2/vpn-services/{vpnServiceId}':
     $ref: 'resources/VpnService/item.yaml'
+  '/ecloud/v2/vpn-sessions':
+    $ref: 'resources/VpnSession/collection.yaml'
+  '/ecloud/v2/vpn-sessions/{vpnSessionId}':
+    $ref: 'resources/VpnSession/item.yaml'
 # When adding endpoints, add them to the list alphabetically using the following format:-
 #  '/ecloud/v2/references':
 #    $ref: 'resources/Reference/collection.yaml'
