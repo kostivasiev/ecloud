@@ -72,6 +72,20 @@ client.test('Get Resource', function () {
 });
 %}
 
+### Get Credential Resource
+GET https://{{host}}/{{version}}/vpn-sessions/vpns-3b3e7bab/credentials
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Credential Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id === client.global.get('credential_id'), 'Credential does not match');
+});
+%}
+
+
 ### Delete Resource
 DELETE https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}
 X-consumer-custom-id: 0-0

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\VpnSession\CreateRequest;
 use App\Http\Requests\V2\VpnSession\UpdateRequest;
 use App\Models\V2\VpnSession;
+use App\Resources\V2\CredentialResource;
 use App\Resources\V2\VpnSessionResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -68,5 +69,11 @@ class VpnSessionController extends BaseController
         $vpnSession = VpnSession::forUser($request->user())->findOrFail($vpnSessionId);
         $task = $vpnSession->syncDelete();
         return $this->responseTaskId($task->id);
+    }
+
+    public function credentials(Request $request, string $vpnSessionId)
+    {
+        $vpnSession = VpnSession::forUser($request->user())->findOrFail($vpnSessionId);
+        return new CredentialResource($vpnSession->credential);
     }
 }
