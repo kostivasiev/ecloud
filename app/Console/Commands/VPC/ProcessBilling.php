@@ -29,41 +29,6 @@ class ProcessBilling extends Command
 
     protected array $billing;
 
-    /**
-     * Billable metrics - Add any metrics to this array that we want to bill for.
-     * @var array|string[]
-     */
-    protected array $billableMetrics = [
-        // Compute
-        'vcpu.count',
-        'ram.capacity',
-        'ram.capacity.high',
-        'hostgroup',
-        'host.hs-aaaaaaaa', // DEV
-        // Storage
-        'disk.capacity',
-        'disk.capacity.300',
-        'disk.capacity.600',
-        'disk.capacity.1200',
-        'disk.capacity.2500',
-        'image.private',
-        // Networking
-        'throughput.20Mb',
-        'throughput.50Mb',
-        'throughput.100Mb',
-        'throughput.250Mb',
-        'throughput.500Mb',
-        'throughput.1Gb',
-        'throughput.2.5Gb',
-        'throughput.5Gb',
-        'throughput.10Gb',
-        'floating-ip.count',
-        'networking.advanced',
-        // License
-        'license.windows',
-        'host.license.windows',
-    ];
-
     public function __construct()
     {
         parent::__construct();
@@ -89,13 +54,11 @@ class ProcessBilling extends Command
                 }
 
                 $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
-                    if (!in_array($key, $this->billableMetrics)) {
-                        return true;
-                    }
-
-                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
 
                     $metrics->get($key)->each(function ($metric) use ($key, $vpc) {
+                        if (!isset($this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key])) {
+                            $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
+                        }
                         $start = $this->startDate;
                         $end = $this->endDate;
 
