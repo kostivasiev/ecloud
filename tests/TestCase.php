@@ -226,6 +226,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         if (!$this->region) {
             $this->region = factory(Region::class)->create([
                 'id' => 'reg-test',
+                'is_public' => true,
             ]);
         }
         return $this->region;

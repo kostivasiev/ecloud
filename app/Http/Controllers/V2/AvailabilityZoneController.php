@@ -43,7 +43,9 @@ class AvailabilityZoneController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = AvailabilityZone::forUser($request->user());
+        $collection = AvailabilityZone::forUser($request->user())->whereHas('region', function ($query) {
+            $query->where('is_public', '=', true);
+        });
         $queryTransformer->config(AvailabilityZone::class)
             ->transform($collection);
 
