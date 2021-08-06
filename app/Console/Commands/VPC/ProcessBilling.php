@@ -56,28 +56,30 @@ class ProcessBilling extends Command
                 $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
 
                     $metrics->get($key)->each(function ($metric) use ($key, $vpc) {
-                        if (!isset($this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key])) {
-                            $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
+                        if ($metric->price > 0.00) {
+                            if (!isset($this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key])) {
+                                $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
+                            }
+                            $start = $this->startDate;
+                            $end = $this->endDate;
+
+                            if ($metric->start > $this->startDate) {
+                                $start = Carbon::parse($metric->start, $this->timeZone);
+                            }
+
+                            if (!empty($metric->end) && $metric->end < $this->endDate) {
+                                $end = Carbon::parse($metric->end, $this->timeZone);
+                            }
+
+                            $hours = $start->diffInHours($end);
+
+                            // Minimum period is 1 hour
+                            $hours = ($hours < 1) ? 1 : $hours;
+
+                            $cost = ($hours * $metric->price) * $metric->value;
+
+                            $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
                         }
-                        $start = $this->startDate;
-                        $end = $this->endDate;
-
-                        if ($metric->start > $this->startDate) {
-                            $start = Carbon::parse($metric->start, $this->timeZone);
-                        }
-
-                        if (!empty($metric->end) && $metric->end < $this->endDate) {
-                            $end = Carbon::parse($metric->end, $this->timeZone);
-                        }
-
-                        $hours = $start->diffInHours($end);
-
-                        // Minimum period is 1 hour
-                        $hours = ($hours < 1) ? 1 : $hours;
-
-                        $cost = ($hours * $metric->price) * $metric->value;
-
-                        $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
                     });
                 });
 
