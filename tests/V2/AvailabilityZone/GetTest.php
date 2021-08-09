@@ -46,11 +46,12 @@ class GetTest extends TestCase
         ])->seeJson([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
-        ])->dontSeeJson([
+        ])->seeJson([
             'id' => $this->regionHiddenAz->id,
+            'name' => $this->regionHiddenAz->name,
         ])->assertResponseStatus(200);
 
-        $this->assertCount(1, $this->response->original);
+        $this->assertCount(3, $this->response->original);
     }
 
     public function testGetCollectionAsNonAdmin()
