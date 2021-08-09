@@ -27,6 +27,7 @@ use App\Resources\V2\ProductResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\RouterThroughputResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -43,9 +44,7 @@ class AvailabilityZoneController extends BaseController
      */
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = AvailabilityZone::forUser($request->user())->whereHas('region', function ($query) {
-            $query->where('is_public', '=', true);
-        });
+        $collection = AvailabilityZone::forUser($request->user());
         $queryTransformer->config(AvailabilityZone::class)
             ->transform($collection);
 
