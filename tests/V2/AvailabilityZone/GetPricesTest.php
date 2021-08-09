@@ -28,14 +28,8 @@ class GetPricesTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $region = factory(Region::class)->create();
-
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->id
-        ]);
-
         $this->product = factory(Product::class)->create([
-            'product_name' => $this->availabilityZone->id . ': vcpu'
+            'product_name' => $this->availabilityZone()->id . ': vcpu'
         ]);
 
         factory(ProductPrice::class)->create([
@@ -53,7 +47,7 @@ class GetPricesTest extends TestCase
     public function testGetPrices()
     {
         $this->get(
-            '/v2/availability-zones/' . $this->availabilityZone->id . '/prices',
+            '/v2/availability-zones/' . $this->availabilityZone()->id . '/prices',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -70,7 +64,7 @@ class GetPricesTest extends TestCase
     public function testGetCustomPrices()
     {
         $this->get(
-            '/v2/availability-zones/' . $this->availabilityZone->id . '/prices',
+            '/v2/availability-zones/' . $this->availabilityZone()->id . '/prices',
             [
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.read',
