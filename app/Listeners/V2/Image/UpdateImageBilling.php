@@ -15,7 +15,7 @@ class UpdateImageBilling
     public function handle($event)
     {
         Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
-        if ($event->model->name !== 'image_create' && $event->model->name !== Sync::TASK_NAME_DELETE) {
+        if ($event->model->name !== 'image_create') {
             return;
         }
 
@@ -58,34 +58,32 @@ class UpdateImageBilling
             }
             $currentActiveMetric->setEndDate($time);
         }
-        if ($event->model->name !== Sync::TASK_NAME_DELETE) {
-            $billingMetric = app()->make(BillingMetric::class);
-            $billingMetric->fill([
-                'resource_id' => $model->id,
-                'vpc_id' => $model->vpc_id,
-                'reseller_id' => $model->vpc->reseller_id,
-                'key' => 'image.private',
-                'value' => $volumeCapacity,
-                'start' => $time,
-            ]);
+        $billingMetric = app()->make(BillingMetric::class);
+        $billingMetric->fill([
+            'resource_id' => $model->id,
+            'vpc_id' => $model->vpc_id,
+            'reseller_id' => $model->vpc->reseller_id,
+            'key' => 'image.private',
+            'value' => $volumeCapacity,
+            'start' => $time,
+        ]);
 
-            $availabilityZone = $model->availabilityZones()->first();
-            $productName = $availabilityZone->id . ': volume-1gb';
-            /** @var Product $product */
-            $product = $availabilityZone->products()
-                ->where('product_name', 'LIKE', '%volume-1gb%')
-                ->first();
-            if (empty($product)) {
-                Log::error(
-                    'Failed to load "' . $productName . '" billing product for availability zone ' . $availabilityZone->id
-                );
-            } else {
-                $billingMetric->category = $product->category;
-                $billingMetric->price = $product->getPrice($model->vpc->reseller_id);
-            }
-
-            $billingMetric->save();
+        $availabilityZone = $model->availabilityZones()->first();
+        $productName = $availabilityZone->id . ': volume-1gb';
+        /** @var Product $product */
+        $product = $availabilityZone->products()
+            ->where('product_name', 'LIKE', '%volume-1gb%')
+            ->first();
+        if (empty($product)) {
+            Log::error(
+                'Failed to load "' . $productName . '" billing product for availability zone ' . $availabilityZone->id
+            );
+        } else {
+            $billingMetric->category = $product->category;
+            $billingMetric->price = $product->getPrice($model->vpc->reseller_id);
         }
+
+        $billingMetric->save();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
     }
