@@ -327,7 +327,7 @@ class ProcessBilling extends Command
                 'netpg' => '', // no payment taken, payment required
                 'nominalCode' => '41003',
                 'source' => 'myukfast',
-                'cost' => number_format($total, 2),
+                'cost' => number_format($total, 2, '.', ''),
                 'vat' => 00.00
             ]);
 

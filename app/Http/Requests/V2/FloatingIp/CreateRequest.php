@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\FloatingIp;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
@@ -39,6 +40,12 @@ class CreateRequest extends FormRequest
                 new ExistsForUser(Vpc::class),
                 new IsResourceAvailable(Vpc::class),
             ],
+            'availability_zone_id' => [
+                'required',
+                'string',
+                'exists:ecloud.availability_zones,id,deleted_at,NULL',
+                new ExistsForUser(AvailabilityZone::class),
+            ],
         ];
     }
 
@@ -50,8 +57,7 @@ class CreateRequest extends FormRequest
     public function messages()
     {
         return [
-            'vpc_id.required' => 'The :attribute field, when specified, cannot be null',
-            'vpc_id.exists' => 'The specified :attribute was not found',
+            'exists' => 'The specified :attribute was not found',
         ];
     }
 }

@@ -12,6 +12,10 @@ properties:
     required: true
     example: 'rtr-2b66bb79'
     readOnly: false
+  vpc_id:
+    type: string
+    example: vpc-4c63cf58
+    readOnly: true
   sync:
     type: object
     readOnly: true

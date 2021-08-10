@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Credential;
 use Illuminate\Database\Seeder;
 
@@ -28,6 +29,9 @@ class AvailabilityZoneSeeder extends Seeder
             'is_public' => true,
         ]);
 
+        /**
+         * Credentials
+         */
         factory(Credential::class)->create([
             'id' => 'cred-kingpin',
             'name' => 'Kingpin (G0)',
@@ -48,6 +52,18 @@ class AvailabilityZoneSeeder extends Seeder
             'password'=> env('NSX_PASSWORD'),
             'port'=> null,
             'is_hidden'=> false,
+        ]);
+
+        /**
+         * Capacity Alerting
+         */
+        factory(AvailabilityZoneCapacity::class)->create([
+            'id' => 'azc-aaaaaaaa',
+            'availability_zone_id' => 'az-aaaaaaaa',
+            'type' => 'floating_ip',
+            'alert_warning' => 60,
+            'alert_critical' => 80,
+            'max' => 95,
         ]);
     }
 }

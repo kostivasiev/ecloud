@@ -14,7 +14,9 @@ use App\Models\V2\Vpc;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfile;
 use App\Models\V2\VpnService;
+use App\Models\V2\VpnSession;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobFailed;
@@ -63,11 +65,15 @@ class AppServiceProvider extends ServiceProvider
             'net' => Network::class,
             'vpne' => VpnEndpoint::class,
             'obuild' => OrchestratorBuild::class,
+            'vpns' => VpnSession::class,
             'vpnp' => VpnProfile::class,
         ]);
 
         Queue::exceptionOccurred(function (JobExceptionOccurred $event) {
-            Log::error($event->job->getName() . " : Job exception occurred", ['exception' => $event->exception]);
+            $message = ($event->exception instanceof RequestException && $event->exception->hasResponse()) ?
+                $event->exception->getResponse()->getBody()->getContents():
+                $event->exception->getMessage();
+            Log::error($event->job->getName() . " : Job exception occurred", ['exception' => $message]);
         });
 
         Queue::failing(function (JobFailed $event) {

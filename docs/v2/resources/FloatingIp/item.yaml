@@ -30,6 +30,8 @@ patch:
               properties :
                 vpc_id :
                   readOnly : true
+                availability_zone_id :
+                  readOnly : true
 
   responses:
     202:

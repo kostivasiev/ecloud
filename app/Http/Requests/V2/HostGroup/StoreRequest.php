@@ -22,7 +22,6 @@ class StoreRequest extends FormRequest
                 new IsResourceAvailable(Vpc::class),
             ],
             'availability_zone_id' => [
-                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',

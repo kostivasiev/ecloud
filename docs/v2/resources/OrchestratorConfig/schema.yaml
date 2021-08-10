@@ -13,6 +13,11 @@ properties:
     required: false
     readonly: false
     example: 54321
+  locked:
+    type: boolean
+    required: false
+    example: false
+    readOnly: false
   deploy_on:
     type: string
     example: '2020-07-07T10:30:00+01:00'

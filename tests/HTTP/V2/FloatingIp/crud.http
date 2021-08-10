@@ -6,7 +6,8 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "vpc_id": "{{dev_vpc_id}}"
+  "vpc_id": "{{dev_vpc_id}}",
+  "availability_zone_id": "{{dev_availability_zone_id}}"
 }
 
 > {%
@@ -45,7 +46,8 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
   client.assert(response.body.data.id === client.global.get('fip_id'), "Incorrect resource ID returned");
   client.assert(response.body.data.name === client.global.get('fip_id'));
-  client.assert(response.body.data.vpc_id === client.global.get('vpc_id'));
+  client.assert(response.body.data.vpc_id === "vpc-aaaaaaaa");
+  client.assert(response.body.data.availability_zone_id === "az-aaaaaaaa");
 });
 %}
 
@@ -69,7 +71,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}floating-ips/{{fip_id}}
+GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}

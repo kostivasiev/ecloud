@@ -1,0 +1,28 @@
+properties:
+  id:
+    type: string
+    example: 'vpne-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    required: false
+    example: 'vpne-2b66bb79'
+  vpn_service_id:
+    type: string
+    required: true
+    example: 'vpn-2b66bb79'
+    readOnly: false
+  floating_ip_id:
+    type: string
+    required: false
+    example: 'fip-2b66bb79'
+    readOnly: false
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Vpns'

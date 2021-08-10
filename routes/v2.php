@@ -134,6 +134,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('vpn-services', 'VpnServiceController@index');
         $router->get('vpn-services/{vpnServiceId}', 'VpnServiceController@show');
+        $router->get('vpn-services/{vpnServiceId}/endpoints', 'VpnServiceController@endpoints');
         $router->post('vpn-services', 'VpnServiceController@create');
         $router->patch('vpn-services/{vpnServiceId}', 'VpnServiceController@update');
         $router->delete('vpn-services/{vpnServiceId}', 'VpnServiceController@destroy');
@@ -143,6 +144,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('vpn-endpoints', 'VpnEndpointController@index');
         $router->get('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@show');
+        $router->get('vpn-endpoints/{vpnEndpointId}/services', 'VpnEndpointController@services');
         $router->post('vpn-endpoints', 'VpnEndpointController@store');
         $router->patch('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@update');
         $router->delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
@@ -152,6 +154,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('vpn-sessions', 'VpnSessionController@index');
         $router->get('vpn-sessions/{vpnSessionId}', 'VpnSessionController@show');
+        $router->get('vpn-sessions/{vpnSessionId}/credentials', 'VpnSessionController@credentials');
         $router->post('vpn-sessions', 'VpnSessionController@create');
         $router->patch('vpn-sessions/{vpnSessionId}', 'VpnSessionController@update');
         $router->delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
@@ -210,7 +213,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('instances/{instanceId}/create-image', 'InstanceController@createImage');
         $router->post('instances/{instanceId}/migrate', 'InstanceController@migrate');
 
-        $router->group(['middleware' => 'is-locked'], function () use ($router) {
+        $router->group(['middleware' => 'instance-is-locked'], function () use ($router) {
             $router->patch('instances/{instanceId}', 'InstanceController@update');
             $router->delete('instances/{instanceId}', 'InstanceController@destroy');
             $router->put('instances/{instanceId}/power-on', 'InstanceController@powerOn');
@@ -483,7 +486,12 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@showData');
         $router->get('orchestrator-configs/{orchestratorConfigId}/builds', 'OrchestratorConfigController@builds');
 
-        $router->group(['middleware' => 'orchestrator-config-is-valid'], function () use ($router) {
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->put('orchestrator-configs/{orchestratorConfigId}/lock', 'OrchestratorConfigController@lock');
+            $router->put('orchestrator-configs/{orchestratorConfigId}/unlock', 'OrchestratorConfigController@unlock');
+        });
+
+        $router->group(['middleware' => ['orchestrator-config-is-locked', 'orchestrator-config-is-valid']], function () use ($router) {
             $router->post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
         });
 
