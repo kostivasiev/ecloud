@@ -119,9 +119,8 @@ class UpdateBillingTest extends TestCase
             $this->sync->resource()->associate($this->image);
         });
 
-        // Check that the image billing metric is added
-        $updateImageBillingListener = new \App\Listeners\V2\Image\UpdateImageBilling();
-        $updateImageBillingListener->handle(new \App\Events\V2\Task\Updated($this->sync));
+        // Delete the image
+        $this->image->delete();
 
         $originalImageMetric->refresh();
         $this->assertNotNull($originalImageMetric->end);
