@@ -37,6 +37,7 @@ class CreateTest extends TestCase
             [
                 'name' => 'Profile Group Name',
                 'description' => 'VPN Profile Group Description',
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ike_profile_id' => 'ike-aaaaaaaa',
                 'ipsec_profile_id' => 'ipsec-aaaaaaaa',
                 'dpd_profile_id' => 'dpd-aaaaaaaa'

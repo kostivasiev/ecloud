@@ -38,6 +38,7 @@ class GetTest extends TestCase
         $this->floatingIp->save();
 
         $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+            'availability_zone_id' => $this->availabilityZone()->id,
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz',
             'dpd_profile_id' => 'dpd-abc123xyz',
