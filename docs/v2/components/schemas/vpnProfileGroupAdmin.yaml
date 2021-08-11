@@ -11,6 +11,11 @@ properties:
     type: string
     required: true
     example: 'Description of my profile group'
+  availability_zone_id:
+    readOnly: false
+    type: string
+    required: true
+    example: 'az-2b66bb79'
   ike_profile_id:
     type: string
     required: true
