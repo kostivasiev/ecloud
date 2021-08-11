@@ -1,0 +1,21 @@
+### Create VPN Session
+POST https://{{host}}/{{version}}/vpn-sessions
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "VPN Session Test",
+    "vpn_profile_group_id": "vpnpg-aaaaaaaa",
+    "vpn_service_id": "vpn-9677932e-dev",
+    "vpn_endpoint_id": "vpne-2a8dd648-dev",
+    "remote_ip": "86.6.85.195",
+    "remote_networks": "192.169.0.0/16,192.177.10.0/8",
+    "local_networks": "217.22.0.0/16"
+}
+
+### Delete Session
+DELETE https://{{host}}/{{version}}/vpn-sessions/vpns-40611b07-dev
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
