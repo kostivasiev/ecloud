@@ -13,11 +13,7 @@ class TaskCreated
 
         if ($event->model->job) {
             Log::debug(get_class($this) . " : Dispatching job", ["job" => $event->model->job]);
-            try {
-                dispatch(new $event->model->job($event->model));
-            } catch (\Throwable $e) {
-                throw $e;
-            }
+            dispatch(new $event->model->job($event->model));
         } else {
             Log::debug(get_class($this) . " : Skipping job dispatch, no job defined for task", ["job" => $event->model->job]);
         }
