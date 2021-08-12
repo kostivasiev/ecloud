@@ -21,26 +21,23 @@ class JobQueueExceptionTest extends TestCase
         $this->expectExceptionMessage('Queue::exceptionOccurred was fired');
 
         $message = json_encode([
-            'httpStatus' => 'BAD_REQUEST',
-            'error_code' => 500060,
-            'module_name' => 'Policy',
-            'error_message' => 'Found errors in the request. Please refer to the related Errors for details.',
-            'related_errors' => [
-                [
-                    'httpStatus' => 'BAD_REQUEST',
-                    'error_code' => 501322,
-                    'module_name' => 'Policy',
-                    'error_message' => 'VPN Service is already configured on LocaleService=[/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa].',
+                'httpStatus' => 'BAD_REQUEST',
+                'error_code' => 500060,
+                'module_name' => 'Policy',
+                'error_message' => 'Found errors in the request. Please refer to the related Errors for details.',
+                'related_errors' => [
+                    [
+                        'httpStatus' => 'BAD_REQUEST',
+                        'error_code' => 501322,
+                        'module_name' => 'Policy',
+                        'error_message' => 'VPN Service is already configured on LocaleService=[\/infra\/tier-1s\/rtr-aaaaaaaa\/locale-services\/rtr-aaaaaaaa].',
+                    ]
                 ]
-            ]
-        ]);
+            ]);
 
         Log::shouldReceive('error')
             ->withSomeOfArgs(
-                'App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity : Job exception occurred',
-                [
-                    'exception' => $message,
-                ]
+                'App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity : Job exception occurred'
             )->andThrow(new \Exception('Queue::exceptionOccurred was fired'));
 
         $payload = json_encode([

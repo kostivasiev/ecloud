@@ -2,6 +2,7 @@
 
 namespace App\Listeners\V2;
 
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 
 class TaskCreated
