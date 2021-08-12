@@ -31,7 +31,6 @@ class OrchestratorBuildController extends BaseController
                     $orchestratorConfigId = $request->get('orchestrator_config_id:eq');
                     $request->query->remove('orchestrator_config_id:eq');
                 }
-
                 $buildIds = $buildIds->reject(function ($orchestratorBuild) use ($orchestratorConfigId) {
                     return $orchestratorBuild->orchestrator_config_id != $orchestratorConfigId;
                 });
@@ -40,7 +39,6 @@ class OrchestratorBuildController extends BaseController
             if ($request->has('orchestrator_config_id:neq')) {
                 $orchestratorConfigId = $request->get('orchestrator_config_id:neq');
                 $request->query->remove('orchestrator_config_id:neq');
-
                 $buildIds = $buildIds->reject(function ($orchestratorBuild) use ($orchestratorConfigId) {
                     return $orchestratorBuild->orchestrator_config_id == $orchestratorConfigId;
                 });
