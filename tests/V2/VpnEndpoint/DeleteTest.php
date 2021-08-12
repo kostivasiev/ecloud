@@ -4,6 +4,10 @@ namespace Tests\V2\VpnEndpoint;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -30,6 +34,7 @@ class DeleteTest extends TestCase
             [
                 'name' => 'Get Test',
                 'vpn_service_id' => $this->vpnService->id,
+                'nsx_uuid' => '825a690b-6bce-4dbc-be46-0230948c89da',
             ]
         );
         $floatingIp->resource()->associate($this->vpnEndpoint);
@@ -38,6 +43,9 @@ class DeleteTest extends TestCase
 
     public function testDeleteResource()
     {
+        $this->nsxServiceMock()->shouldReceive('delete')
+            ->withSomeOfArgs('/api/v1/vpn/ipsec/local-endpoints/'.$this->vpnEndpoint->nsx_uuid)
+            ->andReturnTrue();
         $this->delete('/v2/vpn-endpoints/' . $this->vpnEndpoint->id)
             ->assertResponseStatus(202);
     }

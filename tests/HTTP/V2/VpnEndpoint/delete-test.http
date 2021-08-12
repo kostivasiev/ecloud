@@ -1,0 +1,119 @@
+### GET VPN Service UUID from NSX
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:IPSecVpnService%20AND%20display_name:vpn-timtest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+> {%
+client.test('Get VPN Service UUID', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+client.global.set('vpn_id', 'vpn-timtest');
+client.global.set('vpn_nsx_uuid', response.body.results[0].id);
+client.log('UUID: ' + response.body.results[0].id);
+%}
+
+### Create Floating IP
+POST https://{{host}}/{{version}}/floating-ips
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}",
+  "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('fip_id', response.body.data.id);
+client.log('Floating IP ID: ' + response.body.data.id);
+%}
+
+### Get the IP Address that was created
+GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Floating IP Address', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+client.global.set('remote_address', response.body.data.ip_address);
+client.log('IP Address: ' + response.body.data.ip_address);
+%}
+
+### Create a VPN Endpoint in the API
+POST https://{{host}}/{{version}}/vpn-endpoints
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "Endpoint Test",
+    "vpn_service_id": "{{vpn_id}}",
+    "floating_ip_id": "{{fip_id}}"
+}
+
+> {%
+client.test('Collection Retrieved', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+// client.global.set('vpn_endpoint_id', response.body.data.id);
+client.global.set('vpn_endpoint_id', 'vpne-timtest');
+client.log('Local Endpoint ID: ' + response.body.data.id);
+%}
+
+### Create the same endpoint in NSX
+POST https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVPNLocalEndpoint",
+    "description": "{{vpn_endpoint_id}} - Endpoint Test",
+    "display_name": "{{vpn_endpoint_id}}",
+    "local_id": "{{remote_address}}",
+    "ipsec_vpn_service_id":  {
+        "target_id": "{{vpn_nsx_uuid}}"
+    },
+    "local_address": "{{remote_address}}",
+    "trust_ca_ids": [],
+    "trust_crl_ids": []
+}
+
+> {%
+client.test('Create endpoint in NSX', function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('endpoint_nsx_uuid', response.body.id);
+client.log('Endpoint UUID: ' + response.body.id);
+%}
+
+### Delete the Endpoint in the API
+
+### Delete the Endpoint in NSX
+DELETE https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints/{{endpoint_nsx_uuid}}
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+> {%
+client.test('Delete endpoint using NSX', function () {
+    client.test(response.status === 204, '204 response not received');
+});
+%}
+
+### Delete Floating IP
+DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
