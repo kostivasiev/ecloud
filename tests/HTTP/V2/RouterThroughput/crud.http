@@ -8,8 +8,7 @@ Content-Type: application/json
 {
   "name": "10Gb",
   "availability_zone_id": "{{dev_availability_zone_id}}",
-  "committed_bandwidth": 10240,
-  "burst_size": 1024000000
+  "committed_bandwidth": 10240
 }
 
 > {%
@@ -65,7 +64,6 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.availability_zone_id === "az-aaaaaaaa", "availability_zone_id property incorrect");
   client.assert(response.body.data.name === "10Gb", "name property incorrect");
   client.assert(response.body.data.committed_bandwidth === 10240, "committed_bandwidth property incorrect");
-  client.assert(response.body.data.burst_size === 1024000000, "burst_size property incorrect");
 });
 %}
 ###
@@ -80,8 +78,7 @@ Content-Type: application/json
 {
   "name": "10Gb - updated",
   "availability_zone_id": "az-bbbbbbbb",
-  "committed_bandwidth": 888,
-  "burst_size": 999
+  "committed_bandwidth": 888
 }
 
 > {%
@@ -104,7 +101,6 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.availability_zone_id === "az-bbbbbbbb", "availability_zone_id property incorrect");
   client.assert(response.body.data.name === "10Gb - updated", "name property incorrect");
   client.assert(response.body.data.committed_bandwidth === 888, "committed_bandwidth property incorrect");
-  client.assert(response.body.data.burst_size === 999, "burst_size property incorrect");
 });
 %}
 ###

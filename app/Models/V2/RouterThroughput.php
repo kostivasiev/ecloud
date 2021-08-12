@@ -37,7 +37,6 @@ class RouterThroughput extends Model implements Filterable, Sortable
 
         $this->casts = [
             'committed_bandwidth' => 'integer',
-            'burst_size' => 'integer'
         ];
 
         $this->fillable([
@@ -45,7 +44,6 @@ class RouterThroughput extends Model implements Filterable, Sortable
             'availability_zone_id',
             'name',
             'committed_bandwidth',
-            'burst_size'
         ]);
 
         parent::__construct($attributes);
@@ -93,7 +91,6 @@ class RouterThroughput extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('committed_bandwidth', Filter::$numericDefaults),
-            $factory->create('burst_size', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -111,7 +108,6 @@ class RouterThroughput extends Model implements Filterable, Sortable
             $factory->create('availability_zone_id'),
             $factory->create('name'),
             $factory->create('committed_bandwidth'),
-            $factory->create('burst_size'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -136,7 +132,6 @@ class RouterThroughput extends Model implements Filterable, Sortable
             'availability_zone_id' => 'availability_zone_id',
             'name' => 'name',
             'committed_bandwidth' => 'committed_bandwidth',
-            'burst_size' => 'burst_size',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
