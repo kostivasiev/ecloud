@@ -81,3 +81,13 @@ client.test('VPN Deleted', function () {
     client.assert(response.status === 202, '202 Response not received');
 });
 %}
+
+### Get the Vpn Service in NSX
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/{{dev_router_id}}/locale-services/{{dev_router_id}}/ipsec-vpn-services/{{vpn_id}}
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Delete the Vpn Service in NSX
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/{{dev_router_id}}/locale-services/{{dev_router_id}}/ipsec-vpn-services/{{vpn_id}}
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

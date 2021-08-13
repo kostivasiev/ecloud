@@ -27,6 +27,7 @@ use App\Resources\V2\ProductResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\RouterThroughputResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
