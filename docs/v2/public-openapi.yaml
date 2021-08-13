@@ -372,6 +372,8 @@ paths:
     $ref: 'resources/VpnSession/collection.yaml'
   '/ecloud/v2/vpn-sessions/{vpnSessionId}':
     $ref: 'resources/VpnSession/item.yaml'
+  '/ecloud/v2/vpn-sessions/{vpnSessionId}/credentials':
+    $ref: 'resources/VpnSession/credentials.yaml'
 # When adding endpoints, add them to the list alphabetically using the following format:-
 #  '/ecloud/v2/references':
 #    $ref: 'resources/Reference/collection.yaml'

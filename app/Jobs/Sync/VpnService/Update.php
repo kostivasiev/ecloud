@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Jobs\Sync\Vpn;
+namespace App\Jobs\Sync\VpnService;
 
 use App\Jobs\Job;
+use App\Jobs\Nsx\VpnService\CreateService;
+use App\Jobs\Nsx\VpnService\RetrieveServiceUuid;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -20,9 +22,11 @@ class Update extends Job
 
     public function handle()
     {
-//        $this->updateTaskBatch([
-//            [
-//            ],
-//        ])->dispatch();
+        $this->updateTaskBatch([
+            [
+                new CreateService($this->task->resource),
+                new RetrieveServiceUuid($this->task->resource),
+            ],
+        ])->dispatch();
     }
 }

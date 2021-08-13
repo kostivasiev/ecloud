@@ -63,6 +63,24 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(200);
     }
 
+    public function testStoreDeployDateNoResellerIdFails()
+    {
+        $this->orchestratorConfig->reseller_id = null;
+        $this->orchestratorConfig->saveQuietly();
+
+        $data = [
+            'employee_id' => 1,
+            'deploy_on' => Carbon::tomorrow()->format('Y-m-d H:i:s')
+        ];
+        $this->patch('/v2/orchestrator-configs/' . $this->orchestratorConfig->id, $data)
+            ->seeJson(
+                [
+                    'title' => 'Validation Error',
+                    'detail' => 'The reseller id is required when specifying deploy on property',
+                ]
+            )->assertResponseStatus(422);
+    }
+
     public function testUpdateNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
