@@ -25,7 +25,7 @@ class CreateEndpoint extends Job
     {
         $floatingIp = FloatingIp::findOrFail($this->task->data['floating_ip_id']);
 
-        $this->model->vpnServices()->first()->router->availabilityZone->nsxService()->post(
+        $this->model->vpnService->router->availabilityZone->nsxService()->post(
             '/api/v1/vpn/ipsec/local-endpoints',
             [
                 'json' => [

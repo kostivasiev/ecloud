@@ -352,6 +352,11 @@ Content-Type:  application/json
 
 
 ###
-GET https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints/4a3871e6-2f6e-44de-95b8-63dfeab27fc1
+GET https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints/797a0e38-b3cc-43a6-a908-adf6d461212c
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json

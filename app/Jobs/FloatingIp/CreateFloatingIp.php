@@ -30,6 +30,8 @@ class CreateFloatingIp extends Job
         if (empty($this->task->data['floating_ip_id'])) {
             $floatingIp = app()->make(FloatingIp::class);
             $floatingIp->vpc_id = $this->task->resource->vpnService->router->vpc->id;
+            $floatingIp->availability_zone_id = $this->task->resource->vpnService->router->availabilityZone->id;
+            $floatingIp->resource()->associate($this->model);
             $floatingIp->syncSave();
 
             // Add floating ip id to task

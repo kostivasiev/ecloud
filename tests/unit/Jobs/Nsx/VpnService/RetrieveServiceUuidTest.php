@@ -1,7 +1,7 @@
 <?php
 namespace Tests\unit\Jobs\Nsx\VpnService;
 
-use App\Jobs\Nsx\VpnService\RetrieveServiceUuid;
+use App\Jobs\Nsx\VpnService\RetrieveEndpointUuid;
 use App\Models\V2\VpnService;
 use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
@@ -19,7 +19,7 @@ class RetrieveServiceUuidTest extends TestCase
             'name' => 'Unit Test VPN',
             'router_id' => $this->router()->id,
         ]);
-        $this->job = \Mockery::mock(RetrieveServiceUuid::class, [$this->vpnService])
+        $this->job = \Mockery::mock(RetrieveEndpointUuid::class, [$this->vpnService])
             ->makePartial();
     }
 

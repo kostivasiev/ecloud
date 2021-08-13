@@ -5,6 +5,7 @@ namespace App\Jobs\Sync\VpnEndpoint;
 use App\Jobs\FloatingIp\CreateFloatingIp;
 use App\Jobs\Job;
 use App\Jobs\Nsx\VpnEndpoint\CreateEndpoint;
+use App\Jobs\Nsx\VpnEndpoint\RetrieveEndpointUuid;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -26,6 +27,7 @@ class Update extends Job
             [
                 new CreateFloatingIp($this->task),
                 new CreateEndpoint($this->task),
+                new RetrieveEndpointUuid($this->task),
             ],
         ])->dispatch();
     }
