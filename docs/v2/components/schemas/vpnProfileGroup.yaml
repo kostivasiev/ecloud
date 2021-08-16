@@ -12,9 +12,8 @@ properties:
     required: true
     example: 'Description of my profile group'
   availability_zone_id:
-    readOnly: false
+    readOnly: true
     type: string
-    required: true
     example: 'az-2b66bb79'
   created_at:
     type: string
