@@ -21,6 +21,7 @@ class CreateTest extends TestCase
                 'id' => 'fip-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'ip_address' => '203.0.113.1',
+                'availability_zone_id' => $this->availabilityZone()->id,
             ]);
         });
         $this->vpnService = factory(VpnService::class)->create([

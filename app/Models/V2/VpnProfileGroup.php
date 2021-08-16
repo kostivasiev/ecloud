@@ -15,7 +15,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class VpnProfileGroup extends Model implements Filterable, Sortable
+class VpnProfileGroup extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -31,11 +31,22 @@ class VpnProfileGroup extends Model implements Filterable, Sortable
             'id',
             'name',
             'description',
+            'availability_zone_id',
             'ike_profile_id',
             'ipsec_profile_id',
             'dpd_profile_id',
         ];
         parent::__construct($attributes);
+    }
+
+    public function availabilityZone()
+    {
+        return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    public function vpnSessions()
+    {
+        return $this->hasMany(VpnSession::class);
     }
 
     /**
@@ -48,6 +59,7 @@ class VpnProfileGroup extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),
+            $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('ike_profile_id', Filter::$stringDefaults),
             $factory->create('ipsec_profile_id', Filter::$stringDefaults),
             $factory->create('dpd_profile_id', Filter::$stringDefaults),
@@ -67,6 +79,7 @@ class VpnProfileGroup extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('description'),
+            $factory->create('availability_zone_id'),
             $factory->create('ike_profile_id'),
             $factory->create('ipsec_profile_id'),
             $factory->create('dpd_profile_id'),
@@ -95,6 +108,7 @@ class VpnProfileGroup extends Model implements Filterable, Sortable
             'id' => 'id',
             'name' => 'name',
             'description' => 'description',
+            'availability_zone_id' => 'availability_zone_id',
             'ike_profile_id' => 'ike_profile_id',
             'ipsec_profile_id' => 'ipsec_profile_id',
             'dpd_profile_id' => 'dpd_profile_id',
