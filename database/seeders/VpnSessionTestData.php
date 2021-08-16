@@ -28,6 +28,7 @@ class VpnSessionTestData extends Seeder
                 'ike_profile_id' => 'ike-abc123xyz',
                 'ipsec_profile_id' => 'ipsec-abc123xyz',
                 'dpd_profile_id' => 'dpd-abc123xyz',
+                'availability_zone_id' => 'az-aaaaaaaa',
             ]);
         VpnService::on('ecloud')
             ->create([
@@ -39,7 +40,7 @@ class VpnSessionTestData extends Seeder
             ->create([
                 'id' => 'vpne-aaaaaaaa',
                 'name' => 'Test VPN Endpoint',
-//                'vpn_service_id' => 'vpn-aaaaaaaa',
+                'vpn_service_id' => 'vpn-aaaaaaaa',
             ]);
         VpnSession::on('ecloud')
             ->create([

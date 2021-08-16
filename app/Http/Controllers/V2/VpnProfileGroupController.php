@@ -40,7 +40,6 @@ class VpnProfileGroupController extends BaseController
             'dpd_profile_id',
         ]));
         $vpns->save();
-        $vpns->refresh();
         return $this->responseIdMeta($request, $vpns->id, 201);
     }
 
