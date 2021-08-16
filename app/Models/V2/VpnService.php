@@ -30,7 +30,7 @@ class VpnService extends Model implements Filterable, Sortable, AvailabilityZone
     public $keyPrefix = 'vpn';
 
     public $children = [
-        'vpnSession',
+        'vpnSessions',
         'vpnEndpoints',
     ];
 
@@ -63,9 +63,9 @@ class VpnService extends Model implements Filterable, Sortable, AvailabilityZone
         return $this->hasMany(VpnEndpoint::class);
     }
 
-    public function vpnSession()
+    public function vpnSessions()
     {
-        return $this->hasOne(VpnSession::class);
+        return $this->hasMany(VpnSession::class);
     }
 
     public function availabilityZone()
