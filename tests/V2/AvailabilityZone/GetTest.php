@@ -4,11 +4,32 @@ namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneCapacity;
+use App\Models\V2\Region;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase
 {
+    protected AvailabilityZone $regionHiddenAz;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        // Hidden Region
+        $hiddenRegion = factory(Region::class)->create([
+            'id' => 'reg-hidden',
+            'name' => 'Hidden Region',
+            'is_public' => false,
+        ]);
+
+        // Availability Zone hidden by region
+        $this->regionHiddenAz = factory(AvailabilityZone::class)->create([
+            'id' => 'az-hidden',
+            'name' => 'Region Hidden AZ',
+            'region_id' => $hiddenRegion->id,
+        ]);
+    }
+
     public function testGetCollectionAsAdmin()
     {
         // Availability Zone only visible to admins
@@ -25,9 +46,12 @@ class GetTest extends TestCase
         ])->seeJson([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
+        ])->seeJson([
+            'id' => $this->regionHiddenAz->id,
+            'name' => $this->regionHiddenAz->name,
         ])->assertResponseStatus(200);
 
-        $this->assertCount(2, $this->response->original);
+        $this->assertCount(3, $this->response->original);
     }
 
     public function testGetCollectionAsNonAdmin()
@@ -46,6 +70,8 @@ class GetTest extends TestCase
         ])->seeJson([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
+        ])->dontSeeJson([
+            'id' => $this->regionHiddenAz->id,
         ])->assertResponseStatus(200);
 
         $this->assertCount(1, $this->response->original);
@@ -62,6 +88,8 @@ class GetTest extends TestCase
         ])->seeJson([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
+        ])->dontSeeJson([
+            'id' => $this->regionHiddenAz->id,
         ])->assertResponseStatus(200);
     }
 
@@ -76,6 +104,8 @@ class GetTest extends TestCase
         ])->seeJson([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
+        ])->dontSeeJson([
+            'id' => $this->regionHiddenAz->id,
         ])->assertResponseStatus(200);
     }
 
@@ -90,6 +120,8 @@ class GetTest extends TestCase
         ])->seeJson([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
+        ])->dontSeeJson([
+            'id' => $this->regionHiddenAz->id,
         ])->assertResponseStatus(200);
     }
 
@@ -119,6 +151,8 @@ class GetTest extends TestCase
             'datacentre_site_id' => $this->availabilityZone()->datacentre_site_id,
             'region_id' => $this->availabilityZone()->region_id
         ])->dontSeeJson([
+            'id' => $this->regionHiddenAz->id,
+        ])->dontSeeJson([
             'is_public' => true
         ])->assertResponseStatus(200);
     }
@@ -139,6 +173,8 @@ class GetTest extends TestCase
             'region_id' => $this->availabilityZone()->region_id
         ])->dontSeeJson([
             'is_public' => true
+        ])->dontSeeJson([
+            'id' => $this->regionHiddenAz->id,
         ])->assertResponseStatus(200);
     }
 
@@ -158,6 +194,8 @@ class GetTest extends TestCase
             'alert_warning' => $availabilityZoneCapacity->alert_warning,
             'alert_critical' => $availabilityZoneCapacity->alert_critical,
             'max' => $availabilityZoneCapacity->max
+        ])->dontSeeJson([
+            'id' => $this->regionHiddenAz->id,
         ])->assertResponseStatus(200);
     }
 }

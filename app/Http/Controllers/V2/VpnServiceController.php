@@ -35,17 +35,17 @@ class VpnServiceController extends BaseController
     public function create(CreateRequest $request)
     {
         $vpnService = new VpnService($request->only(['router_id', 'name']));
-        $vpnService->save();
-        $vpnService->refresh();
-        return $this->responseIdMeta($request, $vpnService->id, 202);
+        $task = $vpnService->syncSave();
+
+        return $this->responseIdMeta($request, $vpnService->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $vpnServiceId)
     {
         $vpnService = VpnService::forUser(Auth::user())->findOrFail($vpnServiceId);
         $vpnService->fill($request->only(['name']));
-        $vpnService->save();
-        return $this->responseIdMeta($request, $vpnService->id, 202);
+        $task = $vpnService->syncSave();
+        return $this->responseIdMeta($request, $vpnService->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $vpnServiceId)

@@ -184,7 +184,9 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         if ($user->isAdmin()) {
             return $query;
         }
-        return $query->where('is_public', '=', 1);
+        return $query->whereHas('region', function ($query) {
+            $query->where('is_public', '=', true);
+        })->where('is_public', '=', true);
     }
 
     /**

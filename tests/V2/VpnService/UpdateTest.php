@@ -2,11 +2,9 @@
 
 namespace Tests\V2\VpnService;
 
-use App\Models\V2\Task;
+use App\Events\V2\Task\Created;
 use App\Models\V2\VpnService;
-use App\Support\Sync;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
@@ -25,6 +23,7 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
+        Event::fake(Created::class);
         $data = [
             'name' => 'Unit Test VPN (Updated)',
             'router_id' => $this->router()->id,
