@@ -29,7 +29,10 @@ class VpnService extends Model implements Filterable, Sortable, AvailabilityZone
 
     public $keyPrefix = 'vpn';
 
-    public $children = [];
+    public $children = [
+        'vpnSession',
+        'vpnEndpoints',
+    ];
 
     public function __construct(array $attributes = [])
     {
