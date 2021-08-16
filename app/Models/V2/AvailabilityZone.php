@@ -127,6 +127,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->belongsToMany(Image::class);
     }
 
+    public function vpnProfileGroup()
+    {
+        return $this->hasMany(VpnProfileGroup::class);
+    }
+
     public function nsxService()
     {
         if (!$this->nsxService) {

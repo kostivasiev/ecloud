@@ -5,6 +5,8 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnService;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\IsSameAvailabilityZone;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
@@ -19,6 +21,7 @@ class CreateRequest extends FormRequest
                 Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
                 new ExistsForUser(VpnService::class),
                 new IsResourceAvailable(VpnService::class),
+                new IsSameAvailabilityZone(Request::input('floating_ip_id')),
             ],
             'floating_ip_id' => [
                 'sometimes',
