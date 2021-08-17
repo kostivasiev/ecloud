@@ -23,11 +23,16 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $dhcpId)
  * @method static forUser(string $user)
  */
-class VpnService extends Model implements Filterable, Sortable
+class VpnService extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'vpn';
+
+    public $children = [
+        'vpnSessions',
+        'vpnEndpoints',
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -58,9 +63,14 @@ class VpnService extends Model implements Filterable, Sortable
         return $this->hasMany(VpnEndpoint::class);
     }
 
-    public function vpnSession()
+    public function vpnSessions()
     {
-        return $this->hasOne(VpnSession::class);
+        return $this->hasMany(VpnSession::class);
+    }
+
+    public function availabilityZone()
+    {
+        return $this->router->availabilityZone();
     }
 
     /**

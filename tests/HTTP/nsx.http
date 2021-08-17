@@ -299,7 +299,11 @@ Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
 
-# ebe3adf5-c920-4442-b7fb-573e28d543c1
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-fd91d1dd-dev/locale-services/rtr-fd91d1dd-dev/ipsec-vpn-services?include_mark_for_delete_objects=true'
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
 
 
 ### Create VPN Service

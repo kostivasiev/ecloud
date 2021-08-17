@@ -1,12 +1,8 @@
 <?php
 namespace App\Http\Requests\V2\VpnSession;
 
-use App\Models\V2\VpnEndpoint;
-use App\Models\V2\VpnEndpointVpnSession;
 use App\Models\V2\VpnProfileGroup;
-use App\Rules\V2\EitherOrNotBoth;
-use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\ValidCidrNetworkCsvString;
 use App\Rules\V2\ValidIpv4;
 use Illuminate\Validation\Rule;
@@ -29,6 +25,7 @@ class UpdateRequest extends FormRequest
                 'required',
                 'string',
                 Rule::exists(VpnProfileGroup::class, 'id')->whereNull('deleted_at'),
+                new IsSameAvailabilityZone($vpnSessionId),
             ],
             'remote_ip' => [
                 'sometimes',
