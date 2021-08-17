@@ -72,7 +72,7 @@ class BaseController extends Controller
                     'task_id' => $taskId
                 ],
                 'meta' => [
-                    'location' => config('app.url') . '/tasks/' . $taskId,
+                    'location' => config('app.url') . '/v2/tasks/' . $taskId,
                 ],
             ],
             $statusCode
