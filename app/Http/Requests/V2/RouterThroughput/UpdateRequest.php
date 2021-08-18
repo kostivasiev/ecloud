@@ -41,11 +41,6 @@ class UpdateRequest extends FormRequest
                 'required',
                 'integer'
             ],
-            'burst_size' => [
-                'sometimes',
-                'required',
-                'integer'
-            ]
         ];
     }
 

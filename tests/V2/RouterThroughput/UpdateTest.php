@@ -38,7 +38,6 @@ class UpdateTest extends TestCase
             'name' => 'NEW NAME',
             'availability_zone_id' => $availabilityZone->id,
             "committed_bandwidth" => 999,
-            "burst_size" => 888
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -48,7 +47,6 @@ class UpdateTest extends TestCase
                 'name' => 'NEW NAME',
                 'availability_zone_id' => $availabilityZone->id,
                 "committed_bandwidth" => 999,
-                "burst_size" => 888
             ],
                 'ecloud'
             )

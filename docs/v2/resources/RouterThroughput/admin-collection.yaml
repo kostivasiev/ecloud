@@ -11,13 +11,6 @@ get:
             type: object
             allOf:
               - $ref: '../../components/schemas/routerThroughput.yaml'
-              - type: object
-                properties:
-                  burst_size:
-                    description: Burst size in MB
-                    type: integer
-                    required: true
-                    example: 1024
                 meta:
                   allOf:
                     - $ref: '../../components/schemas/meta.yaml'

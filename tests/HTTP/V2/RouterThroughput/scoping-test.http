@@ -45,8 +45,7 @@ Content-Type: application/json
 {
   "name": "10Gb",
   "availability_zone_id": "{{public_az_id}}",
-  "committed_bandwidth": 10240,
-  "burst_size": 1024000000
+  "committed_bandwidth": 10240
 }
 
 > {%
@@ -69,8 +68,7 @@ Content-Type: application/json
 {
   "name": "10Gb",
   "availability_zone_id": "{{private_az_id}}",
-  "committed_bandwidth": 10240,
-  "burst_size": 1024000000
+  "committed_bandwidth": 10240
 }
 
 > {%

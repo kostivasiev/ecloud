@@ -29,7 +29,6 @@ class GetTest extends TestCase
                 'name' => $this->routerThroughput->name,
                 'availability_zone_id' => $this->routerThroughput->availability_zone_id,
                 "committed_bandwidth" => $this->routerThroughput->committed_bandwidth,
-                "burst_size" => $this->routerThroughput->burst_size
             ])
             ->assertResponseStatus(200);
     }
@@ -45,7 +44,6 @@ class GetTest extends TestCase
                 'name' => $this->routerThroughput->name,
                 'availability_zone_id' => $this->routerThroughput->availability_zone_id,
                 "committed_bandwidth" => $this->routerThroughput->committed_bandwidth,
-                "burst_size" => $this->routerThroughput->burst_size
             ])
             ->assertResponseStatus(200);
     }
