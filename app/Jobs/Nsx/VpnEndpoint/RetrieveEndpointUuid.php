@@ -5,9 +5,7 @@ namespace App\Jobs\Nsx\VpnEndpoint;
 use App\Jobs\Job;
 use App\Models\V2\Task;
 use App\Models\V2\VpnEndpoint;
-use App\Models\V2\VpnService;
 use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -25,6 +23,9 @@ class RetrieveEndpointUuid extends Job
         $this->model = $task->resource;
     }
 
+    /**
+     * @deprecated
+     */
     public function handle()
     {
         $response = $this->model->vpnService->router->availabilityZone->nsxService()->get(
