@@ -21,5 +21,8 @@ class Delete extends Job
     public function handle()
     {
         // @todo - See https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/912
+        $this->task->completed = true;
+        $this->task->save();
+        $this->task->resource->delete();
     }
 }

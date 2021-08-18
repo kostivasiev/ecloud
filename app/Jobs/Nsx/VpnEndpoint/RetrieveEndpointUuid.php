@@ -1,39 +1,40 @@
 <?php
 
-namespace App\Jobs\Nsx\VpnService;
+namespace App\Jobs\Nsx\VpnEndpoint;
 
 use App\Jobs\Job;
-use App\Models\V2\VpnService;
+use App\Models\V2\Task;
+use App\Models\V2\VpnEndpoint;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-/**
- * @deprecated
- */
-class RetrieveServiceUuid extends Job
+class RetrieveEndpointUuid extends Job
 {
     use Batchable, LoggableModelJob;
 
     public $tries = 60;
     public $backoff = 5;
 
-    public VpnService $model;
+    public VpnEndpoint $model;
 
-    public function __construct(VpnService $vpnService)
+    public function __construct(Task $task)
     {
-        $this->model = $vpnService;
+        $this->model = $task->resource;
     }
 
+    /**
+     * @deprecated
+     */
     public function handle()
     {
-        $response = $this->model->router->availabilityZone->nsxService()->get(
-            '/api/v1/search/query?query=resource_type:IPSecVPNService%20AND%20display_name:' . $this->model->id
+        $response = $this->model->vpnService->router->availabilityZone->nsxService()->get(
+            '/api/v1/search/query?query=resource_type:IPSecVPNLocalEndpoint%20AND%20display_name:' . $this->model->id
         );
         $response = json_decode($response->getBody()->getContents());
         if ($response->result_count === 0) {
             Log::info(
-                'Waiting for ' . $this->model->id . ' vpn service creation, retrying in ' . $this->backoff . ' seconds'
+                'Waiting for ' . $this->model->id . ' vpn endpoint creation, retrying in ' . $this->backoff . ' seconds'
             );
             $this->release($this->backoff);
             return;

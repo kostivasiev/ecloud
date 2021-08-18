@@ -303,3 +303,87 @@ Content-Type:  application/json
 GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-fd91d1dd-dev/locale-services/rtr-fd91d1dd-dev/ipsec-vpn-services?include_mark_for_delete_objects=true'
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+
+
+### Create VPN Service
+PATCH https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-timtest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVpnService",
+    "enabled": true
+}
+
+### GET VPN Services - ffad7a64-9e54-4dd7-a2db-00f6d1abf5a4
+GET https://185.197.63.88/api/v1/vpn/ipsec/services
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### GET VPN Service
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Delete VPN Service
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-timtest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get Local Endpoint
+GET https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+POST https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVPNLocalEndpoint",
+    "display_name": "timtest-vpn-local-endpoint",
+    "local_address": "203.0.113.76",
+    "local_id": "203.0.113.76",
+    "ipsec_vpn_service_id": {
+        "target_id": "04d4c278-113f-4d95-ade7-650aec147645",
+        "target_type": "IPSecVpnService"
+    },
+    "trust_ca_ids": [],
+    "trust_crl_ids": []
+}
+
+
+### Delete VPN Service
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-0481248c-dev/locale-services/rtr-0481248c-dev/ipsec-vpn-services/vpn-404e4e11-dev
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Create VPN Endpoint
+PATCH https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints/vpne-paultest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVpnLocalEndpoint",
+    "display_name": "paultest-vpn-local-endpoint",
+    "local_address": "203.0.113.76"
+}
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services/Reference_IPSec_Service/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
