@@ -16,7 +16,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class VpnSession extends Model implements Filterable, Sortable
+class VpnSession extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -59,6 +59,11 @@ class VpnSession extends Model implements Filterable, Sortable
     public function credential()
     {
         return $this->hasOne(Credential::class, 'resource_id', 'id');
+    }
+
+    public function availabilityZone()
+    {
+        return $this->vpnService->router->availabilityZone();
     }
 
     /**

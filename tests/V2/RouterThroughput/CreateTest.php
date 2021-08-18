@@ -30,7 +30,6 @@ class CreateTest extends TestCase
             'name' => '10Gb',
             'availability_zone_id' => $this->availabilityZone->id,
             "committed_bandwidth" => 10240,
-            "burst_size" => 1024
         ];
 
         $this->post('/v2/router-throughputs', $data, [

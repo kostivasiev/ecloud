@@ -493,8 +493,8 @@ class InstanceController extends BaseController
                     'task_id' => $task->id
                 ],
                 'meta' => [
-                    'location' => config('app.url') . '/images/' . $image->id,
-                    'task_location' => config('app.url') . '/tasks/' . $task->id
+                    'location' => config('app.url') . 'v2/images/' . $image->id,
+                    'task_location' => config('app.url') . 'v2/tasks/' . $task->id
                 ],
             ],
             202

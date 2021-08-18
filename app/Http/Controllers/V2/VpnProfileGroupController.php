@@ -34,12 +34,12 @@ class VpnProfileGroupController extends BaseController
         $vpns = new VpnProfileGroup($request->only([
             'name',
             'description',
+            'availability_zone_id',
             'ike_profile_id',
             'ipsec_profile_id',
             'dpd_profile_id',
         ]));
         $vpns->save();
-        $vpns->refresh();
         return $this->responseIdMeta($request, $vpns->id, 201);
     }
 
@@ -49,6 +49,7 @@ class VpnProfileGroupController extends BaseController
         $vpns->fill($request->only([
             'name',
             'description',
+            'availability_zone_id',
             'ike_profile_id',
             'ipsec_profile_id',
             'dpd_profile_id',

@@ -11,6 +11,7 @@ use UKFast\Responses\UKFastResource;
  * @property string id
  * @property string name
  * @property string description
+ * @property string availability_zone_id
  * @property string ike_profile_id
  * @property string ipsec_profile_id
  * @property string dpd_profile_id
@@ -29,6 +30,7 @@ class VpnProfileGroupResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
+            'availability_zone_id' => $this->availability_zone_id,
         ];
         if ($request->user()->isAdmin()) {
             $data['ike_profile_id'] = $this->ike_profile_id;

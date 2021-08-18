@@ -1,9 +1,11 @@
 <?php
 namespace Tests\V2\VpnEndpoint;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -21,6 +23,7 @@ class CreateTest extends TestCase
                 'id' => 'fip-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'ip_address' => '203.0.113.1',
+                'availability_zone_id' => $this->availabilityZone()->id,
             ]);
         });
         $this->vpnService = factory(VpnService::class)->create([
@@ -30,6 +33,7 @@ class CreateTest extends TestCase
 
     public function testCreateResource()
     {
+        Event::fake(Created::class);
         $data = [
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpnService->id,

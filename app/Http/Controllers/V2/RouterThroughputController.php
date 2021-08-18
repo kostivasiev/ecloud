@@ -35,7 +35,6 @@ class RouterThroughputController extends BaseController
             'name',
             'availability_zone_id',
             'committed_bandwidth',
-            'burst_size'
         ]));
         $routerThroughput->save();
         return $this->responseIdMeta($request, $routerThroughput->id, 201);
@@ -48,7 +47,6 @@ class RouterThroughputController extends BaseController
             'name',
             'availability_zone_id',
             'committed_bandwidth',
-            'burst_size'
         ]));
         $routerThroughput->save();
         return $this->responseIdMeta($request, $routerThroughput->id, 200);

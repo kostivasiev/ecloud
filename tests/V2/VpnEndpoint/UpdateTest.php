@@ -1,9 +1,11 @@
 <?php
 namespace Tests\V2\VpnEndpoint;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -39,6 +41,7 @@ class UpdateTest extends TestCase
 
     public function testUpdateResource()
     {
+        Event::fake(Created::class);
         $data = [
             'name' => 'Updated name',
         ];
@@ -55,6 +58,7 @@ class UpdateTest extends TestCase
 
     public function testUpdateResourceWithSameData()
     {
+        Event::fake(Created::class);
         $data = [
             'name' => $this->vpnEndpoint->name,
         ];

@@ -23,11 +23,16 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $dhcpId)
  * @method static forUser(string $user)
  */
-class VpnService extends Model implements Filterable, Sortable
+class VpnService extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'vpn';
+
+    public $children = [
+        'vpnSessions',
+        'vpnEndpoints',
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -39,6 +44,7 @@ class VpnService extends Model implements Filterable, Sortable
             'id',
             'router_id',
             'name',
+            'nsx_uuid',
         ];
         parent::__construct($attributes);
     }
@@ -57,9 +63,14 @@ class VpnService extends Model implements Filterable, Sortable
         return $this->hasMany(VpnEndpoint::class);
     }
 
-    public function vpnSession()
+    public function vpnSessions()
     {
-        return $this->hasOne(VpnSession::class);
+        return $this->hasMany(VpnSession::class);
+    }
+
+    public function availabilityZone()
+    {
+        return $this->router->availabilityZone();
     }
 
     /**
@@ -87,6 +98,7 @@ class VpnService extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('router_id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('nsx_uuid', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -103,6 +115,7 @@ class VpnService extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('router_id'),
             $factory->create('name'),
+            $factory->create('nsx_uuid'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -128,6 +141,7 @@ class VpnService extends Model implements Filterable, Sortable
             'id' => 'id',
             'router_id' => 'router_id',
             'name' => 'name',
+            'nsx_uuid' => 'nsx_uuid',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

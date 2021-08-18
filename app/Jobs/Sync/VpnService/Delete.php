@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Jobs\Sync\Vpn;
+namespace App\Jobs\Sync\VpnService;
 
 use App\Jobs\Job;
+use App\Jobs\Nsx\VpnService\Undeploy;
+use App\Jobs\Nsx\VpnService\UndeployCheck;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -20,9 +22,11 @@ class Delete extends Job
 
     public function handle()
     {
-//        $this->deleteTaskBatch([
-//            [
-//            ]
-//        ])->dispatch();
+        $this->deleteTaskBatch([
+            [
+                new Undeploy($this->task->resource),
+                new UndeployCheck($this->task->resource),
+            ]
+        ])->dispatch();
     }
 }
