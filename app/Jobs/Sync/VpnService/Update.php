@@ -3,7 +3,8 @@
 namespace App\Jobs\Sync\VpnService;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\VpnService\CreateService;
+use App\Jobs\Nsx\DeployCheck;
+use App\Jobs\Nsx\VpnService\Deploy;
 use App\Jobs\Nsx\VpnService\RetrieveServiceUuid;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
@@ -24,8 +25,16 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
-                new CreateService($this->task->resource),
-                new RetrieveServiceUuid($this->task->resource),
+                new Deploy($this->task->resource),
+                // TODO: Why are we doing this? what is this for? Isn't the resource ID the model ID we pass in?
+//                new RetrieveServiceUuid($this->task->resource),
+                new DeployCheck(
+                    $this->task->resource,
+                    $this->task->resource->router->availabilityZone,
+                    '/infra/tier-1s/' . $this->task->resource->router->id .
+                    '/locale-services/' . $this->task->resource->router->id .
+                    '/ipsec-vpn-services/'
+                ),
             ],
         ])->dispatch();
     }

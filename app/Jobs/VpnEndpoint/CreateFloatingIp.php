@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\FloatingIp;
+namespace App\Jobs\VpnEndpoint;
 
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
@@ -18,27 +18,29 @@ class CreateFloatingIp extends Job
     private Task $task;
     private VpnEndpoint $model;
 
-    public function __construct(Task $task)
+    public function __construct(VpnEndpoint $vpnEndpoint, Task $task)
     {
         $this->task = $task;
-        $this->model = $task->resource;
+        $this->model = $vpnEndpoint;
     }
 
     public function handle()
     {
+        $vpnEndpoint = $this->model;
         $floatingIp = null;
         if (empty($this->task->data['floating_ip_id'])) {
             $floatingIp = app()->make(FloatingIp::class);
-            $floatingIp->vpc_id = $this->task->resource->vpnService->router->vpc->id;
-            $floatingIp->availability_zone_id = $this->task->resource->vpnService->router->availabilityZone->id;
+            $floatingIp->vpc()->associate($vpnEndpoint->vpnService->router->vpc);
+            $floatingIp->availabilityZone()->associate($vpnEndpoint->vpnService->router->availabilityZone);
             $floatingIp->resource()->associate($this->model);
             $floatingIp->syncSave();
 
-            // Add floating ip id to task
+            // Add floating ip id to task data
             $this->task->data = [
                 'floating_ip_id' => $floatingIp->id,
             ];
             $this->task->saveQuietly();
+            Log::info(get_class($this) . ' : Floating IP ' . $floatingIp->id . 'created for VPN Endpoint ' . $vpnEndpoint->id);
         }
         if (!$floatingIp) {
             $floatingIp = FloatingIp::findOrFail($this->task->data['floating_ip_id']);

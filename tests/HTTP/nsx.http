@@ -322,7 +322,7 @@ Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
 ### GET VPN Service
-GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-timtest
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
@@ -355,12 +355,49 @@ Content-Type:  application/json
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Delete VPN Service
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-0481248c-dev/locale-services/rtr-0481248c-dev/ipsec-vpn-services/vpn-404e4e11-dev
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Create VPN Endpoint
+PATCH https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints/vpne-paultest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVpnLocalEndpoint",
+    "display_name": "paultest-vpn-local-endpoint",
+    "local_address": "203.0.113.76"
+}
+
 ###
-GET https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
 ###
-DELETE https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints/797a0e38-b3cc-43a6-a908-adf6d461212c
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services/Reference_IPSec_Service/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+

@@ -5,10 +5,12 @@ namespace App\Jobs\Nsx\VpnService;
 use App\Jobs\Job;
 use App\Models\V2\VpnService;
 use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @deprecated
+ */
 class RetrieveServiceUuid extends Job
 {
     use Batchable, LoggableModelJob;
