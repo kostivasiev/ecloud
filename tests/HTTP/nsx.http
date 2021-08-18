@@ -355,20 +355,6 @@ Content-Type:  application/json
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### Delete VPN Service
 DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-0481248c-dev/locale-services/rtr-0481248c-dev/ipsec-vpn-services/vpn-404e4e11-dev
 Authorization: Basic {{nsx_username}} {{nsx_password}}
