@@ -4,9 +4,7 @@ namespace App\Jobs\Nsx\VpnEndpoint;
 use App\Jobs\Job;
 use App\Models\V2\VpnEndpoint;
 use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class Undeploy extends Job
 {
@@ -14,23 +12,21 @@ class Undeploy extends Job
 
     private VpnEndpoint $model;
 
-    public function __construct(VpnEndpoint $model)
+    public function __construct(VpnEndpoint $vpnEndpoint)
     {
-        $this->model = $model;
+        $this->model = $vpnEndpoint;
     }
 
     public function handle()
     {
-        try {
-            $this->model->vpnService->router->availabilityZone->nsxService()->delete(
-                '/api/v1/vpn/ipsec/local-endpoints/' . $this->model->nsx_uuid
-            );
-        } catch (RequestException $e) {
-            if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
-                Log::info("Vpn Endpoint doesn't exist, skipping");
-                return;
-            }
-            throw $e;
-        }
+        $vpnEndpoint = $this->model;
+        $router = $vpnEndpoint->vpnService->router;
+
+        $router->availabilityZone->nsxService()->delete(
+            '/policy/api/v1/infra/tier-1s/' . $router->id .
+            '/locale-services/' . $router->id .
+            '/ipsec-vpn-services/' . $vpnEndpoint->vpnService->id .
+            '/local-endpoints/' . $vpnEndpoint->id
+        );
     }
 }
