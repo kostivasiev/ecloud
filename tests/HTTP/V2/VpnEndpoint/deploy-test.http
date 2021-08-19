@@ -47,8 +47,7 @@ Content-Type:  application/json
 
 {
     "name": "Endpoint Test",
-    "vpn_service_id": "{{vpn_id}}",
-    "vpc_id": "{{dev_vpc_id}}"
+    "vpn_service_id": "{{vpn_id}}"
 }
 
 > {%
@@ -95,7 +94,6 @@ Content-Type:  application/json
 client.test('Delete VPN Endpoint', function () {
     client.assert(response.status === 202, '202 response not received');
 });
-client.log('UPDATE floating_ips SET floating_ips.resource_type=NULL, floating_ips.resource_id=NULL WHERE floating_ips.id=\'' + client.global.get('fip_id') + '\';')
 %}
 
 ### Before going any further execute the following sql in the database:-

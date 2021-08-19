@@ -3,8 +3,6 @@ namespace Tests\unit\Jobs\Nsx\VpnEndpoint;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\Nsx\VpnEndpoint\Deploy;
-use App\Models\V2\Task;
-use App\Support\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -38,19 +36,6 @@ class DeployTest extends TestCase
             ])
             ->andReturnTrue();
 
-        $task = Task::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'task-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->vpnEndpoint);
-            $task->data = [
-                'floating_ip_id' => $this->floatingIp()->id,
-            ];
-            $task->save();
-            return $task;
-        });
-
         dispatch(new Deploy($this->vpnEndpoint()));
 
         Event::assertNotDispatched(JobFailed::class);
@@ -60,20 +45,7 @@ class DeployTest extends TestCase
     {
         Event::fake([JobFailed::class]);
 
-        $task = Task::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'task-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->vpnEndpoint('vpne-test', false));
-            $task->data = [
-                'floating_ip_id' => $this->floatingIp()->id,
-            ];
-            $task->save();
-            return $task;
-        });
-
-        dispatch(new Deploy($this->vpnEndpoint()));
+        dispatch(new Deploy($this->vpnEndpoint('vpne-test', false)));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -84,19 +56,6 @@ class DeployTest extends TestCase
 
         $this->vpnService()->router_id = 'rtr-xxx';
         $this->vpnService()->save();
-
-        $task = Task::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'task-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->vpnEndpoint('vpne-test', false));
-            $task->data = [
-                'floating_ip_id' => $this->floatingIp()->id,
-            ];
-            $task->save();
-            return $task;
-        });
 
         dispatch(new Deploy($this->vpnEndpoint()));
 
@@ -125,19 +84,6 @@ class DeployTest extends TestCase
             ->andThrow(new RequestException('Not Found', new Request('post', '/'), new Response(404, [], 'Resource not found')));
 
         Event::fake([JobFailed::class]);
-
-        $task = Task::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'task-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->vpnEndpoint('vpne-test', false));
-            $task->data = [
-                'floating_ip_id' => $this->floatingIp()->id,
-            ];
-            $task->save();
-            return $task;
-        });
 
         dispatch(new Deploy($this->vpnEndpoint()));
 

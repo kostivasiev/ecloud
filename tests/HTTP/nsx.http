@@ -372,9 +372,21 @@ Content-Type:  application/json
 }
 
 ###
-GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints/vpne-paultest
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints/vpne-paultest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints?include_mark_for_delete_objects=true
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
 
 ###
 GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services

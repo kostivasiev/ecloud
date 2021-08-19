@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 trait VpnEndpointMock
 {
+    use VpnServiceMock;
+
     protected $vpnEndpoint;
 
     public function vpnEndpoint($id = 'vpne-test', $assignFloatingIp = true): VpnEndpoint
