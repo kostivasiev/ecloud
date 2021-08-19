@@ -9,6 +9,9 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * @deprecated
+ */
 class RetrieveEndpointUuid extends Job
 {
     use Batchable, LoggableModelJob;
@@ -23,9 +26,6 @@ class RetrieveEndpointUuid extends Job
         $this->model = $task->resource;
     }
 
-    /**
-     * @deprecated
-     */
     public function handle()
     {
         $response = $this->model->vpnService->router->availabilityZone->nsxService()->get(
