@@ -68,6 +68,7 @@ class CreateTest extends TestCase
                 'remote_networks' => '172.12.23.11/32',
             ]
         )->assertResponseStatus(202);
+        Event::assertDispatched(Created::class);
     }
 
     public function testCreateResourceInvalidService()
