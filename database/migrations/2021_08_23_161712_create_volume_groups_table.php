@@ -13,7 +13,7 @@ class CreateVolumeGroupsTable extends Migration
      */
     public function up()
     {
-        Schema::create('volume_groups', function (Blueprint $table) {
+        Schema::connection('ecloud')->create('volume_groups', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->uuid('availability_zone_id')->index();
@@ -30,6 +30,6 @@ class CreateVolumeGroupsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('volume_groups');
+        Schema::connection('ecloud')->dropIfExists('volume_groups');
     }
 }
