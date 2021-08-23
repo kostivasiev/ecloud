@@ -24,10 +24,10 @@ class VolumeGroupController extends BaseController
         ));
     }
 
-    public function show(Request $request, string $routerId)
+    public function show(Request $request, string $volumeGroupId)
     {
         return new VolumeGroupResource(
-            VolumeGroup::forUser($request->user())->findOrFail($routerId)
+            VolumeGroup::forUser($request->user())->findOrFail($volumeGroupId)
         );
     }
 
@@ -39,18 +39,18 @@ class VolumeGroupController extends BaseController
         return $this->responseIdMeta($request, $volumeGroup->id, 202, $task->id);
     }
 
-    public function update(UpdateRequest $request, string $routerId)
+    public function update(UpdateRequest $request, string $volumeGroupId)
     {
-        $volumeGroup = VolumeGroup::forUser(Auth::user())->findOrFail($routerId);
+        $volumeGroup = VolumeGroup::forUser(Auth::user())->findOrFail($volumeGroupId);
         $volumeGroup->fill($request->only(['name']));
 
         $task = $volumeGroup->syncSave();
         return $this->responseIdMeta($request, $volumeGroup->id, 202, $task->id);
     }
 
-    public function destroy(Request $request, string $routerId)
+    public function destroy(Request $request, string $volumeGroupId)
     {
-        $volumeGroup = VolumeGroup::forUser($request->user())->findOrFail($routerId);
+        $volumeGroup = VolumeGroup::forUser($request->user())->findOrFail($volumeGroupId);
 
         if (!$volumeGroup->canDelete()) {
             return $volumeGroup->getDeletionError();
