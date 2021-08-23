@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\VpnSession\CreateRequest;
 use App\Http\Requests\V2\VpnSession\UpdateRequest;
+use App\Models\V2\Credential;
 use App\Models\V2\VpnSession;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\VpnSessionResource;
@@ -71,9 +72,16 @@ class VpnSessionController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function credentials(Request $request, string $vpnSessionId)
+    public function credentials(Request $request, QueryTransformer $queryTransformer, string $vpnSessionId)
     {
-        $vpnSession = VpnSession::forUser($request->user())->findOrFail($vpnSessionId);
-        return new CredentialResource($vpnSession->credential);
+        $collection = VpnSession::forUser($request->user())->findOrFail($vpnSessionId)
+            ->credentials();
+
+        $queryTransformer->config(Credential::class)
+            ->transform($collection);
+
+        return CredentialResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }
