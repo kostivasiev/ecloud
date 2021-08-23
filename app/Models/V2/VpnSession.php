@@ -51,19 +51,26 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
         return $this->belongsTo(VpnService::class);
     }
 
-    public function vpnEndpoints()
+    public function vpnEndpoint()
     {
-        return $this->belongsToMany(VpnEndpoint::class);
+        return $this->belongsTo(VpnEndpoint::class);
     }
 
-    public function credential()
+    public function credentials()
     {
-        return $this->hasOne(Credential::class, 'resource_id', 'id');
+        return $this->hasMany(Credential::class, 'resource_id', 'id');
     }
 
     public function availabilityZone()
     {
         return $this->vpnService->router->availabilityZone();
+    }
+
+    public function getPskAttribute()
+    {
+        return ($this->credentials()->where('username', 'PSK')->exists()) ?
+            $this->credentials()->where('username', 'PSK')->pluck('password')->first() :
+            null;
     }
 
     /**

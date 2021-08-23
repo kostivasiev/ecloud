@@ -15,7 +15,7 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
+            'name' => 'nullable|string|max:255',
             'vpn_service_id' => [
                 'required',
                 Rule::exists(VpnService::class, 'id')->whereNull('deleted_at'),
