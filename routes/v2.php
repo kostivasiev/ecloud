@@ -319,6 +319,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('volumes/{volumeId}/attach', 'VolumeController@attach');
     });
 
+    /** Volume Groups */
+    $router->group([], function () use ($router) {
+        $router->get('volume-groups', 'VolumeGroupController@index');
+        $router->get('volume-groups/{volumeGroupId}', 'VolumeGroupController@show');
+        $router->post('volume-groups', 'VolumeGroupController@store');
+        $router->patch('volume-groups/{volumeGroupId}', 'VolumeGroupController@update');
+        $router->delete('volume-groups/{volumeGroupId}', 'VolumeGroupController@destroy');
+    });
+
     /** Nics */
     $router->group([], function () use ($router) {
         $router->get('nics', 'NicController@index');
