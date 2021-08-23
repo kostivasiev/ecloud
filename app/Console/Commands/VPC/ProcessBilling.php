@@ -212,80 +212,7 @@ class ProcessBilling extends Command
                 ->where('term_end_date', '>=', $this->endDate)
                 ->get();
 
-            $discountsToApply = collect();
-
-            $discountPlans->each(function ($discountPlan) use (&$discountsToApply) {
-                if ($discountPlan->term_start_date <= $this->startDate) {
-                    $discountsToApply->add($discountPlan);
-                }
-
-                if ($discountPlan->term_start_date > $this->startDate) {
-                    // Discount plan start date is mid-month for the billing period, calculate pro rata discount
-                    $hoursInBillingPeriod = $this->startDate->diffInHours($this->endDate);
-
-                    $hoursRemainingInBillingPeriodFromTermStart = $discountPlan->term_start_date->diffInHours($this->endDate);
-
-                    $percentHoursRemaining = ($hoursRemainingInBillingPeriodFromTermStart / $hoursInBillingPeriod) * 100;
-
-                    $proRataCommitmentAmount = ($discountPlan->commitment_amount / 100) * $percentHoursRemaining;
-
-                    $proRataCommitmentBeforeDiscount = ($discountPlan->commitment_before_discount / 100) * $percentHoursRemaining;
-
-                    $proRataDiscountRate = ($discountPlan->discount_rate / 100) * $percentHoursRemaining;
-
-                    if ($this->option('debug')) {
-                        $this->info('Discount plan ' . $discountPlan->id . ' starts mid billing period. Calculating pro rata discount for this billing period.');
-                        $this->info(
-                            'Term start: 2020-12-20 13:12:10'
-                            . PHP_EOL . round($percentHoursRemaining) . '% of Billing period remaining'
-                            . PHP_EOL . 'Original Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
-                            . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount, 2)
-                            . PHP_EOL . 'Original Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
-                            . PHP_EOL . 'Calculated Pro Rata Commitment Before Discount: £' . number_format($proRataCommitmentBeforeDiscount, 2)
-                            . PHP_EOL . 'Original Discount Rate: ' . $discountPlan->discount_rate
-                            . PHP_EOL . 'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
-                        );
-                        $this->info(PHP_EOL);
-                    }
-
-                    $discountPlan->commitment_amount = $proRataCommitmentAmount;
-                    $discountPlan->commitment_before_discount = $proRataCommitmentBeforeDiscount;
-                    $discountPlan->discount_rate = $proRataDiscountRate;
-
-                    $discountsToApply->add($discountPlan);
-                }
-            });
-
-            if ($discountsToApply->count() > 0) {
-                $this->line('Applying ' . $discountsToApply->count() . ' discounts...');
-
-                if ($total < $discountsToApply->max('commitment_amount')) {
-                    // Charge at least the largest commitment amount
-                    $discountedTotal = $discountsToApply->max('commitment_amount');
-                    $total = $discountedTotal;
-                } else {
-                    foreach ($discountsToApply as $discountPlan) {
-                        if ($total <= $discountPlan->commitment_before_discount) {
-                            $discountedTotal = $discountPlan->commitment_amount;
-                        } else {
-                            //$total > $discountPlan->commitment_before_discount
-                            $difference = $total - $discountPlan->commitment_before_discount;
-
-                            $discountedTotal = $discountPlan->commitment_amount + $difference;
-
-                            if ($this->option('debug')) {
-                                $this->info('Applying discount ' . $discountPlan->id . '...' . PHP_EOL . 'New Total: £' . $discountedTotal);
-                            }
-                        }
-                        $total = $discountedTotal;
-                    }
-                }
-                $this->line(PHP_EOL . 'Total after discounts: £' . number_format($total, 2));
-            } else {
-                if ($this->option('debug')) {
-                    $this->info('No discounts found');
-                }
-            }
+            $total = $this->calculateDiscounts($discountPlans, $total);
 
             // Don't create accounts logs when zero charges
             if ($total <= 0) {
@@ -297,53 +224,39 @@ class ProcessBilling extends Command
             }
 
             // Don't create accounts logs for ukfast accounts
-            try {
-                $customer = (app()->make(AccountAdminClient::class))->customers()->getById($resellerId);
-                if ($customer->accountStatus == 'Internal Account') {
-                    if ($this->option('debug')) {
-                        $this->info('Reseller #' . $resellerId . ' is an internal account - skipping accounts log entry.');
-                    }
-                    continue;
-                }
-            } catch (\Exception $exception) {
-                $error = 'Failed to load customer details for for reseller ' . $resellerId;
-                $this->error($error . ' - ' . $exception->getMessage());
-                Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
+            if ($this->isUkFastAccount($resellerId)) {
+                continue;
             }
 
             // Min £1 surcharge
             $total = ($total < 1) ? 1 : $total;
 
-            $bilingAdminClient = app()->make(BillingAdminClient::class);
-            $payment = new Payment([
-                'description' => 'eCloud VPCs from ' . $this->startDate->format('d/m/Y') . ' to ' . $this->endDate->format('d/m/Y'),
-                'category' => 'eCloud v2',
-                //'productId' => '',
-                'resellerId' => $resellerId,
-                'quantity' => 1,
-                'date' => Carbon::now($this->timeZone)->format('c'),
-                'dateFrom' => $this->startDate->format('c'),
-                'dateTo' => $this->endDate->format('c'),
-                'netpg' => '', // no payment taken, payment required
-                'nominalCode' => '41003',
-                'source' => 'myukfast',
-                'cost' => number_format($total, 2, '.', ''),
-                'vat' => 00.00
-            ]);
+            $this->addBillingToAccount($resellerId, $total);
+        }
 
-            if (!$this->option('test-run')) {
-                // Create acc.log entries
-                try {
-                    $response = $bilingAdminClient->payments()->create($payment);
-                    if ($this->option('debug')) {
-                        $this->info('Accounts Log ' . $response->getId() . ' created.');
-                    }
-                } catch (\Exception $exception) {
-                    $error = 'Failed to crate accounts log for reseller ' . $resellerId;
-                    $this->error($error . $exception->getMessage());
-                    Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
-                }
+        // Finally, calculate discount plans for any plans that don't have a VPC
+        $unbilledPlans = DiscountPlan::select('discount_plans.*')
+            ->leftJoin('vpcs', 'discount_plans.reseller_id', '=', 'vpcs.reseller_id')
+            ->where('discount_plans.status', 'approved')
+            ->where(function ($query) {
+                $query->where('term_start_date', '<=', $this->startDate);
+                $query->orWhereBetween('term_start_date', [$this->startDate, $this->endDate]);
+            })
+            ->where('term_end_date', '>=', $this->endDate)
+            ->whereNull('vpcs.id')
+            ->get();
+
+        foreach ($unbilledPlans as $discountPlan) {
+            // Don't create accounts logs for ukfast accounts
+            if ($this->isUkFastAccount($discountPlan->reseller_id)) {
+                continue;
             }
+            $total = $this->calculateDiscounts(collect([$discountPlan]), 0);
+            $this->addBillingToAccount($discountPlan->reseller_id, $total);
+
+            $this->line('-----------------------------------');
+            $this->line('Reseller ID: ' . $discountPlan->reseller_id . PHP_EOL);
+            $this->line('Discount Plan ' . $discountPlan->id . ' Total: £' . number_format($total, 2) . PHP_EOL);
         }
 
         return Command::SUCCESS;
@@ -427,5 +340,152 @@ class ProcessBilling extends Command
         }
 
         return $supportProduct;
+    }
+
+    /**
+     * @param $discountPlans
+     * @param $total
+     * @return float
+     */
+    public function calculateDiscounts($discountPlans, $total): float
+    {
+        $discountsToApply = collect();
+
+        $discountPlans->each(function ($discountPlan) use (&$discountsToApply) {
+            if ($discountPlan->term_start_date <= $this->startDate) {
+                $discountsToApply->add($discountPlan);
+            }
+
+            if ($discountPlan->term_start_date > $this->startDate) {
+                // Discount plan start date is mid-month for the billing period, calculate pro rata discount
+                $hoursInBillingPeriod = $this->startDate->diffInHours($this->endDate);
+
+                $hoursRemainingInBillingPeriodFromTermStart = $discountPlan->term_start_date->diffInHours($this->endDate);
+
+                $percentHoursRemaining = ($hoursRemainingInBillingPeriodFromTermStart / $hoursInBillingPeriod) * 100;
+
+                $proRataCommitmentAmount = ($discountPlan->commitment_amount / 100) * $percentHoursRemaining;
+
+                $proRataCommitmentBeforeDiscount = ($discountPlan->commitment_before_discount / 100) * $percentHoursRemaining;
+
+                $proRataDiscountRate = ($discountPlan->discount_rate / 100) * $percentHoursRemaining;
+
+                if ($this->option('debug')) {
+                    $this->info('Discount plan ' . $discountPlan->id . ' starts mid billing period. Calculating pro rata discount for this billing period.');
+                    $this->info(
+                        'Term start: 2020-12-20 13:12:10'
+                        . PHP_EOL . round($percentHoursRemaining) . '% of Billing period remaining'
+                        . PHP_EOL . 'Original Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
+                        . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount, 2)
+                        . PHP_EOL . 'Original Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
+                        . PHP_EOL . 'Calculated Pro Rata Commitment Before Discount: £' . number_format($proRataCommitmentBeforeDiscount, 2)
+                        . PHP_EOL . 'Original Discount Rate: ' . $discountPlan->discount_rate
+                        . PHP_EOL . 'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
+                    );
+                    $this->info(PHP_EOL);
+                }
+
+                $discountPlan->commitment_amount = $proRataCommitmentAmount;
+                $discountPlan->commitment_before_discount = $proRataCommitmentBeforeDiscount;
+                $discountPlan->discount_rate = $proRataDiscountRate;
+
+                $discountsToApply->add($discountPlan);
+            }
+        });
+
+        if ($discountsToApply->count() > 0) {
+            $this->line('Applying ' . $discountsToApply->count() . ' discounts...');
+
+            if ($total < $discountsToApply->max('commitment_amount')) {
+                // Charge at least the largest commitment amount
+                $discountedTotal = $discountsToApply->max('commitment_amount');
+                $total = $discountedTotal;
+            } else {
+                foreach ($discountsToApply as $discountPlan) {
+                    if ($total <= $discountPlan->commitment_before_discount) {
+                        $discountedTotal = $discountPlan->commitment_amount;
+                    } else {
+                        //$total > $discountPlan->commitment_before_discount
+                        $difference = $total - $discountPlan->commitment_before_discount;
+
+                        $discountedTotal = $discountPlan->commitment_amount + $difference;
+
+                        if ($this->option('debug')) {
+                            $this->info('Applying discount ' . $discountPlan->id . '...' . PHP_EOL . 'New Total: £' . $discountedTotal);
+                        }
+                    }
+                    $total = $discountedTotal;
+                }
+            }
+            $this->line(PHP_EOL . 'Total after discounts: £' . number_format($total, 2));
+        } else {
+            if ($this->option('debug')) {
+                $this->info('No discounts found');
+            }
+        }
+        return $total;
+    }
+
+    /**
+     * @param $resellerId
+     * @param $total
+     * @return void
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function addBillingToAccount($resellerId, $total): void
+    {
+        $bilingAdminClient = app()->make(BillingAdminClient::class);
+        $payment = new Payment([
+            'description' => 'eCloud VPCs from ' . $this->startDate->format('d/m/Y') . ' to ' . $this->endDate->format('d/m/Y'),
+            'category' => 'eCloud v2',
+            //'productId' => '',
+            'resellerId' => $resellerId,
+            'quantity' => 1,
+            'date' => Carbon::now($this->timeZone)->format('c'),
+            'dateFrom' => $this->startDate->format('c'),
+            'dateTo' => $this->endDate->format('c'),
+            'netpg' => '', // no payment taken, payment required
+            'nominalCode' => '41003',
+            'source' => 'myukfast',
+            'cost' => number_format($total, 2, '.', ''),
+            'vat' => 00.00
+        ]);
+
+        if (!$this->option('test-run')) {
+            // Create acc.log entries
+            try {
+                $response = $bilingAdminClient->payments()->create($payment);
+                if ($this->option('debug')) {
+                    $this->info('Accounts Log ' . $response->getId() . ' created.');
+                }
+            } catch (\Exception $exception) {
+                $error = 'Failed to crate accounts log for reseller ' . $resellerId;
+                $this->error($error . $exception->getMessage());
+                Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
+            }
+        }
+    }
+
+    /**
+     * @param $resellerId
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function isUkFastAccount($resellerId): bool
+    {
+        try {
+            $customer = (app()->make(AccountAdminClient::class))->customers()->getById($resellerId);
+            if ($customer->accountStatus == 'Internal Account') {
+                if ($this->option('debug')) {
+                    $this->info('Reseller #' . $resellerId . ' is an internal account - skipping accounts log entry.');
+                }
+                return true;
+            }
+        } catch (\Exception $exception) {
+            $error = 'Failed to load customer details for for reseller ' . $resellerId;
+            $this->error($error . ' - ' . $exception->getMessage());
+            Log::error(get_class($this) . ' : ' . $error, [$exception->getMessage()]);
+        }
+        return false;
     }
 }
