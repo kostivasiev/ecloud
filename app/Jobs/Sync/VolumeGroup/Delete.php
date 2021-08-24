@@ -26,6 +26,7 @@ class Delete extends Job
 //            [
 //            ]
 //        ])->dispatch();
+        $this->task->resource->delete();
         $this->task->completed = true;
         $this->task->save();
     }
