@@ -31,7 +31,7 @@ class VolumeGroupController extends BaseController
         );
     }
 
-    public function create(CreateRequest $request)
+    public function store(CreateRequest $request)
     {
         $volumeGroup = new VolumeGroup($request->only(['name', 'vpc_id', 'availability_zone_id']));
 

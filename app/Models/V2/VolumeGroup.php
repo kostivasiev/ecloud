@@ -3,6 +3,7 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +17,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class VolumeGroup extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'volgroup';
     protected $keyType = 'string';
@@ -28,6 +29,10 @@ class VolumeGroup extends Model implements Filterable, Sortable, ResellerScopeab
         'name',
         'vpc_id',
         'availability_zone_id',
+    ];
+
+    public $children = [
+        'volumes'
     ];
 
     public function getResellerId(): int
@@ -43,6 +48,11 @@ class VolumeGroup extends Model implements Filterable, Sortable, ResellerScopeab
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
+    }
+
+    public function volumes()
+    {
+        return $this->hasMany(Volume::class);
     }
 
     /**
