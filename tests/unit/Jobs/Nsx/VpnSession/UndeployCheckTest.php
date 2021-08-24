@@ -48,7 +48,7 @@ class UndeployCheckTest extends TestCase
                 'policy/api/v1/infra/tier-1s/' . $this->router()->id .
                 '/locale-services/' . $this->router()->id .
                 '/ipsec-vpn-services/' . $this->vpnService()->id .
-                'sessions/?include_mark_for_delete_objects=true'
+                '/sessions/?include_mark_for_delete_objects=true'
             ])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([

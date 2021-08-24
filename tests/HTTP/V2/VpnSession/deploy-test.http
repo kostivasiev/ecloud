@@ -97,11 +97,11 @@ Content-Type:  application/json
 
 > {%
 client.test('Resource Retrieved', function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 ### Delete VPN Service
-DELETE https://{{host}}/{{version}}/vpn-services/{{vpn_id}}
+DELETE https://{{host}}/{{version}}/vpn-services/{{vpn_service}}
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
