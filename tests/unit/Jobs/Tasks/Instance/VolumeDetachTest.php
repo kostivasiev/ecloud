@@ -8,12 +8,10 @@ use App\Models\V2\Volume;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class VolumeDetachTest extends TestCase
 {
-    use DatabaseMigrations;
 
     private $task;
 
