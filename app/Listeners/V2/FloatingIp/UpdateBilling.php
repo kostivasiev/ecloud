@@ -54,12 +54,10 @@ class UpdateBilling
         $billingMetric->start = Carbon::now();
 
         // Bit of a hack to get the az product, as technically a fip isn't associated with an az
-        $availabilityZone = $floatingIp->vpc->region->availabilityZones()->first();
-
-        $product = $availabilityZone->products()->where('product_name', $availabilityZone->id . ': floating ip')->first();
+        $product = $floatingIp->availabilityZone->products()->where('product_name', $floatingIp->availabilityZone->id . ': floating ip')->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load billing product ' . $availabilityZone->id . ': floating ip'
+                'Failed to load billing product ' . $floatingIp->availabilityZone->id . ': floating ip'
             );
         } else {
             $billingMetric->category = $product->category;
