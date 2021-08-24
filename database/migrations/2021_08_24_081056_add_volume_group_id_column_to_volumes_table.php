@@ -25,7 +25,7 @@ class AddVolumeGroupIdColumnToVolumesTable extends Migration
      */
     public function down()
     {
-        Schema::table('volumes', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('volumes', function (Blueprint $table) {
             $table->dropColumn('volume_group_id');
         });
     }
