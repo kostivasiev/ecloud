@@ -16,6 +16,11 @@ properties:
     required: true
     example: 'az-2b66bb79'
     readOnly : false
+  volume_group_id:
+    type: string
+    required: true
+    example: 'volgroup-2b66bb79'
+    readOnly : true
   capacity:
     type: integer
     required: true

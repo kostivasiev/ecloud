@@ -1,0 +1,6 @@
+in: path
+name: volumeGroupId
+required: true
+schema:
+  type: string
+example: volgroup-2b66bb79

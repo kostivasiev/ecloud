@@ -72,6 +72,8 @@ components:
       $ref: 'components/schemas/vpc.yaml'
     Volume:
       $ref: 'components/schemas/volume.yaml'
+    VolumeGroups:
+      $ref: 'resources/VolumeGroups/schema.yaml'
     VpnEndpoint:
       $ref: 'resources/VpnEndpoint/schema.yaml'
     VpnProfile:
@@ -107,6 +109,8 @@ components:
       $ref: 'resources/Region/parameters/regionId.yaml'
     RouterId:
       $ref: 'resources/Router/parameters/routerId.yaml'
+    VolumeGroupId:
+      $ref: 'resources/VolumeGroup/parameters/volumeGroupId.yaml'
     VpcId:
       $ref: 'resources/Vpc/parameters/vpcId.yaml'
     VpnEndpointId:
@@ -142,6 +146,8 @@ components:
       $ref: 'resources/NetworkRule/responses/idResponse.yaml'
     RouterIdResponse:
       $ref: 'resources/Router/responses/idResponse.yaml'
+    VolumeGroupIdResponse:
+      $ref: 'resources/VolumeGroup/responses/idResponse.yaml'
     VpnEndpointIdResponse:
       $ref: 'resources/VpnEndpoint/responses/idResponse.yaml'
     VpnProfileGroupIdResponse:
@@ -332,6 +338,18 @@ paths:
     $ref: 'resources/VpcSupport/collection.yaml'
   '/ecloud/v2/support/{supportId}':
     $ref: 'resources/VpcSupport/item.yaml'
+  '/ecloud/v2/volumes':
+    $ref: 'resources/Volume/collection.yaml'
+  '/ecloud/v2/volumes/{volumeId}':
+    $ref: 'resources/Volume/item.yaml'
+  '/ecloud/v2/volumes/{volumeId}/instances':
+    $ref: 'resources/Volume/instance.yaml'
+  '/ecloud/v2/volumes/{volumeId}/tasks':
+    $ref: 'resources/Volume/tasks-collection.yaml'
+  '/ecloud/v2/volume-groups':
+    $ref: 'resources/VolumeGroup/collection.yaml'
+  '/ecloud/v2/volume-groups/{volumeGroupId}':
+    $ref: 'resources/VolumeGroup/item.yaml'
   '/ecloud/v2/vpcs':
     $ref: 'resources/Vpc/collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}':
@@ -344,14 +362,6 @@ paths:
     $ref: 'resources/Vpc/tasks-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/volumes':
     $ref: 'resources/Vpc/volumes-collection.yaml'
-  '/ecloud/v2/volumes':
-    $ref: 'resources/Volume/collection.yaml'
-  '/ecloud/v2/volumes/{volumeId}':
-    $ref: 'resources/Volume/item.yaml'
-  '/ecloud/v2/volumes/{volumeId}/instances':
-    $ref: 'resources/Volume/instance.yaml'
-  '/ecloud/v2/volumes/{volumeId}/tasks':
-    $ref: 'resources/Volume/tasks-collection.yaml'
   '/ecloud/v2/vpn-endpoints':
     $ref: 'resources/VpnEndpoint/collection.yaml'
   '/ecloud/v2/vpn-endpoints/{vpnEndpointId}':
