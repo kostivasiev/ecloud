@@ -46,13 +46,15 @@ Content-Type: application/json
     "routers": [
         {
             "vpc_id": "{vpc.0}",
-            "name": "router-1"
+            "name": "router-1",
+            "availability_zone_id": "az-aaaaaaaa"
         },
         {
             "vpc_id": "{vpc.1}",
             "name": "router-2",
             "router_throughput_id": "rtp-aaaaaaaa",
-            "configure_default_policies": true
+            "configure_default_policies": true,
+            "availability_zone_id": "az-aaaaaaaa"
         }
     ],
     "networks": [
@@ -103,10 +105,43 @@ Content-Type: application/json
 {
     "vpcs": [
         {
-            "name": "vpc-2",
+            "name": "vpc-1",
             "region_id": "reg-aaaaaaaa",
             "console_enabled": true,
-            "advanced_networking": true
+            "advanced_networking": true,
+            "support_enabled": true
+        }
+    ],
+    "routers": [
+        {
+            "vpc_id": "{vpc.0}",
+            "name": "router-1",
+            "availability_zone_id": "az-aaaaaaaa"
+        }
+    ],
+    "networks": [
+        {
+            "router_id": "{router.0}",
+            "name": "network-1",
+            "subnet": "10.0.0.0\/24"
+        }
+    ],
+    "instances": [
+        {
+            "name": "Builder Test Instance",
+            "vpc_id": "{vpc.0}",
+            "image_id": "img-aaaaaaaa",
+            "vcpu_cores": 1,
+            "ram_capacity": 1024,
+            "locked": false,
+            "backup_enabled": false,
+            "network_id": "{network.0}",
+            "requires_floating_ip": true,
+            "volume_capacity": 30,
+            "volume_iops": 300,
+            "ssh_key_pair_ids": [
+                "ssh-aaaaaaaa"
+            ]
         }
     ]
 }
@@ -135,7 +170,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/orchestrator-builds/{{orchestrator_build_id}}
+GET https://{{host}}/{{version}}/orchestrator-builds/obuild-3d524f58-dev
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
