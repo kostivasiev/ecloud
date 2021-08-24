@@ -73,7 +73,7 @@ components:
     Volume:
       $ref: 'components/schemas/volume.yaml'
     VolumeGroups:
-      $ref: 'resources/VolumeGroups/schema.yaml'
+      $ref: 'resources/VolumeGroup/schema.yaml'
     VpnEndpoint:
       $ref: 'resources/VpnEndpoint/schema.yaml'
     VpnProfile:
