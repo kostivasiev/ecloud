@@ -5,13 +5,11 @@ namespace App\Jobs\OrchestratorBuild;
 use App\Jobs\Job;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
-use App\Models\V2\Network;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Vpc;
 use App\Support\Sync;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class CreateInstances extends Job
@@ -55,21 +53,32 @@ class CreateInstances extends Job
                     'ram_capacity',
                     'locked',
                     'backup_enabled',
-                    'host_group_id',
+                    'host_group_id'
                 ])->toArray()
             );
 
             $instance->locked = $definition->has('locked') && $definition->get('locked') === true;
 
-            $network = Network::findOrFail($definition->get('network_id'));
-            $instance->availabilityZone()->associate($network->router->availabilityZone);
+            $availabilityZoneId = $this->getAvailabilityZoneId($definition);
+            if (!$availabilityZoneId) {
+                $this->fail(new \Exception('Failed to determine availability zone ID for instance ' . $index));
+                return;
+            }
+
+            $instance->availability_zone_id = $availabilityZoneId;
+
+            $networkId = $this->getNetworkId($definition);
+            if (!$networkId) {
+                $this->fail(new \Exception('Failed to determine network ID for instance ' . $index));
+                return;
+            }
 
             $image = Image::findOrFail($definition->get('image_id'));
 
             $instance->deploy_data = [
                 'volume_capacity' => $definition->get('volume_capacity', config('volume.capacity.' . strtolower($image->platform) . '.min')),
                 'volume_iops' => $definition->get('volume_iops', config('volume.iops.default')),
-                'network_id' => $definition->get('network_id'),
+                'network_id' => $definition->get('network_id', $networkId),
                 'floating_ip_id' => $definition->get('floating_ip_id'),
                 'requires_floating_ip' => $definition->get('requires_floating_ip', false),
                 'image_data' => $definition->get('image_data'),
@@ -83,5 +92,31 @@ class CreateInstances extends Job
 
             $orchestratorBuild->updateState('instance', $index, $instance->id);
         });
+    }
+
+    private function getNetworkId($definition)
+    {
+        if ($definition->has('network_id')) {
+            return $definition->get('network_id');
+        }
+
+        $vpc = Vpc::findOrFail($definition->get('vpc_id'));
+
+        if ($vpc->routers->count() == 1 && $vpc->routers->first()->networks->count() == 1 && $vpc->routers->first()->sync->status !== Sync::STATUS_FAILED) {
+            return $vpc->routers->first()->networks->first()->id;
+        }
+
+        return false;
+    }
+
+    private function getAvailabilityZoneId($definition)
+    {
+        if ($definition->has('availability_zone_id')) {
+            return $definition->get('availability_zone_id');
+        }
+
+        $vpc = Vpc::findOrFail($definition->get('vpc_id'));
+
+        return $vpc->region()->first()->availabilityZones()->first()->id;
     }
 }

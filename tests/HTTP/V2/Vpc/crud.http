@@ -45,7 +45,7 @@ Content-Type:  application/json###
 
 
 ###
-DELETE https://{{host}}/{{version}}/vpcs/vpc-0994146f-dev
+DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 7052-0

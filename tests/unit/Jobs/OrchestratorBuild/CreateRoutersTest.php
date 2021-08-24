@@ -26,7 +26,7 @@ class CreateRoutersTest extends TestCase
                         'vpc_id' => '{vpc.0}',
                         'name' => 'test router',
                         'router_throughput_id' => "rtp-test",
-                        'availability_zone_id' => $this->availabilityZone()->id
+                        'availability_zone_id' => "az-test"
                     ]
                 ]
             ])
@@ -98,6 +98,41 @@ class CreateRoutersTest extends TestCase
         $this->assertEquals(1, count($this->orchestratorBuild->state['router']));
     }
 
+
+    public function testDefaultAvailabilityZoneSuccess()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        $this->orchestratorConfig->data = json_encode([
+                'routers' => [
+                    [
+                        'vpc_id' => '{vpc.0}',
+                        'name' => 'test router',
+                        'router_throughput_id' => "rtp-test"
+                    ]
+                ]
+            ]);
+        $this->orchestratorConfig->save();
+
+        $this->vpc();
+        $this->orchestratorBuild->updateState('vpc', 0, 'vpc-test');
+
+        dispatch(new CreateRouters($this->orchestratorBuild));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+
+        Event::assertDispatched(Created::class);
+
+        $this->orchestratorBuild->refresh();
+
+        $this->assertNotNull($this->orchestratorBuild->state['router']);
+
+        $this->assertEquals(1, count($this->orchestratorBuild->state['router']));
+    }
+
     public function testDefaultRouterThroughputId()
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
@@ -107,7 +142,6 @@ class CreateRoutersTest extends TestCase
                 [
                     'vpc_id' => '{vpc.0}',
                     'name' => 'test router',
-                    'availability_zone_id' => $this->availabilityZone()->id
                 ]
             ]
         ]);
@@ -141,7 +175,7 @@ class CreateRoutersTest extends TestCase
                     'vpc_id' => '{vpc.0}',
                     'name' => 'test router',
                     'router_throughput_id' => "rtp-test",
-                    'availability_zone_id' => $this->availabilityZone()->id
+                    'availability_zone_id' => "az-test"
                 ]
             ]
         ]);
