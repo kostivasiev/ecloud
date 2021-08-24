@@ -1,11 +1,12 @@
 <?php
 namespace Tests\V2\VpnSession;
 
-use App\Models\V2\FloatingIp;
+use App\Events\V2\Task\Created;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -50,7 +51,7 @@ class CreateTest extends TestCase
 
     public function testCreateResource()
     {
-        $counter = 0;
+        Event::fake([Created::class]);
         $vpnService = factory(VpnService::class)->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
@@ -67,6 +68,7 @@ class CreateTest extends TestCase
                 'remote_networks' => '172.12.23.11/32',
             ]
         )->assertResponseStatus(202);
+        Event::assertDispatched(Created::class);
     }
 
     public function testCreateResourceInvalidService()

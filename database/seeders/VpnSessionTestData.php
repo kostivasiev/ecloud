@@ -25,9 +25,9 @@ class VpnSessionTestData extends Seeder
                 'id' => 'vpnpg-aaaaaaaa',
                 'name' => 'Test Profile Group',
                 'description' => 'Test Profile Group Description',
-                'ike_profile_id' => 'ike-abc123xyz',
-                'ipsec_profile_id' => 'ipsec-abc123xyz',
-                'dpd_profile_id' => 'dpd-abc123xyz',
+                'ike_profile_id' => 'nsx-default-l3vpn-ike-profile',
+                'ipsec_profile_id' => 'nsx-default-l3vpn-tunnel-profile',
+                'dpd_profile_id' => 'nsx-default-l3vpn-dpd-profile',
                 'availability_zone_id' => 'az-aaaaaaaa',
             ]);
         VpnService::on('ecloud')

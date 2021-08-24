@@ -1,11 +1,13 @@
 <?php
 namespace Tests\V2\VpnSession;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -55,6 +57,8 @@ class UpdateTest extends TestCase
 
     public function testUpdateResource()
     {
+        Event::fake([Created::class]);
+
         $data = [
             'name' => 'Updated Test Session',
         ];
@@ -66,6 +70,8 @@ class UpdateTest extends TestCase
             $data,
             'ecloud'
         )->assertResponseStatus(202);
+
+        Event::assertDispatched(Created::class);
     }
 
     public function testUpdateResourceInvalidRemoteIp()
