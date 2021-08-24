@@ -14,7 +14,7 @@ class AddVolumeGroupIdColumnToVolumesTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('volumes', function (Blueprint $table) {
-            $table->uuid('volume_group_id')->nullable()->index()->after('availability_zone_id');
+            $table->uuid('volume_group_id')->nullable()->after('availability_zone_id')->index();
         });
     }
 
