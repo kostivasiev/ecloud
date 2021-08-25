@@ -10,8 +10,8 @@ Content-Type: application/json
     "vpn_service_id": "vpn-aaaaaaaa",
     "vpn_endpoint_id": "vpne-aaaaaaaa",
     "remote_ip": "211.12.13.1",
-    "remote_networks": "172.12.23.11/32",
-    "local_networks": "172.11.11.11/32,176.18.22.11/24"
+    "remote_networks": "10.0.3.0/24",
+    "local_networks": "10.0.0.0/24"
 }
 
 > {%
@@ -87,7 +87,7 @@ client.test('Get Credential Resource', function () {
 
 
 ### Delete Resource
-DELETE https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}
+DELETE https://{{host}}/{{version}}/vpn-sessions/vpns-a78cc064-dev
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json

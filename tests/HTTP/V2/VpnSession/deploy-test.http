@@ -70,8 +70,8 @@ Content-Type: application/json
     "vpn_service_id": "{{vpn_service}}",
     "vpn_endpoint_id": "{{vpn_endpoint_id}}",
     "remote_ip": "211.12.13.1",
-    "remote_networks": "172.12.23.11/32",
-    "local_networks": "172.11.11.11/32"
+    "remote_networks": "10.0.3.0/24",
+    "local_networks": "10.0.0.0/24"
 }
 
 > {%

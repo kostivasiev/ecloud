@@ -157,7 +157,8 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Vpn
-        \App\Events\V2\Vpn\Creating::class => [
+        \App\Events\V2\VpnSession\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
         ],
 
         // Task
@@ -178,6 +179,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Host\UpdateLicenseBilling::class,
             \App\Listeners\V2\FloatingIp\UpdateBilling::class,
             \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling::class,
+            \App\Listeners\V2\VpnSession\UpdateBilling::class,
         ],
     ];
 }
