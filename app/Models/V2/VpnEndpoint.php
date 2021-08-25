@@ -2,9 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Vpc\Deleting;
-use App\Events\V2\Vpc\Saved;
-use App\Events\V2\Vpc\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;

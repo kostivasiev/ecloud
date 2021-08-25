@@ -23,7 +23,7 @@ class CreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'sometimes|required|string',
+            'name' => 'nullable|string|max:255',
             'vpn_profile_group_id' => [
                 'bail',
                 'required',

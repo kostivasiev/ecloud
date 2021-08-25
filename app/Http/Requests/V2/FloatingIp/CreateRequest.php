@@ -44,7 +44,6 @@ class CreateRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
-                new ExistsForUser(AvailabilityZone::class),
             ],
         ];
     }

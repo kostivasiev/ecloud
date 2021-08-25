@@ -38,5 +38,8 @@ class MigratePublicTest extends TestCase
         Bus::assertBatched(function (PendingBatch $batch) {
             return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 1;
         });
+
+        // Check that host_group has been disassociated
+        $this->assertNull($this->instance()->host_group_id);
     }
 }

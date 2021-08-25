@@ -387,6 +387,7 @@ Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
 
+### Reference VPN session
 
 ###
 GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services
@@ -398,4 +399,76 @@ GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-servic
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services/Reference_IPSec_Service/sessions
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
 
+
+
+### DEV VPN session
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### List Local Endpoints for t1 / VPN service
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services/vpn-10a8ad0a-dev/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services/vpn-10a8ad0a-dev/sessions
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### LIst IkE profiles
+GET https://185.197.63.88/policy/api/v1/infra/ipsec-vpn-ike-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### LIst DPD profiles
+GET https://185.197.63.88/policy/api/v1/infra/ipsec-vpn-dpd-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### LIst IPSec Tunnel profiles
+GET https://185.197.63.88/policy/api/v1/infra/ipsec-vpn-tunnel-profiles/nsx-default-l3vpn-tunnel-profile
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+
+### Create VPN Session
+### See: https://185.197.63.88/policy/api_includes/method_CreateOrPatchTier1IPSecVpnSession.html
+PATCH https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services/vpn-10a8ad0a-dev/sessions/vpns-paul-test
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "PolicyBasedIPSecVpnSession",
+    "authentication_mode": "PSK",
+    "psk": "qwertyuiop",
+    "display_name": "Pauls Test VPN Session",
+    "dpd_profile_path": "/infra/ipsec-vpn-dpd-profiles/nsx-default-l3vpn-dpd-profile",
+    "ike_profile_path": "/infra/ipsec-vpn-ike-profiles/Unifi_USG",
+    "tunnel_profile_path": "/infra/ipsec-vpn-tunnel-profiles/Unifi_USG",
+    "local_endpoint_path": "/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services/vpn-10a8ad0a-dev/local-endpoints/vpne-f7fc468a-dev",
+    "peer_address": "86.21.40.165",
+    "peer_id": "86.21.40.165",
+    "rules": [
+        {
+            "id": "vpns-paul-test-custom-rule-1",
+            "sources": [
+                {
+                    "subnet": "10.0.0.0/24"
+                }
+            ],
+            "destinations": [
+                {
+                    "subnet": "10.0.3.0/24"
+                }
+            ],
+            "resource_type": "IPSecVpnRule"
+        }
+    ]
+}
