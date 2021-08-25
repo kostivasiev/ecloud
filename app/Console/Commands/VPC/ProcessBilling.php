@@ -246,17 +246,24 @@ class ProcessBilling extends Command
             ->whereNull('vpcs.id')
             ->get();
 
+        $resellerPlans = [];
         foreach ($unbilledPlans as $discountPlan) {
+            if (!isset($resellerPlans[$discountPlan->reseller_id])) {
+                $resellerPlans[$discountPlan->reseller_id] = 0;
+            }
+            $resellerPlans[$discountPlan->reseller_id] += $this->calculateDiscounts(collect([$discountPlan]), 0);
+        }
+
+        foreach ($resellerPlans as $resellerId => $planTotal) {
             // Don't create accounts logs for ukfast accounts
-            if ($this->isUkFastAccount($discountPlan->reseller_id)) {
+            if ($this->isUkFastAccount($resellerId)) {
                 continue;
             }
-            $total = $this->calculateDiscounts(collect([$discountPlan]), 0);
-            $this->addBillingToAccount($discountPlan->reseller_id, $total);
+            $this->addBillingToAccount($resellerId, $planTotal);
 
             $this->line('-----------------------------------');
-            $this->line('Reseller ID: ' . $discountPlan->reseller_id . PHP_EOL);
-            $this->line('Discount Plan ' . $discountPlan->id . ' Total: £' . number_format($total, 2) . PHP_EOL);
+            $this->line('Reseller ID: ' . $resellerId . PHP_EOL);
+            $this->line('Discount Plan Total: £' . number_format($planTotal, 2) . PHP_EOL);
         }
 
         return Command::SUCCESS;
