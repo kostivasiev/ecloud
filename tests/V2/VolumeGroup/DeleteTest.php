@@ -32,25 +32,4 @@ class DeleteTest extends TestCase
             ->assertResponseStatus(202);
         Event::assertDispatched(Created::class);
     }
-
-    public function testDeleteWithAttachedVolumeFails()
-    {
-        $volume = Volume::withoutEvents(function () {
-            return factory(Volume::class)->create([
-                'id' => 'vol-test',
-                'name' => 'Volume',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-                'vmware_uuid' => 'uuid-test-uuid-test-uuid-test'
-            ]);
-        });
-        $this->volumeGroup->volumes()->save($volume);
-        $this->delete('/v2/volume-groups/' . $this->volumeGroup->id)
-            ->seeJson(
-                [
-                    'title' => 'Precondition Failed',
-                    'detail' => 'The specified resource has dependant relationships and cannot be deleted'
-                ]
-            )->assertResponseStatus(412);
-    }
 }

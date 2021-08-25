@@ -49,28 +49,4 @@ class GetTest extends TestCase
                 ]
             )->assertResponseStatus(200);
     }
-
-    public function testGetCollectionAsAdmin()
-    {
-        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->get('/v2/volume-groups')
-            ->seeJson(
-                [
-                    'id' => $this->volumeGroup->id,
-                    'reseller_id' => $this->volumeGroup->getResellerId(),
-                ]
-            )->assertResponseStatus(200);
-    }
-
-    public function testGetResourceAsAdmin()
-    {
-        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->get('/v2/volume-groups/'.$this->volumeGroup->id)
-            ->seeJson(
-                [
-                    'id' => $this->volumeGroup->id,
-                    'reseller_id' => $this->volumeGroup->getResellerId(),
-                ]
-            )->assertResponseStatus(200);
-    }
 }
