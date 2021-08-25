@@ -23,7 +23,7 @@ class VolumeGroupResource extends UKFastResource
      */
     public function toArray($request)
     {
-        $data = [
+        return [
             'id' => $this->id,
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
@@ -38,11 +38,5 @@ class VolumeGroupResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
-
-        if ($request->user()->isAdmin()) {
-            $data['reseller_id'] = $this->getResellerId();
-        }
-
-        return $data;
     }
 }
