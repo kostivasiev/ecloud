@@ -89,6 +89,53 @@ class ProcessBilling extends Command
                     $this->discountBilling[$discountPlan->reseller_id]['minimum_spend'] = 0;
                     $this->discountBilling[$discountPlan->reseller_id]['payg_threshold'] = 0;
                 }
+
+                if ($discountPlan->term_start_date > $this->startDate) {
+                    // Discount plan start date is mid-month for the billing period, calculate pro rata discount
+                    $hoursInBillingPeriod = $this->startDate->diffInHours($this->endDate);
+
+                    $hoursRemainingInBillingPeriodFromTermStart = $discountPlan->term_start_date->diffInHours($this->endDate);
+
+                    $percentHoursRemaining = ($hoursRemainingInBillingPeriodFromTermStart / $hoursInBillingPeriod) * 100;
+
+                    $proRataCommitmentAmount = ($discountPlan->commitment_amount / 100) * $percentHoursRemaining;
+
+                    $proRataCommitmentBeforeDiscount = ($discountPlan->commitment_before_discount / 100) * $percentHoursRemaining;
+
+                    $proRataDiscountRate = ($discountPlan->discount_rate / 100) * $percentHoursRemaining;
+
+                    if ($this->option('debug')) {
+                        $this->info('Reseller Id: ' . $discountPlan->reseller_id);
+                        $this->info('Discount plan ' . $discountPlan->id . ' starts mid billing period. Calculating pro rata discount for this billing period.');
+                        $this->info(
+                            'Term start: '.$discountPlan->term_start_date->format('Y-m-d H:i:s')
+                            . PHP_EOL . round($percentHoursRemaining) . '% of Billing period remaining'
+                            . PHP_EOL . 'Original Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
+                            . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount, 2)
+                            . PHP_EOL . 'Original Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
+                            . PHP_EOL . 'Calculated Pro Rata Commitment Before Discount: £' . number_format($proRataCommitmentBeforeDiscount, 2)
+                            . PHP_EOL . 'Original Discount Rate: ' . $discountPlan->discount_rate
+                            . PHP_EOL . 'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
+                        );
+                        $this->info(PHP_EOL);
+                    }
+
+                    $discountPlan->commitment_amount = $proRataCommitmentAmount;
+                    $discountPlan->commitment_before_discount = $proRataCommitmentBeforeDiscount;
+                    $discountPlan->discount_rate = $proRataDiscountRate;
+                } else {
+                    if ($this->option('debug')) {
+                        $this->info('Reseller Id: ' . $discountPlan->reseller_id);
+                        $this->info('Discount plan ' . $discountPlan->id);
+                        $this->info(
+                            'Term start: ' . $discountPlan->term_start_date->format('Y-m-d H:i:s')
+                            . PHP_EOL . 'Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
+                            . PHP_EOL . 'Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
+                            . PHP_EOL . 'Discount Rate: ' . $discountPlan->discount_rate
+                        );
+                        $this->info(PHP_EOL);
+                    }
+                }
                 $this->discountBilling[$discountPlan->reseller_id]['minimum_spend'] += $discountPlan->commitment_amount;
                 $this->discountBilling[$discountPlan->reseller_id]['payg_threshold'] += $discountPlan->commitment_before_discount;
             });
@@ -223,12 +270,18 @@ class ProcessBilling extends Command
                 if ($total < $this->discountBilling[$resellerId]['payg_threshold']) {
                     $total = $this->discountBilling[$resellerId]['minimum_spend'];
                 } else {
-                    $total = $this->discountBilling[$resellerId]['minimum_spend'] +
+                    $this->line('Applying discounts...');
+                    $discountedTotal = $this->discountBilling[$resellerId]['minimum_spend'] +
                         ($total - $this->discountBilling[$resellerId]['payg_threshold']);
+                    $this->line('Original Total: £' . number_format($total, 2));
+                    $total = $discountedTotal;
                 }
-                $this->line('Reseller ' . $resellerId . ' VPC\'s Total with Discount Plan: £' . number_format($total, 2));
+                $this->line('Reseller ' . $resellerId . ' VPC\'s Total with Discounts: £' . number_format($total, 2) . PHP_EOL);
+            } else {
+                if ($this->option('debug')) {
+                    $this->info('No discounts found for reseller '.$resellerId);
+                }
             }
-            $this->line(PHP_EOL);
 
             // Don't create accounts logs when zero charges
             if ($total <= 0) {
@@ -413,4 +466,46 @@ class ProcessBilling extends Command
         }
         return false;
     }
+
+    public function calculateProRata($discountPlan)
+    {
+        if ($discountPlan->term_start_date <= $this->startDate) {
+            return $discountPlan;
+        }
+
+        // Discount plan start date is mid-month for the billing period, calculate pro rata discount
+        $hoursInBillingPeriod = $this->startDate->diffInHours($this->endDate);
+
+        $hoursRemainingInBillingPeriodFromTermStart = $discountPlan->term_start_date->diffInHours($this->endDate);
+
+        $percentHoursRemaining = ($hoursRemainingInBillingPeriodFromTermStart / $hoursInBillingPeriod) * 100;
+
+        $proRataCommitmentAmount = ($discountPlan->commitment_amount / 100) * $percentHoursRemaining;
+
+        $proRataCommitmentBeforeDiscount = ($discountPlan->commitment_before_discount / 100) * $percentHoursRemaining;
+
+        $proRataDiscountRate = ($discountPlan->discount_rate / 100) * $percentHoursRemaining;
+
+        if ($this->option('debug')) {
+            $this->info('Discount plan ' . $discountPlan->id . ' starts mid billing period. Calculating pro rata discount for this billing period.');
+            $this->info(
+                'Term start: 2020-12-20 13:12:10'
+                . PHP_EOL . round($percentHoursRemaining) . '% of Billing period remaining'
+                . PHP_EOL . 'Original Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
+                . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount, 2)
+                . PHP_EOL . 'Original Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
+                . PHP_EOL . 'Calculated Pro Rata Commitment Before Discount: £' . number_format($proRataCommitmentBeforeDiscount, 2)
+                . PHP_EOL . 'Original Discount Rate: ' . $discountPlan->discount_rate
+                . PHP_EOL . 'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
+            );
+            $this->info(PHP_EOL);
+        }
+
+        $discountPlan->commitment_amount = $proRataCommitmentAmount;
+        $discountPlan->commitment_before_discount = $proRataCommitmentBeforeDiscount;
+        $discountPlan->discount_rate = $proRataDiscountRate;
+
+        return $discountPlan;
+    }
+
 }
