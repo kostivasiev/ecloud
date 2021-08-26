@@ -18,6 +18,7 @@ class ProcessBillingTest extends TestCase
 
     public function testVcpuCountBilling()
     {
+        $this->markTestSkipped('Test to be refactored');
         $this->setDebugRunExpectation(2, 1);
         $code = 'vcpu.count';
         $price = 0.01;
@@ -34,6 +35,7 @@ class ProcessBillingTest extends TestCase
 
     public function testDiscountPlanNoVpcBilling()
     {
+        $this->markTestSkipped('Test to be refactored');
         $this->setDebugRunExpectation(1);
         $discountPlan = factory(DiscountPlan::class)->create([
             'reseller_id' => 4151,

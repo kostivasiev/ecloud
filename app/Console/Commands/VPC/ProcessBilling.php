@@ -123,18 +123,6 @@ class ProcessBilling extends Command
                     $discountPlan->commitment_amount = $proRataCommitmentAmount;
                     $discountPlan->commitment_before_discount = $proRataCommitmentBeforeDiscount;
                     $discountPlan->discount_rate = $proRataDiscountRate;
-                } else {
-                    if ($this->option('debug')) {
-                        $this->info('Reseller Id: ' . $discountPlan->reseller_id);
-                        $this->info('Discount plan ' . $discountPlan->id);
-                        $this->info(
-                            'Term start: ' . $discountPlan->term_start_date->format('Y-m-d H:i:s')
-                            . PHP_EOL . 'Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
-                            . PHP_EOL . 'Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
-                            . PHP_EOL . 'Discount Rate: ' . $discountPlan->discount_rate
-                        );
-                        $this->info(PHP_EOL);
-                    }
                 }
                 $this->discountBilling[$discountPlan->reseller_id]['minimum_spend'] += $discountPlan->commitment_amount;
                 $this->discountBilling[$discountPlan->reseller_id]['payg_threshold'] += $discountPlan->commitment_before_discount;
@@ -507,5 +495,4 @@ class ProcessBilling extends Command
 
         return $discountPlan;
     }
-
 }
