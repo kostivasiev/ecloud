@@ -79,12 +79,11 @@ class ProcessBilling extends Command
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
         // First calculate discount plan values
-        DiscountPlan::where('discount_plans.status', 'approved')
+        DiscountPlan::where('status', 'approved')
             ->where(function ($query) {
                 $query->where('term_start_date', '<=', $this->startDate);
                 $query->orWhereBetween('term_start_date', [$this->startDate, $this->endDate]);
-            })
-            ->where('term_end_date', '>=', $this->endDate)
+            })->where('term_end_date', '>=', $this->endDate)
             ->each(function ($discountPlan) {
                 if (!isset($this->discountBilling[$discountPlan->reseller_id])) {
                     $this->discountBilling[$discountPlan->reseller_id]['minimum_spend'] = 0;
