@@ -42,20 +42,6 @@ trait BillingMetricTrait
         $this->setProtectedProperty($this->command, 'startDate', $this->startDate);
         $this->setProtectedProperty($this->command, 'endDate', $this->endDate);
 
-        // turn on debug and test-run
-        $this->command->expects('option')
-            ->with('debug')
-            ->times(2)
-            ->andReturnUsing(function () {
-                return true;
-            });
-        $this->command->expects('option')
-            ->zeroOrMoreTimes()
-            ->with('test-run')
-            ->andReturnUsing(function () {
-                return true;
-            });
-
         $this->command->shouldReceive('info')
             ->with(\Mockery::capture($this->infoArgument))->andReturnUsing(function () {
                 return true;
@@ -93,6 +79,23 @@ trait BillingMetricTrait
         app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
             return $mockAccountAdminClient;
         });
+    }
+
+    public function setDebugRunExpectation($debug, $testRun = 0)
+    {
+        $this->command->expects('option')
+            ->with('debug')
+            ->times($debug)
+            ->andReturnUsing(function () {
+                return true;
+            });
+        $this->command->expects('option')
+            ->with('test-run')
+            ->times($testRun)
+            ->andReturnUsing(function () {
+                return true;
+            });
+        return;
     }
 
     /**
