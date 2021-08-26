@@ -6,12 +6,10 @@ use App\Jobs\Tasks\FloatingIp\Assign;
 use App\Models\V2\Task;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Facades\Bus;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AssignTest extends TestCase
 {
-    use DatabaseMigrations;
 
     private $task;
 
