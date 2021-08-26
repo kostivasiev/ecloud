@@ -258,10 +258,8 @@ class ProcessBilling extends Command
                 if ($total < $this->discountBilling[$resellerId]['payg_threshold']) {
                     $total = $this->discountBilling[$resellerId]['minimum_spend'];
                 } else {
-                    $this->line('Applying discounts...');
                     $discountedTotal = $this->discountBilling[$resellerId]['minimum_spend'] +
                         ($total - $this->discountBilling[$resellerId]['payg_threshold']);
-                    $this->line('Original Total: £' . number_format($total, 2));
                     $total = $discountedTotal;
                 }
                 $this->line('Reseller ' . $resellerId . ' VPC\'s Total with Discounts: £' . number_format($total, 2) . PHP_EOL);
