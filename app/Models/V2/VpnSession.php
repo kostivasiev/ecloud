@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\VpnSession\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -38,6 +39,11 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
             'remote_networks',
             'local_networks',
         ];
+
+        $this->dispatchesEvents = [
+            'deleted' => Deleted::class,
+        ];
+
         parent::__construct($attributes);
     }
 
