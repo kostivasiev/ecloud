@@ -65,7 +65,7 @@ class UpdateBillingTest extends TestCase
         $metric = BillingMetric::where('resource_id', $this->vpnSession()->id)->first();
 
         $this->assertNotNull($metric);
-        $this->assertEquals('vpn.site-to-site.session', $metric->key);
+        $this->assertEquals('vpn.session.ipsec', $metric->key);
         $this->assertEquals(0.05, $metric->price);
         $this->assertEquals('Networking', $metric->category);
     }
@@ -76,7 +76,7 @@ class UpdateBillingTest extends TestCase
 
         $billingMetric = factory(BillingMetric::class)->create([
             'resource_id' => $this->vpnSession()->id,
-            'key' => 'vpn.site-to-site.session',
+            'key' => 'vpn.session.ipsec',
             'value' => 1,
         ]);
 

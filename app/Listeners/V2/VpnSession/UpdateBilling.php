@@ -30,7 +30,7 @@ class UpdateBilling
         $vpnSession = $event->model->resource;
 
         $currentActiveMetric = BillingMetric::where('resource_id', $vpnSession->id)
-            ->where('key', '=', 'vpn.site-to-site.session')
+            ->where('key', '=', 'vpn.session.ipsec')
             ->whereNull('end')
             ->first();
 
@@ -43,7 +43,7 @@ class UpdateBilling
             'resource_id' => $vpnSession->id,
             'vpc_id' => $vpnSession->vpnService->router->vpc->id,
             'reseller_id' => $vpnSession->vpnService->router->vpc->reseller_id,
-            'key' => 'vpn.site-to-site.session',
+            'key' => 'vpn.session.ipsec',
             'value' => 1,
             'start' => Carbon::now(),
         ]);
