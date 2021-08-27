@@ -43,14 +43,6 @@ class CreateRouters extends Job
 
             $router = app()->make(Router::class);
             $router->fill($definition->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id'])->toArray());
-            // Optional parameters : availability_zone_id & router_throughput_id
-            if (!$definition->has('availability_zone_id')) {
-                $vpc = Vpc::findorFail($definition->get('vpc_id'));
-                $availabilityZone = $vpc->region()->first()->availabilityZones()->first();
-                // As long as we set the AZ id here, the DefaultRouterThroughput listener can use that to set the default router throughput.
-                $router->availabilityZone()->associate($availabilityZone);
-            }
-
             $router->syncSave();
 
             Log::info(get_class($this) . ' : OrchestratorBuild created router ' . $router->id, ['id' => $this->model->id]);

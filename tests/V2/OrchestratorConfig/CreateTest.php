@@ -60,6 +60,21 @@ class CreateTest extends TestCase
             ->assertResponseStatus(201);
     }
 
+    public function testStoreDeployDateNoResellerFails()
+    {
+        $data = [
+            'employee_id' => 1,
+            'deploy_on' => Carbon::tomorrow()->format('Y-m-d H:i:s')
+        ];
+        $this->post('/v2/orchestrator-configs', $data)
+            ->seeJson(
+                [
+                    'title' => 'Validation Error',
+                    'detail' => 'The reseller id is required when specifying deploy on property',
+                ]
+            )->assertResponseStatus(422);
+    }
+
     public function testStoreNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));

@@ -103,7 +103,7 @@ class OrchestratorConfigController extends BaseController
                     'id' => $orchestratorBuild->id,
                 ],
                 'meta' => [
-                    'location' => config('app.url') . '/orchestrator-builds/' . $orchestratorBuild->id,
+                    'location' => config('app.url') . 'v2/orchestrator-builds/' . $orchestratorBuild->id,
                 ],
             ],
             202

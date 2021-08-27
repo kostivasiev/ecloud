@@ -10,12 +10,14 @@ use App\Models\V2\Nic;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Router;
 use App\Models\V2\Volume;
+use App\Models\V2\VolumeGroup;
 use App\Models\V2\Vpc;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfile;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Queue\Events\JobExceptionOccurred;
 use Illuminate\Queue\Events\JobFailed;
@@ -62,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
             'vpc' => Vpc::class,
             'dhcp' => Dhcp::class,
             'net' => Network::class,
+            'volgroup' => VolumeGroup::class,
             'vpne' => VpnEndpoint::class,
             'obuild' => OrchestratorBuild::class,
             'vpns' => VpnSession::class,
@@ -69,14 +72,20 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Queue::exceptionOccurred(function (JobExceptionOccurred $event) {
-            Log::error($event->job->getName() . " : Job exception occurred", ['exception' => $event->exception]);
+            Log::error($event->job->getName() . " : Job exception occurred", [
+                'message' => $this->formatExceptionMessage($event->exception),
+                '[stacktrace]' => $event->exception->getTraceAsString(),
+            ]);
         });
 
         Queue::failing(function (JobFailed $event) {
             Log::error(
                 $event->job->getName() . " : Job failed",
                 array_merge(
-                    ['exception' => $event->exception],
+                    [
+                        'exception' => $this->formatExceptionMessage($event->exception),
+                        '[stacktrace]' => $event->exception->getTraceAsString()
+                    ],
                     $this->getLoggingData($event)
                 )
             );
@@ -95,5 +104,43 @@ class AppServiceProvider extends ServiceProvider
     {
         $command = unserialize($event->job->payload()['data']['command']);
         return method_exists($command, 'getLoggingData') ? $command->getLoggingData() : [];
+    }
+
+    /**
+     * Adapted from GuzzleHttp\Exception\RequestException::create to create non-truncated error message
+     * @param RequestException $exception
+     * @return string
+     */
+    private function formatExceptionMessage(\Throwable $exception)
+    {
+        if (!($exception instanceof RequestException && $exception->hasResponse())) {
+            return $exception->getMessage();
+        }
+
+        $level = (int) floor($exception->getResponse()->getStatusCode() / 100);
+        if ($level === 4) {
+            $label = 'Client error';
+        } elseif ($level === 5) {
+            $label = 'Server error';
+        } else {
+            $label = 'Unsuccessful request';
+        }
+
+        $message = sprintf(
+            '%s: `%s %s` resulted in a `%s %s` response',
+            $label,
+            $exception->getRequest()->getMethod(),
+            $exception->getRequest()->getUri(),
+            $exception->getResponse()->getStatusCode(),
+            $exception->getResponse()->getReasonPhrase()
+        );
+
+        if (!is_null($exception->getResponse())) {
+            $stream = $exception->getResponse()->getBody();
+            $stream->rewind();
+            $message .= ': ' . $stream->getContents();
+        }
+
+        return $message;
     }
 }

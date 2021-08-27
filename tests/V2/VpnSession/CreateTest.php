@@ -1,11 +1,12 @@
 <?php
 namespace Tests\V2\VpnSession;
 
-use App\Models\V2\FloatingIp;
+use App\Events\V2\Task\Created;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -33,6 +34,7 @@ class CreateTest extends TestCase
         $this->floatingIp()->save();
 
         $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+            'availability_zone_id' => $this->availabilityZone()->id,
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz',
             'dpd_profile_id' => 'dpd-abc123xyz',
@@ -49,7 +51,7 @@ class CreateTest extends TestCase
 
     public function testCreateResource()
     {
-        $counter = 0;
+        Event::fake([Created::class]);
         $vpnService = factory(VpnService::class)->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
@@ -66,6 +68,7 @@ class CreateTest extends TestCase
                 'remote_networks' => '172.12.23.11/32',
             ]
         )->assertResponseStatus(202);
+        Event::assertDispatched(Created::class);
     }
 
     public function testCreateResourceInvalidService()
@@ -75,17 +78,17 @@ class CreateTest extends TestCase
             [
                 'name' => 'vpn session test',
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
-                'vpn_service_id' => 'vnps-00000000',
+                'vpn_service_id' => 'vpns-00000000',
                 'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '172.12.23.11/32',
             ]
         )->seeJson(
             [
-                'title' => 'Validation Error',
-                'detail' => 'The selected vpn service id is invalid',
+                'title' => 'Not found',
+                'detail' => 'No Vpn Session with that ID was found',
             ]
-        )->assertResponseStatus(422);
+        )->assertResponseStatus(404);
     }
 
     public function testCreateResourceWithInvalidIps()

@@ -1,13 +1,16 @@
 <?php
 
-namespace App\Jobs\Sync\Vpn;
+namespace App\Jobs\Sync\VolumeGroup;
 
 use App\Jobs\Job;
+use App\Jobs\Kingpin\Volume\CapacityChange;
+use App\Jobs\Kingpin\Volume\Deploy;
+use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 
-class Delete extends Job
+class Update extends Job
 {
     use TaskableBatch, LoggableTaskJob;
 
@@ -20,9 +23,11 @@ class Delete extends Job
 
     public function handle()
     {
-//        $this->deleteTaskBatch([
+//        $this->updateTaskBatch([
 //            [
 //            ]
 //        ])->dispatch();
+        $this->task->completed = true;
+        $this->task->save();
     }
 }

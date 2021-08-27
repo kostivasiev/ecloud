@@ -9,8 +9,6 @@ use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -65,6 +63,7 @@ class OrchestratorBuild extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
+            $factory->create('orchestrator_config_id', Filter::$stringDefaults),
         ];
     }
 
@@ -77,6 +76,7 @@ class OrchestratorBuild extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
+            $factory->create('orchestrator_config_id'),
         ];
     }
 

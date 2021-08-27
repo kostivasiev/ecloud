@@ -15,6 +15,11 @@ class Create extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'description' => 'nullable|max:255',
+            'availability_zone_id' => [
+                'required',
+                'string',
+                'exists:ecloud.availability_zones,id,deleted_at,NULL',
+            ],
             'ike_profile_id' => 'required|string',
             'ipsec_profile_id' => 'required|string',
             'dpd_profile_id' => 'required|string',

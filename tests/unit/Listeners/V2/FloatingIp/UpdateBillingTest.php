@@ -29,7 +29,8 @@ class UpdateBillingTest extends TestCase
         Model::withoutEvents(function () {
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-' . uniqid(),
-                'vpc_id' => $this->vpc()->id
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id
             ]);
         });
 
@@ -49,6 +50,22 @@ class UpdateBillingTest extends TestCase
                 'product_price_product_id' => $product->id,
                 'product_price_sale_price' => 0.006849315
             ]);
+        });
+
+        $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+        $mockAdminCustomerClient = \Mockery::mock(\UKFast\Admin\Account\AdminCustomerClient::class)->makePartial();
+        $mockAdminCustomerClient->shouldReceive('getById')->andReturn(
+            new \UKFast\Admin\Account\Entities\Customer(
+                [
+                    'accountStatus' => ''
+                ]
+            )
+        );
+        $mockAccountAdminClient->shouldReceive('customers')->andReturn(
+            $mockAdminCustomerClient
+        );
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
+            return $mockAccountAdminClient;
         });
     }
 

@@ -7,6 +7,7 @@ Content-Type: application/json
 {
     "name": "Profile Group CRUD Test",
     "description": "VPN Profile Group CRUD Test Record",
+    "availability_zone_id": "{{dev_availability_zone_id}}",
     "ike_profile_id": "ike-aaaaaaaa",
     "ipsec_profile_id": "ipsec-aaaaaaaa",
     "dpd_profile_id": "dpd-aaaaaaaa"
@@ -27,6 +28,7 @@ Content-Type: application/json
 {
     "name": "Profile Group CRUD Test",
     "description": "VPN Profile Group CRUD Test Record",
+    "availability_zone_id": "{{dev_availability_zone_id}}",
     "ike_profile_id": "ike-aaaaaaaa",
     "ipsec_profile_id": "ipsec-aaaaaaaa",
     "dpd_profile_id": "dpd-aaaaaaaa"

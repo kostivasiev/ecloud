@@ -2,9 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Vpc\Deleting;
-use App\Events\V2\Vpc\Saved;
-use App\Events\V2\Vpc\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -19,7 +16,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class VpnEndpoint extends Model implements Filterable, Sortable
+class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -59,6 +56,11 @@ class VpnEndpoint extends Model implements Filterable, Sortable
     public function getResellerId(): int
     {
         return $this->floatingIp->getResellerId();
+    }
+
+    public function availabilityZone()
+    {
+        return $this->vpnService->router->availabilityZone();
     }
 
     /**

@@ -33,10 +33,6 @@ class CreateRequest extends FormRequest
             'committed_bandwidth' => [
                 'required',
                 'integer'
-            ],
-            'burst_size' => [
-                'required',
-                'integer'
             ]
         ];
     }

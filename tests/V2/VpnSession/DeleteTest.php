@@ -1,11 +1,13 @@
 <?php
 namespace Tests\V2\VpnSession;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -55,7 +57,11 @@ class DeleteTest extends TestCase
 
     public function testDeleteResource()
     {
+        Event::fake(Created::class);
+
         $this->delete('/v2/vpn-sessions/' . $this->vpnSession->id)
             ->assertResponseStatus(202);
+
+        Event::assertDispatched(Created::class);
     }
 }

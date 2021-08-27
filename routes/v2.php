@@ -154,6 +154,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('vpn-sessions', 'VpnSessionController@index');
         $router->get('vpn-sessions/{vpnSessionId}', 'VpnSessionController@show');
+        $router->get('vpn-sessions/{vpnSessionId}/credentials', 'VpnSessionController@credentials');
         $router->post('vpn-sessions', 'VpnSessionController@create');
         $router->patch('vpn-sessions/{vpnSessionId}', 'VpnSessionController@update');
         $router->delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
@@ -316,6 +317,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
         $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
         $router->post('volumes/{volumeId}/attach', 'VolumeController@attach');
+    });
+
+    /** Volume Groups */
+    $router->group([], function () use ($router) {
+        $router->get('volume-groups', 'VolumeGroupController@index');
+        $router->get('volume-groups/{volumeGroupId}', 'VolumeGroupController@show');
+        $router->post('volume-groups', 'VolumeGroupController@store');
+        $router->patch('volume-groups/{volumeGroupId}', 'VolumeGroupController@update');
+        $router->delete('volume-groups/{volumeGroupId}', 'VolumeGroupController@destroy');
     });
 
     /** Nics */

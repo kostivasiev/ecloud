@@ -3,6 +3,9 @@
 namespace App\Jobs\Sync\VpnEndpoint;
 
 use App\Jobs\Job;
+use App\Jobs\Nsx\VpnEndpoint\Undeploy;
+use App\Jobs\Nsx\VpnEndpoint\UndeployCheck;
+use App\Jobs\VpnEndpoint\UnassignFloatingIP;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -11,7 +14,7 @@ class Delete extends Job
 {
     use TaskableBatch, LoggableTaskJob;
 
-    private $task;
+    private Task $task;
 
     public function __construct(Task $task)
     {
@@ -20,6 +23,12 @@ class Delete extends Job
 
     public function handle()
     {
-        // @todo - See https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/912
+        $this->deleteTaskBatch([
+            [
+                new Undeploy($this->task->resource),
+                new UndeployCheck($this->task->resource),
+                new UnassignFloatingIP($this->task->resource),
+            ]
+        ])->dispatch();
     }
 }
