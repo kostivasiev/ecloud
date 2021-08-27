@@ -52,10 +52,9 @@ class VolumeGroupController extends BaseController
     {
         $volumeGroup = VolumeGroup::forUser($request->user())->findOrFail($volumeGroupId);
 
-        // See https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/1065
-//        if (!$volumeGroup->canDelete()) {
-//            return $volumeGroup->getDeletionError();
-//        }
+        if (!$volumeGroup->canDelete()) {
+            return $volumeGroup->getDeletionError();
+        }
 
         $task = $volumeGroup->syncDelete();
         return $this->responseTaskId($task->id);
