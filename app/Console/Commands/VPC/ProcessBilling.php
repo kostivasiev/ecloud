@@ -98,7 +98,13 @@ class ProcessBilling extends Command
 
                 if ($this->option('debug')) {
                     $this->info('Reseller Id: ' . $discountPlan->reseller_id);
-                    $this->info('Discount plan ' . $discountPlan->id . ' found.' . PHP_EOL);
+                    $this->info('Discount plan ' . $discountPlan->id . ' found.');
+                    $this->info(
+                        'Term start: '.$discountPlan->term_start_date->format('Y-m-d H:i:s')
+                        . PHP_EOL . 'Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
+                        . PHP_EOL . 'Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
+                        . PHP_EOL . 'Discount Rate: ' . $discountPlan->discount_rate
+                    );
                 }
 
                 if ($discountPlan->term_start_date > $this->startDate) {
@@ -118,10 +124,7 @@ class ProcessBilling extends Command
                         $this->info(
                             'Term start: '.$discountPlan->term_start_date->format('Y-m-d H:i:s')
                             . PHP_EOL . round($percentHoursRemaining) . '% of Billing period remaining'
-                            . PHP_EOL . 'Original Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
                             . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount, 2)
-                            . PHP_EOL . 'Original Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
-                            . PHP_EOL . 'Original Discount Rate: ' . $discountPlan->discount_rate
                             . PHP_EOL . 'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
                         );
                         $this->info(PHP_EOL);
