@@ -127,12 +127,12 @@ class ProcessBilling extends Command
                             . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount, 2)
                             . PHP_EOL . 'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
                         );
-                        $this->info(PHP_EOL);
                     }
 
                     $discountPlan->commitment_amount = $proRataCommitmentAmount;
                     $discountPlan->discount_rate = $proRataDiscountRate;
                 }
+                $this->info(PHP_EOL);
                 $this->discountBilling[$discountPlan->reseller_id]['minimum_spend'] += $discountPlan->commitment_amount;
                 $this->discountBilling[$discountPlan->reseller_id]['payg_threshold'] += $discountPlan->commitment_before_discount;
             });
@@ -319,7 +319,7 @@ class ProcessBilling extends Command
         }
 
         if ($this->option('debug')) {
-            $this->info('Running Total: ' . number_format($this->runningTotal, 2));
+            $this->info('Running Total: £' . number_format($this->runningTotal, 2));
         }
 
         return Command::SUCCESS;
@@ -455,9 +455,6 @@ class ProcessBilling extends Command
         try {
             $customer = (app()->make(AccountAdminClient::class))->customers()->getById($resellerId);
             if ($customer->accountStatus == 'Internal Account') {
-                if ($this->option('debug')) {
-                    $this->info('Reseller #' . $resellerId . ' is an internal account - skipping accounts log entry.');
-                }
                 return true;
             }
         } catch (\Exception $exception) {
