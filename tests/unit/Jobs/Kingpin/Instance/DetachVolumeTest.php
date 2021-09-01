@@ -22,7 +22,7 @@ class DetachVolumeTest extends TestCase
 
     public function testVolumeDetaches()
     {
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
@@ -65,7 +65,7 @@ class DetachVolumeTest extends TestCase
 
     public function testVolumeAlreadyDetachedSkips()
     {
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
@@ -96,7 +96,7 @@ class DetachVolumeTest extends TestCase
 
     public function testRetrieveInstanceInvalidJsonThrowsException()
     {
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,

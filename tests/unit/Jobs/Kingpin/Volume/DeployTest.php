@@ -30,7 +30,7 @@ class DeployTest extends TestCase
     public function testDeploysWhenNoVMwareUuidDefined()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -67,7 +67,7 @@ class DeployTest extends TestCase
     public function testVolumeNotDeployedWhenVMwareUuidDefined()
     {
         $volume = Volume::withoutEvents(function() {
-            $volume = factory(Volume::class)->create([
+            $volume = Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -88,7 +88,7 @@ class DeployTest extends TestCase
     public function testFailsWhenKingpinMissingUuidInResponse()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -121,7 +121,7 @@ class DeployTest extends TestCase
     public function testFailsWhenKingpinUuidEmptyInResponse()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

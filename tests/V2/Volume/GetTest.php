@@ -3,19 +3,16 @@
 namespace Tests\V2\Volume;
 
 use App\Models\V2\Volume;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    protected $volume;
-
     public function setUp(): void
     {
         parent::setUp();
 
         Volume::withoutEvents(function () {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-test',
                 'name' => 'Volume',
                 'vpc_id' => $this->vpc()->id,

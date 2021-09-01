@@ -6,10 +6,8 @@ use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Models\V2\Volume;
 use App\Rules\V2\VolumeCapacityIsGreater;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CapacityIncreaseTest extends TestCase
@@ -20,9 +18,8 @@ class CapacityIncreaseTest extends TestCase
     {
         parent::setUp();
 
-
         $this->volume = Model::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

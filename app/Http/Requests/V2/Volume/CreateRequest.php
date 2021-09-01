@@ -2,9 +2,12 @@
 
 namespace App\Http\Requests\V2\Volume;
 
+use App\Models\V2\VolumeGroup;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\Volume\HasAvailablePorts;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -52,6 +55,16 @@ class CreateRequest extends FormRequest
                 'integer',
                 'in:300,600,1200,2500',
             ],
+            'is_shared' => [
+                'sometimes',
+                'required',
+                'boolean',
+            ],
+            'volume_group_id' => [
+                Rule::exists(VolumeGroup::class, 'id')->whereNull('deleted_at'),
+                new ExistsForUser(VolumeGroup::class),
+                new HasAvailablePorts
+            ]
         ];
     }
 

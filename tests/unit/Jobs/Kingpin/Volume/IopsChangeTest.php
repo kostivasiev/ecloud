@@ -2,23 +2,11 @@
 
 namespace Tests\unit\Jobs\Kingpin\Volume;
 
-use App\Events\V2\Nic\Saved;
-use App\Events\V2\Nic\Saving;
-use App\Jobs\Instance\Deploy\ConfigureNics;
-use App\Jobs\Kingpin\Volume\Deploy;
 use App\Jobs\Kingpin\Volume\IopsChange;
-use App\Jobs\Kingpin\Volume\Undeploy;
-use App\Models\V2\Nic;
 use App\Models\V2\Volume;
-use App\Rules\V2\IpAvailable;
-use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\QueryException;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Queue;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class IopsChangeTest extends TestCase
@@ -33,7 +21,7 @@ class IopsChangeTest extends TestCase
     public function testIopsUpdatedWhenDifferent()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -79,7 +67,7 @@ class IopsChangeTest extends TestCase
     public function testIopsNotUpdatedWhenSame()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -110,7 +98,7 @@ class IopsChangeTest extends TestCase
     public function testIopsNotUpdatedWhenNotAttachedToInstance()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

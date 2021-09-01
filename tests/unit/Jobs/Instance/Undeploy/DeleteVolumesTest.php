@@ -46,7 +46,7 @@ class DeleteVolumesTest extends TestCase
             $this->instance = factory(Instance::class)->create([
                 'id' => 'i-test',
             ]);
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'capacity' => 10,
@@ -71,7 +71,7 @@ class DeleteVolumesTest extends TestCase
             $this->instance = factory(Instance::class)->create([
                 'id' => 'i-test1',
             ]);
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => 'vpc-test',
                 'capacity' => 10,
