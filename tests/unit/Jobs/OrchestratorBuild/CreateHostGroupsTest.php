@@ -103,9 +103,6 @@ class CreateHostGroupsTest extends TestCase
     /** @test */
     public function hostgroupIsCreated()
     {
-        app()->bind(HostGroup::class, function () {
-            return $this->hostGroup;
-        });
         $this->buildHostgroupIsCreatedMocks();
 
         $this->job->handle();

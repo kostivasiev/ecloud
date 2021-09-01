@@ -1,6 +1,7 @@
 <?php
 namespace Tests\unit\Jobs\OrchestratorBuild\Mocks;
 
+use App\Models\V2\HostGroup;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -9,6 +10,9 @@ trait CreateHostGroupsMocks
 {
     public function buildHostgroupIsCreatedMocks()
     {
+        app()->bind(HostGroup::class, function () {
+            return $this->hostGroup;
+        });
         $this->kingpinServiceMock()
             ->expects('get')
             ->with('/api/v2/vpc/vpc-test/hostgroup/hg-test')
