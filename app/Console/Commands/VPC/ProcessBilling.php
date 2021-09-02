@@ -416,7 +416,7 @@ class ProcessBilling extends Command
         $bilingAdminClient = app()->make(BillingAdminClient::class);
         $payment = new Payment([
             'description' => 'eCloud VPCs from ' . $this->startDate->format('d/m/Y') . ' to ' . $this->endDate->format('d/m/Y'),
-            'category' => 'eCloud v2',
+            'category' => 'eCloud VPC',
             //'productId' => '',
             'resellerId' => $resellerId,
             'quantity' => 1,
