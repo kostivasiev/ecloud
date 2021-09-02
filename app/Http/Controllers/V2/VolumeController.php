@@ -115,10 +115,6 @@ class VolumeController extends BaseController
         }
         $volume->fill($request->only($only));
 
-        if ($request->has('volume_group_id')) {
-            $volume->is_shared = true;
-        }
-
         $task = $volume->syncSave();
 
         return $this->responseIdMeta($request, $volume->id, 202, $task->id);
