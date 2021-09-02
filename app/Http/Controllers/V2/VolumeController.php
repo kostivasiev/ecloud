@@ -101,10 +101,6 @@ class VolumeController extends BaseController
             $model->is_shared = true;
         }
 
-        // TODO: Assign port
-
-
-
         $task = $model->syncSave();
 
         return $this->responseIdMeta($request, $model->id, 202, $task->id);

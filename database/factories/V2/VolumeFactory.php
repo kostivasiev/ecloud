@@ -21,8 +21,7 @@ class VolumeFactory extends Factory
     public function definition()
     {
         return [
-            'name' => 'Primary Volume',
-            'capacity' => '100',
+            'capacity' => 100,
         ];
     }
 
