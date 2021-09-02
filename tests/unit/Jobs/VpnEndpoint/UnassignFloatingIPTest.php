@@ -62,11 +62,10 @@ class UnassignFloatingIPTest extends TestCase
 
         $this->assertEquals(Sync::STATUS_FAILED, $this->floatingIp->sync->status);
 
-        Event::fake([JobFailed::class, JobProcessed::class]);
+        Event::fake([JobProcessed::class]);
 
         (new UnassignFloatingIP($this->vpnEndpoint))->handle();
 
-        Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
