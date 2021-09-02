@@ -29,13 +29,11 @@ class UnassignFloatingIP extends Job
             return;
         }
 
-        if ($vpnEndpoint->floatingIp->sync->status == Sync::STATUS_COMPLETE) {
-            $task = $vpnEndpoint->floatingIp->createTaskWithLock(
-                'floating_ip_unassign',
-                \App\Jobs\Tasks\FloatingIp\Unassign::class
-            );
-            Log::info('Triggered floating_ip_unassign task ' . $task->id . ' for Floating IP (' . $vpnEndpoint->floatingIp->id . ')');
-        }
+        $task = $vpnEndpoint->floatingIp->createTaskWithLock(
+            'floating_ip_unassign',
+            \App\Jobs\Tasks\FloatingIp\Unassign::class
+        );
+        Log::info('Triggered floating_ip_unassign task ' . $task->id . ' for Floating IP (' . $vpnEndpoint->floatingIp->id . ')');
 
         $this->awaitSyncableResources([
             $vpnEndpoint->floatingIp->id,
