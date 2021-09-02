@@ -35,7 +35,7 @@ class AssignPort extends Job
             return;
         }
 
-        $ports = collect(range(0,config('volume-group.max_ports')))
+        $ports = collect(range(0, config('volume-group.max_ports')))
             ->forget(config('volume-group.scsi_controller_reserved_port'));
 
         $usedPorts = $volume->volumeGroup->volumes
