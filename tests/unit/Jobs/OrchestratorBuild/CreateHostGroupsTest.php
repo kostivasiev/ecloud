@@ -107,10 +107,6 @@ class CreateHostGroupsTest extends TestCase
 
         $this->job->handle();
 
-        $this->orchestratorConfig->refresh();
-        $configData = json_decode($this->orchestratorConfig->data, true);
         $this->assertEquals($this->orchestratorBuild->state['hostgroup'][0], $this->hostGroup->id);
-        $this->assertArrayHasKey('hosts', $configData);
-        $this->assertEquals(self::NUM_HOSTS, count($configData['hosts']));
     }
 }
