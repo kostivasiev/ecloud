@@ -51,7 +51,7 @@ class UnassignFloatingIpTest extends TestCase
 
         $task = new Task([
             'id' => 'task-test',
-            'completed' => false,
+            'completed' => true,
             'name' => 'floating_ip_unassign',
         ]);
         $this->vpnEndpoint()->floatingIp->tasks()->save($task);
