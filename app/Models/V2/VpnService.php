@@ -23,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $dhcpId)
  * @method static forUser(string $user)
  */
-class VpnService extends Model implements Filterable, Sortable, AvailabilityZoneable
+class VpnService extends Model implements Filterable, Sortable, AvailabilityZoneable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -71,6 +71,11 @@ class VpnService extends Model implements Filterable, Sortable, AvailabilityZone
     public function availabilityZone()
     {
         return $this->router->availabilityZone();
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->router->getResellerId();
     }
 
     /**
