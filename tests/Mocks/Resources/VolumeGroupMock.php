@@ -13,7 +13,7 @@ trait VolumeGroupMock
     {
         if (!$this->volumeGroup) {
             Model::withoutEvents(function () use ($id) {
-                $this->volumeGroup = volumeGroup::factory()->create([
+                $this->volumeGroup = VolumeGroup::factory()->create([
                     'id' => $id,
                     'name' => $id,
                     'availability_zone_id' => $this->availabilityZone()->id,
