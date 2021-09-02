@@ -2,7 +2,7 @@
 POST https://{{host}}/{{version}}/volume-groups
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
