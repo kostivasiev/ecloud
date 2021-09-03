@@ -7,6 +7,7 @@ use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\Network;
 use App\Models\V2\SshKeyPair;
+use App\Models\V2\VolumeGroup;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\FloatingIp\IsAssigned;
@@ -15,6 +16,8 @@ use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\IsValidRamMultiple;
+use App\Rules\V2\Volume\HasAvailableInstances;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -81,6 +84,11 @@ class CreateRequest extends FormRequest
                 new ExistsForUser(HostGroup::class),
                 new IsResourceAvailable(HostGroup::class),
                 new HasHosts(),
+            ],
+            'volume_group_id' => [
+                Rule::exists(VolumeGroup::class, 'id')->whereNull('deleted_at'),
+                new ExistsForUser(VolumeGroup::class),
+                new HasAvailableInstances,
             ],
             'network_id' => [
                 'required',

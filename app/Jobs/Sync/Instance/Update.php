@@ -47,6 +47,7 @@ class Update extends Job
                     new CheckNetworkAvailable($this->task->resource),
                     new Deploy($this->task->resource),
                     new PrepareOsDisk($this->task->resource),
+                    // attach volume group volumes here
                     new AwaitVolumeSync($this->task->resource),
                     new ConfigureNics($this->task->resource),
                     new AwaitNicSync($this->task->resource),
