@@ -2,8 +2,9 @@
 
 namespace Tests\unit\Jobs\Instance;
 
-use App\Jobs\Instance\VolumeGroupAttach;
+use App\Jobs\Instance\VolumeGroupAttachDetach;
 use App\Models\V2\Task;
+use App\Models\V2\Volume;
 use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
@@ -12,27 +13,9 @@ use Tests\Mocks\Resources\VolumeGroupMock;
 use Tests\Mocks\Resources\VolumeMock;
 use Tests\TestCase;
 
-class VolumeGroupAttachTest extends TestCase
+class VolumeGroupAttachDetachTest extends TestCase
 {
     use VolumeGroupMock, VolumeMock;
-
-    protected VolumeGroupAttach $job;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-    }
-
-    /** @test */
-    public function skipIfNoVolumeGroups()
-    {
-        Log::partialMock()
-            ->expects('info')
-            ->withSomeOfArgs('No volume groups to process')
-            ->once();
-
-        $this->assertEmpty((new VolumeGroupAttach($this->instance()))->handle());
-    }
 
     /** @test */
     public function backoffIfInstanceIsNotComplete()
@@ -55,7 +38,7 @@ class VolumeGroupAttachTest extends TestCase
             $sync->save();
         });
 
-        $this->assertEmpty((new VolumeGroupAttach($this->instance()))->handle());
+        $this->assertEmpty((new VolumeGroupAttachDetach($this->instance()))->handle());
     }
 
     /** @test */
@@ -77,7 +60,7 @@ class VolumeGroupAttachTest extends TestCase
         $this->instance()->volumes()->attach($this->volume());
         $this->instance()->saveQuietly();
 
-        $this->assertEmpty((new VolumeGroupAttach($this->instance()))->handle());
+        $this->assertEmpty((new VolumeGroupAttachDetach($this->instance()))->handle());
     }
 
     /** @test */
@@ -124,12 +107,33 @@ class VolumeGroupAttachTest extends TestCase
         // Assert volume is not currently attached
         $this->assertEquals(0, $this->instance()->volumes()->where('id', '=', $this->volume()->id)->count());
 
-        $job = new VolumeGroupAttach($this->instance());
-        $job->handle();
+        (new VolumeGroupAttachDetach($this->instance()))->handle();
 
         $this->instance()->refresh();
 
         // assert volume is now attached
         $this->assertEquals(1, $this->instance()->volumes()->where('id', '=', $this->volume()->id)->count());
+    }
+
+    /** @test */
+    public function volumeDetachesSuccessfully()
+    {
+        $this->volume()->is_shared = true;
+        $this->volume()->port = 0;
+        $this->volume()->saveQuietly();
+        $this->instance()->volumes()->attach($this->volume());
+        $this->instance()->saveQuietly();
+
+        // kingpin mocks
+        $this->kingpinServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-test')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode(['volumes' => []]));
+            });
+
+        (new VolumeGroupAttachDetach($this->instance()))->handle();
+
+        $this->assertEquals(0, $this->instance()->volumes()->count());
     }
 }

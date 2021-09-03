@@ -2,20 +2,15 @@
 namespace App\Jobs\Instance;
 
 use App\Jobs\Job;
-use App\Jobs\Kingpin\Instance\AttachVolume;
-use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Jobs\Tasks\Instance\VolumeAttach;
+use App\Jobs\Tasks\Instance\VolumeDetach;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use App\Support\Sync;
 use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batch;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
-use Throwable;
 
-class VolumeGroupAttach extends Job
+class VolumeGroupAttachDetach extends Job
 {
     use Batchable, LoggableModelJob;
 
@@ -32,16 +27,28 @@ class VolumeGroupAttach extends Job
     public function handle()
     {
         $instance = $this->model;
-        if (empty($instance->volume_group_id)) {
-            Log::info('No volume groups to process', ['instance_id' => $instance->id]);
-            return;
-        }
         if ($instance->sync->status != Sync::STATUS_COMPLETE) {
             Log::warning(
                 'Instance not in sync, retrying in ' . $this->backoff . ' seconds',
                 ['id' => $instance->id]
             );
             return $this->release($this->backoff);
+        }
+
+        if (empty($instance->volume_group_id)) {
+            $instance->volumes()->where('is_shared', '=', true)
+                ->each(function ($volume) use ($instance) {
+                    $instance->createTaskWithLock('volume_detach', VolumeDetach::class, ['volume_id' => $volume->id]);
+                    Log::info(
+                        'Detaching volume from instance, retrying in ' . $this->backoff . ' seconds',
+                        [
+                            'instance_id' => $instance->id,
+                            'volume_id' => $volume->id,
+                        ]
+                    );
+                    return $this->release($this->backoff);
+                });
+            return;
         }
 
         $instance->volumeGroup->volumes()->each(function ($volume) use ($instance) {
@@ -65,5 +72,6 @@ class VolumeGroupAttach extends Job
             );
             return $this->release($this->backoff);
         });
+        return;
     }
 }

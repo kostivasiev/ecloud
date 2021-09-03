@@ -23,6 +23,8 @@ use App\Jobs\Instance\Deploy\RunBootstrapScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
+use App\Jobs\Instance\VolumeGroupAttachDetach;
+use App\Jobs\Instance\VolumeGroupDetach;
 use App\Jobs\Job;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
@@ -47,7 +49,7 @@ class Update extends Job
                     new CheckNetworkAvailable($this->task->resource),
                     new Deploy($this->task->resource),
                     new PrepareOsDisk($this->task->resource),
-                    // attach volume group volumes here
+                    new VolumeGroupAttachDetach($this->task->resource),
                     new AwaitVolumeSync($this->task->resource),
                     new ConfigureNics($this->task->resource),
                     new AwaitNicSync($this->task->resource),
@@ -70,7 +72,8 @@ class Update extends Job
         } else {
             $this->updateTaskBatch([
                 [
-                    new ComputeUpdate($this->task->resource)
+                    new ComputeUpdate($this->task->resource),
+                    new VolumeGroupAttachDetach($this->task->resource),
                 ]
             ])->dispatch();
         }
