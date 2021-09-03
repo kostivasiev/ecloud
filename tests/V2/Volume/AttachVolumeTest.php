@@ -6,10 +6,8 @@ use App\Events\V2\Task\Created;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Support\Sync;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AttachVolumeTest extends TestCase
@@ -18,7 +16,7 @@ class AttachVolumeTest extends TestCase
     {
         Event::fake([Created::class]);
 
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
@@ -35,7 +33,7 @@ class AttachVolumeTest extends TestCase
 
     public function testAttachVolumeInstanceHasFailed()
     {
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
@@ -71,7 +69,7 @@ class AttachVolumeTest extends TestCase
     {
         Event::fake([Created::class]);
 
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,

@@ -93,7 +93,13 @@ class VolumeController extends BaseController
             'availability_zone_id',
             'capacity',
             'iops',
+            'is_shared',
+            'volume_group_id'
         ]));
+
+        if ($request->has('volume_group_id')) {
+            $model->is_shared = true;
+        }
 
         $task = $model->syncSave();
 
@@ -103,11 +109,12 @@ class VolumeController extends BaseController
     public function update(UpdateRequest $request, string $volumeId)
     {
         $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
-        $only = ['name', 'capacity', 'iops'];
+        $only = ['name', 'capacity', 'iops', 'volume_group_id'];
         if ($this->isAdmin) {
             $only[] = 'vmware_uuid';
         }
         $volume->fill($request->only($only));
+
         $task = $volume->syncSave();
 
         return $this->responseIdMeta($request, $volume->id, 202, $task->id);

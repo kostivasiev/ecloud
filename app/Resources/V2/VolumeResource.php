@@ -37,6 +37,9 @@ class VolumeResource extends UKFastResource
             'attached' => $this->attached,
             'sync' => $this->sync,
             'type' => $this->type,
+            'is_shared' => $this->is_shared,
+            'volume_group_id' => $this->volume_group_id,
+            'port' => $this->port,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

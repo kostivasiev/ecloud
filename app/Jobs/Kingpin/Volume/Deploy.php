@@ -35,7 +35,7 @@ class Deploy extends Job
                     'json' => [
                         'volumeId' => $volume->id,
                         'sizeGiB' => $volume->capacity,
-                        'shared' => false,
+                        'shared' => $volume->is_shared,
                     ],
                 ]
             );

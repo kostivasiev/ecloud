@@ -3,8 +3,6 @@
 namespace Tests\V2\Vpc;
 
 use App\Models\V2\Volume;
-use GuzzleHttp\Psr7\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetVpcVolumesTest extends TestCase
@@ -15,7 +13,7 @@ class GetVpcVolumesTest extends TestCase
     {
         parent::setUp();
 
-        $this->volume = factory(Volume::class)->create([
+        Volume::factory()->create([
             'id' => 'vol-test',
             'name' => 'Volume',
             'vpc_id' => $this->vpc()->id,
