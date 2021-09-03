@@ -13,7 +13,7 @@ class VolumeAttachTest extends TestCase
 {
     public function testSucceeds()
     {
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id
@@ -36,7 +36,7 @@ class VolumeAttachTest extends TestCase
 
     public function testAlreadyAttachedFails()
     {
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id

@@ -14,7 +14,7 @@ class UpdateTest extends TestCase
     public function setUp():void
     {
         parent::setUp();
-        $this->volumeGroup = factory(VolumeGroup::class)->create(
+        $this->volumeGroup = VolumeGroup::factory()->create(
             [
                 'name' => 'Unit Test Volume Group',
                 'availability_zone_id' => $this->availabilityZone()->id,

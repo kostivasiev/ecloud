@@ -395,7 +395,7 @@ Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
 ###
-GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services/Reference_IPSec_Service/local-endpoints
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services/Reference_IPSec_Service/summary
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
@@ -404,6 +404,10 @@ GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-servic
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services/Reference_IPSec_Service/sessions/fd4af901-8d1e-49d9-ae46-3a98ef3d8c99/detailed-status
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
 
 
 ### DEV VPN session

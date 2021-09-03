@@ -2,7 +2,16 @@
 
 namespace App\Http\Requests\V2\Volume;
 
+use App\Models\V2\VolumeGroup;
+use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsVolumeAttached;
+use App\Rules\V2\Volume\HasAvailablePorts;
+use App\Rules\V2\Volume\IsMemberOfVolumeGroup;
+use App\Rules\V2\Volume\IsNotAttachedToInstance;
+use App\Rules\V2\Volume\IsOperatingSystemVolume;
+use App\Rules\V2\Volume\IsSharedVolume;
 use App\Rules\V2\VolumeCapacityIsGreater;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -24,6 +33,8 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
+        $volumeId = app('request')->route('volumeId');
+
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'capacity' => [
@@ -45,6 +56,17 @@ class UpdateRequest extends FormRequest
                 'numeric',
                 'in:300,600,1200,2500'
             ],
+            'volume_group_id' => [
+                'sometimes',
+                'required',
+                Rule::exists(VolumeGroup::class, 'id')->whereNull('deleted_at'),
+                new ExistsForUser(VolumeGroup::class),
+                new IsMemberOfVolumeGroup($volumeId),
+                new HasAvailablePorts,
+                new IsOperatingSystemVolume($volumeId),
+                new IsSharedVolume($volumeId),
+                new IsNotAttachedToInstance($volumeId),
+            ]
         ];
     }
 

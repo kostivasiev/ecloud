@@ -19,7 +19,7 @@ class UpdateBackupBillingTest extends TestCase
         parent::setUp();
 
         Volume::withoutEvents(function () {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'capacity' => 20,

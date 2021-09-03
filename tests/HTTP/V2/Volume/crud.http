@@ -23,7 +23,7 @@ client.log('Volume ID: ' + response.body.data.id);
 %}
 
 ### index
-GET https://{{host}}/{{version}}/volumes
+GET https://{{host}}/{{version}}/volumes/vol-23eefedd
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0

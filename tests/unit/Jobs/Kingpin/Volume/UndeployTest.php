@@ -31,7 +31,7 @@ class UndeployTest extends TestCase
     public function testSucceeds()
     {
         Volume::withoutEvents(function() {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->createOne([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -55,7 +55,7 @@ class UndeployTest extends TestCase
     public function testDataVolumeWithInstanceAttachedFails()
     {
         Volume::withoutEvents(function() {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -73,7 +73,7 @@ class UndeployTest extends TestCase
     public function testOSVolumeWithInstanceAttachedSucceeds()
     {
         Volume::withoutEvents(function() {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

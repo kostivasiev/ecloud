@@ -16,7 +16,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZoneable
+class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZoneable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -55,7 +55,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZon
 
     public function getResellerId(): int
     {
-        return $this->floatingIp->getResellerId();
+        return $this->vpnService->getResellerId();
     }
 
     public function availabilityZone()

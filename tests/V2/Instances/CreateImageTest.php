@@ -5,16 +5,17 @@ namespace Tests\V2\Instances;
 use App\Models\V2\Image;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 
 class CreateImageTest extends TestCase
 {
-    protected Volume $volume;
+    protected Model $volume;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->volume = factory(Volume::class)->create([
+        $this->volume = Volume::factory()->createOne([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
