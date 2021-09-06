@@ -1,0 +1,278 @@
+### Create a volume group
+POST https://{{host}}/{{version}}/volume-groups
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Unit Test Volume Group",
+    "availability_zone_id": "{{dev_availability_zone_id}}",
+    "vpc_id": "{{dev_vpc_id}}"
+}
+
+> {%
+client.test('Create Volume Group', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('volume_group_id', response.body.data.id);
+client.log('Volume Group ID: ' + response.body.data.id);
+%}
+
+### create vol and add to group
+POST https://{{host}}/{{version}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "vpc_id": "{{dev_vpc_id}}",
+  "capacity": 25,
+  "availability_zone_id": "{{dev_availability_zone_id}}",
+  "volume_group_id": "{{volume_group_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('volume_id', response.body.data.id);
+client.log('Volume ID: ' + response.body.data.id);
+%}
+
+### check port was assigned 0-15
+GET https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.port === 0);
+
+});
+%}
+
+###
+DELETE https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+
+### create shared volume not assigned to group
+POST https://{{host}}/{{version}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "vpc_id": "{{dev_vpc_id}}",
+  "capacity": 25,
+  "availability_zone_id": "{{dev_availability_zone_id}}",
+  "is_shared": true
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('volume_id', response.body.data.id);
+client.log('Volume ID: ' + response.body.data.id);
+%}
+
+
+### check no port was assigned
+GET https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.port === null);
+});
+%}
+
+### assign shared volume to a volume group
+PATCH https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "volume_group_id": "{{volume_group_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### confirm port was assigned
+GET https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.port != null);
+});
+%}
+
+###
+DELETE https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+
+
+### create non shared volume
+POST https://{{host}}/{{version}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "vpc_id": "{{dev_vpc_id}}",
+  "capacity": 25,
+  "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('volume_id', response.body.data.id);
+client.log('Volume ID: ' + response.body.data.id);
+%}
+
+
+
+### assign shared volume to a volume group
+PATCH https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "volume_group_id": "{{volume_group_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 422, "Response status is not 422");
+});
+%}
+
+###
+DELETE https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+
+### Deploy an instance so we have an OS disk
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{dev_vpc_id}}",
+    "name": "Test",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": false,
+    "network_id": "{{dev_network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600
+}
+
+> {%
+client.global.set("instance_id", response.body.data.id);
+client.log("Instance ID: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### Get OS volume
+GET https://{{host}}/{{version}}/instances/{{instance_id}}/volumes
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Test get volumes', function () {
+    client.assert(response.status === 200, 'Response was not HTTP 200');
+    client.global.set('os_volume_id', response.body.data[0].id);
+});
+%}
+###
+
+### assign shared volume to a volume group
+PATCH https://{{host}}/{{version}}/volumes/{{os_volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "volume_group_id": "{{volume_group_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 422, "Response status is not 422");
+});
+%}
+
+### delete the instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### DELETE the volume group
+DELETE https://{{host}}/{{version}}/volume-groups/{{volume_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json

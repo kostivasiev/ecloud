@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\Image\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -9,7 +10,6 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -61,6 +61,11 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
             'visibility',
             'publisher'
         ]);
+
+        $this->dispatchesEvents = [
+            'deleted' => Deleted::class,
+        ];
+
         parent::__construct($attributes);
     }
 

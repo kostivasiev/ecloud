@@ -23,7 +23,7 @@ class VolumeDetachTest extends TestCase
     public function testJobsBatched()
     {
         Model::withoutEvents(function() {
-            $volume = factory(Volume::class)->create([
+            $volume = Volume::factory()->create([
                 'id' => 'test',
                 'vpc_id' => $this->vpc()->id,
             ]);

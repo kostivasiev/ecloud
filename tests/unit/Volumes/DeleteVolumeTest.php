@@ -19,7 +19,7 @@ class DeleteVolumeTest extends TestCase
         $this->vpc();
         $this->availabilityZone();
         $this->volume = Volume::withoutEvents(function () {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

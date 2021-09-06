@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Events\V2\Volume;
+namespace App\Events\V2\VpnSession;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 
-class Deleting
+class Deleted
 {
     use SerializesModels;
 

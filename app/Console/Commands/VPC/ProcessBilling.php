@@ -29,41 +29,7 @@ class ProcessBilling extends Command
 
     protected array $billing;
     protected array $discountBilling;
-
-    /**
-     * Billable metrics - Add any metrics to this array that we want to bill for.
-     * @var array|string[]
-     */
-    protected array $billableMetrics = [
-        // Compute
-        'vcpu.count',
-        'ram.capacity',
-        'ram.capacity.high',
-        'hostgroup',
-        'host.hs-aaaaaaaa', // DEV
-        // Storage
-        'disk.capacity',
-        'disk.capacity.300',
-        'disk.capacity.600',
-        'disk.capacity.1200',
-        'disk.capacity.2500',
-        'image.private',
-        // Networking
-        'throughput.20Mb',
-        'throughput.50Mb',
-        'throughput.100Mb',
-        'throughput.250Mb',
-        'throughput.500Mb',
-        'throughput.1Gb',
-        'throughput.2.5Gb',
-        'throughput.5Gb',
-        'throughput.10Gb',
-        'floating-ip.count',
-        'networking.advanced',
-        // License
-        'license.windows',
-        'host.license.windows',
-    ];
+    protected float $runningTotal;
 
     public function __construct()
     {
@@ -72,6 +38,7 @@ class ProcessBilling extends Command
         $this->timeZone = new \DateTimeZone(config('app.timezone'));
         $this->startDate = Carbon::createFromTimeString("First day of last month 00:00:00", $this->timeZone);
         $this->endDate = Carbon::createFromTimeString("last day of last month 23:59:59", $this->timeZone);
+        $this->runningTotal = 0.00;
     }
 
     public function handle()
@@ -85,9 +52,24 @@ class ProcessBilling extends Command
                 $query->orWhereBetween('term_start_date', [$this->startDate, $this->endDate]);
             })->where('term_end_date', '>=', $this->endDate)
             ->each(function ($discountPlan) {
+                if ($this->isUkFastAccount($discountPlan->reseller_id)) {
+                    return;
+                }
+
                 if (!isset($this->discountBilling[$discountPlan->reseller_id])) {
                     $this->discountBilling[$discountPlan->reseller_id]['minimum_spend'] = 0;
                     $this->discountBilling[$discountPlan->reseller_id]['payg_threshold'] = 0;
+                }
+
+                if ($this->option('debug')) {
+                    $this->info('Reseller Id: ' . $discountPlan->reseller_id);
+                    $this->info('Discount plan ' . $discountPlan->id . ' found.');
+                    $this->info(
+                        'Term start: '.$discountPlan->term_start_date->format('Y-m-d H:i:s')
+                        . PHP_EOL . 'Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
+                        . PHP_EOL . 'Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
+                        . PHP_EOL . 'Discount Rate: ' . $discountPlan->discount_rate
+                    );
                 }
 
                 if ($discountPlan->term_start_date > $this->startDate) {
@@ -100,30 +82,22 @@ class ProcessBilling extends Command
 
                     $proRataCommitmentAmount = ($discountPlan->commitment_amount / 100) * $percentHoursRemaining;
 
-                    $proRataCommitmentBeforeDiscount = ($discountPlan->commitment_before_discount / 100) * $percentHoursRemaining;
-
                     $proRataDiscountRate = ($discountPlan->discount_rate / 100) * $percentHoursRemaining;
 
                     if ($this->option('debug')) {
-                        $this->info('Reseller Id: ' . $discountPlan->reseller_id);
                         $this->info('Discount plan ' . $discountPlan->id . ' starts mid billing period. Calculating pro rata discount for this billing period.');
                         $this->info(
                             'Term start: '.$discountPlan->term_start_date->format('Y-m-d H:i:s')
                             . PHP_EOL . round($percentHoursRemaining) . '% of Billing period remaining'
-                            . PHP_EOL . 'Original Commitment Amount: £' . number_format($discountPlan->commitment_amount, 2)
                             . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount, 2)
-                            . PHP_EOL . 'Original Commitment Before Discount: £' . number_format($discountPlan->commitment_before_discount, 2)
-                            . PHP_EOL . 'Calculated Pro Rata Commitment Before Discount: £' . number_format($proRataCommitmentBeforeDiscount, 2)
-                            . PHP_EOL . 'Original Discount Rate: ' . $discountPlan->discount_rate
                             . PHP_EOL . 'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
                         );
-                        $this->info(PHP_EOL);
                     }
 
                     $discountPlan->commitment_amount = $proRataCommitmentAmount;
-                    $discountPlan->commitment_before_discount = $proRataCommitmentBeforeDiscount;
                     $discountPlan->discount_rate = $proRataDiscountRate;
                 }
+                $this->info(PHP_EOL);
                 $this->discountBilling[$discountPlan->reseller_id]['minimum_spend'] += $discountPlan->commitment_amount;
                 $this->discountBilling[$discountPlan->reseller_id]['payg_threshold'] += $discountPlan->commitment_before_discount;
             });
@@ -133,6 +107,10 @@ class ProcessBilling extends Command
             ->where('deleted_at', '>=', $this->startDate)
             ->orWhereNull('deleted_at')
             ->each(function ($vpc) {
+                if ($this->isUkFastAccount($vpc->reseller_id)) {
+                    return;
+                }
+
                 $metrics = $this->getVpcMetrics($vpc->id);
 
                 if ($metrics->count() == 0) {
@@ -140,32 +118,32 @@ class ProcessBilling extends Command
                 }
 
                 $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
-                    if (!in_array($key, $this->billableMetrics)) {
-                        return true;
-                    }
-
-                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
 
                     $metrics->get($key)->each(function ($metric) use ($key, $vpc) {
-                        $start = $this->startDate;
-                        $end = $this->endDate;
+                        if ($metric->price > 0.00) {
+                            if (!isset($this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key])) {
+                                $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
+                            }
+                            $start = $this->startDate;
+                            $end = $this->endDate;
 
-                        if ($metric->start > $this->startDate) {
-                            $start = Carbon::parse($metric->start, $this->timeZone);
+                            if ($metric->start > $this->startDate) {
+                                $start = Carbon::parse($metric->start, $this->timeZone);
+                            }
+
+                            if (!empty($metric->end) && $metric->end < $this->endDate) {
+                                $end = Carbon::parse($metric->end, $this->timeZone);
+                            }
+
+                            $hours = $start->diffInHours($end);
+
+                            // Minimum period is 1 hour
+                            $hours = ($hours < 1) ? 1 : $hours;
+
+                            $cost = ($hours * $metric->price) * $metric->value;
+
+                            $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
                         }
-
-                        if (!empty($metric->end) && $metric->end < $this->endDate) {
-                            $end = Carbon::parse($metric->end, $this->timeZone);
-                        }
-
-                        $hours = $start->diffInHours($end);
-
-                        // Minimum period is 1 hour
-                        $hours = ($hours < 1) ? 1 : $hours;
-
-                        $cost = ($hours * $metric->price) * $metric->value;
-
-                        $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
                     });
                 });
 
@@ -278,17 +256,15 @@ class ProcessBilling extends Command
                 continue;
             }
 
-            // Don't create accounts logs for ukfast accounts
-            if ($this->isUkFastAccount($resellerId)) {
-                continue;
-            }
-
             // Min £1 surcharge
-            $total = ($total < 1) ? 1 : $total;
-            $this->addBillingToAccount($resellerId, $total);
+            if ($total > 0) {
+                $total = ($total < 1) ? 1 : $total;
+                $this->addBillingToAccount($resellerId, $total);
+            }
 
             // Remove the billed reseller from the array
             unset($this->discountBilling[$resellerId]);
+            $this->runningTotal += $total;
         }
 
         foreach ($this->discountBilling as $resellerId => $discountTotals) {
@@ -298,13 +274,17 @@ class ProcessBilling extends Command
             }
             $total = $discountTotals['minimum_spend'];
 
-            // Min £1 surcharge
-            $total = ($total < 1) ? 1 : $total;
-
             $this->line('-----------------------------------');
             $this->line('Reseller ' . $resellerId . ' No VPC\'s Committed Spend Total: £' . number_format($total, 2) . PHP_EOL);
 
-            $this->addBillingToAccount($resellerId, $total);
+            if (!empty($total)) {
+                $this->addBillingToAccount($resellerId, $total);
+                $this->runningTotal += $total;
+            }
+        }
+
+        if ($this->option('debug')) {
+            $this->info('Running Total: £' . number_format($this->runningTotal, 2));
         }
 
         return Command::SUCCESS;
@@ -401,7 +381,7 @@ class ProcessBilling extends Command
         $bilingAdminClient = app()->make(BillingAdminClient::class);
         $payment = new Payment([
             'description' => 'eCloud VPCs from ' . $this->startDate->format('d/m/Y') . ' to ' . $this->endDate->format('d/m/Y'),
-            'category' => 'eCloud v2',
+            'category' => 'eCloud VPC',
             //'productId' => '',
             'resellerId' => $resellerId,
             'quantity' => 1,
@@ -440,9 +420,6 @@ class ProcessBilling extends Command
         try {
             $customer = (app()->make(AccountAdminClient::class))->customers()->getById($resellerId);
             if ($customer->accountStatus == 'Internal Account') {
-                if ($this->option('debug')) {
-                    $this->info('Reseller #' . $resellerId . ' is an internal account - skipping accounts log entry.');
-                }
                 return true;
             }
         } catch (\Exception $exception) {

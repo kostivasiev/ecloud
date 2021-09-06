@@ -8,14 +8,15 @@ use App\Models\V2\Region;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Support\Sync;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Resources\VolumeGroupMock;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
+    use VolumeGroupMock;
+
     protected $volume;
 
     public function setUp(): void
