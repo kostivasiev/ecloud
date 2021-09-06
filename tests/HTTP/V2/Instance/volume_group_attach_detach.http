@@ -71,7 +71,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### 2. Create a Secondary Instance
+### 4. Create a Secondary Instance
 POST https://{{host}}/{{version}}/instances
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -96,17 +96,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### 5. Attach Volume Group to Secondary Instance
-PATCH https://{{host}}/{{version}}/instances/{{secondary_instance_id}}
-X-consumer-custom-id:  {{dev_reseller_id_customer}}
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-{
-    "volume_group_id": "{{volume_group_id}}"
-}
-
-### 6. Check Volume is attached to Primary Instance
+### 5. Check Volume is attached to Primary Instance
 GET https://{{host}}/{{version}}/instances/{{primary_instance_id}}/volumes
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -127,7 +117,7 @@ client.test('Get volumes for Primary Instance', function () {
 });
 %}
 
-### 7a. Attempt to remove volume from Primary Instance (MyUKFast Implementation)
+### 6. Attempt to remove volume from Primary Instance (MyUKFast Implementation)
 POST https://{{host}}/{{version}}/volumes/{{volume_id}}/detach
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -143,7 +133,7 @@ client.test('Attempt to detach shared volume (MyUKFast Version)', function () {
 });
 %}
 
-### 7b. Attempt to remove volume from Primary Instance
+### 7. Attempt to remove volume from Primary Instance
 POST https://{{host}}/{{version}}/instances/{{primary_instance_id}}/volume-detach
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -159,7 +149,7 @@ client.test('Attempt to detach shared volume', function () {
 });
 %}
 
-### 8a. Attempt to attach the volume directly to Secondary Instance (MyUKFast Version)
+### 8. Attempt to attach the volume directly to Secondary Instance (MyUKFast Version)
 POST https://{{host}}/{{version}}/volumes/{{volume_id}}/attach
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -175,7 +165,7 @@ client.test('Attempt to detach shared volume', function () {
 });
 %}
 
-### 8b. Attempt to attach the volume directly to Secondary Instance
+### 9. Attempt to attach the volume directly to Secondary Instance
 POST https://{{host}}/{{version}}/instances/{{primary_instance_id}}/volume-attach
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -191,7 +181,7 @@ client.test('Attempt to detach shared volume', function () {
 });
 %}
 
-### 9. Attach the volume group to Secondary Instance
+### 10. Attach the volume group to Secondary Instance
 PATCH https://{{host}}/{{version}}/instances/{{secondary_instance_id}}
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -207,7 +197,7 @@ client.test('Attach volume group to secondary instance', function () {
 });
 %}
 
-### 10. Detach the volume group from Secondary Instance
+### 11. Detach the volume group from Secondary Instance
 PATCH https://{{host}}/{{version}}/instances/{{secondary_instance_id}}
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -223,7 +213,28 @@ client.test('Detach volume group from secondary instance', function () {
 });
 %}
 
-### 11. Detach the volume group from Primary Instance
+### 12. Verify volume is detached from secondary instance
+GET https://{{host}}/{{version}}/instances/{{secondary_instance_id}}/volumes
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Get volumes for Secondary Instance', function () {
+    client.assert(response.status === 200, '200 response not received');
+    var data = response.body.data;
+    var found = false;
+    for (k=0; k < data.length; k++) {
+        if (data[k].id === client.global.get('volume_id')) {
+            found = data[k].id;
+            k = data.length;
+        }
+    }
+    client.assert(found === false, 'Volume was still found in returned data.');
+});
+%}
+
+### 13. Detach the volume group from Primary Instance
 PATCH https://{{host}}/{{version}}/instances/{{primary_instance_id}}
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -236,38 +247,6 @@ Content-Type:  application/json
 > {%
 client.test('Detach volume group from primary instance', function () {
     client.assert(response.status === 200, '200 response not received');
-});
-%}
-
-### 12. Detach Volume from Volume Group
-PATCH https://{{host}}/{{version}}/volumes/{{volume_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: {{dev_reseller_id_customer}}
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-{
-  "volume_group_id": null
-}
-
-> {%
-client.test("Detach volume from Volume Group", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
-
-### 13. Delete Volume
-DELETE https://{{host}}/{{version}}/volumes/{{volume_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: {{dev_reseller_id_customer}}
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-> {%
-client.test("Delete Volume", function() {
-  client.assert(response.status === 204, "Response status is not 204");
 });
 %}
 
@@ -285,7 +264,21 @@ client.test("Delete Volume Group", function() {
 });
 %}
 
-### 15. Delete Secondary Instance
+### 15. Delete Volume
+DELETE https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Delete Volume", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+### 16. Delete Secondary Instance
 DELETE https://{{host}}/{{version}}/instances/{{secondary_instance_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -299,7 +292,7 @@ client.test("Delete Secondary Instance", function() {
 });
 %}
 
-### 16. Delete Primary Instance
+### 17. Delete Primary Instance
 DELETE https://{{host}}/{{version}}/instances/{{primary_instance_id}}
 Accept: */*
 Cache-Control: no-cache
