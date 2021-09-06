@@ -92,6 +92,11 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
+        // Image
+        \App\Events\V2\Image\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
         // Instance
         \App\Events\V2\Instance\Creating::class => [
             \App\Listeners\V2\Instance\DefaultPlatform::class,
