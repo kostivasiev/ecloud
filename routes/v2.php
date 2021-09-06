@@ -315,7 +315,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('volumes/{volumeId}/tasks', 'VolumeController@tasks');
         $router->post('volumes', 'VolumeController@store');
         $router->patch('volumes/{volumeId}', 'VolumeController@update');
-        $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
+        $router->group(['middleware' => 'volume-can-be-deleted'], function () use ($router) {
+            $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
+        });
         $router->post('volumes/{volumeId}/attach', 'VolumeController@attach');
     });
 
