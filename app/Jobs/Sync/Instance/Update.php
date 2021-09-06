@@ -23,7 +23,7 @@ use App\Jobs\Instance\Deploy\RunBootstrapScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
-use App\Jobs\Instance\VolumeGroupAttachDetach;
+use App\Jobs\Instance\VolumeGroupAttach;
 use App\Jobs\Instance\VolumeGroupDetach;
 use App\Jobs\Job;
 use App\Models\V2\Task;
@@ -65,7 +65,7 @@ class Update extends Job
                     new ActivateWindows($this->task->resource),
                     new RunApplianceBootstrap($this->task->resource),
                     new RunBootstrapScript($this->task->resource),
-                    new VolumeGroupAttachDetach($this->task->resource),
+                    new VolumeGroupAttach($this->task->resource),
                     new DeployCompleted($this->task->resource),
                 ],
             ])->dispatch();
@@ -73,7 +73,8 @@ class Update extends Job
             $this->updateTaskBatch([
                 [
                     new ComputeUpdate($this->task->resource),
-                    new VolumeGroupAttachDetach($this->task->resource),
+                    new VolumeGroupAttach($this->task->resource),
+                    new VolumeGroupDetach($this->task->resource),
                 ]
             ])->dispatch();
         }

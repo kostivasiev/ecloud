@@ -89,6 +89,7 @@ class InstanceController extends BaseController
             'locked',
             'backup_enabled',
             'host_group_id',
+            'volume_group_id',
         ]));
 
         $image = Image::forUser(Auth::user())->findOrFail($request->input('image_id'));
@@ -124,6 +125,7 @@ class InstanceController extends BaseController
             'name',
             'vcpu_cores',
             'ram_capacity',
+            'volume_group_id',
         ]));
 
         if ($request->has('backup_enabled') && $this->isAdmin) {

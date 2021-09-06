@@ -75,6 +75,7 @@ class UpdateRequest extends FormRequest
             ],
             'backup_enabled' => 'sometimes|required|boolean',
             'volume_group_id' => [
+                'nullable',
                 Rule::exists(VolumeGroup::class, 'id')->whereNull('deleted_at'),
                 new ExistsForUser(VolumeGroup::class),
                 new HasAvailableInstances,
