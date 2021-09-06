@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\unit\Rules\V2\Instance;
+namespace Tests\unit\Rules\V2\Volume;
 
-use App\Rules\V2\Instance\IsNotSharedVolume;
+use App\Rules\V2\Volume\IsNotSharedVolume;
 use Tests\Mocks\Resources\VolumeMock;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -11,19 +11,17 @@ class IsNotSharedVolumeTest extends TestCase
 {
     use VolumeMock;
 
-    protected IsNotSharedVolume $job;
-
     protected function setUp(): void
     {
         parent::setUp();
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->job = new IsNotSharedVolume();
     }
 
     /** @test */
     public function nonSharedVolumePasses()
     {
-        $this->assertTrue($this->job->passes('volume_id', $this->volume()->id));
+        $job = new IsNotSharedVolume($this->volume()->id);
+        $this->assertTrue($job->passes('instance_id', $this->instance()->id));
     }
 
     /** @test */
@@ -31,6 +29,7 @@ class IsNotSharedVolumeTest extends TestCase
     {
         $this->volume()->is_shared = true;
         $this->volume()->saveQuietly();
-        $this->assertFalse($this->job->passes('volume_id', $this->volume()->id));
+        $job = new IsNotSharedVolume($this->volume()->id);
+        $this->assertFalse($job->passes('instance_id', $this->instance()->id));
     }
 }

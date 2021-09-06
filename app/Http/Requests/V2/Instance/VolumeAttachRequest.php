@@ -27,7 +27,7 @@ class VolumeAttachRequest extends FormRequest
                 new ExistsForUser(Volume::class),
                 new VolumeNotAttachedToInstance($instanceId),
                 new IsSameAvailabilityZone(app('request')->route('instanceId')),
-                new IsNotSharedVolume('attach'),
+                new IsNotSharedVolume,
             ]
         ];
     }

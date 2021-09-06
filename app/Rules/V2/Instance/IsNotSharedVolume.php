@@ -8,12 +8,6 @@ use Illuminate\Support\Facades\Auth;
 
 class IsNotSharedVolume implements Rule
 {
-    protected $state;
-
-    public function __construct(string $state = 'attach')
-    {
-        $this->state = $state;
-    }
 
     public function passes($attribute, $value)
     {
@@ -22,6 +16,6 @@ class IsNotSharedVolume implements Rule
 
     public function message()
     {
-        return 'Shared volumes cannot be ' . $this->state . 'ed directly to instances';
+        return 'Shared volumes cannot be attached directly to instances';
     }
 }
