@@ -49,7 +49,6 @@ class Update extends Job
                     new CheckNetworkAvailable($this->task->resource),
                     new Deploy($this->task->resource),
                     new PrepareOsDisk($this->task->resource),
-                    new VolumeGroupAttachDetach($this->task->resource),
                     new AwaitVolumeSync($this->task->resource),
                     new ConfigureNics($this->task->resource),
                     new AwaitNicSync($this->task->resource),
@@ -66,6 +65,7 @@ class Update extends Job
                     new ActivateWindows($this->task->resource),
                     new RunApplianceBootstrap($this->task->resource),
                     new RunBootstrapScript($this->task->resource),
+                    new VolumeGroupAttachDetach($this->task->resource),
                     new DeployCompleted($this->task->resource),
                 ],
             ])->dispatch();
