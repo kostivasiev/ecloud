@@ -4,9 +4,7 @@ namespace Tests\V2\Volume;
 
 use App\Events\V2\Task\Created;
 use App\Models\V2\Volume;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class IopsModificationTest extends TestCase
@@ -17,7 +15,7 @@ class IopsModificationTest extends TestCase
     {
         parent::setUp();
 
-        $this->volume = factory(Volume::class)->create([
+        $this->volume = Volume::factory()->create([
             'id' => 'vol-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,

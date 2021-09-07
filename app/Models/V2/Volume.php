@@ -2,16 +2,13 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Volume\Created;
 use App\Events\V2\Volume\Creating;
 use App\Events\V2\Volume\Deleted;
-use App\Events\V2\Volume\Deleting;
-use App\Events\V2\Volume\Saved;
-use App\Events\V2\Volume\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -23,40 +20,47 @@ use UKFast\DB\Ditto\Sortable;
 
 class Volume extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable, HasFactory;
 
     public $keyPrefix = 'vol';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    public $incrementing = false;
 
-    protected $casts = [
-        'os_volume' => 'boolean',
-    ];
+    public function __construct(array $attributes = [])
+    {
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
 
-    protected $fillable = [
-        'id',
-        'name',
-        'vpc_id',
-        'availability_zone_id',
-        'capacity',
-        'vmware_uuid',
-        'os_volume',
-        'iops',
-    ];
+        $this->fillable([
+            'id',
+            'name',
+            'vpc_id',
+            'availability_zone_id',
+            'capacity',
+            'vmware_uuid',
+            'os_volume',
+            'iops',
+            'is_shared',
+            'volume_group_id',
+            'port'
+        ]);
 
-    protected $dispatchesEvents = [
-        'creating' => Creating::class,
-        'created' => Created::class,
-        'saving' => Saving::class,
-        'saved' => Saved::class,
-        'deleting' => Deleting::class,
-        'deleted' => Deleted::class,
-    ];
+        $this->casts = [
+            'os_volume' => 'boolean',
+            'is_shared' => 'boolean',
+        ];
 
-    protected $attributes = [
-        'os_volume' => false,
-    ];
+        $this->attributes = [
+            'os_volume' => false,
+            'is_shared' => false,
+        ];
+
+        $this->dispatchesEvents = [
+            'creating' => Creating::class,
+            'deleted' => Deleted::class,
+        ];
+
+        parent::__construct($attributes);
+    }
 
     public function getResellerId(): int
     {
@@ -76,6 +80,11 @@ class Volume extends Model implements Filterable, Sortable, ResellerScopeable, A
     public function instances()
     {
         return $this->belongsToMany(Instance::class)->using(InstanceVolume::class);
+    }
+
+    public function volumeGroup()
+    {
+        return $this->belongsTo(VolumeGroup::class);
     }
 
     /**
@@ -124,6 +133,9 @@ class Volume extends Model implements Filterable, Sortable, ResellerScopeable, A
             $factory->create('capacity', Filter::$stringDefaults),
             $factory->create('vmware_uuid', Filter::$stringDefaults),
             $factory->create('os_volume', Filter::$numericDefaults),
+            $factory->create('is_shared', Filter::$numericDefaults),
+            $factory->create('volume_group_id', Filter::$stringDefaults),
+            $factory->create('port', Filter::$numericDefaults),
             $factory->create('iops', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -146,6 +158,9 @@ class Volume extends Model implements Filterable, Sortable, ResellerScopeable, A
             $factory->create('vmware_uuid'),
             $factory->create('os_volume'),
             $factory->create('iops'),
+            $factory->create('is_shared'),
+            $factory->create('volume_group_id'),
+            $factory->create('port'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -174,6 +189,9 @@ class Volume extends Model implements Filterable, Sortable, ResellerScopeable, A
             'vmware_uuid' => 'vmware_uuid',
             'os_volume' => 'os_volume',
             'iops' => 'iops',
+            'is_shared' => 'is_shared',
+            'volume_group_id' => 'volume_group_id',
+            'port' => 'port',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

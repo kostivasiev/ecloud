@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\VpnEndpoint;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\VpnEndpoint\UnassignFloatingIP;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
@@ -42,23 +43,6 @@ class UnassignFloatingIpTest extends TestCase
         });
     }
 
-    public function testUnassignFloatingIpFailedFails()
-    {
-        Event::fake([JobProcessed::class, Created::class, JobFailed::class]);
-
-        $task = new Task([
-            'id' => 'task-test',
-            'completed' => false,
-            'failure_reason' => 'Test Failure',
-            'name' => Sync::TASK_NAME_UPDATE,
-        ]);
-        $this->vpnEndpoint()->floatingIp->tasks()->save($task);
-
-        dispatch(new UnassignFloatingIP($this->vpnEndpoint()));
-
-        Event::assertDispatched(JobFailed::class);
-    }
-
     public function testAwaitFloatingIpSyncIsReleased()
     {
         Event::fake([JobProcessed::class, Created::class]);
@@ -67,7 +51,7 @@ class UnassignFloatingIpTest extends TestCase
 
         $task = new Task([
             'id' => 'task-test',
-            'completed' => false,
+            'completed' => true,
             'name' => 'floating_ip_unassign',
         ]);
         $this->vpnEndpoint()->floatingIp->tasks()->save($task);
@@ -76,6 +60,32 @@ class UnassignFloatingIpTest extends TestCase
 
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return $event->job->isReleased();
+        });
+    }
+
+    public function testUnassignFloatingIpRegardlessOfState()
+    {
+        Task::withoutEvents(function () {
+            $task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+                'data' => [],
+                'completed' => 0,
+                'failure_reason' => 'A reason for the failure',
+            ]);
+            $task->resource()->associate($this->floatingIp());
+            $task->save();
+            $this->floatingIp()->refresh();
+        });
+
+        $this->assertEquals(Sync::STATUS_FAILED, $this->floatingIp()->sync->status);
+
+        Event::fake([JobProcessed::class]);
+
+        (new UnassignFloatingIP($this->vpnEndpoint()))->handle();
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
         });
     }
 }

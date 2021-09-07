@@ -31,41 +31,6 @@ class ProcessBilling extends Command
     protected array $discountBilling;
     protected float $runningTotal;
 
-    /**
-     * Billable metrics - Add any metrics to this array that we want to bill for.
-     * @var array|string[]
-     */
-    protected array $billableMetrics = [
-        // Compute
-        'vcpu.count',
-        'ram.capacity',
-        'ram.capacity.high',
-        'hostgroup',
-        'host.hs-aaaaaaaa', // DEV
-        // Storage
-        'disk.capacity',
-        'disk.capacity.300',
-        'disk.capacity.600',
-        'disk.capacity.1200',
-        'disk.capacity.2500',
-        'image.private',
-        // Networking
-        'throughput.20Mb',
-        'throughput.50Mb',
-        'throughput.100Mb',
-        'throughput.250Mb',
-        'throughput.500Mb',
-        'throughput.1Gb',
-        'throughput.2.5Gb',
-        'throughput.5Gb',
-        'throughput.10Gb',
-        'floating-ip.count',
-        'networking.advanced',
-        // License
-        'license.windows',
-        'host.license.windows',
-    ];
-
     public function __construct()
     {
         parent::__construct();
@@ -153,32 +118,32 @@ class ProcessBilling extends Command
                 }
 
                 $metrics->keys()->each(function ($key) use ($metrics, $vpc) {
-                    if (!in_array($key, $this->billableMetrics)) {
-                        return true;
-                    }
-
-                    $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
 
                     $metrics->get($key)->each(function ($metric) use ($key, $vpc) {
-                        $start = $this->startDate;
-                        $end = $this->endDate;
+                        if ($metric->price > 0.00) {
+                            if (!isset($this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key])) {
+                                $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] = 0;
+                            }
+                            $start = $this->startDate;
+                            $end = $this->endDate;
 
-                        if ($metric->start > $this->startDate) {
-                            $start = Carbon::parse($metric->start, $this->timeZone);
+                            if ($metric->start > $this->startDate) {
+                                $start = Carbon::parse($metric->start, $this->timeZone);
+                            }
+
+                            if (!empty($metric->end) && $metric->end < $this->endDate) {
+                                $end = Carbon::parse($metric->end, $this->timeZone);
+                            }
+
+                            $hours = $start->diffInHours($end);
+
+                            // Minimum period is 1 hour
+                            $hours = ($hours < 1) ? 1 : $hours;
+
+                            $cost = ($hours * $metric->price) * $metric->value;
+
+                            $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
                         }
-
-                        if (!empty($metric->end) && $metric->end < $this->endDate) {
-                            $end = Carbon::parse($metric->end, $this->timeZone);
-                        }
-
-                        $hours = $start->diffInHours($end);
-
-                        // Minimum period is 1 hour
-                        $hours = ($hours < 1) ? 1 : $hours;
-
-                        $cost = ($hours * $metric->price) * $metric->value;
-
-                        $this->billing[$vpc->reseller_id][$vpc->id]['metrics'][$key] += $cost;
                     });
                 });
 
@@ -416,7 +381,7 @@ class ProcessBilling extends Command
         $bilingAdminClient = app()->make(BillingAdminClient::class);
         $payment = new Payment([
             'description' => 'eCloud VPCs from ' . $this->startDate->format('d/m/Y') . ' to ' . $this->endDate->format('d/m/Y'),
-            'category' => 'eCloud v2',
+            'category' => 'eCloud VPC',
             //'productId' => '',
             'resellerId' => $resellerId,
             'quantity' => 1,

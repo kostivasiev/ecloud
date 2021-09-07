@@ -3,29 +3,13 @@
 namespace Tests\V2\Volume;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
-    /** @var Region */
-    private $region;
-
-    /**
-     * @var AvailabilityZone
-     */
-    private $availabilityZone;
-
-    /** @var Vpc */
-    private $vpc;
-
     /** @var Volume */
     private $volume;
 
@@ -34,7 +18,7 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        $this->volume = factory(Volume::class)->create([
+        $this->volume = Volume::factory()->create([
             'id' => 'vol-abc123xyz',
             'vpc_id' => $this->vpc()->id
         ]);

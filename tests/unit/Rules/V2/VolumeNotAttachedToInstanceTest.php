@@ -15,7 +15,9 @@ class VolumeNotAttachedToInstanceTest extends TestCase
     public function testVolumeNotAttachedSucceeds()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $volume = factory(Volume::class)->create([
+
+        /** @var Volume $volume */
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id
@@ -31,7 +33,8 @@ class VolumeNotAttachedToInstanceTest extends TestCase
     public function testVolumeAttachedFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $volume = factory(Volume::class)->create([
+        /** @var Volume $volume */
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id

@@ -34,7 +34,7 @@ class CapacityChangeTest extends TestCase
     public function testCapacityIncreasedWhenConnectedToInstanceAndDifferent()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -78,7 +78,7 @@ class CapacityChangeTest extends TestCase
     public function testCapacityNotChangedWhenConnectedToInstanceAndNotDifferent()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -109,7 +109,7 @@ class CapacityChangeTest extends TestCase
     public function testCapacityIncreasedWhenNotConnectedToInstanceAndDifferent()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -151,7 +151,7 @@ class CapacityChangeTest extends TestCase
     public function testCapacityNotChangedWhenNotConnectedToInstanceAndNotDifferent()
     {
         $volume = Volume::withoutEvents(function() {
-            return factory(Volume::class)->create([
+            return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

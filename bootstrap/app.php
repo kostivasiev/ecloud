@@ -45,6 +45,7 @@ $app->configure('network');
 $app->configure('auth');
 $app->configure('host');
 $app->configure('billing');
+$app->configure('volume-group');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);

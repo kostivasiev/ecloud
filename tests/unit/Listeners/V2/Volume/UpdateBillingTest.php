@@ -22,7 +22,7 @@ class UpdateBillingTest extends TestCase
         parent::setUp();
 
         Volume::withoutEvents(function() {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
                 'capacity' => 20,
@@ -57,7 +57,7 @@ class UpdateBillingTest extends TestCase
     public function testDefaultIopsBilling()
     {
         Volume::withoutEvents(function() {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -77,7 +77,7 @@ class UpdateBillingTest extends TestCase
     public function testUnattachedVolumeWithNonDefaultIops()
     {
         Volume::withoutEvents(function() {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -98,7 +98,7 @@ class UpdateBillingTest extends TestCase
     public function testAttachedVolumeWithDefaultIops()
     {
         Model::withoutEvents(function() {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id
@@ -126,7 +126,7 @@ class UpdateBillingTest extends TestCase
     public function testAttachedVolumeWithNonDefaultIops()
     {
         Model::withoutEvents(function() {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -170,7 +170,7 @@ class UpdateBillingTest extends TestCase
 
 
         Model::withoutEvents(function() {
-            $this->volume = factory(Volume::class)->create([
+            $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

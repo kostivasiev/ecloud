@@ -110,7 +110,7 @@ class IsSameAvailabilityZoneTest extends TestCase
 
         $rule = new IsSameAvailabilityZone($this->instance()->id);
 
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id
@@ -128,7 +128,7 @@ class IsSameAvailabilityZoneTest extends TestCase
     {
         $rule = new IsSameAvailabilityZone($this->instance()->id);
 
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'availability_zone_id' => $this->availabilityZone2->id,
             'vpc_id' => $this->vpc()->id
@@ -142,7 +142,7 @@ class IsSameAvailabilityZoneTest extends TestCase
     // Volume attach instance endpoint
     public function testVolumeAttachInstanceSameAvailabilityZoneSucceeds()
     {
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id
@@ -162,7 +162,7 @@ class IsSameAvailabilityZoneTest extends TestCase
     // Volume attach instance endpoint
     public function testVolumeAttachInstanceDifferentAvailabilityZoneFails()
     {
-        $volume = factory(Volume::class)->create([
+        $volume = Volume::factory()->create([
             'id' => 'vol-test',
             'availability_zone_id' => $this->availabilityZone2->id,
             'vpc_id' => $this->vpc()->id
