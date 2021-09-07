@@ -350,6 +350,8 @@ paths:
     $ref: 'resources/VolumeGroup/collection.yaml'
   '/ecloud/v2/volume-groups/{volumeGroupId}':
     $ref: 'resources/VolumeGroup/item.yaml'
+  '/ecloud/v2/volume-groups/{volumeGroupId}/volumes':
+    $ref: 'resources/VolumeGroup/volumes.yaml'
   '/ecloud/v2/vpcs':
     $ref: 'resources/Vpc/collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}':
