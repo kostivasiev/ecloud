@@ -2,7 +2,6 @@
 namespace App\Rules\V2\Volume;
 
 use App\Models\V2\Volume;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 
 class IsNotSharedVolume extends \App\Rules\V2\Instance\IsNotSharedVolume
