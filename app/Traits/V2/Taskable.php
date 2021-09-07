@@ -61,7 +61,7 @@ trait Taskable
         return true;
     }
 
-    public function createTask($name, $job, $data = null)
+    public function createTask($name, $job, $data = null, $queued = true)
     {
         Log::debug(get_class($this) . ' : Creating new task - Started', [
             'resource_id' => $this->id,
@@ -73,6 +73,7 @@ trait Taskable
         $task->name = $name;
         $task->job = $job;
         $task->data = $data;
+        $task->queued = $queued;
         if ($this instanceof ResellerScopeable) {
             $task->reseller_id = $this->getResellerId();
         }

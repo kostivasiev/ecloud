@@ -65,7 +65,6 @@ class Update extends Job
                     new ActivateWindows($this->task->resource),
                     new RunApplianceBootstrap($this->task->resource),
                     new RunBootstrapScript($this->task->resource),
-                    new VolumeGroupAttach($this->task->resource),
                     new DeployCompleted($this->task->resource),
                 ],
             ])->dispatch();

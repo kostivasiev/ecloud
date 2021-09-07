@@ -89,8 +89,7 @@ class InstanceController extends BaseController
             'locked',
             'backup_enabled',
             'host_group_id',
-            'volume_group_id',
-        ]));
+            ]));
 
         $image = Image::forUser(Auth::user())->findOrFail($request->input('image_id'));
         $network = Network::forUser(Auth::user())->findOrFail($request->input('network_id'));

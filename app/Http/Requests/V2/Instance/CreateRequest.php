@@ -85,11 +85,6 @@ class CreateRequest extends FormRequest
                 new IsResourceAvailable(HostGroup::class),
                 new HasHosts(),
             ],
-            'volume_group_id' => [
-                Rule::exists(VolumeGroup::class, 'id')->whereNull('deleted_at'),
-                new ExistsForUser(VolumeGroup::class),
-                new HasAvailableInstances,
-            ],
             'network_id' => [
                 'required',
                 'string',
