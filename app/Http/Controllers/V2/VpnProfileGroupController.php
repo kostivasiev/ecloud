@@ -12,7 +12,7 @@ class VpnProfileGroupController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = VpnProfileGroup::query();
+        $collection = VpnProfileGroup::forUser($request->user());
 
         $queryTransformer->config(VpnProfileGroup::class)
             ->transform($collection);
@@ -25,7 +25,7 @@ class VpnProfileGroupController extends BaseController
     public function show(Request $request, string $vpnProfileGroupId)
     {
         return new VpnProfileGroupResource(
-            VpnProfileGroup::findOrFail($vpnProfileGroupId)
+            VpnProfileGroup::forUser($request->user())->findOrFail($vpnProfileGroupId)
         );
     }
 
