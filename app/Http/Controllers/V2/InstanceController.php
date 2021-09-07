@@ -485,7 +485,9 @@ class InstanceController extends BaseController
         $task = $instance->createTaskWithLock(
             'image_create',
             \App\Jobs\Tasks\Instance\CreateImage::class,
-            ['image_id' => $image->id]
+            [
+                'image_id' => $image->id
+            ]
         );
 
         return response()->json(

@@ -45,7 +45,7 @@ class UpdateBillingTest extends TestCase
             $this->sync = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
-                'name' => Sync::TASK_NAME_UPDATE,
+                'name' => 'image_create',
             ]);
             $this->sync->resource()->associate($this->image);
         });
@@ -77,7 +77,7 @@ class UpdateBillingTest extends TestCase
             $this->sync = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
-                'name' => Sync::TASK_NAME_UPDATE,
+                'name' => 'image_create',
             ]);
             $this->sync->resource()->associate($this->image);
         });
@@ -93,6 +93,36 @@ class UpdateBillingTest extends TestCase
         // Check existing metric was ended
         $originalImageMetric->refresh();
 
+        $this->assertNotNull($originalImageMetric->end);
+    }
+
+    public function testEndBillingOnDelete()
+    {
+        // metrics created on deploy
+        $originalImageMetric = factory(BillingMetric::class)->create([
+            'id' => 'bm-test1',
+            'resource_id' => $this->image->id,
+            'vpc_id' => $this->vpc()->id,
+            'key' => 'image.private',
+            'value' => 1,
+            'start' => '2020-07-07T10:30:00+01:00',
+        ]);
+        $this->metaData->value = 4;
+        $this->metaData->save();
+
+        Model::withoutEvents(function () {
+            $this->sync = new Task([
+                'id' => 'sync-1',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $this->sync->resource()->associate($this->image);
+        });
+
+        // Delete the image
+        $this->image->delete();
+
+        $originalImageMetric->refresh();
         $this->assertNotNull($originalImageMetric->end);
     }
 }
