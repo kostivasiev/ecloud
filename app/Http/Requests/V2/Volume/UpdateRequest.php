@@ -58,7 +58,7 @@ class UpdateRequest extends FormRequest
             ],
             'volume_group_id' => [
                 'sometimes',
-                'required',
+                'nullable',
                 Rule::exists(VolumeGroup::class, 'id')->whereNull('deleted_at'),
                 new ExistsForUser(VolumeGroup::class),
                 new IsMemberOfVolumeGroup($volumeId),
