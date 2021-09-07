@@ -2,22 +2,22 @@
 
 namespace Tests\unit\Jobs\OrchestratorBuild;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateHostGroups;
 use App\Models\V2\HostGroup;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Tests\Mocks\HostGroup\TransportNodeProfile;
 use Tests\TestCase;
-use Tests\unit\Jobs\OrchestratorBuild\Mocks\CreateHostGroupsMocks;
 
 class CreateHostGroupsTest extends TestCase
 {
-    use TransportNodeProfile, CreateHostGroupsMocks;
+    use TransportNodeProfile;
 
-    public const NUM_HOSTS = 4;
-
-    protected CreateHostGroups $job;
     protected OrchestratorBuild $orchestratorBuild;
     protected OrchestratorConfig $orchestratorConfig;
     protected HostGroup $hostGroup;
@@ -27,24 +27,19 @@ class CreateHostGroupsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->hostGroup = factory(HostGroup::class)->make(
-            [
-                'id' => 'hg-test',
-                'name' => 'hg-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-                'host_spec_id' => $this->hostSpec()->id,
-                'windows_enabled' => false,
-            ]
-        );
-        $hostGroupArray = $this->hostGroup->attributesToArray();
-        $hostGroupArray['hosts'] = self::NUM_HOSTS;
         $this->orchestratorData = [
             'vpcs' => [
                 $this->vpc()->attributesToArray(),
             ],
             'hostgroups' => [
-                $hostGroupArray,
+                [
+                    'id' => 'hg-test',
+                    'name' => 'hg-test',
+                    'vpc_id' => $this->vpc()->id,
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                    'host_spec_id' => $this->hostSpec()->id,
+                    'windows_enabled' => false,
+                ],
             ]
         ];
         $this->orchestratorConfig = factory(OrchestratorConfig::class)->create(
@@ -61,7 +56,6 @@ class CreateHostGroupsTest extends TestCase
                 'state' => [],
             ]
         );
-        $this->job = new CreateHostGroups($this->orchestratorBuild);
     }
 
     /** @test */
@@ -77,10 +71,10 @@ class CreateHostGroupsTest extends TestCase
             ->expects('info')
             ->once()
             ->withSomeOfArgs(
-                get_class($this->job) . ' : OrchestratorBuild does not contain any Hostgroups, skipping'
+                CreateHostGroups::class . ' : OrchestratorBuild does not contain any Hostgroups, skipping'
             )->andThrow(new \Exception('No Hostgroups'));
 
-        $this->job->handle();
+        (new CreateHostGroups($this->orchestratorBuild))->handle();
     }
 
     /** @test */
@@ -91,22 +85,27 @@ class CreateHostGroupsTest extends TestCase
             ->expects('info')
             ->once()
             ->withSomeOfArgs(
-                get_class($this->job) . ' : OrchestratorBuild hostgroup. 0 has already been initiated, skipping'
+                CreateHostGroups::class . ' : OrchestratorBuild hostgroup. 0 has already been initiated, skipping'
             )->andThrow(new \Exception('Hostgroup Initiated'));
 
         $this->orchestratorBuild->state = ['hostgroup' => ['0']];
         $this->orchestratorBuild->save();
 
-        $this->job->handle();
+        (new CreateHostGroups($this->orchestratorBuild))->handle();
     }
 
     /** @test */
     public function hostgroupIsCreated()
     {
-        $this->buildHostgroupIsCreatedMocks();
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->job->handle();
+        dispatch(new CreateHostGroups($this->orchestratorBuild));
 
-        $this->assertEquals($this->orchestratorBuild->state['hostgroup'][0], $this->hostGroup->id);
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+
+        Event::assertDispatched(Created::class);
     }
 }

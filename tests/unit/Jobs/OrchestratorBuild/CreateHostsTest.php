@@ -2,17 +2,18 @@
 
 namespace Tests\unit\Jobs\OrchestratorBuild;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateHosts;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
-use Tests\unit\Jobs\OrchestratorBuild\Mocks\CreateHostsMocks;
 
 class CreateHostsTest extends TestCase
 {
-    use CreateHostsMocks;
-
     protected CreateHosts $job;
     protected OrchestratorBuild $orchestratorBuild;
     protected OrchestratorConfig $orchestratorConfig;
@@ -43,7 +44,6 @@ class CreateHostsTest extends TestCase
                 'state' => [],
             ]
         );
-        $this->job = new CreateHosts($this->orchestratorBuild);
         $this->availabilityZone();
     }
 
@@ -60,10 +60,10 @@ class CreateHostsTest extends TestCase
             ->expects('info')
             ->once()
             ->withSomeOfArgs(
-                get_class($this->job) . ' : OrchestratorBuild does not contain any Hosts, skipping'
+                CreateHosts::class . ' : OrchestratorBuild does not contain any Hosts, skipping'
             )->andThrow(new \Exception('No Hosts'));
 
-        $this->job->handle();
+        (new CreateHosts($this->orchestratorBuild))->handle();
     }
 
     /** @test */
@@ -74,23 +74,28 @@ class CreateHostsTest extends TestCase
             ->expects('info')
             ->once()
             ->withSomeOfArgs(
-                get_class($this->job) . ' : OrchestratorBuild host. 0 has already been initiated, skipping'
+                CreateHosts::class . ' : OrchestratorBuild host. 0 has already been initiated, skipping'
             )->andThrow(new \Exception('Host Initiated'));
 
         $this->orchestratorBuild->state = ['host' => ['0']];
         $this->orchestratorBuild->save();
 
-        $this->job->handle();
+        (new CreateHosts($this->orchestratorBuild))->handle();
     }
 
     /** @test */
     public function hostIsCreated()
     {
-        $this->buildCreateHostIsCreatedMocks();
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->job->handle();
 
-        $this->assertArrayHasKey('host', $this->orchestratorBuild->state);
-        $this->assertEquals($this->orchestratorBuild->state['host'][0], $this->host()->id);
+        dispatch(new CreateHosts($this->orchestratorBuild));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+
+        Event::assertDispatched(Created::class);
     }
 }
