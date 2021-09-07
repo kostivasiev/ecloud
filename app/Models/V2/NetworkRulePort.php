@@ -42,6 +42,16 @@ class NetworkRulePort extends Model implements Filterable, Sortable
         return $this->belongsTo(NetworkRule::class);
     }
 
+    public function getSourceAttribute()
+    {
+        return preg_replace('/\s+/', '', $this->attributes['source']);
+    }
+
+    public function getDestinationAttribute()
+    {
+        return preg_replace('/\s+/', '', $this->attributes['destination']);
+    }
+
     /**
      * @param $query
      * @param $user
