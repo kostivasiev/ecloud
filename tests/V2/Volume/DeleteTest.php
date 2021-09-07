@@ -1,6 +1,7 @@
 <?php
 namespace Tests\V2\Volume;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
@@ -47,16 +48,14 @@ class DeleteTest extends TestCase
     /** @test */
     public function itDeletesAStandaloneVolume()
     {
-        $this->kingpinServiceMock()
-            ->expects('delete')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/volume/uuid-test-uuid-test-uuid-test')
-            ->andReturnUsing(function () {
-                return new Response(200);
-            });
+        Event::fake(Created::class);
+
         $this->volume->volume_group_id = null;
         $this->volume->saveQuietly();
 
         $this->delete('/v2/volumes/'.$this->volume->id)
             ->assertResponseStatus(202);
+
+        Event::assertDispatched(Created::class);
     }
 }
