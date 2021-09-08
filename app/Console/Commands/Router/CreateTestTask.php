@@ -16,7 +16,7 @@ class CreateTestTask extends Command
 
     public function handle()
     {
-        $router = Router::all()->first();
+        $router = Router::findOrFail('rtr-467e5053');
         $task = $router->createTaskWithLock('test_task', \App\Jobs\Tasks\TestTask::class);
 
         return Command::SUCCESS;
