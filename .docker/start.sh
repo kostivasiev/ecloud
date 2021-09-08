@@ -7,7 +7,7 @@ ROLE=$1
 if [ "$ROLE" = "app" ]; then
     exec apache2-foreground
 elif [ "$ROLE" = "queue" ]; then
-    exec php /var/www/html/artisan queue:work --verbose --tries 3 --timeout=900
+    exec "php /var/www/html/artisan queue:work --verbose --tries 3 --timeout=900"
 elif [ "$ROLE" = "scheduler" ]; then
     function signal_exit
     {
@@ -29,3 +29,5 @@ else
     echo "invalid role '${ROLE}'"
     exit 1
 fi
+
+echo "debug 1"
