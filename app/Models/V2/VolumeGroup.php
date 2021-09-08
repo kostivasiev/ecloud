@@ -127,4 +127,9 @@ class VolumeGroup extends Model implements Filterable, Sortable, ResellerScopeab
             'updated_at' => 'updated_at',
         ];
     }
+
+    public function getVolumeTotalAttribute()
+    {
+        return (int) $this->volumes->count();
+    }
 }

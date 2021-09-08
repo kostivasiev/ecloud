@@ -14,6 +14,7 @@ use UKFast\Responses\UKFastResource;
  * @property string availability_zone_id
  * @property string created_at
  * @property string updated_at
+ * @property int $volume_total
  */
 class VolumeGroupResource extends UKFastResource
 {
@@ -28,6 +29,9 @@ class VolumeGroupResource extends UKFastResource
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
             'availability_zone_id' => $this->availability_zone_id,
+            'usage' => [
+                'volumes' => $this->volume_total,
+            ],
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
