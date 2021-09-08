@@ -2,12 +2,13 @@
 
 namespace Tests\unit\Jobs\Instance;
 
-use App\Events\V2\Task\Created;
 use App\Jobs\Instance\VolumeGroupAttach;
-use GuzzleHttp\Psr7\Response;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Support\Facades\Event;
+use App\Jobs\Kingpin\Instance\AttachVolume;
+use App\Jobs\Kingpin\Volume\IopsChange;
+use App\Models\V2\Task;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 use Tests\Mocks\Resources\VolumeGroupMock;
 use Tests\Mocks\Resources\VolumeMock;
@@ -16,6 +17,8 @@ use Tests\TestCase;
 class VolumeGroupAttachTest extends TestCase
 {
     use VolumeGroupMock, VolumeMock;
+
+    private Task $task;
 
     /** @test */
     public function skipIfVolumeAlreadyMounted()
@@ -36,7 +39,15 @@ class VolumeGroupAttachTest extends TestCase
         $this->instance()->volumes()->attach($this->volume());
         $this->instance()->saveQuietly();
 
-        $this->assertEmpty((new VolumeGroupAttach($this->instance()))->handle());
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'task-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->instance());
+        });
+
+        $this->assertEmpty((new VolumeGroupAttach($this->task))->handle());
     }
 
     /** @test */
@@ -52,22 +63,24 @@ class VolumeGroupAttachTest extends TestCase
         $this->instance()->volume_group_id = $this->volumeGroup()->id;
         $this->instance()->saveQuietly();
 
-        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+        Bus::fake([AttachVolume::class, IopsChange::class]);
 
-        // Assert volume is not currently attached
-        $this->assertEquals(0, $this->instance()->volumes()->where('id', '=', $this->volume()->id)->count());
-
-        dispatch(new VolumeGroupAttach($this->instance()));
-
-        Event::assertNotDispatched(JobFailed::class);
-        Event::assertDispatched(JobProcessed::class, function ($event) {
-            return !$event->job->isReleased();
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'task-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->instance());
         });
-        Event::assertDispatched(Created::class);
 
-        $this->instance()->refresh();
+        $volumeGroupAttach = \Mockery::mock(VolumeGroupAttach::class, [$this->task])
+            ->makePartial();
+        $volumeGroupAttach->allows('awaitTaskWithRelease')
+            ->with(\Mockery::capture($subTask))
+            ->andReturnTrue();
 
-        // assert volume is now attached
-        $this->assertEquals(1, $this->instance()->volumes()->where('id', '=', $this->volume()->id)->count());
+        $volumeGroupAttach->handle();
+
+        $this->assertEquals($this->volume()->id, $subTask->data['volume_id']);
     }
 }

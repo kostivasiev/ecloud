@@ -59,7 +59,7 @@ class VolumeGroupAttach extends Job
                     ]
                 );
 
-                $task = $instance->createTask('volume_attach', VolumeAttach::class, ['volume_id' => $volume->id], true);
+                $task = $instance->createTask('volume_attach', VolumeAttach::class, ['volume_id' => $volume->id]);
                 $this->task->setAttribute('data', ['volume_attach_task_id' => $task->id])->saveQuietly();
                 $this->awaitTaskWithRelease($task);
             });

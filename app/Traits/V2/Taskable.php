@@ -61,7 +61,7 @@ trait Taskable
         return true;
     }
 
-    public function createTask($name, $job, $data = null, $queued = true)
+    public function createTask($name, $job, $data = null)
     {
         Log::debug(get_class($this) . ' : Creating new task - Started', [
             'resource_id' => $this->id,
