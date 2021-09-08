@@ -73,7 +73,6 @@ trait Taskable
         $task->name = $name;
         $task->job = $job;
         $task->data = $data;
-        $task->queued = $queued;
         if ($this instanceof ResellerScopeable) {
             $task->reseller_id = $this->getResellerId();
         }

@@ -2,8 +2,12 @@
 
 namespace Tests\unit\Jobs\Instance;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\Instance\VolumeGroupAttach;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Tests\Mocks\Resources\VolumeGroupMock;
 use Tests\Mocks\Resources\VolumeMock;
@@ -48,38 +52,18 @@ class VolumeGroupAttachTest extends TestCase
         $this->instance()->volume_group_id = $this->volumeGroup()->id;
         $this->instance()->saveQuietly();
 
-        // kingpin mocks
-        $this->kingpinServiceMock()
-            ->expects('get')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-test')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['volumes' => []]));
-            });
-
-        $this->kingpinServiceMock()
-            ->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/vpc-test/instance/i-test/volume/attach',
-                [
-                    'json' => [
-                        'volumeUUID' => $this->volume()->vmware_uuid,
-                        'shared' => $this->volume()->is_shared,
-                        'unitNumber' => $this->volume()->port
-                    ]
-                ]
-            ])->andReturnTrue();
-
-        $this->kingpinServiceMock()
-            ->expects('get')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-test/volume/'.$this->volume()->vmware_uuid)
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['iops' => $this->volume()->iops]));
-            });
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
         // Assert volume is not currently attached
         $this->assertEquals(0, $this->instance()->volumes()->where('id', '=', $this->volume()->id)->count());
 
-        (new VolumeGroupAttach($this->instance()))->handle();
+        dispatch(new VolumeGroupAttach($this->instance()));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+        Event::assertDispatched(Created::class);
 
         $this->instance()->refresh();
 

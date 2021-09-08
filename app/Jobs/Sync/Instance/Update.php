@@ -72,7 +72,7 @@ class Update extends Job
             $this->updateTaskBatch([
                 [
                     new ComputeUpdate($this->task->resource),
-                    new VolumeGroupAttach($this->task->resource),
+                    new VolumeGroupAttach($this->task),
                     new VolumeGroupDetach($this->task->resource),
                 ]
             ])->dispatch();
