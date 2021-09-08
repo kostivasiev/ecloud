@@ -20,7 +20,7 @@ class TestJobWait extends Job
 
     public function handle()
     {
-        for ($i=0; $i<180; $i++) {
+        for ($i=0; $i<10; $i++) {
             Log::warning("TestJobWait loop iteration [".$i."]");
             // Sleep for 5 seconds, 180 times (15 minutes total), less than the 20 minutes configured for redis queue connection retry_after
             sleep(5);
