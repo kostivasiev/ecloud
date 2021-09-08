@@ -130,6 +130,6 @@ class VolumeGroup extends Model implements Filterable, Sortable, ResellerScopeab
 
     public function getVolumeTotalAttribute()
     {
-        return $this->volumes->count();
+        return (int) $this->volumes->count();
     }
 }
