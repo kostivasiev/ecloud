@@ -21,6 +21,8 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
+    const CREDENTIAL_PSK_USERNAME = 'PSK';
+
     public $keyPrefix = 'vpns';
 
     public function __construct(array $attributes = [])
@@ -79,8 +81,8 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
 
     public function getPskAttribute()
     {
-        return ($this->credentials()->where('username', 'PSK')->exists()) ?
-            $this->credentials()->where('username', 'PSK')->pluck('password')->first() :
+        return ($this->credentials()->where('username', self::CREDENTIAL_PSK_USERNAME)->exists()) ?
+            $this->credentials()->where('username', self::CREDENTIAL_PSK_USERNAME)->pluck('password')->first() :
             null;
     }
 

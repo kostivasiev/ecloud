@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: 'parameters/vpnSessionId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              psk:
+                type: string
+                example: str0ngpsk
+                readOnly: true
+  tags:
+    - Vpn Sessions
