@@ -91,4 +91,24 @@ class CreateTest extends TestCase
             ]
         )->assertResponseStatus(422);
     }
+
+    public function testRegionMismatch()
+    {
+        $this->vpc()->setAttribute('region_id', 'test-fail')->saveQuietly();
+
+        $this->post('/v2/dhcps', [
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+        ], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'The vpc id and availability zone id resources are not in the same region',
+                'status' => 422,
+                'source' => 'vpc_id',
+            ]
+        )->assertResponseStatus(422);
+    }
 }

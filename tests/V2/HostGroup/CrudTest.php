@@ -66,6 +66,29 @@ class CrudTest extends TestCase
             ->assertResponseStatus(202);
     }
 
+    public function testStoreMismatchedRegion()
+    {
+        $this->vpc()->setAttribute('region_id', 'test-mismatch')->saveQuietly();
+        $this->vpc()->refresh();
+
+        $data = [
+            'name' => 'hg-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'host_spec_id' => $this->hostSpec()->id,
+            'windows_enabled' => true,
+        ];
+        $this->post('/v2/host-groups', $data)
+            ->seeJson(
+                [
+                    'title' => 'Validation Error',
+                    'detail' => 'The vpc id and availability zone id resources are not in the same region',
+                    'status' => 422,
+                    'source' => 'vpc_id',
+                ]
+            )->assertResponseStatus(422);
+    }
+
     public function testVpcFailedCausesFailure()
     {
         // Force failure
