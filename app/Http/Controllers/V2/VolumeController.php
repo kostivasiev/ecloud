@@ -7,6 +7,7 @@ use App\Http\Requests\V2\Volume\AttachRequest;
 use App\Http\Requests\V2\Volume\DetachRequest;
 use App\Http\Requests\V2\Volume\CreateRequest;
 use App\Http\Requests\V2\Volume\UpdateRequest;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
@@ -67,15 +68,12 @@ class VolumeController extends BaseController
 
     public function store(CreateRequest $request)
     {
-        $availabilityZone = Vpc::forUser(Auth::user())
-            ->findOrFail($request->vpc_id)
-            ->region
-            ->availabilityZones
-            ->first(function ($availabilityZone) use ($request) {
-                return $availabilityZone->id == $request->availability_zone_id;
-            });
+        $availabilityZone = AvailabilityZone::forUser(Auth::user())
+            ->findOrFail($request->availability_zone_id)
+            ->region_id;
+        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->vpc_id)->region_id;
 
-        if (!$availabilityZone) {
+        if ($availabilityZone !== $vpc) {
             return response()->json([
                 'errors' => [
                     'title' => 'Not Found',
