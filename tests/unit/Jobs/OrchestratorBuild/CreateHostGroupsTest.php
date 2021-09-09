@@ -85,7 +85,7 @@ class CreateHostGroupsTest extends TestCase
             ->expects('info')
             ->once()
             ->withSomeOfArgs(
-                CreateHostGroups::class . ' : OrchestratorBuild hostgroup. 0 has already been initiated, skipping'
+                CreateHostGroups::class . ' : OrchestratorBuild hostgroup 0 has already been initiated, skipping'
             )->andThrow(new \Exception('Hostgroup Initiated'));
 
         $this->orchestratorBuild->state = ['hostgroup' => ['0']];
