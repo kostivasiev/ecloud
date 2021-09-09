@@ -34,7 +34,7 @@ class CreateHostGroups extends Job
         collect($data->get('hostgroups'))->each(function ($definition, $index) use ($orchestratorBuild) {
             // Check if a resource has already been created
             if (isset($orchestratorBuild->state['hostgroup']) && isset($orchestratorBuild->state['hostgroup'][$index])) {
-                Log::info(get_class($this) . ' : OrchestratorBuild hostgroup. ' . $index . ' has already been initiated, skipping', ['id' => $this->model->id]);
+                Log::info(get_class($this) . ' : OrchestratorBuild hostgroup ' . $index . ' has already been initiated, skipping', ['id' => $this->model->id]);
                 return;
             }
 
