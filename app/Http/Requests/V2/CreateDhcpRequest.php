@@ -5,7 +5,6 @@ namespace App\Http\Requests\V2;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
-use App\Rules\V2\Region\DoVpcAndAzRegionsMatch;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -39,13 +38,11 @@ class CreateDhcpRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class),
                 new IsResourceAvailable(Vpc::class),
-                new DoVpcAndAzRegionsMatch('availability_zone_id'),
             ],
             'availability_zone_id' => [
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
-                new DoVpcAndAzRegionsMatch('vpc_id'),
             ],
         ];
     }

@@ -2,6 +2,8 @@
 
 namespace Tests\V2\FloatingIp;
 
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Region;
 use App\Support\Sync;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -33,20 +35,23 @@ class CreateTest extends TestCase
         });
     }
 
-    public function testRegionMismatchFail()
+    public function testInvalidAzIsFailed()
     {
-        $this->vpc()->setAttribute('region_id', 'test-fail')->saveQuietly();
+        $region = factory(Region::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $region->id
+        ]);
 
-        $this->post('/v2/floating-ips', [
+        $data = [
             'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id
-        ])->seeJson(
-            [
-                'title' => 'Validation Error',
-                'detail' => 'The vpc id and availability zone id resources are not in the same region',
-                'status' => 422,
-                'source' => 'vpc_id',
-            ]
-        )->assertResponseStatus(422);
+            'availability_zone_id' => $availabilityZone->id,
+        ];
+
+        $this->post('/v2/floating-ips', $data)->seeJson([
+            'title' => 'Not Found',
+            'detail' => 'The specified availability zone is not available to that VPC',
+            'status' => 404,
+            'source' => 'availability_zone_id'
+        ])->assertResponseStatus(404);
     }
 }

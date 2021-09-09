@@ -7,6 +7,7 @@ use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Task;
+use App\Models\V2\Vpc;
 use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
@@ -40,6 +41,25 @@ class FloatingIpController extends BaseController
 
     public function store(CreateRequest $request)
     {
+        $availabilityZone = Vpc::forUser(Auth::user())
+            ->findOrFail($request->vpc_id)
+            ->region
+            ->availabilityZones
+            ->first(function ($availabilityZone) use ($request) {
+                return $availabilityZone->id == $request->availability_zone_id;
+            });
+
+        if (!$availabilityZone) {
+            return response()->json([
+                'errors' => [
+                    'title' => 'Not Found',
+                    'detail' => 'The specified availability zone is not available to that VPC',
+                    'status' => 404,
+                    'source' => 'availability_zone_id'
+                ]
+            ], 404);
+        }
+
         $floatingIp = new FloatingIp(
             $request->only(['vpc_id', 'name', 'availability_zone_id'])
         );
