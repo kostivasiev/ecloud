@@ -16,5 +16,7 @@ get:
                     type: string
                     example: str0ngpsk
                     readOnly: true
+              meta:
+                type: object
   tags:
     - Vpn Sessions
