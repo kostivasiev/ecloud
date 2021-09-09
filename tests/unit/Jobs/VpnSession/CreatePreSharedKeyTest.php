@@ -5,6 +5,7 @@ namespace Tests\unit\Jobs\VpnSession;
 use App\Events\V2\Credential\Creating;
 use App\Jobs\VpnSession\CreatePreSharedKey;
 use App\Models\V2\Credential;
+use App\Models\V2\VpnSession;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
@@ -35,10 +36,10 @@ class CreatePreSharedKeyTest extends TestCase
                 'id' => 'cred-test',
                 'name' => 'Pre-shared Key for VPN Session ' . $this->vpnSession()->id,
                 'host' => null,
-                'username' => 'PSK',
+                'username' => VpnSession::CREDENTIAL_PSK_USERNAME,
                 'password' => Str::random(32),
                 'port' => null,
-                'is_hidden' => false,
+                'is_hidden' => true,
             ]);
             $this->vpnSession()->credentials()->save($credential);
         });

@@ -23,15 +23,15 @@ class CreatePreSharedKey extends Job
     {
         $vpnSession = $this->model;
 
-        if (!$vpnSession->credentials()->where('username', 'PSK')->exists()) {
+        if (!$vpnSession->credentials()->where('username', VpnSession::CREDENTIAL_PSK_USERNAME)->exists()) {
             $credential = new Credential(
                 [
                     'name' => 'Pre-shared Key for VPN Session ' . $vpnSession->id,
                     'host' => null,
-                    'username' => 'PSK',
+                    'username' => VpnSession::CREDENTIAL_PSK_USERNAME,
                     'password' => Str::random(32),
                     'port' => null,
-                    'is_hidden' => false,
+                    'is_hidden' => true,
                 ]
             );
             $vpnSession->credentials()->save($credential);

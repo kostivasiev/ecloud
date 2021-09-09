@@ -154,7 +154,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('vpn-sessions', 'VpnSessionController@index');
         $router->get('vpn-sessions/{vpnSessionId}', 'VpnSessionController@show');
-        $router->get('vpn-sessions/{vpnSessionId}/credentials', 'VpnSessionController@credentials');
+        $router->get('vpn-sessions/{vpnSessionId}/pre-shared-key', 'VpnSessionController@preSharedKey');
         $router->post('vpn-sessions', 'VpnSessionController@create');
         $router->patch('vpn-sessions/{vpnSessionId}', 'VpnSessionController@update');
         $router->delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');

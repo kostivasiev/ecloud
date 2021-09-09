@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\VpnSession;
 
 use App\Jobs\VpnSession\DeletePreSharedKey;
 use App\Models\V2\Credential;
+use App\Models\V2\VpnSession;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
@@ -21,19 +22,19 @@ class DeletePreSharedKeyTest extends TestCase
                 'id' => 'cred-test',
                 'name' => 'Pre-shared Key for VPN Session ' . $this->vpnSession()->id,
                 'host' => null,
-                'username' => 'PSK',
+                'username' => VpnSession::CREDENTIAL_PSK_USERNAME,
                 'password' => Str::random(32),
                 'port' => null,
-                'is_hidden' => false,
+                'is_hidden' => true,
             ]);
             $this->vpnSession()->credentials()->save($credential);
         });
 
-        $this->assertTrue($this->vpnSession()->credentials()->where('username', 'PSK')->exists());
+        $this->assertTrue($this->vpnSession()->credentials()->where('username', VpnSession::CREDENTIAL_PSK_USERNAME)->exists());
 
         dispatch(new DeletePreSharedKey($this->vpnSession()));
 
-        $this->assertFalse($this->vpnSession()->credentials()->where('username', 'PSK')->exists());
+        $this->assertFalse($this->vpnSession()->credentials()->where('username', VpnSession::CREDENTIAL_PSK_USERNAME)->exists());
 
         Event::assertNotDispatched(JobFailed::class);
     }

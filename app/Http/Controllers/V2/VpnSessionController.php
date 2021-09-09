@@ -10,6 +10,7 @@ use App\Resources\V2\CredentialResource;
 use App\Resources\V2\VpnSessionResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class VpnSessionController extends BaseController
@@ -72,16 +73,24 @@ class VpnSessionController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function credentials(Request $request, QueryTransformer $queryTransformer, string $vpnSessionId)
+    public function preSharedKey(Request $request, string $vpnSessionId)
     {
-        $collection = VpnSession::forUser($request->user())->findOrFail($vpnSessionId)
-            ->credentials();
+        $vpnSession = VpnSession::forUser($request->user())->findOrFail($vpnSessionId);
 
-        $queryTransformer->config(Credential::class)
-            ->transform($collection);
+        $credentialQuery = $vpnSession->credentials()->where('username', VpnSession::CREDENTIAL_PSK_USERNAME);
+        if (!$credentialQuery->exists()) {
+            throw new NotFoundException(
+                'Unable to load pre-shared key for VPN session'
+            );
+        }
 
-        return CredentialResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return response()->json(
+            [
+                'data' => [
+                    'psk' => $credentialQuery->get()->first()->password
+                ],
+                'meta' => (object)[]
+            ]
+        );
     }
 }

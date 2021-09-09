@@ -55,6 +55,7 @@ class GetTest extends TestCase
         );
         $this->credential = factory(Credential::class)->create([
             'resource_id' => $this->vpnSession->id,
+            'username' => VpnSession::CREDENTIAL_PSK_USERNAME
         ]);
     }
 
@@ -80,16 +81,22 @@ class GetTest extends TestCase
             )->assertResponseStatus(200);
     }
 
-    public function testGetCredentialResource()
+    public function testGetPreSharedKeySucceedsWhenExists()
     {
-        $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/credentials')
+        $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/pre-shared-key')
             ->seeJson(
                 [
-                    'resource_id' => $this->vpnSession->id,
-                    'username' => 'someuser',
-                    'password' => 'somepassword',
+                    'psk' => 'somepassword',
                 ]
             )
             ->assertResponseStatus(200);
+    }
+
+    public function testGetPreSharedKey404WhenNotExist()
+    {
+        $this->credential->delete();
+
+        $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/pre-shared-key')
+            ->assertResponseStatus(404);
     }
 }
