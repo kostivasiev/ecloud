@@ -30,7 +30,7 @@ class PopulateFipNatSequence extends Command
             }
 
             if ($fip->destinationNat()->exists()) {
-                $this->info('Populating sequence for DNAT ' . $fip->sourceNat->id . ' for floating IP ' . $fip->id);
+                $this->info('Populating sequence for DNAT ' . $fip->destinationNat->id . ' for floating IP ' . $fip->id);
                 $fip->destinationNat->sequence = config('defaults.floating-ip.nat.sequence');
                 $fip->destinationNat->save();
             }
