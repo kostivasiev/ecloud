@@ -97,5 +97,9 @@ class CreateHostsTest extends TestCase
         });
 
         Event::assertDispatched(Created::class);
+
+        $this->orchestratorBuild->refresh();
+        $this->assertNotNull($this->orchestratorBuild->state['host']);
+        $this->assertEquals(1, count($this->orchestratorBuild->state['host']));
     }
 }

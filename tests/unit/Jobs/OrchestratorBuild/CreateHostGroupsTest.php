@@ -107,5 +107,9 @@ class CreateHostGroupsTest extends TestCase
         });
 
         Event::assertDispatched(Created::class);
+
+        $this->orchestratorBuild->refresh();
+        $this->assertNotNull($this->orchestratorBuild->state['hostgroup']);
+        $this->assertEquals(1, count($this->orchestratorBuild->state['hostgroup']));
     }
 }
