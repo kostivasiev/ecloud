@@ -25,7 +25,8 @@ class Nat extends Model
         'id',
         'destination_id',
         'translated_id',
-        'action'
+        'action',
+        'sequence'
     ];
 
     const ACTION_DNAT = 'DNAT';

@@ -41,6 +41,7 @@ class CreateNats extends Job
             $nat->destination()->associate($floatingIp);
             $nat->translated()->associate($this->resource);
             $nat->action = Nat::ACTION_DNAT;
+            $nat->sequence = config('defaults.floating-ip.nat.sequence');
             $task = $nat->syncSave();
             Log::info(get_class($this) . ' : Creating DNAT for floating IP ' . $floatingIp->id, ['task_id' => $task->id]);
         }
@@ -50,6 +51,7 @@ class CreateNats extends Job
             $nat->source()->associate($this->resource);
             $nat->translated()->associate($floatingIp);
             $nat->action = NAT::ACTION_SNAT;
+            $nat->sequence = config('defaults.floating-ip.nat.sequence');
             $task = $nat->syncSave();
             Log::info(get_class($this) . ' : Creating SNAT for floating IP ' . $floatingIp->id, ['task_id' => $task->id]);
         }
