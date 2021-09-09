@@ -8,9 +8,9 @@ Content-Type: application/json
 
 {
   "name": "Test",
-  "vpc_id": "vpc-032cfe89",
+  "vpc_id": "{{dev_vpc_id}}",
   "capacity": 25,
-  "availability_zone_id": "az-aaaaaaaa"
+  "availability_zone_id": "{{dev_availability_zone_id}}"
 }
 
 > {%
