@@ -9,9 +9,12 @@ get:
           schema:
             type: object
             properties:
-              psk:
-                type: string
-                example: str0ngpsk
-                readOnly: true
+              data:
+                type: object
+                properties:
+                  psk:
+                    type: string
+                    example: str0ngpsk
+                    readOnly: true
   tags:
     - Vpn Sessions
