@@ -25,7 +25,7 @@ class AwaitHosts extends Job
         $orchestratorBuild = $this->model;
 
         $state = collect($orchestratorBuild->state);
-        if (!$state->has('hosts')) {
+        if (!$state->has('host')) {
             Log::info(get_class($this) . ' : No Hosts detected in build state, skipping', ['id' => $this->model->id]);
             return;
         }
