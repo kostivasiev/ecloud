@@ -25,11 +25,11 @@ class AwaitHostGroups extends Job
         $orchestratorBuild = $this->model;
 
         $state = collect($orchestratorBuild->state);
-        if (!$state->has('hostgroups')) {
+        if (!$state->has('hostgroup')) {
             Log::info(get_class($this) . ' : No Hostgroups detected in build state, skipping', ['id' => $this->model->id]);
             return;
         }
 
-        $this->awaitSyncableResources($state->get('hostgroups'));
+        $this->awaitSyncableResources($state->get('hostgroup'));
     }
 }

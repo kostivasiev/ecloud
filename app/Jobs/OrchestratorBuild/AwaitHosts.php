@@ -30,6 +30,6 @@ class AwaitHosts extends Job
             return;
         }
 
-        $this->awaitSyncableResources($state->get('hosts'));
+        $this->awaitSyncableResources($state->get('host'));
     }
 }
