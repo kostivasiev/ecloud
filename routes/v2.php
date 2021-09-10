@@ -325,6 +325,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('volume-groups', 'VolumeGroupController@index');
         $router->get('volume-groups/{volumeGroupId}', 'VolumeGroupController@show');
+        $router->get('volume-groups/{volumeGroupId}/volumes', 'VolumeGroupController@volumes');
         $router->post('volume-groups', 'VolumeGroupController@store');
         $router->patch('volume-groups/{volumeGroupId}', 'VolumeGroupController@update');
         $router->delete('volume-groups/{volumeGroupId}', 'VolumeGroupController@destroy');

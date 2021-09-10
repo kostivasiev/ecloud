@@ -276,3 +276,11 @@ Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
+### View the Volumes in the volume group
+GET https://{{host}}/{{version}}/volume-groups/{{volume_group_id}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json

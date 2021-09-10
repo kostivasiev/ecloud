@@ -3,8 +3,10 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\VolumeGroup\CreateRequest;
 use App\Http\Requests\V2\VolumeGroup\UpdateRequest;
+use App\Models\V2\Volume;
 use App\Models\V2\VolumeGroup;
 use App\Resources\V2\VolumeGroupResource;
+use App\Resources\V2\VolumeResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -59,5 +61,16 @@ class VolumeGroupController extends BaseController
 
         $task = $volumeGroup->syncDelete();
         return $this->responseTaskId($task->id);
+    }
+
+    public function volumes(Request $request, QueryTransformer $queryTransformer, string $volumeGroupId)
+    {
+        $collection = VolumeGroup::forUser($request->user())->findOrFail($volumeGroupId)->volumes();
+        $queryTransformer->config(Volume::class)
+            ->transform($collection);
+
+        return VolumeResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }
