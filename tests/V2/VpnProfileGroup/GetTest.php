@@ -46,4 +46,30 @@ class GetTest extends TestCase
             )
             ->assertResponseStatus(200);
     }
+
+    public function testIsNotVisibleInNonPublicAZ()
+    {
+        $this->availabilityZone()->is_public = false;
+        $this->availabilityZone()->saveQuietly();
+
+        $this->get('/v2/vpn-profile-groups')
+            ->dontSeeJson(
+                [
+                    'id' => $this->vpnProfileGroup->id,
+                ]
+            )->assertResponseStatus(200);
+    }
+
+    public function testIsNotVisibleInNonPublicRegion()
+    {
+        $this->region()->is_public = false;
+        $this->region()->saveQuietly();
+
+        $this->get('/v2/vpn-profile-groups')
+            ->dontSeeJson(
+                [
+                    'id' => $this->vpnProfileGroup->id,
+                ]
+            )->assertResponseStatus(200);
+    }
 }

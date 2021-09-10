@@ -7,8 +7,10 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -47,6 +49,23 @@ class VpnProfileGroup extends Model implements Filterable, Sortable, Availabilit
     public function vpnSessions()
     {
         return $this->hasMany(VpnSession::class);
+    }
+
+    /**
+     * @param Builder $query
+     * @param Consumer $user
+     * @return Builder
+     */
+    public function scopeForUser($query, Consumer $user)
+    {
+        if ($user->isAdmin()) {
+            return $query;
+        }
+        return $query->whereHas('availabilityZone.region', function ($query) {
+            $query->where('is_public', '=', true);
+        })->whereHas('availabilityZone', function ($query) {
+            $query->where('is_public', '=', true);
+        });
     }
 
     /**
