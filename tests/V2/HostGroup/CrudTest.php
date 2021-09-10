@@ -3,13 +3,11 @@
 namespace Tests\V2\HostGroup;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Host;
-use App\Models\V2\Region;
-use Illuminate\Support\Facades\Event;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -70,15 +68,12 @@ class CrudTest extends TestCase
 
     public function testInvalidAzIsFailed()
     {
-        $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->id
-        ]);
+        $this->vpc()->setAttribute('region_id', 'test-fail')->saveQuietly();
 
         $data = [
             'name' => 'hg-test',
             'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $availabilityZone->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
             'host_spec_id' => $this->hostSpec()->id,
             'windows_enabled' => true,
         ];

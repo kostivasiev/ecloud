@@ -2,8 +2,6 @@
 
 namespace Tests\V2\FloatingIp;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
 use App\Support\Sync;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -37,14 +35,11 @@ class CreateTest extends TestCase
 
     public function testInvalidAzIsFailed()
     {
-        $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->id
-        ]);
+        $this->vpc()->setAttribute('region_id', 'test-fail')->saveQuietly();
 
         $data = [
             'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $availabilityZone->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
         ];
 
         $this->post('/v2/floating-ips', $data)->seeJson([
