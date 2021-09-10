@@ -133,7 +133,7 @@ class Volume extends Model implements Filterable, Sortable, ResellerScopeable, A
             $factory->create('capacity', Filter::$stringDefaults),
             $factory->create('vmware_uuid', Filter::$stringDefaults),
             $factory->create('os_volume', Filter::$numericDefaults),
-            $factory->create('is_shared', Filter::$numericDefaults),
+            $factory->boolean()->create('is_shared', '1', '0'),
             $factory->create('volume_group_id', Filter::$stringDefaults),
             $factory->create('port', Filter::$numericDefaults),
             $factory->create('iops', Filter::$numericDefaults),
