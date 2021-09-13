@@ -50,6 +50,10 @@ class Deploy extends Job
             'firewall_match' => 'MATCH_EXTERNAL_ADDRESS',
         ];
 
+        if (!empty($this->model->sequence)) {
+            $json['sequence_number'] = $this->model->sequence;
+        }
+
         if (!empty($this->model->destination)) {
             $json['destination_network'] = $this->model->destination->ip_address;
         }

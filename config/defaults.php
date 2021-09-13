@@ -28,7 +28,11 @@ return [
     ],
     'vpn' => [],
     'instance' => [],
-    'floating-ip' => [],
+    'floating-ip' => [
+        'nat' => [
+            'sequence' => 1000
+        ]
+    ],
     'firewall_rule' => [
         /** The defaults for these need review as unsure of what they're supposed to be */
         'egress' => '',
