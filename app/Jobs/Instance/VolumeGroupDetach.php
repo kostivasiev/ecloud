@@ -18,6 +18,7 @@ class VolumeGroupDetach extends Job
     public $backoff = 5;
 
     private Instance $model;
+    private Task $task;
 
     public function __construct(Task $task)
     {
