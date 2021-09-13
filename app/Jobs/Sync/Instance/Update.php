@@ -73,7 +73,7 @@ class Update extends Job
                 [
                     new ComputeUpdate($this->task->resource),
                     new VolumeGroupAttach($this->task),
-                    new VolumeGroupDetach($this->task->resource),
+                    new VolumeGroupDetach($this->task),
                 ]
             ])->dispatch();
         }
