@@ -49,19 +49,19 @@ class AssignVolumeGroup extends Job
                         );
                         return;
                     }
-
-                    Log::info(
-                        'Attaching volume to instance',
-                        [
-                            'instance_id' => $instance->id,
-                            'volume_id' => $volume->id,
-                        ]
-                    );
-
-                    $task = $instance->createTask('volume_attach', VolumeAttach::class, ['volume_id' => $volume->id]);
-                    $this->task->setAttribute('data', ['instance_attach_task_id' => $task->id])->saveQuietly();
-                    $this->awaitTaskWithRelease($task);
                 }
+
+                Log::info(
+                    'Attaching volume to instance',
+                    [
+                        'instance_id' => $instance->id,
+                        'volume_id' => $volume->id,
+                    ]
+                );
+
+                $task = $instance->createTask('volume_attach', VolumeAttach::class, ['volume_id' => $volume->id]);
+                $this->task->setAttribute('data', ['instance_attach_task_id' => $task->id])->saveQuietly();
+                $this->awaitTaskWithRelease($task);
             });
         }
     }
