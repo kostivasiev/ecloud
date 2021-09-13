@@ -3,7 +3,10 @@
 namespace Tests\unit\Jobs\Instance;
 
 use App\Jobs\Instance\VolumeGroupDetach;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Tests\Mocks\Resources\VolumeGroupMock;
 use Tests\Mocks\Resources\VolumeMock;
@@ -13,12 +16,14 @@ class VolumeGroupDetachTest extends TestCase
 {
     use VolumeGroupMock, VolumeMock;
 
+    private Task $task;
+
     /** @test */
     public function skipIfVolumeGroupIdIsNotEmpty()
     {
         Log::partialMock()
             ->expects('info')
-            ->withSomeOfArgs('No volumes to unmount from Instance, skipping')
+            ->withSomeOfArgs('Instance is not associated with a volume group, skipping')
             ->once();
 
         // add volume group to instance and attach the volume
@@ -26,7 +31,15 @@ class VolumeGroupDetachTest extends TestCase
         $this->instance()->volumes()->attach($this->volume());
         $this->instance()->saveQuietly();
 
-        $this->assertEmpty((new VolumeGroupDetach($this->instance()))->handle());
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'task-1',
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $this->task->resource()->associate($this->instance());
+        });
+
+        $this->assertEmpty((new VolumeGroupDetach($this->task))->handle());
     }
 
     /** @test */
@@ -38,6 +51,14 @@ class VolumeGroupDetachTest extends TestCase
         $this->instance()->volumes()->attach($this->volume());
         $this->instance()->saveQuietly();
 
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'task-1',
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $this->task->resource()->associate($this->instance());
+        });
+
         // kingpin mocks
         $this->kingpinServiceMock()
             ->expects('get')
@@ -46,7 +67,7 @@ class VolumeGroupDetachTest extends TestCase
                 return new Response(200, [], json_encode(['volumes' => []]));
             });
 
-        (new VolumeGroupDetach($this->instance()))->handle();
+        (new VolumeGroupDetach($this->task))->handle();
 
         $this->assertEquals(0, $this->instance()->volumes()->count());
     }

@@ -33,7 +33,7 @@ class Delete extends Job
             [
                 new PowerOff($this->task->resource, true),
                 new Undeploy($this->task->resource),
-                new VolumeGroupDetach($this->task->resource),
+                new VolumeGroupDetach($this->task),
                 new DeleteVolumes($this->task->resource),
                 new UnassignFloatingIP($this->task->resource),
                 new DeleteNics($this->task->resource),
