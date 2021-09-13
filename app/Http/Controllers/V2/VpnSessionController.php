@@ -52,14 +52,14 @@ class VpnSessionController extends BaseController
             foreach (Str::of($request->get('local_networks'))->explode(',') as $localNetwork) {
                 $vpnSession->vpnSessionNetworks()->create([
                     'type' => VpnSessionNetwork::TYPE_LOCAL,
-                    'ip_address' => $localNetwork,
+                    'ip_address' => (string) Str::of($localNetwork)->trim(),
                 ]);
             }
 
             foreach (Str::of($request->get('remote_networks'))->explode(',') as $remoteNetwork) {
                 $vpnSession->vpnSessionNetworks()->create([
                     'type' => VpnSessionNetwork::TYPE_LOCAL,
-                    'ip_address' => $remoteNetwork,
+                    'ip_address' => (string) Str::of($remoteNetwork)->trim(),
                 ]);
             }
 
@@ -92,7 +92,7 @@ class VpnSessionController extends BaseController
                 foreach (Str::of($request->get('local_networks'))->explode(',') as $localNetwork) {
                     $vpnSession->vpnSessionNetworks()->create([
                         'type' => VpnSessionNetwork::TYPE_LOCAL,
-                        'ip_address' => $localNetwork,
+                        'ip_address' => (string) Str::of($localNetwork)->trim(),
                     ]);
                 }
             }
@@ -100,7 +100,7 @@ class VpnSessionController extends BaseController
             foreach (Str::of($request->get('remote_networks'))->explode(',') as $remoteNetwork) {
                 $vpnSession->vpnSessionNetworks()->create([
                     'type' => VpnSessionNetwork::TYPE_LOCAL,
-                    'ip_address' => $remoteNetwork,
+                    'ip_address' => (string) Str::of($remoteNetwork)->trim(),
                 ]);
             }
 
