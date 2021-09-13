@@ -7,7 +7,6 @@ use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\Network;
 use App\Models\V2\SshKeyPair;
-use App\Models\V2\VolumeGroup;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\FloatingIp\IsAssigned;
