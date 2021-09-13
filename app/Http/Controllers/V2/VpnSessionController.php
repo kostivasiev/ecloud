@@ -6,10 +6,13 @@ use App\Http\Requests\V2\VpnSession\CreateRequest;
 use App\Http\Requests\V2\VpnSession\UpdateRequest;
 use App\Models\V2\Credential;
 use App\Models\V2\VpnSession;
+use App\Models\V2\VpnSessionNetwork;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\VpnSessionResource;
+use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -42,10 +45,26 @@ class VpnSessionController extends BaseController
             'vpn_service_id',
             'vpn_endpoint_id',
             'remote_ip',
-            'remote_networks',
-            'local_networks',
         ]));
-        $task = $vpnSession->syncSave();
+        $task = $vpnSession->withTaskLock(function ($vpnSession) use ($request) {
+            $vpnSession->save();
+
+            foreach (Str::of($request->get('local_networks'))->explode(',') as $localNetwork) {
+                $vpnSession->vpnSessionNetworks()->create([
+                    'type' => VpnSessionNetwork::TYPE_LOCAL,
+                    'ip_address' => $localNetwork,
+                ]);
+            }
+
+            foreach (Str::of($request->get('remote_networks'))->explode(',') as $remoteNetwork) {
+                $vpnSession->vpnSessionNetworks()->create([
+                    'type' => VpnSessionNetwork::TYPE_LOCAL,
+                    'ip_address' => $remoteNetwork,
+                ]);
+            }
+
+            return $vpnSession->syncSave();
+        });
 
         return $this->responseIdMeta($request, $vpnSession->id, 202, $task->id);
     }
@@ -61,7 +80,32 @@ class VpnSessionController extends BaseController
             'remote_networks',
             'local_networks',
         ]));
-        $task = $vpnSession->syncSave();
+
+        $task = $vpnSession->withTaskLock(function ($vpnSession) use ($request) {
+            $vpnSession->save();
+
+            if ($request->filled('local_networks')) {
+                $vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->each(function ($network) {
+                    $network->delete();
+                });
+
+                foreach (Str::of($request->get('local_networks'))->explode(',') as $localNetwork) {
+                    $vpnSession->vpnSessionNetworks()->create([
+                        'type' => VpnSessionNetwork::TYPE_LOCAL,
+                        'ip_address' => $localNetwork,
+                    ]);
+                }
+            }
+
+            foreach (Str::of($request->get('remote_networks'))->explode(',') as $remoteNetwork) {
+                $vpnSession->vpnSessionNetworks()->create([
+                    'type' => VpnSessionNetwork::TYPE_LOCAL,
+                    'ip_address' => $remoteNetwork,
+                ]);
+            }
+
+            return $vpnSession->createSync(Sync::TYPE_UPDATE);
+        });
 
         return $this->responseIdMeta($request, $vpnSession->id, 202, $task->id);
     }

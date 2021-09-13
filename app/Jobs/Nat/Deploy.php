@@ -44,22 +44,28 @@ class Deploy extends Job
             'display_name' => $this->model->id,
             'description' => $this->model->id,
             'action' => $this->model->action,
-            'translated_network' => $this->model->translated->ip_address,
             'enabled' => true,
             'logging' => false,
-            'firewall_match' => 'MATCH_EXTERNAL_ADDRESS',
         ];
+
+        if ($this->model->action !== Nat::ACTION_NOSNAT) {
+            $json['firewall_match'] = 'MATCH_EXTERNAL_ADDRESS';
+        }
 
         if (!empty($this->model->sequence)) {
             $json['sequence_number'] = $this->model->sequence;
         }
 
         if (!empty($this->model->destination)) {
-            $json['destination_network'] = $this->model->destination->ip_address;
+            $json['destination_network'] = $this->model->destination->getIPAddress();
         }
 
         if (!empty($this->model->source)) {
-            $json['source_network'] = $this->model->source->ip_address;
+            $json['source_network'] = $this->model->source->getIPAddress();
+        }
+
+        if (!empty($this->model->translated)) {
+            $json['translated_network'] = $this->model->translated->getIPAddress();
         }
 
         $router->availabilityZone->nsxService()->patch(

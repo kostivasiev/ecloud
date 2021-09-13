@@ -26,11 +26,12 @@ class Nat extends Model
         'destination_id',
         'translated_id',
         'action',
-        'sequence'
+        'sequence',
     ];
 
     const ACTION_DNAT = 'DNAT';
     const ACTION_SNAT = 'SNAT';
+    const ACTION_NOSNAT = 'NO_SNAT';
 
     protected $dispatchesEvents = [
         'created' => Created::class,

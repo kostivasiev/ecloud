@@ -38,8 +38,6 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
             'vpn_service_id',
             'vpn_endpoint_id',
             'remote_ip',
-            'remote_networks',
-            'local_networks',
         ];
 
         $this->dispatchesEvents = [
@@ -74,6 +72,11 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
         return $this->vpnService->router->availabilityZone();
     }
 
+    public function vpnSessionNetworks()
+    {
+        return $this->hasMany(VpnSessionNetwork::class);
+    }
+
     public function getResellerId(): int
     {
         return $this->vpnService->getResellerId();
@@ -84,6 +87,26 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
         return ($this->credentials()->where('username', self::CREDENTIAL_PSK_USERNAME)->exists()) ?
             $this->credentials()->where('username', self::CREDENTIAL_PSK_USERNAME)->pluck('password')->first() :
             null;
+    }
+
+    public function getLocalNetworksAttribute()
+    {
+        return $this->getNetworksAttributeByType(VpnSessionNetwork::TYPE_LOCAL);
+    }
+
+    public function getRemoteNetworksAttribute()
+    {
+        return $this->getNetworksAttributeByType(VpnSessionNetwork::TYPE_REMOTE);
+    }
+
+    protected function getNetworksAttributeByType($type)
+    {
+        return $this->getNetworksByType($type)->get()->pluck('ip_address')->join(',');
+    }
+
+    protected function getNetworksByType($type)
+    {
+        return $this->vpnSessionNetworks()->where('type', '=', $type);
     }
 
     /**
