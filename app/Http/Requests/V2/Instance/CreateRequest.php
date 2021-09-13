@@ -16,8 +16,6 @@ use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\IsValidRamMultiple;
-use App\Rules\V2\Volume\HasAvailableInstances;
-use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
