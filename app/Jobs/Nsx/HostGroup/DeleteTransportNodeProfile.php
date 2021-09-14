@@ -86,7 +86,9 @@ class DeleteTransportNodeProfile extends Job
                 $hostGroup->id . ', skipping'
             );
             return;
-        }// Once the Profile is Detached it can be deleted
+        }
+
+        // Once the Profile is Detached it can be deleted
         try {
             $this->model->availabilityZone->nsxService()->delete(
                 '/api/v1/transport-node-profiles/' . $transportNodeItem->id
