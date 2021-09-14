@@ -245,7 +245,7 @@ trait TransportNodeProfile
             });
         Log::shouldReceive('info')->zeroOrMoreTimes();
         Log::shouldReceive('warning')->with(\Mockery::on(function ($arg) {
-            return stripos($arg, 'noTransportNodeCollectionItemNoException') !== false;
+            return stripos($arg, 'No Transport Node Collection Items found for') !== false;
         }));
     }
 
