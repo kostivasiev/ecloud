@@ -38,23 +38,19 @@ class UndeployTrashedNetworkNoSNats extends Job
         $natsToDelete = [];
 
         $addNatForDeletion = function($nat) use (&$natsToDelete) {
-            Log::warning("IN addNatForDeletion", ["natsToDelete"=>count($natsToDelete)]);
             foreach ($natsToDelete as $natToDelete) {
-                Log::warning("CHECKING", ["nat->id" => $nat->id, "natToDelete->id" => $natToDelete->id]);
                 if ($nat->id == $natToDelete->id) {
-                    Log::warning("MATCHED EXISTING", ["nat->id" => $nat->id, "natToDelete->id" => $natToDelete->id]);
                     return;
                 }
             }
 
-            Log::warning("UNMATCHED, ADDING", ["nat->id" => $nat->id]);
             $natsToDelete[] = $nat;
         };
 
         foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->withTrashed()->get() as $localNetwork) {
             if ($localNetwork->trashed()) {
                 foreach ($localNetwork->localNoSNATs as $localNoSNAT) {
-                    Log::warning("DEBUG !! ADDING NAT", ["localNoSNAT->id" => $localNoSNAT->id]);
+                    Log::warning("Adding local No SNAT rule for deletiong", ["nat_id" => $localNoSNAT->id]);
                     $addNatForDeletion($localNoSNAT);
                 }
             }
@@ -62,16 +58,16 @@ class UndeployTrashedNetworkNoSNats extends Job
         foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE)->withTrashed()->get() as $remoteNetwork) {
             if ($remoteNetwork->trashed()) {
                 foreach ($remoteNetwork->remoteNoSNATs as $remoteNoSNAT) {
-                    Log::warning("DEBUG !! ADDING NAT", ["remoteNoSNAT->id" => $remoteNoSNAT->id]);
+                    Log::warning("Adding remote No SNAT rule for deletiong", ["nat_id" => $remoteNoSNAT->id]);
                     $addNatForDeletion($remoteNoSNAT);
                 }
             }
         }
 
         if (count($natsToDelete) > 0) {
-            Log::warning("WE HAVE NATS TO DELETE!", ["natsToDelete" => count($natsToDelete)]);
             $taskIDs = [];
             foreach ($natsToDelete as $natToDelete) {
+                Log::warning("Removing No SNAT rule", ["nat_id" => $natToDelete->id]);
                 $task = $natToDelete->syncDelete();
                 $taskIDs[] = $task->id;
             }

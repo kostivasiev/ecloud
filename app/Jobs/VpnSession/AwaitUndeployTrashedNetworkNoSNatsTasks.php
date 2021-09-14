@@ -35,9 +35,7 @@ class AwaitUndeployTrashedNetworkNoSNatsTasks extends Job
         }
 
         foreach ($this->task->data[UndeployTrashedNetworkNoSNats::TASK_WAIT_DATA_KEY] as $taskID) {
-            Log::warning("WAITING ON TASKID $taskID");
             $task = Task::findOrFail($taskID);
-            Log::warning("FOUND TASK ID {$task->id}");
             if ($task->status == Task::STATUS_FAILED) {
                 Log::error(get_class($this) . ': Task in failed state, abort', ['id' => $this->model->id, 'task_id' => $task->id]);
                 $this->fail(new \Exception("Task {$task->id} in failed state, abort"));
