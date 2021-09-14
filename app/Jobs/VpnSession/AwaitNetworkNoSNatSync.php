@@ -12,7 +12,7 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class AwaitNatSync extends Job
+class AwaitNetworkNoSNatSync extends Job
 {
     use Batchable, LoggableModelJob, AwaitResources;
 
@@ -28,8 +28,10 @@ class AwaitNatSync extends Job
         $vpnSession = $this->model;
 
         $resources = [];
-        foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL) as $localNetwork) {
-            $resources[] = $localNetwork->localNoSNATs;
+        foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->get() as $localNetwork) {
+            foreach ($localNetwork->localNoSNATs as $localNoSNAT) {
+                $resources[] = $localNoSNAT->id;
+            }
         }
 
         $this->awaitSyncableResources($resources);

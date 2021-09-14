@@ -14,7 +14,12 @@ trait AwaitResources
 
     protected function awaitSyncableResources(Array $resources = [])
     {
+        Log::warning("DEBUG!!! processing resource",["resources"=>$resources]);
+
         foreach ($resources as $id) {
+            Log::warning("DEBUG!!! processing resource",["id"=>$id]);
+
+
             $resource = Resource::classFromId($id)::findOrFail($id);
 
             if (!in_array(Syncable::class, class_uses($resource))) {

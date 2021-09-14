@@ -5,6 +5,7 @@ namespace App\Jobs\Nat;
 use App\Jobs\Job;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use App\Models\V2\RouterScopable;
 use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
@@ -24,7 +25,7 @@ class Undeploy extends Job
     public function handle()
     {
         // Load NIC from destination or translated
-        $nic = collect(
+        $routerScopable = collect(
             $this->model->load([
                 'destination' => function ($query) {
                     $query->withTrashed();
@@ -37,14 +38,14 @@ class Undeploy extends Job
                 }
             ])->getRelations()
         )
-            ->whereInstanceOf(Nic::class)->first();
+            ->whereInstanceOf(RouterScopable::class)->first();
 
-        if (!$nic) {
-            $this->fail(new \Exception('Could not find NIC for destination or translated'));
+        if (!$routerScopable) {
+            $this->fail(new \Exception('Could not find router scopable resource for source, destination or translated'));
             return;
         }
 
-        $router = $nic->network->router;
+        $router = $routerScopable->getRouter();
 
         try {
             $router->availabilityZone->nsxService()->get(

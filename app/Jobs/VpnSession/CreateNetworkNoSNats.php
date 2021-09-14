@@ -12,7 +12,7 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CreateNats extends Job
+class CreateNetworkNoSNats extends Job
 {
     use Batchable, LoggableModelJob;
 

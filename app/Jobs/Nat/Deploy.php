@@ -29,7 +29,7 @@ class Deploy extends Job
             'source'
         ])->getRelations())->whereInstanceOf(RouterScopable::class)->first();
         if (!$routerScopable) {
-            $this->fail(new \Exception('Nat Deploy Failed. Could not find router scopable resource for source, destination or translated'));
+            $this->fail(new \Exception('Could not find router scopable resource for source, destination or translated'));
             return;
         }
 
