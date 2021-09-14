@@ -232,6 +232,23 @@ trait TransportNodeProfile
         }));
     }
 
+    public function noTransportNodeCollectionItemNoException()
+    {
+        $this->validComputeCollection();
+        $this->nsxServiceMock()->expects('get')
+            ->withSomeOfArgs(
+                '/api/v1/transport-node-collections?compute_collection_id=d54d92a4-0d03-49c9-b621-fbbdd7f3e422'
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'results' => []
+                ]));
+            });
+        Log::shouldReceive('info')->zeroOrMoreTimes();
+        Log::shouldReceive('warning')->with(\Mockery::on(function ($arg) {
+            return stripos($arg, 'noTransportNodeCollectionItemNoException') !== false;
+        }));
+    }
+
     public function validTransportNodeCollection()
     {
         $this->validComputeCollection();

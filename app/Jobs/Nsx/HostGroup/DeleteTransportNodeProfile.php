@@ -62,6 +62,15 @@ class DeleteTransportNodeProfile extends Job
         }
         $transportNodeItem = collect($response->results)->first();
 
+        // Check there are items to detach
+        if (!empty($transportNodeItem)) {
+            Log::warning(
+                get_class($this) . ' : noTransportNodeCollectionItemNoException' .
+                $hostGroup->id . ', skipping'
+            );
+            return;
+        }
+
         // Detach the node
         try {
             $response = $this->model->availabilityZone->nsxService()->delete(
@@ -77,9 +86,7 @@ class DeleteTransportNodeProfile extends Job
                 $hostGroup->id . ', skipping'
             );
             return;
-        }
-
-        // Once the Profile is Detached it can be deleted
+        }// Once the Profile is Detached it can be deleted
         try {
             $this->model->availabilityZone->nsxService()->delete(
                 '/api/v1/transport-node-profiles/' . $transportNodeItem->id

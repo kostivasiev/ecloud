@@ -95,6 +95,14 @@ class DeleteTransportNodeProfileTest extends TestCase
         $this->assertEquals($code, $exception->getCode());
     }
 
+    public function testNoTransportNodeCollectionNoException()
+    {
+        $this->noTransportNodeCollectionItemNoException();
+
+        // null return from running the job
+        $this->assertNull($this->job->handle());
+    }
+
     /**
      * @test DetachNode returns a 404 error
      */
