@@ -31,11 +31,11 @@ class UnAssignVolumeGroup extends Job
     public function handle()
     {
         $volume = $this->model;
-        if (!empty($instance->volume_group_id)) {
+        if (!empty($volume->volume_group_id)) {
             Log::info(
                 'Volume is not associated with a volume group, skipping',
                 [
-                    'instance_id' => $instance->id,
+                    'volume_id' => $volume->id,
                 ]
             );
             return;

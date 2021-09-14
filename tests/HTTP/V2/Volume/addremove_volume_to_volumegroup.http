@@ -1,0 +1,12 @@
+### Steps to implement
+### Create Volume Group
+### Create Instance
+### Assign Volume Group to Instance
+### Create Volume
+### Assign Volume to Volume Group
+### Check Instance has Volume attached
+### Remove Volume from Volume Group
+### Check Instance does not have volume
+### Delete Volume Group
+### Delete Instance
+### Delete Volume
