@@ -104,7 +104,7 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
         return $this->getNetworksByType($type)->get()->pluck('ip_address')->join(',');
     }
 
-    protected function getNetworksByType($type)
+    public function getNetworksByType($type)
     {
         return $this->vpnSessionNetworks()->where('type', '=', $type);
     }

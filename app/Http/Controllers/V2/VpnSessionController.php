@@ -77,8 +77,6 @@ class VpnSessionController extends BaseController
             'name',
             'vpn_profile_group_id',
             'remote_ip',
-            'remote_networks',
-            'local_networks',
         ]));
 
         $task = $vpnSession->withTaskLock(function ($vpnSession) use ($request) {
@@ -97,11 +95,17 @@ class VpnSessionController extends BaseController
                 }
             }
 
-            foreach (Str::of($request->get('remote_networks'))->explode(',') as $remoteNetwork) {
-                $vpnSession->vpnSessionNetworks()->create([
-                    'type' => VpnSessionNetwork::TYPE_LOCAL,
-                    'ip_address' => (string) Str::of($remoteNetwork)->trim(),
-                ]);
+            if ($request->filled('remote_networks')) {
+                $vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE)->each(function ($network) {
+                    $network->delete();
+                });
+
+                foreach (Str::of($request->get('remote_networks'))->explode(',') as $remoteNetwork) {
+                    $vpnSession->vpnSessionNetworks()->create([
+                        'type' => VpnSessionNetwork::TYPE_REMOTE,
+                        'ip_address' => (string)Str::of($remoteNetwork)->trim(),
+                    ]);
+                }
             }
 
             return $vpnSession->createSync(Sync::TYPE_UPDATE);

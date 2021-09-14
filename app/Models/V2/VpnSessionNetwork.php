@@ -60,4 +60,14 @@ class VpnSessionNetwork extends Model implements ResellerScopeable, Natable
     {
         return $this->belongsTo(VpnSession::class);
     }
+
+    public function localNoSNATs()
+    {
+        return $this->morphMany(Nat::class, 'sourceable', null, 'source_id');
+    }
+
+    public function remoteNoSNATs()
+    {
+        return $this->morphMany(Nat::class, 'destinationable', null, 'destination_id');
+    }
 }

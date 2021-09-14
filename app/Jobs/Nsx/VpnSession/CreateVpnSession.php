@@ -3,6 +3,7 @@ namespace App\Jobs\Nsx\VpnSession;
 
 use App\Jobs\Job;
 use App\Models\V2\VpnSession;
+use App\Models\V2\VpnSessionNetwork;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Str;
@@ -57,12 +58,12 @@ class CreateVpnSession extends Job
                         [
                             'resource_type' => 'IPSecVpnRule',
                             'id' => $vpnSession->id . '-custom-rule-1',
-                            'sources' => Str::of($vpnSession->local_networks)->explode(',')->map(function ($subnet) {
+                            'sources' => $vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->get()->pluck('ip_address')->map(function ($subnet) {
                                 return [
                                     'subnet' => (string) Str::of($subnet)->trim()
                                 ];
                             })->toArray(),
-                            'destinations' => Str::of($vpnSession->remote_networks)->explode(',')->map(function ($subnet) {
+                            'destinations' => $vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE)->get()->pluck('ip_address')->map(function ($subnet) {
                                 return [
                                     'subnet' => (string) Str::of($subnet)->trim()
                                 ];
