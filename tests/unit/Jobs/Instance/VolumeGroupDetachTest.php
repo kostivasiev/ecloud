@@ -3,10 +3,12 @@
 namespace Tests\unit\Jobs\Instance;
 
 use App\Jobs\Instance\VolumeGroupDetach;
+use App\Jobs\Kingpin\Instance\DetachVolume;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 use Tests\Mocks\Resources\VolumeGroupMock;
 use Tests\Mocks\Resources\VolumeMock;
@@ -59,16 +61,15 @@ class VolumeGroupDetachTest extends TestCase
             $this->task->resource()->associate($this->instance());
         });
 
-        // kingpin mocks
-        $this->kingpinServiceMock()
-            ->expects('get')
-            ->withSomeOfArgs('/api/v2/vpc/vpc-test/instance/i-test')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['volumes' => []]));
-            });
+        Bus::fake([DetachVolume::class]);
 
-        (new VolumeGroupDetach($this->task))->handle();
+        $volumeGroupDetach = \Mockery::mock(VolumeGroupDetach::class, [$this->task])->makePartial();
+        $volumeGroupDetach->allows('awaitTaskWithRelease')
+            ->with(\Mockery::capture($subTask))
+            ->andReturnTrue();
 
-        $this->assertEquals(0, $this->instance()->volumes()->count());
+        $volumeGroupDetach->handle();
+
+        $this->assertEquals($this->volume()->id, $subTask->data['volume_id']);
     }
 }
