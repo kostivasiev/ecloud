@@ -30,8 +30,8 @@ class CreateNats extends Job
     {
         $vpnSession = $this->model;
 
-        foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL) as $localNetwork) {
-            foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE) as $remoteNetwork) {
+        foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->get() as $localNetwork) {
+            foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE)->get() as $remoteNetwork) {
                 if ($localNetwork->localNoSNATs()->where("destination_id", "=", $remoteNetwork->id)->count() == 0) {
                     $nat = app()->make(Nat::class);
                     $nat->source()->associate($localNetwork);

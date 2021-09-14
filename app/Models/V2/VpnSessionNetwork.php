@@ -17,7 +17,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class VpnSessionNetwork extends Model implements ResellerScopeable, Natable
+class VpnSessionNetwork extends Model implements ResellerScopeable, Natable, RouterScopable
 {
     use CustomKey, SoftDeletes, DeletionRules;
 
@@ -54,6 +54,11 @@ class VpnSessionNetwork extends Model implements ResellerScopeable, Natable
     public function getIPAddress(): string
     {
         return $this->ip_address;
+    }
+
+    public function getRouter()
+    {
+        return $this->vpnSession->vpnService->router;
     }
 
     public function vpnSession()

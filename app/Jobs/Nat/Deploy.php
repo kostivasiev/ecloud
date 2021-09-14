@@ -5,6 +5,7 @@ namespace App\Jobs\Nat;
 use App\Jobs\Job;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use App\Models\V2\RouterScopable;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -22,19 +23,19 @@ class Deploy extends Job
 
     public function handle()
     {
-        $nic = collect((clone $this->model)->load([
+        $routerScopable = collect((clone $this->model)->load([
             'destination',
             'translated',
             'source'
-        ])->getRelations())->whereInstanceOf(Nic::class)->first();
-        if (!$nic) {
-            $this->fail(new \Exception('Nat Deploy Failed. Could not find NIC for source, destination or translated'));
+        ])->getRelations())->whereInstanceOf(RouterScopable::class)->first();
+        if (!$routerScopable) {
+            $this->fail(new \Exception('Nat Deploy Failed. Could not find router scopable resource for source, destination or translated'));
             return;
         }
 
-        $router = $nic->network->router;
+        $router = $routerScopable->getRouter();
         if (!$router) {
-            $this->fail(new \Exception('Nat Deploy ' . $nic->id . ' : No Router found for NIC network'));
+            $this->fail(new \Exception('Nat Deploy ' . $this->model->id . ' : No Router found for resource'));
             return;
         }
 
