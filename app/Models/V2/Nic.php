@@ -23,7 +23,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Nic extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
+class Nic extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Natable, RouterScopable
 {
     use CustomKey, SoftDeletes, Syncable, Taskable, DeletionRules;
 
@@ -51,6 +51,16 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
     public function getResellerId(): int
     {
         return $this->instance->getResellerId();
+    }
+
+    public function getIPAddress(): string
+    {
+        return $this->ip_address;
+    }
+
+    public function getRouter()
+    {
+        return $this->network->router;
     }
 
     public function instance()

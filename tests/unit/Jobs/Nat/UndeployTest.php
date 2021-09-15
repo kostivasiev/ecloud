@@ -83,7 +83,7 @@ class UndeployTest extends TestCase
         dispatch(new Undeploy($this->nat));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
-            return $event->exception->getMessage() == 'Could not find NIC for destination or translated';
+            return $event->exception->getMessage() == 'Could not find router scopable resource for source, destination or translated';
         });
     }
 

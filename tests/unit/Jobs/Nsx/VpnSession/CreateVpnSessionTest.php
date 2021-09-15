@@ -53,22 +53,8 @@ class CreateVpnSessionTest extends TestCase
                             [
                                 'resource_type' => 'IPSecVpnRule',
                                 'id' => $this->vpnSession()->id . '-custom-rule-1',
-                                'sources' => [
-                                    [
-                                        'subnet' => '172.11.11.11/32'
-                                    ],
-                                    [
-                                        'subnet' => '176.18.22.11/24'
-                                    ],
-                                    [
-                                        'subnet' => '127.1.10.1/24'
-                                    ]
-                                ],
-                                'destinations' => [
-                                    [
-                                        'subnet' => '172.12.23.11/32'
-                                    ]
-                                ]
+                                'sources' => [],
+                                'destinations' => []
                             ]
                         ]
                     ]
