@@ -188,7 +188,7 @@ class DeployTest extends TestCase
         dispatch(new Deploy($this->nat));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
-            return $event->exception->getMessage() == 'Nat Deploy Failed. Could not find NIC for source, destination or translated';
+            return $event->exception->getMessage() == 'Could not find router scopable resource for source, destination or translated';
         });
     }
 
@@ -219,7 +219,7 @@ class DeployTest extends TestCase
         dispatch(new Deploy($this->nat));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
-            return $event->exception->getMessage() == 'Nat Deploy nic-test : No Router found for NIC network';
+            return $event->exception->getMessage() == 'Nat Deploy nat-test : No Router found for resource';
         });
     }
 }
