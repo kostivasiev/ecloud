@@ -52,6 +52,10 @@ class CreateTransportNodeProfile extends Job
 
         $transportZones = $this->getTransportZones($hostGroup->availabilityZone);
         if (!$transportZones || !isset($transportZones->results) || !count($transportZones->results)) {
+            Log::error(get_class($this) . ': Failed to get TransportZones', [
+                'hostgroup' => $hostGroup,
+                'transportZones' => $transportZones,
+            ]);
             $this->fail(new \Exception('Failed to get TransportZones'));
             return false;
         }
@@ -59,6 +63,10 @@ class CreateTransportNodeProfile extends Job
 
         $uplinkHostSwitchProfiles = $this->getUplinkHostSwitchProfiles($hostGroup->availabilityZone);
         if (!$uplinkHostSwitchProfiles || !isset($uplinkHostSwitchProfiles->results) || !count($uplinkHostSwitchProfiles->results)) {
+            Log::error(get_class($this) . ': Failed to get UplinkHostSwitchProfiles', [
+                'hostgroup' => $hostGroup,
+                'uplinkHostSwitchProfiles' => $uplinkHostSwitchProfiles,
+            ]);
             $this->fail(new \Exception('Failed to get UplinkHostSwitchProfiles'));
             return false;
         }
@@ -66,6 +74,10 @@ class CreateTransportNodeProfile extends Job
 
         $vtepIpPools = $this->getVtepIpPools($hostGroup->availabilityZone);
         if (!$vtepIpPools || !isset($vtepIpPools->results) || !count($vtepIpPools->results)) {
+            Log::error(get_class($this) . ': Failed to get VtepIpPools', [
+                'hostgroup' => $hostGroup,
+                'vtepIpPools' => $vtepIpPools,
+            ]);
             $this->fail(new \Exception('Failed to get VtepIpPools'));
             return false;
         }
