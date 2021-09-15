@@ -11,7 +11,7 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class AwaitUndeployTrashedNetworkNoSNatsTasks extends Job
+class AwaitSyncNetworkNoSNatsTasks extends Job
 {
     use Batchable, LoggableModelJob;
 
@@ -29,12 +29,12 @@ class AwaitUndeployTrashedNetworkNoSNatsTasks extends Job
 
     public function handle()
     {
-        if (empty($this->task->data[UndeployTrashedNetworkNoSNats::TASK_WAIT_DATA_KEY])) {
+        if (empty($this->task->data[SyncNetworkNoSNats::TASK_WAIT_DATA_KEY])) {
             Log::debug('No tasks to await, skipping');
             return;
         }
 
-        foreach ($this->task->data[UndeployTrashedNetworkNoSNats::TASK_WAIT_DATA_KEY] as $taskID) {
+        foreach ($this->task->data[SyncNetworkNoSNats::TASK_WAIT_DATA_KEY] as $taskID) {
             $task = Task::findOrFail($taskID);
             if ($task->status == Task::STATUS_FAILED) {
                 Log::error(get_class($this) . ': Task in failed state, abort', ['id' => $this->model->id, 'task_id' => $task->id]);

@@ -58,7 +58,7 @@ class VpnSessionController extends BaseController
 
             foreach (Str::of($request->get('remote_networks'))->explode(',') as $remoteNetwork) {
                 $vpnSession->vpnSessionNetworks()->create([
-                    'type' => VpnSessionNetwork::TYPE_LOCAL,
+                    'type' => VpnSessionNetwork::TYPE_REMOTE,
                     'ip_address' => (string) Str::of($remoteNetwork)->trim(),
                 ]);
             }

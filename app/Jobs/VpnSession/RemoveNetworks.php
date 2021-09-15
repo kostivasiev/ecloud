@@ -4,19 +4,19 @@ namespace App\Jobs\VpnSession;
 
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Nat;
 use App\Models\V2\Nic;
 use App\Models\V2\VpnSession;
 use App\Models\V2\VpnSessionNetwork;
-use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class AwaitNetworkNoSNatSync extends Job
+class RemoveNetworks extends Job
 {
-    use Batchable, LoggableModelJob, AwaitResources;
+    use Batchable, LoggableModelJob;
 
-    private $model;
+    private VpnSession $model;
 
     public function __construct(VpnSession $vpnSession)
     {
@@ -27,13 +27,8 @@ class AwaitNetworkNoSNatSync extends Job
     {
         $vpnSession = $this->model;
 
-        $resources = [];
-        foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->get() as $localNetwork) {
-            foreach ($localNetwork->localNoSNATs as $localNoSNAT) {
-                $resources[] = $localNoSNAT->id;
-            }
+        foreach ($vpnSession->vpnSessionNetworks as $vpnSessionNetwork) {
+            $vpnSessionNetwork->delete();
         }
-
-        $this->awaitSyncableResources($resources);
     }
 }
