@@ -58,7 +58,8 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
         return $this->ip_address;
     }
 
-    public function getRouter() {
+    public function getRouter()
+    UndeployTrashedNetworkNoSNats{
         return $this->network->router;
     }
 

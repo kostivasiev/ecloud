@@ -37,7 +37,7 @@ class UndeployTrashedNetworkNoSNats extends Job
 
         $natsToDelete = [];
 
-        $addNatForDeletion = function($nat) use (&$natsToDelete) {
+        $addNatForDeletion = function ($nat) use (&$natsToDelete) {
             foreach ($natsToDelete as $natToDelete) {
                 if ($nat->id == $natToDelete->id) {
                     return;
