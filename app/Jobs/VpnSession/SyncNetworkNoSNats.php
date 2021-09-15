@@ -17,7 +17,7 @@ class SyncNetworkNoSNats extends Job
 {
     use Batchable, LoggableModelJob;
 
-    const TASK_WAIT_DATA_KEY = 'undeploy_trashed_network_no_snats_task_ids';
+    const TASK_WAIT_DATA_KEY = 'sync_network_no_snats_task_ids';
 
     private Task $task;
     private VpnSession $model;
@@ -65,17 +65,14 @@ class SyncNetworkNoSNats extends Job
                         Log::warning("Removing No SNAT rule for deleted remote network", ["vpn_session_network_id"=> $remoteNetwork->id, "nat_id" => $remoteNoSNAT->id]);
                         $task = $remoteNoSNAT->syncDelete();
                         $taskIDs[] = $task->id;
-                        $deletedNatIDs[] = $localNoSNAT->id;
+                        $deletedNatIDs[] = $remoteNoSNAT->id;
                     }
                 }
             }
         }
 
         foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->get() as $localNetwork) {
-            Log::warning("DEBUG !! LOCAL", ['localNetwork', $localNetwork->id]);
             foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE)->get() as $remoteNetwork) {
-                Log::warning("DEBUG !! REMOTE", ['remoteNetwork', $remoteNetwork->id]);
-                Log::warning("DEBUG !! localNoSNATs", ['localNoSNATs', $localNetwork->localNoSNATs()->count()]);
                 if ($localNetwork->localNoSNATs()->where("destination_id", "=", $remoteNetwork->id)->count() == 0) {
                     Log::warning("DEBUG !! CREATING", ['remoteNetwork', $remoteNetwork->id]);
                     $nat = app()->make(Nat::class);
