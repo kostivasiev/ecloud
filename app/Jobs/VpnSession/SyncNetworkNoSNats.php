@@ -49,7 +49,7 @@ class SyncNetworkNoSNats extends Job
             if ($localNetwork->trashed()) {
                 foreach ($localNetwork->localNoSNATs as $localNoSNAT) {
                     if ($shouldDeleteNat($localNoSNAT)) {
-                        Log::warning("Removing No SNAT rule deleted local network", ["vpn_session_network_id"=> $localNetwork->id, "nat_id" => $localNoSNAT->id]);
+                        Log::warning("Removing No SNAT rule for deleted local network", ["vpn_session_network_id"=> $localNetwork->id, "nat_id" => $localNoSNAT->id]);
                         $task = $localNoSNAT->syncDelete();
                         $taskIDs[] = $task->id;
                         $deletedNatIDs[] = $localNoSNAT->id;
@@ -74,7 +74,6 @@ class SyncNetworkNoSNats extends Job
         foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->get() as $localNetwork) {
             foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE)->get() as $remoteNetwork) {
                 if ($localNetwork->localNoSNATs()->where("destination_id", "=", $remoteNetwork->id)->count() == 0) {
-                    Log::warning("DEBUG !! CREATING", ['remoteNetwork', $remoteNetwork->id]);
                     $nat = app()->make(Nat::class);
                     $nat->source()->associate($localNetwork);
                     $nat->destination()->associate($remoteNetwork);
