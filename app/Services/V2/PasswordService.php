@@ -25,25 +25,25 @@ final class PasswordService
             throw new \Exception('Length must be at least 6 characters');
         }
 
-        $letterList = '';
+        $charList = '';
         if ($this->lowerCase) {
-            $letterList = $letterList . $this->lowerCaseChars;
+            $charList = $charList . $this->lowerCaseChars;
         }
         if ($this->upperCase) {
-            $letterList = $letterList . $this->upperCaseChars;
+            $charList = $charList . $this->upperCaseChars;
         }
         if ($this->numeric) {
-            $letterList = $letterList . $this->numericChars;
+            $charList = $charList . $this->numericChars;
         }
         if ($this->special) {
-            $letterList = $letterList . $this->specialChars;
+            $charList = $charList . $this->specialChars;
         }
 
-        $letterListLength = strlen($letterList) - 1;
+        $charListLength = strlen($charList) - 1;
         do {
             $password = '';
             for ($i = 0; $i < $length; $i++) {
-                $password .= $letterList[mt_rand(0, $letterListLength)];
+                $password .= $charList[mt_rand(0, $charListLength)];
             }
         } while (
             $this->lowerCase && !$this->contains($this->lowerCaseChars, $password) ||
