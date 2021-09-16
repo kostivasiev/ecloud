@@ -26,8 +26,8 @@ class DropNetworkColumnsFromVpnSessionsTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('vpn_sessions', function (Blueprint $table) {
-            $table->text('remote_networks');
-            $table->text('local_networks');
+            $table->text('remote_networks')->nullable();
+            $table->text('local_networks')->nullable();
         });
     }
 }
