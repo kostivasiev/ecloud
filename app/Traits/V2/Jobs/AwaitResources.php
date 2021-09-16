@@ -10,7 +10,7 @@ trait AwaitResources
 {
     public $tries = 60;
 
-    public $backoff = 30;
+    public $backoff = 5;
 
     protected function awaitSyncableResources(Array $resources = [])
     {
