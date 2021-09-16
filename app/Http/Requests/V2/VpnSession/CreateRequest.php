@@ -55,12 +55,12 @@ class CreateRequest extends FormRequest
                 new ValidIpv4()
             ],
             'remote_networks' => [
-                'required_without:local_networks',
+                'required',
                 'string',
                 new ValidCidrNetworkCsvString()
             ],
             'local_networks' => [
-                'required_without:remote_networks',
+                'required',
                 'string',
                 new ValidCidrNetworkCsvString()
             ],
