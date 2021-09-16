@@ -26,12 +26,12 @@ properties:
     readOnly: false
   remote_networks:
     type: string
-    required: false
+    required: true
     example: '172.12.23.11/32'
     readOnly: false
   local_networks:
     type: string
-    required: false
+    required: true
     example: '172.11.11.11/32,176.18.22.11/24'
     readOnly: false
   sync:
