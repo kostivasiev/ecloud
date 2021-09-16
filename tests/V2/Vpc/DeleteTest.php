@@ -72,4 +72,19 @@ class DeleteTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertResponseStatus(202);
     }
+
+    public function testDeletionFailsIfVpcHasHostGroup()
+    {
+        $this->hostGroup();
+        $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeJson(
+            [
+                'title' => 'Precondition Failed',
+                'detail' => 'The specified resource has dependant relationships and cannot be deleted',
+                'status' => 412,
+            ]
+        )->assertResponseStatus(412);
+    }
 }
