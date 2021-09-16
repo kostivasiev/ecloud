@@ -16,17 +16,17 @@ class UpdateImageBilling
     {
         Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
         if ($event->model->name !== 'image_create') {
-            Log::info(get_class($this) . ' : Model name was not image_create, skipping');
+            Log::info(get_class($this) . ' : Model name was not image_create, skipping', ['event' => $event]);
             return;
         }
 
         if (!$event->model->completed) {
-            Log::info(get_class($this) . ' : model was not completed, skipping');
+            Log::info(get_class($this) . ' : model was not completed, skipping', ['event' => $event]);
             return;
         }
 
         if (!$event->model->resource->vpc_id) {
-            Log::info(get_class($this) . ' : vpc_id was not set, skipping');
+            Log::info(get_class($this) . ' : vpc_id was not set, skipping', ['event' => $event]);
             return;
         }
 
@@ -34,14 +34,14 @@ class UpdateImageBilling
 
         if (get_class($model) === Instance::class) {
             if (is_null($event->model->data) || !array_key_exists('image_id', $event->model->data)) {
-                Log::info(get_class($this) . ' : no data found, skipping');
+                Log::info(get_class($this) . ' : no data found, skipping', ['event' => $event]);
                 return;
             }
             $model = Image::find($event->model->data['image_id']);
         }
 
         if (get_class($model) != Image::class) {
-            Log::info(get_class($this) . ' : Image class not found, skipping');
+            Log::info(get_class($this) . ' : Image class not found, skipping', ['event' => $event]);
             return;
         }
 
