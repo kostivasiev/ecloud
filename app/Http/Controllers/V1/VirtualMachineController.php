@@ -1829,7 +1829,7 @@ class VirtualMachineController extends BaseController
                 shuffle($datastores);
             }
 
-            $datastore = $datastores[0];
+            $datastore = array_shift($datastores);
 
             $templateType = 'solution';
         }
