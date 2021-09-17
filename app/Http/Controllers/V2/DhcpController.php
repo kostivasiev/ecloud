@@ -4,11 +4,14 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Task;
+use App\Models\V2\Vpc;
 use App\Resources\V2\DhcpResource;
 use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -51,6 +54,22 @@ class DhcpController extends BaseController
      */
     public function create(CreateDhcpRequest $request)
     {
+        $availabilityZone = AvailabilityZone::forUser(Auth::user())
+            ->findOrFail($request->availability_zone_id)
+            ->region_id;
+        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->vpc_id)->region_id;
+
+        if ($availabilityZone !== $vpc) {
+            return response()->json([
+                'errors' => [
+                    'title' => 'Not Found',
+                    'detail' => 'The specified availability zone is not available to that VPC',
+                    'status' => 404,
+                    'source' => 'availability_zone_id'
+                ]
+            ], 404);
+        }
+
         $dhcp = new Dhcp($request->only(['name', 'vpc_id', 'availability_zone_id']));
         $dhcp->save();
 

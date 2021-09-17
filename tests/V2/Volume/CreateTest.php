@@ -3,8 +3,6 @@
 namespace Tests\V2\Volume;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Support\Sync;
@@ -42,14 +40,11 @@ class CreateTest extends TestCase
 
     public function testInvalidAzIsFailed()
     {
-        $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $region->id
-        ]);
+        $this->vpc()->setAttribute('region_id', 'test-fail')->saveQuietly();
 
         $this->post('/v2/volumes', [
             'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $availabilityZone->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => '1',
             'os_volume' => true,
         ], [

@@ -6,7 +6,8 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "vpc_id": "{{dev_vpc_id}}"
+  "vpc_id": "{{dev_vpc_id}}",
+  "availability_zone_id": "{{dev_availability_zone_id}}"
 }
 
 > {%

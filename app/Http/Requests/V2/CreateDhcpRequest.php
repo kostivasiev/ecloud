@@ -39,7 +39,11 @@ class CreateDhcpRequest extends FormRequest
                 new ExistsForUser(Vpc::class),
                 new IsResourceAvailable(Vpc::class),
             ],
-            'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
+            'availability_zone_id' => [
+                'required',
+                'string',
+                'exists:ecloud.availability_zones,id,deleted_at,NULL',
+            ],
         ];
     }
 
