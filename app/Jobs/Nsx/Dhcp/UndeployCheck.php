@@ -12,10 +12,10 @@ class UndeployCheck extends Job
 {
     use Batchable, LoggableModelJob;
 
-    const RETRY_MAX = 60;
-    const RETRY_DELAY = 5;
-
     private Dhcp $model;
+
+    public $tries = 60;
+    public $backoff = 5;
 
     public function __construct(Dhcp $dhcp)
     {
@@ -24,10 +24,6 @@ class UndeployCheck extends Job
 
     public function handle()
     {
-        if ($this->attempts() > static::RETRY_MAX) {
-            throw new \Exception('Failed waiting for ' . $this->model->id . ' to be deleted after ' . static::RETRY_MAX . ' attempts');
-        }
-
         $response = $this->model->availabilityZone->nsxService()->get(
             '/policy/api/v1/infra/dhcp-server-configs/?include_mark_for_delete_objects=true'
         );
@@ -35,10 +31,10 @@ class UndeployCheck extends Job
         foreach ($response->results as $result) {
             if ($this->model->id === $result->id) {
                 Log::info(
-                    'Waiting for ' . $this->model->id . ' to be deleted, retrying in ' . static::RETRY_DELAY . ' seconds'
+                    'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
                 );
-
-                return $this->release(static::RETRY_DELAY);
+                $this->release($this->backoff);
+                return;
             }
         }
     }
