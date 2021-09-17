@@ -34,19 +34,7 @@ class DeleteInVmware extends Job
             return true;
         }
 
-        // Check Exists
-        try {
-            $availabilityZone->kingpinService()->get(
-                '/api/v2/vpc/' . $hostGroup->vpc->id . '/hostgroup/' . $hostGroup->id . '/host/' . $host->mac_address
-            );
-        } catch (RequestException $exception) {
-            if ($exception->hasResponse() && $exception->getResponse()->getStatusCode() == 404) {
-                Log::info("Host doesn't exist, skipping");
-                return true;
-            }
-            throw $exception;
-        }
-
+        // Host delete is idempotent in Kingpin, and should be called regardless of whether host exists in vCenter or not
         $availabilityZone->kingpinService()->delete(
             '/api/v2/vpc/' . $hostGroup->vpc_id . '/hostgroup/' . $hostGroup->id . '/host/' . $host->mac_address
         );
