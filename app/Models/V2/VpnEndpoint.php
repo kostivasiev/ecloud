@@ -79,6 +79,18 @@ class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZon
     }
 
     /**
+     * @param $query
+     * @param $id
+     * @return mixed
+     */
+    public function scopeVpcId($query, $id)
+    {
+        return $query->whereHas('vpnService.router.vpc', function ($query) use ($id) {
+            $query->where('id', $id);
+        });
+    }
+
+    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */

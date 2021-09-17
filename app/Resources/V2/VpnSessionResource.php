@@ -37,6 +37,7 @@ class VpnSessionResource extends UKFastResource
             'remote_networks' => $this->remote_networks,
             'local_networks' => $this->local_networks,
             'sync' => $this->sync,
+            'vpc_id' =>$this->vpnService->router->vpc->id,
         ];
         $retVal['created_at'] = $this->created_at === null ? null : Carbon::parse(
             $this->created_at,
