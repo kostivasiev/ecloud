@@ -14,9 +14,7 @@ class VpnEndpointController extends BaseController
     public function index(Request $request)
     {
         $collection = VpnEndpoint::forUser($request->user());
-        if ($request->vpc_id) {
-            $collection = $collection->vpcId($request->vpc_id);
-        }
+
         (new QueryTransformer($request))
             ->config(VpnEndpoint::class)
             ->transform($collection);

@@ -21,9 +21,7 @@ class VpnSessionController extends BaseController
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
         $collection = VpnSession::forUser($request->user());
-        if ($request->vpc_id) {
-            $collection = $collection->vpcId($request->vpc_id);
-        }
+
         $queryTransformer->config(VpnSession::class)
             ->transform($collection);
 

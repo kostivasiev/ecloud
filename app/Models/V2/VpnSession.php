@@ -125,18 +125,6 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
     }
 
     /**
-     * @param $query
-     * @param $id
-     * @return mixed
-     */
-    public function scopeVpcId($query, $id)
-    {
-        return $query->whereHas('vpnService.router.vpc', function ($query) use ($id) {
-            $query->where('id', $id);
-        });
-    }
-
-    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */
