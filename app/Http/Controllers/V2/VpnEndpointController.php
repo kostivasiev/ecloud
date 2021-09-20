@@ -19,7 +19,6 @@ class VpnEndpointController extends BaseController
             'vpc_id:eq', 'vpc_id:in', 'vpc_id:lk',
             'vpc_id:neq', 'vpc_id:nin', 'vpc_id:nlk',
         ])) {
-
             $vpnEndpointIds = VpnEndpoint::forUser($request->user())->get();
 
             if ($request->has('vpc_id') || $request->has('vpc_id:eq')) {
