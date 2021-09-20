@@ -7,7 +7,6 @@ use App\Models\V2\VpnSession;
 use App\Services\V2\PasswordService;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Str;
 
 class CreatePreSharedKey extends Job
 {
