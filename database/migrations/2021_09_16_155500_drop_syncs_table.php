@@ -27,6 +27,7 @@ class DropSyncsTable extends Migration
             $table->uuid('id')->primary();
             $table->uuid('resource_id');
             $table->string('resource_type')->default('');
+            $table->string('type')->default('');
             $table->boolean('completed');
             $table->text('failure_reason')->nullable();
             $table->timestamps();
