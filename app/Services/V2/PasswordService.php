@@ -45,8 +45,7 @@ final class PasswordService
             for ($i = 0; $i < $length; $i++) {
                 $password .= $charList[mt_rand(0, $charListLength)];
             }
-        } while (
-            $this->lowerCase && !$this->contains($this->lowerCaseChars, $password) ||
+        } while ($this->lowerCase && !$this->contains($this->lowerCaseChars, $password) ||
             $this->upperCase && !$this->contains($this->upperCaseChars, $password) ||
             $this->numeric && !$this->contains($this->numericChars, $password) ||
             $this->special && !$this->contains($this->specialChars, $password)
