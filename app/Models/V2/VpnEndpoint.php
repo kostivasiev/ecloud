@@ -32,7 +32,6 @@ class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZon
             'id',
             'name',
             'vpn_service_id',
-            'nsx_uuid',
         ]);
 
         parent::__construct($attributes);
@@ -88,7 +87,6 @@ class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZon
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('vpn_service_id', Filter::$stringDefaults),
-            $factory->create('nsx_uuid', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -105,7 +103,6 @@ class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZon
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('vpn_service_id'),
-            $factory->create('nsx_uuid'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -132,7 +129,6 @@ class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZon
             'id' => 'id',
             'name' => 'name',
             'vpn_service_id' => 'vpn_service_id',
-            'nsx_uuid' => 'nsx_uuid',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
