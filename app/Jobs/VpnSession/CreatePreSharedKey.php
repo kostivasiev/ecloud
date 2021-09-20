@@ -4,9 +4,9 @@ namespace App\Jobs\VpnSession;
 use App\Jobs\Job;
 use App\Models\V2\Credential;
 use App\Models\V2\VpnSession;
+use App\Services\V2\PasswordService;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Str;
 
 class CreatePreSharedKey extends Job
 {
@@ -19,9 +19,10 @@ class CreatePreSharedKey extends Job
         $this->model = $vpnSession;
     }
 
-    public function handle()
+    public function handle(PasswordService $passwordService)
     {
         $vpnSession = $this->model;
+        $passwordService->special = true;
 
         if (!$vpnSession->credentials()->where('username', VpnSession::CREDENTIAL_PSK_USERNAME)->exists()) {
             $credential = new Credential(
@@ -29,7 +30,7 @@ class CreatePreSharedKey extends Job
                     'name' => 'Pre-shared Key for VPN Session ' . $vpnSession->id,
                     'host' => null,
                     'username' => VpnSession::CREDENTIAL_PSK_USERNAME,
-                    'password' => Str::random(32),
+                    'password' => $passwordService->generate(32),
                     'port' => null,
                     'is_hidden' => true,
                 ]
