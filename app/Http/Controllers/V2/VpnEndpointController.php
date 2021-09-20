@@ -32,7 +32,6 @@ class VpnEndpointController extends BaseController
 
                 $vpnEndpointIds = $vpnEndpointIds->reject(function ($vpnEndpoint) use ($vpcId) {
                     return !$vpnEndpoint->vpnService || $vpnEndpoint->vpnService->router->vpc->id != $vpcId;
-
                 });
             }
 
