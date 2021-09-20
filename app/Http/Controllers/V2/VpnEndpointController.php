@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\VpnEndpoint\CreateRequest;
