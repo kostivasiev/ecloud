@@ -37,7 +37,7 @@ class VpnSessionController extends BaseController
                 }
 
                 $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($vpcId) {
-                    return !$vpnService->vpnService->router || $vpnService->vpnService->router->vpc->id != $vpcId;
+                    return !$vpnService->vpnService || $vpnService->vpnService->router->vpc->id != $vpcId;
                 });
             }
 
@@ -46,7 +46,7 @@ class VpnSessionController extends BaseController
                 $request->query->remove('vpc_id:neq');
 
                 $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($vpcId) {
-                    return !$vpnService->vpnService->router || $vpnService->vpnService->router->vpc->id == $vpcId;
+                    return !$vpnService->vpnService || $vpnService->vpnService->router->vpc->id == $vpcId;
                 });
             }
 
@@ -55,7 +55,7 @@ class VpnSessionController extends BaseController
                 $request->query->remove('vpc_id:lk');
 
                 $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($vpcId) {
-                    return !$vpnService->vpnService->router
+                    return !$vpnService->vpnService
                         || preg_match(
                             '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
                             $vpnService->vpnService->router->vpc->id
@@ -68,7 +68,7 @@ class VpnSessionController extends BaseController
                 $request->query->remove('vpc_id:nlk');
 
                 $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($vpcId) {
-                    return !$vpnService->vpnService->router
+                    return !$vpnService->vpnService
                         || preg_match(
                             '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
                             $vpnService->vpnService->router->vpc->id
@@ -81,7 +81,7 @@ class VpnSessionController extends BaseController
                 $request->query->remove('vpc_id:in');
 
                 $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($ids) {
-                    return !$vpnService->vpnService->router || !in_array($vpnService->vpnService->router->vpc->id, $ids);
+                    return !$vpnService->vpnService || !in_array($vpnService->vpnService->router->vpc->id, $ids);
                 });
             }
 
@@ -90,7 +90,7 @@ class VpnSessionController extends BaseController
                 $request->query->remove('vpc_id:nin');
 
                 $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($ids) {
-                    return !$vpnService->vpnService->router || in_array($vpnService->vpnService->router->vpc->id, $ids);
+                    return !$vpnService->vpnService || in_array($vpnService->vpnService->router->vpc->id, $ids);
                 });
             }
 

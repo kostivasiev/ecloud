@@ -31,7 +31,8 @@ class VpnEndpointController extends BaseController
                 }
 
                 $vpnEndpointIds = $vpnEndpointIds->reject(function ($vpnEndpoint) use ($vpcId) {
-                    return !$vpnEndpoint->vpnService->router || $vpnEndpoint->vpnService->router->vpc->id != $vpcId;
+                    return !$vpnEndpoint->vpnService || $vpnEndpoint->vpnService->router->vpc->id != $vpcId;
+
                 });
             }
 
@@ -40,7 +41,7 @@ class VpnEndpointController extends BaseController
                 $request->query->remove('vpc_id:neq');
 
                 $vpnEndpointIds = $vpnEndpointIds->reject(function ($vpnEndpoint) use ($vpcId) {
-                    return !$vpnEndpoint->vpnService->router || $vpnEndpoint->vpnService->router->vpc->id == $vpcId;
+                    return !$vpnEndpoint->vpnService || $vpnEndpoint->vpnService->router->vpc->id == $vpcId;
                 });
             }
 
@@ -49,7 +50,7 @@ class VpnEndpointController extends BaseController
                 $request->query->remove('vpc_id:lk');
 
                 $vpnEndpointIds = $vpnEndpointIds->reject(function ($vpnEndpoint) use ($vpcId) {
-                    return !$vpnEndpoint->vpnService->router
+                    return !$vpnEndpoint->vpnService
                         || preg_match(
                             '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
                             $vpnEndpoint->vpnService->router->vpc->id
@@ -62,7 +63,7 @@ class VpnEndpointController extends BaseController
                 $request->query->remove('vpc_id:nlk');
 
                 $vpnEndpointIds = $vpnEndpointIds->reject(function ($vpnEndpoint) use ($vpcId) {
-                    return !$vpnEndpoint->vpnService->router
+                    return !$vpnEndpoint->vpnService
                         || preg_match(
                             '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
                             $vpnEndpoint->vpnService->router->vpc->id
@@ -75,7 +76,7 @@ class VpnEndpointController extends BaseController
                 $request->query->remove('vpc_id:in');
 
                 $vpnEndpointIds = $vpnEndpointIds->reject(function ($vpnEndpoint) use ($ids) {
-                    return !$vpnEndpoint->vpnService->router || !in_array($vpnEndpoint->vpnService->router->vpc->id, $ids);
+                    return !$vpnEndpoint->vpnService || !in_array($vpnEndpoint->vpnService->router->vpc->id, $ids);
                 });
             }
 
@@ -84,7 +85,7 @@ class VpnEndpointController extends BaseController
                 $request->query->remove('vpc_id:nin');
 
                 $vpnEndpointIds = $vpnEndpointIds->reject(function ($vpnEndpoint) use ($ids) {
-                    return !$vpnEndpoint->vpnService->router || in_array($vpnEndpoint->vpnService->router->vpc->id, $ids);
+                    return !$vpnEndpoint->vpnService || in_array($vpnEndpoint->vpnService->router->vpc->id, $ids);
                 });
             }
 

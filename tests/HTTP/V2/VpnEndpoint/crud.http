@@ -18,7 +18,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Get Floating IP', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 200, '200 response not receivedr');
 });
 client.global.set('fip_id', response.body.data[0].id);
 client.log('Floating IP ID: ' + response.body.data[0].id);
