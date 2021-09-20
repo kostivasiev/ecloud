@@ -5,7 +5,8 @@ FROM php:7.4-apache AS apio
 RUN pecl install redis-5.1.1 \
     && docker-php-ext-enable redis
 RUN docker-php-ext-install pdo_mysql \
-                           opcache
+                           opcache \
+                           pcntl
 
 FROM apio AS composer-builder
 RUN apt update && \
@@ -52,6 +53,8 @@ COPY .docker/start.sh /start.sh
 
 COPY --chown=www-data:www-data . /var/www/html
 COPY --from=composer-builder --chown=www-data:www-data /build/vendor /var/www/html/vendor/
+
+STOPSIGNAL SIGTERM
 
 CMD ["app"]
 ENTRYPOINT ["/bin/bash", "/start.sh"]

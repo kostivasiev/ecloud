@@ -7,11 +7,12 @@ ROLE=$1
 if [ "$ROLE" = "app" ]; then
     exec apache2-foreground
 elif [ "$ROLE" = "queue" ]; then
-    php /var/www/html/artisan queue:work --verbose --tries 3 --timeout=900
+    exec php /var/www/html/artisan queue:work --verbose --tries 3 --timeout=900
 elif [ "$ROLE" = "scheduler" ]; then
     function signal_exit
     {
         echo "Caught signal, waiting for background processes to finish.."
+        pkill tail
         wait $(jobs -pr)
         exit 0
     }
