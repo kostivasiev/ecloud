@@ -56,6 +56,21 @@ $factory->define(OrchestratorConfig::class, function () {
                         "volume_capacity": 50,
                         "volume_iops": 300
                     }
+                ],
+                "hostgroups": [
+                    {
+                        "id": "hg-test",
+                        "name": "hg-test",
+                        "vpc_id": "{vpc.0}",
+                        "availability_zone_id": "az-aaaaaaaa",
+                        "host_spec_id": "hs-aaaaaaaa",
+                        "windows_enabled": false
+                    }
+                ],
+                "hosts": [
+                    {
+                        "host_group_id": "{hostgroup.0}"
+                    }
                 ]
             }
 EOM;
