@@ -59,15 +59,32 @@ class HostController extends BaseController
     public function destroy(Request $request, string $id)
     {
         $model = Host::forUser($request->user())->findOrFail($id);
+        $hostGroup = $model->hostGroup;
+        $hostSpec = $hostGroup->hostSpec;
 
-        // This will be needed in a future issue, no need to delete it
-//        if ($model->instances()->count()) {
-//            return response()->json([
-//                'title' => 'Validation Error',
-//                'detail' => 'Can not delete Host with active instances',
-//                'status' => 422,
-//            ], 422);
-//        }
+        if ($hostGroup->hosts()->count() == 1 && $hostGroup->instances()->count() > 0) {
+            return response()->json([
+                'title' => 'Validation Error',
+                'detail' => 'Can not delete Host with active instances',
+                'status' => 422,
+            ], 422);
+        }
+
+        if ($hostGroup->ram_used > (($hostGroup->hosts->count() * $hostSpec->ram_capacity) - $hostSpec->ram_capacity)) {
+            return response()->json([
+                'title' => 'Validation Error',
+                'detail' => 'Host removal will result in insufficient ram capacity for existing instances',
+                'status' => 422,
+            ], 422);
+        }
+
+        if ($hostGroup->vcpu_used > ($hostGroup->vcpu_capacity - $hostSpec->cpu_cores)) {
+            return response()->json([
+                'title' => 'Validation Error',
+                'detail' => 'Host removal will result in insufficient vcpu capacity for existing instances',
+                'status' => 422,
+            ], 422);
+        }
 
         $task = $model->syncDelete();
         return $this->responseTaskId($task->id);
