@@ -18,5 +18,11 @@ return [
     ],
     'billing' => [
         'to' => 'gavin.taylor@ukfast.co.uk'
+    ],
+    'health' => [
+        'to' => [
+            'gavin.taylor@ukfast.co.uk',
+            'lee.spottiswood@ukfast.co.uk',
+        ]
     ]
 ];

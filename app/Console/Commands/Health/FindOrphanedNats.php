@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Console\Commands\Nat;
+namespace App\Console\Commands\Health;
 
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
-class FindOrphaned extends Command
+class FindOrphanedNats extends Command
 {
-    protected $signature = 'nat:find-orphaned';
+    protected $signature = 'health:find-orphaned-nats';
 
     protected $description = 'Finds orphaned NAT records';
 
