@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\Network\Creating;
 use App\Events\V2\Network\Deleted;
+use App\Scopes\IsHiddenScope;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -41,6 +42,16 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
         'creating' => Creating::class,
         'deleted' => Deleted::class,
     ];
+
+    /**
+     * @var string dot notation to parent resource via relation
+     */
+    public static string $hiddenBy = 'router';
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new IsHiddenScope);
+    }
 
     public function getResellerId(): int
     {
