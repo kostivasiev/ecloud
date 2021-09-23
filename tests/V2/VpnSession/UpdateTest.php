@@ -7,6 +7,7 @@ use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
+use App\Models\V2\VpnSessionNetwork;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -49,10 +50,23 @@ class UpdateTest extends TestCase
                 'vpn_service_id' => $this->vpnService->id,
                 'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
-                'remote_networks' => '127.1.1.1/32',
-                'local_networks' => '127.1.1.1/32,127.1.10.1/24',
             ]
         );
+        $this->vpnSession->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-local1',
+            'type' => VpnSessionNetwork::TYPE_LOCAL,
+            'ip_address' => '127.1.1.1/32',
+        ]);
+        $this->vpnSession->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-local2',
+            'type' => VpnSessionNetwork::TYPE_LOCAL,
+            'ip_address' => '127.1.10.1/24',
+        ]);
+        $this->vpnSession->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-remote1',
+            'type' => VpnSessionNetwork::TYPE_REMOTE,
+            'ip_address' => '127.1.1.1/32',
+        ]);
     }
 
     public function testUpdateResource()

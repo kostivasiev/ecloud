@@ -7,6 +7,7 @@ use App\Models\V2\VpnSessionNetwork;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Str;
+use IPLib\Range\Subnet;
 
 class CreateVpnSession extends Job
 {
@@ -59,13 +60,15 @@ class CreateVpnSession extends Job
                             'resource_type' => 'IPSecVpnRule',
                             'id' => $vpnSession->id . '-custom-rule-1',
                             'sources' => $vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->get()->pluck('ip_address')->map(function ($subnet) {
+                                $subnetParsed = Subnet::fromString((string) Str::of($subnet)->trim());
                                 return [
-                                    'subnet' => (string) Str::of($subnet)->trim()
+                                    'subnet' => $subnetParsed->getStartAddress()->toString() . '/' . $subnetParsed->getNetworkPrefix()
                                 ];
                             })->toArray(),
                             'destinations' => $vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE)->get()->pluck('ip_address')->map(function ($subnet) {
+                                $subnetParsed = Subnet::fromString((string) Str::of($subnet)->trim());
                                 return [
-                                    'subnet' => (string) Str::of($subnet)->trim()
+                                    'subnet' => $subnetParsed->getStartAddress()->toString() . '/' . $subnetParsed->getNetworkPrefix()
                                 ];
                             })->toArray()
                         ]
