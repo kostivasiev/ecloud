@@ -16,15 +16,14 @@ class IsRestrictedSubnet implements Rule
         if (Auth::user()->isAdmin()) {
             return true;
         }
-        $result = true;
         $chosen = \IPLib\Factory::rangeFromString($value);
         foreach ($this->restricted as $item) {
             $restricted = \IPLib\Factory::rangeFromString($item);
-            if (!$restricted->containsRange($chosen)) {
-                $result = false;
+            if ($restricted->containsRange($chosen)) {
+                return false;
             }
         }
-        return $result;
+        return true;
     }
 
     public function message()
