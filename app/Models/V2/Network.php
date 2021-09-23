@@ -77,6 +77,11 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
         if (!$user->isScoped()) {
             return $query;
         }
+
+        $query->whereHas('router', function ($query) {
+            $query->where('is_hidden', false);
+        });
+
         return $query->whereHas('router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
