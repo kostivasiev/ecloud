@@ -38,6 +38,7 @@ class TaskResource extends UKFastResource
             $data['data'] = $this->data;
             $data['completed'] = $this->completed;
             $data['failure_reason'] = $this->failure_reason;
+            $data['reseller_id'] = $this->reseller_id;
         }
 
         return $data;
