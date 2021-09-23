@@ -6,15 +6,25 @@ use Illuminate\Support\Facades\Auth;
 
 class IsRestrictedSubnet implements Rule
 {
+    protected $restricted = [
+        '192.168.0.0/16',
+        '10.255.255.0/24'
+    ];
+
     public function passes($attribute, $value)
     {
         if (Auth::user()->isAdmin()) {
             return true;
         }
-        $restricted = \IPLib\Factory::rangeFromString('192.168.0.0/16');
+        $result = true;
         $chosen = \IPLib\Factory::rangeFromString($value);
-
-        return !$restricted->containsRange($chosen);
+        foreach ($this->restricted as $item) {
+            $restricted = \IPLib\Factory::rangeFromString($item);
+            if (!$restricted->containsRange($chosen)) {
+                $result = false;
+            }
+        }
+        return $result;
     }
 
     public function message()
