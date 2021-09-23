@@ -214,7 +214,7 @@ paths:
   #    $ref: 'resources/LoadBalancerCluster/item.yaml'
   '/ecloud/v2/load-balancer-specs':
     $ref: 'resources/LoadBalancerSpecification/admin-collection.yaml'
-  '/ecloud/v2/load-balancer-specs/lbs-0c03049b-dev':
+  '/ecloud/v2/load-balancer-specs/{lbsId}':
     $ref: 'resources/LoadBalancerSpecification/admin-item.yaml'
   '/ecloud/v2/nics':
     $ref: 'resources/Nic/collection.yaml'
