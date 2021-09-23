@@ -60,5 +60,4 @@ class LoadBalancerSpecificationsController extends BaseController
         $loadBalancerSpecification->save();
         return $this->responseIdMeta($request, $loadBalancerSpecification->id, 200);
     }
-
 }
