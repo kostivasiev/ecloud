@@ -1,0 +1,51 @@
+get:
+  parameters:
+    - $ref: 'parameters/loadBalancerSpecificationId.yaml'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: 'schema.yaml'
+              meta:
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/orchestrator-configs?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/orchestrator-configs?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/orchestrator-configs?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/orchestrator-configs?page=2'
+  tags:
+    - Load Balancer Specification
+patch:
+  parameters:
+    - $ref: 'parameters/loadBalancerSpecificationId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: 'schema.yaml'
+  responses:
+    200:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Load Balancer Specification

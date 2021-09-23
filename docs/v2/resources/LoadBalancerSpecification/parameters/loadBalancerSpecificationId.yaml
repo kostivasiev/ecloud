@@ -1,0 +1,6 @@
+in: path
+name: loadBalancerSpecificationId
+required: true
+schema:
+  type: string
+example: lbs-0c03049b-dev

@@ -1,0 +1,18 @@
+description: Success
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: lbs-0c03049b-dev
+        meta:
+          type: object
+          properties:
+            location:
+              type: string
+              example: 'https://api.ukfast.io/ecloud/v2/load-balancer-specs/lbs-0c03049b-dev'

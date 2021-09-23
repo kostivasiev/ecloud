@@ -39,6 +39,8 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
 #    LoadBalancerCluster:
 #      $ref: 'components/schemas/lbc.yaml'
+    LoadBalancerSpecifications:
+      $ref: 'components/schemas/admin/loadBalancerSpecifications.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
     Nics:
@@ -85,6 +87,8 @@ components:
       $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
     InstanceId:
       $ref: 'resources/Instance/parameters/instanceId.yaml'
+    LoadBalancerSpecificationId:
+      $ref: 'resources/LoadBalancerSpecification/parameters/loadBalancerSpecificationId.yaml'
     NetworkId:
       $ref: 'resources/Network/parameters/networkId.yaml'
     RegionId:
@@ -123,6 +127,8 @@ components:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     InstanceIdResponse:
       $ref: 'resources/Instance/responses/idResponse.yaml'
+    LoadBalancerSpecificationResponse:
+      $ref: 'resources/LoadBalancerSpecification/responses/idResponse.yaml'
     NetworksIdResponse:
       $ref: 'resources/Network/responses/idResponse.yaml'
     RegionIdResponse:
@@ -206,6 +212,10 @@ paths:
   #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
   #  '/ecloud/v2/lbcs/{lbcId}':
   #    $ref: 'resources/LoadBalancerCluster/item.yaml'
+  '/ecloud/v2/load-balancer-specs':
+    $ref: 'resources/LoadBalancerSpecification/admin-collection.yaml'
+  '/ecloud/v2/load-balancer-specs/lbs-0c03049b-dev':
+    $ref: 'resources/LoadBalancerSpecification/admin-item.yaml'
   '/ecloud/v2/nics':
     $ref: 'resources/Nic/collection.yaml'
   '/ecloud/v2/nics/{nicId}':
