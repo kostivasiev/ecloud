@@ -304,6 +304,13 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('lbcs/{lbcId}', 'LoadBalancerClusterController@destroy');
     });
 
+    /** Load balancer specifications */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->get('load-balancer-specs', 'LoadBalancerSpecificationsController@index');
+        $router->get('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@show');
+        $router->patch('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@update');
+    });
+
     /** Volumes */
     $router->group([], function () use ($router) {
         $router->group(['middleware' => 'can-detach'], function () use ($router) {

@@ -1,0 +1,79 @@
+###
+# Get Collection
+GET https://{{host}}/{{version}}/load-balancer-specs
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+# Get Item
+GET https://{{host}}/{{version}}/load-balancer-specs/{{dev_load_balancer_spec_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === 'lbs-0c03049b-dev');
+  client.assert(response.body.data.name === 'small');
+  client.assert(response.body.data.node_count === 1);
+  client.assert(response.body.data.cpu === 1);
+  client.assert(response.body.data.ram === 2);
+  client.assert(response.body.data.hdd === 20);
+  client.assert(response.body.data.iops === 300);
+  client.assert(response.body.data.image_id === "img-aaaaaaaa");
+});
+%}
+###
+
+PATCH https://{{host}}/{{version}}/load-balancer-specs/{{dev_load_balancer_spec_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "small-2",
+  "node_count": 5,
+  "cpu": 5,
+  "ram": 5,
+  "hdd": 5,
+  "iops": 5,
+  "image_id": "img-aaaaaaaa"
+
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+
+# Confirm patch
+GET https://{{host}}/{{version}}/load-balancer-specs/{{dev_load_balancer_spec_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === 'lbs-0c03049b-dev');
+  client.assert(response.body.data.name === 'small-2');
+  client.assert(response.body.data.node_count === 5);
+  client.assert(response.body.data.cpu === 5);
+  client.assert(response.body.data.ram === 5);
+  client.assert(response.body.data.hdd === 5);
+  client.assert(response.body.data.iops === 5);
+  client.assert(response.body.data.image_id === "img-aaaaaaaa");
+});
+%}
