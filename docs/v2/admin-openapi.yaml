@@ -54,6 +54,8 @@ components:
               required: false
               type: boolean
               example: 'true'
+    Task:
+      $ref: 'components/schemas/task.yaml'
     Volume:
       allOf:
         - $ref: 'components/schemas/volume.yaml'
@@ -234,6 +236,10 @@ paths:
     $ref: 'resources/RouterThroughput/admin-collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/admin-item.yaml'
+  '/ecloud/v2/tasks':
+    $ref: 'resources/Task/admin-collection.yaml'
+  '/ecloud/v2/tasks/{taskId}':
+    $ref: 'resources/Task/admin-item.yaml'
   '/ecloud/v2/volumes':
     $ref: 'resources/Volume/admin-collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
