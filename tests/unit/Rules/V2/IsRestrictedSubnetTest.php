@@ -19,11 +19,13 @@ class IsRestrictedSubnetTest extends TestCase
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->assertFalse($this->rule->passes('subnet', '192.168.0.0/16'));
+        $this->assertFalse($this->rule->passes('subnet', '10.255.255.0/24'));
     }
 
     public function testRulePassesOnSubnetMatchAdmin()
     {
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->assertTrue($this->rule->passes('subnet', '192.168.0.0/16'));
+        $this->assertTrue($this->rule->passes('subnet', '10.255.255.0/24'));
     }
 }
