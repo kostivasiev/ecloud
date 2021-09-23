@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../admin-openapi.yaml#/components/parameters/TaskId'
+    - $ref: '../../resources/Task/parameters/taskId.yaml'
   responses:
     200:
       description: success
