@@ -91,7 +91,7 @@ class AllocateIpTest extends TestCase
         });
 
         $this->floatingIp->refresh();
-        $this->assertEquals('203.0.113.1', $this->floatingIp->ip_address);
+        $this->assertEquals('203.0.113.0', $this->floatingIp->ip_address);
     }
 
     public function testNextAvailableIPAllocatedWithAvailableIPAddresses()
@@ -101,13 +101,13 @@ class AllocateIpTest extends TestCase
                 'id' => 'fip-existing1',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
-                'ip_address' => '203.0.113.1',
+                'ip_address' => '203.0.113.0',
             ]);
             factory(FloatingIp::class)->create([
                 'id' => 'fip-existing2',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
-                'ip_address' => '203.0.113.2',
+                'ip_address' => '203.0.113.1',
             ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
@@ -163,7 +163,7 @@ class AllocateIpTest extends TestCase
         });
 
         $this->floatingIp->refresh();
-        $this->assertEquals('203.0.113.3', $this->floatingIp->ip_address);
+        $this->assertEquals('203.0.113.2', $this->floatingIp->ip_address);
     }
 
     public function testNextAvailableIPAllocatedWithAvailableIPAddressesInSecondRange()
@@ -173,13 +173,25 @@ class AllocateIpTest extends TestCase
                 'id' => 'fip-existing1',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
-                'ip_address' => '203.0.110.1',
+                'ip_address' => '203.0.110.0',
             ]);
             factory(FloatingIp::class)->create([
                 'id' => 'fip-existing2',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
+                'ip_address' => '203.0.110.1',
+            ]);
+            factory(FloatingIp::class)->create([
+                'id' => 'fip-existing3',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.110.2',
+            ]);
+            factory(FloatingIp::class)->create([
+                'id' => 'fip-existing4',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'ip_address' => '203.0.110.3',
             ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
@@ -260,7 +272,7 @@ class AllocateIpTest extends TestCase
         });
 
         $this->floatingIp->refresh();
-        $this->assertEquals('203.0.113.1', $this->floatingIp->ip_address);
+        $this->assertEquals('203.0.113.0', $this->floatingIp->ip_address);
     }
 
     public function testInvalidIPRangeSubnetIsSkipped()
@@ -345,7 +357,7 @@ class AllocateIpTest extends TestCase
         });
 
         $this->floatingIp->refresh();
-        $this->assertEquals('203.0.113.1', $this->floatingIp->ip_address);
+        $this->assertEquals('203.0.113.0', $this->floatingIp->ip_address);
     }
 
     public function testNoAvailableIPAddressesFails()
@@ -355,13 +367,25 @@ class AllocateIpTest extends TestCase
                 'id' => 'fip-existing1',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
-                'ip_address' => '203.0.110.1',
+                'ip_address' => '203.0.110.0',
             ]);
             factory(FloatingIp::class)->create([
                 'id' => 'fip-existing2',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
+                'ip_address' => '203.0.110.1',
+            ]);
+            factory(FloatingIp::class)->create([
+                'id' => 'fip-existing3',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.110.2',
+            ]);
+            factory(FloatingIp::class)->create([
+                'id' => 'fip-existing4',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'ip_address' => '203.0.110.3',
             ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
