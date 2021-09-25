@@ -108,6 +108,8 @@ class NetworkController extends BaseController
             $collection = Network::forUser($request->user());
         }
 
+        $collection = Network::forUser($request->user());
+
         $queryTransformer->config(Network::class)
             ->transform($collection);
 

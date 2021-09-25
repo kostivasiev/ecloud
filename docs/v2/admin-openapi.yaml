@@ -37,6 +37,8 @@ components:
       $ref: 'resources/ImageMetadata/schema.yaml'
     ImageParameter:
       $ref: 'resources/ImageParameter/schema.yaml'
+    IpAddress :
+      $ref : 'resources/IpAddress/schema.yaml'
 #    LoadBalancerCluster:
 #      $ref: 'components/schemas/lbc.yaml'
     Meta:
@@ -73,6 +75,7 @@ components:
 
   parameters:
     # Path Parameters
+    # DEPRECATED - don't add these directly in this file any more.
     DhcpId:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     DiscountPlanId:
@@ -111,6 +114,7 @@ components:
       $ref: 'components/parameters/page.yaml'
 
   responses:
+    # DEPRECATED - don't add these directly in this file any more.
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountIdResponse:
@@ -202,6 +206,13 @@ paths:
     $ref: 'resources/Image/metadata-collection.yaml'
   '/ecloud/v2/images/{id}/parameters':
     $ref: 'resources/Image/parameters-collection.yaml'
+
+  '/ecloud/v2/ip-addresses' :
+    $ref : 'resources/IpAddress/admin-collection.yaml'
+  '/ecloud/v2/ip-addresses/{ipAddressId}' :
+    $ref : 'resources/IpAddress/admin-item.yaml'
+  '/ecloud/v2/ip-addresses/{ipAddressId}/nics' :
+    $ref : 'resources/IpAddress/nic-collection.yaml'
   #  '/ecloud/v2/lbcs':
   #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
   #  '/ecloud/v2/lbcs/{lbcId}':

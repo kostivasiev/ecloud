@@ -14,7 +14,7 @@ get:
               meta:
                 type: object
   tags:
-    - Rename This Tag
+    - IP Addresses
 patch:
   parameters:
     - $ref: 'parameters/id.yaml'
@@ -26,22 +26,25 @@ patch:
           type: object
           allOf:
             - $ref: 'schema.yaml'
-            # Change column properties here
             - type : object
               properties :
-                foreign_key_id :
-                  readOnly : true
+                name :
+                  required : false
+                ip_address :
+                  required : false
+                type :
+                  required : false
   responses:
-    202:
+    200:
       $ref: 'responses/idResponse.yaml'
   tags:
-    - Rename This Tag
+    - Ip Addresses
 delete:
   parameters:
     - $ref: 'parameters/id.yaml'
   responses:
-    202:
-      description: Accepted
+    204:
+      description: Success
   tags:
-    - Rename This Tag
+    - IP Addresses
 
