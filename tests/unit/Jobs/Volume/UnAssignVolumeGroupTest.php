@@ -20,13 +20,24 @@ class UnAssignVolumeGroupTest extends TestCase
     private Task $task;
 
     /** @test */
+    public function skipIfInstanceVolumeGroupIsEmpty()
+    {
+        $this->volume()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'task-1',
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $this->task->resource()->associate($this->volume());
+        });
+
+        $this->assertEmpty((new UnAssignVolumeGroup($this->task))->handle());
+    }
+
+    /** @test */
     public function skipIfVolumeGroupIdIsNotEmpty()
     {
-        Log::partialMock()
-            ->expects('info')
-            ->withSomeOfArgs('Volume is not associated with a volume group, skipping')
-            ->once();
-
         $this->instance()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
         $this->volume()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
 
