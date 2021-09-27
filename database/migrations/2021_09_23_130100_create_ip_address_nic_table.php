@@ -16,6 +16,7 @@ class CreateIpAddressNicTable extends Migration
         Schema::connection('ecloud')->create('ip_address_nic', function (Blueprint $table) {
             $table->uuid('nic_id');
             $table->uuid('ip_address_id');
+            $table->index(['nic_id', 'ip_address_id']);
         });
     }
 

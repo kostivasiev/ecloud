@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\IpAddress;
 
+use App\Models\V2\IpAddress;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
@@ -31,7 +32,7 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                Rule::in(['normal', 'cluster'])
+                Rule::in([IpAddress::TYPE_NORMAL,IpAddress::TYPE_CLUSTER])
             ]
         ];
     }

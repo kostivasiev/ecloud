@@ -20,6 +20,9 @@ class IpAddress extends Model implements Filterable, Sortable
 
     public $keyPrefix = 'ip';
 
+    const TYPE_NORMAL = 'normal';
+    const TYPE_CLUSTER = 'cluster';
+
     public function __construct(array $attributes = [])
     {
         $this->incrementing = false;
