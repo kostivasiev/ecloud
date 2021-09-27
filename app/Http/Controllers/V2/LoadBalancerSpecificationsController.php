@@ -41,11 +41,30 @@ class LoadBalancerSpecificationsController extends BaseController
     }
 
     /**
-     * @param Update $request
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function create(Request $request)
+    {
+        $availabilityZoneCapacity = new LoadBalancerSpecification($request->only([
+            'name',
+            'node_count',
+            'cpu',
+            'ram',
+            'hdd',
+            'iops',
+            'image_id',
+        ]));
+        $availabilityZoneCapacity->save();
+        return $this->responseIdMeta($request, $availabilityZoneCapacity->id, 201);
+    }
+
+    /**
+     * @param Request $request
      * @param string $lbsId
      * @return JsonResponse
      */
-    public function update(Update $request, string $lbsId)
+    public function update(Request $request, string $lbsId)
     {
         $loadBalancerSpecification = LoadBalancerSpecification::findOrFail($lbsId);
         $loadBalancerSpecification->fill($request->only([
@@ -59,5 +78,13 @@ class LoadBalancerSpecificationsController extends BaseController
         ]));
         $loadBalancerSpecification->save();
         return $this->responseIdMeta($request, $loadBalancerSpecification->id, 200);
+    }
+
+    public function destroy(Request $request, string $lbsId)
+    {
+        $loadBalancerSpecification = LoadBalancerSpecification::findOrFail($lbsId);
+        $loadBalancerSpecification->delete();
+
+        return response('', 204);
     }
 }

@@ -1,3 +1,30 @@
+## store
+POST https://{{host}}/{{version}}/load-balancer-specs
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "small-2",
+  "node_count": 5,
+  "cpu": 5,
+  "ram": 5,
+  "hdd": 5,
+  "iops": 5,
+  "image_id": "img-aaaaaaaa"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('dev_load_balancer_spec_id', response.body.data.id);
+client.log('Volume ID: ' + response.body.data.id);
+%}
+
 ###
 # Get Collection
 GET https://{{host}}/{{version}}/load-balancer-specs
@@ -75,5 +102,19 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.hdd === 5);
   client.assert(response.body.data.iops === 5);
   client.assert(response.body.data.image_id === "img-aaaaaaaa");
+});
+%}
+
+### destroy
+DELETE https://{{host}}/{{version}}/load-balancer-specs/{{dev_load_balancer_spec_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}

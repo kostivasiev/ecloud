@@ -2,8 +2,9 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\AvailabilityZoneCapacity\Saved;
 use App\Traits\V2\CustomKey;
+use Database\Factories\V2\LoadBalancerSpecificationFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -20,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class LoadBalancerSpecification extends Model implements Filterable, Sortable
 {
-    use CustomKey;
+    use CustomKey, HasFactory;
 
     public $keyPrefix = 'lbs';
     protected $keyType = 'string';
@@ -50,9 +51,10 @@ class LoadBalancerSpecification extends Model implements Filterable, Sortable
         'image_id' => 'string',
     ];
 
-    protected $dispatchesEvents = [
-        'saved' => Saved::class,
-    ];
+    protected static function newFactory()
+    {
+        return LoadBalancerSpecificationFactory::new();
+    }
 
     /**
      * @param FilterFactory $factory

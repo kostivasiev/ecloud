@@ -308,7 +308,9 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('load-balancer-specs', 'LoadBalancerSpecificationsController@index');
         $router->get('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@show');
+        $router->post('load-balancer-specs', 'LoadBalancerSpecificationsController@create');
         $router->patch('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@update');
+        $router->delete('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@destroy');
     });
 
     /** Volumes */

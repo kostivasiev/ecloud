@@ -49,3 +49,11 @@ patch:
       $ref: 'responses/idResponse.yaml'
   tags:
     - Load Balancer Specification
+delete:
+  parameters:
+    - $ref: 'parameters/loadBalancerSpecificationId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Orchestrator Configs
