@@ -33,7 +33,7 @@ class UnAssignVolumeGroup extends Job
         $volume = $this->model;
         if (!empty($volume->volume_group_id)) {
             Log::info(
-                'Volume is not associated with a volume group, skipping',
+                'Volume is associated with a volume group, skipping',
                 [
                     'volume_id' => $volume->id,
                 ]
@@ -44,25 +44,31 @@ class UnAssignVolumeGroup extends Job
         Instance::whereHas('volumes', function ($query) use ($volume) {
             $query->where('id', '=', $volume->id);
         })->each(function ($instance) use ($volume) {
-            if (isset($this->task->data['instance_detach_task_id'])) {
-                $task = Task::findOrFail($this->task->data['instance_detach_task_id']);
-                if (!$task->completed) {
-                    $this->awaitTaskWithRelease($task);
-                }
-                $this->task->setAttribute('data', null)->saveQuietly();
-            }
-
-            Log::info(
-                'Detaching volume from instance',
-                [
+            if (!empty($instance->volume_group_id)) {
+                Log::info('Detaching Volume from Instance', [
                     'instance_id' => $instance->id,
                     'volume_id' => $volume->id,
-                ]
-            );
+                ]);
+                if (isset($this->task->data['instance_detach_task_id'])) {
+                    $task = Task::findOrFail($this->task->data['instance_detach_task_id']);
+                    if (!$task->completed) {
+                        $this->awaitTaskWithRelease($task);
+                    }
+                    $this->task->setAttribute('data', null)->saveQuietly();
+                }
 
-            $task = $instance->createTask('volume_detach', VolumeDetach::class, ['volume_id' => $volume->id]);
-            $this->task->setAttribute('data', ['instance_detach_task_id' => $task->id]);
-            $this->awaitTaskWithRelease($task);
+                Log::info(
+                    'Detaching volume from instance',
+                    [
+                        'instance_id' => $instance->id,
+                        'volume_id' => $volume->id,
+                    ]
+                );
+
+                $task = $instance->createTask('volume_detach', VolumeDetach::class, ['volume_id' => $volume->id]);
+                $this->task->setAttribute('data', ['instance_detach_task_id' => $task->id]);
+                $this->awaitTaskWithRelease($task);
+            }
         });
     }
 }
