@@ -23,6 +23,8 @@ use App\Jobs\Instance\Deploy\RunBootstrapScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
+use App\Jobs\Instance\VolumeGroupAttach;
+use App\Jobs\Instance\VolumeGroupDetach;
 use App\Jobs\Job;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
@@ -69,7 +71,10 @@ class Update extends Job
         } else {
             $this->updateTaskBatch([
                 [
-                    new ComputeUpdate($this->task->resource)
+                    new ComputeUpdate($this->task->resource),
+// Commented out in order to unblock https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/1067
+//                    new VolumeGroupAttach($this->task),
+//                    new VolumeGroupDetach($this->task),
                 ]
             ])->dispatch();
         }

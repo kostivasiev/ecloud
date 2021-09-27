@@ -41,6 +41,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'deployed',
         'deploy_data',
         'host_group_id',
+        'volume_group_id',
     ];
 
     protected $appends = [
@@ -105,6 +106,11 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         return $this->belongsToMany(Volume::class)->using(InstanceVolume::class);
     }
 
+    public function volumeGroup()
+    {
+        return $this->belongsTo(VolumeGroup::class);
+    }
+
     public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {
@@ -148,6 +154,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup_enabled', Filter::$stringDefaults),
             $factory->create('host_group_id', Filter::$stringDefaults),
+            $factory->create('volume_group_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -172,6 +179,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             $factory->create('platform'),
             $factory->create('backup_enabled'),
             $factory->create('host_group_id'),
+            $factory->create('volume_group_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -206,6 +214,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             'platform' => 'platform',
             'backup_enabled' => 'backup_enabled',
             'host_group_id' => 'host_group_id',
+            'volume_group_id' => 'volume_group_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

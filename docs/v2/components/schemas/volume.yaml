@@ -31,6 +31,16 @@ properties:
     readOnly: true
     description: Is the volume attached to a resource
     example: true
+  volume_group_id:
+    type: string
+    required: false
+    example: 'volgroup-2b66bb79'
+    readOnly : false
+  is_shared:
+    type: boolean
+    required: false
+    description: Is the volume a shared resource
+    example: true
   sync:
     type: object
     readOnly: true

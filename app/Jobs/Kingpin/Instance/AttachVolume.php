@@ -62,13 +62,17 @@ class AttachVolume extends Job
         }
 
         if (!$attached) {
+            $payload = ['volumeUUID' => $this->volume->vmware_uuid];
+            if (!empty($this->instance->volume_group_id) &&
+                $this->instance->volume_group_id === $this->volume->volume_group_id) {
+                $payload['shared'] = $this->volume->is_shared;
+                $payload['unitNumber'] = (int) $this->volume->port;
+            }
             $this->instance->availabilityZone->kingpinService()
                 ->post(
                     '/api/v2/vpc/' . $this->instance->vpc_id . '/instance/' . $this->instance->id . '/volume/attach',
                     [
-                        'json' => [
-                            'volumeUUID' => $this->volume->vmware_uuid
-                        ]
+                        'json' => $payload
                     ]
                 );
             Log::debug('Volume ' . $this->volume->id . ' has been attached to instance ' . $this->instance->id);
