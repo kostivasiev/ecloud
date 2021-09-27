@@ -112,6 +112,7 @@ $app->routeMiddleware([
     'floating-ip-can-be-unassigned' => \App\Http\Middleware\FloatingIp\CanBeUnassigned::class,
     'floating-ip-can-be-deleted' => \App\Http\Middleware\FloatingIp\CanBeDeleted::class,
     'volume-can-be-deleted' => \App\Http\Middleware\Volume\CanDelete::class,
+    'ip-address-can-delete' => \App\Http\Middleware\IpAddress\CanDelete::class,
 ]);
 
 /*

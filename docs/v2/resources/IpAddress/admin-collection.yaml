@@ -25,19 +25,15 @@ get:
                             type: object
                             properties:
                               first:
-                                # Change path in example below
-                                example: 'https://api.ukfast.io/ecloud/v2/references?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/ip-addresses?page=1'
                               previous:
-                                # Change path in example below
-                                example: 'https://api.ukfast.io/ecloud/v2/references?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/ip-addresses?page=1'
                               next:
-                                # Change path in example below
-                                example: 'https://api.ukfast.io/ecloud/v2/references?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/ip-addresses?page=2'
                               last:
-                                # Change path in example below
-                                example: 'https://api.ukfast.io/ecloud/v2/references?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/ip-addresses?page=2'
   tags:
-    - Rename This Tag
+    - IP Addresses
 post:
   requestBody:
     required: true
@@ -50,4 +46,4 @@ post:
       description: Accepted
       $ref: 'responses/idResponse.yaml'
   tags:
-    - Rename This Tag
+    - IP Addresses

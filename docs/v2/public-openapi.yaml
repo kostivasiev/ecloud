@@ -44,6 +44,8 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
+    IpAddress :
+      $ref : 'resources/IpAddress/schema.yaml'
     #    LoadBalancerCluster:
     #      $ref: 'components/schemas/lbc.yaml'
     Meta:
@@ -88,6 +90,7 @@ components:
   #    Reference:
   #      $ref: 'resource/References/schema.yaml'
   parameters:
+    # DEPRECATED - don't add these directly in this file any more.
     # Path Parameters
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
@@ -130,6 +133,7 @@ components:
     Page:
       $ref: 'components/parameters/page.yaml'
   responses:
+    # DEPRECATED - don't add these directly in this file any more.
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
@@ -306,6 +310,8 @@ paths:
     $ref: 'resources/Nic/public_collection.yaml'
   '/ecloud/v2/nics/{nicId}':
     $ref: 'resources/Nic/public_item.yaml'
+  '/ecloud/v2/nics/{nicId}/ip-addresses' :
+    $ref : 'resources/Nic/ip-address-collection.yaml'
   '/ecloud/v2/nics/{nicId}/tasks':
     $ref: 'resources/Nic/tasks-collection.yaml'
   '/ecloud/v2/regions':

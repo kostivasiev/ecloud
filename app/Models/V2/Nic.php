@@ -94,6 +94,15 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
     }
 
     /**
+     * Pivot table ip_address_nic
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function ipAddresses()
+    {
+        return $this->belongsToMany(IpAddress::class);
+    }
+
+    /**
      * Override method from DeletionRules trait.
      * @return bool
      */
