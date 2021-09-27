@@ -25,7 +25,7 @@ class VolumeGroupDetachTest extends TestCase
     {
         Log::partialMock()
             ->expects('info')
-            ->withSomeOfArgs('Instance is not associated with a volume group, skipping')
+            ->withSomeOfArgs('Instance is associated with a volume group, skipping')
             ->once();
 
         // add volume group to instance and attach the volume
