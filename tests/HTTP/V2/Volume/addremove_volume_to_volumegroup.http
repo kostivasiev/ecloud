@@ -64,17 +64,16 @@ client.test("Request executed successfully", function() {
 
 ### Create Volume
 POST https://{{host}}/{{version}}/volumes
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 1-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
 
 {
   "name": "Test Volume",
   "vpc_id": "{{dev_vpc_id}}",
   "capacity": 25,
-  "availability_zone_id": "{{dev_availability_zone_id}}"
+  "availability_zone_id": "{{dev_availability_zone_id}}",
+  "is_shared": true
 }
 
 > {%
