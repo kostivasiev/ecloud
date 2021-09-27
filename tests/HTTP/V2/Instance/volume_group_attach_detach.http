@@ -132,7 +132,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Attach the volume group to Primary Instance', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 

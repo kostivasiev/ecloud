@@ -31,7 +31,7 @@ class VolumeGroupDetach extends Job
         $instance = $this->model;
         if (!empty($instance->volume_group_id)) {
             Log::info(
-                'Instance is not associated with a volume group, skipping',
+                'Instance is associated with a volume group, skipping',
                 [
                     'instance_id' => $instance->id,
                 ]
@@ -55,8 +55,6 @@ class VolumeGroupDetach extends Job
                         'volume_id' => $volume->id,
                     ]
                 );
-
-
 
                 $task = $instance->createTask('volume_detach', VolumeDetach::class, ['volume_id' => $volume->id]);
                 $this->task->setAttribute('data', ['volume_detach_task_id' => $task->id])->saveQuietly();
