@@ -4,11 +4,15 @@ namespace App\Jobs\Sync\OrchestratorBuild;
 
 use App\Jobs\Job;
 use App\Jobs\OrchestratorBuild\AwaitDefaultFirewallPolicies;
+use App\Jobs\OrchestratorBuild\AwaitHostGroups;
+use App\Jobs\OrchestratorBuild\AwaitHosts;
 use App\Jobs\OrchestratorBuild\AwaitInstances;
 use App\Jobs\OrchestratorBuild\AwaitNetworks;
 use App\Jobs\OrchestratorBuild\AwaitRouters;
 use App\Jobs\OrchestratorBuild\AwaitVpcs;
 use App\Jobs\OrchestratorBuild\ConfigureDefaultFirewallPolicies;
+use App\Jobs\OrchestratorBuild\CreateHostGroups;
+use App\Jobs\OrchestratorBuild\CreateHosts;
 use App\Jobs\OrchestratorBuild\CreateInstances;
 use App\Jobs\OrchestratorBuild\CreateNetworks;
 use App\Jobs\OrchestratorBuild\CreateRouters;
@@ -42,6 +46,10 @@ class Update extends Job
                 new AwaitDefaultFirewallPolicies($this->task->resource),
                 new CreateNetworks($this->task->resource),
                 new AwaitNetworks($this->task->resource),
+                new CreateHostGroups($this->task->resource),
+                new AwaitHostGroups($this->task->resource),
+                new CreateHosts($this->task->resource),
+                new AwaitHosts($this->task->resource),
                 new CreateInstances($this->task->resource),
                 new AwaitInstances($this->task->resource),
             ]

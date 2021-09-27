@@ -32,4 +32,21 @@ class CreateTest extends TestCase
             return $event->model->name == Sync::TASK_NAME_UPDATE;
         });
     }
+
+    public function testInvalidAzIsFailed()
+    {
+        $this->vpc()->setAttribute('region_id', 'test-fail')->saveQuietly();
+
+        $data = [
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+        ];
+
+        $this->post('/v2/floating-ips', $data)->seeJson([
+            'title' => 'Not Found',
+            'detail' => 'The specified availability zone is not available to that VPC',
+            'status' => 404,
+            'source' => 'availability_zone_id'
+        ])->assertResponseStatus(404);
+    }
 }

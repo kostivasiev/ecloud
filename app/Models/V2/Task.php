@@ -88,6 +88,8 @@ class Task extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->boolean()->create('completed', '1', '0'),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('resource_id', Filter::$stringDefaults),
+            $factory->create('reseller_id', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -129,7 +131,9 @@ class Task extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'completed' => 'completed',
+            'resource_id' => 'resource_id',
             'name' => 'name',
+            'reseller_id' => 'reseller_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

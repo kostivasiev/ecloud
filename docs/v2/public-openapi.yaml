@@ -338,6 +338,10 @@ paths:
     $ref: 'resources/VpcSupport/collection.yaml'
   '/ecloud/v2/support/{supportId}':
     $ref: 'resources/VpcSupport/item.yaml'
+  '/ecloud/v2/tasks':
+    $ref: 'resources/Task/collection.yaml'
+  '/ecloud/v2/tasks/{taskId}':
+    $ref: 'resources/Task/item.yaml'
   '/ecloud/v2/volumes':
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':

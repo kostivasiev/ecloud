@@ -50,6 +50,7 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
         'loadBalancerClusters',
         'volumes',
         'floatingIps',
+        'hostGroups',
     ];
 
     protected $casts = [
@@ -100,6 +101,11 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
     public function vpcSupports()
     {
         return $this->hasMany(VpcSupport::class);
+    }
+
+    public function hostGroups()
+    {
+        return $this->hasMany(HostGroup::class);
     }
 
 

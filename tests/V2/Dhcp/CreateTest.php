@@ -91,4 +91,27 @@ class CreateTest extends TestCase
             ]
         )->assertResponseStatus(422);
     }
+
+    public function testInvalidAzIsFailed()
+    {
+        $region = factory(Region::class)->create();
+        $availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $region->id
+        ]);
+
+        $data = [
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $availabilityZone->id,
+        ];
+
+        $this->post('/v2/dhcps', $data, [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->seeJson([
+            'title' => 'Not Found',
+            'detail' => 'The specified availability zone is not available to that VPC',
+            'status' => 404,
+            'source' => 'availability_zone_id'
+        ])->assertResponseStatus(404);
+    }
 }

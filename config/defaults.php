@@ -105,6 +105,13 @@ return [
         'policy' => '20/20',
     ],
     'gateway' => [],
+    'vpn_session' => [
+        'network' => [
+            'nosnat' => [
+                'sequence' => 500
+            ]
+        ]
+    ],
     'tag' => [
         'scope' => 'ukfast',
         'networking' => [

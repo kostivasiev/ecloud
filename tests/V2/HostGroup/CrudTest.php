@@ -4,10 +4,10 @@ namespace Tests\V2\HostGroup;
 
 use App\Events\V2\Task\Created;
 use App\Models\V2\Host;
-use Illuminate\Support\Facades\Event;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -64,6 +64,26 @@ class CrudTest extends TestCase
         $this->post('/v2/host-groups', $data)
             ->seeInDatabase('host_groups', $data, 'ecloud')
             ->assertResponseStatus(202);
+    }
+
+    public function testInvalidAzIsFailed()
+    {
+        $this->vpc()->setAttribute('region_id', 'test-fail')->saveQuietly();
+
+        $data = [
+            'name' => 'hg-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'host_spec_id' => $this->hostSpec()->id,
+            'windows_enabled' => true,
+        ];
+
+        $this->post('/v2/host-groups', $data)->seeJson([
+            'title' => 'Not Found',
+            'detail' => 'The specified availability zone is not available to that VPC',
+            'status' => 404,
+            'source' => 'availability_zone_id'
+        ])->assertResponseStatus(404);
     }
 
     public function testVpcFailedCausesFailure()

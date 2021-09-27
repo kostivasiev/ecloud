@@ -6,6 +6,7 @@ use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
+use App\Models\V2\VpnSessionNetwork;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -43,10 +44,23 @@ class CreateTest extends TestCase
             [
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'remote_ip' => '211.12.13.1',
-                'remote_networks' => '127.1.1.1/32',
-                'local_networks' => '127.1.1.1/32,127.1.10.1/24',
             ]
         );
+        $this->vpnSession->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-local1',
+            'type' => VpnSessionNetwork::TYPE_LOCAL,
+            'ip_address' => '127.1.1.1/32',
+        ]);
+        $this->vpnSession->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-local2',
+            'type' => VpnSessionNetwork::TYPE_LOCAL,
+            'ip_address' => '127.1.10.1/24',
+        ]);
+        $this->vpnSession->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-remote1',
+            'type' => VpnSessionNetwork::TYPE_REMOTE,
+            'ip_address' => '127.1.1.1/32',
+        ]);
     }
 
     public function testCreateResource()
@@ -65,6 +79,7 @@ class CreateTest extends TestCase
                 'vpn_service_id' => $vpnService->id,
                 'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
+                'local_networks' => '10.0.0.1/32',
                 'remote_networks' => '172.12.23.11/32',
             ]
         )->assertResponseStatus(202);
@@ -81,6 +96,7 @@ class CreateTest extends TestCase
                 'vpn_service_id' => 'vpns-00000000',
                 'vpn_endpoint_id' => $this->vpnEndpoint->id,
                 'remote_ip' => '211.12.13.1',
+                'local_networks' => '10.0.0.1/32',
                 'remote_networks' => '172.12.23.11/32',
             ]
         )->seeJson(
@@ -118,6 +134,52 @@ class CreateTest extends TestCase
         ])->seeJson([
             'detail' => 'The local networks must contain a valid comma separated list of CIDR subnets',
             'source' => 'local_networks',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testCreateResourceWithMissingLocalNetworks()
+    {
+        $service = factory(VpnService::class)->create([
+            'name' => 'test-service',
+            'router_id' => $this->router()->id,
+        ]);
+
+        $this->post(
+            '/v2/vpn-sessions',
+            [
+                'name' => 'vpn session test',
+                'vpn_profile_group_id' => $this->vpnProfileGroup->id,
+                'vpn_service_id' => $service->id,
+                'vpn_endpoint_id' => $this->vpnEndpoint->id,
+                'remote_ip' => '211.12.13.1',
+                'remote_networks' => '172.12.23.11/32',
+            ]
+        )->seeJson([
+            'detail' => 'The local networks field is required',
+            'source' => 'local_networks',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testCreateResourceWithMissingRemoteNetworks()
+    {
+        $service = factory(VpnService::class)->create([
+            'name' => 'test-service',
+            'router_id' => $this->router()->id,
+        ]);
+
+        $this->post(
+            '/v2/vpn-sessions',
+            [
+                'name' => 'vpn session test',
+                'vpn_profile_group_id' => $this->vpnProfileGroup->id,
+                'vpn_service_id' => $service->id,
+                'vpn_endpoint_id' => $this->vpnEndpoint->id,
+                'remote_ip' => '211.12.13.1',
+                'local_networks' => '172.12.23.11/32',
+            ]
+        )->seeJson([
+            'detail' => 'The remote networks field is required',
+            'source' => 'remote_networks',
         ])->assertResponseStatus(422);
     }
 }
