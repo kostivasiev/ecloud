@@ -35,6 +35,8 @@ class AssignVolumeGroupTest extends TestCase
         $this->instance()->volumes()->attach($this->volume());
         $this->instance()->saveQuietly();
 
+        Bus::fake([AttachVolume::class, IopsChange::class]);
+
         Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'task-1',
