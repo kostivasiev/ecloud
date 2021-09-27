@@ -4,6 +4,7 @@ namespace App\Jobs\Sync\Router;
 
 use App\Jobs\Job;
 use App\Jobs\Router\Deploy;
+use App\Jobs\Router\CreateAdminRouter;
 use App\Jobs\Router\DeployRouterDefaultRule;
 use App\Jobs\Router\DeployRouterLocale;
 use App\Models\V2\Task;
@@ -25,6 +26,7 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
+                new CreateAdminRouter($this->task),
                 new Deploy($this->task->resource),
                 new DeployRouterLocale($this->task->resource),
                 new DeployRouterDefaultRule($this->task->resource),

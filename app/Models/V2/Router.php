@@ -41,6 +41,15 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
         'vpc_id',
         'availability_zone_id',
         'router_throughput_id',
+        'is_hidden',
+    ];
+
+    protected $attributes = [
+        'is_hidden' => false,
+    ];
+
+    protected $casts = [
+        'is_hidden' => 'boolean',
     ];
 
     protected $dispatchesEvents = [
@@ -98,6 +107,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
         if (!$user->isScoped()) {
             return $query;
         }
+        $query->where('is_hidden', false);
         return $query->whereHas('vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
