@@ -39,7 +39,7 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/load-balancer-specs/' . $this->image->id, [
+        $this->get('/v2/load-balancer-specs/' . $this->loadBalancerSpecification->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
