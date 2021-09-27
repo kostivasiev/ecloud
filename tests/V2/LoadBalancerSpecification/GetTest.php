@@ -2,6 +2,7 @@
 
 namespace Tests\V2\LoadBalancerSpecification;
 
+use App\Models\V2\Image;
 use App\Models\V2\LoadBalancerSpecification;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -13,7 +14,10 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->loadBalancerSpecification = factory(LoadBalancerSpecification::class)->create();
+        $this->image = factory(Image::class)->create();
+        $this->loadBalancerSpecification = LoadBalancerSpecification::factory()->create([
+            "image_id" => $this->image->id
+        ]);
     }
 
     public function testGetItemCollection()
@@ -35,7 +39,7 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/load-balancer-specs/' . $this->loadBalancerSpecification->id, [
+        $this->get('/v2/load-balancer-specs/' . $this->image->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
