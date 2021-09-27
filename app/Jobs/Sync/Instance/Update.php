@@ -72,8 +72,9 @@ class Update extends Job
             $this->updateTaskBatch([
                 [
                     new ComputeUpdate($this->task->resource),
-                    new VolumeGroupAttach($this->task),
-                    new VolumeGroupDetach($this->task),
+// Commented out in order to unblock https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/1067
+//                    new VolumeGroupAttach($this->task),
+//                    new VolumeGroupDetach($this->task),
                 ]
             ])->dispatch();
         }
