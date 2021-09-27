@@ -4,6 +4,7 @@ namespace App\Rules\V2;
 use App\Models\V2\AvailabilityZoneable;
 use App\Support\Resource;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * If the two passed in resource types implement the AvailabilityZoneable interface
@@ -14,28 +15,42 @@ use Illuminate\Contracts\Validation\Rule;
  */
 class IsSameAvailabilityZone implements Rule
 {
-    private $resource1;
+    private $resourceId;
 
     public function __construct($resourceId)
     {
-        if (!empty($resourceId)) {
-            $this->resource1 = Resource::classFromId($resourceId)::findOrFail($resourceId);
-        }
+        $this->resourceId = $resourceId;
     }
 
     public function passes($attribute, $value)
     {
-        if (!($this->resource1 instanceof AvailabilityZoneable)) {
+        if (empty($this->resourceId)) {
             return true;
         }
 
-        $resource2 = Resource::classFromId($value)::findOrFail($value);
+        $resourceClass = Resource::classFromId($this->resourceId);
+        if (empty($resourceClass)) {
+            return false;
+        }
+
+        $resource1 = $resourceClass::forUser(Auth::user())->findOrFail($this->resourceId);
+
+        if (!($resource1 instanceof AvailabilityZoneable)) {
+            return true;
+        }
+
+        $resource2Class = Resource::classFromId($value);
+        if (empty($resource2Class)) {
+            return false;
+        }
+
+        $resource2 = $resource2Class::forUser(Auth::user())->findOrFail($value);
 
         if (!($resource2 instanceof AvailabilityZoneable)) {
             return true;
         }
 
-        return $this->resource1->availabilityZone->id == $resource2->availabilityZone->id;
+        return $resource1->availabilityZone->id == $resource2->availabilityZone->id;
     }
 
     public function message()
