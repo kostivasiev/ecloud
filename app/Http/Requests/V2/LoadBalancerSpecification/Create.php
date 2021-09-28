@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests\V2\LoadBalancerSpecification;
 
-use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
-class Update extends FormRequest
+class Create extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

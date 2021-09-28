@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Http\Requests\V2\LoadBalancerSpecification\Create;
 use App\Http\Requests\V2\LoadBalancerSpecification\Update;
 use App\Models\V2\LoadBalancerSpecification;
 use App\Resources\V2\LoadBalancerSpecificationResource;
@@ -41,10 +42,10 @@ class LoadBalancerSpecificationsController extends BaseController
     }
 
     /**
-     * @param Request $request
+     * @param Create $request
      * @return JsonResponse
      */
-    public function create(Request $request)
+    public function create(Create $request)
     {
         $availabilityZoneCapacity = new LoadBalancerSpecification($request->only([
             'name',
@@ -60,11 +61,11 @@ class LoadBalancerSpecificationsController extends BaseController
     }
 
     /**
-     * @param Request $request
+     * @param Update $request
      * @param string $lbsId
      * @return JsonResponse
      */
-    public function update(Request $request, string $lbsId)
+    public function update(Update $request, string $lbsId)
     {
         $loadBalancerSpecification = LoadBalancerSpecification::findOrFail($lbsId);
         $loadBalancerSpecification->fill($request->only([

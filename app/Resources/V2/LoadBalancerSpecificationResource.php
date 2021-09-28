@@ -27,23 +27,29 @@ class LoadBalancerSpecificationResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'node_count' => $this->node_count,
             'cpu' => $this->cpu,
             'ram' => $this->ram,
             'hdd' => $this->hdd,
-            'iops' => $this->iops,
-            'image_id' => $this->image_id,
-            'created_at' => Carbon::parse(
+            'iops' => $this->iops
+        ];
+
+        if ($request->user()->isAdmin()) {
+            $data['image_id'] = $this->image_id;
+            $data['created_at'] = Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
-            'updated_at' => Carbon::parse(
+            )->toIso8601String();
+            $data['updated_at'] = Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
-            )->toIso8601String(),
-        ];
+            )->toIso8601String();
+        }
+
+        return $data;
+
     }
 }
