@@ -23,39 +23,32 @@ class Create extends FormRequest
     {
         return [
             'name' => [
-                'sometimes',
                 'required',
                 'string',
                 'unique:ecloud.load_balancer_specifications,id',
             ],
             'node_count' => [
-                'sometimes',
                 'required',
                 'numeric',
                 'min:1'
             ],
             'cpu' => [
-                'sometimes',
                 'numeric',
                 'min:1'
             ],
             'ram' => [
-                'sometimes',
                 'numeric',
                 'min:1'
             ],
             'hdd' => [
-                'sometimes',
                 'numeric',
                 'min:1'
             ],
             'iops' => [
-                'sometimes',
                 'numeric',
                 'min:1'
             ],
             'image_id' => [
-                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.images,id,deleted_at,NULL',
