@@ -21,6 +21,7 @@ class DeleteDhcp extends Job
 
     public function __construct(Task $task, Router $router)
     {
+        $this->task = $task;
         $this->model = $router;
     }
 
@@ -29,16 +30,22 @@ class DeleteDhcp extends Job
         $availabilityZone = $this->model->availabilityZone;
         $vpc = $this->model->vpc;
 
-        // If DHCP exists and this is the only router in the AZ, remove
-        if (($vpc->dhcps()->where('availability_zone_id', $availabilityZone->id)->count() > 0) &&
-           ($vpc->routers()->where('availability_zone_id', $availabilityZone->id)->count() == 1)) {
-            $deleteTask = $vpc->dhcps()->where('availability_zone_id', $availabilityZone->id)->get()->first()->syncDelete();
-
-            $data = $this->task->data ?? [];
-            $data[self::TASK_WAIT_DATA_KEY] = $deleteTask->id;
-
-            $this->task->data = $data;
-            $this->task->save();
+        if (!$vpc->dhcps()->where('availability_zone_id', $availabilityZone->id)->exists()) {
+            Log::warning("DHCP doesn't exist in AZ, skipping");
+            return;
         }
+
+        if ($vpc->routers()->where('availability_zone_id', $availabilityZone->id)->count() != 1) {
+            Log::warning("Other routers exist in AZ, skipping");
+            return;
+        }
+
+        $deleteTask = $vpc->dhcps()->where('availability_zone_id', $availabilityZone->id)->get()->first()->syncDelete();
+
+        $data = $this->task->data ?? [];
+        $data[self::TASK_WAIT_DATA_KEY] = $deleteTask->id;
+
+        $this->task->data = $data;
+        $this->task->save();
     }
 }
