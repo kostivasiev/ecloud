@@ -33,18 +33,22 @@ class Create extends FormRequest
                 'min:1'
             ],
             'cpu' => [
+                'required',
                 'numeric',
                 'min:1'
             ],
             'ram' => [
+                'required',
                 'numeric',
                 'min:1'
             ],
             'hdd' => [
+                'required',
                 'numeric',
                 'min:1'
             ],
             'iops' => [
+                'required',
                 'numeric',
                 'min:1'
             ],

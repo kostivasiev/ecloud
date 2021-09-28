@@ -40,7 +40,8 @@ class CreateTest extends TestCase
                 'cpu' => 5,
                 'ram' => 5,
                 'hdd' => 5,
-                'iops' => 5
+                'iops' => 5,
+                'image_id' => $this->image->id
             ],
             'ecloud'
         )
