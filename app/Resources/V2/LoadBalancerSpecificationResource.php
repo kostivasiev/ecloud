@@ -50,6 +50,5 @@ class LoadBalancerSpecificationResource extends UKFastResource
         }
 
         return $data;
-
     }
 }
