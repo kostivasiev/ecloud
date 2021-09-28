@@ -4,11 +4,15 @@ namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
+use App\Models\V2\VolumeGroup;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\Instance\IsInstanceInVolumeGroup;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsValidRamMultiple;
+use App\Rules\V2\Volume\HasAvailableInstances;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -70,6 +74,13 @@ class UpdateRequest extends FormRequest
                 new IsValidRamMultiple()
             ],
             'backup_enabled' => 'sometimes|required|boolean',
+            'volume_group_id' => [
+                'nullable',
+                Rule::exists(VolumeGroup::class, 'id')->whereNull('deleted_at'),
+                new ExistsForUser(VolumeGroup::class),
+                new HasAvailableInstances,
+                new IsInstanceInVolumeGroup($this->instanceId),
+            ],
         ];
 
         return $rules;

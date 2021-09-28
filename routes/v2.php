@@ -346,6 +346,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('nics', 'NicController@index');
         $router->get('nics/{nicId}', 'NicController@show');
         $router->get('nics/{nicId}/tasks', 'NicController@tasks');
+        $router->get('nics/{nicId}/ip-addresses', 'NicController@ipAddresses');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             //$router->post('nics', 'NicController@create');
             $router->patch('nics/{nicId}', 'NicController@update');
@@ -526,5 +527,19 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('orchestrator-builds', 'OrchestratorBuildController@index');
         $router->get('orchestrator-builds/{orchestratorBuildId}', 'OrchestratorBuildController@show');
+    });
+
+    /** IP Addresses */
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
+        $router->post('ip-addresses', 'IpAddressController@store');
+        $router->get('ip-addresses', 'IpAddressController@index');
+        $router->get('ip-addresses/{ipAddressId}', 'IpAddressController@show');
+        $router->get('ip-addresses/{ipAddressId}/nics', 'IpAddressController@nics');
+        $router->patch('ip-addresses/{ipAddressId}', 'IpAddressController@update');
+
+        $router->group(['middleware' => 'ip-address-can-delete'], function () use ($router) {
+            $router->delete('ip-addresses/{ipAddressId}', 'IpAddressController@destroy');
+        });
+
     });
 });

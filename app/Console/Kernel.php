@@ -34,6 +34,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\FloatingIp\SetPolymorphicRelationship::class,
         \App\Console\Commands\FloatingIp\PopulateAvailabilityZoneId::class,
         \App\Console\Commands\Nat\FindOrphaned::class,
+        \App\Console\Commands\Health\FindOrphanedNics::class,
     ];
 
     /**

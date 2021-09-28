@@ -1,6 +1,5 @@
 get:
   parameters:
-    # Change path in $ref below
     - $ref: 'parameters/id.yaml'
   responses:
     200:
@@ -11,7 +10,6 @@ get:
             type: object
             properties:
               data:
-                # Change path in $ref below
                 $ref: 'schema.yaml'
               meta:
                 type: object
@@ -19,7 +17,6 @@ get:
     - Rename This Tag
 patch:
   parameters:
-    # Change path in $ref below
     - $ref: 'parameters/id.yaml'
   requestBody:
     required: true
@@ -28,7 +25,6 @@ patch:
         schema:
           type: object
           allOf:
-            # Change path in $ref below
             - $ref: 'schema.yaml'
             # Change column properties here
             - type : object
@@ -37,13 +33,11 @@ patch:
                   readOnly : true
   responses:
     202:
-      # Change path in $ref below
       $ref: 'responses/idResponse.yaml'
   tags:
     - Rename This Tag
 delete:
   parameters:
-    # Change path in $ref below
     - $ref: 'parameters/id.yaml'
   responses:
     202:
