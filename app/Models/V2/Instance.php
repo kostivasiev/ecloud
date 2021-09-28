@@ -36,6 +36,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'ram_capacity',
         'availability_zone_id',
         'locked',
+        'is_hidden',
         'platform',
         'backup_enabled',
         'deployed',
@@ -121,6 +122,15 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         });
     }
 
+    public function scopeHidden($query, Consumer $user)
+    {
+        if (!$user->isAdmin()) {
+            return $query->where('is_hidden', false);
+        }
+        return $query;
+
+    }
+
     public function image()
     {
         return $this->belongsTo(Image::class);
@@ -135,6 +145,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
     {
         return $this->hasMany(BillingMetric::class, 'resource_id', 'id');
     }
+
 
     /**
      * @param FilterFactory $factory

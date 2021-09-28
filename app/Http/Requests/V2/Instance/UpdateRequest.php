@@ -52,6 +52,7 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         $instance = Instance::forUser(Auth::user())
+            ->hidden()
             ->findOrFail($this->instanceId);
 
         $this->config = $instance->image->imageMetadata->pluck('key', 'value')->flip();
@@ -82,6 +83,10 @@ class UpdateRequest extends FormRequest
                 new IsInstanceInVolumeGroup($this->instanceId),
             ],
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $rules['is_hidden'] = ['sometimes', 'boolean'];
+        }
 
         return $rules;
     }

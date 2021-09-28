@@ -118,7 +118,7 @@ class InstanceController extends BaseController
      */
     public function update(UpdateRequest $request, string $instanceId)
     {
-        $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
+        $instance = Instance::forUser(Auth::user())->hidden()->findOrFail($instanceId);
 
         $instance->fill($request->only([
             'name',
