@@ -37,11 +37,13 @@ class Update extends FormRequest
             ],
             'cpu' => [
                 'sometimes',
+                'required',
                 'numeric',
                 'min:1'
             ],
             'ram' => [
                 'sometimes',
+                'required',
                 'numeric',
                 'min:1'
             ],
@@ -52,6 +54,7 @@ class Update extends FormRequest
             ],
             'iops' => [
                 'sometimes',
+                'required',
                 'numeric',
                 'min:1'
             ],
