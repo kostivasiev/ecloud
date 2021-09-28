@@ -23,7 +23,7 @@ class Create extends FormRequest
     {
         return [
             'name' => [
-                'required',
+                'nullable',
                 'string',
                 'unique:ecloud.load_balancer_specifications,id',
             ],

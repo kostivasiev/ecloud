@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
+use App\Traits\V2\DefaultName;
 use Database\Factories\V2\LoadBalancerSpecificationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class LoadBalancerSpecification extends Model implements Filterable, Sortable
 {
-    use CustomKey, HasFactory;
+    use CustomKey, HasFactory, DefaultName;
 
     public $keyPrefix = 'lbs';
     protected $keyType = 'string';

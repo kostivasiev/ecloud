@@ -36,8 +36,7 @@ class CreateTest extends TestCase
                 'cpu' => 5,
                 'ram' => 5,
                 'hdd' => 5,
-                'iops' => 5,
-                'image_id' => 'img-aaaaaaaa'
+                'iops' => 5
             ],
             'ecloud'
         )
