@@ -130,10 +130,6 @@ class CreateRequest extends FormRequest
             ],
         ];
 
-        if (Auth::user()->isAdmin()) {
-            $rules['is_hidden'] = ['sometimes', 'boolean'];
-        }
-
         $rules = array_merge($rules, $this->generateImageDataRules());
         return $rules;
     }

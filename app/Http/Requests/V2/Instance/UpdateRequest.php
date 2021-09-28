@@ -52,7 +52,7 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         $instance = Instance::forUser(Auth::user())
-            ->hidden()
+            ->hidden(Auth::user())
             ->findOrFail($this->instanceId);
 
         $this->config = $instance->image->imageMetadata->pluck('key', 'value')->flip();
