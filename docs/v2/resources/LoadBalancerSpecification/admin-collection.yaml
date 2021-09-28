@@ -34,3 +34,16 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/load-balancer-specs?page=2'
   tags:
     - Load Balancer Specification
+post:
+  description: Create an Load Balancer Specification
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: 'schema.yaml'
+  responses:
+    201:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Load Balancer Specification

@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: 'schema.yaml'
+                  $ref: 'public_schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -31,29 +31,5 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/load-balancer-specs?page=2'
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/load-balancer-specs?page=2'
-  tags:
-    - Load Balancer Specification
-patch:
-  parameters:
-    - $ref: 'parameters/loadBalancerSpecificationId.yaml'
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          type: object
-          allOf:
-            - $ref: 'schema.yaml'
-  responses:
-    200:
-      $ref: 'responses/idResponse.yaml'
-  tags:
-    - Load Balancer Specification
-delete:
-  parameters:
-    - $ref: 'parameters/loadBalancerSpecificationId.yaml'
-  responses:
-    204:
-      description: Success
   tags:
     - Load Balancer Specification
