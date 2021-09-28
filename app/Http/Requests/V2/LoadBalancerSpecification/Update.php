@@ -49,6 +49,7 @@ class Update extends FormRequest
             ],
             'hdd' => [
                 'sometimes',
+                'required',
                 'numeric',
                 'min:1'
             ],
