@@ -44,6 +44,8 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
+    LoadBalancerSpecification:
+      $ref: 'resources/LoadBalancerSpecification/public_schema.yaml'
     IpAddress :
       $ref : 'resources/IpAddress/schema.yaml'
     #    LoadBalancerCluster:
@@ -100,6 +102,8 @@ components:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+    LoadBalancerSpecificationId:
+      $ref: 'resources/LoadBalancerSpecification/parameters/loadBalancerSpecificationId.yaml'
     #    LbcId:
     #      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
     NetworkPolicyId:
@@ -282,6 +286,10 @@ paths:
   #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
   #  '/ecloud/v2/lbcs/{lbcId}':
   #    $ref: 'resources/LoadBalancerCluster/item.yaml'
+  '/ecloud/v2/load-balancer-specs':
+    $ref: 'resources/LoadBalancerSpecification/collection.yaml'
+  '/ecloud/v2/load-balancer-specs/{loadBalancerSpecificationId}':
+    $ref: 'resources/LoadBalancerSpecification/item.yaml'
   '/ecloud/v2/network-policies':
     $ref: 'resources/NetworkPolicy/collection.yaml'
   '/ecloud/v2/network-policies/{networkPolicyId}':

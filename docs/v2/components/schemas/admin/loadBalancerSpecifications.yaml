@@ -1,0 +1,50 @@
+properties:
+  id:
+    type: string
+    example: lbs-0c03049b-dev
+    readOnly: true
+  name:
+    description: Name of the Load Balancer Specification
+    type: string
+    example: 'small'
+    readOnly: false
+  node_count:
+    description: Number of Nodes
+    type: integer
+    example: 1
+    readOnly: false
+  cpu:
+    description: Number of CPUs
+    type: integer
+    example: 1
+    readOnly: false
+  ram:
+    description: Amount of Ram
+    type: integer
+    example: 2
+    readOnly: false
+  hdd:
+    description: Amount of HDD space
+    type: integer
+    example: 20
+    readOnly: false
+  iops:
+    description: Amount of iops
+    type: integer
+    example: 300
+    readOnly: false
+  image_id:
+    description: Name of image
+    type: string
+    example: img-aaaaaaaa
+    readOnly: false
+  created_at:
+    type: string
+    example: '2021-09-23T10:00:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2021-09-23T10:00:00+01:00'
+    readOnly: true
+
+description: 'Load Balancer Specifications'

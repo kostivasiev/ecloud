@@ -1,0 +1,30 @@
+properties:
+  id:
+    type: string
+    example: lbs-0c03049b
+    readOnly: true
+  name:
+    type: string
+    example: 'small'
+    readOnly: false
+  node_count:
+    type: integer
+    example: 1
+    readOnly: false
+  cpu:
+    type: integer
+    example: 1
+    readOnly: false
+  ram:
+    type: integer
+    example: 2
+    readOnly: false
+  hdd:
+    type: integer
+    example: 20
+    readOnly: false
+  iops:
+    type: integer
+    example: 300
+    readOnly: false
+description: 'Load Balancer Specifications'
