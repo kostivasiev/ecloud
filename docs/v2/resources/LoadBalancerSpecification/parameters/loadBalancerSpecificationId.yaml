@@ -3,4 +3,4 @@ name: lbsId
 required: true
 schema:
   type: string
-example: lbs-0c03049b-dev
+example: lbs-0c03049b
