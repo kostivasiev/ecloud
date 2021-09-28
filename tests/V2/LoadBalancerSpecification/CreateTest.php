@@ -2,13 +2,17 @@
 
 namespace Tests\V2\LoadBalancerSpecification;
 
+use App\Models\V2\Image;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
+    protected $image;
+
     public function setUp(): void
     {
         parent::setUp();
+        $this->image = factory(Image::class)->create();
     }
 
     public function testValidDataSucceeds()
@@ -22,7 +26,7 @@ class CreateTest extends TestCase
                 'ram' => 5,
                 'hdd' => 5,
                 'iops' => 5,
-                'image_id' => 'img-aaaaaaaa'
+                'image_id' => $this->image->id
             ],
             [
                 'X-consumer-custom-id' => '0-0',
