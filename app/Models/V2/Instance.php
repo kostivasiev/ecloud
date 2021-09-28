@@ -128,7 +128,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             return $query->where('is_hidden', false);
         }
         return $query;
-
     }
 
     public function image()
