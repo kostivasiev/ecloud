@@ -18,7 +18,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 202, "Response status is not 202");
+  client.assert(response.status === 201, "Response status is not 202");
 });
 
 client.global.set('dev_load_balancer_spec_id', response.body.data.id);
@@ -49,14 +49,14 @@ Content-Type:  application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data.id === 'lbs-0c03049b-dev');
-  client.assert(response.body.data.name === 'small');
-  client.assert(response.body.data.node_count === 1);
-  client.assert(response.body.data.cpu === 1);
-  client.assert(response.body.data.ram === 2);
-  client.assert(response.body.data.hdd === 20);
-  client.assert(response.body.data.iops === 300);
-  client.assert(response.body.data.image_id === "img-aaaaaaaa");
+  client.assert(response.body.data.id === client.global.get('dev_load_balancer_spec_id'), "incorrect ID");
+  client.assert(response.body.data.name === 'small-2', "Incorrect name");
+  client.assert(response.body.data.node_count === 5, "Incorrect Count");
+  client.assert(response.body.data.cpu === 5, "CPU");
+  client.assert(response.body.data.ram === 5, "RAM");
+  client.assert(response.body.data.hdd === 5, "HDD");
+  client.assert(response.body.data.iops === 5, "IOPS");
+  client.assert(response.body.data.image_id === "img-aaaaaaaa", "image_id");
 });
 %}
 ###
@@ -69,11 +69,11 @@ Content-Type: application/json
 
 {
   "name": "small-2",
-  "node_count": 5,
-  "cpu": 5,
-  "ram": 5,
-  "hdd": 5,
-  "iops": 5,
+  "node_count": 1,
+  "cpu": 1,
+  "ram": 1,
+  "hdd": 1,
+  "iops": 1,
   "image_id": "img-aaaaaaaa"
 
 }
@@ -94,13 +94,13 @@ Content-Type:  application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data.id === 'lbs-0c03049b-dev');
+  client.assert(response.body.data.id === client.global.get('dev_load_balancer_spec_id'));
   client.assert(response.body.data.name === 'small-2');
-  client.assert(response.body.data.node_count === 5);
-  client.assert(response.body.data.cpu === 5);
-  client.assert(response.body.data.ram === 5);
-  client.assert(response.body.data.hdd === 5);
-  client.assert(response.body.data.iops === 5);
+  client.assert(response.body.data.node_count === 1);
+  client.assert(response.body.data.cpu === 1);
+  client.assert(response.body.data.ram === 1);
+  client.assert(response.body.data.hdd === 1);
+  client.assert(response.body.data.iops === 1);
   client.assert(response.body.data.image_id === "img-aaaaaaaa");
 });
 %}
@@ -115,6 +115,6 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 202, "Response status is not 202");
+  client.assert(response.status === 204, "Response status is not 204");
 });
 %}
