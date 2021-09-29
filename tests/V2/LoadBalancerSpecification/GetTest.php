@@ -28,6 +28,7 @@ class GetTest extends TestCase
         ])->seeJson([
             'id' => $this->loadBalancerSpecification->id,
             'name' => $this->loadBalancerSpecification->name,
+            'description' => $this->loadBalancerSpecification->description,
             'node_count' => $this->loadBalancerSpecification->node_count,
             'cpu' => $this->loadBalancerSpecification->cpu,
             'ram' => $this->loadBalancerSpecification->ram,
@@ -45,6 +46,7 @@ class GetTest extends TestCase
         ])->seeJson([
             'id' => $this->loadBalancerSpecification->id,
             'name' => $this->loadBalancerSpecification->name,
+            'description' => $this->loadBalancerSpecification->description,
             'node_count' => $this->loadBalancerSpecification->node_count,
             'cpu' => $this->loadBalancerSpecification->cpu,
             'ram' => $this->loadBalancerSpecification->ram,

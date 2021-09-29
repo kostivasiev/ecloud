@@ -49,6 +49,7 @@ class LoadBalancerSpecificationsController extends BaseController
     {
         $availabilityZoneCapacity = new LoadBalancerSpecification($request->only([
             'name',
+            'description',
             'node_count',
             'cpu',
             'ram',
@@ -70,6 +71,7 @@ class LoadBalancerSpecificationsController extends BaseController
         $loadBalancerSpecification = LoadBalancerSpecification::findOrFail($lbsId);
         $loadBalancerSpecification->fill($request->only([
             'name',
+            'description',
             'node_count',
             'cpu',
             'ram',

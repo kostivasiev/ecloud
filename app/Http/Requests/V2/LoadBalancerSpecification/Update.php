@@ -29,6 +29,9 @@ class Update extends FormRequest
                 'string',
                 'unique:ecloud.load_balancer_specifications,id',
             ],
+            'description' => [
+                'string'
+            ],
             'node_count' => [
                 'sometimes',
                 'required',

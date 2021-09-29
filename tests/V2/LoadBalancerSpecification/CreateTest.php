@@ -21,6 +21,7 @@ class CreateTest extends TestCase
             '/v2/load-balancer-specs',
             [
                 'name' => 'small-test',
+                'description' => 'Description Test',
                 'node_count' => 5,
                 'cpu' => 5,
                 'ram' => 5,
@@ -36,6 +37,7 @@ class CreateTest extends TestCase
             'load_balancer_specifications',
             [
                 'name' => 'small-test',
+                'description' => 'Description Test',
                 'node_count' => 5,
                 'cpu' => 5,
                 'ram' => 5,

@@ -8,6 +8,7 @@ Content-Type: application/json
 
 {
   "name": "small-2",
+  "description": "Example description",
   "node_count": 5,
   "cpu": 5,
   "ram": 5,
@@ -69,6 +70,7 @@ Content-Type: application/json
 
 {
   "name": "small-2",
+  "description": "Example description 2",
   "node_count": 1,
   "cpu": 1,
   "ram": 1,
@@ -96,6 +98,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
   client.assert(response.body.data.id === client.global.get('dev_load_balancer_spec_id'));
   client.assert(response.body.data.name === 'small-2');
+  client.assert(response.body.data.description === 'Example description 2');
   client.assert(response.body.data.node_count === 1);
   client.assert(response.body.data.cpu === 1);
   client.assert(response.body.data.ram === 1);
