@@ -20,7 +20,7 @@ class UpdateTest extends TestCase
         parent::setUp();
     }
 
-    public function testJobsBatched()
+    public function testTaskCompleted()
     {
         Model::withoutEvents(function() {
             $this->task = new Task([
@@ -34,8 +34,6 @@ class UpdateTest extends TestCase
         $job = new Update($this->task);
         $job->handle();
 
-        Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() > 0;
-        });
+        $this->assertEquals(Sync::STATUS_COMPLETE, $this->task->status);
     }
 }
