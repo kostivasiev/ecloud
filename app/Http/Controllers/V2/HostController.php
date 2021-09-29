@@ -78,7 +78,7 @@ class HostController extends BaseController
             ], 422);
         }
 
-        if ($hostGroup->vcpu_used > ($hostGroup->vcpu_capacity - $hostSpec->cpu_cores)) {
+        if ($hostGroup->vcpu_used > ($hostGroup->vcpu_capacity - ($hostSpec->cpu_cores * $hostSpec->cpu_sockets))) {
             return response()->json([
                 'title' => 'Validation Error',
                 'detail' => 'Host removal will result in insufficient vcpu capacity for existing instances',
