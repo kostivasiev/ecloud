@@ -15,7 +15,10 @@ class DropDeletedColumnFromFloatingIpTable extends Migration
     {
         Schema::connection('ecloud')->table('floating_ips', function (Blueprint $table) {
             $table->dropUnique('idx_unique_ip_address');
-            $table->dropColumn('deleted');
+        });
+
+        Schema::connection('ecloud')->table('floating_ips', function (Blueprint $table) {
+            $table->dropColumn(['deleted']);
         });
     }
 
