@@ -64,6 +64,7 @@ class IpAddressController extends BaseController
     {
         $ipAddress = IpAddress::forUser($request->user())->findOrFail($ipAddressId);
         $ipAddress->delete();
+        // TODO: remove from pivot table
         return response('', 204);
     }
 

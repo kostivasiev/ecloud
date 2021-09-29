@@ -3,6 +3,7 @@
 namespace App\Jobs\Nsx\Nic;
 
 use App\Jobs\Job;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -23,22 +24,49 @@ class CreateDHCPLease extends Job
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
 
-        $nsxService = $this->model->instance->availabilityZone->nsxService();
+        $nic = $this->model;
+
+        if ($nic->ip_address) {
+            Log::warning("DHCP IP address already assigned, skipping");
+            return true;
+        }
+
+        $network = $nic->network;
+        $router = $nic->network->router;
+        $nsxService = $router->availabilityZone->nsxService();
+        /**
+         * Get DHCP static bindings to determine used IP addresses on the network
+         * @see https://185.197.63.88/policy/api_includes/method_ListSegmentDhcpStaticBinding.html
+         */
+        $cursor = null;
+        $assignedIpsNsx = collect();
+        do {
+            $response = $nsxService->get('/policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/dhcp-static-binding-configs?cursor=' . $cursor);
+            $response = json_decode($response->getBody()->getContents());
+            foreach ($response->results as $dhcpStaticBindingConfig) {
+                $assignedIpsNsx->push($dhcpStaticBindingConfig->ip_address);
+            }
+            $cursor = $response->cursor ?? null;
+        } while (!empty($cursor));
+
+        $ipAddress = $nic->assignIpAddress($assignedIpsNsx->toArray());
+
+        $nic->refresh();
 
         $nsxService->put(
-            '/policy/api/v1/infra/tier-1s/' . $this->model->network->router->id . '/segments/' . $this->model->network->id
-            . '/dhcp-static-binding-configs/' . $this->model->id,
+            '/policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id
+            . '/dhcp-static-binding-configs/' . $nic->id,
             [
                 'json' => [
                     'resource_type' => 'DhcpV4StaticBindingConfig',
-                    'mac_address' => $this->model->mac_address,
-                    'ip_address' => $this->model->ip_address
+                    'mac_address' => $nic->mac_address,
+                    'ip_address' => $ipAddress->ip_address
                 ]
             ]
         );
 
-        Log::info('DHCP static binding created for ' . $this->model->id . ' (' . $this->model->mac_address . ') with IP ' . $this->model->ip_address);
+        Log::info('DHCP static binding created for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $ipAddress->ip_address);
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $nic->id]);
     }
 }

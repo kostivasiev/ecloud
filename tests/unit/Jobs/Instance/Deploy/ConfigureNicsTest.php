@@ -6,7 +6,6 @@ use App\Events\V2\Nic\Saved;
 use App\Events\V2\Nic\Saving;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Models\V2\Nic;
-use App\Rules\V2\IpAvailable;
 use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\QueryException;

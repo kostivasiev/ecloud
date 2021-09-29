@@ -119,15 +119,6 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Nic
-        \App\Events\V2\Nic\Saving::class => [
-            \App\Listeners\V2\ResourceSyncSaving::class,
-        ],
-        \App\Events\V2\Nic\Saved::class => [
-            \App\Listeners\V2\ResourceSyncSaved::class,
-        ],
-        \App\Events\V2\Nic\Deleting::class => [
-            \App\Listeners\V2\ResourceSyncDeleting::class,
-        ],
         \App\Events\V2\Nic\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],

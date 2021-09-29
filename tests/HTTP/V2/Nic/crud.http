@@ -1,15 +1,14 @@
 POST https://{{host}}/{{version}}/nics
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
   "mac_address": "3D:F2:C9:A6:B3:4F",
-  "instance_id": "{{dev_instance_id}}",
-  "network_id": "{{dev_network_id}}",
-  "ip_address": "10.0.0.5"
+  "instance_id": "i-e7264d0d-dev",
+  "network_id": "{{dev_network_id}}"
 }
 
 > {%

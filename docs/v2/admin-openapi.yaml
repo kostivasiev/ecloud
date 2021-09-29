@@ -215,14 +215,14 @@ paths:
     $ref : 'resources/IpAddress/admin-item.yaml'
   '/ecloud/v2/ip-addresses/{ipAddressId}/nics' :
     $ref : 'resources/IpAddress/nic-collection.yaml'
-  #  '/ecloud/v2/lbcs':
-  #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
-  #  '/ecloud/v2/lbcs/{lbcId}':
-  #    $ref: 'resources/LoadBalancerCluster/item.yaml'
   '/ecloud/v2/nics':
     $ref: 'resources/Nic/collection.yaml'
   '/ecloud/v2/nics/{nicId}':
     $ref: 'resources/Nic/item.yaml'
+    '/ecloud/v2/lbcs':
+      $ref: 'resources/LoadBalancerCluster/collection.yaml'
+    '/ecloud/v2/lbcs/{lbcId}':
+      $ref: 'resources/LoadBalancerCluster/item.yaml'
   '/ecloud/v2/orchestrator-configs':
     $ref: 'resources/OrchestratorConfig/admin-collection.yaml'
   '/ecloud/v2/orchestrator-configs/{configId}':
