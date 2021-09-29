@@ -31,7 +31,9 @@ class AwaitTasks extends Job
             return;
         }
 
-        foreach ($this->task->data[$this->taskDataKey] as $taskID) {
+        $taskIDs = is_array($this->task->data[$this->taskDataKey]) ? $this->task->data[$this->taskDataKey] : [$this->task->data[$this->taskDataKey]];
+
+        foreach ($taskIDs as $taskID) {
             $task = Task::findOrFail($taskID);
             if ($task->status == Task::STATUS_FAILED) {
                 Log::error(get_class($this) . ': Task in failed state, abort', ['id' => $this->task->resource->id, 'task_id' => $task->id]);
@@ -49,6 +51,6 @@ class AwaitTasks extends Job
 
     public function resolveModelId()
     {
-        return $this->task->resource->id;
+        return $this->task->resource()->get()->first()->id;
     }
 }
