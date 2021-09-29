@@ -71,7 +71,6 @@ class AllocateIp extends Job
                         continue 2;
                     }
 
-                    Log::warning("test" . $ip);
                     $checkIp = $ip->toString();
 
                     //check no other FIPs have this IP address
