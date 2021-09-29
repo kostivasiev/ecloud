@@ -10,6 +10,7 @@ use App\Jobs\Instance\Undeploy\DeleteVolumes;
 use App\Jobs\Instance\Undeploy\RemoveCredentials;
 use App\Jobs\Instance\Undeploy\UnassignFloatingIP;
 use App\Jobs\Instance\Undeploy\Undeploy;
+use App\Jobs\Instance\VolumeGroupDetach;
 use App\Jobs\Job;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
@@ -32,6 +33,8 @@ class Delete extends Job
             [
                 new PowerOff($this->task->resource, true),
                 new Undeploy($this->task->resource),
+// Commented out in order to unblock https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/1067
+//                new VolumeGroupDetach($this->task),
                 new DeleteVolumes($this->task->resource),
                 new UnassignFloatingIP($this->task->resource),
                 new DeleteNics($this->task->resource),

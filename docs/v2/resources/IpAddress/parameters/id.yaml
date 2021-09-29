@@ -1,0 +1,6 @@
+in: path
+name: id
+required: true
+schema:
+  type: string
+example: ip-3f112f25

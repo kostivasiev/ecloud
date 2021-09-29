@@ -4,6 +4,7 @@ namespace App\Jobs\Sync\VpnSession;
 
 use App\Jobs\Job;
 use App\Jobs\Nsx\VpnSession\CreateVpnSession;
+use App\Jobs\Tasks\AwaitTasks;
 use App\Jobs\VpnSession\AwaitNetworkNoSNatSync;
 use App\Jobs\VpnSession\AwaitSyncNetworkNoSNatsTasks;
 use App\Jobs\VpnSession\CreateNetworkNoSNats;
@@ -31,7 +32,7 @@ class Update extends Job
                 new CreatePreSharedKey($this->task->resource),
                 new CreateVpnSession($this->task->resource),
                 new SyncNetworkNoSNats($this->task, $this->task->resource),
-                new AwaitSyncNetworkNoSNatsTasks($this->task, $this->task->resource)
+                new AwaitTasks($this->task, SyncNetworkNoSNats::TASK_WAIT_DATA_KEY),
             ],
         ])->dispatch();
     }

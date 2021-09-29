@@ -22,11 +22,8 @@ class Delete extends Job
 
     public function handle()
     {
-        $this->deleteTaskBatch([
-            [
-                new DeleteDhcps($this->task->resource),
-                new AwaitDhcpRemoval($this->task->resource),
-            ]
-        ])->dispatch();
+        $this->task->resource->delete();
+        $this->task->completed = true;
+        $this->task->save();
     }
 }

@@ -13,7 +13,6 @@ get:
               data:
                 type: array
                 items:
-                  # Change path in $ref below
                   $ref: 'schema.yaml'
               meta:
                 allOf:
@@ -45,12 +44,10 @@ post:
     content:
       application/json:
         schema:
-          # Change path in $ref below
           $ref: 'schema.yaml'
   responses:
     202:
       description: Accepted
-      # Change path in $ref below
       $ref: 'responses/idResponse.yaml'
   tags:
     - Rename This Tag

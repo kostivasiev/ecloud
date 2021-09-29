@@ -4,8 +4,10 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateNicRequest;
 use App\Http\Requests\V2\UpdateNicRequest;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
+use App\Resources\V2\IpAddressResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
 use App\Rules\V2\IpAvailable;
@@ -87,6 +89,17 @@ class NicController extends BaseController
             ->transform($collection);
 
         return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function ipAddresses(Request $request, QueryTransformer $queryTransformer, string $nicId)
+    {
+        $collection = Nic::forUser($request->user())->findOrFail($nicId)->ipAddresses();
+        $queryTransformer->config(IpAddress::class)
+            ->transform($collection);
+
+        return IpAddressResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

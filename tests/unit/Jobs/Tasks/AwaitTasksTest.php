@@ -1,25 +1,21 @@
 <?php
 
-namespace Tests\unit\Jobs\VpnSession;
+namespace Tests\unit\Jobs\Tasks;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\FloatingIp\AwaitNatSync;
-use App\Jobs\VpnSession\AwaitSyncNetworkNoSNatsTasks;
+use App\Jobs\Tasks\AwaitTasks;
 use App\Jobs\VpnSession\SyncNetworkNoSNats;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
-use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Models\V2\VpnSessionNetwork;
 use App\Support\Sync;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\VpnSessionMock;
 use Tests\TestCase;
 
-class AwaitSyncNetworkNoSNatsTasksTest extends TestCase
+class AwaitTasksTest extends TestCase
 {
     use VpnSessionMock;
 
@@ -72,7 +68,7 @@ class AwaitSyncNetworkNoSNatsTasksTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new AwaitSyncNetworkNoSNatsTasks($task, $this->vpnSession));
+        dispatch(new AwaitTasks($task, SyncNetworkNoSNats::TASK_WAIT_DATA_KEY));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -119,7 +115,7 @@ class AwaitSyncNetworkNoSNatsTasksTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new AwaitSyncNetworkNoSNatsTasks($task, $this->vpnSession));
+        dispatch(new AwaitTasks($task, SyncNetworkNoSNats::TASK_WAIT_DATA_KEY));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -163,7 +159,7 @@ class AwaitSyncNetworkNoSNatsTasksTest extends TestCase
         $task->resource()->associate($this->vpnSession);
         $task->save();
 
-        dispatch(new AwaitSyncNetworkNoSNatsTasks($task, $this->vpnSession));
+        dispatch(new AwaitTasks($task, SyncNetworkNoSNats::TASK_WAIT_DATA_KEY));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
