@@ -14,6 +14,9 @@ class AwaitDhcpSync extends Job
 {
     use Batchable, LoggableModelJob;
 
+    public $tries = 30;
+    public $backoff = 5;
+
     private Router $model;
 
     public function __construct(Router $router)
