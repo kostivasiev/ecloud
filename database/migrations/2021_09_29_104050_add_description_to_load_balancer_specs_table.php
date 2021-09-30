@@ -14,7 +14,7 @@ class AddDescriptionToLoadBalancerSpecsTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('load_balancer_specifications', function (Blueprint $table) {
-            $table->text('description')->nullable()->after('availability_zone_id');
+            $table->text('description')->nullable()->after('name');
         });
     }
 
