@@ -1,7 +1,7 @@
 <?php
 namespace Tests\unit\Jobs\Router;
 
-use App\Jobs\Router\CreateAdminRouter;
+use App\Jobs\Router\CreateManagementRouter;
 use App\Listeners\V2\TaskCreated;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
@@ -11,14 +11,13 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class CreateAdminRouterTest extends TestCase
+class CreateManagementRouterTest extends TestCase
 {
     protected Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->job = \Mockery::mock(CreateAdminRouter::class)->makePartial();
     }
 
     public function testCreateAdminRouter()
@@ -32,7 +31,7 @@ class CreateAdminRouterTest extends TestCase
         });
         Event::fake(TaskCreated::class);
         Bus::fake();
-        $job = new CreateAdminRouter($this->task);
+        $job = new CreateManagementRouter($this->task);
         $job->handle();
 
         $managementRouter = Router::findOrFail($this->task->data['management_router_id']);

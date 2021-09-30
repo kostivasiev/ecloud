@@ -6,11 +6,10 @@ use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\ClientException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CreateAdminRouter extends Job
+class CreateManagementRouter extends Job
 {
     use Batchable, LoggableModelJob, AwaitResources;
 
