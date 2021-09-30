@@ -30,14 +30,14 @@ class CreateManagementNetwork extends Job
         $router = $this->model;
         if (!empty($this->task->data['management_router_id'])) {
             // need to check that the router is up and running
-            $managementRouter = Router::findOrFail($this->task->data['management_router_id']);
+            $managementRouter = Router::find($this->task->data['management_router_id']);
             if ($managementRouter) {
                 $this->awaitSyncableResources([
                     $managementRouter->id,
                 ]);
             }
             if (empty($this->task->data['management_network_id'])) {
-                Log::info(get_class($this) . ' - Create Management Network Start', ['network_id' => $managementRouter->id]);
+                Log::info(get_class($this) . ' - Create Management Network Start', ['router_id' => $managementRouter->id]);
 
                 $managementNetwork = app()->make(Network::class);
                 $managementNetwork->name = 'Management Network for ' . $managementRouter->id;
@@ -53,7 +53,7 @@ class CreateManagementNetwork extends Job
 
                 Log::info(get_class($this) . ' - Create Management Network End', [
                     'router_id' => $managementRouter->id,
-                    'admin_network_id' => $managementNetwork->id,
+                    'network_id' => $managementNetwork->id,
                 ]);
             } else {
                 $managementNetwork = Network::findOrFail($this->task->data['management_network_id']);
