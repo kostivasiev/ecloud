@@ -3,6 +3,7 @@
 namespace Tests\V2\LoadBalancerCluster;
 
 use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\LoadBalancerSpecification;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -10,16 +11,17 @@ use Tests\TestCase;
 class GetTest extends TestCase
 {
     protected $lbcs;
+    protected $lbs;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-
+        $this->lbs = factory(LoadBalancerSpecification::class)->create();
         $this->lbc = factory(LoadBalancerCluster::class)->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id,
-            'lbs_id' => $this->lbs()->id
+            'lbs_id' => $this->lbs->id
         ]);
     }
 
