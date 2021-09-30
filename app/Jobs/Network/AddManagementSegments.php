@@ -9,7 +9,6 @@ use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\LoggableModelJob;
 use Exception;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
