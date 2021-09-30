@@ -36,6 +36,7 @@ class RemoveDHCPLease extends Job
             '/segments/' . $nic->network->id .
             '/dhcp-static-binding-configs/' . $nic->id
         );
+        Log::info('DHCP static binding deleted for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
 
         $nic->refresh();
         $ipAddress = $nic->ipAddresses()->where('type', IpAddress::TYPE_NORMAL)->first();
@@ -43,9 +44,8 @@ class RemoveDHCPLease extends Job
         if (!empty($ipAddress)) {
             $nic->ipAddresses()->detach($ipAddress->id);
             $ipAddress->delete();
+            Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') deleted from NIC ' . $nic->id . ' on network ' . $nic->network->id);
         }
-
-        Log::info('DHCP static binding deleted for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
 
         Log::info(get_class($this) . ' : Finished', ['id' => $nic->id]);
     }

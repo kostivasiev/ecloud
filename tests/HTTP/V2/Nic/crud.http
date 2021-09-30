@@ -1,4 +1,4 @@
-# First create an instance so that we have an instance ID to assign the new NIC to
+# First create an instance, we can confirm that an IP address was assigned to the instance's NIC
 POST https://{{host}}/{{version}}/instances
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -61,9 +61,9 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
+
+
 ###
-
-
 GET https://{{host}}/{{version}}/nics/{{nic_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -114,9 +114,8 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.id === client.global.get('nic_id'), "Incorrect resource ID returned");
 });
 %}
+
 ###
-
-
 GET https://{{host}}/{{version}}/nics/{{nic_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -132,7 +131,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ####
-
 DELETE https://{{host}}/{{version}}/nics/{{nic_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -147,7 +145,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ####
-
 GET https://{{host}}/{{version}}/nics/{{nic_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -160,7 +157,6 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 404, "Response status is not 404");
 });
 %}
-
 
 ###
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
