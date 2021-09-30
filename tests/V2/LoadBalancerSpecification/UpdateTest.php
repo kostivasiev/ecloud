@@ -25,6 +25,7 @@ class UpdateTest extends TestCase
     {
         $data = [
             "name" => "small-1",
+            "description" => "Description Test",
             "node_count" => 5,
             "cpu" => 5,
             "ram" => 5,

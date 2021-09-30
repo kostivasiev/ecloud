@@ -33,6 +33,7 @@ class LoadBalancerSpecification extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
+        'description',
         'node_count',
         'cpu',
         'ram',
@@ -44,6 +45,7 @@ class LoadBalancerSpecification extends Model implements Filterable, Sortable
     protected $casts = [
         'id' => 'string',
         'name' => 'string',
+        'description' => 'string',
         'node_count' => 'integer',
         'cpu' => 'integer',
         'ram' => 'integer',
@@ -66,6 +68,7 @@ class LoadBalancerSpecification extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
+            $factory->create('description', Filter::$stringDefaults),
             $factory->create('node_count', Filter::$numericDefaults),
             $factory->create('cpu', Filter::$numericDefaults),
             $factory->create('ram', Filter::$numericDefaults),
@@ -113,6 +116,7 @@ class LoadBalancerSpecification extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
+            'description' => 'description',
             'node_count' => 'node_count',
             'cpu' => 'cpu',
             'ram' => 'ram',

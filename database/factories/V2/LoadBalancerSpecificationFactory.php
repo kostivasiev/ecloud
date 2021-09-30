@@ -23,6 +23,7 @@ class LoadBalancerSpecificationFactory extends Factory
         return [
             'id' => 'lbs-0c03049b-dev',
             'name' => 'small',
+            'description' => 'Description Test',
             'node_count' => 1,
             'cpu' => 1,
             'ram' => 2,

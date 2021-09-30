@@ -10,6 +10,7 @@ use UKFast\Responses\UKFastResource;
  * @package App\Http\Resources\V2
  * @property string id
  * @property string name
+ * @property string description
  * @property integer node_count
  * @property integer cpu
  * @property integer ram
@@ -30,14 +31,15 @@ class LoadBalancerSpecificationResource extends UKFastResource
         $data = [
             'id' => $this->id,
             'name' => $this->name,
-            'node_count' => $this->node_count,
-            'cpu' => $this->cpu,
-            'ram' => $this->ram,
-            'hdd' => $this->hdd,
-            'iops' => $this->iops
+            'description' => $this->description,
         ];
 
         if ($request->user()->isAdmin()) {
+            $data['node_count'] = $this->node_count;
+            $data['cpu'] = $this->cpu;
+            $data['ram'] = $this->ram;
+            $data['hdd'] = $this->hdd;
+            $data['iops'] = $this->iops;
             $data['image_id'] = $this->image_id;
             $data['created_at'] = Carbon::parse(
                 $this->created_at,
