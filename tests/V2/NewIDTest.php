@@ -2,13 +2,14 @@
 
 namespace Tests\V2;
 
+use App\Listeners\V2\TaskCreated;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class NewIDTest extends TestCase
@@ -37,6 +38,8 @@ class NewIDTest extends TestCase
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
+        Event::fake(TaskCreated::class);
+        Bus::fake();
     }
 
     public function testFormatOfAvailabilityZoneID()

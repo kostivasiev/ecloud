@@ -34,7 +34,7 @@ class UpdateTest extends TestCase
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 5;
+            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 7;
         });
     }
 }
