@@ -14,7 +14,7 @@ class AddLbsIdToLbcsTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('lbcs', function (Blueprint $table) {
-            $table->uuid('lbs_id')->nullable()->after('name')->index();
+            $table->uuid('lbs_id')->after('name');
             $table->dropColumn(['nodes']);
         });
     }

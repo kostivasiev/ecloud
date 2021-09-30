@@ -18,7 +18,8 @@ class GetTest extends TestCase
 
         $this->lbc = factory(LoadBalancerCluster::class)->create([
             'availability_zone_id' => $this->availabilityZone()->id,
-            'vpc_id' => $this->vpc()->id
+            'vpc_id' => $this->vpc()->id,
+            'lbs_id' => $this->lbs()->id
         ]);
     }
 
@@ -35,7 +36,7 @@ class GetTest extends TestCase
                 'id' => $this->lbc->id,
                 'name' => $this->lbc->name,
                 'vpc_id' => $this->lbc->vpc_id,
-                'nodes' => $this->lbc->nodes,
+                'lbs_id' => $this->lbc->lbs_id,
             ])
             ->assertResponseStatus(200);
     }
@@ -52,7 +53,8 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->lbc->id,
                 'name' => $this->lbc->name,
-                'vpc_id' => $this->lbc->vpc_id
+                'vpc_id' => $this->lbc->vpc_id,
+                'lbs_id' => $this->lbc->lbs_id,
             ])
             ->assertResponseStatus(200);
     }

@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -22,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class LoadBalancerCluster extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable;
+    use CustomKey, SoftDeletes, DefaultName, Syncable, HasFactory;
 
     public $keyPrefix = 'lbc';
     protected $keyType = 'string';
@@ -51,6 +52,11 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
+    }
+
+    public function lbs()
+    {
+        return $this->belongsTo(LoadBalancerSpecification::class);
     }
 
     /**
@@ -127,7 +133,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
             'name' => 'name',
             'availability_zone_id' => 'availability_zone_id',
             'vpc_id' => 'vpc_id',
-            'nodes' => 'nodes',
+            'lbs_id' => 'lbs_id',
             'config_id' => 'config_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
