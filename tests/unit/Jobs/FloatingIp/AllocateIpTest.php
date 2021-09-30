@@ -53,8 +53,8 @@ class AllocateIpTest extends TestCase
                     new \UKFast\Admin\Networking\Entities\IpRange(
                         [
                             "id" => 9028,
-                            "description" => "203.0.113.0\/24 TEST-NET-3",
-                            "externalSubnet" => "255.255.255.0",
+                            "description" => "203.0.113.0\/30 TEST-NET-3",
+                            "externalSubnet" => "255.255.255.252",
                             "internalSubnet" => "",
                             "dnsOne" => "",
                             "dnsTwo" => "",
@@ -70,7 +70,7 @@ class AllocateIpTest extends TestCase
                             "resellerId" => 0,
                             "parentRangeId" => 0,
                             "networkAddress" => 3405803776,
-                            "cidr" => 24,
+                            "cidr" => 30,
                             "type" => "External",
                             "vrfNumber" => 0
                         ]
@@ -91,7 +91,7 @@ class AllocateIpTest extends TestCase
         });
 
         $this->floatingIp->refresh();
-        $this->assertEquals('203.0.113.0', $this->floatingIp->ip_address);
+        $this->assertContains($this->floatingIp->ip_address, ['203.0.113.0', '203.0.113.1','203.0.113.2','203.0.113.3']);
     }
 
     public function testNextAvailableIPAllocatedWithAvailableIPAddresses()
@@ -109,6 +109,12 @@ class AllocateIpTest extends TestCase
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.1',
             ]);
+            factory(FloatingIp::class)->create([
+                'id' => 'fip-existing3',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'ip_address' => '203.0.113.2',
+            ]);
             $this->floatingIp = factory(FloatingIp::class)->create([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
@@ -125,8 +131,8 @@ class AllocateIpTest extends TestCase
                     new \UKFast\Admin\Networking\Entities\IpRange(
                         [
                             "id" => 9028,
-                            "description" => "203.0.113.0\/24 TEST-NET-3",
-                            "externalSubnet" => "255.255.255.0",
+                            "description" => "203.0.113.0\/30 TEST-NET-3",
+                            "externalSubnet" => "255.255.255.252",
                             "internalSubnet" => "",
                             "dnsOne" => "",
                             "dnsTwo" => "",
@@ -142,7 +148,7 @@ class AllocateIpTest extends TestCase
                             "resellerId" => 0,
                             "parentRangeId" => 0,
                             "networkAddress" => 3405803776,
-                            "cidr" => 24,
+                            "cidr" => 30,
                             "type" => "External",
                             "vrfNumber" => 0
                         ]
@@ -163,7 +169,7 @@ class AllocateIpTest extends TestCase
         });
 
         $this->floatingIp->refresh();
-        $this->assertEquals('203.0.113.2', $this->floatingIp->ip_address);
+        $this->assertEquals('203.0.113.3', $this->floatingIp->ip_address);
     }
 
     public function testNextAvailableIPAllocatedWithAvailableIPAddressesInSecondRange()
@@ -234,8 +240,8 @@ class AllocateIpTest extends TestCase
                     new \UKFast\Admin\Networking\Entities\IpRange(
                         [
                             "id" => 9028,
-                            "description" => "203.0.113.0\/24 TEST-NET-3",
-                            "externalSubnet" => "255.255.255.0",
+                            "description" => "203.0.113.0\/30 TEST-NET-3",
+                            "externalSubnet" => "255.255.255.252",
                             "internalSubnet" => "",
                             "dnsOne" => "",
                             "dnsTwo" => "",
@@ -251,7 +257,7 @@ class AllocateIpTest extends TestCase
                             "resellerId" => 0,
                             "parentRangeId" => 0,
                             "networkAddress" => 3405803776,
-                            "cidr" => 24,
+                            "cidr" => 30,
                             "type" => "External",
                             "vrfNumber" => 0
                         ],
@@ -272,7 +278,7 @@ class AllocateIpTest extends TestCase
         });
 
         $this->floatingIp->refresh();
-        $this->assertEquals('203.0.113.0', $this->floatingIp->ip_address);
+        $this->assertContains($this->floatingIp->ip_address, ['203.0.113.0','203.0.113.1','203.0.113.2','203.0.113.3']);
     }
 
     public function testInvalidIPRangeSubnetIsSkipped()
@@ -319,8 +325,8 @@ class AllocateIpTest extends TestCase
                     new \UKFast\Admin\Networking\Entities\IpRange(
                         [
                             "id" => 9028,
-                            "description" => "203.0.113.0\/24 TEST-NET-3",
-                            "externalSubnet" => "255.255.255.0",
+                            "description" => "203.0.113.0\/30 TEST-NET-3",
+                            "externalSubnet" => "255.255.255.252",
                             "internalSubnet" => "",
                             "dnsOne" => "",
                             "dnsTwo" => "",
@@ -336,7 +342,7 @@ class AllocateIpTest extends TestCase
                             "resellerId" => 0,
                             "parentRangeId" => 0,
                             "networkAddress" => 3405803776,
-                            "cidr" => 24,
+                            "cidr" => 30,
                             "type" => "External",
                             "vrfNumber" => 0
                         ],
@@ -357,7 +363,7 @@ class AllocateIpTest extends TestCase
         });
 
         $this->floatingIp->refresh();
-        $this->assertEquals('203.0.113.0', $this->floatingIp->ip_address);
+        $this->assertContains($this->floatingIp->ip_address, ['203.0.113.0','203.0.113.1','203.0.113.2','203.0.113.3']);
     }
 
     public function testNoAvailableIPAddressesFails()
