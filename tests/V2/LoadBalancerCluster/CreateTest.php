@@ -170,5 +170,4 @@ class CreateTest extends TestCase
         $resource = LoadBalancerCluster::find($resourceId);
         $this->assertNotNull($resource);
     }
-
 }
