@@ -282,9 +282,9 @@ paths:
     $ref: 'resources/Instance/volume-attachdetach.yaml'
   '/ecloud/v2/instances/{instanceId}/volumes':
     $ref: 'resources/Instance/volumes.yaml'
-  #  '/ecloud/v2/lbcs':
+  #  '/ecloud/v2/load-balancers':
   #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
-  #  '/ecloud/v2/lbcs/{lbcId}':
+  #  '/ecloud/v2/load-balancers/{lbcId}':
   #    $ref: 'resources/LoadBalancerCluster/item.yaml'
   '/ecloud/v2/load-balancer-specs':
     $ref: 'resources/LoadBalancerSpecification/collection.yaml'

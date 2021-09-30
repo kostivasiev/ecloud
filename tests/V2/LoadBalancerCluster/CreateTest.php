@@ -49,7 +49,7 @@ class CreateTest extends TestCase
         ];
 
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -74,7 +74,7 @@ class CreateTest extends TestCase
         ];
 
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -99,7 +99,7 @@ class CreateTest extends TestCase
         ];
 
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '2-0',
@@ -135,7 +135,7 @@ class CreateTest extends TestCase
             'availability_zone_id' => $this->availabilityZone->id
         ];
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -157,7 +157,7 @@ class CreateTest extends TestCase
             'availability_zone_id' => $this->availabilityZone->id
         ];
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

@@ -25,7 +25,7 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -43,7 +43,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/lbcs/' . $this->lbc->id,
+            '/v2/load-balancers/' . $this->lbc->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

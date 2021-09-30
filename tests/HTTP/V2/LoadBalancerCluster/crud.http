@@ -77,7 +77,7 @@ client.log('VPC UUID: ' + response.body.data.id);
 ## Test Resource CRUD
 
 
-POST https://{{host}}/{{version}}/lbcs
+POST https://{{host}}/{{version}}/load-balancers
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -102,7 +102,7 @@ client.log('LBC ID: ' + response.body.data.id);
 
 ###
 
-GET https://{{host}}/{{version}}/lbcs
+GET https://{{host}}/{{version}}/load-balancers
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -117,7 +117,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-GET https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+GET https://ecloud-apio.paul.rnd.ukfast/v2/load-balancers/{{lbc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -133,7 +133,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-PATCH https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+PATCH https://ecloud-apio.paul.rnd.ukfast/v2/load-balancers/{{lbc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -157,7 +157,7 @@ client.test("Request executed successfully", function() {
 ###
 
 
-GET https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+GET https://ecloud-apio.paul.rnd.ukfast/v2/load-balancers/{{lbc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0
@@ -175,7 +175,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-DELETE https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+DELETE https://ecloud-apio.paul.rnd.ukfast/v2/load-balancers/{{lbc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -190,7 +190,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-GET https://ecloud-apio.paul.rnd.ukfast/v2/lbcs/{{lbc_id}}
+GET https://ecloud-apio.paul.rnd.ukfast/v2/load-balancers/{{lbc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 1-0

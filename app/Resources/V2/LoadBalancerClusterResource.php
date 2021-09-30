@@ -12,7 +12,7 @@ use UKFast\Responses\UKFastResource;
  * @property string name
  * @property string availability_zone_id
  * @property string vpc_id
- * @property string nodes
+ * @property string lbs_id
  * @property string config_id
  * @property string created_at
  * @property string updated_at
@@ -30,7 +30,8 @@ class LoadBalancerClusterResource extends UKFastResource
             'name' => $this->name,
             'availability_zone_id' => $this->availability_zone_id,
             'vpc_id' => $this->vpc_id,
-            'nodes' => $this->nodes,
+            'lbs_id' => $this->lbs_id,
+            'sync' => $this->sync,
             'config_id' => $this->config_id,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,

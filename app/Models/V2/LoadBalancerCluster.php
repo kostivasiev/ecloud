@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -21,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class LoadBalancerCluster extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use CustomKey, SoftDeletes, DefaultName, Syncable;
 
     public $keyPrefix = 'lbc';
     protected $keyType = 'string';
@@ -35,7 +36,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
         'name',
         'availability_zone_id',
         'vpc_id',
-        'nodes'
+        'lbs_id'
     ];
 
     protected $casts = [
@@ -78,7 +79,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('nodes', Filter::$numericDefaults),
+            $factory->create('lbs_id', Filter::$stringDefaults),
             $factory->create('config_id', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -97,7 +98,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('availability_zone_id'),
             $factory->create('vpc_id'),
-            $factory->create('nodes'),
+            $factory->create('lbs_id'),
             $factory->create('config_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
