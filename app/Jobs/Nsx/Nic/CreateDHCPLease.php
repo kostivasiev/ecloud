@@ -3,7 +3,6 @@
 namespace App\Jobs\Nsx\Nic;
 
 use App\Jobs\Job;
-use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -27,7 +26,7 @@ class CreateDHCPLease extends Job
         $nic = $this->model;
 
         if ($nic->ip_address) {
-            Log::warning("DHCP IP address already assigned, skipping");
+            Log::info("DHCP IP address already assigned, skipping");
             return true;
         }
 

@@ -9,15 +9,11 @@ use App\Models\V2\Nic;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
+use IPLib\Range\Subnet;
 use Tests\TestCase;
 
 class CreateDHCPLeaseTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testAlreadyAssignedDhcpIpAddressSkips()
     {
         Event::fake([JobFailed::class]);
@@ -31,7 +27,6 @@ class CreateDHCPLeaseTest extends TestCase
         $this->assertEquals(1, $this->nic()->ipAddresses()->count());
 
         Event::assertNotDispatched(JobFailed::class);
-
     }
 
     public function testIpInUseByNicOnSameNetworkIncremented()
@@ -131,5 +126,46 @@ class CreateDHCPLeaseTest extends TestCase
         $this->assertEquals('10.0.0.4', $this->nic()->ip_address);
 
         Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testNoIpAddressAvailableFails()
+    {
+        $network = factory(Network::class)->create([
+            'id' => 'net-2',
+            'subnet' => '172.17.2.0/29',
+            'router_id' => $this->router()->id
+        ]);
+
+        $this->nsxServiceMock()->expects('get')
+            ->withSomeOfArgs('/policy/api/v1/infra/tier-1s/' . $this->router()->id . '/segments/' . $network->id . '/dhcp-static-binding-configs?cursor=')
+            ->andReturnUsing(function () use ($network) {
+                $subnet = Subnet::fromString($network->subnet);
+                $ip = $subnet->getStartAddress();
+                $used = [];
+                while ($ip = $ip->getNextAddress()) {
+                    if ($ip->toString() === $subnet->getEndAddress()->toString()) {
+                        break;
+                    }
+                    $used[]['ip_address'] = $ip->toString();
+                }
+
+                return new Response(200, [], json_encode([
+                    'results' => $used
+                ]));
+            });
+
+        $nic = factory(Nic::class)->create([
+            'mac_address' => 'AA:AA:CC:DD:EE:FF',
+            'instance_id' => $this->instance()->id,
+            'network_id' => $network->id,
+        ]);
+
+        $this->expectExceptionMessage("Assigning IP to NIC $nic->id: Insufficient available IP's in subnet");
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new CreateDHCPLease($nic));
+
+        Event::assertDispatched(JobFailed::class);
     }
 }

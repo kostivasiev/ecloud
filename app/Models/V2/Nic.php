@@ -126,7 +126,7 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
      * @return mixed|void
      * @throws \Exception
      */
-    public function assignIpAddress(array $skip = [], string $type = IpAddress::TYPE_NORMAL) : IpAddress
+    public function assignIpAddress(array $denyList = [], string $type = IpAddress::TYPE_NORMAL) : IpAddress
     {
         // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
         $reserved = 3;
@@ -139,25 +139,26 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
         try {
             $lock->block(60);
 
+            $message = 'Assigning IP to NIC ' . $this->id . ': ';
             while ($ip = $ip->getNextAddress()) {
                 $iterator++;
                 if ($iterator <= $reserved) {
                     continue;
                 }
                 if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                    throw new \Exception('Insufficient available IP\'s in subnet');
+                    throw new \Exception($message . 'Insufficient available IP\'s in subnet');
                 }
 
                 $checkIp = $ip->toString();
 
-                if (collect($skip)->contains($checkIp)) {
-                    Log::warning('IP address "' . $checkIp . '" is within the skip list, skipping');
+                if (collect($denyList)->contains($checkIp)) {
+                    Log::warning($message . 'IP address "' . $checkIp . '" is within the deny list, skipping');
                     continue;
                 }
 
                 foreach ($this->network->nics as $nic) {
                     if ($nic->ipAddresses()->where('ip_address', $checkIp)->count() > 0) {
-                        Log::debug('IP address "' . $checkIp . '" in use');
+                        Log::debug($message . 'IP address "' . $checkIp . '" in use');
                         continue 2;
                     }
                 }
@@ -169,6 +170,7 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
                 ]);
 
                 $this->ipAddresses()->save($ipAddress);
+                Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to NIC ' . $this->id . ', type: ' . $type);
 
                 return $ipAddress;
             }
