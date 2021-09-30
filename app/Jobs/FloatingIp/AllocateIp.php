@@ -56,14 +56,17 @@ class AllocateIp extends Job
                 continue;
             }
 
-            $ip = $subnet->getStartAddress(); //First IP / Network address (is reserved)
+            $ip = $subnet->getStartAddress();
 
             $lock = Cache::lock("floating_ip_address." . $ipRange->networkAddress, 60);
             try {
                 $lock->block(60);
 
-                while ($ip = $ip->getNextAddress()) {
-                    if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
+                $start = true;
+                while ($start || $ip = $ip->getNextAddress()) {
+                    $start = false;
+
+                    if ($ip == null || !$subnet->contains($ip)) {
                         Log::warning('Insufficient available IPs in range ' . $ipRange->id, ['id' => $this->model->id]);
                         continue 2;
                     }
