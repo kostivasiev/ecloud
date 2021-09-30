@@ -47,6 +47,8 @@ class AllocateIp extends Job
             $ipRanges = $ipRanges->merge($page->getItems());
         } while ($currentPage < $page->totalPages());
 
+        $ipRanges = $ipRanges->shuffle();
+
         foreach ($ipRanges as $ipRange) {
             Log::debug('Checking for available IP addresses in range ' . $ipRange->id, ['id' => $this->model->id]);
 
