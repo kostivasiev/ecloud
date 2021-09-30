@@ -130,7 +130,7 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
             }
 
             foreach ($responseData->results[0]->policy_statistics[0]->tunnel_statistics as $tunnelStatistic) {
-                $result->tunnel_statistics[] = [
+                $result->tunnel_statistics[] = (object)[
                     'tunnel_status' => $tunnelStatistic->tunnel_status ?? null,
                     'tunnel_down_reason' => $tunnelStatistic->tunnel_down_reason ?? null,
                     'local_subnet' => $tunnelStatistic->local_subnet ?? null,
