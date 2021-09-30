@@ -6,15 +6,19 @@ use App\Jobs\Nat\Deploy;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
+use App\Models\V2\VpnSessionNetwork;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Resources\VpnSessionMock;
 use Tests\TestCase;
 
 class DeployTest extends TestCase
 {
+    use VpnSessionMock;
+
     protected Nat $nat;
     protected FloatingIp $floatingIp;
     protected Nic $nic;
@@ -116,6 +120,154 @@ class DeployTest extends TestCase
         Event::fake([JobFailed::class]);
 
         dispatch(new Deploy($this->nat));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testSourceCIDRSanitized()
+    {
+        $localNetwork1 = $this->vpnSession()->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-testlocal1',
+            'type' => VpnSessionNetwork::TYPE_LOCAL,
+            'ip_address' => '1.1.1.1/24',
+        ]);
+        $remoteNetwork1 = $this->vpnSession()->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-testremote1',
+            'type' => VpnSessionNetwork::TYPE_REMOTE,
+            'ip_address' => '2.2.2.0/24',
+        ]);
+
+        $nat = app()->make(Nat::class);
+        $nat->id = 'nat-test';
+        $nat->source()->associate($localNetwork1);
+        $nat->destination()->associate($remoteNetwork1);
+        $nat->action = NAT::ACTION_NOSNAT;
+        $nat->save();
+
+
+        $this->nsxServiceMock()->expects('patch')
+            ->withArgs([
+                '/policy/api/v1/infra/tier-1s/rtr-test/nat/USER/nat-rules/nat-test',
+                [
+                    'json' => [
+                        "display_name" => "nat-test",
+                        "description" => "nat-test",
+                        "action" => "NO_SNAT",
+                        "source_network" => "1.1.1.0/24",
+                        "enabled" => true,
+                        "logging" => false,
+                        "destination_network" => "2.2.2.0/24",
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([]));
+            });
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new Deploy($nat));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testDestinationCIDRSanitized()
+    {
+        $localNetwork1 = $this->vpnSession()->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-testlocal1',
+            'type' => VpnSessionNetwork::TYPE_LOCAL,
+            'ip_address' => '1.1.1.0/24',
+        ]);
+        $remoteNetwork1 = $this->vpnSession()->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-testremote1',
+            'type' => VpnSessionNetwork::TYPE_REMOTE,
+            'ip_address' => '2.2.2.1/24',
+        ]);
+
+        $nat = app()->make(Nat::class);
+        $nat->id = 'nat-test';
+        $nat->source()->associate($localNetwork1);
+        $nat->destination()->associate($remoteNetwork1);
+        $nat->action = NAT::ACTION_NOSNAT;
+        $nat->save();
+
+
+        $this->nsxServiceMock()->expects('patch')
+            ->withArgs([
+                '/policy/api/v1/infra/tier-1s/rtr-test/nat/USER/nat-rules/nat-test',
+                [
+                    'json' => [
+                        "display_name" => "nat-test",
+                        "description" => "nat-test",
+                        "action" => "NO_SNAT",
+                        "source_network" => "1.1.1.0/24",
+                        "enabled" => true,
+                        "logging" => false,
+                        "destination_network" => "2.2.2.0/24",
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([]));
+            });
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new Deploy($nat));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testTranslatedCIDRSanitized()
+    {
+        $localNetwork1 = $this->vpnSession()->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-testlocal1',
+            'type' => VpnSessionNetwork::TYPE_LOCAL,
+            'ip_address' => '1.1.1.0/24',
+        ]);
+        $remoteNetwork1 = $this->vpnSession()->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-testremote1',
+            'type' => VpnSessionNetwork::TYPE_REMOTE,
+            'ip_address' => '2.2.2.0/24',
+        ]);
+        $remoteNetwork2 = $this->vpnSession()->vpnSessionNetworks()->create([
+            'id' => 'vpnsn-testremote2',
+            'type' => VpnSessionNetwork::TYPE_REMOTE,
+            'ip_address' => '3.3.3.1/24',
+        ]);
+
+        $nat = app()->make(Nat::class);
+        $nat->id = 'nat-test';
+        $nat->source()->associate($localNetwork1);
+        $nat->destination()->associate($remoteNetwork1);
+        $nat->translated()->associate($remoteNetwork2);
+        $nat->action = NAT::ACTION_NOSNAT;
+        $nat->save();
+
+
+        $this->nsxServiceMock()->expects('patch')
+            ->withArgs([
+                '/policy/api/v1/infra/tier-1s/rtr-test/nat/USER/nat-rules/nat-test',
+                [
+                    'json' => [
+                        "display_name" => "nat-test",
+                        "description" => "nat-test",
+                        "action" => "NO_SNAT",
+                        "source_network" => "1.1.1.0/24",
+                        "enabled" => true,
+                        "logging" => false,
+                        "destination_network" => "2.2.2.0/24",
+                        "translated_network" => "3.3.3.0/24",
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([]));
+            });
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new Deploy($nat));
 
         Event::assertNotDispatched(JobFailed::class);
     }

@@ -26,8 +26,6 @@ class Delete extends Job
         $this->deleteTaskBatch([
             [
                 new RemoveLanPolicies($this->task->resource),
-                new DeleteDhcps($this->task->resource),
-                new AwaitDhcpRemoval($this->task->resource),
             ]
         ])->dispatch();
     }

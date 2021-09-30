@@ -11,6 +11,7 @@ use App\Models\V2\Router;
 use App\Models\V2\Volume;
 use App\Rules\V2\IsSameAvailabilityZone;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class IsSameAvailabilityZoneTest extends TestCase
 {
@@ -19,6 +20,7 @@ class IsSameAvailabilityZoneTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->availabilityZone2 = factory(AvailabilityZone::class)->create([
             'id' => 'az-test-2',
             'region_id' => $this->region()->id,
@@ -171,6 +173,36 @@ class IsSameAvailabilityZoneTest extends TestCase
         $rule = new IsSameAvailabilityZone($volume->id);
 
         $result = $rule->passes('instance_id', $this->instance()->id);
+
+        $this->assertFalse($result);
+    }
+
+    public function testUnknownResourceClassFromIdFails()
+    {
+        $volume = Volume::factory()->create([
+            'id' => 'vol-test',
+            'availability_zone_id' => $this->availabilityZone2->id,
+            'vpc_id' => $this->vpc()->id
+        ]);
+
+        $rule = new IsSameAvailabilityZone('invalid-test');
+
+        $result = $rule->passes('instance_id', $this->instance()->id);
+
+        $this->assertFalse($result);
+    }
+
+    public function testUnknownValueClassFromIdFails()
+    {
+        $volume = Volume::factory()->create([
+            'id' => 'vol-test',
+            'availability_zone_id' => $this->availabilityZone2->id,
+            'vpc_id' => $this->vpc()->id
+        ]);
+
+        $rule = new IsSameAvailabilityZone($this->instance()->id);
+
+        $result = $rule->passes('invalid', 'invalid-test');
 
         $this->assertFalse($result);
     }

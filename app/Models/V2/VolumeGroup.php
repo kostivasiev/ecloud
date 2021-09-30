@@ -56,6 +56,11 @@ class VolumeGroup extends Model implements Filterable, Sortable, ResellerScopeab
         return $this->hasMany(Volume::class);
     }
 
+    public function instances()
+    {
+        return $this->hasMany(Instance::class);
+    }
+
     /**
      * @param $query
      * @param $user
