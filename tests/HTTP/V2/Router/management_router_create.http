@@ -61,6 +61,8 @@ Content-Type:  application/json
 client.test('Get task information', function () {
     client.global.set('management_router_id', response.body.data.management_router_id);
     client.log('Management Router ID: ' + response.body.data.management_router_id);
+    client.global.set('management_network_id', response.body.data.management_network_id);
+    client.log('Management Network ID: ' + response.body.data.management_network_id);
 });
 %}
 
@@ -73,6 +75,32 @@ Content-Type:  application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### Get Management Network
+GET https://{{host}}/{{version}}/networks/{{management_network_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### Delete Management Network
+DELETE https://{{host}}/{{version}}/networks/{{management_network_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
