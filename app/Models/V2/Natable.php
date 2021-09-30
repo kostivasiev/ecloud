@@ -4,5 +4,5 @@ namespace App\Models\V2;
 
 interface Natable
 {
-    public function getIPAddress(): string;
+    public function getIPAddress();
 }

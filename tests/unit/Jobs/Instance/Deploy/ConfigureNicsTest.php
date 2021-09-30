@@ -2,6 +2,7 @@
 
 namespace Tests\unit\Jobs\Instance\Deploy;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
@@ -17,6 +18,7 @@ class ConfigureNicsTest extends TestCase
 
     public function testAssignsNic()
     {
+        Event::fake(Created::class);
         $this->kingpinServiceMock()->expects('get')
             ->withArgs(['/api/v2/vpc/vpc-test/instance/i-test'])
             ->andReturnUsing(function () {

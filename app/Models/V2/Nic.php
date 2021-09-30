@@ -54,7 +54,7 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
         return $this->instance->getResellerId();
     }
 
-    public function getIPAddress(): string
+    public function getIPAddress()
     {
         return $this->ip_address;
     }
@@ -108,7 +108,8 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
      * an IP address in the ip_addresses table of type 'normal' (DHCP)
      * @return mixed|null
      */
-    public function getIpAddressAttribute() {
+    public function getIpAddressAttribute()
+    {
         if (!empty($this->attributes['ip_address'])) {
             return $this->attributes['ip_address'];
         }

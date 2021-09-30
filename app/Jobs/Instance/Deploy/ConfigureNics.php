@@ -9,7 +9,6 @@ use App\Models\V2\Nic;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
-use IPLib\Range\Subnet;
 
 class ConfigureNics extends Job
 {
