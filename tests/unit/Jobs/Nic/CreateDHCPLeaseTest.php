@@ -22,7 +22,26 @@ class CreateDHCPLeaseTest extends TestCase
 
         $this->nic()->ipAddresses()->save($ipAddress);
 
+        $this->nsxServiceMock()->expects('get')
+            ->withSomeOfArgs(
+                '/policy/api/v1/infra/tier-1s/' . $this->router()->id .
+                '/segments/' . $this->network()->id .
+                '/dhcp-static-binding-configs?cursor='
+            )
+            ->andReturnUsing(function () use ($ipAddress) {
+                return new Response(200, [], json_encode([
+                    'results' => [
+                        [
+                            'id' => $this->nic()->id,
+                            'ip_address' => $ipAddress->ip_address
+                        ]
+                    ]
+                ]));
+            });
+
         dispatch(new CreateDHCPLease($this->nic()));
+
+        $this->nsxServiceMock()->shouldNotHaveReceived('put');
 
         $this->assertEquals(1, $this->nic()->ipAddresses()->count());
 

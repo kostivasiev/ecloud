@@ -25,11 +25,6 @@ class CreateDHCPLease extends Job
 
         $nic = $this->model;
 
-        if ($nic->ip_address) {
-            Log::info("DHCP IP address already assigned, skipping");
-            return true;
-        }
-
         $network = $nic->network;
         $router = $nic->network->router;
         $nsxService = $router->availabilityZone->nsxService();
@@ -43,6 +38,12 @@ class CreateDHCPLease extends Job
             $response = $nsxService->get('/policy/api/v1/infra/tier-1s/' . $router->id . '/segments/' . $network->id . '/dhcp-static-binding-configs?cursor=' . $cursor);
             $response = json_decode($response->getBody()->getContents());
             foreach ($response->results as $dhcpStaticBindingConfig) {
+                if (!empty($nic->ip_address)
+                    && $dhcpStaticBindingConfig->id == $nic->id
+                    && $dhcpStaticBindingConfig->ip_address == $nic->ip_address) {
+                    Log::info("DHCP IP address already assigned, skipping");
+                    return true;
+                }
                 $assignedIpsNsx->push($dhcpStaticBindingConfig->ip_address);
             }
             $cursor = $response->cursor ?? null;

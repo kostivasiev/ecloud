@@ -54,7 +54,7 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
         return $this->instance->getResellerId();
     }
 
-    public function getIPAddress()
+    public function getIPAddress(): ?string
     {
         return $this->ip_address;
     }
