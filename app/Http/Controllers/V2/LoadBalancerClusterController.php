@@ -51,7 +51,7 @@ class LoadBalancerClusterController extends BaseController
     public function store(CreateLoadBalancerClusterRequest $request)
     {
         $loadBalancerCluster = new LoadBalancerCluster(
-            $request->only(['name', 'availability_zone_id', 'vpc_id', 'lbs_id'])
+            $request->only(['name', 'availability_zone_id', 'vpc_id', 'load_balancer_spec_id'])
         );
         $loadBalancerCluster->save();
         return $this->responseIdMeta($request, $loadBalancerCluster->id, 201);
@@ -65,7 +65,7 @@ class LoadBalancerClusterController extends BaseController
     public function update(UpdateLoadBalancerClusterRequest $request, string $lbcId)
     {
         $loadBalancerCluster = LoadBalancerCluster::forUser(Auth::user())->findOrFail($lbcId);
-        $loadBalancerCluster->fill($request->only(['name', 'availability_zone_id', 'vpc_id', 'lbs_id']));
+        $loadBalancerCluster->fill($request->only(['name', 'availability_zone_id', 'vpc_id', 'load_balancer_spec_id']));
         $loadBalancerCluster->save();
         return $this->responseIdMeta($request, $loadBalancerCluster->id, 200);
     }

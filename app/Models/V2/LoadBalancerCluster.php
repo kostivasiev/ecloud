@@ -37,7 +37,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
         'name',
         'availability_zone_id',
         'vpc_id',
-        'lbs_id'
+        'load_balancer_spec_id'
     ];
 
     protected $casts = [
@@ -85,7 +85,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('lbs_id', Filter::$stringDefaults),
+            $factory->create('load_balancer_spec_id', Filter::$stringDefaults),
             $factory->create('config_id', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -104,7 +104,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('availability_zone_id'),
             $factory->create('vpc_id'),
-            $factory->create('lbs_id'),
+            $factory->create('load_balancer_spec_id'),
             $factory->create('config_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -133,7 +133,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
             'name' => 'name',
             'availability_zone_id' => 'availability_zone_id',
             'vpc_id' => 'vpc_id',
-            'lbs_id' => 'lbs_id',
+            'load_balancer_spec_id' => 'load_balancer_spec_id',
             'config_id' => 'config_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

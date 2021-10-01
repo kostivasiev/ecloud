@@ -54,7 +54,7 @@ class LoadBalancerSpecification extends Model implements Filterable, Sortable
 
     public function lbc()
     {
-        return $this->hasMany(LoadBalancerCluster::class, 'lbs_id', 'id');
+        return $this->hasMany(LoadBalancerCluster::class, 'load_balancer_spec_id', 'id');
     }
 
     /**

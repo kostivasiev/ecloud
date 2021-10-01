@@ -28,7 +28,7 @@ class VpcSeeder extends Seeder
 
         factory(LoadBalancerCluster::class)->create([
             'vpc_id' => 'vpc-aaaaaaaa',
-            'lbs_id' => 'lbs-aaaaaaaa',
+            'load_balancer_spec_id' => 'lbs-aaaaaaaa',
             'name' => 'Dev LBC',
             'availability_zone_id' => 'az-aaaaaaaa'
         ]);

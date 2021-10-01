@@ -14,7 +14,7 @@ class AlterLbcsTableToHaveLbsId extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('lbcs', function (Blueprint $table) {
-            $table->uuid('lbs_id');
+            $table->uuid('load_balancer_spec_id');
         });
     }
 
@@ -26,7 +26,7 @@ class AlterLbcsTableToHaveLbsId extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('lbcs', function (Blueprint $table) {
-            $table->dropColumn('lbs_id');
+            $table->dropColumn('load_balancer_spec_id');
         });
     }
 }

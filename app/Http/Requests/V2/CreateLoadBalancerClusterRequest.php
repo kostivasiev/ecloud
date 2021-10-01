@@ -32,7 +32,7 @@ class CreateLoadBalancerClusterRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string',
-            'lbs_id' => 'required|string|exists:ecloud.load_balancer_specifications,id',
+            'load_balancer_spec_id' => 'required|string|exists:ecloud.load_balancer_specifications,id',
             'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
             'vpc_id' => [
                 'required',
@@ -52,7 +52,7 @@ class CreateLoadBalancerClusterRequest extends FormRequest
     public function messages()
     {
         return [
-            'lbs_id.exists' => 'The specified :attribute was not found',
+            'load_balancer_spec_id.exists' => 'The specified :attribute was not found',
             'availability_zone_id.exists' => 'The specified :attribute was not found',
             'vpc_id.exists' => 'The specified :attribute was not found'
         ];

@@ -30,7 +30,7 @@ Content-Type:  application/json
 }
 
 > {%
-client.global.set('lbs_id', response.body.data.id);
+client.global.set('load_balancer_spec_id', response.body.data.id);
 client.log('LBS ID: ' + response.body.data.id);
 %}
 
@@ -109,7 +109,7 @@ Content-Type: application/json
   "name": "Test",
   "availability_zone_id": "{{availability_zone_id}}",
   "vpc_id": "{{vpc_id}}",
-  "lbs_id": "{{lbs_id}}",
+  "load_balancer_spec_id": "{{load_balancer_spec_id}}",
   "nodes": 3
 }
 

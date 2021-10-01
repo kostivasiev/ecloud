@@ -47,7 +47,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'My Load Balancer Cluster',
-            'lbs_id' => $this->lbs->id,
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->faker->uuid(),
             'availability_zone_id' => $this->availabilityZone->id
         ];
@@ -73,7 +73,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'My Load Balancer Cluster',
-            'lbs_id' => $this->lbs->id,
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->faker->uuid(),
             'availability_zone_id' => $this->faker->uuid()
         ];
@@ -99,7 +99,7 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'My Load Balancer Cluster',
-            'lbs_id' => $this->lbs->id,
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->faker->uuid()
         ];
@@ -137,7 +137,7 @@ class CreateTest extends TestCase
 
         $data = [
             'name' => 'My Load Balancer Cluster',
-            'lbs_id' => $this->lbs->id,
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->availabilityZone->id
         ];
@@ -161,7 +161,7 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'My Load Balancer Cluster',
             'vpc_id' => $this->vpc->id,
-            'lbs_id' => $this->lbs->id,
+            'load_balancer_spec_id' => $this->lbs->id,
             'availability_zone_id' => $this->availabilityZone->id
         ];
         $this->post(
