@@ -297,11 +297,11 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Load balancer clusters */
     $router->group([], function () use ($router) {
-        $router->get('lbcs', 'LoadBalancerClusterController@index');
-        $router->get('lbcs/{lbcId}', 'LoadBalancerClusterController@show');
-        $router->post('lbcs', 'LoadBalancerClusterController@store');
-        $router->patch('lbcs/{lbcId}', 'LoadBalancerClusterController@update');
-        $router->delete('lbcs/{lbcId}', 'LoadBalancerClusterController@destroy');
+        $router->get('load-balancers', 'LoadBalancerClusterController@index');
+        $router->get('load-balancers/{lbcId}', 'LoadBalancerClusterController@show');
+        $router->post('load-balancers', 'LoadBalancerClusterController@store');
+        $router->patch('load-balancers/{lbcId}', 'LoadBalancerClusterController@update');
+        $router->delete('load-balancers/{lbcId}', 'LoadBalancerClusterController@destroy');
     });
 
     /** Load balancer specifications */

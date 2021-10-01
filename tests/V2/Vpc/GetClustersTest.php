@@ -43,7 +43,7 @@ class GetClustersTest extends TestCase
                 'id'     => $this->lbc->id,
                 'name'   => $this->lbc->name,
                 'vpc_id' => $this->lbc->vpc_id,
-                'nodes'  => $this->lbc->nodes,
+                'load_balancer_spec_id' => $this->lbc->load_balancer_spec_id,
             ])
             ->assertResponseStatus(200);
     }
