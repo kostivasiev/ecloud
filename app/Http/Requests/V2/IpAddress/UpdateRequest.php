@@ -25,8 +25,7 @@ class UpdateRequest extends FormRequest
             'ip_address' => [
                 'sometimes',
                 'required',
-                'ip',
-                'unique:ecloud.ip_addresses,ip_address,NULL,id,deleted_at,NULL'
+                'ip'
             ],
             'type' => [
                 'sometimes',
