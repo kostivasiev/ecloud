@@ -348,7 +348,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('nics/{nicId}/tasks', 'NicController@tasks');
         $router->get('nics/{nicId}/ip-addresses', 'NicController@ipAddresses');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            //$router->post('nics', 'NicController@create');
+            $router->post('nics', 'NicController@create');
             $router->patch('nics/{nicId}', 'NicController@update');
             $router->delete('nics/{nicId}', 'NicController@destroy');
         });

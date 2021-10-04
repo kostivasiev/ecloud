@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AwaitIPAdressAllocationTest extends TestCase
@@ -64,7 +63,6 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nic = factory(Nic::class)->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '',
             ]);
             $this->nat = app()->make(Nat::class);
             $this->nat->id = 'nat-test';

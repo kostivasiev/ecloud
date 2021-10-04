@@ -3,57 +3,37 @@
 namespace Tests\V2\Nic;
 
 use App\Models\V2\IpAddress;
-use App\Models\V2\Nic;
-use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class GetTest extends TestCase
 {
     protected \Faker\Generator $faker;
-    protected $mac_address;
-    protected $ip_address;
-    protected $nic;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-        $this->ip_address = $this->faker->ipv4;
-        $this->mac_address = $this->faker->macAddress;
-
-        Nic::withoutEvents(function() {
-            $this->nic = factory(Nic::class)->create([
-                'id' => 'nic-test',
-                'mac_address' => $this->mac_address,
-                'instance_id' => $this->instance()->id,
-                'network_id' => $this->network()->id,
-                'ip_address' => $this->ip_address,
-            ]);
-        });
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
     }
 
     public function testGetCollection()
     {
+        $this->nic();
         $this->get('/v2/nics')
             ->seeJson([
-            'mac_address' => $this->mac_address,
+            'mac_address' => $this->nic()->mac_address,
             'instance_id' => $this->instance()->id,
             'network_id' => $this->network()->id,
-            'ip_address' => $this->ip_address,
         ])->assertResponseStatus(200);
     }
 
     public function testGetResource()
     {
-        $this->get('/v2/nics/' . $this->nic->id)
+        $this->get('/v2/nics/' . $this->nic()->id)
             ->seeJson([
-            'mac_address' => $this->mac_address,
+            'mac_address' => $this->nic()->mac_address,
             'instance_id' => $this->instance()->id,
             'network_id' => $this->network()->id,
-            'ip_address' => $this->ip_address,
         ])->assertResponseStatus(200);
     }
 
@@ -61,9 +41,9 @@ class GetTest extends TestCase
     {
         $ipAddress = IpAddress::factory()->create();
 
-        $this->nic->ipAddresses()->sync($ipAddress);
+        $this->nic()->ipAddresses()->sync($ipAddress);
 
-        $this->get('/v2/nics/' . $this->nic->id . '/ip-addresses')
+        $this->get('/v2/nics/' . $this->nic()->id . '/ip-addresses')
             ->seeJson(
                 [
                     'id' => $ipAddress->id,
