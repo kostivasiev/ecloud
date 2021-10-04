@@ -20,7 +20,7 @@ class DeleteTest extends TestCase
         parent::setUp();
     }
 
-    public function testTaskCompletedAndVpcDeleted()
+    public function testJobsBatched()
     {
         Model::withoutEvents(function() {
             $this->task = new Task([
@@ -34,7 +34,9 @@ class DeleteTest extends TestCase
         $job = new Delete($this->task);
         $job->handle();
 
-        $this->assertEquals(Sync::STATUS_COMPLETE, $this->task->status);
-        $this->assertTrue($this->vpc()->trashed());
+
+        Bus::assertBatched(function (PendingBatch $batch) {
+            return $batch->jobs->count() > 0;
+        });
     }
 }
