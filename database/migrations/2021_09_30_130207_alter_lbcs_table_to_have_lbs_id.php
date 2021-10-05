@@ -14,7 +14,7 @@ class AlterLbcsTableToHaveLbsId extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('lbcs', function (Blueprint $table) {
-            $table->uuid('load_balancer_spec_id');
+            $table->uuid('load_balancer_spec_id')->nullable();
         });
     }
 
