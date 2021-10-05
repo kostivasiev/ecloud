@@ -35,8 +35,7 @@ class AwaitDhcpRemoval extends Job
                 }
             }
 
-            Log::warning($this->model->dhcps()->count() . ' DHCP(s) still attached, retrying in ' . $this->backoff . ' seconds',
-                ['id' => $this->model->id]);
+            Log::warning($this->model->dhcps()->count() . ' DHCP(s) still attached, retrying in ' . $this->backoff . ' seconds', ['id' => $this->model->id]);
 
             $this->release($this->backoff);
         }
