@@ -81,7 +81,7 @@ class AssociateIpTest extends TestCase
         )->assertResponseStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == 'associate_id';
+            return $event->model->name == 'associate_ip';
         });
     }
 }
