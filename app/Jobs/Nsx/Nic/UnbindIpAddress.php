@@ -9,7 +9,7 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class BindIpAddress extends Job
+class UnbindIpAddress extends Job
 {
     use Batchable, LoggableModelJob;
 
@@ -39,11 +39,13 @@ class BindIpAddress extends Job
         $network = $nic->network;
         $router = $nic->network->router;
         $nsxService = $router->availabilityZone->nsxService();
-
         $nic->refresh();
 
         $ipAddresses = $nic->ipAddresses->where('type', IpAddress::TYPE_CLUSTER);
-        $ipAddresses->push($this->ipAddress);
+
+        $ipAddresses = $ipAddresses->reject(function ($ipAddress) {
+            return $ipAddress->id == $this->ipAddress->id;
+        });
 
         $nsxService->patch(
             '/policy/api/v1/infra/tier-1s/' . $router->id .
@@ -62,8 +64,9 @@ class BindIpAddress extends Job
             ]
         );
 
-        $nic->ipAddresses()->save($this->ipAddress);
-        Log::info('Address binding created for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $this->ipAddress->ip_address);
+        $nic->ipAddresses()->detach($this->ipAddress);
+
+        Log::info('Address binding removed for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $this->ipAddress->ip_address);
 
         Log::info(get_class($this) . ' : Finished', ['id' => $nic->id]);
     }

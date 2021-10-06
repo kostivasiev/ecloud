@@ -105,7 +105,7 @@ class BindIpAddressTest extends TestCase
             'type' => 'cluster'
         ]);
 
-        $this->nsxServiceMock()->expects('put')
+        $this->nsxServiceMock()->expects('patch')
             ->withArgs([
                 '/policy/api/v1/infra/tier-1s/' . $this->router()->id .
                 '/segments/' . $this->network()->id .

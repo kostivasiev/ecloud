@@ -501,6 +501,7 @@ GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
 
-
 ###
-# /policy/api/v1/infra/tier-1s/<tier-1-id>/segments/<segment-id>/ports/<port-id>
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-097208b5/ports/test
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

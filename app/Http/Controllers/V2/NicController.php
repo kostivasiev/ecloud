@@ -112,4 +112,20 @@ class NicController extends BaseController
 
         return $this->responseTaskId($task->id);
     }
+
+    public function disassociateIpAddress(Request $request, string $nicId, string $ipAddressId)
+    {
+        $nic = Nic::forUser(Auth::user())->findOrFail($nicId);
+        $ipAddress = IpAddress::forUser(Auth::user())->findOrFail($ipAddressId);
+
+        $task = $nic->createTaskWithLock(
+            'disassociate_ip',
+            \App\Jobs\Tasks\Nic\DisassociateIp::class,
+            [
+                'ip_address_id' => $ipAddress->id
+            ]
+        );
+
+        return $this->responseTaskId($task->id);
+    }
 }
