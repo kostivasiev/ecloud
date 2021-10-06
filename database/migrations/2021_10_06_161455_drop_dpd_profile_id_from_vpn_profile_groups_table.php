@@ -13,9 +13,11 @@ class DropDpdProfileIdFromVpnProfileGroupsTable extends Migration
      */
     public function up()
     {
-        Schema::table('vpn_profile_groups', function (Blueprint $table) {
-            $table->dropColumn('dpd_profile_id');
-        });
+        if (Schema::hasColumn('vpn_profile_groups', 'dpd_profile_id')) {
+            Schema::table('vpn_profile_groups', function (Blueprint $table) {
+                $table->dropColumn('dpd_profile_id');
+            });
+        }
     }
 
     /**
