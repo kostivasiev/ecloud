@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Nic;
 
 use UKFast\FormRequests\FormRequest;
 
-class UpdateNicRequest extends FormRequest
+class UpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

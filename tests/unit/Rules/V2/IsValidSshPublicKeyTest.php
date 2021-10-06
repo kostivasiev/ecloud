@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Rules\V2;
-
+namespace Tests\unit\Rules\V2;
 
 use App\Rules\V2\IsValidSshPublicKey;
 use Tests\TestCase;

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateNicRequest;
+use App\Http\Requests\V2\Nic\AssociateIpRequest;
+use App\Http\Requests\V2\Nic\CreateRequest;
+use App\Http\Requests\V2\Nic\UpdateRequest;
 use App\Http\Requests\V2\UpdateNicRequest;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
@@ -34,7 +37,7 @@ class NicController extends BaseController
         );
     }
 
-    public function create(CreateNicRequest $request)
+    public function create(CreateRequest $request)
     {
         $nic = new Nic($request->only([
             'name',
@@ -48,7 +51,7 @@ class NicController extends BaseController
         return $this->responseIdMeta($request, $nic->id, 202, $task->id);
     }
 
-    public function update(UpdateNicRequest $request, string $nicId)
+    public function update(UpdateRequest $request, string $nicId)
     {
         $nic = Nic::forUser(Auth::user())->findOrFail($nicId);
         $nic->fill($request->only([
@@ -93,5 +96,20 @@ class NicController extends BaseController
         return IpAddressResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
+    }
+
+    public function associateIpAddress(AssociateIpRequest $request, string $nicId)
+    {
+        $nic = Nic::forUser(Auth::user())->findOrFail($nicId);
+
+        $task = $nic->createTaskWithLock(
+            'associate_ip',
+            \App\Jobs\Tasks\Nic\AssociateIp::class,
+            [
+                'ip_address_id' => $request->input('ip_address_id')
+            ]
+        );
+
+        return $this->responseTaskId($task->id);
     }
 }

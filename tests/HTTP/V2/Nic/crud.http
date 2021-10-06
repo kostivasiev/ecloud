@@ -82,7 +82,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/nics/{{nic_id}}/ip-addresses
+GET https://{{host}}/{{version}}/nics/nic-634550d4-dev/ip-addresses
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

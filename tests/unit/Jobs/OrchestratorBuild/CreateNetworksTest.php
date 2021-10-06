@@ -59,7 +59,7 @@ class CreateNetworksTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->orchestratorBuild->updateState('networks', 0, 'net-abcdef12');
+        $this->orchestratorBuild->updateState('networks', 0, 'net-test');
 
         dispatch(new CreateNetworks($this->orchestratorBuild));
 

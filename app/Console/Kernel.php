@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\IpAddress\PopulateNetworkId;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
@@ -36,6 +37,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Nat\FindOrphaned::class,
         \App\Console\Commands\Health\FindOrphanedNics::class,
         \App\Console\Commands\Task\TimeoutStuck::class,
+        \App\Console\Commands\IpAddress\PopulateNetworkId::class
     ];
 
     /**

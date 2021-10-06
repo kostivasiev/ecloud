@@ -34,11 +34,16 @@ patch:
                   required : false
                 type :
                   required : false
+                network_id :
+                  type : string
+                  required : false
+                  example : 'net-abc123'
+                  readOnly : true
   responses:
     200:
       $ref: 'responses/idResponse.yaml'
   tags:
-    - Ip Addresses
+    - IP Addresses
 delete:
   parameters:
     - $ref: 'parameters/id.yaml'

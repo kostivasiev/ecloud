@@ -82,6 +82,7 @@ class CreateDHCPLeaseTest extends TestCase
         $ipAddress = IpAddress::factory()->create([
             'ip_address' => '10.0.0.4',
         ]);
+        $ipAddress->network()->associate($this->network());
 
         $nic->ipAddresses()->save($ipAddress);
 
@@ -135,6 +136,7 @@ class CreateDHCPLeaseTest extends TestCase
         $ipAddress = IpAddress::factory()->create([
             'ip_address' => '10.0.0.4',
         ]);
+        $ipAddress->network()->associate($network);
 
         $nic->ipAddresses()->save($ipAddress);
 
@@ -179,7 +181,7 @@ class CreateDHCPLeaseTest extends TestCase
             'network_id' => $network->id,
         ]);
 
-        $this->expectExceptionMessage("Assigning IP to NIC $nic->id: Insufficient available IP's in subnet");
+        $this->expectExceptionMessage("Insufficient available IP's in subnet on network $network->id");
 
         Event::fake([JobFailed::class]);
 

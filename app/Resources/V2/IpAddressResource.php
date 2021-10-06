@@ -27,6 +27,7 @@ class IpAddressResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'ip_address' => $this->ip_address,
+            'network_id' => $this->network_id,
             'type' => $this->type,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,

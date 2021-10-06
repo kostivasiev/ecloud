@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AlterLbcsTableToHaveLbsId extends Migration
+class AddNetworkIdToIpAddressesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AlterLbcsTableToHaveLbsId extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->table('lbcs', function (Blueprint $table) {
-            $table->uuid('load_balancer_spec_id')->nullable();
+        Schema::connection('ecloud')->table('ip_addresses', function (Blueprint $table) {
+            $table->uuid('network_id')->nullable()->after('ip_address');
         });
     }
 
@@ -25,8 +25,8 @@ class AlterLbcsTableToHaveLbsId extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->table('lbcs', function (Blueprint $table) {
-            $table->dropColumn('load_balancer_spec_id');
+        Schema::connection('ecloud')->table('ip_addresses', function (Blueprint $table) {
+            $table->dropColumn(['network_id']);
         });
     }
 }

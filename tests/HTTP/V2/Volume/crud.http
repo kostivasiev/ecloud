@@ -23,10 +23,10 @@ client.log('Volume ID: ' + response.body.data.id);
 %}
 
 ### index
-GET https://{{host}}/{{version}}/volumes/vol-23eefedd
+GET https://{{host}}/{{version}}/volumes/vol-41c8f968-dev
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
