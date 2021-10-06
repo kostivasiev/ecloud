@@ -35,8 +35,7 @@ class VpnProfileGroup extends Model implements Filterable, Sortable, Availabilit
             'description',
             'availability_zone_id',
             'ike_profile_id',
-            'ipsec_profile_id',
-            'dpd_profile_id',
+            'ipsec_profile_id'
         ];
         parent::__construct($attributes);
     }
@@ -81,7 +80,6 @@ class VpnProfileGroup extends Model implements Filterable, Sortable, Availabilit
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('ike_profile_id', Filter::$stringDefaults),
             $factory->create('ipsec_profile_id', Filter::$stringDefaults),
-            $factory->create('dpd_profile_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -101,7 +99,6 @@ class VpnProfileGroup extends Model implements Filterable, Sortable, Availabilit
             $factory->create('availability_zone_id'),
             $factory->create('ike_profile_id'),
             $factory->create('ipsec_profile_id'),
-            $factory->create('dpd_profile_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -130,7 +127,6 @@ class VpnProfileGroup extends Model implements Filterable, Sortable, Availabilit
             'availability_zone_id' => 'availability_zone_id',
             'ike_profile_id' => 'ike_profile_id',
             'ipsec_profile_id' => 'ipsec_profile_id',
-            'dpd_profile_id' => 'dpd_profile_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

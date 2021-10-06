@@ -17,8 +17,7 @@ class GetTest extends TestCase
             'description' => 'VPN Profile Group Description',
             'availability_zone_id' => $this->availabilityZone()->id,
             'ike_profile_id' => 'ike-aaaaaaaa',
-            'ipsec_profile_id' => 'ipsec-aaaaaaaa',
-            'dpd_profile_id' => 'dpd-aaaaaaaa'
+            'ipsec_profile_id' => 'ipsec-aaaaaaaa'
         ]);
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
