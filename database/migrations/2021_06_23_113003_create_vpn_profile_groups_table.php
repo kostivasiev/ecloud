@@ -19,6 +19,7 @@ class CreateVpnProfileGroupsTable extends Migration
             $table->text('description');
             $table->uuid('ike_profile_id')->index();
             $table->uuid('ipsec_profile_id')->index();
+            $table->uuid('dpd_profile_id')->index();
             $table->timestamps();
             $table->softDeletes();
         });
