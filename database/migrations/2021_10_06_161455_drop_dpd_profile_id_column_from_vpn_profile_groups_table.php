@@ -25,7 +25,7 @@ class DropDpdProfileIdColumnFromVpnProfileGroupsTable extends Migration
      */
     public function down()
     {
-        Schema::table('vpn_profile_groups', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('vpn_profile_groups', function (Blueprint $table) {
             $table->uuid('dpd_profile_id')->index();
         });
     }
