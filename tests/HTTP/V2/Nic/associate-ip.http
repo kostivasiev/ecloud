@@ -93,7 +93,7 @@ client.log('IP Address ID: ' + response.body.data.id);
 POST https://{{host}}/{{version}}/nics/{{nic_id}}/ip-addresses
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -111,7 +111,7 @@ client.test('Create', function () {
 GET https://{{host}}/{{version}}/nics/{{nic_id}}/ip-addresses
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -123,10 +123,10 @@ client.test("Request executed successfully", function() {
 %}
 
 ### Dissassociate the IP
-DELETE https://{{host}}/{{version}}/nics/{{nic_id}}/ip-addresses/{{ip_address_id}}
+DELETE https://{{host}}/{{version}}/nics/{{nic_id}}/ip-addresses/ip-dd7f0cbf-dev
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -135,7 +135,7 @@ Content-Type: application/json
 GET https://{{host}}/{{version}}/nics/{{nic_id}}/ip-addresses
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -155,7 +155,7 @@ client.test("Request executed successfully", function() {
 DELETE https://{{host}}/{{version}}/nics/{{nic_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 
 ### observe that the RemoveIpAddressBindings job runs
@@ -163,7 +163,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 
 ###
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
-X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-custom-id:  {{dev_reseller_id_admin}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 

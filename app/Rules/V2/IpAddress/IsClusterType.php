@@ -9,7 +9,12 @@ class IsClusterType implements Rule
 {
     public function passes($attribute, $value)
     {
-        return (IpAddress::find($value))->type == IpAddress::TYPE_CLUSTER;
+        $ipAddress = IpAddress::find($value);
+        if (!$ipAddress) {
+            return false;
+        }
+
+        return $ipAddress->type == IpAddress::TYPE_CLUSTER;
     }
 
     /**

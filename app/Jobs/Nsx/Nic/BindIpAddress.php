@@ -52,7 +52,7 @@ class BindIpAddress extends Job
             [
                 'json' => [
                     'resource_type' => 'SegmentPort',
-                    'address_bindings' =>  $ipAddresses->map(function ($ipAddress) use ($nic) {
+                    'address_bindings' =>  $ipAddresses->values()->map(function ($ipAddress) use ($nic) {
                         return [
                             'ip_address' => $ipAddress->ip_address,
                             'mac_address' => $nic->mac_address
