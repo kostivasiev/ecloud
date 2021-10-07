@@ -2,6 +2,7 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\Instance;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -38,6 +39,26 @@ class GetTest extends TestCase
                 'platform' => 'Linux',
             ])
             ->assertResponseStatus(200);
+    }
+
+    public function testCantSeeHiddenResource()
+    {
+        $hidden = factory(Instance::class)->create([
+            'is_hidden' => true
+        ]);
+
+        $this->get(
+            '/v2/instances/' . $hidden->id,
+            [
+                'X-consumer-custom-id' => '7052-1',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Not found',
+                'detail' => 'No Instance with that ID was found',
+            ])
+            ->assertResponseStatus(404);
     }
 
     public function testGetResource()
