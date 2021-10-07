@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class DropDpdProfileIdFromVpnProfileGroupsTable extends Migration
+class DropDpdProfileIdColumnFromVpnProfileGroupsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,9 @@ class DropDpdProfileIdFromVpnProfileGroupsTable extends Migration
      */
     public function up()
     {
-        if (Schema::hasColumn('vpn_profile_groups', 'dpd_profile_id')) {
-            Schema::table('vpn_profile_groups', function (Blueprint $table) {
-                $table->dropColumn('dpd_profile_id');
-            });
-        }
+        Schema::connection('ecloud')->table('vpn_profile_groups', function (Blueprint $table) {
+            $table->dropColumn('dpd_profile_id');
+        });
     }
 
     /**
