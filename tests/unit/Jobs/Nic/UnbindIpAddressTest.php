@@ -29,7 +29,7 @@ class UnbindIpAddressTest extends TestCase
 
         $this->assertEquals(2, $this->nic()->ipAddresses()->count());
 
-        $this->nsxServiceMock()->expects('put')
+        $this->nsxServiceMock()->expects('patch')
             ->withArgs([
                 '/policy/api/v1/infra/tier-1s/' . $this->router()->id .
                 '/segments/' . $this->network()->id .
