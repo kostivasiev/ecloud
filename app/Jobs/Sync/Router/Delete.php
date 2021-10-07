@@ -29,8 +29,6 @@ class Delete extends Job
     {
         $this->deleteTaskBatch([
             [
-                new DeleteDhcp($this->task, $this->task->resource),
-                new AwaitTasks($this->task, DeleteDhcp::TASK_WAIT_DATA_KEY),
                 new DeleteFirewallPolicies($this->task->resource),
                 new AwaitFirewallPolicyRemoval($this->task->resource),
                 new UndeployRouterLocale($this->task->resource),
