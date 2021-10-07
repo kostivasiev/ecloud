@@ -23,7 +23,7 @@ class IsInSubnet implements Rule
             return false;
         }
 
-        $subnet = Subnet::fromString($this->network ->subnet);
+        $subnet = Subnet::fromString($this->network->subnet);
 
         return $address->matches($subnet);
     }
