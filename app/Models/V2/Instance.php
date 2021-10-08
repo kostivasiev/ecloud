@@ -117,11 +117,9 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         if (!$user->isScoped()) {
             return $query;
         }
-        if (!$user->isAdmin()) {
-            return $query->where('is_hidden', false);
-        }
+
         return $query->whereHas('vpc', function ($query) use ($user) {
-            $query->where('reseller_id', $user->resellerId());
+            $query->where('is_hidden', false)->where('reseller_id', $user->resellerId());
         });
     }
 
