@@ -4,6 +4,7 @@ namespace Tests\V2\LoadBalancerCluster;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\LoadBalancerSpecification;
 use App\Models\V2\Region;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
@@ -18,6 +19,7 @@ class CreateTest extends TestCase
     protected $faker;
     protected $region;
     protected $vpc;
+    protected $lbs;
     protected $availabilityZone;
 
     public function setUp(): void
@@ -26,6 +28,7 @@ class CreateTest extends TestCase
         $this->faker = Faker::create();
 
         $this->region = factory(Region::class)->create();
+        $this->lbs = factory(LoadBalancerSpecification::class)->create();
 
         $this->vpc = Vpc::withoutEvents(function () {
             return factory(Vpc::class)->create([
@@ -44,12 +47,13 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'My Load Balancer Cluster',
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->faker->uuid(),
             'availability_zone_id' => $this->availabilityZone->id
         ];
 
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -69,12 +73,13 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'My Load Balancer Cluster',
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->faker->uuid(),
             'availability_zone_id' => $this->faker->uuid()
         ];
 
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -94,12 +99,13 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'My Load Balancer Cluster',
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->faker->uuid()
         ];
 
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '2-0',
@@ -131,11 +137,12 @@ class CreateTest extends TestCase
 
         $data = [
             'name' => 'My Load Balancer Cluster',
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->availabilityZone->id
         ];
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -154,10 +161,11 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'My Load Balancer Cluster',
             'vpc_id' => $this->vpc->id,
+            'load_balancer_spec_id' => $this->lbs->id,
             'availability_zone_id' => $this->availabilityZone->id
         ];
         $this->post(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -170,5 +178,4 @@ class CreateTest extends TestCase
         $resource = LoadBalancerCluster::find($resourceId);
         $this->assertNotNull($resource);
     }
-
 }

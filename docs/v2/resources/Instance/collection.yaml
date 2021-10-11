@@ -40,7 +40,11 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../components/schemas/instance.yaml'
+          allOf:
+          - $ref: '../../components/schemas/instance.yaml'
+          - properties:
+              volume_group_id:
+                readOnly: true
   responses:
     202:
       description: Accepted

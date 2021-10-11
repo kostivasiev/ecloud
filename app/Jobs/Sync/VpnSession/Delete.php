@@ -5,6 +5,7 @@ namespace App\Jobs\Sync\VpnSession;
 use App\Jobs\Job;
 use App\Jobs\Nsx\VpnSession\Undeploy;
 use App\Jobs\Nsx\VpnSession\UndeployCheck;
+use App\Jobs\Tasks\AwaitTasks;
 use App\Jobs\VpnSession\AwaitSyncNetworkNoSNatsTasks;
 use App\Jobs\VpnSession\DeletePreSharedKey;
 use App\Jobs\VpnSession\RemoveNetworks;
@@ -32,7 +33,7 @@ class Delete extends Job
                 new UndeployCheck($this->task->resource),
                 new RemoveNetworks($this->task->resource),
                 new SyncNetworkNoSNats($this->task, $this->task->resource),
-                new AwaitSyncNetworkNoSNatsTasks($this->task, $this->task->resource),
+                new AwaitTasks($this->task, SyncNetworkNoSNats::TASK_WAIT_DATA_KEY),
                 new DeletePreSharedKey($this->task->resource)
             ]
         ])->dispatch();

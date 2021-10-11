@@ -3,6 +3,7 @@
 namespace Tests\V2\LoadBalancerCluster;
 
 use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\LoadBalancerSpecification;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
@@ -10,22 +11,24 @@ use Tests\TestCase;
 class GetTest extends TestCase
 {
     protected $lbcs;
+    protected $lbs;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-
+        $this->lbs = factory(LoadBalancerSpecification::class)->create();
         $this->lbc = factory(LoadBalancerCluster::class)->create([
             'availability_zone_id' => $this->availabilityZone()->id,
-            'vpc_id' => $this->vpc()->id
+            'vpc_id' => $this->vpc()->id,
+            'load_balancer_spec_id' => $this->lbs->id
         ]);
     }
 
     public function testGetCollection()
     {
         $this->get(
-            '/v2/lbcs',
+            '/v2/load-balancers',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -35,7 +38,7 @@ class GetTest extends TestCase
                 'id' => $this->lbc->id,
                 'name' => $this->lbc->name,
                 'vpc_id' => $this->lbc->vpc_id,
-                'nodes' => $this->lbc->nodes,
+                'load_balancer_spec_id' => $this->lbc->load_balancer_spec_id,
             ])
             ->assertResponseStatus(200);
     }
@@ -43,7 +46,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get(
-            '/v2/lbcs/' . $this->lbc->id,
+            '/v2/load-balancers/' . $this->lbc->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
@@ -52,7 +55,8 @@ class GetTest extends TestCase
             ->seeJson([
                 'id' => $this->lbc->id,
                 'name' => $this->lbc->name,
-                'vpc_id' => $this->lbc->vpc_id
+                'vpc_id' => $this->lbc->vpc_id,
+                'load_balancer_spec_id' => $this->lbc->load_balancer_spec_id,
             ])
             ->assertResponseStatus(200);
     }

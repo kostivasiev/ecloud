@@ -476,3 +476,10 @@ Content-Type:  application/json
         }
     ]
 }
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-097208b5/dhcp-static-binding-configs/blah
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+

@@ -22,11 +22,7 @@ class Update extends Job
 
     public function handle()
     {
-        $this->updateTaskBatch([
-            [
-                new CreateDhcps($this->task->resource),
-                new AwaitDhcpSync($this->task->resource),
-            ],
-        ])->dispatch();
+        $this->task->completed = true;
+        $this->task->save();
     }
 }

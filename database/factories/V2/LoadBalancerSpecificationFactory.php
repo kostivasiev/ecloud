@@ -1,27 +1,12 @@
 <?php
-namespace Database\Factories\V2;
+
+/** @var \Illuminate\Database\Eloquent\Factory $factory */
 
 use App\Models\V2\LoadBalancerSpecification;
-use Illuminate\Database\Eloquent\Factories\Factory;
 
-class LoadBalancerSpecificationFactory extends Factory
-{
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
-    protected $model = LoadBalancerSpecification::class;
+$factory->define(LoadBalancerSpecification::class, function () {
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
-    {
         return [
-            'id' => 'lbs-0c03049b-dev',
             'name' => 'small',
             'description' => 'Description Test',
             'node_count' => 1,
@@ -31,5 +16,4 @@ class LoadBalancerSpecificationFactory extends Factory
             'iops' => 300,
             'image_id' => 'img-aaaaaaaa',
         ];
-    }
-}
+});

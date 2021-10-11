@@ -18,10 +18,13 @@ class DeleteDhcps extends Job
         $this->model = $vpc;
     }
 
+    /**
+     * @return bool
+     */
     public function handle()
     {
         $this->model->dhcps()->each(function ($dhcp) {
-            $dhcp->delete();
+            $dhcp->syncDelete();
         });
     }
 }

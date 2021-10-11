@@ -29,25 +29,6 @@ class CreateTest extends TestCase
             )->assertResponseStatus(201);
     }
 
-    public function testExistingIpAddressFails()
-    {
-        IpAddress::factory()->create();
-
-        $this->post(
-            '/v2/ip-addresses',
-            [
-                'name' => 'Test',
-                'ip_address' => '1.1.1.1',
-                'type' => 'normal',
-            ]
-        )->seeJson([
-            'title' => 'Validation Error',
-            'detail' => 'The ip address has already been taken',
-            'status' => 422,
-            'source' => 'ip_address'
-        ])->assertResponseStatus(422);
-    }
-
     public function testNotAdminUnauthorised()
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
