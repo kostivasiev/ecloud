@@ -15,6 +15,7 @@ use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\IsValidRamMultiple;
+use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -126,8 +127,16 @@ class CreateRequest extends FormRequest
                 'sometimes',
                 'string',
                 new ExistsForUser(SshKeyPair::class),
-            ],
+            ]
         ];
+        if (Auth::user()->isAdmin()) {
+            $rules['is_hidden'] = [
+                'sometimes',
+                'required',
+                'boolean'
+            ];
+        };
+
 
         $rules = array_merge($rules, $this->generateImageDataRules());
         return $rules;
