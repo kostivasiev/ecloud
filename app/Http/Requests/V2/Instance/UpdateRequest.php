@@ -83,7 +83,7 @@ class UpdateRequest extends FormRequest
             ],
         ];
 
-        if (Auth::user() && Auth::user()->isAdmin()) {
+        if (Auth::user()->isAdmin()) {
             $rules['is_hidden'] = ['sometimes', 'boolean'];
         }
 
