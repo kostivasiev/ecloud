@@ -44,6 +44,11 @@ class CreateFloatingIp extends Job
         }
         if (!$floatingIp) {
             $floatingIp = FloatingIp::findOrFail($this->task->data['floating_ip_id']);
+            if (empty($floatingIp->resource_id)) {
+                Log::info(get_class($this) . ' : Existing Floating IP ' . $floatingIp->id . ' assigned to VPN Endpoint ' . $vpnEndpoint->id);
+                $floatingIp->resource()->associate($vpnEndpoint);
+                $floatingIp->syncSave();
+            }
         }
 
         $this->awaitSyncableResources([
