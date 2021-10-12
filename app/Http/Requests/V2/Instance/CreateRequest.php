@@ -129,7 +129,8 @@ class CreateRequest extends FormRequest
                 new ExistsForUser(SshKeyPair::class),
             ]
         ];
-        if (Auth::user()->isAdmin()) {
+
+        if (Auth::user() && Auth::user()->isAdmin()) {
             $rules['is_hidden'] = [
                 'sometimes',
                 'required',

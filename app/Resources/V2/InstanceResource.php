@@ -7,6 +7,7 @@ use DateTimeZone;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Responses\UKFastResource;
 use Illuminate\Support\Facades\Log;
 
@@ -58,6 +59,10 @@ class InstanceResource extends UKFastResource
             $response['online'] = isset($kingpinData->powerState) ? $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON : null;
             $response['agent_running'] = isset($kingpinData->toolsRunningStatus) ? $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING : null;
         }
+        if (Auth::user()->isAdmin()) {
+            $response['is_hidden'] = $this->is_hidden;
+        }
+
         return $response;
     }
 }
