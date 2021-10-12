@@ -80,7 +80,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $instance = new Instance($request->only([
+        $only = [
             'name',
             'vpc_id',
             'image_id',
@@ -88,9 +88,12 @@ class InstanceController extends BaseController
             'ram_capacity',
             'locked',
             'backup_enabled',
-            'host_group_id',
-            'is_hidden',
-            ]));
+            'host_group_id'
+        ];
+        if ($this->isAdmin) {
+            $only[] = 'is_hidden';
+        }
+        $instance = new Instance($request->only($only));
 
         $image = Image::forUser(Auth::user())->findOrFail($request->input('image_id'));
         $network = Network::forUser(Auth::user())->findOrFail($request->input('network_id'));
@@ -120,14 +123,16 @@ class InstanceController extends BaseController
     public function update(UpdateRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
-
-        $instance->fill($request->only([
+        $only = [
             'name',
             'vcpu_cores',
             'ram_capacity',
-            'volume_group_id',
-            'is_hidden'
-        ]));
+            'volume_group_id'
+        ];
+        if ($this->isAdmin) {
+            $only[] = 'is_hidden';
+        }
+        $instance->fill($request->only($only));
 
         if ($request->has('backup_enabled') && $this->isAdmin) {
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
