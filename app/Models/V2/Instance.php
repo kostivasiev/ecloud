@@ -36,6 +36,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'ram_capacity',
         'availability_zone_id',
         'locked',
+        'is_hidden',
         'platform',
         'backup_enabled',
         'deployed',
@@ -116,8 +117,9 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         if (!$user->isScoped()) {
             return $query;
         }
+
         return $query->whereHas('vpc', function ($query) use ($user) {
-            $query->where('reseller_id', $user->resellerId());
+            $query->where('is_hidden', false)->where('reseller_id', $user->resellerId());
         });
     }
 
@@ -136,6 +138,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         return $this->hasMany(BillingMetric::class, 'resource_id', 'id');
     }
 
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
@@ -151,6 +154,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             $factory->create('ram_capacity', Filter::$stringDefaults),
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->boolean()->create('locked', '1', '0'),
+            $factory->boolean()->create('is_hidden', '1', '0'),
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup_enabled', Filter::$stringDefaults),
             $factory->create('host_group_id', Filter::$stringDefaults),

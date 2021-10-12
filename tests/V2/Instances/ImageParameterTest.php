@@ -6,6 +6,7 @@ use App\Models\V2\ImageParameter;
 use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\HttpFoundation\Request;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class ImageParameterTest extends TestCase
 {
@@ -14,6 +15,8 @@ class ImageParameterTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         $paramRules = [
             [
