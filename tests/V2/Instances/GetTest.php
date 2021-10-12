@@ -44,13 +44,14 @@ class GetTest extends TestCase
     public function testCantSeeHiddenResource()
     {
         $hidden = factory(Instance::class)->create([
-            'is_hidden' => true
+            'is_hidden' => true,
+            'vpc_id' => $this->vpc()->id,
         ]);
 
         $this->get(
             '/v2/instances/' . $hidden->id,
             [
-                'X-consumer-custom-id' => '7052-1',
+                'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
