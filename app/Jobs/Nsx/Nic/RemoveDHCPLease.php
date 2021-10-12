@@ -3,6 +3,7 @@
 namespace App\Jobs\Nsx\Nic;
 
 use App\Jobs\Job;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -22,17 +23,30 @@ class RemoveDHCPLease extends Job
     public function handle()
     {
         Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        $nic = $this->model;
 
         $nsxService = $this->model->instance->availabilityZone->nsxService();
 
-        //Delete dhcp lease for the ip to the nic's mac address on NSX
+        /**
+         * Delete dhcp lease for the ip to the nic's mac address on NSX
+         * See: https://network-man0.ecloud-service.ukfast.co.uk/policy/api_includes/method_DeleteSegmentDhcpStaticBinding.html
+         */
         $nsxService->delete(
-            '/policy/api/v1/infra/tier-1s/' . $this->model->network->router->id . '/segments/' . $this->model->network->id
-            . '/dhcp-static-binding-configs/' . $this->model->id
+            '/policy/api/v1/infra/tier-1s/' . $nic->network->router->id .
+            '/segments/' . $nic->network->id .
+            '/dhcp-static-binding-configs/' . $nic->id
         );
+        Log::info('DHCP static binding deleted for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
 
-        Log::info('DHCP static binding deleted for ' . $this->model->id . ' (' . $this->model->mac_address . ') with IP ' . $this->model->ip_address);
+        $nic->refresh();
+        $ipAddress = $nic->ipAddresses()->where('type', IpAddress::TYPE_NORMAL)->first();
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $this->model->id]);
+        if (!empty($ipAddress)) {
+            $nic->ipAddresses()->detach($ipAddress->id);
+            $ipAddress->delete();
+            Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') deleted from NIC ' . $nic->id . ' on network ' . $nic->network->id);
+        }
+
+        Log::info(get_class($this) . ' : Finished', ['id' => $nic->id]);
     }
 }

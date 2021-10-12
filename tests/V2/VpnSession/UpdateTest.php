@@ -8,6 +8,7 @@ use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
 use App\Models\V2\VpnSessionNetwork;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -112,6 +113,36 @@ class UpdateTest extends TestCase
             'detail' => 'The remote networks must contain a valid comma separated list of CIDR subnets',
         ])->seeJson([
             'detail' => 'The local networks must contain a valid comma separated list of CIDR subnets',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testUpdateWithMaxLocalNetworksFails()
+    {
+        Config::set('vpn-session.max_local_networks', 2);
+
+        $this->patch(
+            '/v2/vpn-sessions/' . $this->vpnSession->id,
+            [
+                'local_networks' => '10.0.0.1/32,10.0.0.2/32,10.0.0.3/32',
+            ]
+        )->seeJson([
+            'detail' => 'local networks must contain less than 2 comma-seperated items',
+            'source' => 'local_networks',
+        ])->assertResponseStatus(422);
+    }
+
+    public function testUpdateWithMaxRemoteNetworksFails()
+    {
+        Config::set('vpn-session.max_remote_networks', 2);
+
+        $this->patch(
+            '/v2/vpn-sessions/' . $this->vpnSession->id,
+            [
+                'remote_networks' => '172.12.23.11/32,72.12.23.12/32,72.12.23.13/32',
+            ]
+        )->seeJson([
+            'detail' => 'remote networks must contain less than 2 comma-seperated items',
+            'source' => 'remote_networks',
         ])->assertResponseStatus(422);
     }
 }

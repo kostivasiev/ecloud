@@ -41,7 +41,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/lbcs/' . $this->lbc->id,
+            '/v2/load-balancers/' . $this->lbc->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -66,7 +66,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/lbcs/' . $this->lbc->id,
+            '/v2/load-balancers/' . $this->lbc->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -91,7 +91,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/lbcs/' . $this->lbc->id,
+            '/v2/load-balancers/' . $this->lbc->id,
             $data,
             [
                 'X-consumer-custom-id' => '2-0',
@@ -127,7 +127,7 @@ class UpdateTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id
         ];
         $this->patch(
-            '/v2/lbcs/' . $this->lbc->id,
+            '/v2/load-balancers/' . $this->lbc->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -149,7 +149,7 @@ class UpdateTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id
         ];
         $this->patch(
-            '/v2/lbcs/' . $this->lbc->id,
+            '/v2/load-balancers/' . $this->lbc->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

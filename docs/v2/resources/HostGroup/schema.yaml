@@ -24,7 +24,7 @@ properties:
     example: hs-4c63cf58
     readOnly: false
   windows_enabled:
-    type: bolean
+    type: boolean
     required: false
     description : Determines whether the host group contains windows-enabled hosts, defaults to false.
     example: true

@@ -46,6 +46,7 @@ $app->configure('auth');
 $app->configure('host');
 $app->configure('billing');
 $app->configure('volume-group');
+$app->configure('vpn-session');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -112,6 +113,7 @@ $app->routeMiddleware([
     'floating-ip-can-be-unassigned' => \App\Http\Middleware\FloatingIp\CanBeUnassigned::class,
     'floating-ip-can-be-deleted' => \App\Http\Middleware\FloatingIp\CanBeDeleted::class,
     'volume-can-be-deleted' => \App\Http\Middleware\Volume\CanDelete::class,
+    'ip-address-can-delete' => \App\Http\Middleware\IpAddress\CanDelete::class,
 ]);
 
 /*

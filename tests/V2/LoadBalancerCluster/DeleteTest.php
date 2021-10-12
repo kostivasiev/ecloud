@@ -46,7 +46,7 @@ class DeleteTest extends TestCase
     public function testInvalidIdFails()
     {
         $this->delete(
-            '/v2/lbcs/' . $this->faker->uuid,
+            '/v2/load-balancers/' . $this->faker->uuid,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -64,7 +64,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/lbcs/' . $this->lbc->id,
+            '/v2/load-balancers/' . $this->lbc->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',

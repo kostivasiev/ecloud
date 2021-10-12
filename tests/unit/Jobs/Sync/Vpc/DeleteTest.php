@@ -34,6 +34,7 @@ class DeleteTest extends TestCase
         $job = new Delete($this->task);
         $job->handle();
 
+
         Bus::assertBatched(function (PendingBatch $batch) {
             return $batch->jobs->count() > 0;
         });

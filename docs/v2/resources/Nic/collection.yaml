@@ -34,16 +34,16 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/nics?page=2'
   tags:
     - Nics
-#post:
-#  requestBody:
-#    required: true
-#    content:
-#      application/json:
-#        schema:
-#          $ref: '../../components/schemas/nic.yaml'
-#  responses:
-#    202:
-#      description: Accepted
-#      $ref: '../../resources/Nic/responses/idResponse.yaml'
-#  tags:
-#    - Nics
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/nic.yaml'
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/Nic/responses/idResponse.yaml'
+  tags:
+    - Nics

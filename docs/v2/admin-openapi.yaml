@@ -37,8 +37,12 @@ components:
       $ref: 'resources/ImageMetadata/schema.yaml'
     ImageParameter:
       $ref: 'resources/ImageParameter/schema.yaml'
+    IpAddress :
+      $ref : 'resources/IpAddress/schema.yaml'
 #    LoadBalancerCluster:
 #      $ref: 'components/schemas/lbc.yaml'
+    LoadBalancerSpecifications:
+      $ref: 'components/schemas/admin/loadBalancerSpecifications.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
     Nics:
@@ -75,6 +79,7 @@ components:
 
   parameters:
     # Path Parameters
+    # DEPRECATED - don't add these directly in this file any more.
     DhcpId:
       $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
     DiscountPlanId:
@@ -87,6 +92,8 @@ components:
       $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
     InstanceId:
       $ref: 'resources/Instance/parameters/instanceId.yaml'
+    LoadBalancerSpecificationId:
+      $ref: 'resources/LoadBalancerSpecification/parameters/loadBalancerSpecificationId.yaml'
     NetworkId:
       $ref: 'resources/Network/parameters/networkId.yaml'
     RegionId:
@@ -113,6 +120,7 @@ components:
       $ref: 'components/parameters/page.yaml'
 
   responses:
+    # DEPRECATED - don't add these directly in this file any more.
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountIdResponse:
@@ -125,6 +133,8 @@ components:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
     InstanceIdResponse:
       $ref: 'resources/Instance/responses/idResponse.yaml'
+    LoadBalancerSpecificationResponse:
+      $ref: 'resources/LoadBalancerSpecification/responses/idResponse.yaml'
     NetworksIdResponse:
       $ref: 'resources/Network/responses/idResponse.yaml'
     RegionIdResponse:
@@ -204,10 +214,21 @@ paths:
     $ref: 'resources/Image/metadata-collection.yaml'
   '/ecloud/v2/images/{id}/parameters':
     $ref: 'resources/Image/parameters-collection.yaml'
-  #  '/ecloud/v2/lbcs':
+
+  '/ecloud/v2/ip-addresses' :
+    $ref : 'resources/IpAddress/admin-collection.yaml'
+  '/ecloud/v2/ip-addresses/{ipAddressId}' :
+    $ref : 'resources/IpAddress/admin-item.yaml'
+  '/ecloud/v2/ip-addresses/{ipAddressId}/nics' :
+    $ref : 'resources/IpAddress/nic-collection.yaml'
+  #  '/ecloud/v2/load-balancers':
   #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
-  #  '/ecloud/v2/lbcs/{lbcId}':
+  #  '/ecloud/v2/load-balancers/{lbcId}':
   #    $ref: 'resources/LoadBalancerCluster/item.yaml'
+  '/ecloud/v2/load-balancer-specs':
+    $ref: 'resources/LoadBalancerSpecification/admin-collection.yaml'
+  '/ecloud/v2/load-balancer-specs/{lbsId}':
+    $ref: 'resources/LoadBalancerSpecification/admin-item.yaml'
   '/ecloud/v2/nics':
     $ref: 'resources/Nic/collection.yaml'
   '/ecloud/v2/nics/{nicId}':

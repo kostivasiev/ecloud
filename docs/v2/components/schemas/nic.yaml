@@ -3,6 +3,10 @@ properties:
     type: string
     example: 'nic-2b66bb79'
     readOnly: true
+  name:
+    type: string
+    required: false
+    example: 'Nic 1'
   mac_address:
     type: string
     required: true
@@ -19,10 +23,11 @@ properties:
     example: 'net-2b66bb79'
     readOnly: false
   ip_address:
+    description: DHCP IP Address
     type: string
     required: false
     example: '10.0.0.5'
-    readOnly: false
+    readOnly: true
   sync:
     type: object
     readOnly: true

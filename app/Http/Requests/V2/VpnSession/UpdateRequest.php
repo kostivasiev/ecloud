@@ -2,6 +2,7 @@
 namespace App\Http\Requests\V2\VpnSession;
 
 use App\Models\V2\VpnProfileGroup;
+use App\Rules\V2\IsNotMaxCommaSeperatedItems;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\ValidCidrNetworkCsvString;
 use App\Rules\V2\ValidIpv4;
@@ -37,13 +38,15 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required_without:local_networks',
                 'string',
-                new ValidCidrNetworkCsvString()
+                new ValidCidrNetworkCsvString(),
+                new IsNotMaxCommaSeperatedItems(config('vpn-session.max_remote_networks'))
             ],
             'local_networks' => [
                 'sometimes',
                 'required_without:remote_networks',
                 'string',
-                new ValidCidrNetworkCsvString()
+                new ValidCidrNetworkCsvString(),
+                new IsNotMaxCommaSeperatedItems(config('vpn-session.max_local_networks'))
             ],
         ];
     }
