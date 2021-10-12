@@ -30,10 +30,13 @@ patch:
               properties:
                 mac_address:
                   required: false
+                  readOnly : true
                 instance_id:
                   required: false
+                  readOnly : true
                 network_id:
                   required: false
+                  readOnly : true
   responses:
     202:
       description: Accepted

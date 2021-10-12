@@ -7,6 +7,8 @@ use App\Jobs\Kingpin\Volume\CapacityChange;
 use App\Jobs\Kingpin\Volume\Deploy;
 use App\Jobs\Kingpin\Volume\IopsChange;
 use App\Jobs\Volume\AssignPort;
+use App\Jobs\Volume\AssignVolumeGroup;
+use App\Jobs\Volume\UnAssignVolumeGroup;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -32,6 +34,8 @@ class Update extends Job
                 new Deploy($volume),
                 new IopsChange($volume),
                 new CapacityChange($volume),
+                new AssignVolumeGroup($this->task),
+                new UnAssignVolumeGroup($this->task),
             ]
         ])->dispatch();
     }

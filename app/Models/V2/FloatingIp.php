@@ -30,7 +30,6 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         'name',
         'vpc_id',
         'availability_zone_id',
-        'deleted',
     ];
 
     protected $dispatchesEvents = [

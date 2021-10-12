@@ -5,6 +5,7 @@ use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsNotMaxCommaSeperatedItems;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\ValidCidrNetworkCsvString;
@@ -57,12 +58,14 @@ class CreateRequest extends FormRequest
             'remote_networks' => [
                 'required',
                 'string',
-                new ValidCidrNetworkCsvString()
+                new ValidCidrNetworkCsvString(),
+                new IsNotMaxCommaSeperatedItems(config('vpn-session.max_remote_networks'))
             ],
             'local_networks' => [
                 'required',
                 'string',
-                new ValidCidrNetworkCsvString()
+                new ValidCidrNetworkCsvString(),
+                new IsNotMaxCommaSeperatedItems(config('vpn-session.max_local_networks'))
             ],
         ];
     }
