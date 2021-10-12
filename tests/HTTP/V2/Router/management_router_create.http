@@ -102,6 +102,12 @@ client.test("Request executed successfully", function() {
 });
 %}
 
+### Get Firewall Policy
+GET https://{{host}}/{{version}}/firewall-policies/?router_id:eq={{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
 ### Delete Management Network
 DELETE https://{{host}}/{{version}}/networks/{{management_network_id}}
 Accept: */*
