@@ -3,6 +3,9 @@
 namespace App\Http\Requests\V2\IpAddress;
 
 use App\Models\V2\IpAddress;
+use App\Rules\V2\IpAddress\IsAvailable;
+use App\Rules\V2\IpAddress\IsInSubnet;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
@@ -15,6 +18,10 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
+        $ipAddress = IpAddress::forUser(Auth::user())
+            ->findOrFail(app('request')
+                ->route('ipAddressId'));
+
         return [
             'name' => [
                 'sometimes',
@@ -25,7 +32,10 @@ class UpdateRequest extends FormRequest
             'ip_address' => [
                 'sometimes',
                 'required',
-                'ip'
+                'ip',
+                new IsInSubnet($ipAddress->network->id),
+                'bail',
+                new IsAvailable($ipAddress->network->id),
             ],
             'type' => [
                 'sometimes',

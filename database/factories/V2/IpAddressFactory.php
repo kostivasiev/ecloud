@@ -2,6 +2,7 @@
 namespace Database\Factories\V2;
 
 use App\Models\V2\IpAddress;
+use App\Models\V2\Network;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class IpAddressFactory extends Factory
@@ -22,6 +23,8 @@ class IpAddressFactory extends Factory
     {
         return [
             'ip_address' => '1.1.1.1',
+             // Not yet supported until we convert other resources to the new laravel model format
+             //'network_id' => Network::where('id','net-test')->firstOr(fn() => Network::factory(['id' => 'net-test'])->create())->id,
             'type' => 'normal'
         ];
     }

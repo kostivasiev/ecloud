@@ -70,6 +70,11 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
         return $this->router->availabilityZone();
     }
 
+    public function ipAddresses()
+    {
+        return $this->hasMany(IpAddress::class);
+    }
+
     /**
      * @param $query
      * @param Consumer $user
@@ -88,6 +93,40 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
         return $query->whereHas('router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
+    }
+
+    public function getNextAvailableIp(array $denyList = [])
+    {
+        // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
+        $reserved = 3;
+        $iterator = 0;
+
+        $subnet = Subnet::fromString($this->subnet);
+        $ip = $subnet->getStartAddress(); //First reserved IP
+
+        while ($ip = $ip->getNextAddress()) {
+            $iterator++;
+            if ($iterator <= $reserved) {
+                continue;
+            }
+            if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
+                throw new \Exception('Insufficient available IP\'s in subnet on network ' . $this->id);
+            }
+
+            $checkIp = $ip->toString();
+
+            if (collect($denyList)->contains($checkIp)) {
+                Log::warning('IP address "' . $checkIp . '" is within the deny list, skipping');
+                continue;
+            }
+
+            if ($this->ipAddresses()->where('ip_address', $checkIp)->count() > 0) {
+                Log::debug('IP address "' . $checkIp . '" on network ' . $this->id .' in use');
+                continue;
+            }
+
+            return $checkIp;
+        }
     }
 
     /**

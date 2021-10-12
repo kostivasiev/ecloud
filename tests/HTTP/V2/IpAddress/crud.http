@@ -8,6 +8,7 @@ Content-Type: application/json
 {
     "name": "Test",
     "ip_address": "1.1.1.1",
+    "network_id": "{{dev_network_id}}",
     "type": "cluster"
 }
 
@@ -46,6 +47,7 @@ client.test('Get Item', function () {
     client.assert(response.status === 200, '200 response not received');
     client.assert(response.body.data.id === client.global.get('ip_address_id'), 'Invalid ID');
     client.assert(response.body.data.ip_address === '1.1.1.1', 'Invalid ip_address');
+    client.assert(response.body.data.network_id === 'net-aaaaaaaa', 'Invalid network_id');
     client.assert(response.body.data.type === 'cluster', 'Invalid type');
 });
 %}

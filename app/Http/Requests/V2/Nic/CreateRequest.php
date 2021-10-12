@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\Nic;
 
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
@@ -8,7 +8,7 @@ use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidMacAddress;
 use UKFast\FormRequests\FormRequest;
 
-class CreateNicRequest extends FormRequest
+class CreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

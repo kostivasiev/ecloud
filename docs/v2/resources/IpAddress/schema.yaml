@@ -13,6 +13,11 @@ properties:
     required: true
     example: '1.1.1.1'
     readOnly: false
+  network_id:
+    type: string
+    required: true
+    example: 'net-abc123'
+    readOnly: false
   type:
     type: string
     required: true

@@ -320,6 +320,8 @@ paths:
     $ref: 'resources/Nic/public_item.yaml'
   '/ecloud/v2/nics/{nicId}/ip-addresses' :
     $ref : 'resources/Nic/ip-address-collection.yaml'
+  /ecloud/v2/nics/{nicId}/ip-addresses/{ipAddressId}:
+    $ref : 'resources/Nic/ip-address-item.yaml'
   '/ecloud/v2/nics/{nicId}/tasks':
     $ref: 'resources/Nic/tasks-collection.yaml'
   '/ecloud/v2/regions':
