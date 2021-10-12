@@ -68,6 +68,7 @@ class UnAssignVolumeGroup extends Job
                 $task = $instance->createTask('volume_detach', VolumeDetach::class, ['volume_id' => $volume->id]);
                 $this->task->setAttribute('data', ['instance_detach_task_id' => $task->id]);
                 $this->awaitTaskWithRelease($task);
+                $volume->setAttribute('port', null)->saveQuietly();
             }
         });
     }
