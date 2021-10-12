@@ -21,7 +21,7 @@ class DeleteNics extends Job
     public function handle()
     {
         $this->model->nics()->each(function ($nic) {
-            $nic->delete();
+            $nic->syncDelete();
         });
     }
 }

@@ -24,9 +24,6 @@ class Delete extends Job
 
         $this->task->completed = true;
         $this->task->save();
-
-        $floatingIp->deleted = time();
-        $floatingIp->save();
         $floatingIp->delete();
     }
 }

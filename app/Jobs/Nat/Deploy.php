@@ -9,6 +9,7 @@ use App\Models\V2\RouterScopable;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
+use IPLib\Factory;
 
 class Deploy extends Job
 {
@@ -58,15 +59,18 @@ class Deploy extends Job
         }
 
         if (!empty($this->model->destination)) {
-            $json['destination_network'] = $this->model->destination->getIPAddress();
+            $destination = Factory::rangeFromString($this->model->destination->getIPAddress());
+            $json['destination_network'] = $destination->toString();
         }
 
         if (!empty($this->model->source)) {
-            $json['source_network'] = $this->model->source->getIPAddress();
+            $source = Factory::rangeFromString($this->model->source->getIPAddress());
+            $json['source_network'] = $source->toString();
         }
 
         if (!empty($this->model->translated)) {
-            $json['translated_network'] = $this->model->translated->getIPAddress();
+            $translated = Factory::rangeFromString($this->model->translated->getIPAddress());
+            $json['translated_network'] = $translated->toString();
         }
 
         $router->availabilityZone->nsxService()->patch(

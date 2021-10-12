@@ -44,6 +44,10 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
+    LoadBalancerSpecification:
+      $ref: 'resources/LoadBalancerSpecification/public_schema.yaml'
+    IpAddress :
+      $ref : 'resources/IpAddress/schema.yaml'
     #    LoadBalancerCluster:
     #      $ref: 'components/schemas/lbc.yaml'
     Meta:
@@ -88,6 +92,7 @@ components:
   #    Reference:
   #      $ref: 'resource/References/schema.yaml'
   parameters:
+    # DEPRECATED - don't add these directly in this file any more.
     # Path Parameters
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
@@ -97,6 +102,8 @@ components:
       $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+    LoadBalancerSpecificationId:
+      $ref: 'resources/LoadBalancerSpecification/parameters/loadBalancerSpecificationId.yaml'
     #    LbcId:
     #      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
     NetworkPolicyId:
@@ -130,6 +137,7 @@ components:
     Page:
       $ref: 'components/parameters/page.yaml'
   responses:
+    # DEPRECATED - don't add these directly in this file any more.
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
@@ -274,10 +282,14 @@ paths:
     $ref: 'resources/Instance/volume-attachdetach.yaml'
   '/ecloud/v2/instances/{instanceId}/volumes':
     $ref: 'resources/Instance/volumes.yaml'
-  #  '/ecloud/v2/lbcs':
+  #  '/ecloud/v2/load-balancers':
   #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
-  #  '/ecloud/v2/lbcs/{lbcId}':
+  #  '/ecloud/v2/load-balancers/{lbcId}':
   #    $ref: 'resources/LoadBalancerCluster/item.yaml'
+  '/ecloud/v2/load-balancer-specs':
+    $ref: 'resources/LoadBalancerSpecification/collection.yaml'
+  '/ecloud/v2/load-balancer-specs/{loadBalancerSpecificationId}':
+    $ref: 'resources/LoadBalancerSpecification/item.yaml'
   '/ecloud/v2/network-policies':
     $ref: 'resources/NetworkPolicy/collection.yaml'
   '/ecloud/v2/network-policies/{networkPolicyId}':
@@ -306,6 +318,8 @@ paths:
     $ref: 'resources/Nic/public_collection.yaml'
   '/ecloud/v2/nics/{nicId}':
     $ref: 'resources/Nic/public_item.yaml'
+  '/ecloud/v2/nics/{nicId}/ip-addresses' :
+    $ref : 'resources/Nic/ip-address-collection.yaml'
   '/ecloud/v2/nics/{nicId}/tasks':
     $ref: 'resources/Nic/tasks-collection.yaml'
   '/ecloud/v2/regions':

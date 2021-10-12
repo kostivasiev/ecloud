@@ -25,13 +25,13 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/lbcs?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancers?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/lbcs?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancers?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/lbcs?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancers?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/lbcs?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancers?page=2'
   tags:
     - Load Balancer Clusters
 post:

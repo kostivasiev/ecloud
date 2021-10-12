@@ -2,10 +2,6 @@
 
 namespace App\Http\Requests\V2;
 
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
-use App\Rules\V2\IsResourceAvailable;
-use App\Rules\V2\ValidMacAddress;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateNicRequest extends FormRequest
@@ -28,41 +24,12 @@ class UpdateNicRequest extends FormRequest
     protected function rules()
     {
         return [
-            'mac_address' => [
+            'name' => [
                 'sometimes',
                 'required',
                 'string',
-                new ValidMacAddress()
+                'max:255'
             ],
-            'instance_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.instances,id,deleted_at,NULL',
-                new IsResourceAvailable(Instance::class),
-            ],
-            'network_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.networks,id,deleted_at,NULL',
-                new IsResourceAvailable(Network::class),
-            ],
-            'ip_address' => ['sometimes', 'nullable', 'ip']
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'mac_address.required' => 'The :attribute field is required',
-            'mac_address.string' => 'The :attribute field must be a string',
-            'instance_id.required' => 'The :attribute field is required',
-            'instance_id.string' => 'The :attribute field must be a string',
-            'instance_id.exists' => 'The :attribute is not a valid Instance',
-            'network_id.required' => 'The :attribute field is required',
-            'network_id.string' => 'The :attribute field must be a string',
-            'network_id.exists' => 'The :attribute is not a valid Network',
         ];
     }
 }

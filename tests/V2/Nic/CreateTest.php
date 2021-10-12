@@ -2,9 +2,14 @@
 
 namespace Tests\V2\Nic;
 
+use App\Events\V2\Task\Created;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class CreateTest extends TestCase
 {
@@ -12,37 +17,115 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->macAddress = $this->faker->macAddress;
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
     }
 
     public function testValidDataSucceeds()
     {
-        $this->markTestSkipped('Skipped create NIC endpoint - CRUD endpoint does not deploy yet');
+        Event::fake([Created::class]);
 
         $macAddress = $this->faker->macAddress;
         $this->post(
             '/v2/nics',
             [
+                'name' => 'test-nic',
                 'mac_address' => $macAddress,
                 'instance_id' => $this->instance()->id,
                 'network_id' => $this->network()->id,
-                'ip_address'  => '10.0.0.5',
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
             ]
         )
             ->seeInDatabase(
                 'nics',
                 [
+                    'name' => 'test-nic',
                     'mac_address' => $macAddress,
                     'instance_id' => $this->instance()->id,
                     'network_id'  => $this->network()->id,
-                    'ip_address' => '10.0.0.5'
                 ],
                 'ecloud'
             )
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
+
+        Event::assertDispatched(Created::class);
+    }
+
+    public function testInvalidMacAddressFails()
+    {
+        $this->post('/v2/nics', [
+                'mac_address' => 'INVALID_MAC_ADDRESS',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'The mac address must be a valid MAC address',
+                'status' => 422,
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testInvalidInstanceIdFails()
+    {
+        $this->post('/v2/nics', [
+                'instance_id' => 'INVALID_INSTANCE_ID',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'The instance id is not a valid Instance',
+                'status' => 422,
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testInvalidNetworkIdFails()
+    {
+        $this->post('/v2/nics', [
+                'network_id' => 'INVALID_NETWORK_ID',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'The network id is not a valid Network',
+                'status' => 422,
+            ])
+            ->assertResponseStatus(422);
+    }
+
+    public function testFailedInstanceOrNetworkCausesFailure()
+    {
+        // Force failure
+        Model::withoutEvents(function () {
+            $model = new Task([
+                'id' => 'sync-test-1',
+                'failure_reason' => 'instance Failure',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $model->resource()->associate($this->instance());
+            $model->save();
+            $model = new Task([
+                'id' => 'sync-test-2',
+                'failure_reason' => 'network Failure',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $model->resource()->associate($this->network());
+            $model->save();
+        });
+
+        $this->post('/v2/nics', [
+                'mac_address' => $this->faker->macAddress,
+                'instance_id' => $this->instance()->id,
+                'network_id' => $this->network()->id,
+                'ip_address' => '10.0.0.6'
+            ])->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'The specified instance id resource is currently in a failed state and cannot be used',
+            ]
+        )->seeJson([
+                'title' => 'Validation Error',
+                'detail' => 'The specified network id resource is currently in a failed state and cannot be used',
+            ]
+        )->assertResponseStatus(422);
     }
 }

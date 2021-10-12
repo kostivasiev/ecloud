@@ -2,6 +2,7 @@
 
 namespace Tests\unit\Jobs\Instance\Undeploy;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Undeploy\DeleteNics;
 use App\Models\V2\Instance;
 use App\Models\V2\Nic;
@@ -42,27 +43,18 @@ class DeleteNicsTest extends TestCase
 
     public function testDeletesAttachedNics()
     {
-        Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
-                'id' => 'i-test',
-            ]);
-            $this->nic = $this->instance->nics()->create([
-                'id' => 'vol-test',
-                'mac_address' => 'aa:bb:cc:dd:ee:ff',
-                'network_id' => 'net-test',
-            ]);
-        });
+        $this->nic();
 
-        Event::fake();
+        Event::fake([Created::class, JobFailed::class, JobProcessed::class]);
 
-        dispatch(new DeleteNics($this->instance));
+        dispatch(new DeleteNics($this->instance()));
 
         Event::assertNotDispatched(JobFailed::class);
+
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
 
-        $this->nic->refresh();
-        $this->assertNotNull($this->nic->deleted_at);
+        Event::assertDispatched(Created::class);
     }
 }

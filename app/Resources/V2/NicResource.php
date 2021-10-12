@@ -26,6 +26,7 @@ class NicResource extends UKFastResource
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'mac_address' => $this->mac_address,
             'instance_id' => $this->instance_id,
             'network_id' => $this->network_id,

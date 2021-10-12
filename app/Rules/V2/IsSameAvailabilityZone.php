@@ -33,7 +33,7 @@ class IsSameAvailabilityZone implements Rule
             return false;
         }
 
-        $resource1 = $resourceClass::forUser(Auth::user())->findOrFail($this->resourceId);
+        $resource1 = $resourceClass::findOrFail($this->resourceId);
 
         if (!($resource1 instanceof AvailabilityZoneable)) {
             return true;
@@ -44,7 +44,7 @@ class IsSameAvailabilityZone implements Rule
             return false;
         }
 
-        $resource2 = $resource2Class::forUser(Auth::user())->findOrFail($value);
+        $resource2 = $resource2Class::findOrFail($value);
 
         if (!($resource2 instanceof AvailabilityZoneable)) {
             return true;

@@ -1,0 +1,14 @@
+properties:
+  id:
+    type: string
+    example: lbs-0c03049b
+    readOnly: true
+  name:
+    type: string
+    example: 'small'
+    readOnly: false
+  description:
+    type: string
+    example: 'Example description'
+    readOnly: false
+description: 'Load Balancer Specifications'

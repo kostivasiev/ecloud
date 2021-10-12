@@ -47,6 +47,8 @@ class AllocateIp extends Job
             $ipRanges = $ipRanges->merge($page->getItems());
         } while ($currentPage < $page->totalPages());
 
+        $ipRanges = $ipRanges->shuffle();
+
         foreach ($ipRanges as $ipRange) {
             Log::debug('Checking for available IP addresses in range ' . $ipRange->id, ['id' => $this->model->id]);
 
@@ -56,19 +58,28 @@ class AllocateIp extends Job
                 continue;
             }
 
-            $ip = $subnet->getStartAddress(); //First IP / Network address (is reserved)
-
             $lock = Cache::lock("floating_ip_address." . $ipRange->networkAddress, 60);
             try {
                 $lock->block(60);
 
-                while ($ip = $ip->getNextAddress()) {
-                    if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                        Log::warning('Insufficient available IPs in range ' . $ipRange->id, ['id' => $this->model->id]);
-                        continue 2;
+                $ipAddresses = collect();
+
+                $ip = $subnet->getStartAddress();
+
+                $start = true;
+                while ($start || $ip = $ip->getNextAddress()) {
+                    $start = false;
+                    if ($ip == null || !$subnet->contains($ip)) {
+                        break;
                     }
 
-                    $checkIp = $ip->toString();
+                    $ipAddresses->add($ip);
+                }
+
+                $ipAddresses = $ipAddresses->shuffle();
+
+                foreach ($ipAddresses as $ipAddress) {
+                    $checkIp = $ipAddress->toString();
 
                     //check no other FIPs have this IP address
                     if (FloatingIp::where('ip_address', $checkIp)
@@ -83,9 +94,11 @@ class AllocateIp extends Job
                     Log::info('Success. IP ' . $this->model->ip_address . ' was assigned.', ['id' => $this->model->id]);
 
                     dispatch(new UpdateFloatingIpCapacity($this->model->availabilityZone));
-
                     break 2;
                 }
+
+                Log::warning('Insufficient available IPs in range ' . $ipRange->id, ['id' => $this->model->id]);
+                continue;
             } finally {
                 $lock->release();
             }

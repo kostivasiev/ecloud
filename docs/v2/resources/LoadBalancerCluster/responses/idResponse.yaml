@@ -15,4 +15,4 @@ content:
           properties:
             location:
               type: string
-              example: 'https://api.ukfast.io/ecloud/v2/lbcs/lbc-6ui8gt89'
+              example: 'https://api.ukfast.io/ecloud/v2/load-balancers/lbc-6ui8gt89'

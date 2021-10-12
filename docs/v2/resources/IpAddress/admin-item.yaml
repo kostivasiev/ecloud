@@ -1,0 +1,50 @@
+get:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: 'schema.yaml'
+              meta:
+                type: object
+  tags:
+    - IP Addresses
+patch:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: 'schema.yaml'
+            - type : object
+              properties :
+                name :
+                  required : false
+                ip_address :
+                  required : false
+                type :
+                  required : false
+  responses:
+    200:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Ip Addresses
+delete:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - IP Addresses
+
