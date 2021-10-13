@@ -10,6 +10,7 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -107,6 +108,45 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
     public function getNetworksByType($type)
     {
         return $this->vpnSessionNetworks()->where('type', '=', $type);
+    }
+
+    public function getTunnelDetailsAttribute()
+    {
+        try {
+            $response = $this->availabilityZone->nsxService()->get('/policy/api/v1/infra/tier-1s/' . $this->vpnService->router->id . '/locale-services/' . $this->vpnService->router->id . '/ipsec-vpn-services/' . $this->vpnService->id . '/sessions/' . $this->id . '/statistics');
+            $responseData = json_decode($response->getBody()->getContents());
+
+            if (empty($responseData->results)) {
+                return null;
+            }
+
+            $result = (object)[
+                'session_state' => (isset($responseData->results[0]->ike_status->ike_session_state)) ? $responseData->results[0]->ike_status->ike_session_state : null,
+                'tunnel_statistics' => [],
+            ];
+
+            if (!isset($responseData->results[0]->policy_statistics[0]->tunnel_statistics)) {
+                return $result;
+            }
+
+            foreach ($responseData->results[0]->policy_statistics[0]->tunnel_statistics as $tunnelStatistic) {
+                $result->tunnel_statistics[] = (object)[
+                    'tunnel_status' => $tunnelStatistic->tunnel_status ?? null,
+                    'tunnel_down_reason' => $tunnelStatistic->tunnel_down_reason ?? null,
+                    'local_subnet' => $tunnelStatistic->local_subnet ?? null,
+                    'peer_subnet' => $tunnelStatistic->peer_subnet ?? null,
+                ];
+            }
+
+            return $result;
+        } catch (\Exception $exception) {
+            Log::warning('Failed to retrieve tunnel status from NSX', [
+                'vpn_session_id' => $this->id,
+                'message' => $exception->getMessage()
+            ]);
+        }
+
+        return null;
     }
 
     /**
