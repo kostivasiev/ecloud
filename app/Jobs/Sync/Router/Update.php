@@ -5,7 +5,8 @@ namespace App\Jobs\Sync\Router;
 use App\Jobs\Job;
 use App\Jobs\Network\CreateManagementNetwork;
 use App\Jobs\Router\AwaitDhcpSync;
-use App\Jobs\Router\CreateManagementPolicies;
+use App\Jobs\Router\CreateManagementFirewallPolicies;
+use App\Jobs\Router\CreateManagementNetworkPolicies;
 use App\Jobs\Router\CreateManagementRouter;
 use App\Jobs\Router\CreateDhcp;
 use App\Jobs\Router\Deploy;
@@ -32,7 +33,8 @@ class Update extends Job
             [
                 new CreateManagementRouter($this->task),
                 new CreateManagementNetwork($this->task),
-                new CreateManagementPolicies($this->task),
+                new CreateManagementFirewallPolicies($this->task),
+                new CreateManagementNetworkPolicies($this->task),
                 new Deploy($this->task->resource),
                 new DeployRouterLocale($this->task->resource),
                 new DeployRouterDefaultRule($this->task->resource),

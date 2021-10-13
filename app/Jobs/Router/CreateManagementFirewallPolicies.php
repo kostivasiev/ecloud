@@ -11,10 +11,9 @@ use App\Models\V2\Task;
 use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
-class CreateManagementPolicies extends Job
+class CreateManagementFirewallPolicies extends Job
 {
     use Batchable, LoggableModelJob, AwaitResources;
 
@@ -45,21 +44,21 @@ class CreateManagementPolicies extends Job
                 ]);
             }
             if ($managementNetwork) {
-                Log::info(get_class($this) . ' - Create Management Router Policy and Rules Start', [
+                Log::info(get_class($this) . ' - Create Firewall Policy and Rules Start', [
                     'router_id' => $managementRouter->id,
                     'network_id' => $managementNetwork->id,
                 ]);
 
                 $firewallPolicy = new FirewallPolicy([
-                    'name' => 'Management_Network_Policy_for_' . $router->id,
-                    'router_id' => $router->id,
+                    'name' => 'Management_Firewall_Policy_for_' . $managementRouter->id,
+                    'router_id' => $managementRouter->id,
                     'sequence' => 0,
                 ]);
                 $firewallPolicy->save();
 
                 // Allow inbound 4222
                 $firewallRule = new FirewallRule([
-                    'name' => 'Allow_Ed_on_Port_4222_inbound_' . $router->id,
+                    'name' => 'Allow_Ed_on_Port_4222_inbound_' . $managementRouter->id,
                     'sequence' => 10,
                     'firewall_policy_id' => $firewallPolicy->id,
                     'source' => 'ANY',
@@ -79,7 +78,7 @@ class CreateManagementPolicies extends Job
 
                 // Block all outbound
                 (new FirewallRule([
-                    'name' => 'Block_all_outbound_' . $router->id,
+                    'name' => 'Block_all_outbound_' . $managementRouter->id,
                     'sequence' => 10,
                     'firewall_policy_id' => $firewallPolicy->id,
                     'source' => 'ANY',
@@ -91,7 +90,7 @@ class CreateManagementPolicies extends Job
 
                 $firewallPolicy->save();
 
-                Log::info(get_class($this) . ' - Create Management Router Policy and Rules End', [
+                Log::info(get_class($this) . ' - Create Firewall Policy and Rules End', [
                     'router_id' => $managementRouter->id,
                     'network_id' => $managementNetwork->id,
                 ]);
