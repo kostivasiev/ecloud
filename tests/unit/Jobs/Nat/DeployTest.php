@@ -3,15 +3,12 @@
 namespace Tests\unit\Jobs\Nat;
 
 use App\Jobs\Nat\Deploy;
-use App\Models\V2\FloatingIp;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nat;
-use App\Models\V2\Nic;
 use App\Models\V2\VpnSessionNetwork;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\Mocks\Resources\VpnSessionMock;
 use Tests\TestCase;
 
@@ -19,35 +16,26 @@ class DeployTest extends TestCase
 {
     use VpnSessionMock;
 
-    protected Nat $nat;
-    protected FloatingIp $floatingIp;
-    protected Nic $nic;
+    public IpAddress $ipAddress;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->ipAddress = IpAddress::factory()->create([
+            'network_id' => $this->network()->id,
+            'ip_address' => '10.3.4.5'
+        ]);
     }
 
     public function testSourceNATExpectedRequest()
     {
-        Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
-                'id' => 'fip-test',
-                'ip_address' => '10.2.3.4',
-            ]);
-            $this->nic = factory(Nic::class)->create([
-                'id' => 'nic-test',
-                'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
-            ]);
-            $this->nat = app()->make(Nat::class);
-            $this->nat->id = 'nat-test';
-            $this->nat->source()->associate($this->nic);
-            $this->nat->translated()->associate($this->floatingIp);
-            $this->nat->action = NAT::ACTION_SNAT;
-            $this->nat->save();
-        });
-
+        $nat = app()->make(Nat::class);
+        $nat->id = 'nat-test';
+        $nat->source()->associate($this->ipAddress);
+        $nat->translated()->associate($this->floatingIp());
+        $nat->action = NAT::ACTION_SNAT;
+        $nat->save();
 
         $this->nsxServiceMock()->expects('patch')
             ->withArgs([
@@ -57,7 +45,7 @@ class DeployTest extends TestCase
                         "display_name" => "nat-test",
                         "description" => "nat-test",
                         "action" => "SNAT",
-                        "translated_network" => "10.2.3.4",
+                        "translated_network" => "1.1.1.1",
                         "enabled" => true,
                         "logging" => false,
                         "firewall_match" => "MATCH_EXTERNAL_ADDRESS",
@@ -71,31 +59,19 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->nat));
+        dispatch(new Deploy($nat));
 
         Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testDestinationNATExpectedRequest()
     {
-        Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
-                'id' => 'fip-test',
-                'ip_address' => '10.2.3.4',
-            ]);
-            $this->nic = factory(Nic::class)->create([
-                'id' => 'nic-test',
-                'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
-            ]);
-            $this->nat = app()->make(Nat::class);
-            $this->nat->id = 'nat-test';
-            $this->nat->destination()->associate($this->floatingIp);
-            $this->nat->translated()->associate($this->nic);
-            $this->nat->action = NAT::ACTION_DNAT;
-            $this->nat->save();
-        });
-
+        $nat = app()->make(Nat::class);
+        $nat->id = 'nat-test';
+        $nat->destination()->associate($this->floatingIp());
+        $nat->translated()->associate($this->ipAddress);
+        $nat->action = NAT::ACTION_DNAT;
+        $nat->save();
 
         $this->nsxServiceMock()->expects('patch')
             ->withArgs([
@@ -109,7 +85,7 @@ class DeployTest extends TestCase
                         "enabled" => true,
                         "logging" => false,
                         "firewall_match" => "MATCH_EXTERNAL_ADDRESS",
-                        "destination_network" => "10.2.3.4",
+                        "destination_network" => "1.1.1.1",
                     ]
                 ]
             ])
@@ -119,7 +95,7 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->nat));
+        dispatch(new Deploy($nat));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -143,7 +119,6 @@ class DeployTest extends TestCase
         $nat->destination()->associate($remoteNetwork1);
         $nat->action = NAT::ACTION_NOSNAT;
         $nat->save();
-
 
         $this->nsxServiceMock()->expects('patch')
             ->withArgs([
@@ -274,25 +249,13 @@ class DeployTest extends TestCase
 
     public function testNATSequenceNumberSetWhenSequenceSpecified()
     {
-        Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
-                'id' => 'fip-test',
-                'ip_address' => '10.2.3.4',
-            ]);
-            $this->nic = factory(Nic::class)->create([
-                'id' => 'nic-test',
-                'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
-            ]);
-            $this->nat = app()->make(Nat::class);
-            $this->nat->id = 'nat-test';
-            $this->nat->source()->associate($this->nic);
-            $this->nat->translated()->associate($this->floatingIp);
-            $this->nat->action = NAT::ACTION_SNAT;
-            $this->nat->sequence = 10;
-            $this->nat->save();
-        });
-
+        $nat = app()->make(Nat::class);
+        $nat->id = 'nat-test';
+        $nat->source()->associate($this->ipAddress);
+        $nat->translated()->associate($this->floatingIp());
+        $nat->action = NAT::ACTION_SNAT;
+        $nat->sequence = 10;
+        $nat->save();
 
         $this->nsxServiceMock()->expects('patch')
             ->withArgs([
@@ -302,7 +265,7 @@ class DeployTest extends TestCase
                         "display_name" => "nat-test",
                         "description" => "nat-test",
                         "action" => "SNAT",
-                        "translated_network" => "10.2.3.4",
+                        "translated_network" => "1.1.1.1",
                         "enabled" => true,
                         "logging" => false,
                         "sequence_number" => 10,
@@ -317,58 +280,43 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->nat));
+        dispatch(new Deploy($nat));
 
         Event::assertNotDispatched(JobFailed::class);
     }
 
-    public function testNatNoSourceOrDestinationNicFails()
+    public function testNatNoSourceOrDestinationNatableFails()
     {
-        Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
-                'id' => 'fip-test',
-            ]);
-            $this->nat = app()->make(Nat::class);
-            $this->nat->id = 'nat-test';
-            $this->nat->translated()->associate($this->floatingIp);
-            $this->nat->action = NAT::ACTION_SNAT;
-            $this->nat->save();
-        });
+        $nat = app()->make(Nat::class);
+        $nat->id = 'nat-test';
+        $nat->translated()->associate($this->floatingIp());
+        $nat->action = NAT::ACTION_SNAT;
+        $nat->save();
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->nat));
+        dispatch(new Deploy($nat));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
             return $event->exception->getMessage() == 'Could not find router scopable resource for source, destination or translated';
         });
     }
 
-    public function testNatNoNicRouterFails()
+    public function testNatNoRouterFails()
     {
-        Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
-                'id' => 'fip-test',
-            ]);
+        $this->network()->router_id = '';
+        $this->network()->save();
 
-            $this->network()->router_id = '';
-            $this->network()->save();
-            $this->nic = factory(Nic::class)->create([
-                'id' => 'nic-test',
-                'network_id' => $this->network()->id,
-            ]);
-
-            $this->nat = app()->make(Nat::class);
-            $this->nat->id = 'nat-test';
-            $this->nat->source()->associate($this->nic);
-            $this->nat->translated()->associate($this->floatingIp);
-            $this->nat->action = NAT::ACTION_SNAT;
-            $this->nat->save();
-        });
+        $nat = app()->make(Nat::class);
+        $nat->id = 'nat-test';
+        $nat->source()->associate($this->ipAddress);
+        $nat->translated()->associate($this->floatingIp());
+        $nat->action = NAT::ACTION_SNAT;
+        $nat->save();
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->nat));
+        dispatch(new Deploy($nat));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
             return $event->exception->getMessage() == 'Nat Deploy nat-test : No Router found for resource';

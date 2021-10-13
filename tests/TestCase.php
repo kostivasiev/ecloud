@@ -15,6 +15,7 @@ use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
@@ -281,6 +282,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                     'network_id' => $this->network()->id,
                 ]);
             });
+
+//            $ipAddress = IpAddress::factory()->create();
+//            $ipAddress->nics()->sync($this->nic());
         }
         return $this->nic;
     }

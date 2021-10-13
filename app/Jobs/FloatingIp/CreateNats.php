@@ -4,8 +4,9 @@ namespace App\Jobs\FloatingIp;
 
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nat;
-use App\Models\V2\Nic;
+use App\Models\V2\Natable;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -31,8 +32,8 @@ class CreateNats extends Job
     {
         $floatingIp = $this->model;
 
-        if (!($this->resource instanceof Nic)) {
-            Log::info(get_class($this) . ' : Resource is not a NIC, skipping');
+        if (!($this->resource instanceof Natable)) {
+            Log::info(get_class($this) . ' : Resource is not a Natable resource, skipping');
             return;
         }
 

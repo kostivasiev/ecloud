@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\FloatingIp;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\FloatingIp\CreateNats;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nat;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -12,15 +13,13 @@ use Tests\TestCase;
 
 class CreateNatsTest extends TestCase
 {
-
-    public function testNicAttachedCreatesNats()
+    public function testIpAddressAttachedCreatesNats()
     {
-        $this->floatingIp()->resource()->associate($this->nic());
-        $this->floatingIp()->save();
+        $ipAddress = IpAddress::factory()->create();
 
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        dispatch(new CreateNats($this->floatingIp(), $this->nic()));
+        dispatch(new CreateNats($this->floatingIp(), $ipAddress));
 
         Event::assertNotDispatched(JobFailed::class);
 

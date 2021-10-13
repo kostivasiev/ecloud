@@ -24,7 +24,6 @@ class Undeploy extends Job
 
     public function handle()
     {
-        // Load NIC from destination or translated
         $routerScopable = collect(
             $this->model->load([
                 'destination' => function ($query) {

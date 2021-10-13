@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\FloatingIp;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\FloatingIp\RemoveNats;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nat;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -12,9 +13,10 @@ use Tests\TestCase;
 
 class RemoveNatsTest extends TestCase
 {
-    public function testJobCompletesWithNicAttached()
+    public function testJobCompletesWithNoNats()
     {
-        $this->floatingIp()->resource()->associate($this->nic());
+        $ipAddress = IpAddress::factory()->create();
+        $this->floatingIp()->resource()->associate($ipAddress);
         $this->floatingIp()->save();
 
         Event::fake([JobFailed::class, JobProcessed::class, ]);
@@ -27,16 +29,18 @@ class RemoveNatsTest extends TestCase
         });
     }
 
-    public function testUnassignedNicTriggersNatDelete()
+    public function testUnassignedIpAddressTriggersNatDelete()
     {
+        $ipAddress = IpAddress::factory()->create();
+
         $destinationNat = app()->make(Nat::class);
         $destinationNat->destination()->associate($this->floatingIp());
-        $destinationNat->translated()->associate($this->nic());
+        $destinationNat->translated()->associate($ipAddress);
         $destinationNat->action = Nat::ACTION_DNAT;
         $destinationNat->save();
 
         $sourceNat = app()->make(Nat::class);
-        $sourceNat->source()->associate($this->nic());
+        $sourceNat->source()->associate($ipAddress);
         $sourceNat->translated()->associate($this->floatingIp());
         $sourceNat->action = NAT::ACTION_SNAT;
         $sourceNat->save();
