@@ -10,15 +10,20 @@ use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Jobs\Instance\PowerOn;
 use App\Models\V2\Credential;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
+use App\Models\V2\IpAddressNic;
+use App\Models\V2\Nat;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Models\V2\RouterScopable;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
+use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
@@ -444,6 +449,34 @@ class InstanceController extends BaseController
             ->transform($collection);
 
         return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * Load floating IP's assigned to an ip address, which is assigned to a NIC assigned to the instance!
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $instanceId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     */
+    public function floatingIps(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    {
+        $nics = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
+
+        $ipAddresses = IpAddressNic::whereIn('nic_id', $nics->pluck('id'))->pluck('ip_address_id');
+
+        $fipIds = Nat::where('translatedable_type', 'ip')
+            ->where('destinationable_type', 'fip')
+            ->whereIn('translated_id', $ipAddresses)
+            ->pluck('destination_id');
+
+        $collection = FloatingIp::whereIn('id', $fipIds);
+
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return FloatingIpResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
