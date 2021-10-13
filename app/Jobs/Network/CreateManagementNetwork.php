@@ -11,6 +11,7 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use IPLib\Factory;
 
 class CreateManagementNetwork extends Job
 {
@@ -42,9 +43,21 @@ class CreateManagementNetwork extends Job
                 $managementNetwork = app()->make(Network::class);
                 $managementNetwork->name = 'Management Network for ' . $managementRouter->id;
                 $managementNetwork->router_id = $managementRouter->id; // needs to be the management router
-                $managementNetwork->subnet = $router->vpc->advanced_networking ?
+
+                /**
+                 * It's this element that needs reworking, because it's not just a simple case of taking the supplied
+                 * subnets... we need to do some calculations.
+                 * Yes we need to do this initial comparison, but that just gives us the starting range, from there we
+                 * need to slice the range up into pieces and then work out what is free....
+                 *
+                 * https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/1078#note_835836
+                 *
+                 */
+                $subnet = $router->vpc->advanced_networking ?
                     config('network.subnet.advanced') :
                     config('network.subnet.standard');
+                $managementNetwork->subnet = $this->getNextAvailableSubnet($subnet, $managementRouter->availability_zone_id);
+
                 $managementNetwork->syncSave();
 
                 // Store the management network id, so we can backoff everything else
@@ -65,5 +78,37 @@ class CreateManagementNetwork extends Job
                 ]);
             }
         }
+    }
+
+    public function getNextAvailableSubnet($subnet, $availabilityZoneId, $firstRun = true)
+    {
+        Log::info(get_class($this) . ' - Start Subnet', ['subnet' => $subnet]);
+        $range = Factory::rangeFromString($subnet);
+        if ($firstRun) {
+            $newFromInteger = ip2long($range->getStartAddress()) + 1024;
+        } else {
+            $newFromInteger = ip2long($range->getEndAddress()) + 1;
+        }
+        $newFrom = Factory::addressFromString(long2ip($newFromInteger));
+        $newToInteger = $newFromInteger + 15;
+        $newTo = Factory::addressFromString(long2ip($newToInteger));
+        $newRange = Factory::rangeFromBoundaries($newFrom, $newTo);
+        $subnet = $newRange->asSubnet()->toString();
+
+        // Check database
+        $networkCollection = Network::whereHas('router.availabilityZone', function ($query) use ($availabilityZoneId) {
+            $query->where('availability_zones.id', '=', $availabilityZoneId);
+        })->get();
+
+        foreach ($networkCollection as $network) {
+            $range = Factory::rangeFromString($network->subnet);
+            if ($range->containsRange($newRange)) {
+                Log::info(get_class($this) . ' - Subnet in use', ['subnet' => $subnet]);
+                return $this->getNextAvailableSubnet($subnet, $availabilityZoneId, false);
+            }
+        }
+
+        Log::info(get_class($this) . ' - Next Subnet', ['subnet' => $subnet]);
+        return $subnet;
     }
 }

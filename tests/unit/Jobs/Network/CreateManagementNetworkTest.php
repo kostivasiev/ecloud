@@ -11,12 +11,15 @@ use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
+use IPLib\Factory;
+use IPLib\Range\Subnet;
 use Tests\TestCase;
 
 class CreateManagementNetworkTest extends TestCase
 {
     protected Task $task;
     protected Router $managementRouter;
+    public bool $first = true;
 
     public function setUp(): void
     {
@@ -95,5 +98,17 @@ class CreateManagementNetworkTest extends TestCase
         $this->assertNotNull($managementNetwork);
         $this->assertEquals(config('network.subnet.advanced'), $managementNetwork->subnet);
         $this->assertEquals($this->managementRouter->id, $managementNetwork->router_id);
+    }
+
+    public function testSubnetAvailability()
+    {
+        $job = \Mockery::mock(CreateManagementNetwork::class)->makePartial();
+        $subnet = $job->getNextAvailableSubnet('192.168.0.0/17', $this->availabilityZone()->id);
+        $this->assertEquals('192.168.4.0/28', $subnet);
+
+        // If 192.168.4.0/28 is in use, then next address should be used 192.168.4.16/28
+        $this->network()->setAttribute('subnet', '192.168.4.0/28')->saveQuietly();
+        $subnet = $job->getNextAvailableSubnet('192.168.0.0/17', $this->availabilityZone()->id);
+        $this->assertEquals('192.168.4.16/28', $subnet);
     }
 }
