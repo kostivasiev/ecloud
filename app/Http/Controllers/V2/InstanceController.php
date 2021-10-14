@@ -462,6 +462,8 @@ class InstanceController extends BaseController
      */
     public function floatingIps(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
+        // TODO: This will also have to be backward-compatible with existing fIP's assigned directly to a NIC too
+
         $nics = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
 
         $ipAddresses = IpAddressNic::whereIn('nic_id', $nics->pluck('id'))->pluck('ip_address_id');
