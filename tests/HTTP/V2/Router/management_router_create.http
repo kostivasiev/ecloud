@@ -8,7 +8,8 @@ Content-Type:  application/json
 
 {
     "name": "Management Router VPC Test",
-    "region_id": "{{dev_region_id}}"
+    "region_id": "{{dev_region_id}}",
+    "advanced_networking": true
 }
 
 > {%
@@ -20,7 +21,7 @@ client.log('VPC Id : ' + response.body.data.id);
 POST https://{{host}}/{{version}}/routers
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -90,6 +91,18 @@ client.test("Request executed successfully", function() {
 });
 %}
 
+### Check Management Network is not visible to non-admin in collection
+GET https://{{host}}/{{version}}/networks/{{management_network_id}}
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Network hidden from user', function () {
+    client.assert(response.status === 404, '404 response not received');
+});
+%}
+
 ### Get Management Network
 GET https://{{host}}/{{version}}/networks/{{management_network_id}}
 X-consumer-custom-id:  0-0
@@ -103,10 +116,92 @@ client.test("Request executed successfully", function() {
 %}
 
 ### Get Firewall Policy
-GET https://{{host}}/{{version}}/firewall-policies/?router_id:eq={{router_id}}
+GET https://{{host}}/{{version}}/firewall-policies/?router_id:eq={{management_router_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
+
+> {%
+client.test('Get Firewall Policy', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.global.set('firewall_policy_id', response.body.data[0].id);
+    client.log('Firewall Policy ID: ' + response.body.data[0].id);
+});
+%}
+
+### Get firewall rules
+GET https://{{host}}/{{version}}/firewall-rules/?firewall_policy_id:eq={{firewall_policy_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Check firewall rules', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data[0].action === 'ALLOW', 'Rule is not allow');
+    client.assert(response.body.data[1].action === 'REJECT', 'Rule is not reject');
+    client.global.set('firewall_rule', response.body.data[0].id);
+    client.log('Firewall Rule: ' + response.body.data[0].id);
+});
+%}
+
+### Firewall Rule Ports
+GET https://{{host}}/{{version}}/firewall-rule-ports/?firewall_rule_id:eq={{firewall_rule}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Check firewall rule port', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data[0].protocol === 'TCP', 'Protocol not set to TCP');
+    client.assert(response.body.data[0].source === '4222', 'Source not set to 4222');
+});
+%}
+
+### Get Network Policy
+GET https://{{host}}/{{version}}/network-policies/?network_id:eq={{management_network_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Network Policy', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.global.set('network_policy_id', response.body.data[0].id);
+    client.log('Network Policy ID: ' + response.body.data[0].id);
+});
+%}
+
+### Get Network Policy Rules
+GET https://{{host}}/{{version}}/network-rules/?network_policy_id:eq={{network_policy_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Check network rules', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data[0].action === 'ALLOW', 'Rule is not allow');
+    client.assert(response.body.data[1].action === 'REJECT', 'Rule is not reject');
+    client.global.set('network_rule', response.body.data[0].id);
+    client.log('Network Rule: ' + response.body.data[0].id);
+});
+%}
+
+### Network Rule Ports
+GET https://{{host}}/{{version}}/network-rule-ports/?network_rule_id:eq={{network_rule}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Check firewall rule port', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data[0].protocol === 'TCP', 'Protocol not set to TCP');
+    client.assert(response.body.data[0].source === '4222', 'Source not set to 4222');
+});
+%}
 
 ### Delete Management Network
 DELETE https://{{host}}/{{version}}/networks/{{management_network_id}}
