@@ -71,7 +71,6 @@ class CreateManagementNetworkTest extends TestCase
 
         $managementNetwork = Network::find($this->task->data['management_network_id']);
         $this->assertNotNull($managementNetwork);
-        $this->assertEquals(config('network.subnet.standard'), $managementNetwork->subnet);
         $this->assertEquals($this->managementRouter->id, $managementNetwork->router_id);
     }
 
@@ -96,7 +95,6 @@ class CreateManagementNetworkTest extends TestCase
 
         $managementNetwork = Network::find($this->task->data['management_network_id']);
         $this->assertNotNull($managementNetwork);
-        $this->assertEquals(config('network.subnet.advanced'), $managementNetwork->subnet);
         $this->assertEquals($this->managementRouter->id, $managementNetwork->router_id);
     }
 
