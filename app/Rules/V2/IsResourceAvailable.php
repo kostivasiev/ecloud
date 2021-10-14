@@ -3,6 +3,7 @@
 namespace App\Rules\V2;
 
 use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Contracts\Validation\Rule;
 
 class IsResourceAvailable implements Rule
@@ -20,7 +21,7 @@ class IsResourceAvailable implements Rule
         if (!$instance) {
             return false;
         }
-        return $instance->sync->status !== Task::STATUS_FAILED;
+        return $instance->sync->status === Sync::STATUS_COMPLETE;
     }
 
     public function message()
