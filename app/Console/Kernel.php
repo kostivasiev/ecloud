@@ -60,6 +60,10 @@ class Kernel extends ConsoleKernel
             $schedule->command('health:find-orphaned-nats')
                 ->dailyAt("09:00")
                 ->emailOutputOnFailure(config('alerts.health.to'));
+
+            $schedule->command('health:find-orphaned-nics')
+                ->dailyAt("09:00")
+                ->emailOutputOnFailure(config('alerts.health.to'));
         }
 
         $schedule->command('task:timeout-stuck --hours=12')
