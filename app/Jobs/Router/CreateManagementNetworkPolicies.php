@@ -82,7 +82,7 @@ class CreateManagementNetworkPolicies extends Job
                     (new NetworkRule([
                         'name' => 'Block_all_outbound_' . $managementNetwork->id,
                         'sequence' => 10,
-                        'network_policy_id' => $managementNetwork->id,
+                        'network_policy_id' => $networkPolicy->id,
                         'source' => 'ANY',
                         'destination' => 'ANY',
                         'action' => 'REJECT',
