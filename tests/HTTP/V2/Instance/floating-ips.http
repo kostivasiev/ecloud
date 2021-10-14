@@ -23,7 +23,13 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-###
+#### OLD NATTING
+#GET https://{{host}}/{{version}}/instances/i-4289404a-dev/floating-ips
+#X-consumer-custom-id:  0-0
+#X-consumer-groups:  ecloud.read, ecloud.write
+#Content-Type:  application/json
+
+### NEW NATTING
 GET https://{{host}}/{{version}}/instances/{{instance_id}}/floating-ips
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write

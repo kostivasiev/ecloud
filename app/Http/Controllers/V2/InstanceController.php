@@ -14,14 +14,11 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
-use App\Models\V2\IpAddressNic;
-use App\Models\V2\Nat;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
-use App\Models\V2\RouterScopable;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\InstanceResource;
@@ -462,18 +459,15 @@ class InstanceController extends BaseController
      */
     public function floatingIps(Request $request, QueryTransformer $queryTransformer, string $instanceId)
     {
-        // TODO: This will also have to be backward-compatible with existing fIP's assigned directly to a NIC too
-
         $nics = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
 
-        $ipAddresses = IpAddressNic::whereIn('nic_id', $nics->pluck('id'))->pluck('ip_address_id');
+        $collection = FloatingIp::where(function ($query) use ($nics) {
+            $query->whereIn('resource_id', $nics->pluck('id'));
 
-        $fipIds = Nat::where('translatedable_type', 'ip')
-            ->where('destinationable_type', 'fip')
-            ->whereIn('translated_id', $ipAddresses)
-            ->pluck('destination_id');
-
-        $collection = FloatingIp::whereIn('id', $fipIds);
+            $query->orWhereIn('resource_id', IpAddress::whereHas('nics', function ($query) use ($nics) {
+                return $query->whereIn('id', $nics->pluck('id'));
+            })->pluck('id'));
+        });
 
         $queryTransformer->config(Task::class)
             ->transform($collection);
