@@ -14,7 +14,6 @@ use UKFast\Responses\UKFastResource;
  * @property string availability_zone_id
  * @property string ike_profile_id
  * @property string ipsec_profile_id
- * @property string dpd_profile_id
  * @property string created_at
  * @property string updated_at
  */
@@ -35,7 +34,6 @@ class VpnProfileGroupResource extends UKFastResource
         if ($request->user()->isAdmin()) {
             $data['ike_profile_id'] = $this->ike_profile_id;
             $data['ipsec_profile_id'] = $this->ipsec_profile_id;
-            $data['dpd_profile_id'] = $this->dpd_profile_id;
         }
         $data['created_at'] = $this->created_at === null ? null : Carbon::parse(
             $this->created_at,

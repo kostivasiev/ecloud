@@ -21,8 +21,7 @@ class Create extends FormRequest
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
             ],
             'ike_profile_id' => 'required|string',
-            'ipsec_profile_id' => 'required|string',
-            'dpd_profile_id' => 'required|string',
+            'ipsec_profile_id' => 'required|string'
         ];
     }
 }

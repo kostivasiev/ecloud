@@ -41,8 +41,7 @@ class DeleteTest extends TestCase
 
         $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
             'ike_profile_id' => 'ike-abc123xyz',
-            'ipsec_profile_id' => 'ipsec-abc123xyz',
-            'dpd_profile_id' => 'dpd-abc123xyz',
+            'ipsec_profile_id' => 'ipsec-abc123xyz'
         ]);
         $this->vpnSession = factory(VpnSession::class)->create(
             [

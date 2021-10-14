@@ -43,7 +43,6 @@ class GetTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id,
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz',
-            'dpd_profile_id' => 'dpd-abc123xyz',
         ]);
         $this->vpnSession = factory(VpnSession::class)->create(
             [
