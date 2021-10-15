@@ -11,6 +11,7 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -119,7 +120,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
      */
     public function filterableColumns(FilterFactory $factory)
     {
-        return [
+        $columns = [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('router_throughput_id', Filter::$stringDefaults),
@@ -128,6 +129,12 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $columns[] = $factory->create('is_hidden', Filter::$numericDefaults);
+        }
+
+        return $columns;
     }
 
     /**
@@ -137,7 +144,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
      */
     public function sortableColumns(SortFactory $factory)
     {
-        return [
+        $columns = [
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('router_throughput_id'),
@@ -146,6 +153,12 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $columns[] = $factory->create('is_hidden');
+        }
+
+        return $columns;
     }
 
     /**
@@ -162,7 +175,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
 
     public function databaseNames()
     {
-        return [
+        $columns = [
             'id' => 'id',
             'name' => 'name',
             'router_throughput_id' => 'router_throughput_id',
@@ -171,5 +184,11 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $columns['is_hidden'] = 'is_hidden';
+        }
+
+        return $columns;
     }
 }
