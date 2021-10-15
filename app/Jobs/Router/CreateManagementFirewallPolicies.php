@@ -31,8 +31,6 @@ class CreateManagementFirewallPolicies extends Job
      */
     public function handle()
     {
-        $router = $this->model;
-
         if (!empty($this->task->data['management_router_id']) && !empty($this->task->data['management_network_id'])) {
             // need to check that the router & network are up and running
             $managementRouter = Router::find($this->task->data['management_router_id']);
