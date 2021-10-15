@@ -44,18 +44,9 @@ class CreateManagementNetwork extends Job
                 $managementNetwork->name = 'Management Network for ' . $managementRouter->id;
                 $managementNetwork->router_id = $managementRouter->id; // needs to be the management router
 
-                /**
-                 * It's this element that needs reworking, because it's not just a simple case of taking the supplied
-                 * subnets... we need to do some calculations.
-                 * Yes we need to do this initial comparison, but that just gives us the starting range, from there we
-                 * need to slice the range up into pieces and then work out what is free....
-                 *
-                 * https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/1078#note_835836
-                 *
-                 */
                 $subnet = $router->vpc->advanced_networking ?
-                    config('network.subnet.advanced') :
-                    config('network.subnet.standard');
+                    config('network.management_range.advanced') :
+                    config('network.management_range.standard');
                 $managementNetwork->subnet = $this->getNextAvailableSubnet($subnet, $managementRouter->availability_zone_id);
 
                 $managementNetwork->syncSave();
