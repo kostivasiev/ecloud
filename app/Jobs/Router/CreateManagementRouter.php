@@ -30,13 +30,16 @@ class CreateManagementRouter extends Job
         $router = $this->model;
         $managementRouter = null;
         if (empty($this->task->data['management_router_id'])) {
-            $managementCount = $router->vpc->routers()->where('is_hidden', '=', true)->count();
+            $managementCount = $router->vpc->routers()->where(function ($query) use ($router) {
+                $query->where('is_hidden', '=', true);
+                $query->where('availability_zone_id', '=', $router->availability_zone_id);
+            })->count();
             if ($router->vpc->routers()->count() <= 0 || $managementCount == 0) {
                 Log::info(get_class($this) . ' - Create Admin Router Start', ['router_id' => $router->id]);
 
                 $managementRouter = app()->make(Router::class);
                 $managementRouter->vpc_id = $router->vpc_id;
-                $managementRouter->name = 'Management Router for ' . $router->vpc_id;
+                $managementRouter->name = 'Management Router for ' . $router->availability_zone_id . ' - ' . $router->vpc_id;
                 $managementRouter->router_throughput_id = $router->router_throughput_id;
                 $managementRouter->availability_zone_id = $router->availability_zone_id;
                 $managementRouter->is_hidden = true;
