@@ -26,11 +26,6 @@ properties:
     required: true
     example: 'ipsec-2b66bb79'
     readOnly: false
-  dpd_profile_id:
-    type: string
-    required: true
-    example: 'dpd-2b66bb79'
-    readOnly: false
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

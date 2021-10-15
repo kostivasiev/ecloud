@@ -24,7 +24,7 @@ properties:
   resource_id:
     description: ID of the resource that the floating IP is assigned to.
     type: string
-    example: 'nic-abc123'
+    example: 'ip-abc123'
     readOnly: true
   sync:
     type: object

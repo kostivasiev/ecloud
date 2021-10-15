@@ -77,5 +77,6 @@ class UnAssignVolumeGroupTest extends TestCase
 
         $unassignVolumeGroup->handle();
         $this->assertEquals($this->volume()->id, $subTask->data['volume_id']);
+        $this->assertNull($this->volume()->port);
     }
 }

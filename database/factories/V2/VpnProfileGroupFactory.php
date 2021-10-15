@@ -10,6 +10,5 @@ $factory->define(VpnProfileGroup::class, function () {
         'description' => 'Profile group description',
         'ike_profile_id' => 'nsx-default-l3vpn-ike-profile',
         'ipsec_profile_id' => 'nsx-default-l3vpn-tunnel-profile',
-        'dpd_profile_id' => 'nsx-default-l3vpn-dpd-profile',
     ];
 });
