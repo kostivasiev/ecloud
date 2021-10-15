@@ -8,7 +8,7 @@ $factory->define(LoadBalancerCluster::class, function () {
     return [
         'name' => 'Load Balancer Cluster 1',
         'load_balancer_spec_id' => 'lbs-aaaaaaaa',
-        'config_id' => '77898345-2a38-4a18-92c0-59a1f8681b65'
+        'config_id' => '77898345'
     ];
 });
 
