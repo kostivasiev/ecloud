@@ -86,7 +86,7 @@ class CreateManagementFirewallPolicies extends Job
                     'enabled' => true
                 ]))->save();
 
-                $firewallPolicy->save();
+                $firewallPolicy->syncSave();
 
                 Log::info(get_class($this) . ' - Create Firewall Policy and Rules End', [
                     'router_id' => $managementRouter->id,
