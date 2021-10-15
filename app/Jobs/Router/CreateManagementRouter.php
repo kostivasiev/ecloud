@@ -40,7 +40,6 @@ class CreateManagementRouter extends Job
                 $managementRouter = app()->make(Router::class);
                 $managementRouter->vpc_id = $router->vpc_id;
                 $managementRouter->name = 'Management Router for ' . $router->availability_zone_id . ' - ' . $router->vpc_id;
-                $managementRouter->router_throughput_id = $router->router_throughput_id;
                 $managementRouter->availability_zone_id = $router->availability_zone_id;
                 $managementRouter->is_hidden = true;
                 $managementRouter->syncSave();
