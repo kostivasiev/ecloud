@@ -89,6 +89,7 @@ class CreateManagementNetworkPolicies extends Job
                         'direction' => 'OUT',
                         'enabled' => true
                     ]))->save();
+                    $networkPolicy->syncSave();
 
                     Log::info(get_class($this) . ' - Create Network Policy and Rules End', [
                         'router_id' => $managementRouter->id,
