@@ -4,7 +4,6 @@ namespace App\Http\Requests\V2\FloatingIp;
 
 use App\Models\V2\FloatingIp;
 use App\Models\V2\IpAddress;
-use App\Models\V2\Nic;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsSameAvailabilityZone;
 use UKFast\FormRequests\FormRequest;
