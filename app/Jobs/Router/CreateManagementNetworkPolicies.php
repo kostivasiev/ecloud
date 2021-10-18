@@ -85,7 +85,7 @@ class CreateManagementNetworkPolicies extends Job
                         $this->task->data = Arr::add($this->task->data, 'network_policy_id', $networkPolicy->id);
                         $this->task->saveQuietly();
 
-                        Log::info(get_class($this) . ' - Create Network Policy and Rules End', [
+                        Log::info(get_class($this) . ' - Create Management Network Policy and Rules End', [
                             'network_id' => $managementNetwork->id,
                         ]);
                     }
