@@ -5,7 +5,6 @@ use App\Jobs\Job;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
-use App\Models\V2\Vpc;
 use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
