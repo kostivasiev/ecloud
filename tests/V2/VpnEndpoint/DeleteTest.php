@@ -3,13 +3,13 @@ namespace Tests\V2\VpnEndpoint;
 
 use App\Events\V2\Task\Created;
 use Illuminate\Support\Facades\Event;
-use Tests\Mocks\Resources\VpnEndpointMock;
+use Tests\Mocks\Resources\VpnSessionMock;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-    use VpnEndpointMock;
+    use VpnSessionMock;
 
     public function setUp(): void
     {
@@ -35,5 +35,18 @@ class DeleteTest extends TestCase
                     'detail' => 'No Vpn Endpoint with that ID was found',
                 ]
             )->assertResponseStatus(404);
+    }
+
+    public function testDeleteResourceWhenVpnSessionExists()
+    {
+        $this->vpnSession();
+        Event::fake(Created::class);
+        $this->delete('/v2/vpn-endpoints/' . $this->vpnEndpoint()->id)
+            ->seeJson(
+                [
+                    'title' => 'Forbidden',
+                    'detail' => 'Vpn Endpoints that have associated Vpn Sessions cannot be deleted',
+                ]
+            )->assertResponseStatus(403);
     }
 }

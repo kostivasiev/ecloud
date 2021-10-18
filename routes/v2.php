@@ -147,7 +147,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('vpn-endpoints/{vpnEndpointId}/services', 'VpnEndpointController@services');
         $router->post('vpn-endpoints', 'VpnEndpointController@store');
         $router->patch('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@update');
-        $router->delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
+        $router->group(['middleware' => 'vpn-endpoint-can-delete'], function () use ($router) {
+            $router->delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
+        });
     });
 
     /** Vpn Sessions */
