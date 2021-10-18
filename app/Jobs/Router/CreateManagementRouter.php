@@ -36,7 +36,7 @@ class CreateManagementRouter extends Job
                 $query->where('availability_zone_id', '=', $router->availability_zone_id);
             })->count();
             if ($managementCount == 0) {
-                Log::info(get_class($this) . ' - Create Admin Router Start', ['router_id' => $router->id]);
+                Log::info(get_class($this) . ' - Create Management Router Start', ['router_id' => $router->id]);
 
                 $managementRouter = app()->make(Router::class);
                 $managementRouter->vpc_id = $router->vpc_id;
