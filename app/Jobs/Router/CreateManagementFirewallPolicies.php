@@ -36,7 +36,7 @@ class CreateManagementFirewallPolicies extends Job
             if (empty($this->task->data['firewall_policy_id'])) {
                 $managementRouter = Router::find($this->task->data['management_router_id']);
                 if ($managementRouter) {
-                    Log::info(get_class($this) . ' - Create Firewall Policy and Rules Start', [
+                    Log::info(get_class($this) . ' - Create Management Firewall Policy and Rules Start', [
                         'router_id' => $managementRouter->id,
                     ]);
 
