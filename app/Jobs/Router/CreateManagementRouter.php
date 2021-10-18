@@ -51,7 +51,7 @@ class CreateManagementRouter extends Job
                 ];
                 $this->task->saveQuietly();
 
-                Log::info(get_class($this) . ' - Create Admin Router End', [
+                Log::info(get_class($this) . ' - Create Management Router End', [
                     'router_id' => $router->id,
                     'admin_router_id' => $managementRouter->id,
                 ]);
