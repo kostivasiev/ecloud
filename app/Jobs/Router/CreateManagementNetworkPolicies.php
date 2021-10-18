@@ -39,7 +39,7 @@ class CreateManagementNetworkPolicies extends Job
                 if (empty($this->task->data['network_policy_id'])) {
                     $managementNetwork = Network::find($this->task->data['management_network_id']);
                     if ($managementNetwork) {
-                        Log::info(get_class($this) . ' - Create Network Policy and Rules Start', [
+                        Log::info(get_class($this) . ' - Create Management Network Policy and Rules Start', [
                             'network_id' => $managementNetwork->id,
                         ]);
 
