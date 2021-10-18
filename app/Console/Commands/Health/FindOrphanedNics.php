@@ -2,11 +2,9 @@
 
 namespace App\Console\Commands\Health;
 
-use App\Models\V2\FloatingIp;
-use App\Models\V2\Nat;
 use App\Models\V2\Nic;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 
 class FindOrphanedNics extends Command
 {
@@ -17,7 +15,11 @@ class FindOrphanedNics extends Command
     public function handle()
     {
         $failed = false;
-        foreach (Nic::all() as $nic) {
+
+        $nics = Nic::query()
+            ->where('updated_at', '<=', Carbon::now()->addHours(-12))->get();
+
+        foreach ($nics as $nic) {
             if (!empty($nic->instance_id) && !$nic->instance()->exists()) {
                 $this->error("Orphaned NIC {$nic->id} exists for deleted instance {$nic->instance_id}");
                 $failed = true;
