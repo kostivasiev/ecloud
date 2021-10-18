@@ -5,7 +5,6 @@ use App\Jobs\Job;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
-use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Traits\V2\Jobs\AwaitResources;
@@ -32,19 +31,10 @@ class CreateManagementFirewallPolicies extends Job
     public function handle()
     {
         if (!empty($this->task->data['management_router_id']) && !empty($this->task->data['management_network_id'])) {
-            // need to check that the router & network are up and running
             $managementRouter = Router::find($this->task->data['management_router_id']);
-            $managementNetwork = Network::find($this->task->data['management_network_id']);
-            if ($managementRouter && $managementNetwork) {
-                $this->awaitSyncableResources([
-                    $managementRouter->id,
-                    $managementNetwork->id,
-                ]);
-            }
-            if ($managementNetwork) {
+            if ($managementRouter) {
                 Log::info(get_class($this) . ' - Create Firewall Policy and Rules Start', [
                     'router_id' => $managementRouter->id,
-                    'network_id' => $managementNetwork->id,
                 ]);
 
                 $firewallPolicy = new FirewallPolicy([
@@ -85,12 +75,10 @@ class CreateManagementFirewallPolicies extends Job
                     'direction' => 'OUT',
                     'enabled' => true
                 ]))->save();
-
                 $firewallPolicy->syncSave();
 
                 Log::info(get_class($this) . ' - Create Firewall Policy and Rules End', [
                     'router_id' => $managementRouter->id,
-                    'network_id' => $managementNetwork->id,
                 ]);
             }
         }

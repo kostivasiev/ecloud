@@ -2,9 +2,6 @@
 namespace App\Jobs\Router;
 
 use App\Jobs\Job;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
-use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
@@ -37,18 +34,9 @@ class CreateManagementNetworkPolicies extends Job
         $router = $this->model;
         if ($router->vpc->advanced_networking) {
             if (!empty($this->task->data['management_router_id']) && !empty($this->task->data['management_network_id'])) {
-                // need to check that the router & network are up and running
-                $managementRouter = Router::find($this->task->data['management_router_id']);
                 $managementNetwork = Network::find($this->task->data['management_network_id']);
-                if ($managementRouter && $managementNetwork) {
-                    $this->awaitSyncableResources([
-                        $managementRouter->id,
-                        $managementNetwork->id,
-                    ]);
-                }
                 if ($managementNetwork) {
                     Log::info(get_class($this) . ' - Create Network Policy and Rules Start', [
-                        'router_id' => $managementRouter->id,
                         'network_id' => $managementNetwork->id,
                     ]);
 
@@ -92,7 +80,6 @@ class CreateManagementNetworkPolicies extends Job
                     $networkPolicy->syncSave();
 
                     Log::info(get_class($this) . ' - Create Network Policy and Rules End', [
-                        'router_id' => $managementRouter->id,
                         'network_id' => $managementNetwork->id,
                     ]);
                 }

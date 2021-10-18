@@ -5,8 +5,8 @@ use App\Jobs\Job;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
-use App\Models\V2\Vpc;
 use App\Traits\V2\Jobs\AwaitResources;
+use App\Traits\V2\Jobs\AwaitTask;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Arr;
@@ -15,7 +15,7 @@ use IPLib\Factory;
 
 class CreateManagementNetwork extends Job
 {
-    use Batchable, LoggableModelJob, AwaitResources;
+    use Batchable, LoggableModelJob, AwaitResources, AwaitTask;
 
     private Task $task;
     private Router $model;
@@ -30,13 +30,7 @@ class CreateManagementNetwork extends Job
     {
         $router = $this->model;
         if (!empty($this->task->data['management_router_id'])) {
-            // need to check that the router is up and running
             $managementRouter = Router::find($this->task->data['management_router_id']);
-            if ($managementRouter) {
-                $this->awaitSyncableResources([
-                    $managementRouter->id,
-                ]);
-            }
             if (empty($this->task->data['management_network_id'])) {
                 Log::info(get_class($this) . ' - Create Management Network Start', ['router_id' => $managementRouter->id]);
 
@@ -48,7 +42,6 @@ class CreateManagementNetwork extends Job
                     config('network.management_range.advanced') :
                     config('network.management_range.standard');
                 $managementNetwork->subnet = $this->getNextAvailableSubnet($subnet, $managementRouter->availability_zone_id);
-
                 $managementNetwork->syncSave();
 
                 // Store the management network id, so we can backoff everything else

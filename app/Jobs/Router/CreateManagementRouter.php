@@ -5,13 +5,14 @@ use App\Jobs\Job;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Traits\V2\Jobs\AwaitResources;
+use App\Traits\V2\Jobs\AwaitTask;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class CreateManagementRouter extends Job
 {
-    use Batchable, LoggableModelJob, AwaitResources;
+    use Batchable, LoggableModelJob, AwaitResources, AwaitTask;
 
     private Task $task;
     private Router $model;
@@ -34,7 +35,7 @@ class CreateManagementRouter extends Job
                 $query->where('is_hidden', '=', true);
                 $query->where('availability_zone_id', '=', $router->availability_zone_id);
             })->count();
-            if ($router->vpc->routers()->count() <= 0 || $managementCount == 0) {
+            if ($managementCount == 0) {
                 Log::info(get_class($this) . ' - Create Admin Router Start', ['router_id' => $router->id]);
 
                 $managementRouter = app()->make(Router::class);
