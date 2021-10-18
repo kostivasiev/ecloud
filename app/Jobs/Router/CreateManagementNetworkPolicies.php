@@ -2,9 +2,6 @@
 namespace App\Jobs\Router;
 
 use App\Jobs\Job;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
-use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
