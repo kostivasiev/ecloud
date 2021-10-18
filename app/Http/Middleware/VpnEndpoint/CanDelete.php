@@ -14,7 +14,7 @@ class CanDelete
     public function handle($request, Closure $next)
     {
         $vpnEndpoint = VpnEndpoint::forUser($request->user())->findOrFail($request->route('vpnEndpointId'));
-        if ($vpnEndpoint->vpnService->vpnSessions->count() > 0) {
+        if ($vpnEndpoint->vpnSessions->count() > 0) {
             return response()->json([
                 'errors' => [
                     [
