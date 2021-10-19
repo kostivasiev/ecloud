@@ -32,7 +32,7 @@ class CreateManagementRouter extends Job
         $managementRouter = null;
         if (empty($this->task->data['management_router_id'])) {
             $managementCount = $router->vpc->routers()->where(function ($query) use ($router) {
-                $query->where('is_hidden', '=', true);
+                $query->where('is_management', '=', true);
                 $query->where('availability_zone_id', '=', $router->availability_zone_id);
             })->count();
             if ($managementCount == 0) {
