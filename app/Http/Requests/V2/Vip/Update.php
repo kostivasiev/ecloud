@@ -21,9 +21,7 @@ class Update extends FormRequest
                 'string'
             ],
             'allocate_floating_ip' => [
-                'required',
-                'numeric',
-                'min:1'
+                'numeric'
             ],
         ];
     }

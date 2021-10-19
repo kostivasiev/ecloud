@@ -18,11 +18,9 @@ class Create extends FormRequest
                 'exists:ecloud.ip_addresses,id,deleted_at,NULL',
             ],
             'network_id' => [
-                'sometimes',
                 'string'
             ],
             'allocate_floating_ip' => [
-                'sometimes',
                 'boolean'
             ],
         ];

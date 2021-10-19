@@ -52,7 +52,7 @@ class VipController extends BaseController
             'ip_address_id'
         ]));
         $vip->syncSave([
-            'network_id' => $request->input('network_id'),
+            'network_id' => $request->input('network_id', null),
             'allocate_floating_ip' => $request->input('allocate_floating_ip', 0)
         ]);
         return $this->responseIdMeta($request, $vip->id, 201);
@@ -71,7 +71,7 @@ class VipController extends BaseController
         ]));
 
         $vip = $model->syncSave([
-            'network_id' => $request->input('network_id'),
+            'network_id' => $request->input('network_id', null),
             'allocate_floating_ip' => $request->input('allocate_floating_ip', 0)
         ]);
         return $this->responseIdMeta($request, $vip->id, 202, $vip->id);
