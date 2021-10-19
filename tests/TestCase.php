@@ -22,6 +22,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
 use App\Models\V2\Task;
+use App\Models\V2\Vip;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\ArtisanService;
@@ -205,6 +206,20 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->vpc;
+    }
+
+    public function vip($id = 'vip-aaaaaaaa-dev'): Vip
+    {
+        if (!$this->vip) {
+            Model::withoutEvents(function() use ($id) {
+                $this->vip = Vip::factory()->create([
+                    'id' => $id,
+                    'ip_address_id' => "ip-aaaaaaaa-dev",
+                    'name' => $id
+                ]);
+            });
+        }
+        return $this->vip;
     }
 
     public function dhcp()

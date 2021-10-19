@@ -15,6 +15,7 @@ class CreateVipsTable extends Migration
     {
         Schema::connection('ecloud')->create('vips', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->string('name')->nullable();
             $table->uuid('ip_address_id')->index();
             $table->softDeletes();
             $table->timestamps();

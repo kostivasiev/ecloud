@@ -1,17 +1,17 @@
 <?php
 namespace Database\Factories\V2;
 
-use App\Models\V2\IpAddress;
+use App\Models\V2\Vip;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class IpAddressFactory extends Factory
+class VipFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = IpAddress::class;
+    protected $model = Vip::class;
 
     /**
      * Define the model's default state.
@@ -21,9 +21,9 @@ class IpAddressFactory extends Factory
     public function definition()
     {
         return [
-            'ip_address' => '1.1.1.1',
-            'network_id' => 'net-aaaaaaaa',
-            'type' => 'normal'
+            'id' => 'vip-aaaaaaaa-dev',
+            'ip_address_id' => 'ip-aaaaaaaa-dev',
+            'name' => 'vip-aaaaaaaa-dev'
         ];
     }
 }

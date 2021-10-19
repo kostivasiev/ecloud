@@ -47,15 +47,14 @@ class VipController extends BaseController
      */
     public function create(Create $request)
     {
-        $vip = app()->make(Vip::class);
-        $vip->fill($request->only([
+        $vip = new Vip($request->only([
             'ip_address_id'
         ]));
         $vip->syncSave([
             'network_id' => $request->input('network_id', null),
             'allocate_floating_ip' => $request->input('allocate_floating_ip', 0)
         ]);
-        return $this->responseIdMeta($request, $vip->id, 201);
+        return $this->responseIdMeta($request, $vip->id, 202);
     }
 
     /**

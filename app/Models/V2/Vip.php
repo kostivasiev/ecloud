@@ -6,6 +6,8 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
+use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -17,7 +19,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Vip extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable;
+    use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable, HasFactory;
 
     public $keyPrefix = 'vip';
     public $incrementing = false;
@@ -25,10 +27,12 @@ class Vip extends Model implements Filterable, Sortable
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     protected $fillable = [
-        'ip_address_id'
+        'id',
+        'ip_address_id',
+        'name'
     ];
 
-    public function ip_address()
+    public function ipAddress()
     {
         return $this->belongsTo(IpAddress::class);
     }
@@ -38,7 +42,7 @@ class Vip extends Model implements Filterable, Sortable
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('ip_address.network.router.vpc', function ($query) use ($user) {
+        return $query->whereHas('ipAddress.network.router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }
