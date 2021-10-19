@@ -5,6 +5,7 @@ namespace Tests\unit\Rules\V2\NetworkRulePort;
 use App\Models\V2\NetworkRule;
 use App\Rules\V2\NetworkRulePort\CanCreatePortForNetworkRule;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class CanCreatePortForNetworkRuleTest extends TestCase
 {
@@ -14,6 +15,7 @@ class CanCreatePortForNetworkRuleTest extends TestCase
     {
         parent::setUp();
         $this->rule = new CanCreatePortForNetworkRule();
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 
     public function testNoTypePasses()

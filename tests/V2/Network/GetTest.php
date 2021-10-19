@@ -2,19 +2,14 @@
 
 namespace Tests\V2\Network;
 
-use App\Models\V2\Network;
-use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    protected $faker;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
+        $this->network();
     }
 
     public function testNoPermsIsDenied()
@@ -33,9 +28,6 @@ class GetTest extends TestCase
 
     public function testGetCollection()
     {
-        $network = factory(Network::class)->create([
-            'name' => 'Manchester Network',
-        ]);
         $this->get(
             '/v2/networks',
             [
@@ -44,8 +36,8 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $network->id,
-                'name' => $network->name,
+                'id' => $this->network()->id,
+                'name' => $this->network()->name,
                 'subnet' => '10.0.0.0/24'
             ])
             ->assertResponseStatus(200);
@@ -53,19 +45,16 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $network = factory(Network::class)->create([
-            'name' => 'Manchester Network',
-        ]);
         $this->get(
-            '/v2/networks/' . $network->id,
+            '/v2/networks/' . $this->network()->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $network->id,
-                'name' => $network->name,
+                'id' => $this->network()->id,
+                'name' => $this->network()->name,
                 'subnet' => '10.0.0.0/24'
             ])
             ->assertResponseStatus(200);
