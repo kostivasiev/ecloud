@@ -40,7 +40,7 @@ class DeleteManagementNetwork extends Job
             ];
             $this->task->saveQuietly();
         } else {
-            $managementNetwork = Network::whereIn($this->task->data['management_network_ids'])
+            $managementNetwork = Network::whereIn('id', $this->task->data['management_network_ids'])
                 ->get()
                 ->pluck('id')
                 ->toArray();

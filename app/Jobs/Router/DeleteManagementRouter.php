@@ -36,7 +36,7 @@ class DeleteManagementRouter extends Job
             ];
             $this->task->saveQuietly();
         } else {
-            $managementRouters = Router::whereIn($this->task->data['management_router_ids'])
+            $managementRouters = Router::whereIn('id', $this->task->data['management_router_ids'])
                 ->get()
                 ->pluck('id')
                 ->toArray();
