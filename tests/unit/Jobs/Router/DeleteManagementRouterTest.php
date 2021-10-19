@@ -30,8 +30,7 @@ class DeleteManagementRouterTest extends TestCase
 
         $job = new DeleteManagementRouter($this->task);
         $job->handle();
-
-        $this->assertEquals($this->router()->id, $this->task->data['management_router_id']);
+        $this->assertTrue(in_array($this->router()->id, $this->task->data['management_router_ids']));
     }
 
     public function testSkipNonManagementRouter()
@@ -49,6 +48,6 @@ class DeleteManagementRouterTest extends TestCase
         $job = new DeleteManagementRouter($this->task);
         $job->handle();
 
-        $this->assertEmpty($this->task->data);
+        $this->assertEquals(0, count($this->task->data['management_router_ids']));
     }
 }

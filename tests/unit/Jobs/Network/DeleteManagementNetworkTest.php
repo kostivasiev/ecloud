@@ -32,7 +32,7 @@ class DeleteManagementNetworkTest extends TestCase
 
         $job = new DeleteManagementNetwork($this->task);
         $job->handle();
-        $this->assertEquals($this->network()->id, $this->task->data['management_network_id']);
+        $this->assertTrue(in_array($this->network()->id, $this->task->data['management_network_ids']));
     }
 
     public function testSkipDeletingManagementNetwork()
@@ -50,6 +50,6 @@ class DeleteManagementNetworkTest extends TestCase
         $job = new DeleteManagementNetwork($this->task);
         $job->handle();
 
-        $this->assertEmpty($this->task->data);
+        $this->assertEquals(0, count($this->task->data['management_network_ids']));
     }
 }

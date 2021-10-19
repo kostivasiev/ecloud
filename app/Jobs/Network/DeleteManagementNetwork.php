@@ -25,24 +25,29 @@ class DeleteManagementNetwork extends Job
 
     public function handle()
     {
-        $managementNetwork = null;
-        if (empty($this->task->data['management_network_id'])) {
-            $router = $this->model->routers->where('is_hidden', '=', true)->first();
-            if ($router) {
-                $managementNetwork = Network::whereHas('router', function ($query) use ($router) {
+        $managementNetwork = [];
+        if (empty($this->task->data['management_network_ids'])) {
+            $this->model->routers->where('is_hidden', '=', true)->each(function ($router) use (&$managementNetwork) {
+                Network::whereHas('router', function ($query) use ($router) {
                     $query->where('router_id', '=', $router->id);
-                })->first();
-                $this->task->setAttribute('data', ['management_network_id' => $managementNetwork->id])->saveQuietly();
-                $managementNetwork->syncDelete();
-            }
+                })->each(function ($network) use (&$managementNetwork) {
+                    $network->syncDelete();
+                    $managementNetwork[] = $network->id;
+                });
+            });
+            $this->task->data = [
+                'management_network_ids' => $managementNetwork,
+            ];
+            $this->task->saveQuietly();
         } else {
-            $managementNetwork = Network::find($this->task->data['management_network_id']);
+            $managementNetwork = Network::whereIn($this->task->data['management_network_ids'])
+                ->get()
+                ->pluck('id')
+                ->toArray();
         }
 
         if ($managementNetwork) {
-            $this->awaitSyncableResources([
-                $managementNetwork->id,
-            ]);
+            $this->awaitSyncableResources($managementNetwork);
         }
     }
 }

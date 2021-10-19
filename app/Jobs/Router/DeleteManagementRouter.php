@@ -25,20 +25,25 @@ class DeleteManagementRouter extends Job
 
     public function handle()
     {
-        if (empty($this->task->data['management_router_id'])) {
-            $managementRouter = $this->model->routers->where('is_hidden', '=', true)->first();
-            if ($managementRouter) {
-                $this->task->setAttribute('data', ['management_router_id' => $managementRouter->id])->saveQuietly();
-                $managementRouter->syncDelete();
-            }
+        if (empty($this->task->data['management_router_ids'])) {
+            $managementRouters = [];
+            $this->model->routers->where('is_hidden', '=', true)->each(function ($router) use (&$managementRouters) {
+                $router->syncDelete();
+                $managementRouters[] = $router->id;
+            });
+            $this->task->data = [
+                'management_router_ids' => $managementRouters,
+            ];
+            $this->task->saveQuietly();
         } else {
-            $managementRouter = Router::find($this->task->data['management_router_id']);
+            $managementRouters = Router::whereIn($this->task->data['management_router_ids'])
+                ->get()
+                ->pluck('id')
+                ->toArray();
         }
 
-        if ($managementRouter) {
-            $this->awaitSyncableResources([
-                $managementRouter->id,
-            ]);
+        if ($managementRouters) {
+            $this->awaitSyncableResources($managementRouters);
         }
     }
 }
