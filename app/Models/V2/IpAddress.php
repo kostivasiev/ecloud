@@ -48,6 +48,20 @@ class IpAddress extends Model implements Filterable, Sortable
         return $this->belongsToMany(Nic::class);
     }
 
+    public function network()
+    {
+        return $this->belongsTo(Network::class);
+    }
+
+    /**
+     * Pivot table ip_address_nic
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function vips()
+    {
+        return $this->hasMany(Vip::class);
+    }
+
 
     /**
      * @param $query
@@ -56,7 +70,13 @@ class IpAddress extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, Consumer $user)
     {
-        return $query;
+        if (!$user->isScoped()) {
+            return $query;
+        }
+        return $query->whereHas('network.router.vpc', function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+        });
+
     }
 
 
@@ -70,6 +90,7 @@ class IpAddress extends Model implements Filterable, Sortable
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('ip_address', Filter::$stringDefaults),
+            $factory->create('network_id', Filter::$stringDefaults),
             $factory->create('type', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -87,6 +108,7 @@ class IpAddress extends Model implements Filterable, Sortable
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('ip_address'),
+            $factory->create('network_id'),
             $factory->create('type'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -111,6 +133,7 @@ class IpAddress extends Model implements Filterable, Sortable
             'id' => 'id',
             'name' => 'name',
             'ip_address' => 'ip_address',
+            'network_id' => 'network_id',
             'type' => 'type',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

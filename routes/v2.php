@@ -302,6 +302,16 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('load-balancers', 'LoadBalancerClusterController@store');
         $router->patch('load-balancers/{lbcId}', 'LoadBalancerClusterController@update');
         $router->delete('load-balancers/{lbcId}', 'LoadBalancerClusterController@destroy');
+
+    });
+
+    /** VIPS */
+    $router->group([], function() use ($router) {
+        $router->get('vips', 'VipController@index');
+        $router->get('vips/{vipId}', 'VipController@show');
+        $router->post('vips', 'VipController@create');
+        $router->patch('vips/{vipId}', 'VipController@update');
+        $router->delete('vips/{vipId}', 'VipController@destroy');
     });
 
     /** Load balancer specifications */
