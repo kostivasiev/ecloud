@@ -11,6 +11,7 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -48,15 +49,18 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             'vpc_id',
             'availability_zone_id',
             'router_throughput_id',
-            'is_management'
+            'is_management',
+            'is_hidden',
         ]);
 
         $this->casts = [
             'is_management' => 'boolean',
+            'is_hidden' => 'boolean',
         ];
 
         $this->attributes = [
-            'is_management' => false
+            'is_management' => false,
+            'is_hidden' => false,
         ];
 
         $this->dispatchesEvents = [
@@ -112,6 +116,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
         if (!$user->isScoped()) {
             return $query;
         }
+        $query->where('is_hidden', false);
         return $query->whereHas('vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
@@ -123,7 +128,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
      */
     public function filterableColumns(FilterFactory $factory)
     {
-        return [
+        $columns = [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('router_throughput_id', Filter::$stringDefaults),
@@ -133,6 +138,12 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('updated_at', Filter::$dateDefaults),
             $factory->create('is_management', Filter::$enumDefaults),
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $columns[] = $factory->create('is_hidden', Filter::$numericDefaults);
+        }
+
+        return $columns;
     }
 
     /**
@@ -142,7 +153,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
      */
     public function sortableColumns(SortFactory $factory)
     {
-        return [
+        $columns = [
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('router_throughput_id'),
@@ -152,6 +163,12 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('updated_at'),
             $factory->create('is_management'),
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $columns[] = $factory->create('is_hidden');
+        }
+
+        return $columns;
     }
 
     /**
@@ -168,7 +185,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
 
     public function databaseNames()
     {
-        return [
+        $columns = [
             'id' => 'id',
             'name' => 'name',
             'router_throughput_id' => 'router_throughput_id',
@@ -178,5 +195,11 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $columns['is_hidden'] = 'is_hidden';
+        }
+
+        return $columns;
     }
 }

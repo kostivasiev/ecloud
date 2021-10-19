@@ -2,13 +2,13 @@
 
 namespace Tests\V2;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class NewIDTest extends TestCase
@@ -60,6 +60,7 @@ class NewIDTest extends TestCase
 
     public function testFormatOfRoutersId()
     {
+        Event::fake(Created::class);
         App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
         $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
@@ -74,11 +75,15 @@ class NewIDTest extends TestCase
             $this->generateRegExp(Router::class),
             (json_decode($this->response->getContent()))->data->id
         );
+        Event::assertDispatched(Created::class);
     }
 
     public function testDevEnvironmentId()
     {
+        Event::fake(Created::class);
+
         App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
+
         $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc()->id,
@@ -92,10 +97,13 @@ class NewIDTest extends TestCase
             $this->generateRegExp(Router::class),
             (json_decode($this->response->getContent()))->data->id
         );
+
+        Event::assertDispatched(Created::class);
     }
 
     public function testProductionEnvironmentId()
     {
+        Event::fake(Created::class);
         App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('production');
         $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
@@ -110,6 +118,7 @@ class NewIDTest extends TestCase
             $this->generateRegExp(Router::class),
             (json_decode($this->response->getContent()))->data->id
         );
+        Event::assertDispatched(Created::class);
     }
 
     /**

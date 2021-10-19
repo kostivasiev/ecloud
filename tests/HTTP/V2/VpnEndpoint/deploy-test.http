@@ -96,6 +96,33 @@ client.test('Delete VPN Endpoint', function () {
 });
 %}
 
+
+
+### Create VPN Session
+POST https://{{host}}/{{version}}/vpn-sessions
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "vpn session test",
+    "vpn_profile_group_id": "vpnpg-aaaaaaaa",
+    "vpn_service_id": "{{vpn_id}}",
+    "vpn_endpoint_id": "{{vpn_endpoint_id}}",
+    "remote_ip": "211.12.13.1",
+    "remote_networks": "10.0.3.0/24",
+    "local_networks": "10.0.0.0/24"
+}
+
+> {%
+client.test('Create VPN Session', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('vpn_session_id', response.body.data.id);
+client.log('VPN Session ID: ' + response.body.data.id);
+%}
+
+
 ### Before going any further execute the following sql in the database:-
 ### UPDATE floating_ips SET floating_ips.resource_type=NULL, floating_ips.resource_id=NULL WHERE floating_ips.id='{{floating_ip_id}}';
 
@@ -115,6 +142,18 @@ Content-Type:  application/json
 
 > {%
 client.test('Delete FIP', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### Delete Resource
+DELETE https://{{host}}/{{version}}/vpn-sessions/vpns-a78cc064-dev
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete Resource', function () {
     client.assert(response.status === 202, '202 response not received');
 });
 %}
