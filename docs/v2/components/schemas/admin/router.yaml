@@ -1,26 +1,12 @@
-properties:
-  id:
-    type: string
-    example: rtr-2b66bb79
-    readOnly: false
-  name:
-    type: string
-    example: 'Primary Router'
-    readOnly: false
-  vpc_id:
-    type: string
-    required: true
-    example: 'vpc-2b66bb79'
-#  availability_zone_id:
-#    type: string
-#    required: false
-#    example: 'az-2b66bb79'
-  created_at:
-    type: string
-    example: '2020-07-07T10:30:00+01:00'
-    readOnly: false
-  updated_at:
-    type: string
-    example: '2020-07-07T10:30:00+01:00'
-    readOnly: false
-description: 'Routers'
+allOf:
+  - $ref: "../router.yaml"
+  - type: object
+    properties:
+      is_management:
+        type: boolean
+        readOnly: false
+        example: false
+      is_hidden :
+        type : boolean
+        readOnly : true
+        example : false

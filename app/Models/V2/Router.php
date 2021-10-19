@@ -30,28 +30,42 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'rtr';
-    public $incrementing = false;
-    public $timestamps = true;
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-
-    protected $fillable = [
-        'id',
-        'name',
-        'vpc_id',
-        'availability_zone_id',
-        'router_throughput_id',
-    ];
-
-    protected $dispatchesEvents = [
-        'creating' => Creating::class,
-        'deleted' => Deleted::class,
-    ];
 
     public $children = [
         'vpns',
         'networks'
     ];
+
+    public function __construct(array $attributes = [])
+    {
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+
+        $this->fillable([
+            'id',
+            'name',
+            'vpc_id',
+            'availability_zone_id',
+            'router_throughput_id',
+            'is_management'
+        ]);
+
+        $this->casts = [
+            'is_management' => 'boolean',
+        ];
+
+        $this->attributes = [
+            'is_management' => false
+        ];
+
+        $this->dispatchesEvents = [
+            'creating' => Creating::class,
+            'deleted' => Deleted::class,
+        ];
+
+        parent::__construct($attributes);
+    }
 
     public function getResellerId(): int
     {
@@ -117,6 +131,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
+            $factory->create('is_management', Filter::$enumDefaults),
         ];
     }
 
@@ -135,6 +150,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('availability_zone_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
+            $factory->create('is_management'),
         ];
     }
 
@@ -158,6 +174,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             'router_throughput_id' => 'router_throughput_id',
             'vpc_id' => 'vpc_id',
             'availability_zone_id' => 'availability_zone_id',
+            'is_management' => 'is_management',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

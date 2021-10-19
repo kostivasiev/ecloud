@@ -44,6 +44,11 @@ class CreateRequest extends FormRequest
                 'required',
                 'exists:ecloud.router_throughputs,id,deleted_at,NULL',
                 new ExistsForAvailabilityZone($this->request->get('availability_zone_id'))
+            ],
+            'is_management' => [
+                'sometimes',
+                'required',
+                'boolean'
             ]
         ];
     }
