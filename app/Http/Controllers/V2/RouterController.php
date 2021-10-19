@@ -45,6 +45,10 @@ class RouterController extends BaseController
     {
         $router = new Router($request->only(['name', 'vpc_id', 'availability_zone_id', 'router_throughput_id']));
 
+        if ($request->user()->isAdmin()) {
+            $router->is_management = $request->input('is_management', false);
+        }
+
         $task = $router->syncSave();
         return $this->responseIdMeta($request, $router->id, 202, $task->id);
     }
@@ -53,6 +57,10 @@ class RouterController extends BaseController
     {
         $router = Router::forUser(Auth::user())->findOrFail($routerId);
         $router->fill($request->only(['name', 'router_throughput_id']));
+
+        if ($request->user()->isAdmin()) {
+            $router->is_management = $request->input('is_management', $router->is_management);
+        }
 
         $task = $router->syncSave();
         return $this->responseIdMeta($request, $router->id, 202, $task->id);

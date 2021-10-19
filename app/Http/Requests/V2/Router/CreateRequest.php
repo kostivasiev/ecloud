@@ -2,12 +2,10 @@
 
 namespace App\Http\Requests\V2\Router;
 
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
-use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest

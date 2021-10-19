@@ -4,7 +4,6 @@ namespace Tests\V2\Router;
 
 use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
-use UKFast\Api\Auth\Consumer;
 
 class GetTest extends TestCase
 {
@@ -81,22 +80,5 @@ class GetTest extends TestCase
                 'sequence' => $this->firewallPolicy()->sequence,
             ])
             ->assertResponseStatus(200);
-    }
-
-
-    public function testGetManagedRouterNotAdminFails()
-    {
-        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-
-       exit(print_r(
-          $this->router()
-       ));
-
-        $this->router()->setAttribute('is_managed', true)->save();
-
-//        $this->get(
-//            '/v2/routers/' . $this->router()->id,
-//        )
-//            ->assertResponseStatus(404);
     }
 }

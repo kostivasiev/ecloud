@@ -59,15 +59,17 @@ class NetworkRulePort extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, $user)
     {
-        if (!empty($user->resellerId)) {
-            $query->whereHas('networkRule.networkPolicy.network.router.vpc', function ($query) use ($user) {
-                $resellerId = filter_var($user->resellerId, FILTER_SANITIZE_NUMBER_INT);
-                if (!empty($resellerId)) {
-                    $query->where('reseller_id', '=', $resellerId);
-                }
-            });
+        if (!$user->isScoped()) {
+            return $query;
         }
-        return $query;
+
+        return $query
+            ->whereHas('networkRule.networkPolicy.network.router.vpc', function ($query) use ($user) {
+                $query->where('reseller_id', $user->resellerId());
+            })
+            ->whereHas('networkRule.networkPolicy.network.router', function ($query) {
+                $query->where('is_management', false);
+            });
     }
 
     public function filterableColumns(FilterFactory $factory)

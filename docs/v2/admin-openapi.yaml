@@ -229,6 +229,14 @@ paths:
     $ref: 'resources/LoadBalancerSpecification/admin-collection.yaml'
   '/ecloud/v2/load-balancer-specs/{lbsId}':
     $ref: 'resources/LoadBalancerSpecification/admin-item.yaml'
+  '/ecloud/v2/networks' :
+    $ref : 'resources/Network/admin-collection.yaml'
+  '/ecloud/v2/networks/{networkId}' :
+    $ref : 'resources/Network/admin-item.yaml'
+  '/ecloud/v2/networks/{networkId}/nics' :
+    $ref : 'resources/Network/nic-collection.yaml'
+  '/ecloud/v2/networks/{networkId}/tasks' :
+    $ref : 'resources/Network/tasks-collection.yaml'
   '/ecloud/v2/nics':
     $ref: 'resources/Nic/collection.yaml'
   '/ecloud/v2/nics/{nicId}':

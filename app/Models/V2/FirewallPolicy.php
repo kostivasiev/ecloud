@@ -69,6 +69,11 @@ class FirewallPolicy extends Model implements Filterable, Sortable, ResellerScop
         if (!$user->isScoped()) {
             return $query;
         }
+
+        $query->whereHas('router', function ($query) {
+            $query->where('is_management', false);
+        });
+
         return $query->whereHas('router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });

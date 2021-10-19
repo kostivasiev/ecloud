@@ -50,17 +50,18 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             'availability_zone_id',
             'router_throughput_id',
             'is_management',
-            'is_hidden',
         ]);
 
         $this->casts = [
             'is_management' => 'boolean',
-            'is_hidden' => 'boolean',
         ];
 
         $this->attributes = [
             'is_management' => false,
-            'is_hidden' => false,
+        ];
+
+        $this->appends = [
+            'is_hidden'
         ];
 
         $this->dispatchesEvents = [
@@ -106,6 +107,11 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
         return $this->belongsTo(RouterThroughput::class);
     }
 
+    public function getIsHiddenAttribute(): bool
+    {
+        return (bool) $this->attributes['is_management'];
+    }
+
     /**
      * @param $query
      * @param $user
@@ -116,7 +122,8 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
         if (!$user->isScoped()) {
             return $query;
         }
-        $query->where('is_hidden', false);
+
+        $query->where('is_management', false);
         return $query->whereHas('vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
@@ -185,7 +192,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
 
     public function databaseNames()
     {
-        $columns = [
+        return [
             'id' => 'id',
             'name' => 'name',
             'router_throughput_id' => 'router_throughput_id',
@@ -195,11 +202,5 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];
-
-        if (Auth::user()->isAdmin()) {
-            $columns['is_hidden'] = 'is_hidden';
-        }
-
-        return $columns;
     }
 }
