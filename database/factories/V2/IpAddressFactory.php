@@ -23,7 +23,8 @@ class IpAddressFactory extends Factory
         return [
             'ip_address' => '1.1.1.1',
             'network_id' => 'net-aaaaaaaa',
-            'type' => 'normal'
+            'type' => 'normal',
+            'name' => 'test IP',
         ];
     }
 }

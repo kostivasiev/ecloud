@@ -15,6 +15,7 @@ use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
@@ -122,6 +123,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var Image */
     private $image;
 
+    /** @var IpAddress */
+    private $ip;
+
     /** @var ImageParameter */
     private $imageParameter;
 
@@ -154,6 +158,22 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->firewallPolicy;
+    }
+
+    public function ip($id = 'ip-aaaaaaaa-dev'): IpAddress
+    {
+        if (!$this->ip) {
+            Model::withoutEvents(function() use ($id) {
+                $this->ip = IpAddress::factory()->create([
+                    'id' => $id,
+                    'ip_address' => '1.1.1.1',
+                    'name' => 'test IP',
+                    'network_id' => $this->network()->id,
+                    'type' => 'normal'
+                ]);
+            });
+        }
+        return $this->ip;
     }
 
     public function networkPolicy($id = 'np-test'): NetworkPolicy
@@ -211,13 +231,13 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->vpc;
     }
 
-    public function vip($id = 'vip-aaaaaaaa-dev', $ip = 'ip-aaaaaaaa-dev'): Vip
+    public function vip($id = 'vip-aaaaaaaa-dev'): Vip
     {
         if (!$this->vip) {
-            Model::withoutEvents(function() use ($id, $ip) {
+            Model::withoutEvents(function() use ($id) {
                 $this->vip = Vip::factory()->create([
                     'id' => $id,
-                    'ip_address_id' => $ip,
+                    'ip_address_id' => $this->ip()->id,
                     'name' => $id
                 ]);
             });
