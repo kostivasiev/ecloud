@@ -24,7 +24,7 @@ class UpdateTest extends TestCase
     {
         Model::withoutEvents(function() {
             $this->task = new Task([
-                'id' => 'task-1',
+                'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $this->task->resource()->associate($this->vip());
@@ -35,7 +35,7 @@ class UpdateTest extends TestCase
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() > 0;
+            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 5;
         });
     }
 }

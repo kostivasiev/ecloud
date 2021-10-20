@@ -3,7 +3,6 @@
 namespace Tests\V2\Vip;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\IpAddress;
 use App\Models\V2\Vip;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -13,7 +12,6 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        IpAddress::factory()->create();
     }
 
     public function testValidDataIsSuccessful()
@@ -25,8 +23,8 @@ class UpdateTest extends TestCase
                 'ip_address_id' => 'vip-bbbbbbbb',
             ],
             [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'x-consumer-custom-id' => '0-0',
+                'x-consumer-groups' => 'ecloud.write'
             ]
         )
             ->assertResponseStatus(202);

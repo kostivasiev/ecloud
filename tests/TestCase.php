@@ -215,7 +215,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     {
         if (!$this->vip) {
             Model::withoutEvents(function() use ($id, $ip) {
-
                 $this->vip = Vip::factory()->create([
                     'id' => $id,
                     'ip_address_id' => $ip,
@@ -672,6 +671,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,
             \App\Events\V2\Nat\Created::class,
+            \App\Events\V2\Vip\Created::class,
 
             // Deleting
             \App\Events\V2\Nat\Deleting::class,
@@ -682,6 +682,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\FloatingIp\Deleted::class,
             \App\Events\V2\Network\Deleted::class,
             \App\Events\V2\Router\Deleted::class,
+            \App\Events\V2\Vip\Deleted::class,
 
             // Saved
             \App\Events\V2\Nat\Saved::class,
