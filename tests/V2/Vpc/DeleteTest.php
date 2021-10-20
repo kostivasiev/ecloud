@@ -63,6 +63,16 @@ class DeleteTest extends TestCase
         ])->assertResponseStatus(412);
     }
 
+    public function testDeleteVpcWithManagementResourceDoesNotFail()
+    {
+        Event::fake(Created::class);
+        $this->router()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
+            'X-consumer-custom-id' => '0-0',
+            'X-consumer-groups' => 'ecloud.write',
+        ])->assertResponseStatus(202);
+    }
+
     public function testSuccessfulDelete()
     {
         Event::fake(Created::class);

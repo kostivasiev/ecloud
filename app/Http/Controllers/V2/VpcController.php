@@ -108,12 +108,7 @@ class VpcController extends BaseController
 
     public function destroy(Request $request, string $vpcId)
     {
-        $vpc = Vpc::forUser($request->user())->findOrFail($vpcId);
-        if (!$vpc->canDelete()) {
-            return $vpc->getDeletionError();
-        }
-
-        $task = $vpc->syncDelete();
+        $task = Vpc::forUser($request->user())->findOrFail($vpcId)->syncDelete();
         return $this->responseTaskId($task->id);
     }
 
