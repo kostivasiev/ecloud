@@ -14,7 +14,7 @@ class AddIsManagementToRoutersTable extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('routers', function (Blueprint $table) {
-            $table->boolean('is_management')->default(false)->after('availability_zone_id');
+            $table->renameColumn('is_hidden', 'is_management');
         });
     }
 
