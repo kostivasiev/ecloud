@@ -76,9 +76,7 @@ class IpAddress extends Model implements Filterable, Sortable
         return $query->whereHas('network.router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
-
     }
-
 
     /**
      * @param FilterFactory $factory
