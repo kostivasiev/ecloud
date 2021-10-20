@@ -3,8 +3,8 @@
 namespace App\Jobs\Sync\Vpc;
 
 use App\Jobs\Job;
-use App\Jobs\Network\DeleteManagementNetwork;
-use App\Jobs\Router\DeleteManagementRouter;
+use App\Jobs\Network\DeleteManagementNetworks;
+use App\Jobs\Router\DeleteManagementRouters;
 use App\Jobs\Vpc\AwaitDhcpRemoval;
 use App\Jobs\Vpc\DeleteDhcps;
 use App\Jobs\Vpc\RemoveLanPolicies;
@@ -27,8 +27,8 @@ class Delete extends Job
     {
         $this->deleteTaskBatch([
             [
-                new DeleteManagementNetwork($this->task),
-                new DeleteManagementRouter($this->task),
+                new DeleteManagementNetworks($this->task),
+                new DeleteManagementRouters($this->task),
                 new RemoveLanPolicies($this->task->resource),
                 new DeleteDhcps($this->task->resource),
                 new AwaitDhcpRemoval($this->task->resource),

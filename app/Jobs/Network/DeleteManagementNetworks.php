@@ -10,7 +10,7 @@ use App\Traits\V2\Jobs\AwaitTask;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 
-class DeleteManagementNetwork extends Job
+class DeleteManagementNetworks extends Job
 {
     use Batchable, LoggableModelJob, AwaitResources, AwaitTask;
 
@@ -25,29 +25,29 @@ class DeleteManagementNetwork extends Job
 
     public function handle()
     {
-        $managementNetwork = [];
+        $managementNetworkIds = [];
         if (empty($this->task->data['management_network_ids'])) {
-            $this->model->routers->where('is_hidden', '=', true)->each(function ($router) use (&$managementNetwork) {
+            $this->model->routers->where('is_hidden', '=', true)->each(function ($router) use (&$managementNetworkIds) {
                 Network::whereHas('router', function ($query) use ($router) {
                     $query->where('router_id', '=', $router->id);
-                })->each(function ($network) use (&$managementNetwork) {
+                })->each(function ($network) use (&$managementNetworkIds) {
                     $network->syncDelete();
-                    $managementNetwork[] = $network->id;
+                    $managementNetworkIds[] = $network->id;
                 });
             });
             $this->task->data = [
-                'management_network_ids' => $managementNetwork,
+                'management_network_ids' => $managementNetworkIds,
             ];
             $this->task->saveQuietly();
         } else {
-            $managementNetwork = Network::whereIn('id', $this->task->data['management_network_ids'])
+            $managementNetworkIds = Network::whereIn('id', $this->task->data['management_network_ids'])
                 ->get()
                 ->pluck('id')
                 ->toArray();
         }
 
-        if ($managementNetwork) {
-            $this->awaitSyncableResources($managementNetwork);
+        if ($managementNetworkIds) {
+            $this->awaitSyncableResources($managementNetworkIds);
         }
     }
 }

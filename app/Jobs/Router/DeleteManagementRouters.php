@@ -10,7 +10,7 @@ use App\Traits\V2\Jobs\AwaitTask;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 
-class DeleteManagementRouter extends Job
+class DeleteManagementRouters extends Job
 {
     use Batchable, LoggableModelJob, AwaitResources, AwaitTask;
 
@@ -26,24 +26,24 @@ class DeleteManagementRouter extends Job
     public function handle()
     {
         if (empty($this->task->data['management_router_ids'])) {
-            $managementRouters = [];
-            $this->model->routers->where('is_hidden', '=', true)->each(function ($router) use (&$managementRouters) {
+            $managementRoutersIds = [];
+            $this->model->routers->where('is_hidden', '=', true)->each(function ($router) use (&$managementRoutersIds) {
                 $router->syncDelete();
-                $managementRouters[] = $router->id;
+                $managementRoutersIds[] = $router->id;
             });
             $this->task->data = [
-                'management_router_ids' => $managementRouters,
+                'management_router_ids' => $managementRoutersIds,
             ];
             $this->task->saveQuietly();
         } else {
-            $managementRouters = Router::whereIn('id', $this->task->data['management_router_ids'])
+            $managementRoutersIds = Router::whereIn('id', $this->task->data['management_router_ids'])
                 ->get()
                 ->pluck('id')
                 ->toArray();
         }
 
-        if ($managementRouters) {
-            $this->awaitSyncableResources($managementRouters);
+        if ($managementRoutersIds) {
+            $this->awaitSyncableResources($managementRoutersIds);
         }
     }
 }
