@@ -135,7 +135,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
      */
     public function filterableColumns(FilterFactory $factory)
     {
-        $columns = [
+        return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('router_throughput_id', Filter::$stringDefaults),
@@ -145,12 +145,6 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('updated_at', Filter::$dateDefaults),
             $factory->create('is_management', Filter::$enumDefaults),
         ];
-
-        if (Auth::user()->isAdmin()) {
-            $columns[] = $factory->create('is_hidden', Filter::$numericDefaults);
-        }
-
-        return $columns;
     }
 
     /**
@@ -160,7 +154,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
      */
     public function sortableColumns(SortFactory $factory)
     {
-        $columns = [
+        return [
             $factory->create('id'),
             $factory->create('name'),
             $factory->create('router_throughput_id'),
@@ -170,12 +164,6 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('updated_at'),
             $factory->create('is_management'),
         ];
-
-        if (Auth::user()->isAdmin()) {
-            $columns[] = $factory->create('is_hidden');
-        }
-
-        return $columns;
     }
 
     /**

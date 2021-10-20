@@ -82,7 +82,7 @@ class CreateManagementNetwork extends Job
         // Check database
         $networkCollection = Network::whereHas('router.availabilityZone', function ($query) use ($availabilityZoneId) {
             $query->where('availability_zones.id', '=', $availabilityZoneId);
-            $query->where('routers.is_hidden', '=', true);
+            $query->where('routers.is_management', '=', true);
         })->get();
 
         foreach ($networkCollection as $network) {

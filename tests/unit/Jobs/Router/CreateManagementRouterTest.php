@@ -20,7 +20,7 @@ class CreateManagementRouterTest extends TestCase
         parent::setUp();
     }
 
-    public function testCreateAdminRouter()
+    public function testCreateManagementRouter()
     {
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -35,6 +35,6 @@ class CreateManagementRouterTest extends TestCase
         $job->handle();
 
         $managementRouter = Router::findOrFail($this->task->data['management_router_id']);
-        $this->assertTrue($managementRouter->is_hidden);
+        $this->assertTrue($managementRouter->is_management);
     }
 }
