@@ -80,8 +80,6 @@ components:
       $ref: 'resources/VolumeGroup/schema.yaml'
     VpnEndpoint:
       $ref: 'resources/VpnEndpoint/schema.yaml'
-    VpnProfile:
-      $ref: 'resources/VpnProfile/schema.yaml'
     VpnProfileGroup:
       $ref: 'components/schemas/vpnProfileGroup.yaml'
     VpnService:
@@ -160,8 +158,6 @@ components:
       $ref: 'resources/VpnEndpoint/responses/idResponse.yaml'
     VpnProfileGroupIdResponse:
       $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
-    VpnProfileIdResponse:
-      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
     VpnServiceIdResponse:
       $ref: 'resources/VpnService/responses/idResponse.yaml'
     VpnSessionIdResponse:
@@ -274,6 +270,8 @@ paths:
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/tasks':
     $ref: 'resources/Instance/tasks-collection.yaml'
+  '/ecloud/v2/instances/{instanceId}/floating-ips':
+    $ref: 'resources/Instance/fips-collection.yaml'
   '/ecloud/v2/instances/{instanceId}/unlock':
     $ref: 'resources/Instance/lockUnlock.yaml'
   '/ecloud/v2/instances/{instanceId}/volume-attach':
@@ -320,6 +318,8 @@ paths:
     $ref: 'resources/Nic/public_item.yaml'
   '/ecloud/v2/nics/{nicId}/ip-addresses' :
     $ref : 'resources/Nic/ip-address-collection.yaml'
+  /ecloud/v2/nics/{nicId}/ip-addresses/{ipAddressId}:
+    $ref : 'resources/Nic/ip-address-item.yaml'
   '/ecloud/v2/nics/{nicId}/tasks':
     $ref: 'resources/Nic/tasks-collection.yaml'
   '/ecloud/v2/regions':
@@ -390,10 +390,6 @@ paths:
     $ref: 'resources/VpnProfileGroup/collection.yaml'
   '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':
     $ref: 'resources/VpnProfileGroup/item.yaml'
-  '/ecloud/v2/vpn-profiles':
-    $ref: 'resources/VpnProfile/collection.yaml'
-  '/ecloud/v2/vpn-profiles/{vpnProfileId}':
-    $ref: 'resources/VpnProfile/item.yaml'
   '/ecloud/v2/vpn-services':
     $ref: 'resources/VpnService/collection.yaml'
   '/ecloud/v2/vpn-services/{vpnServiceId}':

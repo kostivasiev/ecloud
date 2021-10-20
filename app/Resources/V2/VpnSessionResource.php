@@ -47,6 +47,11 @@ class VpnSessionResource extends UKFastResource
             $this->updated_at,
             new \DateTimeZone(config('app.timezone'))
         )->toIso8601String();
+
+        if ($request->route('vpnSessionId')) {
+            $retVal['tunnel_details'] = $this->tunnel_details;
+        }
+
         return $retVal;
     }
 }

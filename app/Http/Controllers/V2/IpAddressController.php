@@ -39,6 +39,7 @@ class IpAddressController extends BaseController
             $request->only([
                 'name',
                 'ip_address',
+                'network_id',
                 'type'
             ])
         );

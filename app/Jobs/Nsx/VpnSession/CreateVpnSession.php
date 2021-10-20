@@ -46,7 +46,6 @@ class CreateVpnSession extends Job
                     'authentication_mode' => 'PSK',
                     'psk' => $vpnSession->psk,
                     'display_name' => $vpnSession->id,
-                    'dpd_profile_path' => '/infra/ipsec-vpn-dpd-profiles/' . $vpnSession->vpnProfileGroup->dpd_profile_id,
                     'ike_profile_path' => '/infra/ipsec-vpn-ike-profiles/' . $vpnSession->vpnProfileGroup->ike_profile_id,
                     'tunnel_profile_path' => '/infra/ipsec-vpn-tunnel-profiles/' . $vpnSession->vpnProfileGroup->ipsec_profile_id,
                     'local_endpoint_path' => '/infra/tier-1s/' . $router->id .

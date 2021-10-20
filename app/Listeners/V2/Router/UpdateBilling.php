@@ -38,6 +38,11 @@ class UpdateBilling
         }
         /** @var Router $model */
 
+        // If is management router, don't add a billing entry
+        if ($model->is_hidden) {
+            return;
+        }
+
         $time = Carbon::now();
 
         $currentActiveMetric = BillingMetric::where('resource_id', $model->id)

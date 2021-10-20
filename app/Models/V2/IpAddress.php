@@ -33,6 +33,7 @@ class IpAddress extends Model implements Filterable, Sortable
             'id',
             'name',
             'ip_address',
+            'network_id',
             'type',
         ]);
 

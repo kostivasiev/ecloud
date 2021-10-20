@@ -8,6 +8,7 @@ use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
 use App\Models\V2\VpnSession;
 use App\Models\V2\VpnSessionNetwork;
+use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -42,7 +43,6 @@ class GetTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id,
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz',
-            'dpd_profile_id' => 'dpd-abc123xyz',
         ]);
         $this->vpnSession = factory(VpnSession::class)->create(
             [
@@ -86,6 +86,14 @@ class GetTest extends TestCase
 
     public function testGetResource()
     {
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs([
+                '/policy/api/v1/infra/tier-1s/rtr-test/locale-services/rtr-test/ipsec-vpn-services/' . $this->vpnSession->vpnService->id . '/sessions/' . $this->vpnSession->id . '/statistics',
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([]));
+            });
+
         $this->get('/v2/vpn-sessions/' . $this->vpnSession->id)
             ->seeJson(
                 [

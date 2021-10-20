@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\V2\Dhcp;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\OrchestratorBuild;
@@ -69,6 +70,7 @@ class AppServiceProvider extends ServiceProvider
             'obuild' => OrchestratorBuild::class,
             'vpns' => VpnSession::class,
             'vpnp' => VpnProfile::class,
+            'ip' => IpAddress::class,
         ]);
 
         Queue::exceptionOccurred(function (JobExceptionOccurred $event) {

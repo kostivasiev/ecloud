@@ -2,8 +2,8 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\Instance;
 use GuzzleHttp\Psr7\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase
@@ -15,7 +15,6 @@ class GetTest extends TestCase
 
         $this->kingpinServiceMock()->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode([
-                'powerState' => 'poweredOn',
                 'powerState' => 'poweredOn',
                 'toolsRunningStatus' => 'guestToolsRunning'
             ]))
@@ -38,6 +37,27 @@ class GetTest extends TestCase
                 'platform' => 'Linux',
             ])
             ->assertResponseStatus(200);
+    }
+
+    public function testCantSeeHiddenResource()
+    {
+        $hidden = factory(Instance::class)->create([
+            'is_hidden' => true,
+            'vpc_id' => $this->vpc()->id,
+        ]);
+
+        $this->get(
+            '/v2/instances/' . $hidden->id,
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'title' => 'Not found',
+                'detail' => 'No Instance with that ID was found',
+            ])
+            ->assertResponseStatus(404);
     }
 
     public function testGetResource()
@@ -63,5 +83,22 @@ class GetTest extends TestCase
         $this->seeJson([
             'platform' => 'Linux',
         ]);
+    }
+
+    public function testGetFloatingIps()
+    {
+        $this->floatingIp()->resource()->associate($this->nic())->save();
+
+        $this->get(
+            '/v2/instances/' . $this->instance()->id . '/floating-ips',
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )
+            ->seeJson([
+                'id' => 'fip-test',
+            ])
+            ->assertResponseStatus(200);
     }
 }

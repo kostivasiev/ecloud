@@ -1,22 +1,25 @@
 <?php
 
-namespace App\Console\Commands\Nat;
+namespace App\Console\Commands\Health;
 
-use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Carbon;
 
-class FindOrphaned extends Command
+class FindOrphanedNats extends Command
 {
-    protected $signature = 'nat:find-orphaned';
+    protected $signature = 'health:find-orphaned-nats';
 
     protected $description = 'Finds orphaned NAT records';
 
     public function handle()
     {
         $failed = false;
-        foreach (Nat::all() as $nat) {
+
+        $nats = Nat::query()
+            ->where('updated_at', '<=', Carbon::now()->addHours(-12))->get();
+
+        foreach ($nats as $nat) {
             if (!empty($nat->source_id) && !$nat->source()->exists()) {
                 $this->error("Orphaned NAT {$nat->id} exists for deleted source {$nat->source_id}");
                 $failed = true;

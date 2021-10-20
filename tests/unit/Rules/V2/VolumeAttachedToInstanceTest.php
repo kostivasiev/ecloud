@@ -1,13 +1,9 @@
 <?php
 
-
-namespace Rules\V2;
-
+namespace Tests\unit\Rules\V2;
 
 use App\Models\V2\Volume;
-use App\Rules\V2\IsValidSshPublicKey;
 use App\Rules\V2\VolumeAttachedToInstance;
-use App\Rules\V2\VolumeNotAttachedToInstance;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 

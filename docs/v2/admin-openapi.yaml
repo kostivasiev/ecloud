@@ -233,6 +233,12 @@ paths:
     $ref: 'resources/Nic/collection.yaml'
   '/ecloud/v2/nics/{nicId}':
     $ref: 'resources/Nic/item.yaml'
+  '/ecloud/v2/nics/{nicId}/ip-addresses' :
+    $ref : 'resources/Nic/ip-address-collection.yaml'
+  /ecloud/v2/nics/{nicId}/ip-addresses/{ipAddressId}:
+    $ref : 'resources/Nic/ip-address-item.yaml'
+  '/ecloud/v2/nics/{nicId}/tasks':
+    $ref: 'resources/Nic/tasks-collection.yaml'
   '/ecloud/v2/orchestrator-configs':
     $ref: 'resources/OrchestratorConfig/admin-collection.yaml'
   '/ecloud/v2/orchestrator-configs/{configId}':
@@ -272,9 +278,9 @@ paths:
   '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':
     $ref: 'resources/VpnProfileGroup/admin-item.yaml'
   '/ecloud/v2/vpn-profiles':
-    $ref: 'resources/VpnProfile/admin-collection.yaml'
+    $ref: 'resources/VpnProfile/collection.yaml'
   '/ecloud/v2/vpn-profiles/{vpnProfileId}':
-    $ref: 'resources/VpnProfile/admin-item.yaml'
+    $ref: 'resources/VpnProfile/item.yaml'
 #  When adding a new response use the following reference, and add to the list above alphabetically
 #  '/ecloud/v2/references':
 #    $ref: 'resources/Reference/collection.yaml'

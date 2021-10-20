@@ -114,6 +114,8 @@ $app->routeMiddleware([
     'floating-ip-can-be-deleted' => \App\Http\Middleware\FloatingIp\CanBeDeleted::class,
     'volume-can-be-deleted' => \App\Http\Middleware\Volume\CanDelete::class,
     'ip-address-can-delete' => \App\Http\Middleware\IpAddress\CanDelete::class,
+    'vpn-endpoint-can-delete' => \App\Http\Middleware\VpnEndpoint\CanDelete::class,
+    'vpc-can-delete' => \App\Http\Middleware\Vpc\CanDelete::class,
 ]);
 
 /*

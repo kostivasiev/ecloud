@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Console\Commands\IpAddress\PopulateNetworkId;
 use Illuminate\Console\Scheduling\Schedule;
 use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
@@ -33,9 +34,10 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Orchestrator\ScheduledDeploy::class,
         \App\Console\Commands\FloatingIp\SetPolymorphicRelationship::class,
         \App\Console\Commands\FloatingIp\PopulateAvailabilityZoneId::class,
-        \App\Console\Commands\Nat\FindOrphaned::class,
+        \App\Console\Commands\Health\FindOrphanedNats::class,
         \App\Console\Commands\Health\FindOrphanedNics::class,
         \App\Console\Commands\Task\TimeoutStuck::class,
+        \App\Console\Commands\IpAddress\PopulateNetworkId::class
     ];
 
     /**
@@ -54,6 +56,14 @@ class Kernel extends ConsoleKernel
                 ->emailOutputTo(config('alerts.billing.to'));
             $schedule->command('orchestrator:deploy')
                 ->everyMinute();
+
+            $schedule->command('health:find-orphaned-nats')
+                ->dailyAt("09:00")
+                ->emailOutputOnFailure(config('alerts.health.to'));
+
+            $schedule->command('health:find-orphaned-nics')
+                ->dailyAt("09:00")
+                ->emailOutputOnFailure(config('alerts.health.to'));
         }
 
         $schedule->command('task:timeout-stuck --hours=12')

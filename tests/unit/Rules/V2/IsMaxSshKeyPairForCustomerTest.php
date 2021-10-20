@@ -4,8 +4,6 @@ namespace Tests\unit\Rules\V2;
 
 use App\Http\Middleware\IsMaxSshKeyPairForCustomer;
 use App\Models\V2\SshKeyPair;
-use App\Models\V2\Vpc;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;

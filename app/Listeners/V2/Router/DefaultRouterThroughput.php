@@ -18,8 +18,11 @@ class DefaultRouterThroughput
         }
 
         // Default router throughput is 20Mbps
+        $committedBandwidth = ($router->is_hidden) ?
+            config('router.throughput.admin_default.bandwidth'):
+            config('router.throughput.default.bandwidth');
         $routerThroughput = $router->availabilityZone->routerThroughputs
-            ->where('committed_bandwidth', config('router.throughput.default.bandwidth'))
+            ->where('committed_bandwidth', $committedBandwidth)
             ->first();
 
         if (empty($routerThroughput)) {

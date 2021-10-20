@@ -60,7 +60,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('vpcs/{vpcId}', 'VpcController@update');
         $router->get('vpcs', 'VpcController@index');
         $router->get('vpcs/{vpcId}', 'VpcController@show');
-        $router->delete('vpcs/{vpcId}', 'VpcController@destroy');
+
+        $router->group(['middleware' => 'vpc-can-delete'], function () use ($router) {
+            $router->delete('vpcs/{vpcId}', 'VpcController@destroy');
+        });
 
         $router->get('vpcs/{vpcId}/volumes', 'VpcController@volumes');
         $router->get('vpcs/{vpcId}/instances', 'VpcController@instances');
@@ -147,7 +150,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('vpn-endpoints/{vpnEndpointId}/services', 'VpnEndpointController@services');
         $router->post('vpn-endpoints', 'VpnEndpointController@store');
         $router->patch('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@update');
-        $router->delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
+        $router->group(['middleware' => 'vpn-endpoint-can-delete'], function () use ($router) {
+            $router->delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
+        });
     });
 
     /** Vpn Sessions */
@@ -207,6 +212,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('instances/{instanceId}/volumes', 'InstanceController@volumes');
         $router->get('instances/{instanceId}/nics', 'InstanceController@nics');
         $router->get('instances/{instanceId}/tasks', 'InstanceController@tasks');
+        $router->get('instances/{instanceId}/floating-ips', 'InstanceController@floatingIps');
         $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
         $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
@@ -357,6 +363,8 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('nics/{nicId}', 'NicController@show');
         $router->get('nics/{nicId}/tasks', 'NicController@tasks');
         $router->get('nics/{nicId}/ip-addresses', 'NicController@ipAddresses');
+        $router->post('nics/{nicId}/ip-addresses', 'NicController@associateIpAddress');
+        $router->delete('nics/{nicId}/ip-addresses/{ipAddressId}', 'NicController@disassociateIpAddress');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('nics', 'NicController@create');
             $router->patch('nics/{nicId}', 'NicController@update');

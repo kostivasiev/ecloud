@@ -1,7 +1,6 @@
 <?php
 namespace Tests\V2\IpAddress;
 
-use App\Models\V2\IpAddress;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -17,7 +16,8 @@ class CreateTest extends TestCase
     {
         $data = [
             'name' => 'Test',
-            'ip_address' => '1.1.1.1',
+            'ip_address' => '10.0.0.4',
+            'network_id' => $this->network()->id,
             'type' => 'normal',
         ];
 
@@ -34,8 +34,21 @@ class CreateTest extends TestCase
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
         $this->post('/v2/ip-addresses', [
             'name' => 'Test',
-            'ip_address' => '1.1.1.1',
+            'ip_address' => '10.0.0.4',
+            'network_id' => $this->network()->id,
             'type' => 'normal',
         ])->assertResponseStatus(401);
+    }
+
+    public function testIpAddressNotInSubnetFails()
+    {
+        $data = [
+            'name' => 'Test',
+            'ip_address' => '1.1.1.1',
+            'network_id' => $this->network()->id,
+            'type' => 'normal',
+        ];
+
+        $this->post('/v2/ip-addresses', $data)->assertResponseStatus(422);
     }
 }

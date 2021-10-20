@@ -53,4 +53,40 @@ class CreateFloatingIpTest extends TestCase
 
         $this->assertEquals($this->floatingIp()->id, $task->data['floating_ip_id']);
     }
+
+    public function testWhenFipAlreadyAssigned()
+    {
+        app()->bind(FloatingIp::class, function () {
+            return $this->floatingIp();
+        });
+
+        Event::fake([Created::class]);
+
+        $this->assertNull($this->vpnEndpoint('vpne-test', false)->floatingIp);
+
+        $task = Task::withoutEvents(function () {
+            $task = new Task([
+                'id' => 'task-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+                'data' => [
+                    'floating_ip_id' => $this->floatingIp()->id,
+                ]
+            ]);
+            $task->resource()->associate($this->vpnEndpoint('vpne-test', false));
+            $task->save();
+            return $task;
+        });
+
+        dispatch(new CreateFloatingIp($this->vpnEndpoint(), $task));
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        $this->vpnEndpoint()->refresh();
+        $this->assertNotNull($this->vpnEndpoint()->floatingIp);
+        $task->refresh();
+        $this->assertEquals($this->floatingIp()->id, $task->data['floating_ip_id']);
+
+        $this->floatingIp()->refresh();
+        $this->assertNotNull($this->floatingIp()->resource_id);
+    }
 }

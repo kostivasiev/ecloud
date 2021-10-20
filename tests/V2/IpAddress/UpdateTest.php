@@ -2,6 +2,7 @@
 namespace Tests\V2\IpAddress;
 
 use App\Models\V2\IpAddress;
+use App\Models\V2\Network;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -15,20 +16,20 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $ipAddress = IpAddress::factory()->create();
+        $ipAddress = IpAddress::factory()->create([
+            'network_id' => $this->network()->id
+        ]);
 
         $this->patch(
             '/v2/ip-addresses/' . $ipAddress->id, [
                 'name' => 'UPDATED',
-                'ip_address' => '2.2.2.2',
+                'ip_address' => '10.0.0.6',
                 'type' => 'cluster',
-            ])
-            ->seeInDatabase('ip_addresses', [
+            ])->seeInDatabase('ip_addresses', [
                 'name' => 'UPDATED',
-                'ip_address' => '2.2.2.2',
+                'ip_address' => '10.0.0.6',
                 'type' => 'cluster',
             ],
-            'ecloud')
-            ->assertResponseStatus(200);
+            'ecloud')->assertResponseStatus(200);
     }
 }

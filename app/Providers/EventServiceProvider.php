@@ -151,7 +151,6 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
-            \App\Listeners\V2\HostGroup\UpdateBilling::class,
             \App\Listeners\V2\Host\UpdateBilling::class,
             \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
             \App\Listeners\V2\Host\UpdateLicenseBilling::class,

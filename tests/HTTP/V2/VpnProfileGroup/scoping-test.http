@@ -53,8 +53,7 @@ Content-Type: application/json
     "description": "Public VPN Profile Group",
     "availability_zone_id": "{{public_az_id}}",
     "ike_profile_id": "ike-aaaaaaaa",
-    "ipsec_profile_id": "ipsec-aaaaaaaa",
-    "dpd_profile_id": "dpd-aaaaaaaa"
+    "ipsec_profile_id": "ipsec-aaaaaaaa"
 }
 
 > {%
@@ -76,8 +75,7 @@ Content-Type: application/json
     "description": "Private VPN Profile Group",
     "availability_zone_id": "{{private_az_id}}",
     "ike_profile_id": "ike-aaaaaaaa",
-    "ipsec_profile_id": "ipsec-aaaaaaaa",
-    "dpd_profile_id": "dpd-aaaaaaaa"
+    "ipsec_profile_id": "ipsec-aaaaaaaa"
 }
 
 > {%

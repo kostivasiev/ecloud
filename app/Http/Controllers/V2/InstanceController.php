@@ -10,15 +10,17 @@ use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Http\Requests\V2\Instance\VolumeDetachRequest;
 use App\Jobs\Instance\PowerOn;
 use App\Models\V2\Credential;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\Instance;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
-use App\Models\V2\Vpc;
 use App\Resources\V2\CredentialResource;
+use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
@@ -80,7 +82,7 @@ class InstanceController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $instance = new Instance($request->only([
+        $only = [
             'name',
             'vpc_id',
             'image_id',
@@ -88,8 +90,12 @@ class InstanceController extends BaseController
             'ram_capacity',
             'locked',
             'backup_enabled',
-            'host_group_id',
-            ]));
+            'host_group_id'
+        ];
+        if ($this->isAdmin) {
+            $only[] = 'is_hidden';
+        }
+        $instance = new Instance($request->only($only));
 
         $image = Image::forUser(Auth::user())->findOrFail($request->input('image_id'));
         $network = Network::forUser(Auth::user())->findOrFail($request->input('network_id'));
@@ -119,13 +125,16 @@ class InstanceController extends BaseController
     public function update(UpdateRequest $request, string $instanceId)
     {
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
-
-        $instance->fill($request->only([
+        $only = [
             'name',
             'vcpu_cores',
             'ram_capacity',
-            'volume_group_id',
-        ]));
+            'volume_group_id'
+        ];
+        if ($this->isAdmin) {
+            $only[] = 'is_hidden';
+        }
+        $instance->fill($request->only($only));
 
         if ($request->has('backup_enabled') && $this->isAdmin) {
             $instance->backup_enabled = $request->input('backup_enabled', $instance->backup_enabled);
@@ -437,6 +446,33 @@ class InstanceController extends BaseController
             ->transform($collection);
 
         return TaskResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    /**
+     * Load floating IP's assigned to an ip address, which is assigned to a NIC assigned to the instance!
+     * @param Request $request
+     * @param QueryTransformer $queryTransformer
+     * @param string $instanceId
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
+     */
+    public function floatingIps(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    {
+        $nics = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
+
+        $collection = FloatingIp::where(function ($query) use ($nics) {
+            $query->whereIn('resource_id', $nics->pluck('id'));
+
+            $query->orWhereIn('resource_id', IpAddress::whereHas('nics', function ($query) use ($nics) {
+                return $query->whereIn('id', $nics->pluck('id'));
+            })->pluck('id'));
+        });
+
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return FloatingIpResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

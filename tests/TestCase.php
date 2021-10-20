@@ -361,7 +361,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         if (!$this->network) {
             Model::withoutEvents(function() {
                 $this->network = factory(Network::class)->create([
-                    'id' => 'net-abcdef12',
+                    'id' => 'net-test',
                     'name' => 'Manchester Network',
                     'subnet' => '10.0.0.0/24',
                     'router_id' => $this->router()->id

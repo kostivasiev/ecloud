@@ -1,0 +1,43 @@
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{dev_vpc_id}}",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": true,
+    "network_id": "{{dev_network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600
+}
+
+> {%
+client.global.set("instance_id", response.body.data.id);
+client.log("Instance ID: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### Test OLD NIC->fIP NATting
+GET https://{{host}}/{{version}}/instances/{{instance_id}}/floating-ips
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+#### NEW NATTING
+#GET https://{{host}}/{{version}}/instances/{{instance_id}}/floating-ips
+#X-consumer-custom-id:  0-0
+#X-consumer-groups:  ecloud.read, ecloud.write
+#Content-Type:  application/json
+
+
+###
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

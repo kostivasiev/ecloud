@@ -7,6 +7,7 @@ use DateTimeZone;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Responses\UKFastResource;
 use Illuminate\Support\Facades\Log;
 
@@ -29,8 +30,8 @@ class InstanceResource extends UKFastResource
             'locked' => $this->locked,
             'platform' => $this->platform,
             'backup_enabled' => $this->backup_enabled,
-            'host_group_id' => $this->host_group_id ?? null,
-            'volume_group_id' => $this->volume_group_id ?? null,
+            'host_group_id' => !empty($this->host_group_id) ? $this->host_group_id : null,
+            'volume_group_id' => !empty($this->volume_group_id) ? $this->volume_group_id : null,
             'volume_capacity' => $this->volume_capacity,
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
@@ -58,6 +59,10 @@ class InstanceResource extends UKFastResource
             $response['online'] = isset($kingpinData->powerState) ? $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON : null;
             $response['agent_running'] = isset($kingpinData->toolsRunningStatus) ? $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING : null;
         }
+        if (Auth::user()->isAdmin()) {
+            $response['is_hidden'] = $this->is_hidden;
+        }
+
         return $response;
     }
 }

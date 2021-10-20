@@ -3,6 +3,7 @@
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Responses\UKFastResource;
 
 /**
@@ -21,7 +22,7 @@ class RouterResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $columns = [
             'id' => $this->id,
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
@@ -37,5 +38,11 @@ class RouterResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $columns['is_hidden'] = $this->is_hidden;
+        }
+
+        return $columns;
     }
 }

@@ -37,7 +37,6 @@ class VpnProfileGroupController extends BaseController
             'availability_zone_id',
             'ike_profile_id',
             'ipsec_profile_id',
-            'dpd_profile_id',
         ]));
         $vpns->save();
         return $this->responseIdMeta($request, $vpns->id, 201);
@@ -52,7 +51,6 @@ class VpnProfileGroupController extends BaseController
             'availability_zone_id',
             'ike_profile_id',
             'ipsec_profile_id',
-            'dpd_profile_id',
         ]));
         $vpns->save();
         return $this->responseIdMeta($request, $vpns->id, 200);

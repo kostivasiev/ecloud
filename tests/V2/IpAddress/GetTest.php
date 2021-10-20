@@ -22,12 +22,15 @@ class GetTest extends TestCase
                 ['ip_address' => '1.1.1.1'],
                 ['ip_address' => '2.2.2.2'],
             ))
-            ->create();
+            ->create([
+                'network_id' => $this->network()->id
+            ]);
 
         $this->get('/v2/ip-addresses')
             ->seeJson(
                 [
                     'ip_address' => '1.1.1.1',
+                    'network_id' => $this->network()->id,
                     'type' => 'normal'
                 ]
             )->assertResponseStatus(200);
@@ -35,13 +38,16 @@ class GetTest extends TestCase
 
     public function testGetResource()
     {
-        $ipAddress = IpAddress::factory()->create();
+        $ipAddress = IpAddress::factory()->create([
+            'network_id' => $this->network()->id
+        ]);
 
         $this->get('/v2/ip-addresses/' . $ipAddress->id)
             ->seeJson(
                 [
                     'id' => $ipAddress->id,
                     'ip_address' => '1.1.1.1',
+                    'network_id' => $this->network()->id,
                     'type' => 'normal'
                 ]
             )->assertResponseStatus(200);

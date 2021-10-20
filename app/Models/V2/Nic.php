@@ -122,59 +122,30 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
     }
 
     /**
-     * @param array $skip
+     * @param array $denyList
      * @param string $type
      * @return mixed|void
      * @throws \Exception
      */
     public function assignIpAddress(array $denyList = [], string $type = IpAddress::TYPE_NORMAL) : IpAddress
     {
-        // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
-        $reserved = 3;
-        $iterator = 0;
-
-        $subnet = Subnet::fromString($this->network->subnet);
-        $ip = $subnet->getStartAddress(); //First reserved IP
-
         $lock = Cache::lock("ip_address." . $this->id, 60);
         try {
             $lock->block(60);
 
-            $message = 'Assigning IP to NIC ' . $this->id . ': ';
-            while ($ip = $ip->getNextAddress()) {
-                $iterator++;
-                if ($iterator <= $reserved) {
-                    continue;
-                }
-                if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                    throw new \Exception($message . 'Insufficient available IP\'s in subnet');
-                }
+            $ip = $this->network->getNextAvailableIp($denyList);
 
-                $checkIp = $ip->toString();
+            $ipAddress = app()->make(IpAddress::class);
+            $ipAddress->fill([
+                'ip_address' => $ip,
+                'network_id' => $this->network->id,
+                'type' => $type
+            ]);
 
-                if (collect($denyList)->contains($checkIp)) {
-                    Log::warning($message . 'IP address "' . $checkIp . '" is within the deny list, skipping');
-                    continue;
-                }
+            $this->ipAddresses()->save($ipAddress);
+            Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to NIC ' . $this->id . ', type: ' . $type);
 
-                foreach ($this->network->nics as $nic) {
-                    if ($nic->ipAddresses()->where('ip_address', $checkIp)->count() > 0) {
-                        Log::debug($message . 'IP address "' . $checkIp . '" in use');
-                        continue 2;
-                    }
-                }
-
-                $ipAddress = app()->make(IpAddress::class);
-                $ipAddress->fill([
-                    'ip_address' => $checkIp,
-                    'type' => $type
-                ]);
-
-                $this->ipAddresses()->save($ipAddress);
-                Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to NIC ' . $this->id . ', type: ' . $type);
-
-                return $ipAddress;
-            }
+            return $ipAddress;
         } finally {
             $lock->release();
         }

@@ -44,7 +44,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZon
 
     public function vpnSessions()
     {
-        return $this->belongsToMany(VpnSession::class);
+        return $this->hasMany(VpnSession::class);
     }
 
     public function floatingIp()
