@@ -1,11 +1,7 @@
 allOf:
-  - $ref: "../router.yaml"
+  - $ref: "../network.yaml"
   - type: object
     properties:
-      is_management:
-        type: boolean
-        readOnly: false
-        example: false
       is_hidden :
         type : boolean
         readOnly : true

@@ -42,6 +42,11 @@ class UpdateRequest extends FormRequest
                 'required',
                 new ExistsForAvailabilityZone($availabilityZoneId)
             ],
+            'is_management' => [
+                'sometimes',
+                'required',
+                'boolean'
+            ]
         ];
     }
 

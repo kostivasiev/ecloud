@@ -55,9 +55,13 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('network.router.vpc', function ($query) use ($user) {
-            $query->where('reseller_id', $user->resellerId());
-        });
+        return $query
+            ->whereHas('network.router.vpc', function ($query) use ($user) {
+                $query->where('reseller_id', $user->resellerId());
+            })
+            ->whereHas('network.router', function ($query) {
+                $query->where('is_management', false);
+            });
     }
 
     /**

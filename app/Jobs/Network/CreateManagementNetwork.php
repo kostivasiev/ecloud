@@ -90,9 +90,10 @@ class CreateManagementNetwork extends Job
             'router.availabilityZone',
             function ($query) use ($availabilityZoneId) {
                 $query->where('availability_zones.id', '=', $availabilityZoneId);
-                $query->where('routers.is_hidden', '=', true);
+                $query->where('routers.is_management', '=', true);
             }
         )->get();
+
         foreach ($networkCollection as $network) {
             $range = Factory::rangeFromString($network->subnet);
             if ($range->containsRange($newRange)) {

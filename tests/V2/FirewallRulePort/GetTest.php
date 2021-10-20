@@ -8,6 +8,7 @@ use App\Models\V2\FirewallRulePort;
 use GuzzleHttp\Psr7\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class GetTest extends TestCase
 {
@@ -75,5 +76,24 @@ class GetTest extends TestCase
                 'destination' => $this->firewallRulePort->destination
             ])
             ->assertResponseStatus(200);
+    }
+
+    public function testGetHiddenNotAdminFails()
+    {
+        $this->router()->setAttribute('is_management', true)->save();
+
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+
+        $this->get('/v2/firewall-rule-ports/' . $this->firewallRulePort->id)
+            ->assertResponseStatus(404);
+    }
+
+    public function testGetHiddenAdminPasses()
+    {
+        $this->router()->setAttribute('is_management', true)->save();
+
+        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+
+        $this->get('/v2/firewall-rule-ports/' . $this->firewallRulePort->id)->assertResponseStatus(200);
     }
 }

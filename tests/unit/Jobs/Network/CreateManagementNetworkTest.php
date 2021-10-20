@@ -58,7 +58,7 @@ class CreateManagementNetworkTest extends TestCase
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->router()->setAttribute('is_hidden', true)->saveQuietly();
+            $this->router()->setAttribute('is_management', true)->saveQuietly();
             $this->task->resource()->associate($this->router());
             $this->task->data = [
                 'management_router_id' => $this->managementRouter->id,
@@ -82,7 +82,7 @@ class CreateManagementNetworkTest extends TestCase
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->router()->setAttribute('is_hidden', true)->saveQuietly();
+            $this->router()->setAttribute('is_management', true)->saveQuietly();
             $this->task->resource()->associate($this->router());
             $this->task->data = [
                 'management_router_id' => $this->managementRouter->id,
@@ -100,7 +100,7 @@ class CreateManagementNetworkTest extends TestCase
 
     public function testSubnetAvailability()
     {
-        $this->router()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->router()->setAttribute('is_management', true)->saveQuietly();
         $job = \Mockery::mock(CreateManagementNetwork::class)->makePartial();
         $subnet = $job->getNextAvailableSubnet('192.168.0.0/17', $this->availabilityZone()->id);
         $this->assertEquals('192.168.4.0/28', $subnet);

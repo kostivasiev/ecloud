@@ -11,7 +11,6 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 use UKFast\Api\Auth\Consumer;
@@ -28,22 +27,35 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'net';
-    public $incrementing = false;
+
     public $children = [
         'nics',
     ];
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    protected $fillable = [
-        'id',
-        'name',
-        'router_id',
-        'subnet'
-    ];
-    protected $dispatchesEvents = [
-        'creating' => Creating::class,
-        'deleted' => Deleted::class,
-    ];
+
+    public function __construct(array $attributes = [])
+    {
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+
+        $this->fillable([
+            'id',
+            'name',
+            'router_id',
+            'subnet'
+        ]);
+
+        $this->appends = [
+            'is_hidden'
+        ];
+
+        $this->dispatchesEvents = [
+            'creating' => Creating::class,
+            'deleted' => Deleted::class,
+        ];
+
+        parent::__construct($attributes);
+    }
 
     public function getResellerId(): int
     {
@@ -75,6 +87,11 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
         return $this->hasMany(IpAddress::class);
     }
 
+    public function getIsHiddenAttribute(): bool
+    {
+        return (bool) $this->router->is_management;
+    }
+
     /**
      * @param $query
      * @param Consumer $user
@@ -87,7 +104,7 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
         }
 
         $query->whereHas('router', function ($query) {
-            $query->where('is_hidden', false);
+            $query->where('is_management', false);
         });
 
         return $query->whereHas('router.vpc', function ($query) use ($user) {

@@ -54,7 +54,10 @@ class FirewallRulePort extends Model implements Filterable, Sortable
         }
         return $query->whereHas('firewallRule.firewallPolicy.router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
-        });
+        })
+            ->whereHas('firewallRule.firewallPolicy.router', function ($query) {
+                $query->where('is_management', false);
+            });
     }
 
     /**
