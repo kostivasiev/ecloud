@@ -49,6 +49,6 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(202);
-        Event::assertDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertDispatched(Created::class);
     }
 }
