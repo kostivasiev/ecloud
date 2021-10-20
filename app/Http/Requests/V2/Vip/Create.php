@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\V2\Vip;
 
+use App\Models\V2\IpAddress;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 class Create extends FormRequest
@@ -15,7 +17,7 @@ class Create extends FormRequest
             'ip_address_id' => [
                 'required',
                 'string',
-                'exists:ecloud.ip_addresses,id,deleted_at,NULL',
+                Rule::exists(IpAddress::class, 'id')->whereNull('deleted_at')
             ],
             'network_id' => [
                 'string'

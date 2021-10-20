@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Jobs\Sync\Router;
 
-use App\Jobs\Sync\Vip\Update;
+use App\Jobs\Sync\Router\Update;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Bus\PendingBatch;
