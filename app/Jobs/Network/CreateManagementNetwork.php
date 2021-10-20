@@ -10,6 +10,7 @@ use App\Traits\V2\Jobs\AwaitTask;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use IPLib\Factory;
 
@@ -66,34 +67,38 @@ class CreateManagementNetwork extends Job
 
     public function getNextAvailableSubnet($subnet, $availabilityZoneId, $firstRun = true)
     {
-        Log::info(get_class($this) . ' - Start Subnet', ['subnet' => $subnet]);
-        $range = Factory::rangeFromString($subnet);
-        if ($firstRun) {
-            $newFromInteger = ip2long($range->getStartAddress()) + 1024;
-        } else {
-            $newFromInteger = ip2long($range->getEndAddress()) + 1;
-        }
-        $newFrom = Factory::addressFromString(long2ip($newFromInteger));
-        $newToInteger = $newFromInteger + 15;
-        $newTo = Factory::addressFromString(long2ip($newToInteger));
-        $newRange = Factory::rangeFromBoundaries($newFrom, $newTo);
-        $subnet = $newRange->asSubnet()->toString();
-
-        // Check database
-        $networkCollection = Network::whereHas('router.availabilityZone', function ($query) use ($availabilityZoneId) {
-            $query->where('availability_zones.id', '=', $availabilityZoneId);
-            $query->where('routers.is_hidden', '=', true);
-        })->get();
-
-        foreach ($networkCollection as $network) {
-            $range = Factory::rangeFromString($network->subnet);
-            if ($range->containsRange($newRange)) {
-                Log::info(get_class($this) . ' - Subnet in use', ['subnet' => $subnet]);
-                return $this->getNextAvailableSubnet($subnet, $availabilityZoneId, false);
+        $lock = Cache::lock('subnet.'.$subnet, 60);
+        try {
+            Log::info(get_class($this) . ' - Start Subnet', ['subnet' => $subnet]);
+            $range = Factory::rangeFromString($subnet);
+            if ($firstRun) {
+                $newFromInteger = ip2long($range->getStartAddress()) + 1024;
+            } else {
+                $newFromInteger = ip2long($range->getEndAddress()) + 1;
             }
+            $newFrom = Factory::addressFromString(long2ip($newFromInteger));
+            $newToInteger = $newFromInteger + 15;
+            $newTo = Factory::addressFromString(long2ip($newToInteger));
+            $newRange = Factory::rangeFromBoundaries($newFrom, $newTo);
+            $subnet = $newRange->asSubnet()->toString();// Check database
+            $networkCollection = Network::whereHas(
+                'router.availabilityZone',
+                function ($query) use ($availabilityZoneId) {
+                    $query->where('availability_zones.id', '=', $availabilityZoneId);
+                    $query->where('routers.is_hidden', '=', true);
+                }
+            )->get();
+            foreach ($networkCollection as $network) {
+                $range = Factory::rangeFromString($network->subnet);
+                if ($range->containsRange($newRange)) {
+                    Log::info(get_class($this) . ' - Subnet in use', ['subnet' => $subnet]);
+                    return $this->getNextAvailableSubnet($subnet, $availabilityZoneId, false);
+                }
+            }
+            Log::info(get_class($this) . ' - Next Subnet', ['subnet' => $subnet]);
+            return $subnet;
+        } finally {
+            $lock->release();
         }
-
-        Log::info(get_class($this) . ' - Next Subnet', ['subnet' => $subnet]);
-        return $subnet;
     }
 }
