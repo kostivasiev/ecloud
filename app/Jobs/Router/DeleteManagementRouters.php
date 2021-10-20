@@ -27,10 +27,11 @@ class DeleteManagementRouters extends Job
     {
         if (empty($this->task->data['management_router_ids'])) {
             $managementRoutersIds = [];
-            $this->model->routers->where('is_hidden', '=', true)->each(function ($router) use (&$managementRoutersIds) {
+            $this->model->routers->where('is_management', '=', true)->each(function ($router) use (&$managementRoutersIds) {
                 $router->syncDelete();
                 $managementRoutersIds[] = $router->id;
             });
+
             $this->task->data = [
                 'management_router_ids' => $managementRoutersIds,
             ];

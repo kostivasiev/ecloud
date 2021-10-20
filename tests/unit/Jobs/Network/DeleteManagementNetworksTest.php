@@ -17,7 +17,7 @@ class DeleteManagementNetworksTest extends TestCase
     public function testDeleteManagementNetwork()
     {
         Event::fake(Created::class);
-        $this->router()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->router()->setAttribute('is_management', true)->saveQuietly();
         $this->network()->router()->associate($this->router());
 
         Model::withoutEvents(function () {

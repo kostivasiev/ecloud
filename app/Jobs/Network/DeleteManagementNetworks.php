@@ -27,7 +27,7 @@ class DeleteManagementNetworks extends Job
     {
         $managementNetworkIds = [];
         if (empty($this->task->data['management_network_ids'])) {
-            $this->model->routers->where('is_hidden', '=', true)->each(function ($router) use (&$managementNetworkIds) {
+            $this->model->routers->where('is_management', '=', true)->each(function ($router) use (&$managementNetworkIds) {
                 Network::whereHas('router', function ($query) use ($router) {
                     $query->where('router_id', '=', $router->id);
                 })->each(function ($network) use (&$managementNetworkIds) {
