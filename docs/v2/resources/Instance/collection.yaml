@@ -43,6 +43,8 @@ post:
           allOf:
           - $ref: '../../components/schemas/instance.yaml'
           - properties:
+              availability_zone_id:
+                readOnly: true
               volume_group_id:
                 readOnly: true
   responses:
