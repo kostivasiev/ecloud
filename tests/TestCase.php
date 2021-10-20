@@ -68,6 +68,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var Vpc */
     private $vpc;
 
+    /** @var Vip */
+    private $vip;
+
     /** @var Dhcp */
     private $dhcp;
 
@@ -208,13 +211,14 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->vpc;
     }
 
-    public function vip($id = 'vip-aaaaaaaa-dev'): Vip
+    public function vip($id = 'vip-aaaaaaaa-dev', $ip = 'ip-aaaaaaaa-dev'): Vip
     {
         if (!$this->vip) {
-            Model::withoutEvents(function() use ($id) {
+            Model::withoutEvents(function() use ($id, $ip) {
+
                 $this->vip = Vip::factory()->create([
                     'id' => $id,
-                    'ip_address_id' => "ip-aaaaaaaa-dev",
+                    'ip_address_id' => $ip,
                     'name' => $id
                 ]);
             });

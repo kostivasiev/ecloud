@@ -25,7 +25,7 @@ class CreateTest extends TestCase
                 'ip_address_id' => $this->ip->id
             ],
             [
-                'X-consumer-custom-id' => '7052-1',
+                'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )  ->seeInDatabase(

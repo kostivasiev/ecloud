@@ -2,39 +2,33 @@
 
 namespace Tests\V2\Vip;
 
-use App\Models\V2\IpAddress;
+use App\Events\V2\Task\Created;
 use App\Models\V2\Vip;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    protected $ip;
-    protected $vip;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->ip = IpAddress::factory()->create();
-        $this->vip = Vip::factory()->create();
     }
 
     public function testValidDataIsSuccessful()
     {
+        Event::fake(Created::class);
         $data = [
-            "ip_address_id" => $this->ip->id,
+            'ip_address_id' => "vip-bbbbbbbb",
         ];
-
-        $this->patch('/v2/vips/' . $this->vip->id,
+        $this->patch('/v2/vips/' . $this->vip()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read,ecloud.write',
+                'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeInDatabase(
-            'vips',
-            $data,
-            'ecloud'
-        )->assertResponseStatus(202);
+        )
+            ->assertResponseStatus(202);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class);
+        $this->assertEquals($data['ip_address_id'], Vip::findOrFail($this->vip()->id)->ip_address_id);
     }
 }

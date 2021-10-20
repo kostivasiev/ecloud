@@ -53,15 +53,10 @@ class IpAddress extends Model implements Filterable, Sortable
         return $this->belongsTo(Network::class);
     }
 
-    /**
-     * Pivot table ip_address_nic
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function vips()
     {
         return $this->hasMany(Vip::class);
     }
-
 
     /**
      * @param $query

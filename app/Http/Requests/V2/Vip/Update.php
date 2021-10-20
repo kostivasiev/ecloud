@@ -15,7 +15,7 @@ class Update extends FormRequest
             'ip_address_id' => [
                 'required',
                 'string',
-                'exists:ecloud.ip_addresses,id,deleted_at,NULL',
+
             ],
             'network_id' => [
                 'string'

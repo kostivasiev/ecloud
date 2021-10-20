@@ -13,8 +13,6 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        IpAddress::factory()->create();
-        $this->vip = Vip::factory()->create();
     }
 
     public function testGetItemCollection()
@@ -22,7 +20,7 @@ class GetTest extends TestCase
         $this->vip();
 
         $this->get('/v2/vips', [
-            'X-consumer-custom-id' => '7052-1',
+            'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
             'id' => $this->vip()->id
@@ -32,7 +30,7 @@ class GetTest extends TestCase
     public function testGetItemDetail()
     {
         $this->get('/v2/vips/' . $this->vip()->id, [
-            'X-consumer-custom-id' => '7052-1',
+            'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
             'id' => $this->vip()->id
