@@ -29,6 +29,7 @@ class Vip extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'loadbalancer_id',
+        'network_id',
         'name'
     ];
 
