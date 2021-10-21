@@ -143,7 +143,7 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
-            $factory->create('is_management', Filter::$enumDefaults),
+            $factory->boolean()->create('is_management', '1', '0'),
         ];
     }
 
