@@ -54,9 +54,9 @@ class LoadBalancerSpecification extends Model implements Filterable, Sortable
         'image_id' => 'string',
     ];
 
-    public function lbc()
+    public function loadBalancers()
     {
-        return $this->hasMany(LoadBalancerCluster::class, 'load_balancer_spec_id', 'id');
+        return $this->hasMany(LoadBalancer::class, 'load_balancer_spec_id', 'id');
     }
 
     /**

@@ -8,12 +8,12 @@ use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
-use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\LoadBalancer;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
-use App\Resources\V2\LoadBalancerClusterResource;
+use App\Resources\V2\LoadBalancerResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
@@ -145,13 +145,13 @@ class VpcController extends BaseController
         ));
     }
 
-    public function lbcs(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    public function loadBalancers(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
-        $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->loadBalancerClusters();
-        $queryTransformer->config(LoadBalancerCluster::class)
+        $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->loadBalancers();
+        $queryTransformer->config(LoadBalancer::class)
             ->transform($collection);
 
-        return LoadBalancerClusterResource::collection($collection->paginate(
+        return LoadBalancerResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

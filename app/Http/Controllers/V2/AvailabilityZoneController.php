@@ -11,7 +11,7 @@ use App\Models\V2\Dhcp;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
-use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\LoadBalancer;
 use App\Models\V2\Product;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
@@ -22,12 +22,11 @@ use App\Resources\V2\DhcpResource;
 use App\Resources\V2\HostSpecResource;
 use App\Resources\V2\ImageResource;
 use App\Resources\V2\InstanceResource;
-use App\Resources\V2\LoadBalancerClusterResource;
+use App\Resources\V2\LoadBalancerResource;
 use App\Resources\V2\ProductResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\RouterThroughputResource;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -206,14 +205,14 @@ class AvailabilityZoneController extends BaseController
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function lbcs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function loadBalancers(Request $request, QueryTransformer $queryTransformer, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
-            ->loadBalancerClusters();
-        $queryTransformer->config(LoadBalancerCluster::class)
+            ->loadBalancers();
+        $queryTransformer->config(LoadBalancer::class)
             ->transform($collection);
 
-        return LoadBalancerClusterResource::collection($collection->paginate(
+        return LoadBalancerResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

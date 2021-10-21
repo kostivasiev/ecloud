@@ -1,13 +1,12 @@
 <?php
 
-namespace Tests\V2\LoadBalancerCluster;
+namespace Tests\V2\LoadBalancer;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\LoadBalancer;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
@@ -16,7 +15,7 @@ class DeleteTest extends TestCase
     protected $region;
     protected $vpc;
     protected $availabilityZone;
-    protected $lbc;
+    protected $loadBalancer;
 
     public function setUp(): void
     {
@@ -37,7 +36,7 @@ class DeleteTest extends TestCase
             'region_id' => $this->region->id
         ]);
 
-        $this->lbc = factory(LoadBalancerCluster::class)->create([
+        $this->loadBalancer = factory(LoadBalancer::class)->create([
             'availability_zone_id' => $this->availabilityZone->id,
             'vpc_id' => $this->vpc->id
         ]);
@@ -55,7 +54,7 @@ class DeleteTest extends TestCase
         )
             ->seeJson([
                 'title' => 'Not found',
-                'detail' => 'No Load Balancer Cluster with that ID was found',
+                'detail' => 'No Load Balancer with that ID was found',
                 'status' => 404,
             ])
             ->assertResponseStatus(404);
@@ -64,7 +63,7 @@ class DeleteTest extends TestCase
     public function testSuccessfulDelete()
     {
         $this->delete(
-            '/v2/load-balancers/' . $this->lbc->id,
+            '/v2/load-balancers/' . $this->loadBalancer->id,
             [],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -72,7 +71,7 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(204);
-        $resource = LoadBalancerCluster::withTrashed()->findOrFail($this->lbc->id);
+        $resource = LoadBalancer::withTrashed()->findOrFail($this->loadBalancer->id);
         $this->assertNotNull($resource->deleted_at);
     }
 }
