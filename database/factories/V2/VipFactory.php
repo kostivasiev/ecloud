@@ -22,7 +22,8 @@ class VipFactory extends Factory
     {
         return [
             'id' => 'vip-aaaaaaaa-dev',
-            'ip_address_id' => 'ip-aaaaaaaa-dev',
+            'loadbalancer_id' => 'lbc-c11e4492-dev',
+            'network_id' => 'net-aaaaaaaa',
             'name' => 'vip-aaaaaaaa-dev'
         ];
     }

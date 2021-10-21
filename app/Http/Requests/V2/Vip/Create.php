@@ -3,6 +3,12 @@
 namespace App\Http\Requests\V2\Vip;
 
 use App\Models\V2\IpAddress;
+use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\Network;
+use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IpAddress\IsClusterType;
+use App\Rules\V2\IpAddress\IsSameNetworkAsNic;
+use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
@@ -14,28 +20,21 @@ class Create extends FormRequest
     public function rules()
     {
         return [
-            'ip_address_id' => [
+            'loadbalancer_id' => [
                 'required',
                 'string',
-                Rule::exists(IpAddress::class, 'id')->whereNull('deleted_at')
+                new ExistsForUser(LoadBalancerCluster::class),
+                new IsResourceAvailable(LoadBalancerCluster::class),
             ],
             'network_id' => [
-                'string'
+                'required',
+                'string',
+                'exists:ecloud.networks,id,deleted_at,NULL',
+                new IsResourceAvailable(Network::class),
             ],
             'allocate_floating_ip' => [
                 'boolean'
             ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function messages()
-    {
-        return [
-            'required' => 'The :attribute field is required',
-            'exists' => 'The specified :attribute was not found',
         ];
     }
 }

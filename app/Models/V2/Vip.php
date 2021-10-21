@@ -28,13 +28,18 @@ class Vip extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $fillable = [
         'id',
-        'ip_address_id',
+        'loadbalancer_id',
         'name'
     ];
 
-    public function ipAddress()
+    public function loadbalancer()
     {
-        return $this->belongsTo(IpAddress::class);
+        return $this->belongsTo(LoadBalancerCluster::class);
+    }
+
+    public function network()
+    {
+        return $this->belongsTo(Network::class);
     }
 
     public function scopeForUser($query, Consumer $user)

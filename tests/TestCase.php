@@ -16,6 +16,7 @@ use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
+use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
@@ -77,6 +78,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var FirewallPolicy */
     private $firewallPolicy;
+
+    /** @var $loadballancer */
+    private $loadballancer;
 
     /** @var NetworkPolicy */
     private $networkPolicy;
@@ -176,6 +180,21 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->ip;
     }
 
+    public function loadbalancer(): LoadBalancerCluster
+    {
+        if (!$this->loadballancer) {
+            Model::withoutEvents(function() {
+                $this->loadballancer = factory(LoadBalancerCluster::class)->create([
+                    'name' => 'Load Balancer Cluster 1',
+                    'load_balancer_spec_id' => 'lbs-aaaaaaaa',
+                    'vpc_id' => $this->vpc()->id,
+                    'config_id' => '77898345'
+                ]);
+            });
+        }
+        return $this->loadballancer;
+    }
+
     public function networkPolicy($id = 'np-test'): NetworkPolicy
     {
         if (!$this->networkPolicy) {
@@ -237,7 +256,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             Model::withoutEvents(function() use ($id) {
                 $this->vip = Vip::factory()->create([
                     'id' => $id,
-                    'ip_address_id' => $this->ip()->id,
+                    'loadbalancer_id' => $this->loadbalancer()->id,
+                    'network_id' => $this->network()->id,
                     'name' => $id
                 ]);
             });
@@ -691,7 +711,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,
             \App\Events\V2\Nat\Created::class,
-            \App\Events\V2\Vip\Created::class,
 
             // Deleting
             \App\Events\V2\Nat\Deleting::class,
@@ -702,7 +721,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             \App\Events\V2\FloatingIp\Deleted::class,
             \App\Events\V2\Network\Deleted::class,
             \App\Events\V2\Router\Deleted::class,
-            \App\Events\V2\Vip\Deleted::class,
 
             // Saved
             \App\Events\V2\Nat\Saved::class,

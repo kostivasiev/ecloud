@@ -13,27 +13,31 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->vip = $this->vip();
     }
 
     public function testGetItemCollection()
     {
-        $this->vip();
 
         $this->get('/v2/vips', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
-            'id' => $this->vip()->id
+            'id' => $this->vip->id,
+            'loadbalancer_id' => $this->vip->loadbalancer_id,
+            'network_id' => $this->vip->network_id
         ])->assertResponseStatus(200);
     }
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/vips/' . $this->vip()->id, [
+        $this->get('/v2/vips/' . $this->vip->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
-            'id' => $this->vip()->id
+            'id' => $this->vip->id,
+            'loadbalancer_id' => $this->vip->loadbalancer_id,
+            'network_id' => $this->vip->network_id
         ])->assertResponseStatus(200);
     }
 }

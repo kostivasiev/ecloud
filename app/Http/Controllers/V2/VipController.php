@@ -48,13 +48,13 @@ class VipController extends BaseController
     public function create(Create $request)
     {
         $vip = new Vip($request->only([
-            'ip_address_id'
+            'loadbalancer_id',
+            'network_id'
         ]));
-        $vip->syncSave([
-            'network_id' => $request->input('network_id', null),
+        $task = $vip->syncSave([
             'allocate_floating_ip' => $request->input('allocate_floating_ip', 0)
         ]);
-        return $this->responseIdMeta($request, $vip->id, 202);
+        return $this->responseIdMeta($request, $vip->id, 202, $task->id);
     }
 
     /**
@@ -66,11 +66,11 @@ class VipController extends BaseController
     {
         $model = Vip::forUser(Auth::user())->findOrFail($vipId);
         $model->fill($request->only([
-            'ip_address_id'
+            'loadbalancer_id',
+            'network_id'
         ]));
 
         $vip = $model->syncSave([
-            'network_id' => $request->input('network_id', null),
             'allocate_floating_ip' => $request->input('allocate_floating_ip', 0)
         ]);
         return $this->responseIdMeta($request, $vip->id, 202, $vip->id);

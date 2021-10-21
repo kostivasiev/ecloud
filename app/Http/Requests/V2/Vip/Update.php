@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\V2\Vip;
 
-use App\Models\V2\IpAddress;
-use Illuminate\Validation\Rule;
+use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\Network;
+use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsResourceAvailable;
 use UKFast\FormRequests\FormRequest;
 
 class Update extends FormRequest
@@ -14,28 +16,21 @@ class Update extends FormRequest
     public function rules()
     {
         return [
-            'ip_address_id' => [
+            'loadbalancer_id' => [
                 'required',
                 'string',
-                Rule::exists(IpAddress::class, 'id')->whereNull('deleted_at')
+                new ExistsForUser(LoadBalancerCluster::class),
+                new IsResourceAvailable(LoadBalancerCluster::class),
             ],
             'network_id' => [
-                'string'
+                'required',
+                'string',
+                'exists:ecloud.networks,id,deleted_at,NULL',
+                new IsResourceAvailable(Network::class),
             ],
             'allocate_floating_ip' => [
                 'numeric'
             ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function messages()
-    {
-        return [
-            'required' => 'The :attribute field is required',
-            'exists' => 'The specified :attribute was not found',
         ];
     }
 }

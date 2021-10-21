@@ -3,18 +3,21 @@
 namespace Tests\V2\Vip;
 
 use App\Models\V2\IpAddress;
+use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\Network;
 use App\Models\V2\Vip;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    protected $ip;
+    protected $loadbalancer;
+    protected $network;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->ip = IpAddress::factory()->create();
-        Vip::factory()->create();
+        $this->loadbalancer = $this->loadbalancer();
+        $this->network = $this->network();
     }
 
     public function testValidDataSucceeds()
@@ -22,7 +25,8 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/vips',
             [
-                'ip_address_id' => $this->ip->id
+                'loadbalancer_id' => $this->loadbalancer->id,
+                'network_id' => $this->network->id
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -31,7 +35,8 @@ class CreateTest extends TestCase
         )  ->seeInDatabase(
             'vips',
             [
-                'ip_address_id' => $this->ip->id
+                'loadbalancer_id' => $this->loadbalancer->id,
+                'network_id' => $this->network->id
             ],
             'ecloud'
         )
