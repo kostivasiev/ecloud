@@ -1,12 +1,12 @@
 properties:
   id:
     type: string
-    example: 'lbc-2b66bb79'
+    example: 'lb-2b66bb79'
     readOnly: true
   name:
     type: string
     required: false
-    example: 'Load Balancer Cluster 1'
+    example: 'Load Balancer 1'
   vpc_id:
     type: string
     required: true
@@ -32,4 +32,4 @@ properties:
     type: string
     example: '2020-07-07T10:30:00+01:00'
     readOnly: true
-description: 'Load Balancer Clusters'
+description: 'Load Balancers'

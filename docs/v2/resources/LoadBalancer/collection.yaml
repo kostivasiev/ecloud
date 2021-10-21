@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/LoadBalancerCluster'
+                  $ref: '../../public-openapi.yaml#/components/schemas/LoadBalancer'
               meta:
                 allOf:
                   - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
@@ -33,7 +33,7 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/load-balancers?page=2'
   tags:
-    - Load Balancer Clusters
+    - Load Balancers
 post:
   requestBody:
     required: true
@@ -43,6 +43,6 @@ post:
           $ref: '../../public-openapi.yaml#/components/schemas/LoadBalancerCluster'
   responses:
     201:
-      $ref: '../../public-openapi.yaml#/components/responses/LbcIdResponse'
+      $ref: '../../public-openapi.yaml#/components/responses/LoadBalancerIdResponse'
   tags:
-    - Load Balancer Clusters
+    - Load Balancers
