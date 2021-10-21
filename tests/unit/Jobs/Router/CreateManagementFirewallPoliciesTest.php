@@ -45,7 +45,7 @@ class CreateManagementFirewallPoliciesTest extends TestCase
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->router()->setAttribute('is_hidden', true)->saveQuietly();
+            $this->router()->setAttribute('is_management', true)->saveQuietly();
             $this->task->resource()->associate($this->router());
         });
         Event::fake(TaskCreated::class);
@@ -61,7 +61,7 @@ class CreateManagementFirewallPoliciesTest extends TestCase
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->router()->setAttribute('is_hidden', true)->saveQuietly();
+            $this->router()->setAttribute('is_management', true)->saveQuietly();
             $this->task->resource()->associate($this->router());
             $this->task->setAttribute('data', [
                 'management_router_id' => $this->managementRouter->id,

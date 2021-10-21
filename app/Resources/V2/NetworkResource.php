@@ -4,6 +4,7 @@ namespace App\Resources\V2;
 
 use App\Models\V2\Router;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Responses\UKFastResource;
 
 /**
@@ -27,7 +28,7 @@ class NetworkResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'router_id' => $this->router_id,
@@ -43,5 +44,11 @@ class NetworkResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $data['is_hidden'] = $this->is_hidden;
+        }
+
+        return $data;
     }
 }

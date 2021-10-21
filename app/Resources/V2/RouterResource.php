@@ -22,7 +22,7 @@ class RouterResource extends UKFastResource
      */
     public function toArray($request)
     {
-        $columns = [
+        $data =  [
             'id' => $this->id,
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
@@ -40,9 +40,10 @@ class RouterResource extends UKFastResource
         ];
 
         if (Auth::user()->isAdmin()) {
-            $columns['is_hidden'] = $this->is_hidden;
+            $data['is_management'] = $this->is_management;
+            $data['is_hidden'] = $this->is_hidden;
         }
 
-        return $columns;
+        return $data;
     }
 }

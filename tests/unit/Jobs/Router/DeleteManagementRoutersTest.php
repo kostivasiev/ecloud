@@ -17,7 +17,7 @@ class DeleteManagementRoutersTest extends TestCase
     public function testDeleteManagementRouter()
     {
         Event::fake(Created::class);
-        $this->router()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->router()->setAttribute('is_management', true)->saveQuietly();
         Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'sync-1',

@@ -3,7 +3,6 @@
 namespace Tests\V2\Router;
 
 use GuzzleHttp\Psr7\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase

@@ -39,7 +39,7 @@ class UpdateBilling
         /** @var Router $model */
 
         // If is management router, don't add a billing entry
-        if ($model->is_hidden) {
+        if ($model->is_management) {
             return;
         }
 

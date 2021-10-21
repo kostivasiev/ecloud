@@ -61,4 +61,23 @@ class GetTest extends TestCase
                 'destination' => '555',
             ])->assertResponseStatus(200);
     }
+
+    public function testGetHiddenNotAdminFails()
+    {
+        $this->router()->setAttribute('is_management', true)->save();
+
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+
+        $this->get('/v2/network-rule-ports/nrp-test')
+            ->assertResponseStatus(404);
+    }
+
+    public function testGetHiddenAdminPasses()
+    {
+        $this->router()->setAttribute('is_management', true)->save();
+
+        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+
+        $this->get('/v2/network-rule-ports/nrp-test')->assertResponseStatus(200);
+    }
 }

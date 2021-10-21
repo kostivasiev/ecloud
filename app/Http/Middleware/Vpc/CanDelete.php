@@ -23,7 +23,7 @@ class CanDelete
         )->sum(function ($relation) {
             return $relation->count();
         });
-        $managementRouterCount = $vpc->routers()->where('is_hidden', true)->count();
+        $managementRouterCount = $vpc->routers()->where('is_management', true)->count();
         $relationships = $relationships - $managementRouterCount;
 
         if ($relationships > 0) {

@@ -340,6 +340,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                     'network_id' => $this->network()->id,
                 ]);
             });
+
+//            $ipAddress = IpAddress::factory()->create();
+//            $ipAddress->nics()->sync($this->nic());
         }
         return $this->nic;
     }

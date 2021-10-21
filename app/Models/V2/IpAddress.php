@@ -14,7 +14,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class IpAddress extends Model implements Filterable, Sortable
+class IpAddress extends Model implements Filterable, Sortable, Natable, RouterScopable
 {
     use CustomKey, SoftDeletes, DefaultName, HasFactory;
 
@@ -57,6 +57,16 @@ class IpAddress extends Model implements Filterable, Sortable
     public function vips()
     {
         return $this->hasMany(Vip::class);
+    }
+
+    public function getIPAddress(): ?string
+    {
+        return $this->ip_address;
+    }
+
+    public function getRouter()
+    {
+        return $this->network->router;
     }
 
     /**
