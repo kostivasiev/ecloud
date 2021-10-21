@@ -20,9 +20,10 @@ class Create extends FormRequest
     public function rules()
     {
         return [
-            'loadbalancer_id' => [
+            'load_balancer_id' => [
                 'required',
                 'string',
+                'exists:ecloud.lbcs,id,deleted_at,NULL',
                 new ExistsForUser(LoadBalancerCluster::class),
                 new IsResourceAvailable(LoadBalancerCluster::class),
             ],
@@ -30,6 +31,7 @@ class Create extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.networks,id,deleted_at,NULL',
+                new ExistsForUser(Network::class),
                 new IsResourceAvailable(Network::class),
             ],
             'allocate_floating_ip' => [

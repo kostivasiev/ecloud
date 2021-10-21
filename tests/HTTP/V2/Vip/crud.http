@@ -1,64 +1,54 @@
-## 1 setup
-POST https://{{host}}/{{version}}/ip-addresses
+##
+POST https://{{host}}/{{version}}/load-balancers
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 7052-1
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "name": "Test",
-    "ip_address": "1.1.1.1",
-    "type": "normal"
+  "name": "Test",
+  "availability_zone_id": "{{dev_availability_zone_id}}",
+  "vpc_id": "{{dev_vpc_id}}",
+  "load_balancer_spec_id": "{{dev_load_balancer_spec_id}}",
+  "nodes": 3
 }
 
 > {%
-client.global.set('ip_address_id', response.body.data.id);
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('lbc_id', response.body.data.id);
+client.log('LBC ID: ' + response.body.data.id);
 %}
 
-### 2
-POST https://{{host}}/{{version}}/ip-addresses
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 7052-1
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
+###
 
-{
-    "name": "Test 2",
-    "ip_address": "2.1.1.1",
-    "type": "normal"
-}
-
-> {%
-client.global.set('ip_address_id_2', response.body.data.id);
-%}
-
-### 3 store
+### store
 POST https://{{host}}/{{version}}/vips
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 7052-1
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
   "id": "vip-14353186-dev",
-  "ip_address_id": "{{ip_address_id}}"
+  "load_balancer_id": "{{lbc_id}}",
+  "network_id": {{dev_network_id}}
 }
 
 > {%
 client.test('Create', function () {
     client.assert(response.status === 201, '201 response not received');
 });
-client.global.set('vip_id', response.body.data.id);
-client.log('Vip ID: ' + response.body.data.id);
 %}
 
-### 4 Get Collection
+### 2 Get Collection
 GET https://{{host}}/{{version}}/vips
 Cache-Control: no-cache
-X-consumer-custom-id: 7052-1
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -68,10 +58,10 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### 5 Get Item
-GET https://{{host}}/{{version}}/vips/{{vip_id}}
+### 3 Get Item
+GET https://{{host}}/{{version}}/vips/vip-14353186-dev
 Cache-Control: no-cache
-X-consumer-custom-id: 7052-1
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -82,14 +72,15 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 6
-PATCH https://{{host}}/{{version}}/vips/{{vip_id}}
+PATCH https://{{host}}/{{version}}/vips/vip-14353186-dev
 Cache-Control: no-cache
-X-consumer-custom-id: 7052-1
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "ip_address_id": "{{ip_address_id_2}}"
+  "load_balancer_id": "{{ lbc_id }}",
+  "network_id": "net-test"
 }
 
 > {%
@@ -99,8 +90,8 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 7 Confirm patch
-GET https://{{host}}/{{version}}/vips/{{vip_id}}
-X-consumer-custom-id: 7052-1
+GET https://{{host}}/{{version}}/vips/vip-14353186-dev
+X-consumer-custom-id: 0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
@@ -112,10 +103,10 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 8 destroy
-DELETE https://{{host}}/{{version}}/vips/{{vip_id}}
+DELETE https://{{host}}/{{version}}/vips/vip-14353186-dev
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 7052-1
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -126,10 +117,10 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 9 confirm destroy
-GET https://{{host}}/{{version}}/vips/{{vip_id}}
+GET https://{{host}}/{{version}}/vips/vip-14353186-dev
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 7052-1
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 

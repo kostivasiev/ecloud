@@ -12,12 +12,6 @@ use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-    protected $vip;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
 
     public function testFailInvalidId()
     {

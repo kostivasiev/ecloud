@@ -79,8 +79,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var FirewallPolicy */
     private $firewallPolicy;
 
-    /** @var $loadballancer */
-    private $loadballancer;
+    /** @var $loadBalancer */
+    private $loadBalancer;
 
     /** @var NetworkPolicy */
     private $networkPolicy;
@@ -180,11 +180,11 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->ip;
     }
 
-    public function loadbalancer(): LoadBalancerCluster
+    public function loadBalancer(): LoadBalancerCluster
     {
-        if (!$this->loadballancer) {
+        if (!$this->loadBalancer) {
             Model::withoutEvents(function() {
-                $this->loadballancer = factory(LoadBalancerCluster::class)->create([
+                $this->loadBalancer = factory(LoadBalancerCluster::class)->create([
                     'id' => 'lbc-aaaaaaaa',
                     'name' => 'Load Balancer Cluster 1',
                     'load_balancer_spec_id' => 'lbs-aaaaaaaa',
@@ -193,7 +193,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 ]);
             });
         }
-        return $this->loadballancer;
+        return $this->loadBalancer;
     }
 
     public function networkPolicy($id = 'np-test'): NetworkPolicy
@@ -257,7 +257,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             Model::withoutEvents(function() use ($id) {
                 $this->vip = Vip::factory()->create([
                     'id' => $id,
-                    'loadbalancer_id' => $this->loadbalancer()->id,
+                    'load_balancer_id' => $this->loadBalancer()->id,
                     'network_id' => $this->network()->id,
                     'name' => $id
                 ]);

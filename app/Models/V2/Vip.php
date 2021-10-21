@@ -28,12 +28,12 @@ class Vip extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $fillable = [
         'id',
-        'loadbalancer_id',
+        'load_balancer_id',
         'network_id',
         'name'
     ];
 
-    public function loadbalancer()
+    public function loadBalancer()
     {
         return $this->belongsTo(LoadBalancerCluster::class);
     }
@@ -48,9 +48,10 @@ class Vip extends Model implements Filterable, Sortable
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('ipAddress.network.router.vpc', function ($query) use ($user) {
-            $query->where('reseller_id', $user->resellerId());
-        });
+        return $query
+            ->whereHas('network.router.vpc', function ($query) use ($user) {
+                $query->where('reseller_id', $user->resellerId());
+            });
     }
 
     /**
@@ -61,7 +62,7 @@ class Vip extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
-            $factory->create('ip_address_id', Filter::$stringDefaults),
+            $factory->create('load_balancer_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -76,7 +77,7 @@ class Vip extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
-            $factory->create('ip_address_id'),
+            $factory->create('load_balancer_id', Filter::$stringDefaults),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -100,7 +101,8 @@ class Vip extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
-            'ip_address_id' => 'ip_address_id'
+            'load_balancer_id' => 'load_balancer_id',
+            'network_id' => 'network_id'
         ];
     }
 }

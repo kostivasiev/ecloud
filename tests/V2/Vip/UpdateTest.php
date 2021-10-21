@@ -9,10 +9,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
 
     public function testValidDataIsSuccessful()
     {
@@ -20,7 +16,7 @@ class UpdateTest extends TestCase
 
         $this->patch('/v2/vips/' . $this->vip()->id,
             [
-                'loadbalancer_id' => $this->loadbalancer()->id,
+                'load_balancer_id' => $this->loadBalancer()->id,
                 'network_id' => $this->network()->id
             ],
             [
@@ -28,6 +24,6 @@ class UpdateTest extends TestCase
                 'x-consumer-groups' => 'ecloud.write'
             ]
         )->assertResponseStatus(202);
-        $this->assertEquals($this->loadbalancer()->id, Vip::findOrFail($this->vip()->id)->loadbalancer_id);
+        $this->assertEquals($this->loadBalancer()->id, Vip::findOrFail($this->vip()->id)->load_balancer_id);
     }
 }

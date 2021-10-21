@@ -10,23 +10,14 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    protected $loadbalancer;
-    protected $network;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->loadbalancer = $this->loadbalancer();
-        $this->network = $this->network();
-    }
 
     public function testValidDataSucceeds()
     {
         $this->post(
             '/v2/vips',
             [
-                'loadbalancer_id' => $this->loadbalancer->id,
-                'network_id' => $this->network->id
+                'load_balancer_id' => $this->loadBalancer()->id,
+                'network_id' => $this->network()->id
             ],
             [
                 'X-consumer-custom-id' => '0-0',
@@ -35,8 +26,8 @@ class CreateTest extends TestCase
         )  ->seeInDatabase(
             'vips',
             [
-                'loadbalancer_id' => $this->loadbalancer->id,
-                'network_id' => $this->network->id
+                'load_balancer_id' => $this->loadBalancer()->id,
+                'network_id' => $this->network()->id
             ],
             'ecloud'
         )

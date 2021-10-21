@@ -48,7 +48,7 @@ class VipController extends BaseController
     public function create(Create $request)
     {
         $vip = new Vip($request->only([
-            'loadbalancer_id',
+            'load_balancer_id',
             'network_id'
         ]));
         $task = $vip->syncSave([
@@ -66,7 +66,7 @@ class VipController extends BaseController
     {
         $model = Vip::forUser(Auth::user())->findOrFail($vipId);
         $model->fill($request->only([
-            'loadbalancer_id',
+            'load_balancer_id',
             'network_id'
         ]));
 

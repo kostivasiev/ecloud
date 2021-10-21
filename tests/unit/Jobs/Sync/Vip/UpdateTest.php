@@ -15,11 +15,6 @@ class UpdateTest extends TestCase
 {
     private $task;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testJobsBatched()
     {
         $this->markTestSkipped();

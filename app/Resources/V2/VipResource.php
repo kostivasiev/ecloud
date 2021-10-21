@@ -9,7 +9,7 @@ use UKFast\Responses\UKFastResource;
  * Class VipResource
  * @package App\Http\Resources\V2
  * @property string id
- * @property string loadbalancer_id
+ * @property string load_balancer_id
  * @property string network_id
  * @property string deleted_at
  * @property string created_at
@@ -25,7 +25,7 @@ class VipResource extends UKFastResource
     {
         return [
             'id' => $this->id,
-            'loadbalancer_id' => $this->loadbalancer_id,
+            'load_balancer_id' => $this->load_balancer_id,
             'network_id' => $this->network_id,
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
