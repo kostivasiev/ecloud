@@ -4,7 +4,6 @@ namespace App\Jobs\FloatingIp;
 
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\IpAddress;
 use App\Models\V2\Nat;
 use App\Models\V2\Natable;
 use App\Traits\V2\LoggableModelJob;
