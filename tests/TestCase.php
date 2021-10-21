@@ -185,6 +185,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         if (!$this->loadballancer) {
             Model::withoutEvents(function() {
                 $this->loadballancer = factory(LoadBalancerCluster::class)->create([
+                    'id' => 'lbc-aaaaaaaa',
                     'name' => 'Load Balancer Cluster 1',
                     'load_balancer_spec_id' => 'lbs-aaaaaaaa',
                     'vpc_id' => $this->vpc()->id,
