@@ -4,7 +4,7 @@ namespace App\Jobs\FloatingIp;
 
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Nic;
+use App\Models\V2\Natable;
 use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -26,8 +26,8 @@ class AwaitNatSync extends Job
 
     public function handle()
     {
-        if (!($this->resource instanceof Nic)) {
-            Log::info(get_class($this) . ' : Resource is not a NIC, skipping');
+        if (!($this->resource instanceof Natable)) {
+            Log::info(get_class($this) . ' : Resource is not a Natable resource, skipping');
             return;
         }
 

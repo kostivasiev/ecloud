@@ -4,7 +4,6 @@ namespace App\Jobs\Nat;
 
 use App\Jobs\Job;
 use App\Models\V2\Nat;
-use App\Models\V2\Nic;
 use App\Models\V2\RouterScopable;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;

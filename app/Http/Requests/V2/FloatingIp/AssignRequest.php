@@ -3,8 +3,7 @@
 namespace App\Http\Requests\V2\FloatingIp;
 
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Network;
-use App\Models\V2\Nic;
+use App\Models\V2\IpAddress;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsSameAvailabilityZone;
 use UKFast\FormRequests\FormRequest;
@@ -34,8 +33,8 @@ class AssignRequest extends FormRequest
                     'required',
                     'string',
                     new ExistsForUser([
-                        Nic::class,
                         FloatingIp::class,
+                        IpAddress::class
                     ]),
                     new IsSameAvailabilityZone(app('request')->route('fipId'))
                 ],

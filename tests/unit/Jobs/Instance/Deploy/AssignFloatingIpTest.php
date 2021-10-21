@@ -3,6 +3,7 @@ namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
@@ -28,7 +29,8 @@ class AssignFloatingIpTest extends TestCase
     {
         Event::fake([JobProcessed::class, Created::class]);
 
-        $this->nic();
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($this->nic());
 
         $deploy_data = $this->instance()->deploy_data;
         $deploy_data['floating_ip_id'] = $this->floatingIp()->id;
@@ -50,7 +52,8 @@ class AssignFloatingIpTest extends TestCase
     {
         Event::fake([JobProcessed::class, Created::class, JobFailed::class]);
 
-        $this->nic();
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($this->nic());
 
         $deploy_data = $this->instance()->deploy_data;
         $deploy_data['floating_ip_id'] = $this->floatingIp()->id;
@@ -79,7 +82,8 @@ class AssignFloatingIpTest extends TestCase
     {
         Event::fake([JobProcessed::class, Created::class, JobFailed::class]);
 
-        $this->nic();
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($this->nic());
 
         $deploy_data = $this->instance()->deploy_data;
         $deploy_data['floating_ip_id'] = $this->floatingIp()->id;
@@ -89,7 +93,7 @@ class AssignFloatingIpTest extends TestCase
         $task = new Task([
             'id' => 'task-test',
             'completed' => true,
-            'name' => Sync::TASK_NAME_UPDATE,
+            'name' => 'floating_ip_assign'
         ]);
         $this->floatingIp()->tasks()->save($task);
 
@@ -99,6 +103,7 @@ class AssignFloatingIpTest extends TestCase
         });
 
         $job = new AssignFloatingIp($this->instance());
+
         $job->awaitTask($task);
 
         $this->assertTrue($job->awaitTask($task));

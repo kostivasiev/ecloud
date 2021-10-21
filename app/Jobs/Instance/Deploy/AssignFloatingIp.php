@@ -5,6 +5,7 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
+use App\Models\V2\IpAddress;
 use App\Traits\V2\Jobs\AwaitTask;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -30,14 +31,16 @@ class AssignFloatingIp extends Job
 
         $nic = $this->model->nics()->first();
 
+        $ipAddress = $nic->ipAddresses()->where('type', IpAddress::TYPE_NORMAL)->first();
+
         $floatingIp = FloatingIp::findOrFail($this->model->deploy_data['floating_ip_id']);
         $task = $floatingIp->createTaskWithLock(
             'floating_ip_assign',
             \App\Jobs\Tasks\FloatingIp\Assign::class,
-            ['resource_id' => $nic->id]
+            ['resource_id' => $ipAddress->id]
         );
 
-        Log::info('Triggered floating_ip_assign task for Floating IP (' . $floatingIp->id . '), assigning to NIC (' . $nic->id . ')');
+        Log::info('Triggered floating_ip_assign task for Floating IP (' . $floatingIp->id . '), assigning to IP Address (' . $ipAddress->id . ')');
 
         $this->awaitTask($task);
     }

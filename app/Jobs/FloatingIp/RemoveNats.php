@@ -20,7 +20,7 @@ class RemoveNats extends Job
     }
 
     /**
-     * Check if the floating IP was unassigned to a NIC and delete any NATs that were created.
+     * Check if the floating IP was unassigned from a Natable resource deletes any NATs that were created.
      */
     public function handle()
     {
