@@ -305,7 +305,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('load-balancers', 'LoadBalancerClusterController@index');
         $router->get('load-balancers/{lbcId}', 'LoadBalancerClusterController@show');
+
+
         $router->post('load-balancers', 'LoadBalancerClusterController@store');
+
         $router->patch('load-balancers/{lbcId}', 'LoadBalancerClusterController@update');
         $router->delete('load-balancers/{lbcId}', 'LoadBalancerClusterController@destroy');
     });

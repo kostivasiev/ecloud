@@ -5,7 +5,7 @@ namespace Database\Seeders;
 use App\Models\V2\Image;
 use Illuminate\Database\Seeder;
 
-class ImageSeeder extends Seeder
+class LoadBalancerImageSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -15,17 +15,17 @@ class ImageSeeder extends Seeder
     public function run()
     {
         $image = factory(Image::class)->create([
-            'id' => 'img-aaaaaaaa',
-            'name' => 'Dev Image (Centos 7)',
+            'id' => 'img-loadbalancer',
+            'name' => 'Ubuntu 20.04 LBv2',
             'vpc_id' => null,
-            'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
-            'documentation_uri' => 'https://docs.centos.org/en-US/docs/',
-            'description' => 'CentOS (Community enterprise Operating System)',
+            'logo_uri' => null,
+            'documentation_uri' => null,
+            'description' => 'Load Balancer Image',
             'script_template' => '',
             'vm_template' => 'CentOS7 x86_64',
             'platform' => 'Linux',
             'active' => true,
-            'public' => true,
+            'public' => false,
             'visibility' => Image::VISIBILITY_PUBLIC,
         ]);
 

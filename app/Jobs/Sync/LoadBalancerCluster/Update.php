@@ -20,7 +20,13 @@ class Update extends Job
 
     public function handle()
     {
-        $this->task->completed = true;
-        $this->task->save();
+        $this->updateTaskBatch([
+            [
+//                new AwaitRouterSync($this->task->resource),
+//                new Deploy($this->task->resource),
+//                new DeploySecurityProfile($this->task->resource),
+//                new DeployDiscoveryProfile($this->task->resource),
+            ],
+        ])->dispatch();
     }
 }
