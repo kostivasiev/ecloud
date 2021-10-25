@@ -6,7 +6,7 @@ use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
 /**
- * Class LoadBalancerClusterResource
+ * Class LoadBalancerResource
  * @package App\Http\Resources\V2
  * @property string id
  * @property string name
@@ -17,7 +17,7 @@ use UKFast\Responses\UKFastResource;
  * @property string created_at
  * @property string updated_at
  */
-class LoadBalancerClusterResource extends UKFastResource
+class LoadBalancerResource extends UKFastResource
 {
     /**
      * @param \Illuminate\Http\Request $request

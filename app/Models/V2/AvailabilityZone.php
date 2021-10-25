@@ -59,7 +59,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     public $children = [
         'routers',
         'instances',
-        'loadBalancerClusters'
+        'loadBalancers'
     ];
 
     /**
@@ -112,9 +112,9 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         return $this->hasMany(Instance::class);
     }
 
-    public function loadBalancerClusters()
+    public function loadBalancers()
     {
-        return $this->hasMany(LoadBalancerCluster::class);
+        return $this->hasMany(LoadBalancer::class);
     }
 
     public function availabilityZoneCapacities()

@@ -16,21 +16,20 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
 /**
- * Class LoadBalancerCluster
+ * Class LoadBalancer
  * @package App\Models\V2
- * @method static findOrFail(string $lbcId)
+ * @method static findOrFail(string $loadBalancerId)
  * @method static forUser(string $user)
  */
-class LoadBalancerCluster extends Model implements Filterable, Sortable
+class LoadBalancer extends Model implements Filterable, Sortable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, HasFactory;
 
-    public $keyPrefix = 'lbc';
+    public $keyPrefix = 'lb';
     protected $keyType = 'string';
     protected $connection = 'ecloud';
     public $incrementing = false;
     public $timestamps = true;
-    public $table = 'lbcs';
 
     protected $fillable = [
         'id',
@@ -54,7 +53,7 @@ class LoadBalancerCluster extends Model implements Filterable, Sortable
         return $this->belongsTo(Vpc::class);
     }
 
-    public function lbs()
+    public function loadBalancerSpec()
     {
         return $this->belongsTo(LoadBalancerSpecification::class);
     }

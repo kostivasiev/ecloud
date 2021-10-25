@@ -47,7 +47,7 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
     public $children = [
         'routers',
         'instances',
-        'loadBalancerClusters',
+        'loadBalancers',
         'volumes',
         'floatingIps',
         'hostGroups',
@@ -93,9 +93,9 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
         return $this->hasMany(FloatingIp::class);
     }
 
-    public function loadBalancerClusters()
+    public function loadBalancers()
     {
-        return $this->hasMany(LoadBalancerCluster::class);
+        return $this->hasMany(LoadBalancer::class);
     }
 
     public function vpcSupports()

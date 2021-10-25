@@ -3,19 +3,17 @@
 namespace Tests\V2\Vpc;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancerCluster;
-use App\Models\V2\Region;
+use App\Models\V2\LoadBalancer;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetClustersTest extends TestCase
 {
     protected \Faker\Generator $faker;
     protected AvailabilityZone $availabilityZone;
-    protected LoadBalancerCluster $lbc;
+    protected LoadBalancer $loadBalancer;
     protected Router $router;
     protected Vpc $vpc;
 
@@ -24,7 +22,7 @@ class GetClustersTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->lbc = factory(LoadBalancerCluster::class)->create([
+        $this->loadBalancer = factory(LoadBalancer::class)->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id
         ]);
@@ -33,17 +31,17 @@ class GetClustersTest extends TestCase
     public function testGetCollection()
     {
         $this->get(
-            '/v2/vpcs/' . $this->vpc()->id . '/lbcs',
+            '/v2/vpcs/' . $this->vpc()->id . '/load-balancers',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id'     => $this->lbc->id,
-                'name'   => $this->lbc->name,
-                'vpc_id' => $this->lbc->vpc_id,
-                'load_balancer_spec_id' => $this->lbc->load_balancer_spec_id,
+                'id'     => $this->loadBalancer->id,
+                'name'   => $this->loadBalancer->name,
+                'vpc_id' => $this->loadBalancer->vpc_id,
+                'load_balancer_spec_id' => $this->loadBalancer->load_balancer_spec_id,
             ])
             ->assertResponseStatus(200);
     }
