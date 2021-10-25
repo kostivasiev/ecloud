@@ -176,7 +176,7 @@ paths:
     $ref: 'resources/AvailabilityZone/instance-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/routers':
     $ref: 'resources/AvailabilityZone/router-collection.yaml'
-#  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/lbcs':
+#  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/load-balancers':
 #    $ref: 'resources/AvailabilityZone/lbc-collection.yaml'
   '/ecloud/v2/billing-metrics':
     $ref: 'resources/BillingMetric/collection.yaml'
@@ -279,7 +279,7 @@ paths:
     $ref: 'resources/Volume/admin-collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
     $ref: 'resources/Volume/admin-item.yaml'
-#  '/ecloud/v2/vpcs/{vpcId}/lbcs':
+#  '/ecloud/v2/vpcs/{vpcId}/load-balancers':
 #    $ref: 'resources/Vpc/cluster-collection.yaml'
   '/ecloud/v2/vpn-profile-groups':
     $ref: 'resources/VpnProfileGroup/admin-collection.yaml'

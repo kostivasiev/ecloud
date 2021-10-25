@@ -1,47 +1,58 @@
 <?php
 
-namespace Tests\V2\LoadBalancerCluster;
+namespace Tests\V2\LoadBalancer;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\LoadBalancer;
+use App\Models\V2\LoadBalancerSpecification;
 use App\Models\V2\Region;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Support\Sync;
 use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
-class UpdateTest extends TestCase
+class CreateTest extends TestCase
 {
     protected $faker;
     protected $region;
     protected $vpc;
+    protected $lbs;
     protected $availabilityZone;
-    protected $lbc;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->lbc = factory(LoadBalancerCluster::class)->create([
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'vpc_id' => $this->vpc()->id
+        $this->region = factory(Region::class)->create();
+        $this->lbs = factory(LoadBalancerSpecification::class)->create();
+
+        $this->vpc = Vpc::withoutEvents(function () {
+            return factory(Vpc::class)->create([
+                'id' => 'vpc-test',
+                'name' => 'Manchester DC',
+                'region_id' => $this->region->id
+            ]);
+        });
+
+        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            'region_id' => $this->region->id
         ]);
     }
 
     public function testInvalidVpcIdIsFailed()
     {
         $data = [
-            'name' => 'My Load Balancer Cluster',
+            'name' => 'My Load Balancer',
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->faker->uuid(),
-            'availability_zone_id' => $this->availabilityZone()->id
+            'availability_zone_id' => $this->availabilityZone->id
         ];
 
-        $this->patch(
-            '/v2/load-balancers/' . $this->lbc->id,
+        $this->post(
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -57,16 +68,17 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
-    public function testInvalidavailabilityZoneIsFailed()
+    public function testInvalidAvailabilityZoneIsFailed()
     {
         $data = [
-            'name' => 'My Load Balancer Cluster',
+            'name' => 'My Load Balancer',
+            'load_balancer_spec_id' => $this->lbs->id,
             'vpc_id' => $this->faker->uuid(),
             'availability_zone_id' => $this->faker->uuid()
         ];
 
-        $this->patch(
-            '/v2/load-balancers/' . $this->lbc->id,
+        $this->post(
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -85,13 +97,14 @@ class UpdateTest extends TestCase
     public function testNotOwnedVpcIdIsFailed()
     {
         $data = [
-            'name' => 'My Load Balancer Cluster',
-            'vpc_id' => $this->vpc()->id,
+            'name' => 'My Load Balancer',
+            'load_balancer_spec_id' => $this->lbs->id,
+            'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $this->faker->uuid()
         ];
 
-        $this->patch(
-            '/v2/load-balancers/' . $this->lbc->id,
+        $this->post(
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '2-0',
@@ -107,7 +120,7 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(422);
     }
 
-    public function testFailedVpcCausesFailure()
+    public function testFailedVpcCausesFail()
     {
         // Force failure
         Model::withoutEvents(function () {
@@ -117,17 +130,18 @@ class UpdateTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $model->resource()->associate($this->vpc());
+            $model->resource()->associate($this->vpc);
             $model->save();
         });
 
         $data = [
-            'name' => 'My Load Balancer Cluster',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id
+            'name' => 'My Load Balancer',
+            'load_balancer_spec_id' => $this->lbs->id,
+            'vpc_id' => $this->vpc->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ];
-        $this->patch(
-            '/v2/load-balancers/' . $this->lbc->id,
+        $this->post(
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -144,26 +158,23 @@ class UpdateTest extends TestCase
     public function testValidDataSucceeds()
     {
         $data = [
-            'name' => 'My Load Balancer Cluster',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id
+            'name' => 'My Load Balancer',
+            'vpc_id' => $this->vpc->id,
+            'load_balancer_spec_id' => $this->lbs->id,
+            'availability_zone_id' => $this->availabilityZone->id
         ];
-        $this->patch(
-            '/v2/load-balancers/' . $this->lbc->id,
+        $this->post(
+            '/v2/load-balancers',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(200);
+            ->assertResponseStatus(201);
 
         $resourceId = (json_decode($this->response->getContent()))->data->id;
-        $resource = LoadBalancerCluster::find($resourceId);
-
-
-        $this->assertEquals($data['name'], $resource->name);
-        $this->assertEquals($data['vpc_id'], $resource->vpc_id);
-        $this->assertEquals($data['availability_zone_id'], $resource->availability_zone_id);
+        $resource = LoadBalancer::find($resourceId);
+        $this->assertNotNull($resource);
     }
 }

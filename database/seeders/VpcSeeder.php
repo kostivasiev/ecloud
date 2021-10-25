@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
-use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\LoadBalancer;
 use App\Models\V2\Vpc;
 use Illuminate\Database\Seeder;
 
@@ -26,7 +25,7 @@ class VpcSeeder extends Seeder
             'advanced_networking' => true
         ]);
 
-        factory(LoadBalancerCluster::class)->create([
+        factory(LoadBalancer::class)->create([
             'vpc_id' => 'vpc-aaaaaaaa',
             'load_balancer_spec_id' => 'lbs-aaaaaaaa',
             'name' => 'Dev LBC',

@@ -36,7 +36,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('availability-zones/{zoneId}/dhcps', 'AvailabilityZoneController@dhcps');
         $router->get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
         $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
-        $router->get('availability-zones/{zoneId}/lbcs', 'AvailabilityZoneController@lbcs');
+        $router->get('availability-zones/{zoneId}/load-balancers', 'AvailabilityZoneController@loadBalancers');
         $router->get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
     });
 
@@ -69,7 +69,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('vpcs/{vpcId}/instances', 'VpcController@instances');
         $router->get('vpcs/{vpcId}/tasks', 'VpcController@tasks');
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->get('vpcs/{vpcId}/lbcs', 'VpcController@lbcs');
+            $router->get('vpcs/{vpcId}/load-balancers', 'VpcController@loadBalancers');
         });
     });
 
@@ -301,16 +301,13 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
     });
 
-    /** Load balancer clusters */
+    /** Load balancers */
     $router->group([], function () use ($router) {
-        $router->get('load-balancers', 'LoadBalancerClusterController@index');
-        $router->get('load-balancers/{lbcId}', 'LoadBalancerClusterController@show');
-
-
-        $router->post('load-balancers', 'LoadBalancerClusterController@store');
-
-        $router->patch('load-balancers/{lbcId}', 'LoadBalancerClusterController@update');
-        $router->delete('load-balancers/{lbcId}', 'LoadBalancerClusterController@destroy');
+        $router->get('load-balancers', 'LoadBalancerController@index');
+        $router->get('load-balancers/{loadBalancerId}', 'LoadBalancerController@show');
+        $router->post('load-balancers', 'LoadBalancerController@store');
+        $router->patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
+        $router->delete('load-balancers/{loadBalancerId}', 'LoadBalancerController@destroy');
     });
 
     /** Load balancer specifications */

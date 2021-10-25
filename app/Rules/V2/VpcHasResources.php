@@ -9,7 +9,7 @@ class VpcHasResources implements Rule
 {
     public function passes($attribute, $value)
     {
-        $vpc = Vpc::with(['instances', 'routers', 'volumes', 'loadBalancerClusters', 'floatingIps'])->findOrFail($value);
+        $vpc = Vpc::with(['instances', 'routers', 'volumes', 'loadBalancers', 'floatingIps'])->findOrFail($value);
 
         foreach ($vpc->getRelations() as $relation) {
             if ($relation->count() > 0) {
