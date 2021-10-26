@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\CreateLoadBalancerClusterRequest;
-use App\Http\Requests\V2\UpdateLoadBalancerClusterRequest;
+use App\Http\Requests\V2\LoadBalancer\CreateRequest;
+use App\Http\Requests\V2\LoadBalancer\UpdateRequest;
 use App\Models\V2\LoadBalancer;
 use App\Resources\V2\LoadBalancerResource;
 use Illuminate\Http\Request;
@@ -45,24 +45,25 @@ class LoadBalancerController extends BaseController
     }
 
     /**
-     * @param CreateLoadBalancerClusterRequest $request
+     * @param CreateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(CreateLoadBalancerClusterRequest $request)
+    public function store(CreateRequest $request)
     {
         $loadBalancer = new LoadBalancer(
             $request->only(['name', 'availability_zone_id', 'vpc_id', 'load_balancer_spec_id'])
         );
-        $loadBalancer->save();
-        return $this->responseIdMeta($request, $loadBalancer->id, 201);
+
+        $task = $loadBalancer->syncSave();
+        return $this->responseIdMeta($request, $loadBalancer->id, 202, $task->id);
     }
 
     /**
-     * @param UpdateLoadBalancerClusterRequest $request
+     * @param UpdateRequest $request
      * @param string $loadBalancerId
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(UpdateLoadBalancerClusterRequest $request, string $loadBalancerId)
+    public function update(UpdateRequest $request, string $loadBalancerId)
     {
         $loadBalancer = LoadBalancer::forUser(Auth::user())->findOrFail($loadBalancerId);
         $loadBalancer->fill($request->only(['name', 'availability_zone_id', 'vpc_id', 'load_balancer_spec_id']));

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Jobs\Sync\LoadBalancerCluster;
+namespace App\Jobs\Sync\LoadBalancer;
 
 use App\Jobs\Job;
+use App\Jobs\LoadBalancer\CreateInstances;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -22,10 +23,7 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
-//                new AwaitRouterSync($this->task->resource),
-//                new Deploy($this->task->resource),
-//                new DeploySecurityProfile($this->task->resource),
-//                new DeployDiscoveryProfile($this->task->resource),
+                new CreateInstances($this->task),
             ],
         ])->dispatch();
     }

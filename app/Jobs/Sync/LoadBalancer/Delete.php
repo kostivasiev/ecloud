@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Sync\LoadBalancerCluster;
+namespace App\Jobs\Sync\LoadBalancer;
 
 use App\Jobs\Job;
 use App\Models\V2\Task;

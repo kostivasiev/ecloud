@@ -305,9 +305,12 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('load-balancers', 'LoadBalancerController@index');
         $router->get('load-balancers/{loadBalancerId}', 'LoadBalancerController@show');
-        $router->post('load-balancers', 'LoadBalancerController@store');
         $router->patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
         $router->delete('load-balancers/{loadBalancerId}', 'LoadBalancerController@destroy');
+
+        $router->group(['middleware' => 'load-balancer-is-max-for-customer'], function () use ($router) {
+            $router->post('load-balancers', 'LoadBalancerController@store');
+        });
     });
 
     /** Load balancer specifications */

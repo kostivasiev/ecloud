@@ -3,28 +3,28 @@
 namespace Tests\unit\Middleware\LoadBalancer;
 
 use App\Http\Middleware\Loadbalancer\IsMaxForForCustomer;
+use App\Models\V2\LoadBalancer;
+use App\Models\V2\LoadBalancerSpecification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class IsMaxForCustomerTest extends TestCase
 {
-    protected OrchestratorConfig $orchestratorConfig;
+    use LoadBalancerMock;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
     }
 
-    public function testIsNotValidOrchestratorConfigFails()
+    public function testLimitReachedFails()
     {
-        Config::set('load-balancer.customer_max_per_az', 1);
-
-        // Create a loadbalancer instace
-
-        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+        Config::set('load-balancer.customer_max_per_az', 2);
+        $this->loadBalancer();
 
         $request = Request::create(
             'POST',
@@ -35,29 +35,37 @@ class IsMaxForCustomerTest extends TestCase
             [
                 'CONTENT_TYPE' => 'application/json',
             ],
-            'INVALID JSON');
+            json_encode([
+                'load_balancer_spec_id' => $this->loadBalancerSpecification()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'vpc_id' => $this->vpc()->id,
+            ]));
 
         $middleware = new IsMaxForForCustomer();
 
         $response = $middleware->handle($request, function () {});
 
-        $this->assertEquals($response->getStatusCode(), 422);
+        $this->assertEquals($response->getStatusCode(), 403);
     }
 
-    public function testIsValidOrchestratorConfigPasses()
+    public function testLimitNotReachedPasses()
     {
-        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+        Config::set('load-balancer.customer_max_per_az', 2);
 
         $request = Request::create(
             'POST',
-            '/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/data',
+            '/v2/load-balancers',
             [],
             [],
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
             ],
-            json_encode(['foo' => 'bar']));
+            json_encode([
+                'load_balancer_spec_id' => $this->loadBalancerSpecification()->id,
+                'availability_zone_id' => $this->availabilityZone(),
+                'vpc_id' => $this->vpc()->id,
+            ]));
 
         $middleware = new IsMaxForForCustomer();
 

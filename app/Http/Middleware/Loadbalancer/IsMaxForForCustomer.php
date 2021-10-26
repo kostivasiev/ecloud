@@ -2,9 +2,10 @@
 
 namespace App\Http\Middleware\Loadbalancer;
 
-use App\Exceptions\V2\MaxVpcException;
 use App\Http\Middleware\ResellerBypass;
 use App\Models\V2\Instance;
+use App\Models\V2\LoadBalancer;
+use App\Models\V2\LoadBalancerSpecification;
 use Closure;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,20 +19,19 @@ class IsMaxForForCustomer
             return $next($request);
         }
 
+        $limit = config('load-balancer.customer_max_per_az');
 
-        return Instance::forUser(Auth::user())->count() < config('load-balancer.customer_max_per_az');
+        $nodes = LoadBalancer::forUser(Auth::user())
+            ->where('availability_zone_id', $request->input('availability_zone_id'))
+            ->sum('nodes');
 
+        $loadBalancerSpec = LoadBalancerSpecification::findOrFail($request->input('load_balancer_spec_id'));
 
-        $ipAddress = IpAddress::forUser($request->user())->findOrFail($request->route('ipAddressId'));
-        if (!empty($ipAddress->nics()->count() > 0)) {
+        if ($nodes + $loadBalancerSpec->node_count > $limit) {
             return response()->json([
-                'errors' => [
-                    [
-                        'title' => 'Forbidden',
-                        'detail' => 'The IP address is in use',
-                        'status' => 403,
-                    ]
-                ]
+                'title' => 'Forbidden',
+                'detail' => 'A maximum of ' . $limit . ' load balancer nodes can be launched per availability zone.',
+                'status' => 403,
             ], 403);
         }
 
