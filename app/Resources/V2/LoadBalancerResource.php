@@ -33,6 +33,7 @@ class LoadBalancerResource extends UKFastResource
             'load_balancer_spec_id' => $this->load_balancer_spec_id,
             'sync' => $this->sync,
             'config_id' => $this->config_id,
+            'nodes' => $this->nodes,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

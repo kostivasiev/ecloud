@@ -21,10 +21,12 @@ properties:
     required: true
     example: 'lbs-2b66bb79'
     readOnly : false
-#  nodes:
-#    type: integer
-#    required: true
-#    example: 3
+  nodes:
+    type: integer
+    required: false
+    readOnly: true
+    description: "Number of nodes the load balancer has".
+    example: 3
   config_id:
     type: string
     readOnly: true

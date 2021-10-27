@@ -308,6 +308,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
         $router->delete('load-balancers/{loadBalancerId}', 'LoadBalancerController@destroy');
 
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->get('load-balancers/{loadBalancerId}/nodes', 'LoadBalancerController@nodes');
+        });
+
         $router->group(['middleware' => 'load-balancer-is-max-for-customer'], function () use ($router) {
             $router->post('load-balancers', 'LoadBalancerController@store');
         });

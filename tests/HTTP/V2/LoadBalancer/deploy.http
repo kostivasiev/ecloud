@@ -24,7 +24,7 @@ client.test("Request executed successfully", function() {
 ###
 GET https://{{host}}/{{version}}/load-balancer-specs?name:eq=medium
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -60,40 +60,57 @@ client.log('Load Balancer ID: ' + response.body.data.id);
 
 ###
 
-GET https://{{host}}/{{version}}/load-balancers
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 1-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-%}
-
-###
-
 GET https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data.id === client.global.get('lbc_id'), "Incorrect resource ID returned");
+  client.assert(response.body.data.id === client.global.get('load_balancer_id'), "Incorrect resource ID returned");
+  client.assert(response.body.data.nodes === 2, "Incorrect node count");
 });
 %}
 
 ###
 
+GET https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}/nodes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### Clean up
+
+## Get the instance ID's here so we can delete them
+GET https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}/nodes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
 
 
+### Use the instance ID's from above to clean up
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
 
+###
+DELETE https://{{host}}/{{version}}/load-balancers/lb-e07cd83f-dev
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+
+###
 DELETE https://{{host}}/{{version}}/routers/{{router_id}}
 Accept: */*
 Cache-Control: no-cache

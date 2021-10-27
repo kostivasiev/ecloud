@@ -78,6 +78,11 @@ class LoadBalancer extends Model implements Filterable, Sortable
         });
     }
 
+    public function getNodesAttribute()
+    {
+        return $this->instances()->count();
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]

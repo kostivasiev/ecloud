@@ -171,7 +171,7 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(201);
+            ->assertResponseStatus(202);
 
         $resourceId = (json_decode($this->response->getContent()))->data->id;
         $resource = LoadBalancer::find($resourceId);

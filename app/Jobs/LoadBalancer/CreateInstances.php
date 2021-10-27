@@ -85,7 +85,7 @@ class CreateInstances extends Job
                     'volume_iops' => $loadBalancer->loadBalancerSpec->iops,
                     'image_data' => [
                         //TODO: we will need to expand upon this, see https://gitlab.devops.ukfast.co.uk/ukfast/infrastructure/appliance-service/-/blob/master/ubuntu2004-lbv2/README.md
-                        "node_id" => $i,
+                        "node_id" => ($i+1),
                     ],
                     'load_balancer_id' => $loadBalancer->id,
                     'is_hidden' => true
@@ -118,6 +118,5 @@ class CreateInstances extends Job
                 $orchestratorBuild->id,
             ]);
         }
-
     }
 }
