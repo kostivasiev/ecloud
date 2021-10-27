@@ -35,7 +35,6 @@ trait LoadBalancerMock
                     'availability_zone_id' => $this->availabilityZone()->id,
                     'vpc_id' => $this->vpc()->id,
                     'load_balancer_spec_id' => $this->loadBalancerSpecification()->id,
-                    'nodes' => 2
                 ]);
             });
         }
