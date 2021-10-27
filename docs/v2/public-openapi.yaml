@@ -48,8 +48,8 @@ components:
       $ref: 'resources/LoadBalancerSpecification/public_schema.yaml'
     IpAddress :
       $ref : 'resources/IpAddress/schema.yaml'
-    #    LoadBalancerCluster:
-    #      $ref: 'components/schemas/lbc.yaml'
+    #    LoadBalancer:
+    #      $ref: 'components/schemas/loadBalancer.yaml'
     Meta:
       $ref: 'components/schemas/meta.yaml'
     Network:
@@ -102,8 +102,8 @@ components:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     LoadBalancerSpecificationId:
       $ref: 'resources/LoadBalancerSpecification/parameters/loadBalancerSpecificationId.yaml'
-    #    LbcId:
-    #      $ref: 'resources/LoadBalancerCluster/parameters/lbcId.yaml'
+    #    LoadBalancerId:
+    #      $ref: 'resources/LoadBalancerCluster/parameters/loadBalancerId.yaml'
     NetworkPolicyId:
       $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
     NetworkRulePortId:
@@ -142,7 +142,7 @@ components:
       $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
     FirewallPolicyIdResponse:
       $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
-    #    LbcIdResponse:
+    #    LoadBalancerIdResponse:
     #      $ref: 'resources/LoadBalancerCluster/responses/idResponse.yaml'
     NetworkPolicyIdResponse:
       $ref: 'resources/NetworkPolicy/responses/idResponse.yaml'
@@ -281,9 +281,9 @@ paths:
   '/ecloud/v2/instances/{instanceId}/volumes':
     $ref: 'resources/Instance/volumes.yaml'
   #  '/ecloud/v2/load-balancers':
-  #    $ref: 'resources/LoadBalancerCluster/collection.yaml'
-  #  '/ecloud/v2/load-balancers/{lbcId}':
-  #    $ref: 'resources/LoadBalancerCluster/item.yaml'
+  #    $ref: 'resources/LoadBalancer/collection.yaml'
+  #  '/ecloud/v2/load-balancers/{loadBalancerId}':
+  #    $ref: 'resources/LoadBalancer/item.yaml'
   '/ecloud/v2/load-balancer-specs':
     $ref: 'resources/LoadBalancerSpecification/collection.yaml'
   '/ecloud/v2/load-balancer-specs/{loadBalancerSpecificationId}':

@@ -3,20 +3,19 @@
 namespace Tests\V2\Region;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancerCluster;
+use App\Models\V2\LoadBalancer;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetPricesTest extends TestCase
 {
     protected \Faker\Generator $faker;
-    protected LoadBalancerCluster $lbc;
+    protected LoadBalancer $lbc;
     protected Router $router;
     protected Vpc $vpc;
     protected Region $region;
