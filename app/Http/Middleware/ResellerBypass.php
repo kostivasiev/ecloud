@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Middleware;
-;
+
 use Illuminate\Support\Facades\Auth;
 
 trait ResellerBypass
