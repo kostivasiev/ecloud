@@ -42,21 +42,21 @@ class FloatingIpController extends BaseController
 
     public function store(CreateRequest $request)
     {
-        $availabilityZone = AvailabilityZone::forUser(Auth::user())
-            ->findOrFail($request->availability_zone_id)
-            ->region_id;
-        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->vpc_id)->region_id;
-
-        if ($availabilityZone !== $vpc) {
-            return response()->json([
-                'errors' => [
-                    'title' => 'Not Found',
-                    'detail' => 'The specified availability zone is not available to that VPC',
-                    'status' => 404,
-                    'source' => 'availability_zone_id'
-                ]
-            ], 404);
-        }
+//        $availabilityZone = AvailabilityZone::forUser(Auth::user())
+//            ->findOrFail($request->availability_zone_id)
+//            ->region_id;
+//        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->vpc_id)->region_id;
+//
+//        if ($availabilityZone !== $vpc) {
+//            return response()->json([
+//                'errors' => [
+//                    'title' => 'Not Found',
+//                    'detail' => 'The specified availability zone is not available to that VPC',
+//                    'status' => 404,
+//                    'source' => 'availability_zone_id'
+//                ]
+//            ], 404);
+//        }
 
         $floatingIp = new FloatingIp(
             $request->only(['vpc_id', 'name', 'availability_zone_id'])
