@@ -275,6 +275,10 @@ paths:
     $ref: 'resources/Task/admin-collection.yaml'
   '/ecloud/v2/tasks/{taskId}':
     $ref: 'resources/Task/admin-item.yaml'
+  '/ecloud/v2/vips':
+    $ref: 'resources/Vip/collection.yaml'
+  '/ecloud/v2/vips/{vipId}':
+    $ref: 'resources/Vip/item.yaml'
   '/ecloud/v2/volumes':
     $ref: 'resources/Volume/admin-collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':

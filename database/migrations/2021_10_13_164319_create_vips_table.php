@@ -18,6 +18,7 @@ class CreateVipsTable extends Migration
             $table->string('name');
             $table->uuid('load_balancer_id');
             $table->uuid('network_id');
+            $table->uuid('ip_address_id')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

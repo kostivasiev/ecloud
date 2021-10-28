@@ -16,15 +16,12 @@ use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
-use App\Models\V2\LoadBalancerCluster;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
-use App\Models\V2\Task;
-use App\Models\V2\Vip;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\ArtisanService;
@@ -69,9 +66,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var Vpc */
     private $vpc;
-
-    /** @var Vip */
-    private $vip;
 
     /** @var Dhcp */
     private $dhcp;
@@ -180,22 +174,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->ip;
     }
 
-    public function loadBalancer(): LoadBalancerCluster
-    {
-        if (!$this->loadBalancer) {
-            Model::withoutEvents(function() {
-                $this->loadBalancer = factory(LoadBalancerCluster::class)->create([
-                    'id' => 'lbc-aaaaaaaa',
-                    'name' => 'Load Balancer Cluster 1',
-                    'load_balancer_spec_id' => 'lbs-aaaaaaaa',
-                    'vpc_id' => $this->vpc()->id,
-                    'config_id' => '77898345'
-                ]);
-            });
-        }
-        return $this->loadBalancer;
-    }
-
     public function networkPolicy($id = 'np-test'): NetworkPolicy
     {
         if (!$this->networkPolicy) {
@@ -249,21 +227,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->vpc;
-    }
-
-    public function vip($id = 'vip-aaaaaaaa-dev'): Vip
-    {
-        if (!$this->vip) {
-            Model::withoutEvents(function() use ($id) {
-                $this->vip = Vip::factory()->create([
-                    'id' => $id,
-                    'load_balancer_id' => $this->loadBalancer()->id,
-                    'network_id' => $this->network()->id,
-                    'name' => $id
-                ]);
-            });
-        }
-        return $this->vip;
     }
 
     public function dhcp()

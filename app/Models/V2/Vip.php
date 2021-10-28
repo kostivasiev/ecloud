@@ -4,7 +4,6 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,19 +27,25 @@ class Vip extends Model implements Filterable, Sortable
     protected $connection = 'ecloud';
     protected $fillable = [
         'id',
+        'name',
         'load_balancer_id',
         'network_id',
-        'name'
+        'ip_address_id'
     ];
 
     public function loadBalancer()
     {
-        return $this->belongsTo(LoadBalancerCluster::class);
+        return $this->belongsTo(LoadBalancer::class);
     }
 
     public function network()
     {
         return $this->belongsTo(Network::class);
+    }
+
+    public function ipAddress()
+    {
+        return $this->belongsTo(IpAddress::class);
     }
 
     public function scopeForUser($query, Consumer $user)
@@ -62,7 +67,10 @@ class Vip extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id', Filter::$stringDefaults),
+            $factory->create('name', Filter::$stringDefaults),
             $factory->create('load_balancer_id', Filter::$stringDefaults),
+            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('ip_address_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -77,7 +85,10 @@ class Vip extends Model implements Filterable, Sortable
     {
         return [
             $factory->create('id'),
+            $factory->create('name'),
             $factory->create('load_balancer_id', Filter::$stringDefaults),
+            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('ip_address_id', Filter::$stringDefaults),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -101,8 +112,10 @@ class Vip extends Model implements Filterable, Sortable
     {
         return [
             'id' => 'id',
+            'name' => 'name',
             'load_balancer_id' => 'load_balancer_id',
-            'network_id' => 'network_id'
+            'network_id' => 'network_id',
+            'ip_address_id' => 'ip_address_id'
         ];
     }
 }

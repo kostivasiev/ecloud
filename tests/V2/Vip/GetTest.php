@@ -2,21 +2,26 @@
 
 namespace Tests\V2\Vip;
 
-use App\Models\V2\IpAddress;
-use App\Models\V2\Vip;
+use Tests\Mocks\Resources\VipMock;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class GetTest extends TestCase
 {
+    use VipMock;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+    }
 
     public function testGetItemCollection()
     {
         $this->vip();
 
-        $this->get('/v2/vips', [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        $this->get('/v2/vips')
+            ->seeJson([
             'id' => $this->vip()->id,
             'load_balancer_id' => $this->vip()->load_balancer_id,
             'network_id' => $this->vip()->network_id
@@ -25,10 +30,7 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/vips/' . $this->vip()->id, [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        $this->get('/v2/vips/' . $this->vip()->id)->seeJson([
             'id' => $this->vip()->id,
             'load_balancer_id' => $this->vip()->load_balancer_id,
             'network_id' => $this->vip()->network_id

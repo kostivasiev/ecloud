@@ -27,6 +27,7 @@ class VipResource extends UKFastResource
             'id' => $this->id,
             'load_balancer_id' => $this->load_balancer_id,
             'network_id' => $this->network_id,
+            'ip_address_id' => $this->ip_address_id,
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,

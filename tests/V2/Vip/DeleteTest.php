@@ -3,26 +3,24 @@
 namespace Tests\V2\Vip;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\IpAddress;
-use App\Models\V2\Vip;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
+use Tests\Mocks\Resources\VipMock;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
+    use VipMock;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+    }
 
     public function testFailInvalidId()
     {
-        $this->delete(
-            '/v2/vips/NOT_FOUND',
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->delete('/v2/vips/NOT_FOUND')
             ->seeJson([
                 'title' => 'Not found',
                 'detail' => 'No Vip with that ID was found',
@@ -43,6 +41,9 @@ class DeleteTest extends TestCase
             ]
         )
             ->assertResponseStatus(202);
-        Event::assertDispatched(Created::class);
+
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == 'sync_delete';
+        });
     }
 }

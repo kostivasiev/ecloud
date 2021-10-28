@@ -25,6 +25,7 @@ class LoadBalancerSpecificationSeeder extends Seeder
         ]);
 
         factory(LoadBalancerSpecification::class)->create([
+                'id' => 'lbs-aaaaaaaa', // dev_load_balancer_spec_id
                 'name' => 'medium',
                 'node_count' => 2,
                 'cpu' => 2,

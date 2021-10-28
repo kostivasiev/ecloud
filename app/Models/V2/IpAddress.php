@@ -54,9 +54,9 @@ class IpAddress extends Model implements Filterable, Sortable, Natable, RouterSc
         return $this->belongsTo(Network::class);
     }
 
-    public function vips()
+    public function vip()
     {
-        return $this->hasMany(Vip::class);
+        return $this->hasOne(Vip::class);
     }
 
     public function getIPAddress(): ?string
