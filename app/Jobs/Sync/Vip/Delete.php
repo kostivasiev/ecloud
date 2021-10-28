@@ -20,6 +20,7 @@ class Delete extends Job
 
     public function handle()
     {
+        $this->task->resource->delete();
         $this->task->completed = true;
         $this->task->save();
     }

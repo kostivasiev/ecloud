@@ -25,6 +25,7 @@ class VipResource extends UKFastResource
     {
         return [
             'id' => $this->id,
+            'name' => $this->name,
             'load_balancer_id' => $this->load_balancer_id,
             'network_id' => $this->network_id,
             'ip_address_id' => $this->ip_address_id,

@@ -33,12 +33,12 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "load_balancer_id": "{{load_balancer_id}}",
-  "network_id": {{dev_network_id}}
+  "load_balancer_id" : "{{load_balancer_id}}",
+  "network_id": "{{dev_network_id}}"
 }
-
 > {%
 client.test('Create', function () {
+    client.global.set('vip_id', response.body.data.id);
     client.assert(response.status === 202, '202 response not received');
 });
 %}
@@ -57,7 +57,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 3 Get Item
-GET https://{{host}}/{{version}}/vips/vip-14353186-dev
+GET https://{{host}}/{{version}}/vips/{{vip_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
@@ -70,25 +70,24 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 6
-PATCH https://{{host}}/{{version}}/vips/vip-14353186-dev
+PATCH https://{{host}}/{{version}}/vips/{{vip_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "load_balancer_id": "{{ lbc_id }}",
-  "network_id": "net-test"
+  "name": "RENAMED"
 }
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
 ### 7 Confirm patch
-GET https://{{host}}/{{version}}/vips/vip-14353186-dev
+GET https://{{host}}/{{version}}/vips/{{vip_id}}
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -96,12 +95,12 @@ Content-Type:  application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data.ip_address_id === client.global.get('ip_address_id_2'));
+  client.assert(response.body.data.name === "RENAMED");
 });
 %}
 
 ### 8 destroy
-DELETE https://{{host}}/{{version}}/vips/vip-14353186-dev
+DELETE https://{{host}}/{{version}}/vips/{{vip_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
@@ -110,12 +109,12 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
 ### 9 confirm destroy
-GET https://{{host}}/{{version}}/vips/vip-14353186-dev
+GET https://{{host}}/{{version}}/vips/{{vip_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
