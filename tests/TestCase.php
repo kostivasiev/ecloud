@@ -22,7 +22,6 @@ use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
-use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\ArtisanService;
@@ -74,6 +73,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var FirewallPolicy */
     private $firewallPolicy;
 
+    /** @var $loadBalancer */
+    private $loadBalancer;
+
     /** @var NetworkPolicy */
     private $networkPolicy;
 
@@ -119,6 +121,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var Image */
     private $image;
 
+    /** @var IpAddress */
+    private $ip;
+
     /** @var ImageParameter */
     private $imageParameter;
 
@@ -151,6 +156,22 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->firewallPolicy;
+    }
+
+    public function ip($id = 'ip-aaaaaaaa-dev'): IpAddress
+    {
+        if (!$this->ip) {
+            Model::withoutEvents(function() use ($id) {
+                $this->ip = IpAddress::factory()->create([
+                    'id' => $id,
+                    'ip_address' => '1.1.1.1',
+                    'name' => 'test IP',
+                    'network_id' => $this->network()->id,
+                    'type' => 'normal'
+                ]);
+            });
+        }
+        return $this->ip;
     }
 
     public function networkPolicy($id = 'np-test'): NetworkPolicy

@@ -4,6 +4,8 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Syncable;
+use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,39 +16,26 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class IpAddress extends Model implements Filterable, Sortable, Natable, RouterScopable
+class Vip extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, HasFactory;
+    use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable, HasFactory;
 
-    public $keyPrefix = 'ip';
+    public $keyPrefix = 'vip';
+    public $incrementing = false;
+    public $timestamps = true;
+    protected $keyType = 'string';
+    protected $connection = 'ecloud';
+    protected $fillable = [
+        'id',
+        'name',
+        'load_balancer_id',
+        'network_id',
+        'ip_address_id'
+    ];
 
-    const TYPE_NORMAL = 'normal';
-    const TYPE_CLUSTER = 'cluster';
-
-    public function __construct(array $attributes = [])
+    public function loadBalancer()
     {
-        $this->incrementing = false;
-        $this->keyType = 'string';
-        $this->connection = 'ecloud';
-
-        $this->fillable([
-            'id',
-            'name',
-            'ip_address',
-            'network_id',
-            'type',
-        ]);
-
-        parent::__construct($attributes);
-    }
-
-    /**
-     * Pivot table ip_address_nic
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function nics()
-    {
-        return $this->belongsToMany(Nic::class);
+        return $this->belongsTo(LoadBalancer::class);
     }
 
     public function network()
@@ -54,34 +43,20 @@ class IpAddress extends Model implements Filterable, Sortable, Natable, RouterSc
         return $this->belongsTo(Network::class);
     }
 
-    public function vip()
+    public function ipAddress()
     {
-        return $this->hasOne(Vip::class);
+        return $this->belongsTo(IpAddress::class);
     }
 
-    public function getIPAddress(): ?string
-    {
-        return $this->ip_address;
-    }
-
-    public function getRouter()
-    {
-        return $this->network->router;
-    }
-
-    /**
-     * @param $query
-     * @param $user
-     * @return mixed
-     */
     public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('network.router.vpc', function ($query) use ($user) {
-            $query->where('reseller_id', $user->resellerId());
-        });
+        return $query
+            ->whereHas('network.router.vpc', function ($query) use ($user) {
+                $query->where('reseller_id', $user->resellerId());
+            });
     }
 
     /**
@@ -93,9 +68,9 @@ class IpAddress extends Model implements Filterable, Sortable, Natable, RouterSc
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('ip_address', Filter::$stringDefaults),
+            $factory->create('load_balancer_id', Filter::$stringDefaults),
             $factory->create('network_id', Filter::$stringDefaults),
-            $factory->create('type', Filter::$stringDefaults),
+            $factory->create('ip_address_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -111,9 +86,9 @@ class IpAddress extends Model implements Filterable, Sortable, Natable, RouterSc
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('ip_address'),
-            $factory->create('network_id'),
-            $factory->create('type'),
+            $factory->create('load_balancer_id', Filter::$stringDefaults),
+            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('ip_address_id', Filter::$stringDefaults),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -127,20 +102,20 @@ class IpAddress extends Model implements Filterable, Sortable, Natable, RouterSc
     public function defaultSort(SortFactory $factory)
     {
         return [
-            $factory->create('created_at', 'desc'),
+            $factory->create('created_at', 'asc'),
         ];
     }
-
+    /**
+     * @return array|string[]
+     */
     public function databaseNames()
     {
         return [
             'id' => 'id',
             'name' => 'name',
-            'ip_address' => 'ip_address',
+            'load_balancer_id' => 'load_balancer_id',
             'network_id' => 'network_id',
-            'type' => 'type',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
+            'ip_address_id' => 'ip_address_id'
         ];
     }
 }

@@ -356,6 +356,10 @@ paths:
     $ref: 'resources/Task/collection.yaml'
   '/ecloud/v2/tasks/{taskId}':
     $ref: 'resources/Task/item.yaml'
+  '/ecloud/v2/vips':
+    $ref: 'resources/Vip/collection.yaml'
+  '/ecloud/v2/vips/{vipId}':
+    $ref: 'resources/Vip/item.yaml'
   '/ecloud/v2/volumes':
     $ref: 'resources/Volume/collection.yaml'
   '/ecloud/v2/volumes/{volumeId}':
