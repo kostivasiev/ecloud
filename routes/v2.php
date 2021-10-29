@@ -303,6 +303,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Load balancers */
     $router->group([], function () use ($router) {
+
         $router->get('load-balancers', 'LoadBalancerController@index');
         $router->get('load-balancers/{loadBalancerId}', 'LoadBalancerController@show');
         $router->patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
@@ -315,6 +316,15 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'load-balancer-is-max-for-customer'], function () use ($router) {
             $router->post('load-balancers', 'LoadBalancerController@store');
         });
+    });
+
+    /** VIPS */
+    $router->group([], function() use ($router) {
+        $router->get('vips', 'VipController@index');
+        $router->get('vips/{vipId}', 'VipController@show');
+        $router->post('vips', 'VipController@create');
+        $router->patch('vips/{vipId}', 'VipController@update');
+        $router->delete('vips/{vipId}', 'VipController@destroy');
     });
 
     /** Load balancer specifications */

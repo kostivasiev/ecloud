@@ -8,9 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 
 trait LoadBalancerMock
 {
-   protected LoadBalancerSpecification $loadBalancerSpecification;
+   protected $loadBalancerSpecification;
 
-    protected LoadBalancer $loadBalancer;
+    protected $loadBalancer;
 
     public function loadBalancerSpecification($id = 'lbs-test'): LoadBalancerSpecification
     {
