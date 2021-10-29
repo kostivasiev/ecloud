@@ -23,7 +23,7 @@ class IsMaxForForCustomer
 
         $nodes = LoadBalancer::forUser(Auth::user())
             ->where('availability_zone_id', $request->input('availability_zone_id'))
-            ->sum('nodes');
+            ->get()->pluck('nodes')->sum();
 
         $loadBalancerSpec = LoadBalancerSpecification::findOrFail($request->input('load_balancer_spec_id'));
 

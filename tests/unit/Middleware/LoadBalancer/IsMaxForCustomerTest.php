@@ -3,8 +3,7 @@
 namespace Tests\unit\Middleware\LoadBalancer;
 
 use App\Http\Middleware\Loadbalancer\IsMaxForForCustomer;
-use App\Models\V2\LoadBalancer;
-use App\Models\V2\LoadBalancerSpecification;
+use App\Models\V2\Instance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Tests\Mocks\Resources\LoadBalancerMock;
@@ -25,6 +24,17 @@ class IsMaxForCustomerTest extends TestCase
     {
         Config::set('load-balancer.customer_max_per_az', 2);
         $this->loadBalancer();
+
+        factory(Instance::class, 2)->create([
+            'vpc_id' => $this->vpc()->id,
+            'name' => 'Test Instance ' . uniqid(),
+            'image_id' => $this->image()->id,
+            'vcpu_cores' => 1,
+            'ram_capacity' => 1024,
+            'platform' => 'Linux',
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'load_balancer_id' => $this->loadBalancer()->id
+        ]);
 
         $request = Request::create(
             'POST',
