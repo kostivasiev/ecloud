@@ -32,6 +32,10 @@ class UpdateRamBilling
             return;
         }
 
+        if ($instance->loadBalancer()->exists()) {
+            return;
+        }
+
         if (!empty($instance->host_group_id)) {
             $instance->billingMetrics()
                 ->whereIn('key', ['ram.capacity', 'ram.capacity.high'])
