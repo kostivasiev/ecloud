@@ -89,11 +89,6 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
 
     public function getIsHiddenAttribute(): bool
     {
-        if (!$this->router) {
-            echo $this->id;
-            return false;
-        }
-
         return (bool) $this->router->is_management;
     }
 
