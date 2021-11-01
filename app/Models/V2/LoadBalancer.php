@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Events\V2\LoadBalancer\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -26,22 +27,27 @@ class LoadBalancer extends Model implements Filterable, Sortable
     use CustomKey, SoftDeletes, DefaultName, Syncable, HasFactory;
 
     public $keyPrefix = 'lb';
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    public $incrementing = false;
-    public $timestamps = true;
 
-    protected $fillable = [
-        'id',
-        'name',
-        'availability_zone_id',
-        'vpc_id',
-        'load_balancer_spec_id'
-    ];
+    public function __construct(array $attributes = [])
+    {
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
 
-    protected $casts = [
-        'nodes' => 'integer',
-    ];
+        $this->fillable([
+            'id',
+            'name',
+            'availability_zone_id',
+            'vpc_id',
+            'load_balancer_spec_id'
+        ]);
+
+        $this->dispatchesEvents = [
+            'deleted' => Deleted::class,
+        ];
+
+        parent::__construct($attributes);
+    }
 
     public function availabilityZone()
     {
@@ -58,6 +64,11 @@ class LoadBalancer extends Model implements Filterable, Sortable
         return $this->belongsTo(LoadBalancerSpecification::class);
     }
 
+    public function instances()
+    {
+        return $this->hasMany(Instance::class);
+    }
+
     /**
      * @param $query
      * @param Consumer $user
@@ -71,6 +82,11 @@ class LoadBalancer extends Model implements Filterable, Sortable
         return $query->whereHas('vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
+    }
+
+    public function getNodesAttribute(): int
+    {
+        return (int) $this->instances()->count();
     }
 
     /**

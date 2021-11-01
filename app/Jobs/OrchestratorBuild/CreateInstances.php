@@ -56,6 +56,8 @@ class CreateInstances extends Job
                     'locked',
                     'backup_enabled',
                     'host_group_id',
+                    'load_balancer_id',
+                    'is_hidden'
                 ])->toArray()
             );
 

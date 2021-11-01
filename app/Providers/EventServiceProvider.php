@@ -96,6 +96,11 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\BillingMetric\End::class,
         ],
 
+        // LoadBalancer
+        \App\Events\V2\LoadBalancer\Deleted::class => [
+            \App\Listeners\V2\BillingMetric\End::class,
+        ],
+
         // Network
         \App\Events\V2\Network\Creating::class => [
             \App\Listeners\V2\Network\DefaultSubnet::class,
@@ -157,6 +162,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\FloatingIp\UpdateBilling::class,
             \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling::class,
             \App\Listeners\V2\VpnSession\UpdateBilling::class,
+            \App\Listeners\V2\LoadBalancer\UpdateBilling::class,
         ],
     ];
 }

@@ -19,5 +19,10 @@ class RouterThroughputSeeder extends Seeder
             'availability_zone_id' => 'az-aaaaaaaa',
             'committed_bandwidth' => config('router.throughput.default.bandwidth')
         ]);
+
+        factory(RouterThroughput::class)->create([
+            'availability_zone_id' => 'az-aaaaaaaa',
+            'committed_bandwidth' => config('router.throughput.admin_default.bandwidth')
+        ]);
     }
 }

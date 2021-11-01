@@ -14,7 +14,7 @@ class ImageSeeder extends Seeder
      */
     public function run()
     {
-        factory(Image::class)->create([
+        $image = factory(Image::class)->create([
             'id' => 'img-aaaaaaaa',
             'name' => 'Dev Image (Centos 7)',
             'vpc_id' => null,
@@ -28,5 +28,8 @@ class ImageSeeder extends Seeder
             'public' => true,
             'visibility' => Image::VISIBILITY_PUBLIC,
         ]);
+
+        // Sync the pivot table
+        $image->availabilityZones()->sync('az-aaaaaaaa');
     }
 }

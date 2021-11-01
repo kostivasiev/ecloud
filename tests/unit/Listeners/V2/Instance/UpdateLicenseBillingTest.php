@@ -5,11 +5,13 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
 class UpdateLicenseBillingTest extends TestCase
 {
+    use LoadBalancerMock;
+
     private Task $task;
 
     public function setUp(): void
@@ -63,5 +65,19 @@ class UpdateLicenseBillingTest extends TestCase
         // Check existing metric was ended
         $originalVcpuMetric->refresh();
         $this->assertNotNull($originalVcpuMetric->end);
+    }
+
+    public function testLoadBalancerInstancesIgnored()
+    {
+        $this->instance()->vcpu_cores = 1;
+        $this->instance()->platform = 'Windows'; // LB nodes are not Windows, but just for testing...
+
+        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+
+        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
+        $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
+
+        $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
+        $this->assertNull($vcpuMetric);
     }
 }

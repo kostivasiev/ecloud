@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class IsMaxSshKeyPairForCustomer
 {
+    use ResellerBypass;
+
     /**
      * @param $request
      * @param Closure $next
@@ -26,12 +28,7 @@ class IsMaxSshKeyPairForCustomer
 
     public function isWithinLimit(): bool
     {
-        $reseller_bypass = [
-            7052, // UKFast - eCloud Testing
-            22114, // UKFast - eCloud Automated Testing
-        ];
-
-        if (in_array(Auth::user()->resellerId(), $reseller_bypass)) {
+        if ($this->resellerBypass()) {
             return true;
         }
         return (SshKeyPair::forUser(Auth::user())->get()->count() < config('defaults.ssh_key_pair.max_count'));

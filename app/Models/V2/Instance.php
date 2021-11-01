@@ -43,6 +43,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'deploy_data',
         'host_group_id',
         'volume_group_id',
+        'load_balancer_id'
     ];
 
     protected $appends = [
@@ -86,6 +87,11 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    public function loadBalancer()
+    {
+        return $this->belongsTo(LoadBalancer::class);
     }
 
     public function nics()
@@ -159,6 +165,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             $factory->create('backup_enabled', Filter::$stringDefaults),
             $factory->create('host_group_id', Filter::$stringDefaults),
             $factory->create('volume_group_id', Filter::$stringDefaults),
+            $factory->create('load_balancer_id', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -184,6 +191,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             $factory->create('backup_enabled'),
             $factory->create('host_group_id'),
             $factory->create('volume_group_id'),
+            $factory->create('load_balancer_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -219,6 +227,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             'backup_enabled' => 'backup_enabled',
             'host_group_id' => 'host_group_id',
             'volume_group_id' => 'volume_group_id',
+            'load_balancer_id' => 'load_balancer_id',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

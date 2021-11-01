@@ -9,10 +9,13 @@ content:
           properties:
             id:
               type: string
-              example: lbc-6ui8gt89
+              example: lb-6ui8gt89
+            task_id :
+              type : string
+              example : task-abc123xyz
         meta:
           type: object
           properties:
             location:
               type: string
-              example: 'https://api.ukfast.io/ecloud/v2/load-balancers/lbc-6ui8gt89'
+              example: 'https://api.ukfast.io/ecloud/v2/load-balancers/lb-6ui8gt89'

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\V2;
+namespace App\Http\Requests\V2\LoadBalancer;
 
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
@@ -8,10 +8,10 @@ use App\Rules\V2\IsResourceAvailable;
 use UKFast\FormRequests\FormRequest;
 
 /**
- * Class UpdateLoadBalancerClusterRequest
+ * Class CreateLoadBalancerClusterRequest
  * @package App\Http\Requests\V2
  */
-class UpdateLoadBalancerClusterRequest extends FormRequest
+class CreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,9 +32,9 @@ class UpdateLoadBalancerClusterRequest extends FormRequest
     {
         return [
             'name' => 'nullable|string',
-            'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
+            'load_balancer_spec_id' => 'required|string|exists:ecloud.load_balancer_specifications,id',
+            'availability_zone_id' => 'required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
             'vpc_id' => [
-                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
@@ -52,6 +52,7 @@ class UpdateLoadBalancerClusterRequest extends FormRequest
     public function messages()
     {
         return [
+            'load_balancer_spec_id.exists' => 'The specified :attribute was not found',
             'availability_zone_id.exists' => 'The specified :attribute was not found',
             'vpc_id.exists' => 'The specified :attribute was not found'
         ];

@@ -47,6 +47,7 @@ $app->configure('host');
 $app->configure('billing');
 $app->configure('volume-group');
 $app->configure('vpn-session');
+$app->configure('load-balancer');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -116,6 +117,7 @@ $app->routeMiddleware([
     'ip-address-can-delete' => \App\Http\Middleware\IpAddress\CanDelete::class,
     'vpn-endpoint-can-delete' => \App\Http\Middleware\VpnEndpoint\CanDelete::class,
     'vpc-can-delete' => \App\Http\Middleware\Vpc\CanDelete::class,
+    'load-balancer-is-max-for-customer' => \App\Http\Middleware\Loadbalancer\IsMaxForForCustomer::class,
 ]);
 
 /*

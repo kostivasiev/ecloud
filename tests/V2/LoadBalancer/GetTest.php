@@ -44,6 +44,8 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
+        $this->loadBalancer->instances()->save($this->instance());
+
         $this->get(
             '/v2/load-balancers/' . $this->loadBalancer->id,
             [
@@ -56,6 +58,7 @@ class GetTest extends TestCase
                 'name' => $this->loadBalancer->name,
                 'vpc_id' => $this->loadBalancer->vpc_id,
                 'load_balancer_spec_id' => $this->loadBalancer->load_balancer_spec_id,
+                'nodes' => 1,
             ])
             ->assertResponseStatus(200);
     }

@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/LoadBalancerId'
+    - $ref: '../../resources/LoadBalancer/parameters/loadBalancerId.yaml'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../public-openapi.yaml#/components/schemas/LoadBalancer'
+                $ref: '../../components/schemas/loadBalancer.yaml'
               meta:
                 type: object
   tags:
     - Load Balancers
 patch:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/LoadBalancerId'
+    - $ref: '../../resources/LoadBalancer/parameters/loadBalancerId.yaml'
   requestBody:
     required: true
     content:
@@ -25,21 +25,21 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: "../../public-openapi.yaml#/components/schemas/LoadBalancer"
+            - $ref: '../../components/schemas/loadBalancer.yaml'
             - type: object
               properties:
                 vpc_id:
                   required: false
-                nodes:
-                  required: false
+#                nodes:
+#                  required: false
   responses:
     200:
-      $ref: '../../public-openapi.yaml#/components/responses/LoadBalancerIdResponse'
+      $ref: '../../resources/LoadBalancer/responses/idResponse.yaml'
   tags:
     - Load Balancers
 delete:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/LoadBalancerId'
+    - $ref: '../../resources/LoadBalancer/parameters/loadBalancerId.yaml'
   responses:
     204:
       description: Success

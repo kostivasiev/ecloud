@@ -5,11 +5,13 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
 class UpdateVcpuBillingTest extends TestCase
 {
+    use LoadBalancerMock;
+
     private $sync;
 
     public function setUp(): void
@@ -53,5 +55,29 @@ class UpdateVcpuBillingTest extends TestCase
         $originalVcpuMetric->refresh();
 
         $this->assertNotNull($originalVcpuMetric->end);
+    }
+
+    public function testLoadBalancerInstancesIgnored()
+    {
+        $this->instance();
+
+        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+
+        $task = Model::withoutEvents(function() {
+            $task = new Task([
+                'id' => 'sync-1',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $task->resource()->associate($this->instance());
+            return $task;
+        });
+
+        $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
+        $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($task));
+
+        $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'vcpu.count');
+
+        $this->assertNull($billingMetric);
     }
 }
