@@ -33,7 +33,7 @@ class CreateInstancesTest extends TestCase
         ]);
 
         // Create the management network
-        $this->router()->setAttribute('is_management', true)->save();;
+        $this->router()->setAttribute('is_management', true)->save();
         $this->network();
 
         $task = Model::withoutEvents(function () {
