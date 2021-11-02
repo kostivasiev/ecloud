@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use IPLib\Range\Subnet;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -133,14 +132,7 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
         try {
             $lock->block(60);
 
-            $ip = $this->network->getNextAvailableIp($denyList);
-
-            $ipAddress = app()->make(IpAddress::class);
-            $ipAddress->fill([
-                'ip_address' => $ip,
-                'network_id' => $this->network->id,
-                'type' => $type
-            ]);
+            $ipAddress = $this->network->getNextAvailableIp($denyList);
 
             $this->ipAddresses()->save($ipAddress);
             Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to NIC ' . $this->id . ', type: ' . $type);

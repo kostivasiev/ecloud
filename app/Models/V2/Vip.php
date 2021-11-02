@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Traits\V2\AssignIpAddress;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -9,6 +10,8 @@ use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -16,9 +19,9 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class Vip extends Model implements Filterable, Sortable
+class Vip extends Model implements Filterable, Sortable, NetworkScopable
 {
-    use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable, HasFactory;
+    use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable, HasFactory, AssignIpAddress;
 
     public $keyPrefix = 'vip';
     public $incrementing = false;
@@ -57,6 +60,29 @@ class Vip extends Model implements Filterable, Sortable
             ->whereHas('network.router.vpc', function ($query) use ($user) {
                 $query->where('reseller_id', $user->resellerId());
             });
+    }
+
+    /**
+     * @param array $denyList
+     * @param string $type
+     * @return mixed|void
+     * @throws \Exception
+     */
+    public function assignIpAddress(array $denyList = [], string $type = IpAddress::TYPE_NORMAL) : IpAddress
+    {
+        $lock = Cache::lock("ip_address." . $this->id, 60);
+        try {
+            $lock->block(60);
+
+            $ipAddress = $this->network->getNextAvailableIp($denyList);
+
+            $this->ipAddress()->associate($ipAddress);
+            Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to vIP ' . $this->id . ', type: ' . $type);
+
+            return $ipAddress;
+        } finally {
+            $lock->release();
+        }
     }
 
     /**

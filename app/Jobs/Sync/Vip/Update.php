@@ -20,7 +20,16 @@ class Update extends Job
 
     public function handle()
     {
-        $this->task->completed = true;
-        $this->task->save();
+        $this->updateTaskBatch([
+            [
+                // assign ip address to the vip
+
+                /// assign ip address to each of the loadbalancer NICs
+
+
+                new AssignIpAddress($this->task),
+                new AssignIpToNics
+            ],
+        ])->dispatch();
     }
 }

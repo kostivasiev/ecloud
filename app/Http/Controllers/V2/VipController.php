@@ -24,6 +24,9 @@ class VipController extends BaseController
     {
         $collection = Vip::forUser($request->user());
 
+        $queryTransformer->config(Vip::class)
+            ->transform($collection);
+
         return VipResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
