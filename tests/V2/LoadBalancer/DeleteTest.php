@@ -70,7 +70,7 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(204);
+            ->assertResponseStatus(202);
         $resource = LoadBalancer::withTrashed()->findOrFail($this->loadBalancer->id);
         $this->assertNotNull($resource->deleted_at);
     }
