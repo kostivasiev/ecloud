@@ -3,7 +3,6 @@
 namespace App\Http\Middleware\Loadbalancer;
 
 use App\Http\Middleware\ResellerBypass;
-use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerSpecification;
 use Closure;

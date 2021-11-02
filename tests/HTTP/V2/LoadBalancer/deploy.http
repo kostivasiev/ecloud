@@ -94,6 +94,13 @@ X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.global.set('instance_id', response.body.data[0].id);
+});
+%}
+
 
 ### Use the instance ID's from above to clean up
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
@@ -102,10 +109,10 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 ###
-DELETE https://{{host}}/{{version}}/load-balancers/lb-e07cd83f-dev
+DELETE https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
