@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Instance extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
+class Instance extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Manageable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
@@ -144,6 +144,15 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         return $this->hasMany(BillingMetric::class, 'resource_id', 'id');
     }
 
+    public function isManaged() :bool
+    {
+        return $this->loadBalancer()->exists();
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isManaged() || $this->is_hidden;
+    }
 
     /**
      * @param FilterFactory $factory

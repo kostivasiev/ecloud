@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Network extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
+class Network extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Manageable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -44,10 +44,6 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
             'router_id',
             'subnet'
         ]);
-
-        $this->appends = [
-            'is_hidden'
-        ];
 
         $this->dispatchesEvents = [
             'creating' => Creating::class,
@@ -87,9 +83,14 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
         return $this->hasMany(IpAddress::class);
     }
 
-    public function getIsHiddenAttribute(): bool
+    public function isManaged() :bool
     {
         return (bool) $this->router->is_management;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isManaged();
     }
 
     /**

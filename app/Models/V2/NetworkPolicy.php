@@ -15,7 +15,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScopeable
+class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScopeable, Manageable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable;
 
@@ -62,6 +62,16 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
             ->whereHas('network.router', function ($query) {
                 $query->where('is_management', false);
             });
+    }
+
+    public function isManaged() :bool
+    {
+        return (bool) $this->network->router->is_management;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isManaged();
     }
 
     /**

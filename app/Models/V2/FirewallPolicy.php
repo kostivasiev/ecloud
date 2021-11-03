@@ -25,7 +25,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $firewallPolicyId)
  * @method static forUser($request)
  */
-class FirewallPolicy extends Model implements Filterable, Sortable, ResellerScopeable
+class FirewallPolicy extends Model implements Filterable, Sortable, ResellerScopeable, Manageable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -77,6 +77,16 @@ class FirewallPolicy extends Model implements Filterable, Sortable, ResellerScop
         return $query->whereHas('router.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
+    }
+
+    public function isManaged() :bool
+    {
+        return (bool) $this->router->is_management;
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isManaged();
     }
 
     /**

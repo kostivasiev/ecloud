@@ -23,11 +23,17 @@ class UpdateAdvancedNetworkingBilling
             return;
         }
 
+        if ($event->model->resource->isManaged()) {
+            return;
+        }
+
         $vpc = $event->model->resource->vpc;
         Cache::lock('billing.networking.advanced.'  . $vpc->id, 60)->block(60, function () use ($vpc, $event) {
             $time = Carbon::now();
 
-            $value = $vpc->instances->sum('ram_capacity');
+            $value = $vpc->instances->reject(function ($instance) {
+                return $instance->isManaged();
+            })->sum('ram_capacity');
 
             if ($event->model->name == Sync::TASK_NAME_DELETE) {
                 // The resource isnt actually marked as deleted until the delete batch completes

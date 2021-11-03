@@ -32,7 +32,7 @@ class UpdateVcpuBilling
             return;
         }
 
-        if ($instance->loadBalancer()->exists()) {
+        if ($instance->isManaged()) {
             return;
         }
 
