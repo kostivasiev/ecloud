@@ -127,7 +127,7 @@ class ProcessBilling extends Command
                             $start = $this->startDate;
                             $end = $this->endDate;
 
-                            if ($metric->start > $this->startDate) {
+                            if ($metric->start < $this->startDate) {
                                 $start = Carbon::parse($metric->start, $this->timeZone);
                             }
 
