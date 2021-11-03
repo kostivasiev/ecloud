@@ -32,7 +32,7 @@ class UpdateLicenseBilling
 
         $instance = $event->model->resource;
 
-        if (empty($instance) || $instance->loadBalancer()->exists()) {
+        if (empty($instance) || $instance->isManaged()) {
             return;
         }
 

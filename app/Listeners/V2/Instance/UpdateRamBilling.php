@@ -32,7 +32,7 @@ class UpdateRamBilling
             return;
         }
 
-        if ($instance->loadBalancer()->exists()) {
+        if ($instance->isManaged()) {
             return;
         }
 

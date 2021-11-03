@@ -23,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $firewallRuleId)
  * @method static forUser($request)
  */
-class FirewallRulePort extends Model implements Filterable, Sortable
+class FirewallRulePort extends Model implements Filterable, Sortable, Manageable
 {
     use CustomKey, SoftDeletes, DefaultName;
 
@@ -58,6 +58,16 @@ class FirewallRulePort extends Model implements Filterable, Sortable
             ->whereHas('firewallRule.firewallPolicy.router', function ($query) {
                 $query->where('is_management', false);
             });
+    }
+
+    public function isManaged() :bool
+    {
+        return (bool) $this->firewallRule->firewallPolicy->router->isManaged();
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isManaged();
     }
 
     /**

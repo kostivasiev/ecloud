@@ -8,10 +8,13 @@ use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
 class UpdateAdvancedNetworkingBillingTest extends TestCase
 {
+    use LoadBalancerMock;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -164,6 +167,30 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
 
         $originalMetric->refresh();
         $this->assertNotNull($originalMetric->end);
+
+        $this->assertNull(BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced'));
+    }
+
+    public function testManagedInstancesAreIgnored()
+    {
+        $this->assertNull(BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced'));
+
+        $this->assertEquals(0, $this->vpc()->instances()->sum('ram_capacity'));
+
+        $task = Model::withoutEvents(function() {
+            $task = new Task([
+                'id' => 'sync-1',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE
+            ]);
+            $task->resource()->associate($this->instance());
+            return $task;
+        });
+
+        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+
+        $listener = new \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling();
+        $listener->handle(new \App\Events\V2\Task\Updated($task));
 
         $this->assertNull(BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced'));
     }
