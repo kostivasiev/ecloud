@@ -62,7 +62,7 @@ class FirewallRulePort extends Model implements Filterable, Sortable, Manageable
 
     public function isManaged() :bool
     {
-        return (bool) $this->firewallRule->firewallPolicy->router->is_management;
+        return (bool) $this->firewallRule->firewallPolicy->router->isManaged();
     }
 
     public function isHidden(): bool

@@ -79,7 +79,7 @@ class NetworkRule extends Model implements Filterable, Sortable, Manageable
 
     public function isManaged() :bool
     {
-        return (bool) $this->networkPolicy->network->router->is_management;
+        return (bool) $this->networkPolicy->network->router->isManaged();
     }
 
     public function isHidden(): bool

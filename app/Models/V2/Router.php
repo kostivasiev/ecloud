@@ -60,10 +60,6 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable, M
             'is_management' => false,
         ];
 
-        $this->appends = [
-            'is_hidden'
-        ];
-
         $this->dispatchesEvents = [
             'creating' => Creating::class,
             'deleted' => Deleted::class,

@@ -66,7 +66,7 @@ class NetworkPolicy extends Model implements Filterable, Sortable, ResellerScope
 
     public function isManaged() :bool
     {
-        return (bool) $this->network->router->is_management;
+        return (bool) $this->network->router->isManaged();
     }
 
     public function isHidden(): bool

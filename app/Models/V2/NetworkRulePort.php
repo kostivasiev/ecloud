@@ -74,7 +74,7 @@ class NetworkRulePort extends Model implements Filterable, Sortable, Manageable
 
     public function isManaged() :bool
     {
-        return (bool) $this->networkRule->networkPolicy->router->is_management;
+        return (bool) $this->networkRule->networkPolicy->router->isManaged();
     }
 
     public function isHidden(): bool

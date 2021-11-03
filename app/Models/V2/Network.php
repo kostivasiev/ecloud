@@ -85,7 +85,7 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
 
     public function isManaged() :bool
     {
-        return (bool) $this->router->is_management;
+        return (bool) $this->router->isManaged();
     }
 
     public function isHidden(): bool
