@@ -32,6 +32,10 @@ class UpdateVcpuBilling
             return;
         }
 
+        if ($instance->isManaged()) {
+            return;
+        }
+
         if (!empty($instance->host_group_id)) {
             $instance->billingMetrics()
                 ->where('key', '=', 'vcpu.count')

@@ -7,11 +7,13 @@ use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
 class UpdateRamBillingTest extends TestCase
 {
+    use LoadBalancerMock;
+
     protected int $standardTier;
 
     protected Task $task;
@@ -206,5 +208,19 @@ class UpdateRamBillingTest extends TestCase
 
         $highMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity.high');
         $this->assertNull($highMetric);
+    }
+
+    public function testLoadBalancerInstancesIgnored()
+    {
+        $this->instance()->ram_capacity = 1024;
+
+        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+
+        $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
+        $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
+
+        $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
+
+        $this->assertNull($billingMetric);
     }
 }

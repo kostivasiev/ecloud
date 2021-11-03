@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Jobs\Sync\LoadBalancerCluster;
+namespace App\Jobs\Sync\LoadBalancer;
 
 use App\Jobs\Job;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
 
-class Update extends Job
+class Delete extends Job
 {
     use TaskableBatch, LoggableTaskJob;
 
@@ -20,6 +20,7 @@ class Update extends Job
 
     public function handle()
     {
+        $this->task->resource->delete();
         $this->task->completed = true;
         $this->task->save();
     }

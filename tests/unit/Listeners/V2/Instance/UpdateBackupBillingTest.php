@@ -6,11 +6,13 @@ use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
 class UpdateBackupBillingTest extends TestCase
 {
+    use LoadBalancerMock;
+
     private $volume;
     private $task;
 
@@ -153,5 +155,32 @@ class UpdateBackupBillingTest extends TestCase
         $metric->refresh();
 
         $this->assertNotNull($metric->end);
+    }
+
+    public function testLoadBalancerInstancesIgnored()
+    {
+        $this->instance()->setAttribute('backup_enabled', true)->save();
+
+        $this->volume->capacity = 15;
+        $this->volume->save();
+
+        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'task-1',
+                'completed' => true,
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->volume);
+        });
+
+        // Check that the backup billing metric is not added
+        $updateBackupBillingListener = new \App\Listeners\V2\Instance\UpdateBackupBilling();
+        $updateBackupBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
+
+        $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
+
+        $this->assertNull($backupMetric);
     }
 }

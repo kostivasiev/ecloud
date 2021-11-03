@@ -18,7 +18,7 @@ trait LoadBalancerMock
             Model::withoutEvents(function () use ($id) {
                 $this->loadBalancerSpecification = factory(LoadBalancerSpecification::class)->create([
                     'id' => $id,
-                    'name' => $id,
+                    'name' => 'medium',
                 ]);
             });
         }

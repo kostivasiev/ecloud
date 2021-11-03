@@ -10,6 +10,7 @@ use App\Resources\V2\ImageParameterResource;
 use App\Resources\V2\ImageResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -39,20 +40,24 @@ class ImageController extends BaseController
 
     public function store(StoreRequest $request)
     {
-        $model = new Image($request->only([
-            'name',
-            'logo_uri',
-            'documentation_uri',
-            'description',
-            'script_template',
-            'vm_template',
-            'platform',
-            'active',
-            'public',
-            'visibility',
-        ]));
+        try {
+            $model = new Image($request->only([
+                'name',
+                'logo_uri',
+                'documentation_uri',
+                'description',
+                'script_template',
+                'vm_template',
+                'platform',
+                'active',
+                'public',
+                'visibility',
+            ]));
 
-        $task = $model->syncSave();
+            $task = $model->syncSave();
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage());
+        }
 
         // Sync the pivot table
         $model->availabilityZones()->sync($request->input('availability_zone_ids'));

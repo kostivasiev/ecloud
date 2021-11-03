@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 
 class IsMaxVpcForCustomer
 {
+    use ResellerBypass;
+
     /**
      * @param $request
      * @param Closure $next
@@ -26,12 +28,7 @@ class IsMaxVpcForCustomer
 
     public function isWithinLimit(): bool
     {
-        $reseller_bypass = [
-            7052, // UKFast - eCloud Testing
-            22114, // UKFast - eCloud Automated Testing
-        ];
-
-        if (in_array(Auth::user()->resellerId(), $reseller_bypass)) {
+        if ($this->resellerBypass()) {
             return true;
         }
         return (Vpc::forUser(Auth::user())->get()->count() < config('defaults.vpc.max_count'));

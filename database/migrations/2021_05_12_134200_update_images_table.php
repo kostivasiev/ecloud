@@ -20,10 +20,6 @@ class UpdateImagesTable extends Migration
             $table->boolean('public')->default(false);
             $table->string('publisher')->nullable();
         });
-
-        Schema::connection('ecloud')->table('images', function ($table) {
-            $table->dropColumn(['appliance_version_id']);
-        });
     }
 
     public function down()
@@ -42,10 +38,6 @@ class UpdateImagesTable extends Migration
                 'public',
                 'publisher'
             ]);
-        });
-
-        Schema::connection('ecloud')->table('images', function ($table) {
-            $table->uuid('appliance_version_id')->nullable();
         });
     }
 }

@@ -46,7 +46,7 @@ class NetworkResource extends UKFastResource
         ];
 
         if (Auth::user()->isAdmin()) {
-            $data['is_hidden'] = $this->is_hidden;
+            $data['is_hidden'] = $this->isHidden();
         }
 
         return $data;

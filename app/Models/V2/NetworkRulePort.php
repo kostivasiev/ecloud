@@ -14,7 +14,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class NetworkRulePort extends Model implements Filterable, Sortable
+class NetworkRulePort extends Model implements Filterable, Sortable, Manageable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
@@ -70,6 +70,16 @@ class NetworkRulePort extends Model implements Filterable, Sortable
             ->whereHas('networkRule.networkPolicy.network.router', function ($query) {
                 $query->where('is_management', false);
             });
+    }
+
+    public function isManaged() :bool
+    {
+        return (bool) $this->networkRule->networkPolicy->router->isManaged();
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isManaged();
     }
 
     public function filterableColumns(FilterFactory $factory)

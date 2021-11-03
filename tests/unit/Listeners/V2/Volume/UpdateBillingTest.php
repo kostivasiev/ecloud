@@ -8,11 +8,13 @@ use App\Models\V2\Volume;
 use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
 class UpdateBillingTest extends TestCase
 {
+    use LoadBalancerMock;
+
     protected Volume $volume;
     protected Task $task;
     protected Instance $instance;
@@ -200,5 +202,17 @@ class UpdateBillingTest extends TestCase
 
         $this->assertEquals($originalBilling->resource_id, $metric->resource_id);
         $this->assertNull($metric->end);
+    }
+
+    public function testLoadBalancerInstanceVolumesIgnored()
+    {
+        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+
+        $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
+        $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->volume));
+
+        $metric = BillingMetric::where('resource_id', $this->volume->id)->first();
+
+        $this->assertNull($metric);
     }
 }

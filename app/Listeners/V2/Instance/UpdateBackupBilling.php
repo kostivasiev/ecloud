@@ -37,8 +37,8 @@ class UpdateBackupBilling
         } else {
             $instance = $event->model->resource;
         }
-        
-        if (empty($instance)) {
+
+        if (empty($instance) || $instance->isManaged()) {
             return;
         }
 

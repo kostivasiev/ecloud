@@ -25,13 +25,6 @@ class VpcSeeder extends Seeder
             'advanced_networking' => true
         ]);
 
-        factory(LoadBalancer::class)->create([
-            'vpc_id' => 'vpc-aaaaaaaa',
-            'load_balancer_spec_id' => 'lbs-aaaaaaaa',
-            'name' => 'Dev LBC',
-            'availability_zone_id' => 'az-aaaaaaaa'
-        ]);
-
         // Todo: convert this to use a factory when DHCP resource has been updated to use syncSave()
         app()->make(Dhcp::class)->fill([
             'id' => 'dhcp-aaaaaaaa',

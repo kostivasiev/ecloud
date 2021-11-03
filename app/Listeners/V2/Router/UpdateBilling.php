@@ -36,10 +36,9 @@ class UpdateBilling
         if (!($model instanceof Router)) {
             return;
         }
-        /** @var Router $model */
 
         // If is management router, don't add a billing entry
-        if ($model->is_management) {
+        if ($model->isManaged()) {
             return;
         }
 

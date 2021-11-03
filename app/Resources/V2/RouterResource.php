@@ -41,7 +41,7 @@ class RouterResource extends UKFastResource
 
         if (Auth::user()->isAdmin()) {
             $data['is_management'] = $this->is_management;
-            $data['is_hidden'] = $this->is_hidden;
+            $data['is_hidden'] = $this->isHidden();
         }
 
         return $data;

@@ -60,7 +60,8 @@ class InstanceResource extends UKFastResource
             $response['agent_running'] = isset($kingpinData->toolsRunningStatus) ? $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING : null;
         }
         if (Auth::user()->isAdmin()) {
-            $response['is_hidden'] = $this->is_hidden;
+            $response['is_hidden'] = $this->isHidden();
+            $response['load_balancer_id'] = $this->load_balancer_id;
         }
 
         return $response;

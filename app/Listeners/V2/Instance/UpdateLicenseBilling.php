@@ -5,7 +5,6 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use App\Support\Resource;
 use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -33,7 +32,7 @@ class UpdateLicenseBilling
 
         $instance = $event->model->resource;
 
-        if (empty($instance)) {
+        if (empty($instance) || $instance->isManaged()) {
             return;
         }
 

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 
 class IsMaxInstanceForCustomer
 {
+    use ResellerBypass;
+
     /**
      * @param $request
      * @param Closure $next
@@ -27,12 +29,7 @@ class IsMaxInstanceForCustomer
 
     public function isWithinLimit(): bool
     {
-        $reseller_bypass = [
-            7052, // UKFast - eCloud Testing
-            22114, // UKFast - eCloud Automated Testing
-        ];
-
-        if (in_array(Auth::user()->resellerId(), $reseller_bypass)) {
+        if ($this->resellerBypass()) {
             return true;
         }
         return Instance::forUser(Auth::user())->count() < config('instance.max_limit.total');

@@ -26,7 +26,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $routerUuid)
  * @method static forUser(string $user)
  */
-class Router extends Model implements Filterable, Sortable, ResellerScopeable
+class Router extends Model implements Filterable, Sortable, ResellerScopeable, Manageable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -58,10 +58,6 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
 
         $this->attributes = [
             'is_management' => false,
-        ];
-
-        $this->appends = [
-            'is_hidden'
         ];
 
         $this->dispatchesEvents = [
@@ -107,9 +103,14 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable
         return $this->belongsTo(RouterThroughput::class);
     }
 
-    public function getIsHiddenAttribute(): bool
+    public function isManaged(): bool
     {
         return (bool) $this->attributes['is_management'];
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->isManaged();
     }
 
     /**
