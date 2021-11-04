@@ -17,14 +17,16 @@ class ProcessBillingTest extends TestCase
 
     public function testBuildAndBillSolution()
     {
+        $this->setDebugRunExpectation(3, 0);
         $expectedCost = 11.13;
         $actualCost = $this->averageMonth()
             ->addVcpu(1)
             ->addRam(1)
             ->addVolume(50, 300)
             ->addSupport()
+            ->runBilling()
             ->getCost();
-        $this->assertEquals($expectedCost, $actualCost);
+        $this->assertEquals($expectedCost, number_format($actualCost, 2));
     }
 
     // no vpc | £100 discount plan (£90 charge)
@@ -133,12 +135,12 @@ class ProcessBillingTest extends TestCase
     public function testSingleVpcOneInstanceSimple()
     {
         $this->setDebugRunExpectation(3, 0);
-        $expectedCost = 22;
-        $actualCost = $this->forDays(14)
+        $expectedCost = 11;
+        $actualCost = $this->forHours(365) // for half a month
             ->useSimplePrice()
-            ->addVcpu() // 1
-            ->addRam(1) // 1
-            ->addVolume(20, 300) // 20
+            ->addVcpu(1) // 0.5
+            ->addRam(1) // 0.5
+            ->addVolume(20, 300) // 10
             ->runBilling()
             ->getCost();
         $this->assertEquals(number_format($expectedCost, 2), number_format($actualCost, 2));
@@ -148,7 +150,7 @@ class ProcessBillingTest extends TestCase
     public function testSingleVpcOneInstanceWith25GbRamUpgradeMidMonth()
     {
         $this->setDebugRunExpectation(3, 0);
-        $expectedCost = 38;
+        $expectedCost = 36;
 
         // Set duration and pricing
         $this->forHours(365) // for half a month (total 11)
