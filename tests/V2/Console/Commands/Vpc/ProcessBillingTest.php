@@ -150,19 +150,21 @@ class ProcessBillingTest extends TestCase
     public function testSingleVpcOneInstanceWith25GbRamUpgradeMidMonth()
     {
         $this->setDebugRunExpectation(3, 0);
-        $expectedCost = 36;
+        $expectedCost = 46.5;
 
-        // Set duration and pricing
+        // Solution for first half of month
         $this->forHours(365) // for half a month (total 11)
             ->useSimplePrice() // price of 1 per month
             ->addVcpu(1) // 0.5
             ->addRam(1) // 0.5
             ->addVolume(20, 300); // 10
 
-        // for another half month
-        $actualCost = $this->endRam(1) // (total 25)
+        // Solution for second half of month
+        $actualCost = $this->endRam(1) // (total 35.5)
             ->forHours(365)
             ->addRam(25) // 25 (price set to be double when high ram)
+            ->addVcpu(1) // 0.5
+            ->addVolume(20, 300) // 10
             ->runBilling()
             ->getCost();
 
