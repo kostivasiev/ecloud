@@ -18,8 +18,9 @@ class ProcessBillingTest extends TestCase
     public function testBuildAndBillSolution()
     {
         $this->setDebugRunExpectation(3, 0);
-        $expectedCost = 11.13;
+        $expectedCost = 53;
         $actualCost = $this->averageMonth()
+            ->useSimplePrice()
             ->addVcpu(1)
             ->addRam(1)
             ->addVolume(50, 300)
@@ -71,7 +72,7 @@ class ProcessBillingTest extends TestCase
         $this->setDebugRunExpectation(3, 0);
         $expectedCost = 1.00;
         $actualCost = $this->forHours(1)
-            ->addVolume()
+            ->addVolume(1, 300)
             ->runBilling()
             ->getCost();
         $this->assertEquals($expectedCost, $actualCost);
@@ -83,8 +84,8 @@ class ProcessBillingTest extends TestCase
         $this->setDebugRunExpectation(3, 0);
         $expectedCost = 8.90;
         $actualCost = $this->averageMonth()
-            ->addVcpu()
-            ->addRam()
+            ->addVcpu(1)
+            ->addRam(1)
             ->addVolume(50, 300)
             ->runBilling()
             ->getCost();
@@ -97,8 +98,8 @@ class ProcessBillingTest extends TestCase
         $this->setDebugRunExpectation(3, 0);
         $expectedCost = 1.00;
         $actualCost = $this->forDays(1)
-            ->addVcpu()
-            ->addRam()
+            ->addVcpu(1)
+            ->addRam(1)
             ->addVolume(50, 300)
             ->runBilling()
             ->getCost();
@@ -110,8 +111,8 @@ class ProcessBillingTest extends TestCase
         $this->setDebugRunExpectation(3, 0);
         $expectedCost = 2.05;
         $actualCost = $this->forDays(7)
-            ->addVcpu()
-            ->addRam()
+            ->addVcpu(1)
+            ->addRam(1)
             ->addVolume(50, 300)
             ->runBilling()
             ->getCost();
@@ -123,8 +124,8 @@ class ProcessBillingTest extends TestCase
         $this->setDebugRunExpectation(3, 0);
         $expectedCost = 4.10;
         $actualCost = $this->forDays(14)
-            ->addVcpu()
-            ->addRam()
+            ->addVcpu(1)
+            ->addRam(1)
             ->addVolume(50, 300)
             ->runBilling()
             ->getCost();
