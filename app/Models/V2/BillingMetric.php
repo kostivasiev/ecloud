@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Support\Resource;
 use App\Traits\V2\CustomKey;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -63,6 +64,21 @@ class BillingMetric extends Model implements Filterable, Sortable
     public function instance()
     {
         return $this->belongsTo(Instance::class, 'resource_id', 'id');
+    }
+
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
+    }
+
+    public function getResource()
+    {
+        $class = Resource::classFromId($this->resource_id);
+        if (empty($class)) {
+            return false;
+        }
+
+        return $class::find($this->resource_id) ?? false;
     }
 
     /**
