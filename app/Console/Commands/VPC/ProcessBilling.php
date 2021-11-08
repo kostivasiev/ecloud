@@ -127,7 +127,7 @@ class ProcessBilling extends Command
                             $start = $this->startDate;
                             $end = $this->endDate;
 
-                            if ($metric->start > $this->startDate) {
+                            if (($metric->start > $this->startDate)) {
                                 $start = Carbon::parse($metric->start, $this->timeZone);
                             }
 
@@ -303,8 +303,11 @@ class ProcessBilling extends Command
                 $query->whereBetween('start', [$this->startDate, $this->endDate]);
 
                 // any metrics that start before the billing period and end within it
-                $query->orWhere('start', '<=', $this->startDate)
-                    ->where('end', '<=', $this->endDate);
+                $query->orWhere(function ($query) {
+                    $query->where('start', '<=', $this->startDate);
+                    $query->where('end', '<=', $this->endDate);
+                    $query->where('end', '>', $this->startDate);
+                });
 
                 // any metrics that start before the billing period are still active
                 $query->orWhere(function ($query) {
