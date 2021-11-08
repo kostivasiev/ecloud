@@ -8,17 +8,17 @@ use App\Support\Sync;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Tests\Mocks\Resources\VipMock;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
+    use VipMock;
+
     private $task;
 
     public function testJobsBatched()
     {
-        $this->markTestSkipped();
-
         Model::withoutEvents(function() {
             $this->task = new Task([
                 'id' => 'sync-1',
@@ -32,7 +32,7 @@ class UpdateTest extends TestCase
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 5;
+            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 3;
         });
     }
 }

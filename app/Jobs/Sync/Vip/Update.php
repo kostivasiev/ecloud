@@ -3,6 +3,9 @@
 namespace App\Jobs\Sync\Vip;
 
 use App\Jobs\Job;
+use App\Jobs\Vip\AssignFloatingIp;
+use App\Jobs\Vip\AssignIpAddress;
+use App\Jobs\Vip\AssignToNics;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -22,13 +25,11 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
-                // assign ip address to the vip
+                new AssignIpAddress($this->task->resource),
+                new AssignToNics($this->task),
 
-                /// assign ip address to each of the loadbalancer NICs
+                new AssignFloatingIp($this->task),
 
-
-                new AssignIpAddress($this->task),
-                new AssignIpToNics
             ],
         ])->dispatch();
     }

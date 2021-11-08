@@ -69,6 +69,11 @@ class IpAddress extends Model implements Filterable, Sortable, Natable, RouterSc
         return $this->network->router;
     }
 
+    public function floatingIp()
+    {
+        return $this->morphOne(FloatingIp::class, 'resource');
+    }
+
     /**
      * @param $query
      * @param $user

@@ -17,9 +17,9 @@ trait VipMock
             Model::withoutEvents(function() use ($id) {
                 $this->vip = Vip::factory()->create([
                     'id' => $id,
+                    'name' => $id,
                     'load_balancer_id' => $this->loadBalancer()->id,
                     'network_id' => $this->network()->id,
-                    'name' => $id
                 ]);
             });
         }

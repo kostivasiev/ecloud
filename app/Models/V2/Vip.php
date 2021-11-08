@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Traits\V2\AssignIpAddress;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -19,9 +18,9 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class Vip extends Model implements Filterable, Sortable, NetworkScopable
+class Vip extends Model implements Filterable, Sortable
 {
-    use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable, HasFactory, AssignIpAddress;
+    use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable, HasFactory;
 
     public $keyPrefix = 'vip';
     public $incrementing = false;
@@ -68,16 +67,29 @@ class Vip extends Model implements Filterable, Sortable, NetworkScopable
      * @return mixed|void
      * @throws \Exception
      */
-    public function assignIpAddress(array $denyList = [], string $type = IpAddress::TYPE_NORMAL) : IpAddress
+    public function assignClusterIp() : IpAddress
     {
+        if ($this->ipAddress()->exists()) {
+            throw new \Exception('Cluster IP address already assigned to VIP');
+        }
+
         $lock = Cache::lock("ip_address." . $this->id, 60);
         try {
             $lock->block(60);
 
-            $ipAddress = $this->network->getNextAvailableIp($denyList);
+            $ip = $this->network->getNextAvailableIp();
 
-            $this->ipAddress()->associate($ipAddress);
-            Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to vIP ' . $this->id . ', type: ' . $type);
+            $ipAddress = app()->make(IpAddress::class);
+            $ipAddress->fill([
+                'ip_address' => $ip,
+                'network_id' => $this->network->id,
+                'type' => IpAddress::TYPE_CLUSTER
+            ]);
+            $ipAddress->save();
+
+            $this->ipAddress()->associate($ipAddress)->save();
+
+            Log::info(IpAddress::TYPE_CLUSTER . ' IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to VIP ' . $this->id);
 
             return $ipAddress;
         } finally {

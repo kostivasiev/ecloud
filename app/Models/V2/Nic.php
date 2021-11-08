@@ -132,7 +132,14 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
         try {
             $lock->block(60);
 
-            $ipAddress = $this->network->getNextAvailableIp($denyList);
+            $ip = $this->network->getNextAvailableIp($denyList);
+
+            $ipAddress = app()->make(IpAddress::class);
+            $ipAddress->fill([
+                'ip_address' => $ip,
+                'network_id' => $this->network->id,
+                'type' => $type
+            ]);
 
             $this->ipAddresses()->save($ipAddress);
             Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to NIC ' . $this->id . ', type: ' . $type);

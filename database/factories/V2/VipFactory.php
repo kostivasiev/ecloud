@@ -21,10 +21,7 @@ class VipFactory extends Factory
     public function definition()
     {
         return [
-            'id' => 'vip-aaaaaaaa-dev',
-            'load_balancer_id' => 'lb-c11e4492-dev',
-            'network_id' => 'net-aaaaaaaa',
-            'name' => 'vip-aaaaaaaa-dev'
+            'name' => 'vip-test',
         ];
     }
 }
