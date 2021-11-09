@@ -14,9 +14,13 @@ class PowerOffTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         $this->kingpinServiceMock()->expects('get')
+            ->times(4)
             ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
             ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'powerState' => 'poweredOff',
+                    'toolsRunningStatus' => 'guestToolsRunning',
+                ]));
             });
 
         $this->kingpinServiceMock()->expects('delete')
