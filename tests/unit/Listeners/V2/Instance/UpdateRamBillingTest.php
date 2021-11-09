@@ -6,6 +6,7 @@ use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
 use App\Support\Sync;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
@@ -24,7 +25,7 @@ class UpdateRamBillingTest extends TestCase
 
         $this->standardTier = config('billing.ram_tiers.standard');
 
-        $this->task = Model::withoutEvents(function() {
+        $this->task = Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => true,
@@ -71,6 +72,15 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceCreatedStandardTierBilling()
     {
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'powerState' => 'poweredOn',
+                    'toolsRunningStatus' => 'guestToolsRunning',
+                ]));
+            });
+
         $this->instance()->ram_capacity = 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
@@ -85,6 +95,15 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceCreatedHighTierBilling()
     {
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'powerState' => 'poweredOn',
+                    'toolsRunningStatus' => 'guestToolsRunning',
+                ]));
+            });
+
         $this->instance()->ram_capacity = (config('billing.ram_tiers.standard') * 1024) + 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
@@ -103,6 +122,15 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceResizedStandardTierBilling()
     {
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'powerState' => 'poweredOn',
+                    'toolsRunningStatus' => 'guestToolsRunning',
+                ]));
+            });
+
         $originalRamMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test2',
             'resource_id' => $this->instance()->id,
@@ -114,7 +142,7 @@ class UpdateRamBillingTest extends TestCase
 
         $this->instance()->ram_capacity = 2048;
 
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
@@ -138,6 +166,15 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceResizedToHighTierBilling()
     {
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'powerState' => 'poweredOn',
+                    'toolsRunningStatus' => 'guestToolsRunning',
+                ]));
+            });
+
         $originalRamMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test2',
             'resource_id' => $this->instance()->id,
@@ -170,6 +207,15 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceResizedToStandardTierBillingFromHigh()
     {
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'powerState' => 'poweredOn',
+                    'toolsRunningStatus' => 'guestToolsRunning',
+                ]));
+            });
+
         $originalStandardMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-' . uniqid(),
             'resource_id' => $this->instance()->id,

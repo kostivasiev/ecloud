@@ -4,6 +4,7 @@ namespace Tests\unit\Listeners\V2\Instance;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
 use App\Support\Sync;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
@@ -21,6 +22,15 @@ class UpdateVcpuBillingTest extends TestCase
 
     public function testVcpuChangeBilling()
     {
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'powerState' => 'poweredOn',
+                    'toolsRunningStatus' => 'guestToolsRunning',
+                ]));
+            });
+
         // compute metrics created on deploy
         $originalVcpuMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test1',

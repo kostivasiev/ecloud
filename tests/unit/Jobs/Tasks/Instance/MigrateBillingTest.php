@@ -6,6 +6,7 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Carbon\Carbon;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 
@@ -20,6 +21,14 @@ class MigrateBillingTest extends TestCase
 
     public function testBillingEndsOnPublicInstance()
     {
+        $this->kingpinServiceMock()->expects('get')
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'powerState' => 'poweredOn',
+                    'toolsRunningStatus' => 'guestToolsRunning',
+                ]));
+            });
         // compute metrics created on deploy
         $originalVcpuMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test1',
@@ -82,6 +91,15 @@ class MigrateBillingTest extends TestCase
 
     public function testBillingStartsOnAPublicInstance()
     {
+        $this->kingpinServiceMock()->expects('get')
+            ->twice()
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'powerState' => 'poweredOn',
+                    'toolsRunningStatus' => 'guestToolsRunning',
+                ]));
+            });
         $this->instance()->host_group_id = '';
         $this->instance()->platform = 'Windows';
 
