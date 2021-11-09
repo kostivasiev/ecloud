@@ -109,11 +109,15 @@ class ConvertBilling extends Command
                         $newMetric->save();
                     }
                 } else {
-                    $this->line('Changing existing metric price');
-                    $metric->price = $productPrice;
-                    $this->line('Price: ' . number_format($productPrice, 12));
-                    $this->line('Start: ' . $metric->start);
-                    $this->line('End: ' . $metric->end);
+                    if ($metric->price !== $productPrice) {
+                        $this->line('Changing existing metric price');
+                        $metric->price = $productPrice;
+                        $this->line('Price: ' . number_format($productPrice, 12));
+                        $this->line('Start: ' . $metric->start);
+                        $this->line('End: ' . $metric->end);
+                    } else {
+                        $this->line('No price difference found');
+                    }
                 }
                 if (!$this->option('test-run')) {
                     $metric->save();
@@ -147,6 +151,7 @@ class ConvertBilling extends Command
 
         $this->line('Availability Zone: ' . $availabilityZone->id);
 
+        $product = false;
         // host price is based on hostspec used
         if (strpos($metric->key, 'host.hs' !== false)) {
             $hostSpecId = explode('.', $metric->key)[1];
@@ -158,10 +163,11 @@ class ConvertBilling extends Command
                 $product = $availabilityZone->products()
                     ->where('product_name', 'LIKE', '%' . $availabilityZone->id . ': ' . $this->codeMap[$metric->key] . '%')
                     ->first();
-            } else {
-                $this->line('Price for metric ' . $metric->key . ' not found, skipping');
-                return $metric->price;
             }
+        }
+        if (!$product) {
+            $this->line('Price for metric ' . $metric->key . ' not found, skipping');
+            return $metric->price;
         }
         $this->line('Product: ' . $product->id);
         return $product->getPrice($metric->reseller_id);
