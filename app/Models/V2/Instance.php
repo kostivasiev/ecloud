@@ -4,12 +4,14 @@ namespace App\Models\V2;
 
 use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
+use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -152,6 +154,26 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
     public function isHidden(): bool
     {
         return $this->isManaged() || $this->is_hidden;
+    }
+
+    public function getOnlineAgentStatus(): array
+    {
+        $kingpinData = null;
+        try {
+            $kingpinResponse = $this->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->id);
+
+            $kingpinData = json_decode($kingpinResponse->getBody()->getContents());
+        } catch (\Exception $exception) {
+            Log::info('Failed to retrieve instance from Kingpin', [
+                'vpc_id' => $this->vpc_id,
+                'instance_id' => $this->id,
+                'message' => $exception->getMessage()
+            ]);
+        }
+        return [
+            'online' => isset($kingpinData->powerState) ? $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON : null,
+            'agent_running' => isset($kingpinData->toolsRunningStatus) ? $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING : null,
+        ];
     }
 
     /**

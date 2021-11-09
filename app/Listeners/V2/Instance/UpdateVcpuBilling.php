@@ -47,6 +47,10 @@ class UpdateVcpuBilling
             return;
         }
 
+        if ($instance->getOnlineAgentStatus()['online'] !== true) {
+            return;
+        }
+
         $time = Carbon::now();
 
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'vcpu.count');
