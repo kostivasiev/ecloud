@@ -31,5 +31,10 @@ class ImageSeeder extends Seeder
 
         // Sync the pivot table
         $image->availabilityZones()->sync('az-aaaaaaaa');
+
+        /**
+         * Other Images
+         */
+        $this->call(PleskImageSeeder::class);
     }
 }

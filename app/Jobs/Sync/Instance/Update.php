@@ -63,6 +63,7 @@ class Update extends Job
                     new ExpandOsDisk($this->task->resource),
                     new ConfigureWinRm($this->task->resource),
                     new ActivateWindows($this->task->resource),
+                    new RegisterLicenses($this->task->resource),
                     new RunApplianceBootstrap($this->task->resource),
                     new RunBootstrapScript($this->task->resource),
                     new DeployCompleted($this->task->resource),
