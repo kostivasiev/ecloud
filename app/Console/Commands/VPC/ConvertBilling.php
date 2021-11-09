@@ -151,6 +151,7 @@ class ConvertBilling extends Command
 
         $this->line('Availability Zone: ' . $availabilityZone->id);
 
+        $product = false;
         // host price is based on hostspec used
         if (strpos($metric->key, 'host.hs' !== false)) {
             $hostSpecId = explode('.', $metric->key)[1];
@@ -162,8 +163,6 @@ class ConvertBilling extends Command
                 $product = $availabilityZone->products()
                     ->where('product_name', 'LIKE', '%' . $availabilityZone->id . ': ' . $this->codeMap[$metric->key] . '%')
                     ->first();
-            } else {
-                $product = false;
             }
         }
         if (!$product) {
