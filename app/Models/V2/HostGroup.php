@@ -23,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class HostGroup
  * @package App\Models\V2
  */
-class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
+class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 

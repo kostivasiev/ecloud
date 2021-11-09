@@ -2,6 +2,7 @@
 namespace App\Console\Commands\VPC;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\AvailabilityZoneable;
 use App\Models\V2\BillingMetric;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -140,13 +141,8 @@ class ConvertBilling extends Command
         }
 
         $availabilityZone = $metric->vpc->region->availabilityZones()->first(); // fallback
-        if ($resource) {
-            if (property_exists('availability_zone_id', $resource)) {
-                $newAz = AvailabilityZone::find($resource->availability_zone_id);
-                if ($newAz) {
-                    $availabilityZone = $newAz;
-                }
-            }
+        if ($resource && $resource instanceof AvailabilityZoneable) {
+            $availabilityZone = $resource->availabilityZone;
         }
 
         $this->line('Availability Zone: ' . $availabilityZone->id);
