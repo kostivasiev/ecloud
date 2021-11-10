@@ -2,6 +2,7 @@
 namespace App\Console\Commands\VPC;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\AvailabilityZoneable;
 use App\Models\V2\BillingMetric;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -90,37 +91,37 @@ class ConvertBilling extends Command
                 $this->line('Old Price: ' . number_format($metric->price, 12));
                 $this->line('New Price: ' . number_format($productPrice, 12));
 
-                // if end is null then we need to set the end date to end of last billing period
-                // duplicate the entry, change start date to beginning of this period, and change the price
-                if (is_null($metric->end)) {
-                    $this->line('Ending old metric');
-                    $metric->setAttribute('end', $this->lastPeriodEnd);
-                    // Start building the new metric
-                    $attributes = array_diff_key($metric->getAttributes(), array_flip($this->keysToRemove));
-                    $newMetric = new BillingMetric($attributes);
-                    $newMetric->price = $productPrice;
-                    $newMetric->start = $this->startDate;
-                    $newMetric->end = null;
-                    $this->line('Creating new metric:-');
-                    $this->line('Price: ' . number_format($productPrice, 12));
-                    $this->line('Start: ' . $newMetric->start);
-                    $this->line('End: ' . $newMetric->end);
-                    if (!$this->option('test-run')) {
-                        $newMetric->save();
-                    }
-                } else {
-                    if ($metric->price !== $productPrice) {
+                if ($productPrice !== $metric->price) {
+                    // if end is null then we need to set the end date to end of last billing period
+                    // duplicate the entry, change start date to beginning of this period, and change the price
+                    if (is_null($metric->end)) {
+                        $this->line('Ending old metric');
+                        $metric->setAttribute('end', $this->lastPeriodEnd);
+                        // Start building the new metric
+                        $attributes = array_diff_key($metric->getAttributes(), array_flip($this->keysToRemove));
+                        $newMetric = new BillingMetric($attributes);
+                        $newMetric->price = $productPrice;
+                        $newMetric->start = $this->startDate;
+                        $newMetric->end = null;
+                        $this->line('Creating new metric:-');
+                        $this->line('Price: ' . number_format($productPrice, 12));
+                        $this->line('Start: ' . $newMetric->start);
+                        $this->line('End: ' . $newMetric->end);
+                        if (!$this->option('test-run')) {
+                            $newMetric->save();
+                        }
+                    } else {
                         $this->line('Changing existing metric price');
                         $metric->price = $productPrice;
                         $this->line('Price: ' . number_format($productPrice, 12));
                         $this->line('Start: ' . $metric->start);
                         $this->line('End: ' . $metric->end);
-                    } else {
-                        $this->line('No price difference found');
                     }
-                }
-                if (!$this->option('test-run')) {
-                    $metric->save();
+                    if (!$this->option('test-run')) {
+                        $metric->save();
+                    }
+                } else {
+                    $this->line('No price change, skipping');
                 }
             } else {
                 $this->line('Vpc ' . $metric->vpc_id . ' no longer exists. ' . $metric->id . ' skipped');
@@ -140,13 +141,8 @@ class ConvertBilling extends Command
         }
 
         $availabilityZone = $metric->vpc->region->availabilityZones()->first(); // fallback
-        if ($resource) {
-            if (property_exists('availability_zone_id', $resource)) {
-                $newAz = AvailabilityZone::find($resource->availability_zone_id);
-                if ($newAz) {
-                    $availabilityZone = $newAz;
-                }
-            }
+        if ($resource && $resource instanceof AvailabilityZoneable) {
+            $availabilityZone = $resource->availabilityZone;
         }
 
         $this->line('Availability Zone: ' . $availabilityZone->id);
@@ -161,7 +157,7 @@ class ConvertBilling extends Command
         } else {
             if (array_key_exists($metric->key, $this->codeMap)) {
                 $product = $availabilityZone->products()
-                    ->where('product_name', 'LIKE', '%' . $availabilityZone->id . ': ' . $this->codeMap[$metric->key] . '%')
+                    ->where('product_name', 'LIKE', '%' . $availabilityZone->id . '%' . $this->codeMap[$metric->key] . '%')
                     ->first();
             }
         }

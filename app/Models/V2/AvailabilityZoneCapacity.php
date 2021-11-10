@@ -18,7 +18,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
  */
-class AvailabilityZoneCapacity extends Model implements Filterable, Sortable
+class AvailabilityZoneCapacity extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes;
 

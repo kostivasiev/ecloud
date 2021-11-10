@@ -25,7 +25,7 @@ use UKFast\DB\Ditto\Sortable;
  * @package App\Models\V2
  * @method static findOrFail(string $dhcpId)
  */
-class Dhcp extends Model implements Filterable, Sortable, ResellerScopeable
+class Dhcp extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
