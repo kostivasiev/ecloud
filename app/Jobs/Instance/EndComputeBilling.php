@@ -26,19 +26,13 @@ class EndComputeBilling extends Job
 
     public function handle()
     {
-        $instance = $this->model;
-
-        // Wait for instance to power off
-        if ($instance->getOnlineAgentStatus()['online'] === true) {
-            Log::debug('Instance pending shutdown, waiting ' . $this->backoff . ' seconds to retry.');
-            $this->release($this->backoff);
+        if (!$this->model->is_online) {
+            $this->model->billingMetrics()
+                ->whereIn('key', ['ram.capacity', 'ram.capacity.high', 'vcpu.count'])
+                ->each(function ($billingMetric) {
+                    Log::debug('End billing of `' . $billingMetric->key . '` for Instance ' . $this->model->id);
+                    $billingMetric->setEndDate();
+                });
         }
-
-        $instance->billingMetrics()
-            ->whereIn('key', ['ram.capacity', 'ram.capacity.high', 'vcpu.count'])
-            ->each(function ($billingMetric) use ($instance) {
-                Log::debug('End billing of `' . $billingMetric->key . '` for Instance ' . $instance->id);
-                $billingMetric->setEndDate();
-            });
     }
 }

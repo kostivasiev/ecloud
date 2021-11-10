@@ -26,5 +26,6 @@ class PowerOn extends Job
         $this->model->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/power'
         );
+        $this->model->setAttribute('is_online', true)->saveQuietly();
     }
 }

@@ -4,14 +4,12 @@ namespace App\Models\V2;
 
 use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
-use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -39,6 +37,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'availability_zone_id',
         'locked',
         'is_hidden',
+        'is_online',
         'platform',
         'backup_enabled',
         'deployed',
@@ -46,6 +45,10 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'host_group_id',
         'volume_group_id',
         'load_balancer_id'
+    ];
+
+    protected $attributes = [
+        'is_online' => true,
     ];
 
     protected $appends = [
@@ -56,6 +59,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'locked' => 'boolean',
         'backup_enabled' => 'boolean',
         'deployed' => 'boolean',
+        'is_online' => 'boolean',
         'deploy_data' => 'array',
     ];
 
@@ -156,26 +160,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         return $this->isManaged() || $this->is_hidden;
     }
 
-    public function getOnlineAgentStatus(): array
-    {
-        $kingpinData = null;
-        try {
-            $kingpinResponse = $this->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->id);
-
-            $kingpinData = json_decode($kingpinResponse->getBody()->getContents());
-        } catch (\Exception $exception) {
-            Log::info('Failed to retrieve instance from Kingpin', [
-                'vpc_id' => $this->vpc_id,
-                'instance_id' => $this->id,
-                'message' => $exception->getMessage()
-            ]);
-        }
-        return [
-            'online' => isset($kingpinData->powerState) ? $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON : null,
-            'agent_running' => isset($kingpinData->toolsRunningStatus) ? $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING : null,
-        ];
-    }
-
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]
@@ -192,6 +176,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->boolean()->create('locked', '1', '0'),
             $factory->boolean()->create('is_hidden', '1', '0'),
+            $factory->boolean()->create('is_online', '1', '0'),
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup_enabled', Filter::$stringDefaults),
             $factory->create('host_group_id', Filter::$stringDefaults),
@@ -225,6 +210,8 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             $factory->create('load_balancer_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
+            $factory->create('is_online'),
+            $factory->create('is_hidden'),
         ];
     }
 
@@ -259,6 +246,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             'host_group_id' => 'host_group_id',
             'volume_group_id' => 'volume_group_id',
             'load_balancer_id' => 'load_balancer_id',
+            'is_online' => 'is_online',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

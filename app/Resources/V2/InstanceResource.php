@@ -44,9 +44,23 @@ class InstanceResource extends UKFastResource
             )->toIso8601String(),
         ];
         if ($request->route('instanceId')) {
-            foreach ($this->getOnlineAgentStatus() as $key => $value) {
-                $response[$key] = $value;
+            $kingpinData = null;
+            try {
+                $kingpinResponse = $this->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->id);
+
+                $kingpinData = json_decode($kingpinResponse->getBody()->getContents());
+            } catch (Exception $exception) {
+                Log::info('Failed to retrieve instance from Kingpin', [
+                    'vpc_id' => $this->vpc_id,
+                    'instance_id' => $this->id,
+                    'message' => $exception->getMessage()
+                ]);
             }
+            $response['online'] = isset($kingpinData->powerState) ? $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON : null;
+            if ($this->is_online !== $response['online']) {
+                $this->setAttribute('is_online', $response['online'] ?? false)->saveQuietly();
+            }
+            $response['agent_running'] = isset($kingpinData->toolsRunningStatus) ? $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING : null;
         }
         if (Auth::user()->isAdmin()) {
             $response['is_hidden'] = $this->isHidden();

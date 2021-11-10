@@ -11,23 +11,12 @@ class GuestShutdownTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->kingpinServiceMock()->expects('get')
-            ->twice()
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'powerState' => 'poweredOff',
-                    'toolsRunningStatus' => 'guestToolsRunning',
-                ]));
-            });
-
         $this->kingpinServiceMock()
             ->shouldReceive('put')
             ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/power/guest/shutdown'])
             ->andReturn(
                 new Response(200)
-            );
+        );
     }
 
     public function testShutdown()

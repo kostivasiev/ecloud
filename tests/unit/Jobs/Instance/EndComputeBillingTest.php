@@ -13,19 +13,9 @@ class EndComputeBillingTest extends TestCase
 
     public function testEndComputeBillingJob()
     {
-        $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/' . $this->instance()->vpc_id . '/instance/' . $this->instance()->id])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'powerState' => 'poweredOff',
-                    'toolsRunningStatus' => 'guestToolsRunning',
-                ]));
-            });
-
+        $this->instance()->setAttribute('is_online', false)->saveQuietly();
         Event::fake([JobFailed::class]);
-
         dispatch(new EndComputeBilling($this->instance()));
-
         Event::assertNotDispatched(JobFailed::class);
     }
 }

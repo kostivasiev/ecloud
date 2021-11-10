@@ -12,22 +12,9 @@ class PowerOnTest extends TestCase
     {
         parent::setUp();
 
-        $this->kingpinServiceMock()->expects('get')
-            ->twice()
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'powerState' => 'poweredOff',
-                    'toolsRunningStatus' => 'guestToolsRunning',
-                ]));
-            });
-
-        $this->kingpinServiceMock()
-            ->shouldReceive('post')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/power'])
-            ->andReturn(
-                new Response(200)
-            );
+        $this->kingpinServiceMock()->shouldReceive('post')->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/power'])->andReturn(
+            new Response(200)
+        );
     }
 
     public function testPowerOn()

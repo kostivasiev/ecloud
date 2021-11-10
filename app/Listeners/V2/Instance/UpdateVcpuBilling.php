@@ -47,7 +47,7 @@ class UpdateVcpuBilling
             return;
         }
 
-        if ($instance->getOnlineAgentStatus()['online'] !== true) {
+        if (!$instance->is_online) {
             return;
         }
 
