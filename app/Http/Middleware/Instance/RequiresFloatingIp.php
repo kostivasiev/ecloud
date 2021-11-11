@@ -14,8 +14,7 @@ class RequiresFloatingIp
 
         if ($image->imageMetadata->pluck('key', 'value')->flip()->get('ukfast.fip.required') == 'true' &&
             empty($request->input('floating_ip_id')) &&
-            empty($request->input('requires_floating_ip', false)))
-        {
+            empty($request->input('requires_floating_ip', false))) {
             return response()->json([
                 'errors' => [
                     [

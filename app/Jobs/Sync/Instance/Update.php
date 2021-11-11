@@ -18,6 +18,7 @@ use App\Jobs\Instance\Deploy\ExpandOsDisk;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
+use App\Jobs\Instance\Deploy\RegisterLicenses;
 use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Jobs\Instance\Deploy\RunBootstrapScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
