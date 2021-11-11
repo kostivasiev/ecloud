@@ -9,7 +9,7 @@ use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Licenses\AdminClient;
 use UKFast\SDK\Licenses\Entities\Key;
-use UKFast\SDK\Licenses\Entities\License;
+use UKFast\SDK\SelfResponse;
 
 class RegisterLicenses extends Job
 {
@@ -41,8 +41,8 @@ class RegisterLicenses extends Job
         if ($imageMetadata->get('ukfast.license.type') == 'plesk') {
             Log::info(get_class($this) . ' : Requesting Plesk license for instance ' . $instance->id);
 
-            /** @var License $license */
-            $license = $licensesAdminClient
+            /** @var SelfResponse $response */
+            $response = $licensesAdminClient
                 ->plesk()
                 ->requestLicense(
                     $instance->id,
@@ -50,10 +50,10 @@ class RegisterLicenses extends Job
                     $imageMetadata->get('ukfast.license.identifier')
                 );
 
-            Log::info(get_class($this) . ' : License ' . $license->id .' (Plesk) assigned to instance ' . $instance->id);
+            Log::info(get_class($this) . ' : License ' . $response->getId() .' (Plesk) assigned to instance ' . $instance->id);
 
             /** @var Key $key */
-            $key = $licensesAdminClient->key($license->id);
+            $key = $licensesAdminClient->licenses()->key($response->getId());
 
             if (empty($key->key)) {
                 $this->fail(new \Exception('Failed to load Plesk license key'));
@@ -64,6 +64,8 @@ class RegisterLicenses extends Job
             $deployData['image_data']['plesk_key'] = $key->key;
             $instance->deploy_data = $deployData;
             $instance->save();
+
+            Log::info(get_class($this) . ' : Plesk License ' . $response->getId() .' key added to instance ' . $instance->id . ' deploy data');
         }
     }
 }

@@ -151,6 +151,8 @@ $app->register(UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider
 $app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\NetworkingAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\BillingAdminClientServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\LicensesAdminClientServiceProvider::class);
+
 
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);
 
