@@ -33,7 +33,7 @@ client.test("Request executed successfully", function() {
 
 ###
 # Get Policy Item
-GET https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
+GET https://{{host}}/{{version}}/firewall-policies/fwp-34030886-dev
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

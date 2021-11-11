@@ -4,10 +4,12 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
-use App\Support\Sync;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
+use UKFast\Admin\Licenses\AdminClient;
+use UKFast\SDK\Licenses\Entities\Key;
+use UKFast\SDK\Licenses\Entities\License;
 
 class RegisterLicenses extends Job
 {
@@ -21,38 +23,47 @@ class RegisterLicenses extends Job
     }
 
     /**
+     * Request a license from the licenses API
      * See https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/licenses/-/blob/master/openapi.yaml
      */
     public function handle()
     {
-        $volume = $this->model->volumes->first();
+        $instance = $this->model;
 
-        if ($volume->sync->status != Sync::STATUS_COMPLETE) {
-            $this->release(static::RETRY_DELAY);
-            Log::info(get_class($this) . ' : primary volume is not in sync, retrying in ' . static::RETRY_DELAY . ' seconds');
+        $imageMetadata = $instance->image->imageMetadata->pluck('key', 'value')->flip();
+
+        if (!$imageMetadata->has('ukfast.license.identifier')) {
             return;
         }
 
-        $guestAdminCredential = $this->model->credentials()
-            ->where('username', ($this->model->platform == 'Linux') ? 'root' : 'graphite.rack')
-            ->firstOrFail();
-        if (!$guestAdminCredential) {
-            $message = 'PrepareOsDisk failed for ' . $this->model->id . ', no admin credentials found';
-            Log::error($message);
-            $this->fail(new \Exception($message));
-            return;
-        }
+        $licensesAdminClient = app()->make(AdminClient::class);
 
-        // Extend volume to expanded size
-        $endpoint = ($this->model->platform == 'Linux') ? 'linux/disk/lvm/extend' : 'windows/disk/expandall';
-        $this->model->availabilityZone->kingpinService()->put(
-            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
-            [
-                'json' => [
-                    'username' => $guestAdminCredential->username,
-                    'password' => $guestAdminCredential->password,
-                ],
-            ]
-        );
+        if ($imageMetadata->get('ukfast.license.type') == 'plesk') {
+            Log::info(get_class($this) . ' : Requesting Plesk license for instance ' . $instance->id);
+
+            /** @var License $license */
+            $license = $licensesAdminClient
+                ->plesk()
+                ->requestLicense(
+                    $instance->id,
+                    'ecloud_vpc',
+                    $imageMetadata->get('ukfast.license.identifier')
+                );
+
+            Log::info(get_class($this) . ' : License ' . $license->id .' (Plesk) assigned to instance ' . $instance->id);
+
+            /** @var Key $key */
+            $key = $licensesAdminClient->key($license->id);
+
+            if (empty($key->key)) {
+                $this->fail(new \Exception('Failed to load Plesk license key'));
+                return;
+            }
+
+            $deployData = $instance->deploy_data;
+            $deployData['image_data']['plesk_key'] = $key->key;
+            $instance->deploy_data = $deployData;
+            $instance->save();
+        }
     }
 }
