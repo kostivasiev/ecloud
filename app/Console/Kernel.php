@@ -51,9 +51,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         if ($this->app->environment() == 'production') {
-            $schedule->command('vpc:process-billing')
+            $schedule->command('vpc:process-billing --debug')
                 ->monthlyOn(1, '01:00')
                 ->emailOutputTo(config('alerts.billing.to'));
+                
             $schedule->command('orchestrator:deploy')
                 ->everyMinute();
 
