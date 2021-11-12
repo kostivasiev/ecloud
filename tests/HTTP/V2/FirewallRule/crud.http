@@ -8,11 +8,18 @@ Content-Type:  application/json
     "name": "What's in a name?",
     "sequence": 10,
     "firewall_policy_id": "{{dev_firewall_policy_id}}",
-    "source": "192.168.100.1/24",
-    "destination": "212.22.18.10/24",
+    "source": "ANY",
+    "destination": "ANY",
     "action": "ALLOW",
     "direction": "IN",
-    "enabled": true
+    "enabled": true,
+    "ports": [
+        {
+            "protocol": "TCP",
+            "source": "ANY",
+            "destination": "ANY"
+        }
+    ]
 }
 
 > {%

@@ -203,7 +203,7 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Instances */
     $router->group([], function () use ($router) {
-        $router->group(['middleware' => 'customer-max-instance'], function () use ($router) {
+        $router->group(['middleware' => ['customer-max-instance', 'instance-requires-floating-ip']], function () use ($router) {
             $router->post('instances', 'InstanceController@store');
         });
         $router->get('instances', 'InstanceController@index');
