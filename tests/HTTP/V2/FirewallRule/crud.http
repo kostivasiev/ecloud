@@ -5,9 +5,9 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "foo",
+    "name": "What's in a name?",
     "sequence": 10,
-    "firewall_policy_id": "fwp-34030886-dev",
+    "firewall_policy_id": "{{dev_firewall_policy_id}}",
     "source": "ANY",
     "destination": "ANY",
     "action": "ALLOW",
