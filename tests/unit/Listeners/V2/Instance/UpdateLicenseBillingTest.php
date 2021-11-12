@@ -2,16 +2,16 @@
 namespace Tests\unit\Listeners\V2\Instance;
 
 use App\Models\V2\BillingMetric;
+use App\Models\V2\ImageMetadata;
+use App\Models\V2\Product;
+use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
 class UpdateLicenseBillingTest extends TestCase
 {
-    use LoadBalancerMock;
-
     private Task $task;
 
     public function setUp(): void
@@ -26,58 +26,60 @@ class UpdateLicenseBillingTest extends TestCase
             ]);
             $this->task->resource()->associate($this->instance());
         });
+
+        $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+        $mockAdminCustomerClient = \Mockery::mock(\UKFast\Admin\Account\AdminCustomerClient::class)->makePartial();
+        $mockAdminCustomerClient->shouldReceive('getById')->andReturn(
+            new \UKFast\Admin\Account\Entities\Customer(
+                [
+                    'accountStatus' => ''
+                ]
+            )
+        );
+        $mockAccountAdminClient->shouldReceive('customers')->andReturn(
+            $mockAdminCustomerClient
+        );
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
+            return $mockAccountAdminClient;
+        });
     }
 
-    public function testInstertLicenseBilling()
+    public function testInsertPleskLicenseBilling()
     {
-        $this->instance()->vcpu_cores = 1;
-        $this->instance()->platform = 'Windows';
+        // Add a plesk billing product
+        factory(Product::class)->create([
+            'product_name' => $this->availabilityZone()->id . ': plesk-license',
+            'product_category' => 'eCloud',
+            'product_subcategory' => 'License',
+        ])->each(function ($product) {
+            factory(ProductPrice::class)->create([
+                'product_price_product_id' => $product->id,
+                'product_price_sale_price' => 0.00000816
+            ]);
+        });
 
-        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
-        $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
-
-        $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
-        $this->assertNotNull($vcpuMetric);
-        $this->assertEquals(1, $vcpuMetric->value);
-    }
-
-    public function testUpdateLicenseChangeBilling()
-    {
-        $originalVcpuMetric = factory(BillingMetric::class)->create([
-            'id' => 'bm-test1',
-            'resource_id' => $this->instance()->id,
-            'vpc_id' => $this->vpc()->id,
-            'key' => 'license.windows',
-            'value' => 1,
-            'start' => '2020-07-07T10:30:00+01:00',
+        // add iimage metadata for ukfast.license.type = 'plesk'
+        factory(ImageMetadata::class)->create([
+            'key' => 'ukfast.license.type',
+            'value' => 'plesk',
+            'image_id' => $this->image()->id
         ]);
 
-        $this->instance()->vcpu_cores = 5;
-        $this->instance()->platform = 'Windows';
-
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
-        $this->assertNotNull($vcpuMetric);
-        $this->assertEquals(5, $vcpuMetric->value);
+        $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'license.plesk');
 
-        // Check existing metric was ended
-        $originalVcpuMetric->refresh();
-        $this->assertNotNull($originalVcpuMetric->end);
+        $this->assertNotNull($billingMetric);
+        $this->assertEquals(1, $billingMetric->value);
+        $this->assertEquals(0.00000816, $billingMetric->price);
     }
 
-    public function testLoadBalancerInstancesIgnored()
+    public function testNoLicenseTypeSkips()
     {
-        $this->instance()->vcpu_cores = 1;
-        $this->instance()->platform = 'Windows'; // LB nodes are not Windows, but just for testing...
-
-        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
-
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
-        $this->assertNull($vcpuMetric);
+        $this->assertNull(BillingMetric::getActiveByKey($this->instance(), 'license.plesk'));
     }
 }

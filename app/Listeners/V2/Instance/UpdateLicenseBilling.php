@@ -5,12 +5,16 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use App\Support\Sync;
+use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateLicenseBilling
 {
+    use BillableListener;
+
+    const RESOURCE = Instance::class;
+
     /**
      * @param Updated $event
      * @return void
@@ -18,67 +22,45 @@ class UpdateLicenseBilling
      */
     public function handle(Updated $event)
     {
-        if ($event->model->name == Sync::TASK_NAME_DELETE) {
-            return;
-        }
-
-        if (!$event->model->completed) {
-            return;
-        }
-
-        if (get_class($event->model->resource) != Instance::class) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
 
         $instance = $event->model->resource;
 
-        if (empty($instance) || $instance->isManaged()) {
+        if ($instance->image->imagemetadata->where('key', 'ukfast.license.type')->count() == 0) {
             return;
         }
 
-        if ($instance->platform != 'Windows') {
-            return;
-        }
+        $licenseType = $instance->image->imagemetadata->where('key', 'ukfast.license.type')->first()->value;
 
-        if (!empty($instance->host_group_id)) {
-            $instance->billingMetrics()
-                ->where('key', '=', 'license.windows')
-                ->each(function ($billingMetric) use ($instance) {
-                    $billingMetric->setEndDate();
-                    Log::debug('End billing of `' . $billingMetric->key . '` for Instance ' . $instance->id);
-                });
-            Log::warning(get_class($this) . ': Instance ' . $instance->id . ' is in the host group ' . $instance->host_group_id . ', nothing to do');
-            return;
-        }
+        // Check for an associated license billing product, if we find one, we want to bill for this license.
+        $product = $instance->availabilityZone->products()
+            ->where('product_name', $instance->availabilityZone->id . ': ' . $licenseType . '-license')
+            ->first();
+        if (!empty($product)) {
+            $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.' . $licenseType);
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.windows');
-        if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == $instance->vcpu_cores) {
+            if (!empty($currentActiveMetric)) {
                 return;
             }
-            $currentActiveMetric->setEndDate();
+
+            $key = 'license.' . $licenseType;
+
+            $billingMetric = app()->make(BillingMetric::class);
+            $billingMetric->fill([
+                'resource_id' => $instance->id,
+                'vpc_id' => $instance->vpc->id,
+                'reseller_id' => $instance->vpc->reseller_id,
+                'key' => $key,
+                'value' => 1,
+                'start' => Carbon::now(),
+                'category' => $product->category,
+                'price' => $product->getPrice($instance->vpc->reseller_id),
+            ]);
+            $billingMetric->save();
+
+            Log::info('Billing metric ' . $key . ' added for resource ' . $instance->id);
         }
-
-        $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $instance->id;
-        $billingMetric->vpc_id = $instance->vpc->id;
-        $billingMetric->reseller_id = $instance->vpc->reseller_id;
-        $billingMetric->key = 'license.windows';
-        $billingMetric->value = $instance->vcpu_cores;
-        $billingMetric->start = Carbon::now();
-
-        $product = $instance->availabilityZone->products()
-            ->where('product_name', $instance->availabilityZone->id . ': windows-os-license')
-            ->first();
-        if (empty($product)) {
-            Log::error(
-                'Failed to load \'windows\' billing product for availability zone ' . $instance->availabilityZone->id
-            );
-        } else {
-            $billingMetric->category = $product->category;
-            $billingMetric->price = $product->getPrice($instance->vpc->reseller_id);
-        }
-
-        $billingMetric->save();
     }
 }
