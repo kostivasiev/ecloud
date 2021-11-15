@@ -33,7 +33,12 @@ Accept: */*
 Cache-Control: no-cache
 Authorization: myukfast
 
-#8
+###
+GET https://kong.staging.rnd.ukfast/licenses/v1/licenses?owner_type:eq=ecloud_vpc&owner_id:eq=i-test
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
 
 
 

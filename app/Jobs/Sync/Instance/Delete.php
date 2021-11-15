@@ -8,6 +8,7 @@ use App\Jobs\Instance\Undeploy\AwaitVolumeRemoval;
 use App\Jobs\Instance\Undeploy\DeleteNics;
 use App\Jobs\Instance\Undeploy\DeleteVolumes;
 use App\Jobs\Instance\Undeploy\RemoveCredentials;
+use App\Jobs\Instance\Undeploy\RevokeLicenses;
 use App\Jobs\Instance\Undeploy\UnassignFloatingIP;
 use App\Jobs\Instance\Undeploy\Undeploy;
 use App\Jobs\Instance\VolumeGroupDetach;
@@ -41,6 +42,7 @@ class Delete extends Job
                 new AwaitVolumeRemoval($this->task->resource),
                 new AwaitNicRemoval($this->task->resource),
                 new RemoveCredentials($this->task->resource),
+                new RevokeLicenses($this->task->resource),
             ],
         ])->dispatch();
     }
