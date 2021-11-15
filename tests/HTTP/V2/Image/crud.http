@@ -7,7 +7,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "name": "TEST PLESK",
+    "name": "Test Image - PMC4",
     "logo_uri": "https://images.ukfast.co.uk/logos/centos/300x300_white.png",
     "documentation_uri": "https://docs.centos.org/en-US/docs/",
     "description": "CentOS (Community enterprise Operating System)",
