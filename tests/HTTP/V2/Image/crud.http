@@ -7,10 +7,10 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "name": "Test Image - PMC4",
+    "name": "TEST PLESK",
     "logo_uri": "https://images.ukfast.co.uk/logos/centos/300x300_white.png",
     "documentation_uri": "https://docs.centos.org/en-US/docs/",
-    "description": "CentOS (Community enterprise Operating System)",
+    "description": "We have partnered with Plesk to provide their leading tool for managing your Ubuntu 20.04 server.\r\n\r\n Plesk Web Host Edition is for Web Hosters to customize, provision, and manage hosting businesses. Get maximum flexibility, access to the domain management tools, and the full WordPress Toolkit to support your multi-tenant, \u201cinstall anything\u201d business model.\r\n\r\n Plesk provides an intuitive user interface to simplify your server access, so whatever your level of expertise, you can easily manage, Something is wrongure and update your server. With multiple levels of administration access, Plesk is a market-leading control panel, ensuring security and flexibility for every organisation.\r\n\r\n This appliance is installed with Plesk Web Host Edition*, allowing you to customize, provision, and manage hosting businesses. Get maximum flexibility, access to the domain management tools, and the full WordPress Toolkit to support your multi-tenant, \u201cinstall anything\u201d business model.\r\n\r\n * Additional license fees apply",
     "script_template": null,
     "vm_template": "CentOS7 x86_64",
     "platform": "Linux",
