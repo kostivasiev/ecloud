@@ -1,4 +1,4 @@
-###
+### Deploy Plesk instance
 POST https://{{host}}/{{version}}/instances
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -28,8 +28,29 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-###
 
+### Check the instance deployed successfully
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### Hit the licenses APIO to confirm licence assigned (correct VPN settings will be requried)
+GET https://kong.staging.rnd.ukfast/licenses/v1/licenses?owner_type:eq=ecloud_vpc&owner_id:eq={{instance_id}}
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.meta.pagination.count === 1, "license was not assigned");
+});
+%}
+
+
+### Delete the instance
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
