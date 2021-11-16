@@ -67,7 +67,7 @@ class MigrateBillingTest extends TestCase
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $updateVcpuBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
         $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
-        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
+        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $this->instance()->refresh();
 
@@ -99,7 +99,7 @@ class MigrateBillingTest extends TestCase
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $updateVcpuBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
         $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
-        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
+        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $this->instance()->refresh();
 

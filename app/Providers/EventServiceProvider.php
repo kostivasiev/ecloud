@@ -154,6 +154,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Image\UpdateImageBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
+            \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
             \App\Listeners\V2\Host\UpdateBilling::class,
