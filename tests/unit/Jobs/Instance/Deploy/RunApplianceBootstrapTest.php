@@ -10,7 +10,7 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class RunAppliancesBootstrapTest extends TestCase
+class RunApplianceBootstrapTest extends TestCase
 {
     public function testLoadsAndRendersEncryptedPasswords()
     {
