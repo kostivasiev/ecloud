@@ -1,0 +1,44 @@
+###
+GET https://kong.staging.rnd.ukfast/licenses/v1/licenses
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+<> 2021-11-10T141220.200.json
+
+
+###
+POST https://kong.staging.rnd.ukfast/licenses/v1/plesk-license
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+{
+  "owner_id": "i-test",
+  "owner_type": "ecloud_vpc",
+  "product_type": "PLESK-12-VPS-WEB-HOST-1M"
+}
+
+###
+GET https://kong.staging.rnd.ukfast/licenses/v1/licenses/13/key
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+
+###
+POST https://kong.staging.rnd.ukfast/licenses/v1/licenses/8/revoke
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+
+###
+GET https://kong.staging.rnd.ukfast/licenses/v1/licenses?owner_type:eq=ecloud_vpc&owner_id:eq=i-test
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+
+

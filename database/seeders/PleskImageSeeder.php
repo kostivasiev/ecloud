@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
@@ -68,7 +69,7 @@ EOM,
         $image = factory(Image::class)->create($imageData);
 
         // Sync the pivot table
-        $image->availabilityZones()->sync('az-aaaaaaaa');
+        $image->availabilityZones()->sync(AvailabilityZone::all()->pluck('id')->toArray());
 
         factory(ImageMetadata::class)->create([
             'image_id' => $image->id,
