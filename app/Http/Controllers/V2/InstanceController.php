@@ -13,6 +13,7 @@ use App\Models\V2\Credential;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
+use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
@@ -102,13 +103,33 @@ class InstanceController extends BaseController
         $instance->availabilityZone()->associate($network->router->availabilityZone);
 
         $instance->locked = $request->input('locked', false);
+
+        $instance->save();
+
+        $imageData = collect($request->input('image_data'));
+        $image->imageParameters
+        ->filter(function ($value) use ($imageData) {
+            return $value->type == ImageParameter::TYPE_PASSWORD &&
+                in_array($value->key, $imageData->keys()->toArray());
+        })
+        ->each(function ($populatedPassword) use ($imageData, $instance) {
+            $credential = app()->make(Credential::class);
+            $credential->fill([
+                'name' => $populatedPassword->key,
+                'username' => $populatedPassword->key,
+                'password' => $imageData->get($populatedPassword->key)
+            ]);
+            $instance->credentials()->save($credential);
+            $imageData->forget($populatedPassword->key);
+        });
+
         $instance->deploy_data = [
             'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.' . strtolower($image->platform) . '.min')),
             'volume_iops' => $request->input('volume_iops', config('volume.iops.default')),
             'network_id' => $request->input('network_id', $network->id),
             'floating_ip_id' => $request->input('floating_ip_id'),
             'requires_floating_ip' => $request->input('requires_floating_ip', false),
-            'image_data' => $request->input('image_data'),
+            'image_data' => $imageData->toArray(),
             'user_script' => $request->input('user_script'),
             'ssh_key_pair_ids' => $request->input('ssh_key_pair_ids'),
         ];

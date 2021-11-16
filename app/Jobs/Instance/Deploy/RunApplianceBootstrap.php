@@ -3,6 +3,7 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
+use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -24,33 +25,47 @@ class RunApplianceBootstrap extends Job
      */
     public function handle()
     {
+        $instance = $this->model;
+
         if ($this->model->platform !== 'Linux') {
-            Log::info('RunApplianceBootstrap for ' . $this->model->id . ', nothing to do for non-Linux platforms, skipping');
+            Log::info('RunApplianceBootstrap for ' . $instance->id . ', nothing to do for non-Linux platforms, skipping');
             return;
         }
 
         if (empty($this->model->image->script_template)) {
-            Log::info('RunApplianceBootstrap for ' . $this->model->id . ', no script template defined, skipping');
+            Log::info('RunApplianceBootstrap for ' . $instance->id . ', no script template defined, skipping');
             return;
         }
 
-        $guestAdminCredential = $this->model->credentials()
-            ->where('username', ($this->model->platform == 'Linux') ? 'root' : 'graphite.rack')
+        $guestAdminCredential = $instance->credentials()
+            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
-            $message = 'RunApplianceBootstrap failed for ' . $this->model->id . ', no admin credentials found';
+            $message = 'RunApplianceBootstrap failed for ' . $instance->id . ', no admin credentials found';
             Log::error($message);
             $this->fail(new \Exception($message));
             return;
         }
 
-        $this->model->availabilityZone->kingpinService()->post(
+        $imageData = $instance->deploy_data['image_data'];
+
+        $instance->image->imageParameters
+            ->filter(function ($value) {
+                return $value->type == ImageParameter::TYPE_PASSWORD;
+            })->each(function ($passwordParameter) use ($instance, &$imageData) {
+                $credential = $instance->credentials()->where('username', $passwordParameter->key)->first();
+                if ($credential) {
+                    $imageData[$passwordParameter->key] = $credential->password;
+                }
+            });
+
+        $instance->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/linux/script',
             [
                 'json' => [
                     'encodedScript' => base64_encode(
                         (new \Mustache_Engine())->loadTemplate($this->model->image->script_template)
-                            ->render($this->model->deploy_data['image_data'])
+                            ->render($imageData)
                     ),
                     'username' => $guestAdminCredential->username,
                     'password' => $guestAdminCredential->password,
