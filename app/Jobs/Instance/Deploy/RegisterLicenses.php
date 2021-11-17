@@ -46,7 +46,7 @@ class RegisterLicenses extends Job
                 ->plesk()
                 ->requestLicense(
                     $instance->id,
-                    'ecloud_vpc',
+                    'ecloud',
                     $imageMetadata->get('ukfast.license.identifier')
                 );
 
