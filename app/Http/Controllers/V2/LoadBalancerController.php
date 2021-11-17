@@ -75,8 +75,9 @@ class LoadBalancerController extends BaseController
 
     public function destroy(Request $request, string $loadBalancerId)
     {
-        LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId)->delete();
-        return response('', 204);
+        $loadBalancer = LoadBalancer::forUser(Auth::user())->findOrFail($loadBalancerId);
+        $task = $loadBalancer->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 
     public function nodes(Request $request, QueryTransformer $queryTransformer, string $loadBalancerId)

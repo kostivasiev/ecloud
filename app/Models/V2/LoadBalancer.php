@@ -69,6 +69,11 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
         return $this->hasMany(Instance::class);
     }
 
+    public function vips()
+    {
+        return $this->hasMany(Vip::class);
+    }
+
     /**
      * @param $query
      * @param Consumer $user

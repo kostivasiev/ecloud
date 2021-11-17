@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Jobs\Sync\LoadBalancer;
 
-use App\Jobs\Sync\LoadBalancer\Update;
+use App\Jobs\Sync\LoadBalancer\Delete;
 use App\Models\V2\Task;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Bus;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
-class UpdateTest extends TestCase
+class DeleteTest extends TestCase
 {
     use LoadBalancerMock;
 
@@ -33,11 +33,11 @@ class UpdateTest extends TestCase
         });
 
         Bus::fake();
-        $job = new Update($this->task);
+        $job = new Delete($this->task);
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 1;
+            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 2;
         });
     }
 }
