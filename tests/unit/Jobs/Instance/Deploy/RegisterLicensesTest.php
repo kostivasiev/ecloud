@@ -4,7 +4,6 @@ namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Jobs\Instance\Deploy\RegisterLicenses;
 use App\Models\V2\ImageMetadata;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -38,6 +37,7 @@ class RegisterLicensesTest extends TestCase
         $mockAdminPleskClient = \Mockery::mock(AdminPleskClient::class)->makePartial();
 
         $mockAdminLicensesLicensesClient = \Mockery::mock(AdminLicensesClient::class)->makePartial();
+
         $mockAdminLicensesLicensesClient
             ->shouldReceive('key')
             ->withArgs([10])
@@ -59,6 +59,7 @@ class RegisterLicensesTest extends TestCase
         $mockAdminLicensesClient = \Mockery::mock(AdminClient::class);
         $mockAdminLicensesClient->shouldReceive('plesk')->andReturn($mockAdminPleskClient);
         $mockAdminLicensesClient->shouldReceive('licenses')->andReturn($mockAdminLicensesLicensesClient);
+        $mockAdminLicensesClient->shouldReceive('setResellerId')->andReturn($mockAdminLicensesClient);
 
         app()->bind(AdminClient::class, function () use ($mockAdminLicensesClient) {
             return $mockAdminLicensesClient;
