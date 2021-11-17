@@ -5,6 +5,7 @@ namespace App\Jobs\Instance\Deploy;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Licenses\AdminClient;
@@ -66,6 +67,46 @@ class RegisterLicenses extends Job
             $instance->save();
 
             Log::info(get_class($this) . ' : Plesk License ' . $response->getId() .' key added to instance ' . $instance->id . ' deploy data');
+        }
+
+        // If it's a MSSQL license, then let's handle things slightly differently
+        if ($imageMetadata->get('ukfast.license.type') == 'MSSQL2019') {
+            Log::info(get_class($this) . ' : Submitting MSSQL license data for instance ' . $instance->id);
+
+            try {
+                $response = $licensesAdminClient->post('v1/licenses', json_encode([
+                    'owner_id' => $instance->id,
+                    'owner_type' => 'ecloud',
+                    'key_id' => $imageMetadata->get('ukfast.license.identifier'),
+                    'license_type' => $imageMetadata->get('ukfast.license.type'),
+                    'reseller_id' => $instance->vpc->reseller_id
+                ]));
+            } catch (GuzzleException $exception) {
+                $this->fail($exception);
+            }
+
+            $licenseData = (json_decode($response->getBody()->getContents()))->data;
+            /** @var Key $key */
+            $key = $licensesAdminClient->licenses()->key($licenseData->id);
+            if (empty($key->key)) {
+                $this->fail(
+                    new \Exception(
+                        'Failed to create '.$imageMetadata->get('ukfast.license.type').' license key'
+                    )
+                );
+                return;
+            }
+
+            $deployData = $instance->deploy_data;
+            $deployData['image_data']['license_type'] = $imageMetadata->get('ukfast.license.type');
+            $deployData['image_data']['license_id'] = $key->key;
+            $instance->deploy_data = $deployData;
+            $instance->save();
+
+            Log::info(
+                get_class($this) . ' : '.$imageMetadata->get('ukfast.license.type').' License '.
+                $licenseData->id .' key added to instance ' . $instance->id . ' deploy data'
+            );
         }
     }
 }
