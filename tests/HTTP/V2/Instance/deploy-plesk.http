@@ -36,7 +36,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 ### Hit the licenses APIO to confirm licence assigned (correct VPN settings will be requried)
-GET https://kong.staging.rnd.ukfast/licenses/v1/licenses?owner_type:eq=ecloud_vpc&owner_id:eq={{instance_id}}
+GET https://kong.staging.rnd.ukfast/licenses/v1/licenses?owner_type:eq=ecloud&owner_id:eq={{instance_id}}
 Accept: */*
 Cache-Control: no-cache
 Authorization: myukfast

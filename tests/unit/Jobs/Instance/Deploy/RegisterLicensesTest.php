@@ -49,7 +49,7 @@ class RegisterLicensesTest extends TestCase
 
         $mockAdminPleskClient
             ->shouldReceive('requestLicense')
-            ->withArgs([$this->instance()->id, 'ecloud_vpc', 'PLESK-12-VPS-WEB-HOST-1M'])
+            ->withArgs([$this->instance()->id, 'ecloud', 'PLESK-12-VPS-WEB-HOST-1M'])
             ->andReturnUsing(function (){
                 $mockSelfResponse = \Mockery::mock(SelfResponse::class)->makePartial();
                 $mockSelfResponse->shouldReceive('getId')->andReturn(10);

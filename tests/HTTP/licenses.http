@@ -17,7 +17,7 @@ Content-Type:  application/json
 
 {
   "owner_id": "i-test",
-  "owner_type": "ecloud_vpc",
+  "owner_type": "ecloud",
   "product_type": "PLESK-12-VPS-WEB-HOST-1M"
 }
 
@@ -34,7 +34,7 @@ Cache-Control: no-cache
 Authorization: myukfast
 
 ###
-GET https://kong.staging.rnd.ukfast/licenses/v1/licenses?owner_type:eq=ecloud_vpc&owner_id:eq=i-test
+GET https://kong.staging.rnd.ukfast/licenses/v1/licenses?owner_type:eq=ecloud&owner_id:eq=i-test
 Accept: */*
 Cache-Control: no-cache
 Authorization: myukfast

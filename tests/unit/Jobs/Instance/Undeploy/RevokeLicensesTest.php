@@ -25,7 +25,7 @@ class RevokeLicensesTest extends TestCase
                 new License([
                     'id' => 123,
                     'owner_id' => 'i-test',
-                    'owner_type' => 'ecloud_vpc',
+                    'owner_type' => 'ecloud',
                     'key_id' => 'PLSK1234.5678',
                     'license_type' => 'plesk',
                     'reseller_id' => 0
@@ -33,7 +33,7 @@ class RevokeLicensesTest extends TestCase
                 new License([
                     'id' => 321,
                     'owner_id' => 'i-test',
-                    'owner_type' => 'ecloud_vpc',
+                    'owner_type' => 'ecloud',
                     'key_id' => 'PLSK1234.5678',
                     'license_type' => 'plesk',
                     'reseller_id' => 0

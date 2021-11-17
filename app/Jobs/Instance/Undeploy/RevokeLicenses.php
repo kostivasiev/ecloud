@@ -35,7 +35,7 @@ class RevokeLicenses extends Job
             ->licenses()
             ->getAll(
                 [
-                    'owner_type' => 'ecloud_vpc',
+                    'owner_type' => 'ecloud',
                     'owner_id' => $instance->id,
                 ]
             ));
