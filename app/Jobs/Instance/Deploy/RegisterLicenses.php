@@ -36,7 +36,7 @@ class RegisterLicenses extends Job
             return;
         }
 
-        $licensesAdminClient = app()->make(AdminClient::class);
+        $licensesAdminClient = app()->make(AdminClient::class)->setResellerId($instance->vpc->reseller_id);
 
         if ($imageMetadata->get('ukfast.license.type') == 'plesk') {
             Log::info(get_class($this) . ' : Requesting Plesk license for instance ' . $instance->id);
