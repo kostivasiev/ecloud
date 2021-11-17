@@ -35,6 +35,12 @@ This appliance is installed with Plesk Web Host Edition*, allowing you to custom
 
 * Additional license fees apply',
             'script_template' => <<<EOM
+plesk bin init_conf --init -email '{{{ plesk_admin_email_address }}}' -passwd '{{{ plesk_admin_password }}}'
+if  [ $? -gt 0 ]; then
+    echo "failed to initialise Plesk"
+    exit 1
+fi
+
 {{#plesk_key}}
 cat > /tmp/plesk.key << EOF
 {{{ plesk_key }}}
@@ -48,12 +54,6 @@ fi
 
 rm -f /tmp/plesk.key
 {{/plesk_key}}
-
-plesk bin init_conf --init -email '{{{ plesk_admin_email_address }}}' -passwd '{{{ plesk_admin_password }}}'
-if  [ $? -gt 0 ]; then
-    echo "failed to initialise Plesk"
-    exit 1
-fi
 EOM,
             'vm_template' => 'ubuntu2004-plesk-v1.0.0',
             'platform' => 'Linux',
