@@ -3,6 +3,7 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
@@ -47,7 +48,7 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
-        $imageData = $instance->deploy_data['image_data'];
+        $imageData = $instance->deploy_data['image_data'] ?? [];
 
         $instance->image->imageParameters
             ->filter(function ($value) {
@@ -65,12 +66,39 @@ class RunApplianceBootstrap extends Job
                 'json' => [
                     'encodedScript' => base64_encode(
                         (new \Mustache_Engine())->loadTemplate($this->model->image->script_template)
-                            ->render($imageData)
+                            ->render($this->generateDefaultParameters($imageData))
                     ),
                     'username' => $guestAdminCredential->username,
                     'password' => $guestAdminCredential->password,
                 ],
             ]
         );
+    }
+
+    /**
+     * @param $imageData
+     * @return mixed
+     */
+    protected function generateDefaultParameters($imageData)
+    {
+        if ($this->model->image->getMetadata('ukfast.license.type') == 'cpanel') {
+            return $this->generateDefaultCpanelParameters($imageData);
+        }
+
+        return $imageData;
+    }
+
+    /**
+     * @param $imageData
+     * @return mixed
+     */
+    protected function generateDefaultCpanelParameters($imageData)
+    {
+        if (!in_array('cpanel_hostname', array_keys($imageData))) {
+            $floatingIp = FloatingIp::findOrFail($this->model->deploy_data['floating_ip_id']);
+            $imageData['cpanel_hostname'] = $floatingIp->ip_address . '.srvlist.ukfast.net';
+        }
+
+        return $imageData;
     }
 }
