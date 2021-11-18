@@ -50,7 +50,7 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
-        $imageData = (!empty($instance->deploy_data['image_data'])) ? $instance->deploy_data['image_data'] : [];
+        $imageData = $instance->deploy_data['image_data'] ?? [];
 
         // Check metadata for plesk image
         $imageMetadata = $this->model->image->imageMetadata->pluck('key', 'value')->flip();
