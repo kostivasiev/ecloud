@@ -119,7 +119,7 @@ class RunApplianceBootstrapTest extends TestCase
             ->andReturns('111');
         $this->accountsServiceMock()
             ->allows('getPrimaryContactEmail')
-            ->andReturns('elmer.fudd@example.com');
+            ->andReturns('captain.kirk@example.com');
 
         $this->kingpinServiceMock()
             ->expects('post')
@@ -129,7 +129,7 @@ class RunApplianceBootstrapTest extends TestCase
                 '/guest/linux/script',
                 [
                     'json' => [
-                        'encodedScript' => base64_encode('elmer.fudd@example.com somepassword'),
+                        'encodedScript' => base64_encode('captain.kirk@example.com somepassword'),
                         'username' => 'root',
                         'password' => 'somepassword'
                     ]
