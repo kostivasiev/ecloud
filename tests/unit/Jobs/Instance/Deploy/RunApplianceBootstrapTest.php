@@ -6,11 +6,9 @@ use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Models\V2\Credential;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
-use App\Services\V2\PasswordService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Mustache_Engine;
 use Tests\TestCase;
 
 class RunApplianceBootstrapTest extends TestCase

@@ -7,7 +7,6 @@ use App\Models\V2\Credential;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Services\AccountsService;
-use App\Services\V2\NsxService;
 use App\Services\V2\PasswordService;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
