@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Jobs\Instance\Deploy\RegisterLicenses;
 use App\Models\V2\ImageMetadata;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -69,6 +70,47 @@ class RegisterLicensesTest extends TestCase
 
         $this->instance()->refresh();
 
+        $this->assertEquals('plesk license key', $this->instance()->deploy_data['image_data']['plesk_key']);
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testRegisterMsSqlLicense()
+    {
+        factory(ImageMetadata::class)->create([
+            'key' => 'ukfast.license.identifier',
+            'value' => 'WINDOWS-2019-DATACENTER-MSSQL2019-STANDARD',
+            'image_id' => $this->image()->id
+        ]);
+
+        factory(ImageMetadata::class)->create([
+            'key' => 'ukfast.license.type',
+            'value' => 'MSSQL2019',
+            'image_id' => $this->image()->id
+        ]);
+
+        $mockAdminPleskClient = \Mockery::mock(AdminPleskClient::class)->makePartial();
+        $mockAdminPleskClient
+            ->allows('post')
+            ->withSomeOfArgs('v1/licenses')
+            ->andReturnUsing(function () {
+                return new Response(201, [], json_encode(['data' => [ 'id' => 'testid']]));
+            });
+
+        $mockAdminLicensesClient = \Mockery::mock(AdminClient::class);
+//        $mockAdminLicensesClient->allows('plesk')->andReturns($mockAdminPleskClient);
+//        $mockAdminLicensesClient->allows('licenses')->andReturns($mockAdminLicensesLicensesClient);
+        $mockAdminLicensesClient->allows('setResellerId')->andReturns($mockAdminLicensesClient);
+
+        app()->bind(AdminClient::class, function () use ($mockAdminLicensesClient) {
+            return $mockAdminLicensesClient;
+        });
+
+        dispatch(new RegisterLicenses($this->instance()));
+
+        $this->instance()->refresh();
+
+        // needs reworking
         $this->assertEquals('plesk license key', $this->instance()->deploy_data['image_data']['plesk_key']);
 
         Event::assertNotDispatched(JobFailed::class);

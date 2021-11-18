@@ -85,27 +85,17 @@ class RegisterLicenses extends Job
                 $this->fail($exception);
             }
 
-            $licenseData = (json_decode($response->getBody()->getContents()))->data;
-            /** @var Key $key */
-            $key = $licensesAdminClient->licenses()->key($licenseData->id);
-            if (empty($key->key)) {
-                $this->fail(
-                    new \Exception(
-                        'Failed to create '.$imageMetadata->get('ukfast.license.type').' license key'
-                    )
-                );
-                return;
-            }
+            $licenseId = (json_decode($response->getBody()->getContents()))->data->id;
 
             $deployData = $instance->deploy_data;
             $deployData['image_data']['license_type'] = $imageMetadata->get('ukfast.license.type');
-            $deployData['image_data']['license_id'] = $key->key;
+            $deployData['image_data']['license_id'] = $licenseId;
             $instance->deploy_data = $deployData;
             $instance->save();
 
             Log::info(
                 get_class($this) . ' : '.$imageMetadata->get('ukfast.license.type').' License '.
-                $licenseData->id .' key added to instance ' . $instance->id . ' deploy data'
+                $licenseId .' key added to instance ' . $instance->id . ' deploy data'
             );
         }
     }
