@@ -4,6 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Credential;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Services\AccountsService;
@@ -18,15 +19,26 @@ class RunApplianceBootstrap extends Job
 
     private $model;
 
+    private $imageData;
+
     public function __construct(Instance $instance)
     {
         $this->model = $instance;
+        $this->imageData = $instance->deploy_data['image_data'] ?? [];
+        $this->getImageData();
+    }
+
+    protected function getImageData()
+    {
+        $this->getCpanelImageData();
+        $this->getPleskImageData();
+        $this->getPasswords();
     }
 
     /**
      * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/333
      */
-    public function handle(AccountsService $accountsService)
+    public function handle()
     {
         $instance = $this->model;
 
@@ -50,53 +62,70 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
-        $imageData = $instance->deploy_data['image_data'] ?? [];
-
-        // Check metadata for plesk image
-        $imageMetadata = $this->model->image->imageMetadata->pluck('key', 'value')->flip();
-        if ($imageMetadata->get('ukfast.license.type') == 'plesk') {
-            if (empty($imageData['plesk_admin_email_address'])) {
-                // get email address
-                $imageData['plesk_admin_email_address'] = $accountsService->getPrimaryContactEmail($this->model->getResellerId());
-                $deployData['image_data'] = $imageData;
-                $instance->setAttribute('deploy_data', $deployData)->saveQuietly();
-            }
-            if (!$instance->credentials()
-                ->where('name', '=', 'plesk_admin_password')
-                ->exists()) {
-                $credential = app()->make(Credential::class);
-                $credential->fill([
-                    'name' => 'plesk_admin_password',
-                    'username' => 'plesk_admin_password',
-                    'password' => (new PasswordService())->generate(),
-                ]);
-                $credential->save();
-                $instance->credentials()->save($credential);
-            }
-        }
-
-        $instance->image->imageParameters
-            ->filter(function ($value) {
-                return $value->type == ImageParameter::TYPE_PASSWORD;
-            })->each(function ($passwordParameter) use ($instance, &$imageData) {
-                $credential = $instance->credentials()->where('username', $passwordParameter->key)->first();
-                if ($credential) {
-                    $imageData[$passwordParameter->key] = $credential->password;
-                }
-            });
-
         $instance->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/linux/script',
             [
                 'json' => [
                     'encodedScript' => base64_encode(
                         (new \Mustache_Engine())->loadTemplate($this->model->image->script_template)
-                            ->render($imageData)
+                            ->render($this->imageData)
                     ),
                     'username' => $guestAdminCredential->username,
                     'password' => $guestAdminCredential->password,
                 ],
             ]
         );
+    }
+
+    protected function getPleskImageData()
+    {
+        if ($this->model->image->getMetadata('ukfast.license.type') != 'plesk') {
+            return;
+        }
+
+        if (!in_array('plesk_admin_email_address', array_keys($this->imageData))) {
+            $accountsService = app()->make(AccountsService::class);
+            $this->imageData['plesk_admin_email_address'] = $accountsService->getPrimaryContactEmail($this->model->getResellerId());
+            $deployData['image_data'] = $this->imageData;
+            $this->model->setAttribute('deploy_data', $deployData)->saveQuietly();
+        }
+
+        if (!$this->model->credentials()
+            ->where('name', '=', 'plesk_admin_password')
+            ->exists()) {
+            $credential = app()->make(Credential::class);
+            $credential->fill([
+                'name' => 'plesk_admin_password',
+                'username' => 'plesk_admin_password',
+                'password' => (new PasswordService())->generate(),
+            ]);
+            $credential->save();
+            $this->model->credentials()->save($credential);
+        }
+    }
+
+    protected function getCpanelImageData()
+    {
+        if ($this->model->image->getMetadata('ukfast.license.type') != 'cpanel') {
+            return;
+        }
+
+        if (!in_array('cpanel_hostname', array_keys($this->imageData))) {
+            $floatingIp = FloatingIp::findOrFail($this->model->deploy_data['floating_ip_id']);
+            $this->imageData['cpanel_hostname'] = $floatingIp->ip_address . '.srvlist.ukfast.net';
+        }
+    }
+
+    protected function getPasswords()
+    {
+        $this->model->image->imageParameters
+            ->filter(function ($value) {
+                return $value->type == ImageParameter::TYPE_PASSWORD;
+            })->each(function ($passwordParameter) {
+                $credential = $this->model->credentials()->where('username', $passwordParameter->key)->first();
+                if ($credential) {
+                    $this->imageData[$passwordParameter->key] = $credential->password;
+                }
+            });
     }
 }

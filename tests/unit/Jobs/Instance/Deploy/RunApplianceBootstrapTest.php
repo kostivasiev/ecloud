@@ -6,6 +6,7 @@ use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Models\V2\Credential;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
+use Database\Seeders\CpanelImageSeeder;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
@@ -61,6 +62,101 @@ class RunApplianceBootstrapTest extends TestCase
                 [
                     'json' => [
                         'encodedScript' => base64_encode('elmer.fudd@example.com somepassword'),
+                        'username' => 'root',
+                        'password' => 'somepassword'
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        dispatch(new RunApplianceBootstrap($this->instance()));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testCreatesDefaultCpanelHostname()
+    {
+        (new CpanelImageSeeder())->run();
+
+        $this->instance()
+            ->setAttribute('image_id', 'img-cpanel')
+            ->setAttribute('deploy_data', [
+                'floating_ip_id' => $this->floatingIp()->id,
+            ])
+            ->save();
+
+        $this->instance()->image->setAttribute(
+            'script_template',
+            'ARG_HOSTNAME="{{cpanel_hostname}}"'
+        )->save();
+
+        $credential = app()->make(Credential::class);
+        $credential->fill([
+            'name' => 'root',
+            'username' => 'root',
+            'password' => 'somepassword'
+        ]);
+        $this->instance()->credentials()->save($credential);
+
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/' . $this->instance()->vpc->id .
+                '/instance/' . $this->instance()->id .
+                '/guest/linux/script',
+                [
+                    'json' => [
+                        'encodedScript' => base64_encode('ARG_HOSTNAME="' . $this->floatingIp()->ip_address . '.srvlist.ukfast.net"'),
+                        'username' => 'root',
+                        'password' => 'somepassword'
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        dispatch(new RunApplianceBootstrap($this->instance()));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testCpanelHostnamePopulatesFromImageData()
+    {
+        (new CpanelImageSeeder())->run();
+
+        $this->instance()
+            ->setAttribute('image_id', 'img-cpanel')
+            ->setAttribute('deploy_data', [
+                'floating_ip_id' => $this->floatingIp()->id,
+                'image_data' => [
+                    'cpanel_hostname' => 'my.cpanel.hostname'
+                ]
+            ])
+            ->save();
+
+        $this->instance()->image->setAttribute(
+            'script_template',
+            'ARG_HOSTNAME="{{cpanel_hostname}}"'
+        )->save();
+
+        $credential = app()->make(Credential::class);
+        $credential->fill([
+            'name' => 'root',
+            'username' => 'root',
+            'password' => 'somepassword'
+        ]);
+        $this->instance()->credentials()->save($credential);
+
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/' . $this->instance()->vpc->id .
+                '/instance/' . $this->instance()->id .
+                '/guest/linux/script',
+                [
+                    'json' => [
+                        'encodedScript' => base64_encode('ARG_HOSTNAME="my.cpanel.hostname"'),
                         'username' => 'root',
                         'password' => 'somepassword'
                     ]

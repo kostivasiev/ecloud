@@ -3,7 +3,8 @@
 namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Jobs\Instance\Deploy\RegisterLicenses;
-use App\Models\V2\ImageMetadata;
+use Database\Seeders\CpanelImageSeeder;
+use Database\Seeders\PleskImageSeeder;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -15,24 +16,10 @@ use UKFast\SDK\SelfResponse;
 
 class RegisterLicensesTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testRegisterPleskLicense()
     {
-        factory(ImageMetadata::class)->create([
-            'key' => 'ukfast.license.identifier',
-            'value' => 'PLESK-12-VPS-WEB-HOST-1M',
-            'image_id' => $this->image()->id
-        ]);
-
-        factory(ImageMetadata::class)->create([
-            'key' => 'ukfast.license.type',
-            'value' => 'plesk',
-            'image_id' => $this->image()->id
-        ]);
+        (new PleskImageSeeder())->run();
+        $this->instance()->setAttribute('image_id', 'img-plesk')->save();
 
         $mockAdminPleskClient = \Mockery::mock(AdminPleskClient::class)->makePartial();
 
@@ -81,6 +68,34 @@ class RegisterLicensesTest extends TestCase
         $this->instance()->refresh();
 
         $this->assertFalse(isset($this->instance()->deploy_data['image_data']['plesk_key']));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testRegisterCpanelLicense()
+    {
+        (new CpanelImageSeeder())->run();
+
+        $this->instance()
+            ->setAttribute('image_id', 'img-cpanel')
+            ->setAttribute('deploy_data', [
+                'floating_ip_id' => $this->floatingIp()->id
+            ])
+            ->save();
+
+        $mockAdminLicensesClient = \Mockery::mock(AdminClient::class);
+        $mockAdminLicensesClient->shouldReceive('cpanel->requestLicense')
+            ->withArgs([$this->instance()->id, 'ecloud', '1.1.1.1', 21163])
+            ->andReturnUsing(function (){
+                return \Mockery::mock(SelfResponse::class)->makePartial();
+            });
+        $mockAdminLicensesClient->shouldReceive('setResellerId')->andReturn($mockAdminLicensesClient);
+
+        app()->bind(AdminClient::class, function () use ($mockAdminLicensesClient) {
+            return $mockAdminLicensesClient;
+        });
+
+        dispatch(new RegisterLicenses($this->instance()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
