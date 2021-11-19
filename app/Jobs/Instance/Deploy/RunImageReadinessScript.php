@@ -24,9 +24,6 @@ class RunImageReadinessScript extends Job
         $this->model = $instance;
     }
 
-    /**
-     * @see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/333
-     */
     public function handle()
     {
         $instance = $this->model;
