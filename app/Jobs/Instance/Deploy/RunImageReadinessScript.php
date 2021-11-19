@@ -85,7 +85,7 @@ class RunImageReadinessScript extends Job
                         'output' => $response->output
                     ]
                 );
-                throw new \Exception('Readiness script for ' . $instance->id . ' failed with exit code 2. ' . $response->output);
+                throw new \Exception('Readiness script for ' . $instance->id . ' returned an unexpected response: ' . $response->exitCode . ':' . $response->output);
         }
     }
 }
