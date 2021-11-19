@@ -92,13 +92,7 @@ class MsSqlImageSeeder extends Seeder
             factory(ImageMetadata::class)->create([
                 'image_id' => $image->id,
                 'key' => 'ukfast.license.type',
-                'value' => 'MSSQL2019',
-            ]);
-
-            factory(ImageMetadata::class)->create([
-                'image_id' => $image->id,
-                'key' => 'ukfast.fip.required',
-                'value' => 'true',
+                'value' => 'mssql',
             ]);
         });
     }
