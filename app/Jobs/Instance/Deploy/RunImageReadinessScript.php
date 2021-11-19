@@ -28,7 +28,7 @@ class RunImageReadinessScript extends Job
     {
         $instance = $this->model;
 
-        if (empty($this->model->image->readiness_script)) {
+        if (empty($instance->image->readiness_script)) {
             Log::info('No readiness script for ' . $instance->id . ', skipping');
             return;
         }
