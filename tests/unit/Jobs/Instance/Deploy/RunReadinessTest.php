@@ -10,7 +10,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class RunReadinessTest extends TestCase
+class RunReadinessScriptTest extends TestCase
 {
     public function testRunsReadinessScriptCompleteSucceeds()
     {
