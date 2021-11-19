@@ -21,6 +21,7 @@ use App\Jobs\Instance\Deploy\PrepareOsUsers;
 use App\Jobs\Instance\Deploy\RegisterLicenses;
 use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Jobs\Instance\Deploy\RunBootstrapScript;
+use App\Jobs\Instance\Deploy\RunReadinessScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
@@ -66,6 +67,7 @@ class Update extends Job
                     new ActivateWindows($this->task->resource),
                     new RegisterLicenses($this->task->resource),
                     new RunApplianceBootstrap($this->task->resource),
+                    new RunReadinessScript($this->task->resource),
                     new RunBootstrapScript($this->task->resource),
                     new DeployCompleted($this->task->resource),
                 ],
