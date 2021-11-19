@@ -11,6 +11,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => [
+                'sometimes',
                 'required',
                 'string',
                 'max:255'
@@ -21,6 +22,7 @@ class UpdateRequest extends FormRequest
                 'array'
             ],
             'availability_zone_ids.*' => [
+                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
