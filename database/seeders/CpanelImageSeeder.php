@@ -114,7 +114,7 @@ EOM,
         factory(ImageMetadata::class)->create([
             'image_id' => $image->id,
             'key' => 'ukfast.license.identifier',
-            'value' => 21159,
+            'value' => 21163,
         ]);
 
         factory(ImageMetadata::class)->create([
