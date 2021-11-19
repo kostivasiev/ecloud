@@ -124,4 +124,35 @@ class AccountsService extends AbstractApioService
             throw new ServiceResponseException('unable to confirm account status');
         }
     }
+
+    public function getPrimaryContactId($resellerId)
+    {
+        try {
+            /** @var \GuzzleHttp\Psr7\Response $response */
+            $response = $this->makeRequest('GET', 'v1/customers/' . $resellerId);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('unexpected response (' . $response->getStatusCode() . ') from accounts apio');
+            }
+            $data = $this->parseResponseData($response->getBody()->getContents())->data;
+            return $data->primary_contact_id;
+        } catch (\Exception $exception) {
+            throw new ServiceResponseException('unable to retrieve account data');
+        }
+    }
+
+    public function getPrimaryContactEmail($resellerId)
+    {
+        $primaryContactId = $this->getPrimaryContactId($resellerId);
+        try {
+            /** @var \GuzzleHttp\Psr7\Response $response */
+            $response = $this->makeRequest('GET', 'v1/contacts/' . $primaryContactId);
+            if ($response->getStatusCode() !== 200) {
+                throw new \Exception('unexpected response (' . $response->getStatusCode() . ') from accounts apio');
+            }
+            $data = $this->parseResponseData($response->getBody()->getContents())->data;
+            return $data->email_address;
+        } catch (\Exception $exception) {
+            throw new ServiceResponseException('unable to retrieve primary contact data');
+        }
+    }
 }
