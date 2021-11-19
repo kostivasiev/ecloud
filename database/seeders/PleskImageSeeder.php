@@ -95,7 +95,7 @@ EOM,
             'key' => 'plesk_admin_email_address',
             'type' => 'String',
             'description' => 'Plesk Admin Email Address',
-            'required' => true,
+            'required' => false,
             'validation_rule' => '/\w+/',
         ]);
 
