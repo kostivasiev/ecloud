@@ -9,7 +9,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class RunReadinessScript extends Job
+class RunImageReadinessScript extends Job
 {
     use Batchable, LoggableModelJob;
 
@@ -37,7 +37,7 @@ class RunReadinessScript extends Job
         }
 
         $guestAdminCredential = $instance->credentials()
-            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
+            ->where('username', 'root')
             ->firstOrFail();
         if (!$guestAdminCredential) {
             $message = 'RunApplianceBootstrap failed for ' . $instance->id . ', no admin credentials found';
@@ -60,13 +60,13 @@ class RunReadinessScript extends Job
 
         $response = json_decode($response->getBody()->getContents());
         if (!$response) {
-            $this->fail(new \Exception('Could not decode response from readiness script for ' . $instance->id));
-            return;
+            throw new \Exception('Could not decode response from readiness script for ' . $instance->id);
         }
 
         // 0 = completed, 1 = still processing, 2 = failed
         switch ($response->exitCode) {
             case 0:
+                Log::info(get_class($this) . ': Readiness script completed successfully for instance ' .  $instance->id, ['id' => $instance->id]);
                 return;
             case 1:
                 Log::warning(get_class($this) . ': Readiness script still in progress, retrying in ' . $this->backoff . ' seconds', ['id' => $instance->id]);
@@ -85,7 +85,7 @@ class RunReadinessScript extends Job
                         'output' => $response->output
                     ]
                 );
-                $this->fail(new \Exception('Readiness script for ' . $instance->id . ' failed with exit code 2. ' . $response->output));
+                throw new \Exception('Readiness script for ' . $instance->id . ' failed with exit code 2. ' . $response->output);
         }
     }
 }

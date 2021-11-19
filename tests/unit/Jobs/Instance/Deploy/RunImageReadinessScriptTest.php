@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Jobs\Instance\Deploy;
 
-use App\Jobs\Instance\Deploy\RunReadinessScript;
+use App\Jobs\Instance\Deploy\RunImageReadinessScript;
 use App\Models\V2\Credential;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
@@ -10,7 +10,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class RunReadinessScriptTest extends TestCase
+class RunImageReadinessScriptTest extends TestCase
 {
     public function testRunsReadinessScriptCompleteSucceeds()
     {
@@ -49,7 +49,7 @@ class RunReadinessScriptTest extends TestCase
                 ]));
             });
 
-        dispatch(new RunReadinessScript($this->instance()));
+        dispatch(new RunImageReadinessScript($this->instance()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -62,7 +62,7 @@ class RunReadinessScriptTest extends TestCase
 
         $this->kingpinServiceMock()->shouldNotReceive('post');
 
-        dispatch(new RunReadinessScript($this->instance()));
+        dispatch(new RunImageReadinessScript($this->instance()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -104,7 +104,7 @@ class RunReadinessScriptTest extends TestCase
                 ]));
             });
 
-        dispatch(new RunReadinessScript($this->instance()));
+        dispatch(new RunImageReadinessScript($this->instance()));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -150,7 +150,7 @@ class RunReadinessScriptTest extends TestCase
                 ]));
             });
 
-        dispatch(new RunReadinessScript($this->instance()));
+        dispatch(new RunImageReadinessScript($this->instance()));
 
         Event::assertDispatched(JobFailed::class);
     }
