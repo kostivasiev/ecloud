@@ -85,7 +85,7 @@ class RegisterLicensesTest extends TestCase
 
         $mockAdminLicensesClient = \Mockery::mock(AdminClient::class);
         $mockAdminLicensesClient->shouldReceive('cpanel->requestLicense')
-            ->withArgs([$this->instance()->id, 'ecloud', '1.1.1.1', 21159])
+            ->withArgs([$this->instance()->id, 'ecloud', '1.1.1.1', 21163])
             ->andReturnUsing(function (){
                 return \Mockery::mock(SelfResponse::class)->makePartial();
             });
