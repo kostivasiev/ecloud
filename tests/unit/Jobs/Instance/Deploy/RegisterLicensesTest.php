@@ -108,7 +108,7 @@ class RegisterLicensesTest extends TestCase
 
         $this->instance()->refresh();
 
-        $this->assertEquals('MSSQL2019', $this->instance()->deploy_data['image_data']['license_type']);
+        $this->assertEquals('mssql', $this->instance()->deploy_data['image_data']['license_type']);
         $this->assertEquals($licenseId, $this->instance()->deploy_data['image_data']['license_id']);
 
         Event::assertNotDispatched(JobFailed::class);
