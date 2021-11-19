@@ -95,7 +95,7 @@ EOM,
             'key' => 'plesk_admin_email_address',
             'type' => 'String',
             'description' => 'Plesk Admin Email Address',
-            'required' => true,
+            'required' => false,
             'validation_rule' => '/\w+/',
         ]);
 
@@ -105,8 +105,8 @@ EOM,
             'key' => 'plesk_admin_password',
             'type' => 'Password',
             'description' => 'Plesk Admin Password',
-            'required' => true,
-            'validation_rule' => '/\w+/',
+            'required' => false,
+            'validation_rule' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/',
         ]);
     }
 }

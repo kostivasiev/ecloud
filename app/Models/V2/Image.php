@@ -105,6 +105,20 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
     }
 
     /**
+     * Get a single metadata value by key or return all as key => value collection
+     * @param $key
+     * @return \Illuminate\Database\Eloquent\HigherOrderBuilderProxy|\Illuminate\Support\Collection|mixed
+     */
+    public function getMetadata($key)
+    {
+        if ($key) {
+            return $this->hasMany(ImageMetadata::class)->where('key', $key)->firstOr(fn() => new ImageMetadata(['value' => null]))->value;
+        }
+
+        return $this->hasMany(ImageMetadata::class)->pluck('key', 'value')->flip();
+    }
+
+    /**
      * @param $query
      * @param $user
      * @return mixed
