@@ -70,7 +70,7 @@ class RunImageReadinessScript extends Job
                 $this->release($this->backoff);
                 return;
             case 2:
-                Log::error(get_class($this) . ': Readiness script failed', ['id' => $this->model->id]);
+                Log::error(get_class($this) . ': Readiness script failed', ['id' => $instance->id]);
                 $this->fail(new \Exception('Readiness script for ' . $instance->id . ' failed with exit code 2. ' . $response->output));
                 return;
             default:
