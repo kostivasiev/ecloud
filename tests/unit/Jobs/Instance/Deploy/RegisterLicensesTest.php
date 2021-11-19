@@ -87,7 +87,7 @@ class RegisterLicensesTest extends TestCase
 
         factory(ImageMetadata::class)->create([
             'key' => 'ukfast.license.type',
-            'value' => 'MSSQL2019',
+            'value' => 'mssql',
             'image_id' => $this->image()->id
         ]);
 

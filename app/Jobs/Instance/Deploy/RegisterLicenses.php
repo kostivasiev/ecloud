@@ -70,7 +70,7 @@ class RegisterLicenses extends Job
         }
 
         // If it's a MSSQL license, then let's handle things slightly differently
-        if ($imageMetadata->get('ukfast.license.type') == 'MSSQL2019') {
+        if ($imageMetadata->get('ukfast.license.type') == 'mssql') {
             Log::info(get_class($this) . ' : Submitting MSSQL license data for instance ' . $instance->id);
 
             try {
