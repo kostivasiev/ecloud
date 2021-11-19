@@ -105,8 +105,8 @@ EOM,
             'key' => 'plesk_admin_password',
             'type' => 'Password',
             'description' => 'Plesk Admin Password',
-            'required' => true,
-            'validation_rule' => '/\w+/',
+            'required' => false,
+            'validation_rule' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/',
         ]);
     }
 }
