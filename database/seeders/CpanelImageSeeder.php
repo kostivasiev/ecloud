@@ -21,7 +21,7 @@ class CpanelImageSeeder extends Seeder
          * Ubuntu 20.04 x86_64 - Plesk
          */
         $imageData = [
-            'name' => 'cPanel & WHM - Admin Edition',
+            'name' => 'cPanel & WHM - Pro Edition',
             'vpc_id' => null,
             'logo_uri' => 'https://images.ukfast.co.uk/logos/cpanel/300x300_white.png',
             'documentation_uri' => 'https://docs.cpanel.net/',
