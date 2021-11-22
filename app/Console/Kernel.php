@@ -38,6 +38,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Task\TimeoutStuck::class,
         \App\Console\Commands\IpAddress\PopulateNetworkId::class,
         \App\Console\Commands\VPC\ConvertBilling::class,
+        \App\Console\Commands\Billing\CleanupAdvancedNetworking::class,
     ];
 
     /**
