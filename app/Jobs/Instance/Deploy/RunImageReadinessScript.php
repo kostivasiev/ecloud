@@ -60,18 +60,22 @@ class RunImageReadinessScript extends Job
             throw new \Exception('Could not decode response from readiness script for ' . $instance->id);
         }
 
-        // 0 = completed, 1 = still processing, 2 = failed
+        // 0 = completed, 1 = not started, 2 = running, 3 = failed
         switch ($response->exitCode) {
             case 0:
-                Log::info(get_class($this) . ': Readiness script completed successfully for instance ' .  $instance->id, ['id' => $instance->id]);
+                Log::info(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' completed successfully', ['id' => $instance->id]);
                 return;
             case 1:
-                Log::warning(get_class($this) . ': Readiness script still in progress, retrying in ' . $this->backoff . ' seconds', ['id' => $instance->id]);
+                Log::info(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' has not yet started, retrying in ' . $this->backoff . ' seconds', ['id' => $instance->id]);
                 $this->release($this->backoff);
                 return;
             case 2:
-                Log::error(get_class($this) . ': Readiness script failed', ['id' => $instance->id]);
-                $this->fail(new \Exception('Readiness script for ' . $instance->id . ' failed with exit code 2. ' . $response->output));
+                Log::info(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' still in progress, retrying in ' . $this->backoff . ' seconds', ['id' => $instance->id]);
+                $this->release($this->backoff);
+                return;
+            case 3:
+                Log::error(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' failed', ['id' => $instance->id]);
+                $this->fail(new \Exception('Readiness script for ' . $instance->id . ' failed with exit code 3. Output: ' . $response->output));
                 return;
             default:
                 Log::error(
