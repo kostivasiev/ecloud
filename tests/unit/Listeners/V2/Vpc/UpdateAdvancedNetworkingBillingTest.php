@@ -27,6 +27,22 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
                 'product_price_sale_price' => 0.001388889,
             ]);
         });
+
+        $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+        $mockAdminCustomerClient = \Mockery::mock(\UKFast\Admin\Account\AdminCustomerClient::class)->makePartial();
+        $mockAdminCustomerClient->shouldReceive('getById')->andReturn(
+            new \UKFast\Admin\Account\Entities\Customer(
+                [
+                    'accountStatus' => ''
+                ]
+            )
+        );
+        $mockAccountAdminClient->shouldReceive('customers')->andReturn(
+            $mockAdminCustomerClient
+        );
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
+            return $mockAccountAdminClient;
+        });
     }
 
     public function testCreateInstanceUpdatesAdvancedNetworkingBillingMetric()
@@ -46,7 +62,6 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
 
         $listener = new \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling();
         $listener->handle(new \App\Events\V2\Task\Updated($task));
-
 
         $metric = BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced');
         $this->assertNotNull($metric);
