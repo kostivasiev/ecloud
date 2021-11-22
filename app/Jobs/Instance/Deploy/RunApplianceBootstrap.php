@@ -83,7 +83,7 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
-        if (!in_array('plesk_admin_email_address', array_keys($this->imageData))) {
+        if (!in_array('plesk_admin_email_address', array_keys($this->imageData)) || empty($this->imageData['plesk_admin_email_address'])) {
             $accountsService = app()->make(AccountsService::class);
             $this->imageData['plesk_admin_email_address'] = $accountsService->getPrimaryContactEmail($this->model->getResellerId());
             $deployData['image_data'] = $this->imageData;
@@ -110,7 +110,7 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
-        if (!in_array('cpanel_hostname', array_keys($this->imageData))) {
+        if (!in_array('cpanel_hostname', array_keys($this->imageData)) || empty($this->imageData['cpanel_hostname'])) {
             $floatingIp = FloatingIp::findOrFail($this->model->deploy_data['floating_ip_id']);
             $this->imageData['cpanel_hostname'] = $floatingIp->ip_address . '.srvlist.ukfast.net';
         }
