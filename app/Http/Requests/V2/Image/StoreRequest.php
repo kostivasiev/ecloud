@@ -31,6 +31,7 @@ class StoreRequest extends FormRequest
             'documentation_uri' => ['nullable'],
             'description' => ['nullable'],
             'script_template' => ['nullable'],
+            'readiness_script' => ['nullable'],
             'vm_template' => ['nullable'],
             'platform' => ['required'],
             'active' => [

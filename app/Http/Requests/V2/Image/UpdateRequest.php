@@ -44,6 +44,10 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'nullable'
             ],
+            'readiness_script' => [
+                'sometimes',
+                'nullable'
+            ],
             'vm_template' => [
                 'sometimes',
                 'nullable'

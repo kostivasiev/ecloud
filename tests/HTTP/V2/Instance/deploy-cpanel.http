@@ -1,3 +1,13 @@
+###
+POST https://{{host}}/{{version}}/vpcs/{{dev_vpc_id}}/deploy-defaults
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
 ### Deploy Plesk instance
 POST https://{{host}}/{{version}}/instances
 X-consumer-custom-id:  {{dev_reseller_id_customer}}

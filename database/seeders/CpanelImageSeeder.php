@@ -35,21 +35,21 @@ This appliance comes with a cPanel Admin license*, created for a small to mid-le
 
 * Additional license fees apply',
             'script_template' => <<<'EOM'
+cat > /tmp/cpanelinstall <<\EOF
 ARG_HOSTNAME="{{cpanel_hostname}}"
 hostnamectl set-hostname $ARG_HOSTNAME
 
-IPADDRESS=$(ifconfig | grep inet | head -1 |sed 's/\:/ /g'|awk '{print $2}')
+ARG_PRIMARYIP=$(ifconfig | grep inet | head -1 |sed 's/\:/ /g'|awk '{print $2}')
 NETMASK=$(ifconfig | grep inet | head -1 |sed 's/\:/ /g' | awk '{print $4}')
 GATEWAY=$(route -n | grep "^0.0.0.0" | awk '{print $2}')
 sed -i '/BOOTPROTO=dhcp/BOOTPROTO=static/' /etc/sysconfig/network-scripts/ifcfg-eth0
-echo "IPADDR=$IPADDRESS" >> /etc/sysconfig/network-scripts/ifcfg-eth0
+echo "IPADDR=$ARG_PRIMARYIP" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 echo "NETMASK=$NETMASK" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 echo "GATEWAY=$GATEWAY" >> /etc/sysconfig/network-scripts/ifcfg-eth0
 systemctl restart networking
 
 $( mkdir /var/tmp/cpanelinstalltmp )
 $( touch /var/tmp/cpanelinstall.lock )
-ARG_PRIMARYIP=$( ifconfig|grep inet|head -1|sed 's/\:/ /g'|awk '{print $3}' )
 $( echo "exclude=apache* bind-chroot courier* dovecot* exim* httpd* mod_ssl* mydns* mysql* nsd* php* proftpd* pure-ftpd* ruby* spamassassin* squirrelmail*" >> /etc/yum.conf )
 $( echo "ADDR ${ARG_PRIMARYIP}" >  /etc/wwwacct.conf )
 $( echo "CONTACTEMAIL root@${ARG_HOSTNAME} " >>  /etc/wwwacct.conf )
@@ -94,6 +94,26 @@ $( service exim restart )
 if [ ! -x /tmp/.nocpanelreboot ]; then
     $( shutdown -r now )
 fi
+EOF
+
+if ! chmod +x /tmp/cpanelinstall; then echo "Failed to chmod /tmp/cpanelinstall"; exit 7; fi
+echo "/bin/bash /tmp/cpanelinstall"|at now > /dev/null
+exit $?
+EOM,
+            'readiness_script' => <<<'EOM'
+if [ -f /var/tmp/cpanelinstall.err ] ; then tail /var/tmp/cpanelinstall.err && exit 3 ; fi
+
+if [ -f /var/log/cpanel-install.log ]
+then 
+    if grep -q 'Thank you for installing cPanel' /var/log/cpanel-install.log
+    then 
+        exit 0
+    fi
+else
+    exit 1
+fi
+
+exit 2
 EOM,
             'vm_template' => 'CentOS7 x86_64',
             'platform' => 'Linux',
