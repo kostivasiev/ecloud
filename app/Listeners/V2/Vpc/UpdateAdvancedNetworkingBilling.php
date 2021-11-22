@@ -28,6 +28,11 @@ class UpdateAdvancedNetworkingBilling
         }
 
         $vpc = $event->model->resource->vpc;
+
+        if (!$vpc->advanced_networking) {
+            return;
+        }
+
         Cache::lock('billing.networking.advanced.'  . $vpc->id, 60)->block(60, function () use ($vpc, $event) {
             $time = Carbon::now();
 
