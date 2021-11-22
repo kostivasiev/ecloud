@@ -18,8 +18,10 @@ use App\Jobs\Instance\Deploy\ExpandOsDisk;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
+use App\Jobs\Instance\Deploy\RegisterLicenses;
 use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Jobs\Instance\Deploy\RunBootstrapScript;
+use App\Jobs\Instance\Deploy\RunImageReadinessScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
@@ -63,7 +65,9 @@ class Update extends Job
                     new ExpandOsDisk($this->task->resource),
                     new ConfigureWinRm($this->task->resource),
                     new ActivateWindows($this->task->resource),
+                    new RegisterLicenses($this->task->resource),
                     new RunApplianceBootstrap($this->task->resource),
+                    new RunImageReadinessScript($this->task->resource),
                     new RunBootstrapScript($this->task->resource),
                     new DeployCompleted($this->task->resource),
                 ],

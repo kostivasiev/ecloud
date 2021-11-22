@@ -1,0 +1,94 @@
+### Deploy Plesk instance
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}",
+  "name": "Plesk Test",
+  "vcpu_cores": 1,
+  "ram_capacity": 1024,
+  "image_id": "img-plesk",
+  "network_id": "{{dev_network_id}}",
+  "volume_capacity": 30,
+  "requires_floating_ip": true,
+  "image_data": {
+    "plesk_admin_email_address": "elmer.fudd@example.com",
+    "plesk_admin_password": "plesky_wabbit"
+  }
+}
+
+> {%
+client.global.set('instance_id', response.body.data.id);
+client.log('Instance ID: ' + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+
+### Check the instance deployed successfully
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### Hit the licenses APIO to confirm licence assigned (correct VPN settings will be requried)
+GET https://kong.staging.rnd.ukfast/licenses/v1/licenses?owner_type:eq=ecloud&owner_id:eq={{instance_id}}
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.meta.pagination.count === 1, "license was not assigned");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/instances/{{instance_id}}/credentials
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+
+
+###
+
+### Delete the instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+### Test Requires floating IP metadata (No fif specified fails validation)
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}",
+  "name": "Test",
+  "vcpu_cores": 1,
+  "ram_capacity": 1024,
+  "image_id": "img-plesk",
+  "network_id": "{{dev_network_id}}",
+  "volume_capacity": 30,
+  "image_data": {
+    "plesk_admin_email_address": "elmer.fudd@example.com",
+    "plesk_admin_password": "plesky_wabbit"
+  }
+}
+
+> {%
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 422, "Response status is not 422");
+});
+%}

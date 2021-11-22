@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class RouterThroughput
  * @package App\Models\V2
  */
-class RouterThroughput extends Model implements Filterable, Sortable
+class RouterThroughput extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules;
 

@@ -54,6 +54,7 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
             'documentation_uri',
             'description',
             'script_template',
+            'readiness_script',
             'vm_template',
             'platform',
             'active',
@@ -101,6 +102,20 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
     public function imageMetadata()
     {
         return $this->hasMany(ImageMetadata::class);
+    }
+
+    /**
+     * Get a single metadata value by key or return all as key => value collection
+     * @param $key
+     * @return \Illuminate\Database\Eloquent\HigherOrderBuilderProxy|\Illuminate\Support\Collection|mixed
+     */
+    public function getMetadata($key)
+    {
+        if ($key) {
+            return $this->hasMany(ImageMetadata::class)->where('key', $key)->firstOr(fn() => new ImageMetadata(['value' => null]))->value;
+        }
+
+        return $this->hasMany(ImageMetadata::class)->pluck('key', 'value')->flip();
     }
 
     /**
@@ -152,6 +167,7 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('documentation_uri', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),
             $factory->create('script_template', Filter::$stringDefaults),
+            $factory->create('readiness_script', Filter::$stringDefaults),
             $factory->create('vm_template', Filter::$stringDefaults),
             $factory->create('platform', Filter::$enumDefaults),
             $factory->create('active', Filter::$enumDefaults),
@@ -178,6 +194,7 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
             $factory->create('documentation_uri'),
             $factory->create('description'),
             $factory->create('script_template'),
+            $factory->create('readiness_script'),
             $factory->create('vm_template'),
             $factory->create('platform'),
             $factory->create('active'),
@@ -210,6 +227,7 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
             'documentation_uri' => 'documentation_uri',
             'description' => 'description',
             'script_template' => 'script_template',
+            'readiness_script' => 'readiness_script',
             'vm_template' => 'vm_template',
             'platform' => 'platform',
             'active' => 'active',

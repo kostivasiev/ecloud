@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $loadBalancerId)
  * @method static forUser(string $user)
  */
-class LoadBalancer extends Model implements Filterable, Sortable
+class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, HasFactory;
 
@@ -67,6 +67,11 @@ class LoadBalancer extends Model implements Filterable, Sortable
     public function instances()
     {
         return $this->hasMany(Instance::class);
+    }
+
+    public function vips()
+    {
+        return $this->hasMany(Vip::class);
     }
 
     /**

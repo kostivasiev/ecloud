@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
+use App\Models\V2\ImageParameter;
 use Illuminate\Database\Seeder;
 
 class LoadBalancerImageSeeder extends Seeder

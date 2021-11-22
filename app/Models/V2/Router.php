@@ -26,7 +26,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $routerUuid)
  * @method static forUser(string $user)
  */
-class Router extends Model implements Filterable, Sortable, ResellerScopeable, Manageable
+class Router extends Model implements Filterable, Sortable, ResellerScopeable, Manageable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 

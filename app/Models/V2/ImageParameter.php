@@ -24,6 +24,8 @@ class ImageParameter extends Model implements Filterable, Sortable
 
     public string $keyPrefix = 'imgparam';
 
+    const TYPE_PASSWORD = 'Password';
+
     protected $casts = [
         'required' => 'boolean',
     ];
