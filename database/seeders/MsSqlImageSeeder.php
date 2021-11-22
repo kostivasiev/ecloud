@@ -94,6 +94,12 @@ class MsSqlImageSeeder extends Seeder
                 'key' => 'ukfast.license.type',
                 'value' => 'mssql',
             ]);
+
+            factory(ImageMetadata::class)->create([
+                'image_id' => $image->id,
+                'key' => 'ukfast.license.mssql.edition',
+                'value' => Str::replace('windows 2019 ', '', $image->vm_template),
+            ]);
         });
     }
 }
