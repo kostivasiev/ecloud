@@ -138,7 +138,8 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
 
     public function testDeleteAllInstancesEndsBillingMetric()
     {
-        $instance = Instance::withoutEvents(function() {
+        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
+        $instance = Instance::withoutEvents(function () {
             return factory(Instance::class)->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
