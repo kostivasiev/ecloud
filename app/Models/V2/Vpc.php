@@ -108,6 +108,11 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
         return $this->hasMany(HostGroup::class);
     }
 
+    public function billingMetrics()
+    {
+        return $this->hasMany(BillingMetric::class);
+    }
+
 
     /**
      * @param $query

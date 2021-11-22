@@ -24,6 +24,7 @@ use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
+use App\Services\AccountsService;
 use App\Services\V2\ArtisanService;
 use App\Services\V2\ConjurerService;
 use App\Services\V2\KingpinService;
@@ -96,6 +97,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var ArtisanService */
     private $artisanServiceMock;
+
+    /** @var AccountsService */
+    private $accountsServiceMock;
 
     /** @var Credential */
     private $credential;
@@ -598,6 +602,21 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             ]);
         }
         return $this->hostSpec;
+    }
+
+    public function accountsServiceMock()
+    {
+        if (!$this->accountsServiceMock) {
+            $this->accountsServiceMock = \Mockery::mock(new AccountsService(new Client([
+                'base_uri' => env('APIO_ACCOUNT_HOST'),
+                'timeout' => 2,
+                'verify' => app()->environment() === 'production',
+            ])))->makePartial();
+            app()->bind(AccountsService::class, function () {
+                return $this->accountsServiceMock;
+            });
+        }
+        return $this->accountsServiceMock;
     }
 
     public function artisanServiceMock()

@@ -12,6 +12,7 @@ $factory->define(Image::class, function () {
         'documentation_uri' => 'https://docs.centos.org/en-US/docs/',
         'description' => 'CentOS (Community enterprise Operating System)',
         'script_template' => '',
+        'readiness_script' => '',
         'vm_template' => 'CentOS7 x86_64',
         'platform' => 'Linux',
         'active' => true,
