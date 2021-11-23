@@ -8,8 +8,9 @@ use App\Models\V2\Instance;
 use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
-class UpdateLicenseBilling
+class UpdateMsSqlLicenseBilling
 {
     use BillableListener;
 
@@ -33,22 +34,29 @@ class UpdateLicenseBilling
         }
 
         $licenseType = $instance->image->imagemetadata->where('key', 'ukfast.license.type')->first()->value;
-        if ($licenseType == 'mssql') {
+        if ($licenseType !== 'mssql') {
             return;
         }
+        $edition = Str::replace(
+            'datacenter-mssql2019-',
+            '',
+            $instance->image->imagemetadata->where('key', 'ukfast.license.mssql.edition')->first()->value()
+        );
 
         // Check for an associated license billing product, if we find one, we want to bill for this license.
         $product = $instance->availabilityZone->products()
-            ->where('product_name', $instance->availabilityZone->id . ': ' . $licenseType . '-license')
+            ->where('product_name', $instance->availabilityZone->id . ': ' . $edition . '-license')
             ->first();
         if (!empty($product)) {
-            $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.' . $licenseType);
+            $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.' . $licenseType . '.' . $edition);
 
             if (!empty($currentActiveMetric)) {
                 return;
             }
 
-            $key = 'license.' . $licenseType;
+            $key = 'license.' . $licenseType . '.' . $edition;
+            $cores = $instance->vcpu_cores < 4 ? 4 : $instance->vcpu_cores;
+            $packs = ceil($cores / 2);
 
             $billingMetric = app()->make(BillingMetric::class);
             $billingMetric->fill([
@@ -56,7 +64,7 @@ class UpdateLicenseBilling
                 'vpc_id' => $instance->vpc->id,
                 'reseller_id' => $instance->vpc->reseller_id,
                 'key' => $key,
-                'value' => 1,
+                'value' => $packs,
                 'start' => Carbon::now(),
                 'category' => $product->category,
                 'price' => $product->getPrice($instance->vpc->reseller_id),
