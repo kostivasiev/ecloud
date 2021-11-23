@@ -49,7 +49,7 @@ class UpdateVcpuBilling
             return;
         }
 
-        if (!($this->getOnlineStatus($instance)['online'])) {
+        if ($this->getOnlineStatus($instance)['online'] === false) {
             return;
         }
 
