@@ -14,7 +14,8 @@ trait InstanceOnlineState
         $kingpinData = null;
         try {
             $kingpinResponse = $instance->availabilityZone
-                ->kingpinService()->get('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id);
+                ->kingpinService()
+                ->get('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id);
             $kingpinData = json_decode($kingpinResponse->getBody()->getContents());
         } catch (Exception $exception) {
             Log::info('Failed to retrieve instance from Kingpin', [
