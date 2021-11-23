@@ -3,6 +3,7 @@
 namespace App\Resources\V2;
 
 use App\Services\V2\KingpinService;
+use App\Traits\V2\InstanceOnlineState;
 use DateTimeZone;
 use Exception;
 use Illuminate\Http\Request;
@@ -13,6 +14,8 @@ use Illuminate\Support\Facades\Log;
 
 class InstanceResource extends UKFastResource
 {
+    use InstanceOnlineState;
+
     /**
      * @param Request $request
      * @return array
@@ -44,23 +47,7 @@ class InstanceResource extends UKFastResource
             )->toIso8601String(),
         ];
         if ($request->route('instanceId')) {
-            $kingpinData = null;
-            try {
-                $kingpinResponse = $this->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $this->vpc_id . '/instance/' . $this->id);
-
-                $kingpinData = json_decode($kingpinResponse->getBody()->getContents());
-            } catch (Exception $exception) {
-                Log::info('Failed to retrieve instance from Kingpin', [
-                    'vpc_id' => $this->vpc_id,
-                    'instance_id' => $this->id,
-                    'message' => $exception->getMessage()
-                ]);
-            }
-            $response['online'] = isset($kingpinData->powerState) ? $kingpinData->powerState == KingpinService::INSTANCE_POWERSTATE_POWEREDON : null;
-            if ($this->is_online !== $response['online']) {
-                $this->setAttribute('is_online', $response['online'] ?? false)->saveQuietly();
-            }
-            $response['agent_running'] = isset($kingpinData->toolsRunningStatus) ? $kingpinData->toolsRunningStatus == KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING : null;
+            $response = $this->getOnlineStatus($this, $response);
         }
         if (Auth::user()->isAdmin()) {
             $response['is_hidden'] = $this->isHidden();

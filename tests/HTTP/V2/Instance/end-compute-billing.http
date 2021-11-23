@@ -24,7 +24,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### Check the Instance
-GET https://{{host}}/{{version}}/instances/i-1d443090-dev
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

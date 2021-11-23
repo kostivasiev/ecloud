@@ -37,7 +37,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'availability_zone_id',
         'locked',
         'is_hidden',
-        'is_online',
         'platform',
         'backup_enabled',
         'deployed',
@@ -45,10 +44,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'host_group_id',
         'volume_group_id',
         'load_balancer_id'
-    ];
-
-    protected $attributes = [
-        'is_online' => true,
     ];
 
     protected $appends = [
@@ -59,7 +54,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'locked' => 'boolean',
         'backup_enabled' => 'boolean',
         'deployed' => 'boolean',
-        'is_online' => 'boolean',
         'deploy_data' => 'array',
     ];
 
@@ -176,7 +170,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             $factory->create('availability_zone_id', Filter::$stringDefaults),
             $factory->boolean()->create('locked', '1', '0'),
             $factory->boolean()->create('is_hidden', '1', '0'),
-            $factory->boolean()->create('is_online', '1', '0'),
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('backup_enabled', Filter::$stringDefaults),
             $factory->create('host_group_id', Filter::$stringDefaults),
@@ -210,8 +203,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             $factory->create('load_balancer_id'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
-            $factory->create('is_online'),
-            $factory->create('is_hidden'),
         ];
     }
 
@@ -246,7 +237,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
             'host_group_id' => 'host_group_id',
             'volume_group_id' => 'volume_group_id',
             'load_balancer_id' => 'load_balancer_id',
-            'is_online' => 'is_online',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

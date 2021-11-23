@@ -6,11 +6,13 @@ use App\Events\V2\Task\Updated;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Sync;
+use App\Traits\V2\InstanceOnlineState;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateRamBilling
 {
+    use InstanceOnlineState;
     /**
      * @param Updated $event
      * @return void
@@ -36,7 +38,7 @@ class UpdateRamBilling
             return;
         }
 
-        if (!$instance->is_online) {
+        if (!($this->getOnlineStatus($instance)['online'])) {
             return;
         }
 
