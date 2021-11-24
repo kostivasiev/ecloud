@@ -37,26 +37,30 @@ class UpdateMsSqlLicenseBilling
         if ($licenseType !== 'mssql') {
             return;
         }
+
         $edition = Str::replace(
             'datacenter-mssql2019-',
             '',
-            $instance->image->imagemetadata->where('key', 'ukfast.license.mssql.edition')->first()->value()
+            $instance->image->imagemetadata->where('key', 'ukfast.license.mssql.edition')->first()->value
         );
+
+        $key = 'license.' . $licenseType . '.' . $edition;
+        $cores = $instance->vcpu_cores < 4 ? 4 : $instance->vcpu_cores;
+        $packs = ceil($cores / 2);
 
         // Check for an associated license billing product, if we find one, we want to bill for this license.
         $product = $instance->availabilityZone->products()
-            ->where('product_name', $instance->availabilityZone->id . ': ' . $edition . '-license')
+            ->where('product_name', $instance->availabilityZone->id . ': mssql-' . $edition . '-license')
             ->first();
         if (!empty($product)) {
             $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.' . $licenseType . '.' . $edition);
 
             if (!empty($currentActiveMetric)) {
-                return;
+                if ($currentActiveMetric->value == $packs) {
+                    return;
+                }
+                $currentActiveMetric->setEndDate();
             }
-
-            $key = 'license.' . $licenseType . '.' . $edition;
-            $cores = $instance->vcpu_cores < 4 ? 4 : $instance->vcpu_cores;
-            $packs = ceil($cores / 2);
 
             $billingMetric = app()->make(BillingMetric::class);
             $billingMetric->fill([
@@ -67,7 +71,7 @@ class UpdateMsSqlLicenseBilling
                 'value' => $packs,
                 'start' => Carbon::now(),
                 'category' => $product->category,
-                'price' => $product->getPrice($instance->vpc->reseller_id),
+                'price' => $product->getPrice($instance->vpc->reseller_id) * $packs,
             ]);
             $billingMetric->save();
 
