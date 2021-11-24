@@ -5,7 +5,6 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Volume;
 use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -25,6 +24,11 @@ class IopsChange extends Job
         $volume = $this->model;
         if (!$volume->instances()->count()) {
             Log::info('Volume not attached to any instances, skipping');
+            return;
+        }
+
+        if ($volume->is_shared) {
+            Log::info(get_class($this) . ' : Shared volume detected, skipping');
             return;
         }
 
