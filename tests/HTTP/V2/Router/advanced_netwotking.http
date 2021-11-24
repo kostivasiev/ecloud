@@ -67,14 +67,6 @@ Content-Type: application/json
 # Test Advanced networking
 #
 
-
-### Create a VPC with standard networking
-GET https://{{host}}/{{version}}/credentials
-X-consumer-custom-id: {{dev_reseller_id_admin}}
-X-consumer-groups:  ecloud.read, ecloud.write
-
-
-
 ### Create a VPC with ADVANCED networking
 POST https://{{host}}/{{version}}/vpcs
 X-consumer-custom-id: {{dev_reseller_id_customer}}

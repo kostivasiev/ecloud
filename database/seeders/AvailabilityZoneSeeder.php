@@ -87,6 +87,28 @@ class AvailabilityZoneSeeder extends Seeder
             'is_hidden'=> false,
         ]);
 
+        factory(Credential::class)->create([
+            'id' => 'cred-ucs',
+            'name' => 'UCS API',
+            'resource_id'=> 'az-aaaaaaaa',
+            'host'=> null,
+            'username'=> 'ucs-api',
+            'password'=> env('UCS_PASSWORD'),
+            'port'=> null,
+            'is_hidden'=> false,
+        ]);
+
+        factory(Credential::class)->create([
+            'id' => 'cred-envoy',
+            'name' => 'Envoy',
+            'resource_id'=> 'az-aaaaaaaa',
+            'host'=> 'https://185.197.63.87',
+            'username'=> 'envoyapi',
+            'password'=> env('ENVOY_PASSWORD'),
+            'port'=> 9443,
+            'is_hidden'=> false,
+        ]);
+
         /**
          * Capacity Alerting
          */
