@@ -34,8 +34,7 @@ class Delete extends Job
             [
                 new PowerOff($this->task->resource, true),
                 new Undeploy($this->task->resource),
-// Commented out in order to unblock https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/1067
-//                new VolumeGroupDetach($this->task),
+                new VolumeGroupDetach($this->task),
                 new DeleteVolumes($this->task->resource),
                 new UnassignFloatingIP($this->task->resource),
                 new DeleteNics($this->task->resource),
