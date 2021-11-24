@@ -24,13 +24,17 @@ class FixPriceOnAdvancedNetworkingBillingMetrics extends Command
                     return;
                 }
 
-                $availabilityZone = $vpc->region->availabilityZones()->where('is_public', true)->first();
+                $product = null;
+                $vpc->region->availabilityZones->each(function ($availabilityZone) use (&$product) {
+                    if ($availabilityZone->products()->where('product_name', $availabilityZone->id . ': advanced networking')->count() > 0) {
+                        $product = $availabilityZone->products()->where('product_name', $availabilityZone->id . ': advanced networking')->first();
+                        return false;
+                    }
+                });
 
-                $product = $availabilityZone->products()->where('product_name', $availabilityZone->id . ': advanced networking')->first();
                 if (empty($product)) {
-                    Log::error(
-                        'Failed to load billing product ' . $availabilityZone->id . ': advanced networking'
-                    );
+                    $this->info('Failed to load billing product \'advanced networking\' for VPC: ' . $vpc->id);
+                    return;
                 } else {
                     $currentActiveMetric->category = $product->category;
                     $currentActiveMetric->price = $product->getPrice($vpc->reseller_id);

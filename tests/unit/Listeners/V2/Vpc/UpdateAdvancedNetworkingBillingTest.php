@@ -111,11 +111,13 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
             factory(Instance::class)->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ram_capacity' => 1024,
             ]);
             return factory(Instance::class)->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ram_capacity' => 1024,
             ]);
         });
