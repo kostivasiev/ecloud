@@ -54,6 +54,39 @@ class AvailabilityZoneSeeder extends Seeder
             'is_hidden'=> false,
         ]);
 
+        factory(Credential::class)->create([
+            'id' => 'cred-conjurer',
+            'name' => 'Conjurer API',
+            'resource_id'=> 'az-aaaaaaaa',
+            'host'=> 'https://compute-20.ecloud-service.ukfast.co.uk',
+            'username'=> 'conjurerapi',
+            'password'=> env('CONJURER_PASSWORD'),
+            'port'=> 8444,
+            'is_hidden'=> false,
+        ]);
+
+        factory(Credential::class)->create([
+            'id' => 'cred-3par',
+            'name' => '3PAR',
+            'resource_id'=> 'az-aaaaaaaa',
+            'host'=> null,
+            'username'=> 'apiuser',
+            'password'=> env('3PAR_PASSWORD'),
+            'port'=> null,
+            'is_hidden'=> false,
+        ]);
+
+        factory(Credential::class)->create([
+            'id' => 'cred-artisan',
+            'name' => 'Artisan API',
+            'resource_id'=> 'az-aaaaaaaa',
+            'host'=> 'https://storage-20.ecloud-service.ukfast.co.uk',
+            'username'=> 'artisanapi',
+            'password'=> env('ARTISAN_PASSWORD'),
+            'port'=> null,
+            'is_hidden'=> false,
+        ]);
+
         /**
          * Capacity Alerting
          */
