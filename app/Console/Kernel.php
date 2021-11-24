@@ -40,6 +40,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\VPC\ConvertBilling::class,
         \App\Console\Commands\Billing\CleanupAdvancedNetworking::class,
         \App\Console\Commands\Credentials\AddPortToPleskCredential::class,
+        \App\Console\Commands\Billing\FixPriceOnAdvancedNetworkingBillingMetrics::class,
     ];
 
     /**
