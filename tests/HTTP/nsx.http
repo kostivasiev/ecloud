@@ -505,3 +505,21 @@ Content-Type:  application/json
 DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-097208b5/ports/test
 Authorization: Basic {{nsx_username}} {{nsx_password}}
 Content-Type:  application/json
+
+
+
+
+### Get Edge Clusters
+GET https://185.197.63.88/api/v1/edge-clusters
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Search AZ for an edge cluster by tag (az-default or az-advancedNetworking)
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:EdgeCluster%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Search AZ for an edge cluster by tag (az-default or az-advancedNetworking)
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:EdgeCluster%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-advancedNetworking
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
