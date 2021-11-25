@@ -50,7 +50,7 @@ class UpdateMsSqlLicenseBilling
 
         // Check for an associated license billing product, if we find one, we want to bill for this license.
         $product = $instance->availabilityZone->products()
-            ->where('product_name', $instance->availabilityZone->id . ': mssql-' . $edition . '-license')
+            ->where('product_name', $instance->availabilityZone->id . ': mssql ' . $edition . ' license')
             ->first();
         if (!empty($product)) {
             $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.' . $licenseType . '.' . $edition);
