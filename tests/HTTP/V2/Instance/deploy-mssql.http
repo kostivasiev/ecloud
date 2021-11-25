@@ -44,13 +44,6 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-###
-GET https://{{host}}/{{version}}/instances/{{instance_id}}/credentials
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: {{dev_reseller_id_customer}}
-X-consumer-groups: ecloud.read, ecloud.write
-
 ### Delete the instance
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id: {{dev_reseller_id_customer}}
