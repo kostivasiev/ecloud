@@ -101,16 +101,18 @@ echo "/bin/bash /tmp/cpanelinstall"|at now > /dev/null
 exit $?
 EOM,
             'readiness_script' => <<<'EOM'
-if [ -f /var/tmp/cpanelinstall.err ] ; then tail /var/tmp/cpanelinstall.err && exit 3 ; fi
-
 if [ -f /var/log/cpanel-install.log ]
 then 
     if grep -q 'Thank you for installing cPanel' /var/log/cpanel-install.log
     then 
         exit 0
     fi
-else
-    exit 1
+
+    if grep -q '(FATAL)' /var/log/cpanel-install.log
+    then
+        tail -n 25 /var/log/cpanel-install.log
+        exit 1
+    fi
 fi
 
 exit 2
