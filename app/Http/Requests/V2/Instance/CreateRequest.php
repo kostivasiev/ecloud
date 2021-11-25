@@ -14,6 +14,7 @@ use App\Rules\V2\HasHosts;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsSameAvailabilityZone;
+use App\Rules\V2\IsSameVpc;
 use App\Rules\V2\IsValidRamMultiple;
 use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
@@ -89,6 +90,7 @@ class CreateRequest extends FormRequest
                 'exists:ecloud.networks,id,deleted_at,NULL',
                 new ExistsForUser(Network::class),
                 new IsResourceAvailable(Network::class),
+                new IsSameVpc($this->request->get('vpc_id')),
             ],
             'floating_ip_id' => [
                 'sometimes',
