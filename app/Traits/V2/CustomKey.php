@@ -38,7 +38,7 @@ trait CustomKey
         try {
             do {
                 $model->id = $model->keyPrefix . '-' . bin2hex(random_bytes(4)) . $suffix;
-            } while ($model->find($model->id));
+            } while ($model->withTrashed()->find($model->id));
         } catch (\Exception $exception) {
             Log::error('Failed to set Custom Key on ' . get_class($model), [
                 $exception,
