@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Admin\Account\AdminContactClient;
 
 class RunApplianceBootstrapTest extends TestCase
 {
@@ -208,12 +209,30 @@ class RunApplianceBootstrapTest extends TestCase
         ]);
         $this->instance()->credentials()->save($credential);
 
-        $this->accountsServiceMock()
-            ->allows('getPrimaryContactId')
-            ->andReturns('111');
-        $this->accountsServiceMock()
-            ->allows('getPrimaryContactEmail')
-            ->andReturns('captain.kirk@example.com');
+        $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+        $mockAccountAdminClient->allows('setResellerId')->withAnyArgs()->andReturnSelf();
+        $mockAdminContactClient = \Mockery::mock(AdminContactClient::class)->makePartial();
+        $mockAdminContactClient->allows('get')
+            ->withSomeOfArgs('v1/customers/' . $this->instance()->getResellerId())
+            ->andReturnUsing(function () {
+                $customer = new \UKFast\Admin\Account\Entities\Customer([
+                    'primary_contact_id' => 111,
+                ]);
+                return new Response(200, [], json_encode(['data' => $customer->toArray()]));
+            });
+        $mockAdminContactClient->allows('getById')
+            ->withArgs([111])
+            ->andReturnUsing(function () {
+                return new \UKFast\Admin\Account\Entities\Contact([
+                    'emailAddress' => 'captain.kirk@example.com',
+                ]);
+            });
+
+        $mockAccountAdminClient->allows('contacts')->andReturn($mockAdminContactClient);
+
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
+            return $mockAccountAdminClient;
+        });
 
         $this->kingpinServiceMock()
             ->expects('post')
