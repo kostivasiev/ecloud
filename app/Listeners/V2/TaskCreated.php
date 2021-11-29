@@ -3,7 +3,6 @@
 namespace App\Listeners\V2;
 
 use App\Tasks\Task;
-use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
@@ -17,28 +16,26 @@ class TaskCreated
 
         if ($event->model->job) {
             $task = $event->model;
-            $taskJob = new $task->job($event->model);
+            $taskJob = new $task->job($task);
 
             if ($taskJob instanceof Task) {
-                // Handle new method
-
                 $jobs = [];
                 foreach ($taskJob->jobs() as $job) {
                     $jobs[] = new $job($task);
                 }
-                $exceptionCallback = $taskJob->exceptionCallback();
+                $failureReasonCallback = $taskJob->failureReasonCallback();
 
+                Log::debug(get_class($this) . " : Dispatching batch", ["id" => $event->model->id]);
                 Bus::batch([$jobs])->then(function (Batch $batch) use ($task) {
                     Log::info("Setting task completed", ['id' => $task->id, 'resource_id' => $task->resource->id]);
                     $task->completed = true;
                     $task->save();
-                })->catch(function (Batch $batch, Throwable $e) use ($task, $exceptionCallback) {
+                })->catch(function (Batch $batch, Throwable $e) use ($task, $failureReasonCallback) {
                     Log::warning("Setting task failed", ['id' => $task->id, 'resource_id' => $task->resource->id]);
-                    $task->failure_reason = $exceptionCallback($e);
+                    $task->failure_reason = $failureReasonCallback($e);
                     $task->save();
                 })->dispatch();
             } else {
-                // Fallback to dispatching defined job directly
                 Log::debug(get_class($this) . " : Dispatching job", ["job" => $event->model->job]);
                 dispatch($taskJob);
             }
