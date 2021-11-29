@@ -98,6 +98,7 @@ class RunApplianceBootstrap extends Job
                 'name' => 'plesk_admin_password',
                 'username' => 'plesk_admin_password',
                 'password' => (new PasswordService())->generate(),
+                'port' => config('plesk.admin.port', 8880),
             ]);
             $credential->save();
             $this->model->credentials()->save($credential);
