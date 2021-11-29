@@ -94,11 +94,6 @@ class RegisterLicensesTest extends TestCase
 
         dispatch(new RegisterLicenses($this->instance()));
 
-        $this->instance()->refresh();
-
-        $this->assertEquals('mssql', $this->instance()->deploy_data['image_data']['license_type']);
-        $this->assertEquals($licenseId, $this->instance()->deploy_data['image_data']['license_id']);
-
         Event::assertNotDispatched(JobFailed::class);
     }
 

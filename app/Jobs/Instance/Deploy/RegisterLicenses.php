@@ -123,12 +123,6 @@ class RegisterLicenses extends Job
         ]));
         $licenseId = (json_decode($response->getBody()->getContents()))->data->id;
 
-        $deployData = $instance->deploy_data;
-        $deployData['image_data']['license_type'] = $this->imageMetadata->get('ukfast.license.type');
-        $deployData['image_data']['license_id'] = $licenseId;
-        $instance->deploy_data = $deployData;
-        $instance->save();
-
         Log::info(
             get_class($this) . ' : '.$this->imageMetadata->get('ukfast.license.type').' License '.
             $licenseId .' key added to instance ' . $instance->id . ' deploy data'
