@@ -12,6 +12,7 @@ use App\Services\V2\PasswordService;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
+use UKFast\Admin\Account\AdminClient;
 
 class RunApplianceBootstrap extends Job
 {
