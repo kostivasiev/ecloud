@@ -213,6 +213,11 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('instances/{instanceId}/nics', 'InstanceController@nics');
         $router->get('instances/{instanceId}/tasks', 'InstanceController@tasks');
         $router->get('instances/{instanceId}/floating-ips', 'InstanceController@floatingIps');
+
+
+        $router->get('instances/{instanceId}/software', 'InstanceController@software');
+
+
         $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
         $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
@@ -565,6 +570,37 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'ip-address-can-delete'], function () use ($router) {
             $router->delete('ip-addresses/{ipAddressId}', 'IpAddressController@destroy');
         });
+    });
 
+    /** Software */
+    $router->group([], function () use ($router) {
+        $router->get('software', 'SoftwareController@index');
+        $router->get('software/{softwareId}', 'SoftwareController@show');
+
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('software', 'SoftwareController@store');
+            $router->patch('software/{softwareId}', 'SoftwareController@update');
+            $router->delete('software/{softwareId}', 'SoftwareController@destroy');
+        });
+
+        $router->get('software/{softwareId}/scripts', 'SoftwareController@scripts');
+    });
+
+    /** Scripts */
+    $router->group([], function () use ($router) {
+        $router->get('scripts', 'ScriptController@index');
+        $router->get('scripts/{scriptId}', 'ScriptController@show');
+        $router->post('scripts', 'ScriptController@store');
+        $router->patch('scripts/{scriptId}', 'ScriptController@update');
+        $router->delete('scripts/{scriptId}', 'ScriptController@destroy');
+    });
+
+    /** Instance Software */
+    $router->group([], function () use ($router) {
+        $router->get('instance-software', 'InstanceSoftwareController@index');
+        $router->get('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@show');
+        $router->post('instance-software', 'InstanceSoftwareController@store');
+        $router->patch('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@update');
+        $router->delete('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@destroy');
     });
 });

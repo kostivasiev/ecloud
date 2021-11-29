@@ -9,7 +9,7 @@ use App\Resources\V2\VpnProfileResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
-class VpnProfileController extends BaseController
+class InstanceSoftwareController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
