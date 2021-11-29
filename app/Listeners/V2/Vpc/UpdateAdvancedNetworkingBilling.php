@@ -67,7 +67,7 @@ class UpdateAdvancedNetworkingBilling
             $billingMetric->value = $value;
             $billingMetric->start = Carbon::now();
 
-            $availabilityZone = $vpc->region->availabilityZones()->first();
+            $availabilityZone = $event->model->resource->availabilityZone;
             $product = $availabilityZone->products()->where('product_name', $availabilityZone->id . ': advanced networking')->first();
             if (empty($product)) {
                 Log::error(

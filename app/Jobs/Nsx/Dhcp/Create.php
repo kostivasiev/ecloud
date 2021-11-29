@@ -27,7 +27,7 @@ class Create extends Job
             'json' => [
                 'lease_time' => config('defaults.dhcp.lease_time'),
                 'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/'
-                    . $this->model->availabilityZone->nsxService()->getEdgeClusterId(),
+                    . $this->model->availabilityZone->getNsxEdgeClusterId($this->model->vpc->advanced_networking),
                 'resource_type' => 'DhcpServerConfig',
                 'tags' => [
                     [

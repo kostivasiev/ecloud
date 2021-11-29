@@ -61,33 +61,18 @@ class RunImageReadinessScript extends Job
             throw new \Exception('Could not decode response from readiness script for ' . $instance->id);
         }
 
-        // 0 = completed, 1 = not started, 2 = running, 3 = failed
+        // 0 = completed, 1 = error, any other = retry
         switch ($response->exitCode) {
             case 0:
                 Log::info(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' completed successfully', ['id' => $instance->id]);
                 return;
             case 1:
-                Log::info(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' has not yet started, retrying in ' . $this->backoff . ' seconds', ['id' => $instance->id]);
-                $this->release($this->backoff);
-                return;
-            case 2:
-                Log::info(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' still in progress, retrying in ' . $this->backoff . ' seconds', ['id' => $instance->id]);
-                $this->release($this->backoff);
-                return;
-            case 3:
                 Log::error(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' failed', ['id' => $instance->id]);
-                $this->fail(new \Exception('Readiness script for ' . $instance->id . ' failed with exit code 3. Output: ' . $response->output));
+                $this->fail(new \Exception('Readiness script for ' . $instance->id . ' failed with exit code 1. Output: ' . $response->output));
                 return;
             default:
-                Log::error(
-                    get_class($this) . ': Readiness script returned an unexpected response',
-                    [
-                        'id' => $instance->id,
-                        'exitCode' => $response->exitCode,
-                        'output' => $response->output
-                    ]
-                );
-                throw new \Exception('Readiness script for ' . $instance->id . ' returned an unexpected response: ' . $response->exitCode . ':' . $response->output);
+                Log::info(get_class($this) . ': Readiness script not yet complete, retrying in ' . $this->backoff . ' seconds');
+                $this->release($this->backoff);
         }
     }
 }
