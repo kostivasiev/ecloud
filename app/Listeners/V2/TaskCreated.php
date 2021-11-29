@@ -17,26 +17,28 @@ class TaskCreated
 
         if ($event->model->job) {
             $task = $event->model;
-            $taskJob = new $task->job($task);
+            $taskJob = new $task->job($event->model);
 
             if ($taskJob instanceof Task) {
+                // Handle new method
+
                 $jobs = [];
                 foreach ($taskJob->jobs() as $job) {
                     $jobs[] = new $job($task);
                 }
-                $failureReasonCallback = $taskJob->failureReasonCallback();
+                $exceptionCallback = $taskJob->exceptionCallback();
 
-                Log::debug(get_class($this) . " : Dispatching batch", ["id" => $event->model->id]);
                 Bus::batch([$jobs])->then(function (Batch $batch) use ($task) {
                     Log::info("Setting task completed", ['id' => $task->id, 'resource_id' => $task->resource->id]);
                     $task->completed = true;
                     $task->save();
-                })->catch(function (Batch $batch, Throwable $e) use ($task, $failureReasonCallback) {
+                })->catch(function (Batch $batch, Throwable $e) use ($task, $exceptionCallback) {
                     Log::warning("Setting task failed", ['id' => $task->id, 'resource_id' => $task->resource->id]);
-                    $task->failure_reason = $failureReasonCallback($e);
+                    $task->failure_reason = $exceptionCallback($e);
                     $task->save();
                 })->dispatch();
             } else {
+                // Fallback to dispatching defined job directly
                 Log::debug(get_class($this) . " : Dispatching job", ["job" => $event->model->job]);
                 dispatch($taskJob);
             }
