@@ -21,10 +21,12 @@ class RunApplianceBootstrap extends Job
     private $model;
 
     private $imageData;
+    private $deployData;
 
     public function __construct(Instance $instance)
     {
         $this->model = $instance;
+        $this->deployData = $instance->deploy_data;
         $this->imageData = $instance->deploy_data['image_data'] ?? [];
         $this->getImageData();
     }
@@ -97,8 +99,8 @@ class RunApplianceBootstrap extends Job
                 ->primary_contact_id;
             $primaryContactEmail = $adminClient->contacts()->getById($primaryContactId)->emailAddress;
             $this->imageData['plesk_admin_email_address'] = $primaryContactEmail;
-            $deployData['image_data'] = $this->imageData;
-            $this->model->setAttribute('deploy_data', $deployData)->saveQuietly();
+            $this->deployData['image_data'] = $this->imageData;
+            $this->model->setAttribute('deploy_data', $this->deployData)->saveQuietly();
         }
 
         if (!$this->model->credentials()
