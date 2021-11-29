@@ -69,4 +69,9 @@ abstract class TaskJob extends Job
 
         return $context;
     }
+
+    public function getLoggingData()
+    {
+        return $this->hydrateLogContext([]);
+    }
 }
