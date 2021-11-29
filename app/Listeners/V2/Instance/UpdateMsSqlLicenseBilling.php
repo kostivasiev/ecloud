@@ -9,6 +9,7 @@ use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use UKFast\Admin\Licenses\AdminClient;
 
 class UpdateMsSqlLicenseBilling
 {
@@ -37,12 +38,11 @@ class UpdateMsSqlLicenseBilling
         if ($licenseType !== 'mssql') {
             return;
         }
-
-        $edition = Str::replace(
-            'datacenter-mssql2019-',
-            '',
-            $instance->image->imagemetadata->where('key', 'ukfast.license.mssql.edition')->first()->value
-        );
+        $licensesAdminClient = app()->make(AdminClient::class)->setResellerId($instance->vpc->reseller_id);
+        $response = $licensesAdminClient
+            ->get('v1/licenses?resource_id:eq='.$instance->id.'&license_type:eq='.$licenseType);
+        $license = json_decode($response->getBody()->getContents())->data[0];
+        $edition = Str::lower(Str::replace('WINDOWS-2019-DATACENTER-MSSQL2019-', '', $license));
 
         $key = 'license.' . $licenseType . '.' . $edition;
         $cores = $instance->vcpu_cores < 4 ? 4 : $instance->vcpu_cores;
