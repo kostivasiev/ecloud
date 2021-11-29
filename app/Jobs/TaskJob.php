@@ -19,7 +19,7 @@ abstract class TaskJob extends Job
 
     protected function getTaskJobName()
     {
-        return substr(strrchr(__CLASS__, "\\"), 1);
+        return substr(strrchr(get_class($this), "\\"), 1);
     }
 
     public function trace($message, $context = [])
