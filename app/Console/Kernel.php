@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Router\SetDefaultBilling::class,
         \App\Console\Commands\Conjurer\TestAuth::class,
         \App\Console\Commands\Queue\PopulateFailedJobsUuids::class,
+        \App\Console\Commands\Dev\CreateExampleTask::class,
         \App\Console\Commands\Artisan\TestAuth::class,
         \App\Console\Commands\Host\Delete::class,
         \App\Console\Commands\Billing\ProductCreate::class,
