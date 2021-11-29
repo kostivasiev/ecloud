@@ -40,8 +40,8 @@ class UpdateMsSqlLicenseBilling
         }
         $licensesAdminClient = app()->make(AdminClient::class)->setResellerId($instance->vpc->reseller_id);
         $response = $licensesAdminClient
-            ->get('v1/licenses?resource_id:eq='.$instance->id.'&license_type:eq='.$licenseType);
-        $license = json_decode($response->getBody()->getContents())->data[0];
+            ->get('v1/licenses?owner_id:eq='.$instance->id.'&license_type:eq='.$licenseType);
+        $license = json_decode($response->getBody()->getContents())->data[0]->key_id;
         $edition = Str::lower(Str::replace('WINDOWS-2019-DATACENTER-MSSQL2019-', '', $license));
 
         $key = 'license.' . $licenseType . '.' . $edition;
