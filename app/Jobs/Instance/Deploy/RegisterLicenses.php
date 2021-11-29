@@ -114,18 +114,13 @@ class RegisterLicenses extends Job
         $licensesAdminClient = app()->make(AdminClient::class)->setResellerId($instance->vpc->reseller_id);
         Log::info(get_class($this) . ' : Submitting MSSQL license data for instance ' . $instance->id);
 
-        try {
-            $response = $licensesAdminClient->post('v1/licenses', json_encode([
-                'owner_id' => $instance->id,
-                'owner_type' => 'ecloud',
-                'key_id' => $this->imageMetadata->get('ukfast.license.identifier'),
-                'license_type' => $this->imageMetadata->get('ukfast.license.type'),
-                'reseller_id' => $instance->vpc->reseller_id
-            ]));
-        } catch (GuzzleException $exception) {
-            $this->fail($exception);
-        }
-
+        $response = $licensesAdminClient->post('v1/licenses', json_encode([
+            'owner_id' => $instance->id,
+            'owner_type' => 'ecloud',
+            'key_id' => $this->imageMetadata->get('ukfast.license.identifier'),
+            'license_type' => $this->imageMetadata->get('ukfast.license.type'),
+            'reseller_id' => $instance->vpc->reseller_id
+        ]));
         $licenseId = (json_decode($response->getBody()->getContents()))->data->id;
 
         $deployData = $instance->deploy_data;
