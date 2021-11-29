@@ -10,6 +10,7 @@ use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
 use App\Support\Sync;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Mockery;
 use Tests\TestCase;
@@ -51,6 +52,27 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
             return $mockAccountAdminClient;
         });
 
+        $mockAdminLicensesClient = \Mockery::mock(\UKFast\Admin\Licenses\AdminClient::class);
+        $mockAdminLicensesClient->allows('setResellerId')->andReturns($mockAdminLicensesClient);
+        $mockAdminLicensesClient->allows()
+            ->get('v1/licenses?owner_id:eq=' . $this->instance()->id . '&license_type:eq=mssql')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'data' => [
+                        [
+                            'id' => 'lic-abc123xyz',
+                            'owner_id' => $this->instance()->id,
+                            'owner_type' => 'ecloud',
+                            'key_id' => 'WINDOWS-2019-DATACENTER-MSSQL2019-STANDARD',
+                            'license_type' => 'mssql',
+                            'reseller_id' => $this->instance()->getResellerId(),
+                        ]
+                    ]
+                ]));
+            });
+        app()->bind(\UKFast\Admin\Licenses\AdminClient::class, function () use ($mockAdminLicensesClient) {
+            return $mockAdminLicensesClient;
+        });
 
         $this->image()->imageMetadata()->save(factory(ImageMetadata::class)->create([
             'key' => 'ukfast.license.type',
