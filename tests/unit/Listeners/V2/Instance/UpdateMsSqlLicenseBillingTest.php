@@ -62,11 +62,11 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
                 return [
                     new \UKFast\SDK\Licenses\Entities\License([
                         'id' => 'lic-abc123xyz',
-                        'owner_id' => $this->instance()->id,
-                        'owner_type' => 'ecloud',
-                        'key_id' => 'WINDOWS-2019-DATACENTER-MSSQL2019-STANDARD',
-                        'license_type' => 'mssql',
-                        'reseller_id' => $this->instance()->getResellerId(),
+                        'ownerId' => $this->instance()->id,
+                        'ownerType' => 'ecloud',
+                        'keyId' => 'WINDOWS-2019-DATACENTER-MSSQL2019-STANDARD',
+                        'licenseType' => 'mssql',
+                        'resellerId' => $this->instance()->getResellerId(),
                     ]),
                 ];
             });
