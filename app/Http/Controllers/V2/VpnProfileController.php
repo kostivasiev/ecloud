@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\VpnProfile\CreateRequest;
-use App\Http\Requests\V2\VpnProfile\Update;
+use App\Http\Requests\V2\VpnProfile\UpdateRequest;
 use App\Models\V2\VpnProfile;
 use App\Resources\V2\VpnProfileResource;
 use Illuminate\Http\Request;
@@ -44,7 +44,7 @@ class VpnProfileController extends BaseController
         return $this->responseIdMeta($request, $vpnProfile->id, 201);
     }
 
-    public function update(Update $request, string $vpnProfileId)
+    public function update(UpdateRequest $request, string $vpnProfileId)
     {
         $vpnProfile = VpnProfile::findOrFail($vpnProfileId);
         $vpnProfile->fill($request->only([
