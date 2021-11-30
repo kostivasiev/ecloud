@@ -84,9 +84,9 @@ class RegisterLicensesTest extends TestCase
         $mockAdminLicensesClient->allows('licenses')->andReturnSelf();
         $mockAdminLicensesClient->allows('createEntity')
             ->andReturnUsing(function () use ($licenseId) {
-                return new \UKFast\SDK\Licenses\Entities\License([
-                    'id' => $licenseId,
-                ]);
+                $responseMock = \Mockery::mock(SelfResponse::class)->makePartial();
+                $responseMock->allows('getId')->andReturns($licenseId);
+                return $responseMock;
             });
 
         app()->bind(AdminClient::class, function () use ($mockAdminLicensesClient) {

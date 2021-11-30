@@ -114,7 +114,6 @@ class RegisterLicenses extends Job
         $licensesAdminClient = app()->make(AdminClient::class)->setResellerId($instance->vpc->reseller_id);
         Log::info(get_class($this) . ' : Submitting MSSQL license data for instance ' . $instance->id);
 
-        /** @var \UKFast\SDK\Licenses\Entities\License $response */
         $response = $licensesAdminClient->licenses()
             ->createEntity([
                 'owner_id' => $instance->id,
@@ -123,8 +122,7 @@ class RegisterLicenses extends Job
                 'license_type' => $this->imageMetadata->get('ukfast.license.type'),
                 'reseller_id' => $instance->vpc->reseller_id
             ]);
-        $licenseId = $response->id;
 
-        Log::info(get_class($this) . ' : License ' . $licenseId .' (MSSQL) assigned to instance ' . $instance->id);
+        Log::info(get_class($this) . ' : License ' . $response->getId() .' (MSSQL) assigned to instance ' . $instance->id);
     }
 }
