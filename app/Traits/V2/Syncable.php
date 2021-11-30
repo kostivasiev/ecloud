@@ -13,14 +13,24 @@ trait Syncable
     public function getUpdateSyncJob()
     {
         $class = explode('\\', __CLASS__);
-        return 'App\\Jobs\\Sync\\' . end($class) . '\\Update';
+        $syncJobClass = 'App\\Jobs\\Sync\\' . end($class) . '\\Update';
+        if (class_exists($syncJobClass)) {
+            return $syncJobClass;
+        }
+
+        return 'App\\Tasks\\'. end($class) . '\\Update';
     }
 
     // TODO: Make this abstract - we should force objects implementing Syncable to return job class
     public function getDeleteSyncJob()
     {
         $class = explode('\\', __CLASS__);
-        return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
+        $syncJobClass = 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
+        if (class_exists($syncJobClass)) {
+            return $syncJobClass;
+        }
+
+        return 'App\\Tasks\\'. end($class) . '\\Delete';
     }
 
     public function getSyncAttribute()

@@ -47,12 +47,6 @@ abstract class TaskJob extends Job
         $this->log(__FUNCTION__, $message, $context);
     }
 
-    public function fatal($message, $context = [])
-    {
-        $this->error($message, $context);
-        $this->fail($message);
-    }
-
     protected function log($level, $message, $context = [])
     {
         Log::log($level, $message, $this->hydrateLogContext($context));
