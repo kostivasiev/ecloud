@@ -62,8 +62,9 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
+        $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
         $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/linux/script',
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
             [
                 'json' => [
                     'encodedScript' => base64_encode(
@@ -98,6 +99,7 @@ class RunApplianceBootstrap extends Job
                 'name' => 'plesk_admin_password',
                 'username' => 'plesk_admin_password',
                 'password' => (new PasswordService())->generate(),
+                'port' => config('plesk.admin.port', 8880),
             ]);
             $credential->save();
             $this->model->credentials()->save($credential);

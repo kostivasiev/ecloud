@@ -7,6 +7,7 @@ use App\Traits\V2\DefaultName;
 use Database\Factories\V2\LoadBalancerSpecificationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -21,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class LoadBalancerSpecification extends Model implements Filterable, Sortable
 {
-    use CustomKey, HasFactory, DefaultName;
+    use CustomKey, HasFactory, DefaultName, SoftDeletes;
 
     public $keyPrefix = 'lbs';
     protected $keyType = 'string';

@@ -26,7 +26,8 @@ class DeployRouterLocale extends Job
         // Deploy the router locale
         $this->model->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $this->model->id . '/locale-services/' . $this->model->id, [
             'json' => [
-                'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' . $this->model->availabilityZone->nsxService()->getEdgeClusterId(),
+                'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' .
+                    $this->model->availabilityZone->getNsxEdgeClusterId($this->model->vpc->advanced_networking),
                 'tags' => [
                     [
                         'scope' => config('defaults.tag.scope'),
