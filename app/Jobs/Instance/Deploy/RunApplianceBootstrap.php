@@ -62,8 +62,9 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
+        $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
         $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/linux/script',
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
             [
                 'json' => [
                     'encodedScript' => base64_encode(

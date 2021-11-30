@@ -36,6 +36,7 @@ class ImageSeeder extends Seeder
          * Other Images
          */
         $this->call(PleskImageSeeder::class);
+        $this->call(MsSqlImageSeeder::class);
         $this->call(CpanelImageSeeder::class);
     }
 }
