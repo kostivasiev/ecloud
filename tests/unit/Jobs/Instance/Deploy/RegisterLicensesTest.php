@@ -66,7 +66,7 @@ class RegisterLicensesTest extends TestCase
 
     public function testRegisterMsSqlLicense()
     {
-        $licenseId = Str::uuid();
+        $licenseId = (string) Str::uuid();
         factory(ImageMetadata::class)->create([
             'key' => 'ukfast.license.identifier',
             'value' => 'WINDOWS-2019-DATACENTER-MSSQL2019-STANDARD',
@@ -80,12 +80,13 @@ class RegisterLicensesTest extends TestCase
         ]);
 
         $mockAdminLicensesClient = \Mockery::mock(AdminClient::class);
-        $mockAdminLicensesClient->allows('setResellerId')->andReturns($mockAdminLicensesClient);
-        $mockAdminLicensesClient
-            ->allows('post')
-            ->withSomeOfArgs('v1/licenses')
+        $mockAdminLicensesClient->allows('setResellerId')->andReturnSelf();
+        $mockAdminLicensesClient->allows('licenses')->andReturnSelf();
+        $mockAdminLicensesClient->allows('createEntity')
             ->andReturnUsing(function () use ($licenseId) {
-                return new Response(201, [], json_encode(['data' => [ 'id' => $licenseId]]));
+                return new \UKFast\SDK\Licenses\Entities\License([
+                    'id' => $licenseId,
+                ]);
             });
 
         app()->bind(AdminClient::class, function () use ($mockAdminLicensesClient) {
