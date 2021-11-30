@@ -79,21 +79,4 @@ class SyncableTest extends TestCase
         $this->assertEquals('App\Jobs\Sync\SyncableTestModel\Delete', $task->job);
         $this->assertEquals(['testKey' => 'testVal'], $task->data);
     }
-
-    public function testSyncCreate()
-    {
-        Event::fake(\App\Events\V2\Task\Created::class);
-
-        $model = new SyncableTestModel([
-            'id' => 'test-testing'
-        ]);
-
-        $task = $model->syncDelete(['testKey' => 'testVal']);
-
-        Event::assertDispatched(\App\Events\V2\Task\Created::class);
-
-        $this->assertEquals('sync_delete', $task->name);
-        $this->assertEquals('App\Jobs\Sync\SyncableTestModel\Delete', $task->job);
-        $this->assertEquals(['testKey' => 'testVal'], $task->data);
-    }
 }
