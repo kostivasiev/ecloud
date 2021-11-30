@@ -1,0 +1,108 @@
+### Create
+POST https://{{host}}/{{version}}/software
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test",
+  "platform": "Linux",
+  "visibility" : "public"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+    client.global.set('software_id', response.body.data.id);
+    client.log('software_id: ' + response.body.data.id);
+});
+%}
+
+### Get Collection
+GET https://{{host}}/{{version}}/software
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].id === client.global.get('software_id'), "Incorrect ID");
+});
+%}
+
+### Get Item
+GET https://{{host}}/{{version}}/software/{{software_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('software_id'), "Incorrect ID");
+  client.assert(response.body.data.name === "test", "Incorrect name");
+  client.assert(response.body.data.platform === "Linux", "Incorrect platform");
+  client.assert(response.body.data.visibility === "public", "Incorrect visibility");
+});
+%}
+
+### Update
+PATCH https://{{host}}/{{version}}/software/{{software_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "test - RENAMED",
+    "platform": "Windows",
+    "visibility" : "private"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### Confirm PATCH changes
+GET https://{{host}}/{{version}}/software/{{software_id}}
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.name === "test - RENAMED", "Incorrect name");
+  client.assert(response.body.data.platform === "Windows", "Incorrect platform");
+  client.assert(response.body.data.visibility === "private", "Incorrect visibility");
+});
+%}
+
+### Delete Router
+DELETE https://{{host}}/{{version}}/software/{{software_id}}
+X-consumer-custom-id:  {{dev_reseller_id_admin}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+### Confirm DELETE
+GET https://{{host}}/{{version}}/software/{{software_id}}
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 404, "Response status is not 404");
+});
+%}

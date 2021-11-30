@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\Unit;
+namespace Database\Seeders;
 
 use App\Models\V2\Software;
 use Illuminate\Database\Seeder;
@@ -17,8 +17,10 @@ class SoftwareSeeder extends Seeder
         Software::factory()->create(
             [
                 'id' => 'soft-test',
-                'name' => 'Test Software',
+                'name' => 'Test Software'
             ]
         );
+
+        $this->call(ScriptSeeder::class);
     }
 }

@@ -4,7 +4,7 @@ namespace Database\Factories\V2;
 use App\Models\V2\Script;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ScriptsFactory extends Factory
+class ScriptFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
@@ -21,7 +21,7 @@ class ScriptsFactory extends Factory
     public function definition(): array
     {
         return [
-//            'sequence' => 1,
+            'script' => 'exit 0'
         ];
     }
 }

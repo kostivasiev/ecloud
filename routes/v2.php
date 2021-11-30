@@ -590,9 +590,12 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('scripts', 'ScriptController@index');
         $router->get('scripts/{scriptId}', 'ScriptController@show');
-        $router->post('scripts', 'ScriptController@store');
-        $router->patch('scripts/{scriptId}', 'ScriptController@update');
-        $router->delete('scripts/{scriptId}', 'ScriptController@destroy');
+
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('scripts', 'ScriptController@store');
+            $router->patch('scripts/{scriptId}', 'ScriptController@update');
+            $router->delete('scripts/{scriptId}', 'ScriptController@destroy');
+        });
     });
 
     /** Instance Software */

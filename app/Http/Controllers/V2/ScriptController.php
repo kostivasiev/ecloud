@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\VpnProfile\CreateRequest;
-use App\Http\Requests\V2\VpnProfile\Update;
-use App\Models\V2\VpnProfile;
-use App\Resources\V2\VpnProfileResource;
+use App\Http\Requests\V2\Script\Create;
+use App\Http\Requests\V2\Script\Update;
+use App\Models\V2\Script;
+use App\Resources\V2\ScriptResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -13,54 +13,50 @@ class ScriptController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = VpnProfile::query();
+        $collection = Script::forUser($request->user());
 
-        $queryTransformer->config(VpnProfile::class)
+        $queryTransformer->config(Script::class)
             ->transform($collection);
 
-        return VpnProfileResource::collection($collection->paginate(
+        return ScriptResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
-    public function show(Request $request, string $vpnProfileId)
+    public function show(Request $request, string $scriptId)
     {
-        return new VpnProfileResource(
-            VpnProfile::findOrFail($vpnProfileId)
+        return new ScriptResource(
+            Script::forUser($request->user())->findOrFail($scriptId)
         );
     }
 
-    public function create(CreateRequest $request)
+    public function store(Create $request)
     {
-        $vpnProfile = new VpnProfile($request->only([
+        $resource = new Script($request->only([
             'name',
-            'ike_version',
-            'encryption_algorithm',
-            'digest_algorithm',
-            'diffie_hellman',
+            'software_id',
+            'sequence',
+            'script',
         ]));
-        $vpnProfile->save();
-        $vpnProfile->refresh();
-        return $this->responseIdMeta($request, $vpnProfile->id, 201);
+        $resource->save();
+        return $this->responseIdMeta($request, $resource->id, 201);
     }
 
-    public function update(Update $request, string $vpnProfileId)
+    public function update(Update $request, string $scriptId)
     {
-        $vpnProfile = VpnProfile::findOrFail($vpnProfileId);
+        $vpnProfile = Script::forUser($request->user())->findOrFail($scriptId);
         $vpnProfile->fill($request->only([
             'name',
-            'ike_version',
-            'encryption_algorithm',
-            'digest_algorithm',
-            'diffie_hellman',
+            'sequence',
+            'script',
         ]));
         $vpnProfile->save();
         return $this->responseIdMeta($request, $vpnProfile->id, 200);
     }
 
-    public function destroy(Request $request, string $vpnProfileId)
+    public function destroy(Request $request, string $scriptId)
     {
-        VpnProfile::findOrFail($vpnProfileId)->delete();
+        Script::forUser($request->user())->findOrFail($scriptId)->delete();
         return response('', 204);
     }
 }

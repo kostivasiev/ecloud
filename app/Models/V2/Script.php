@@ -34,7 +34,23 @@ class Script extends Model implements Filterable, Sortable
             'sequence',
             'script',
         ];
+        $this->casts = [
+            'sequence' => 'integer'
+        ];
         parent::__construct($attributes);
+    }
+
+    protected static function booted()
+    {
+        /**
+         * If sequence is not specified when creating, increment to next available.
+         */
+        static::creating(function ($model) {
+            if (empty($model->sequence)) {
+                $max = Script::where('software_id', $model->software_id)->pluck('sequence')->max();
+                $model->sequence = ++$max;
+            }
+        });
     }
 
     public function software(): BelongsTo
