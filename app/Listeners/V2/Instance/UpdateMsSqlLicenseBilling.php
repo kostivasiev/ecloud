@@ -29,23 +29,20 @@ class UpdateMsSqlLicenseBilling
         }
 
         $instance = $event->model->resource;
-
-        if ($instance->image->imagemetadata->where('key', 'ukfast.license.type')->count() == 0) {
-            return;
-        }
-
-        $licenseType = $instance->image->imagemetadata->where('key', 'ukfast.license.type')->first()->value;
-        if ($licenseType !== 'mssql') {
-            return;
-        }
         $licensesAdminClient = app()->make(AdminClient::class)->setResellerId($instance->vpc->reseller_id);
-        $license = collect($licensesAdminClient->licenses()->getAll([
+        $licenses = collect($licensesAdminClient->licenses()->getAll([
             'owner_id:eq' => $instance->id,
-            'license_type:eq' => $licenseType,
-        ]))->first()->key_id;
+            'license_type:eq' => 'mssql',
+        ]));
+
+        if ($licenses->count() === 0) {
+            return;
+        }
+
+        $license = $licenses[0]->keyId;
         $edition = Str::lower(Str::replace('WINDOWS-2019-DATACENTER-MSSQL2019-', '', $license));
 
-        $key = 'license.' . $licenseType . '.' . $edition;
+        $key = 'license.mssql.' . $edition;
         $cores = $instance->vcpu_cores < 4 ? 4 : $instance->vcpu_cores;
         $packs = ceil($cores / 2);
 
@@ -54,7 +51,7 @@ class UpdateMsSqlLicenseBilling
             ->where('product_name', $instance->availabilityZone->id . ': mssql ' . $edition . ' license')
             ->first();
         if (!empty($product)) {
-            $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.' . $licenseType . '.' . $edition);
+            $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.mssql.' . $edition);
 
             if (!empty($currentActiveMetric)) {
                 if ($currentActiveMetric->value == $packs) {
