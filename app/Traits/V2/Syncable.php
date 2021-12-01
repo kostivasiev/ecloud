@@ -18,7 +18,7 @@ trait Syncable
             return $syncJobClass;
         }
 
-        return 'App\\Tasks\\'. end($class) . '\\Update';
+        return 'App\\Tasks\\Sync\\'. end($class) . '\\Update';
     }
 
     // TODO: Make this abstract - we should force objects implementing Syncable to return job class
@@ -30,7 +30,7 @@ trait Syncable
             return $syncJobClass;
         }
 
-        return 'App\\Tasks\\'. end($class) . '\\Delete';
+        return 'App\\Tasks\\Sync\\'. end($class) . '\\Delete';
     }
 
     public function getSyncAttribute()
