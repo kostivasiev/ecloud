@@ -114,7 +114,10 @@ class RunApplianceBootstrap extends Job
         }
 
         if (!in_array('cpanel_hostname', array_keys($this->imageData)) || empty($this->imageData['cpanel_hostname'])) {
-            $floatingIp = FloatingIp::findOrFail($this->model->deploy_data['floating_ip_id']);
+            $floatingIp = FloatingIp::find($this->model->deploy_data['floating_ip_id']);
+            if (!$floatingIp) {
+                throw new \Exception('Floating Ip ' . $this->model->deploy_data['floating_ip_id'] . ' not found');
+            }
             $this->imageData['cpanel_hostname'] = $floatingIp->ip_address . '.srvlist.ukfast.net';
         }
     }
