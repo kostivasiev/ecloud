@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Requests\V2\VpnProfile\CreateRequest;
-use App\Http\Requests\V2\VpnProfile\Update;
-use App\Models\V2\VpnProfile;
-use App\Resources\V2\VpnProfileResource;
+use App\Http\Requests\V2\InstanceSoftware\Create;
+use App\Http\Requests\V2\InstanceSoftware\Update;
+use App\Models\V2\InstanceSoftware;
+use App\Resources\V2\InstanceSoftwareResource;
 use Illuminate\Http\Request;
 use UKFast\DB\Ditto\QueryTransformer;
 
@@ -13,54 +13,49 @@ class InstanceSoftwareController extends BaseController
 {
     public function index(Request $request, QueryTransformer $queryTransformer)
     {
-        $collection = VpnProfile::query();
+        $collection = InstanceSoftware::forUser($request->user());
 
-        $queryTransformer->config(VpnProfile::class)
+        $queryTransformer->config(InstanceSoftware::class)
             ->transform($collection);
 
-        return VpnProfileResource::collection($collection->paginate(
+        return InstanceSoftwareResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
-    public function show(Request $request, string $vpnProfileId)
+    public function show(Request $request, string $instanceSoftwareId)
     {
-        return new VpnProfileResource(
-            VpnProfile::findOrFail($vpnProfileId)
+        return new InstanceSoftwareResource(
+            InstanceSoftware::forUser($request->user())->findOrFail($instanceSoftwareId)
         );
     }
 
-    public function create(CreateRequest $request)
+    public function store(Create $request)
     {
-        $vpnProfile = new VpnProfile($request->only([
+        $resource = new InstanceSoftware($request->only([
             'name',
-            'ike_version',
-            'encryption_algorithm',
-            'digest_algorithm',
-            'diffie_hellman',
+            'instance_id',
+            'software_id',
         ]));
-        $vpnProfile->save();
-        $vpnProfile->refresh();
-        return $this->responseIdMeta($request, $vpnProfile->id, 201);
+        $task = $resource->syncSave();
+        return $this->responseIdMeta($request, $resource->id, 202, $task->id);
     }
 
-    public function update(Update $request, string $vpnProfileId)
+    public function update(Update $request, string $instanceSoftwareId)
     {
-        $vpnProfile = VpnProfile::findOrFail($vpnProfileId);
-        $vpnProfile->fill($request->only([
+        $resource = InstanceSoftware::forUser($request->user())->findOrFail($instanceSoftwareId);
+        $resource->fill($request->only([
             'name',
-            'ike_version',
-            'encryption_algorithm',
-            'digest_algorithm',
-            'diffie_hellman',
         ]));
-        $vpnProfile->save();
-        return $this->responseIdMeta($request, $vpnProfile->id, 200);
+        $task = $resource->syncSave();
+        return $this->responseIdMeta($request, $resource->id, 202, $task->id);
     }
 
-    public function destroy(Request $request, string $vpnProfileId)
+    public function destroy(Request $request, string $instanceSoftwareId)
     {
-        VpnProfile::findOrFail($vpnProfileId)->delete();
-        return response('', 204);
+        $resource = InstanceSoftware::forUser($request->user())->findOrFail($instanceSoftwareId);
+
+        $task = $resource->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 }

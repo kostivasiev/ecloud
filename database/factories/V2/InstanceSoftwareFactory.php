@@ -2,7 +2,6 @@
 namespace Database\Factories\V2;
 
 use App\Models\V2\InstanceSoftware;
-use App\Models\V2\Software;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class InstanceSoftwareFactory extends Factory

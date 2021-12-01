@@ -83,7 +83,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### Delete Router
+### Delete software
 DELETE https://{{host}}/{{version}}/software/{{software_id}}
 X-consumer-custom-id:  {{dev_reseller_id_admin}}
 X-consumer-groups:  ecloud.read, ecloud.write

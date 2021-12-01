@@ -4,6 +4,8 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\Syncable;
+use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,7 +19,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class InstanceSoftware extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, HasFactory;
+    use CustomKey, SoftDeletes, DefaultName, HasFactory, Syncable, Taskable;
 
     public $keyPrefix = 'is';
 

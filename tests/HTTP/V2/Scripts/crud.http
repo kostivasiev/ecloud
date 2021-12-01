@@ -110,7 +110,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### Delete Router
+### Delete script
 DELETE https://{{host}}/{{version}}/scripts/{{script_id}}
 X-consumer-custom-id:  {{dev_reseller_id_admin}}
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -124,6 +124,18 @@ client.test("Request executed successfully", function() {
 
 ### Confirm DELETE
 GET https://{{host}}/{{version}}/scripts/{{script_id}}
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 404, "Response status is not 404");
+});
+%}
+
+### Confirm DELETE
+GET https://{{host}}/{{version}}/software/{{software_id}}
 X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

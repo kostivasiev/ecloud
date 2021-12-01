@@ -602,8 +602,11 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group([], function () use ($router) {
         $router->get('instance-software', 'InstanceSoftwareController@index');
         $router->get('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@show');
-        $router->post('instance-software', 'InstanceSoftwareController@store');
-        $router->patch('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@update');
-        $router->delete('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@destroy');
+
+        $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->post('instance-software', 'InstanceSoftwareController@store');
+            $router->patch('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@update');
+            $router->delete('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@destroy');
+        });
     });
 });
