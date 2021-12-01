@@ -24,15 +24,6 @@ class RunApplianceBootstrap extends Job
     public function __construct(Instance $instance)
     {
         $this->model = $instance;
-        $this->imageData = $instance->deploy_data['image_data'] ?? [];
-        $this->getImageData();
-    }
-
-    protected function getImageData()
-    {
-        $this->getCpanelImageData();
-        $this->getPleskImageData();
-        $this->getPasswords();
     }
 
     /**
@@ -41,6 +32,8 @@ class RunApplianceBootstrap extends Job
     public function handle()
     {
         $instance = $this->model;
+        $this->imageData = $instance->deploy_data['image_data'] ?? [];
+        $this->getImageData();
 
         if ($this->model->platform !== 'Linux') {
             Log::info('RunApplianceBootstrap for ' . $instance->id . ', nothing to do for non-Linux platforms, skipping');
@@ -78,12 +71,20 @@ class RunApplianceBootstrap extends Job
         );
     }
 
+    protected function getImageData()
+    {
+        $this->getCpanelImageData();
+        $this->getPleskImageData();
+        $this->getPasswords();
+    }
+
     protected function getPleskImageData()
     {
         if ($this->model->image->getMetadata('ukfast.license.type') != 'plesk') {
             return;
         }
 
+        $deployData = $this->model->deploy_data;
         if (!in_array('plesk_admin_email_address', array_keys($this->imageData)) || empty($this->imageData['plesk_admin_email_address'])) {
             $accountsService = app()->make(AccountsService::class);
             $this->imageData['plesk_admin_email_address'] = $accountsService->getPrimaryContactEmail($this->model->getResellerId());
@@ -113,7 +114,10 @@ class RunApplianceBootstrap extends Job
         }
 
         if (!in_array('cpanel_hostname', array_keys($this->imageData)) || empty($this->imageData['cpanel_hostname'])) {
-            $floatingIp = FloatingIp::findOrFail($this->model->deploy_data['floating_ip_id']);
+            $floatingIp = FloatingIp::find($this->model->deploy_data['floating_ip_id']);
+            if (!$floatingIp) {
+                throw new \Exception('Floating Ip ' . $this->model->deploy_data['floating_ip_id'] . ' not found');
+            }
             $this->imageData['cpanel_hostname'] = $floatingIp->ip_address . '.srvlist.ukfast.net';
         }
     }
