@@ -29,7 +29,6 @@ Content-Type:  application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data[0].id === client.global.get('software_id'), "Incorrect ID");
 });
 %}
 
@@ -45,7 +44,6 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.id === client.global.get('software_id'), "Incorrect ID");
   client.assert(response.body.data.name === "test", "Incorrect name");
   client.assert(response.body.data.platform === "Linux", "Incorrect platform");
-  client.assert(response.body.data.visibility === "public", "Incorrect visibility");
 });
 %}
 

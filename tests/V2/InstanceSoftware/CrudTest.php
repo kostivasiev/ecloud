@@ -12,7 +12,6 @@ use UKFast\Api\Auth\Consumer;
 
 class CrudTest extends TestCase
 {
-    public $instanceSoftware;
     public $software;
 
     public function setUp(): void

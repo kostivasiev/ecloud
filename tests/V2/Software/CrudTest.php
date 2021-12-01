@@ -18,27 +18,28 @@ class CrudTest extends TestCase
 
     public function testIndex()
     {
+        // Assert public visibility is returned for non admin
         $this->get('/v2/software')
             ->seeJson([
                 'id' => 'soft-test',
                 'name' => 'Test Software',
                 'platform' => 'Linux',
-                'visibility' => 'public',
             ])
             ->assertResponseStatus(200);
 
         $software = Software::first();
         $software->setAttribute('visibility', Software::VISIBILITY_PRIVATE)->save();
 
+        // Assert private visibility is not returned to non admin
         $this->get('/v2/software')
             ->dontSeeJson([
                 'id' => 'soft-test',
                 'name' => 'Test Software',
                 'platform' => 'Linux',
-                'visibility' => 'private',
         ])
             ->assertResponseStatus(200);
 
+        // Assert private visibility is returned for admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->get('/v2/software/soft-test')
             ->seeJson([
@@ -52,19 +53,21 @@ class CrudTest extends TestCase
 
     public function testShow()
     {
+        // Assert public visibility is returned for non admin
         $this->get('/v2/software/soft-test')
             ->seeJson([
                 'id' => 'soft-test',
                 'name' => 'Test Software',
                 'platform' => 'Linux',
-                'visibility' => 'public',
             ])
             ->assertResponseStatus(200);
 
+        // Assert private visibility is not returned to non admin
         $software = Software::first();
         $software->setAttribute('visibility', Software::VISIBILITY_PRIVATE)->save();
         $this->get('/v2/software/soft-test')->assertResponseStatus(404);
 
+        // Assert private visibility is returned for admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->get('/v2/software/soft-test')->assertResponseStatus(200);
     }

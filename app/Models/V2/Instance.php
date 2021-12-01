@@ -9,6 +9,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Exceptions\InvalidSortException;
@@ -152,6 +153,22 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
     public function isHidden(): bool
     {
         return $this->isManaged() || $this->is_hidden;
+    }
+
+    /**
+     * Loads software using the InstanceSoftware model as a pivot
+     * @return HasManyThrough
+     */
+    public function software(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Software::class,
+            InstanceSoftware::class,
+            'instance_id',
+            'id',
+            'id',
+            'software_id'
+        );
     }
 
     /**

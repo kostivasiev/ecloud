@@ -124,6 +124,21 @@ client.test("Request executed successfully", function() {
 });
 %}
 
+### Get instances/{id}/software
+GET https://{{host}}/{{version}}/instances/{{instance_id}}/software
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].id === client.global.get('software_id'), "Incorrect id");
+  client.assert(response.body.data[0].name === "test", "Incorrect name");
+  client.assert(response.body.data[0].platform === "Linux", "Incorrect platform");
+});
+%}
+
 ### Delete Item
 DELETE https://{{host}}/{{version}}/instance-software/{{instance_software_id}}
 X-consumer-custom-id:  {{dev_reseller_id_admin}}

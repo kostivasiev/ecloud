@@ -17,11 +17,11 @@ class SoftwareResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'platform' => $this->platform,
-            'visibility' => $this->visibility,
         ];
 
         if ($request->user()->isAdmin()) {
             $tz = new \DateTimeZone(config('app.timezone'));
+            $data['visibility'] = $this->visibility;
             $data['created_at'] = Carbon::parse($this->created_at, $tz)->toIso8601String();
             $data['updated_at'] = Carbon::parse($this->updated_at, $tz)->toIso8601String();
         }
