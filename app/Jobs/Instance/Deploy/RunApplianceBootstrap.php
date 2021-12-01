@@ -26,16 +26,6 @@ class RunApplianceBootstrap extends Job
     public function __construct(Instance $instance)
     {
         $this->model = $instance;
-        $this->deployData = $instance->deploy_data;
-        $this->imageData = $instance->deploy_data['image_data'] ?? [];
-        $this->getImageData();
-    }
-
-    protected function getImageData()
-    {
-        $this->getCpanelImageData();
-        $this->getPleskImageData();
-        $this->getPasswords();
     }
 
     /**
@@ -44,6 +34,8 @@ class RunApplianceBootstrap extends Job
     public function handle()
     {
         $instance = $this->model;
+        $this->imageData = $instance->deploy_data['image_data'] ?? [];
+        $this->getImageData();
 
         if ($this->model->platform !== 'Linux') {
             Log::info('RunApplianceBootstrap for ' . $instance->id . ', nothing to do for non-Linux platforms, skipping');
@@ -65,8 +57,9 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
+        $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
         $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/linux/script',
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
             [
                 'json' => [
                     'encodedScript' => base64_encode(
@@ -80,12 +73,20 @@ class RunApplianceBootstrap extends Job
         );
     }
 
+    protected function getImageData()
+    {
+        $this->getCpanelImageData();
+        $this->getPleskImageData();
+        $this->getPasswords();
+    }
+
     protected function getPleskImageData()
     {
         if ($this->model->image->getMetadata('ukfast.license.type') != 'plesk') {
             return;
         }
 
+        $deployData = $this->model->deploy_data;
         if (!in_array('plesk_admin_email_address', array_keys($this->imageData)) ||
             empty($this->imageData['plesk_admin_email_address'])
         ) {
@@ -99,8 +100,8 @@ class RunApplianceBootstrap extends Job
                 ->primary_contact_id;
             $primaryContactEmail = $adminClient->contacts()->getById($primaryContactId)->emailAddress;
             $this->imageData['plesk_admin_email_address'] = $primaryContactEmail;
-            $this->deployData['image_data'] = $this->imageData;
-            $this->model->setAttribute('deploy_data', $this->deployData)->saveQuietly();
+            $deployData['image_data'] = $this->imageData;
+            $this->model->setAttribute('deploy_data', $deployData)->saveQuietly();
         }
 
         if (!$this->model->credentials()
@@ -111,6 +112,7 @@ class RunApplianceBootstrap extends Job
                 'name' => 'plesk_admin_password',
                 'username' => 'plesk_admin_password',
                 'password' => (new PasswordService())->generate(),
+                'port' => config('plesk.admin.port', 8880),
             ]);
             $credential->save();
             $this->model->credentials()->save($credential);
@@ -124,7 +126,10 @@ class RunApplianceBootstrap extends Job
         }
 
         if (!in_array('cpanel_hostname', array_keys($this->imageData)) || empty($this->imageData['cpanel_hostname'])) {
-            $floatingIp = FloatingIp::findOrFail($this->model->deploy_data['floating_ip_id']);
+            $floatingIp = FloatingIp::find($this->model->deploy_data['floating_ip_id']);
+            if (!$floatingIp) {
+                throw new \Exception('Floating Ip ' . $this->model->deploy_data['floating_ip_id'] . ' not found');
+            }
             $this->imageData['cpanel_hostname'] = $floatingIp->ip_address . '.srvlist.ukfast.net';
         }
     }

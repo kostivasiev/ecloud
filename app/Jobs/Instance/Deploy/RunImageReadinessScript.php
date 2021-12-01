@@ -34,7 +34,7 @@ class RunImageReadinessScript extends Job
         }
 
         $guestAdminCredential = $instance->credentials()
-            ->where('username', 'root')
+            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
             ->firstOrFail();
         if (!$guestAdminCredential) {
             $message = 'RunApplianceBootstrap failed for ' . $instance->id . ', no admin credentials found';
@@ -43,8 +43,10 @@ class RunImageReadinessScript extends Job
             return;
         }
 
+        $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
+        /** @var Response $deployResponse */
         $response = $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/linux/script',
+            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
             [
                 'json' => [
                     'encodedScript' => base64_encode($this->model->image->readiness_script),

@@ -48,6 +48,7 @@ $app->configure('billing');
 $app->configure('volume-group');
 $app->configure('vpn-session');
 $app->configure('load-balancer');
+$app->configure('plesk');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
