@@ -22,10 +22,6 @@ properties:
     type: string
     example: 'reg-a63dd78c'
     readOnly: false
-  nsx_manager_endpoint:
-    type: string
-    example: 'https://127.0.0.1'
-    readOnly: false
   ucs_compute_name:
     type : string
     example : AA-UCS-A12-RAD-A'
