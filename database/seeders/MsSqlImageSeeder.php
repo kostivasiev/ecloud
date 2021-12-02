@@ -27,7 +27,9 @@ class MsSqlImageSeeder extends Seeder
                 'logo_uri' => null,
                 'documentation_uri' => null,
                 'description' => null,
-                'script_template' => 'Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$env:COMPUTERNAME\Administrators /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait',
+                'script_template' => <<<'EOM'
+Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$env:COMPUTERNAME\Administrators /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait
+EOM,
                 'vm_template' => 'windows 2019 datacenter-mssql2019-standard',
                 'platform' => 'Windows',
                 'active' => true,
@@ -40,7 +42,9 @@ class MsSqlImageSeeder extends Seeder
                 'logo_uri' => null,
                 'documentation_uri' => null,
                 'description' => null,
-                'script_template' => 'Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$env:COMPUTERNAME\Administrators /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait',
+                'script_template' => <<<'EOM'
+Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$env:COMPUTERNAME\Administrators /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait
+EOM,
                 'vm_template' => 'windows 2019 datacenter-mssql2019-web',
                 'platform' => 'Windows',
                 'active' => true,
@@ -53,7 +57,9 @@ class MsSqlImageSeeder extends Seeder
                 'logo_uri' => null,
                 'documentation_uri' => null,
                 'description' => null,
-                'script_template' => 'Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$env:COMPUTERNAME\Administrators /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait',
+                'script_template' => <<<'EOM'
+Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$env:COMPUTERNAME\Administrators /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait
+EOM,
                 'vm_template' => 'windows 2019 datacenter-mssql2019-enterprise',
                 'platform' => 'Windows',
                 'active' => true,
