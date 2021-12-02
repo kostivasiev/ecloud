@@ -23,7 +23,6 @@ class AvailabilityZoneSeeder extends Seeder
             'datacentre_site_id' => 8,
             'region_id' => 'reg-aaaaaaaa',
             'nsx_manager_endpoint' => 'https://185.197.63.88/',
-            'nsx_edge_cluster_id' => '8bc61267-583e-4988-b5d9-16b46f7fe900',
             'san_name' => 'MCS-E-G0-3PAR-01',
             'ucs_compute_name' => 'GC-UCS-FI2-DEV-A',
             'is_public' => true,
