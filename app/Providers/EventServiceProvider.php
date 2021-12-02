@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\V2\Instance\UpdateMsSqlLicenseBilling;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -155,6 +156,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
             \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling::class,
+            \App\Listeners\V2\Instance\UpdateMsSqlLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
             \App\Listeners\V2\Host\UpdateBilling::class,
