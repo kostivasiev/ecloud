@@ -22,13 +22,13 @@ class SoftwareTest extends TestCase
     {
         $instanceSoftware = InstanceSoftware::factory()->make();
         $instanceSoftware->instance()->associate($this->instance());
-        $instanceSoftware->software()->associate(Software::find('soft-test'));
+        $instanceSoftware->software()->associate(Software::find('soft-aaaaaaaa'));
         $instanceSoftware->save();
 
         $this->get(
             '/v2/instances/' . $this->instance()->id . '/software')
             ->seeJson([
-                'id' => 'soft-test',
+                'id' => 'soft-aaaaaaaa',
                 'name' => 'Test Software',
                 'platform' => 'Linux',
             ])

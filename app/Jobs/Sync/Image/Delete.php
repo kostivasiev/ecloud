@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\Image;
 
 use App\Jobs\Image\SyncAvailabilityZones;
+use App\Jobs\Image\SyncSoftware;
 use App\Jobs\Job;
 use App\Jobs\Kingpin\Image\DeleteImage;
 use App\Models\V2\Task;
@@ -24,8 +25,11 @@ class Delete extends Job
     {
         $image = $this->task->resource;
         $this->deleteTaskBatch([
-            new DeleteImage($image),
-            new SyncAvailabilityZones($image),
+            [
+                new DeleteImage($image),
+                new SyncAvailabilityZones($image),
+                new SyncSoftware($image),
+            ]
         ])->dispatch();
     }
 }

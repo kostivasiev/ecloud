@@ -23,7 +23,7 @@ class ScriptSeeder extends Seeder
                 ['id' => 'scr-test-3', 'name' => 'Script 3', 'sequence' => 3],
             ))
             ->create([
-                'software_id' => 'soft-test',
+                'software_id' => 'soft-aaaaaaaa',
             ]);
     }
 }

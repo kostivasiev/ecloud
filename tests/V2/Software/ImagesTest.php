@@ -6,7 +6,7 @@ use Database\Seeders\SoftwareSeeder;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
-class ScriptsTest extends TestCase
+class ImagesTest extends TestCase
 {
     public function setUp(): void
     {
@@ -15,15 +15,13 @@ class ScriptsTest extends TestCase
         (new SoftwareSeeder())->run();
     }
 
-    public function testShow()
+    public function testImageSoftware()
     {
-        $this->get('/v2/software/soft-aaaaaaaa/scripts')
+        $this->image()->software()->sync(['soft-aaaaaaaa']);
+
+        $this->get('/v2/software/soft-aaaaaaaa/images')
             ->seeJson([
-                'id' => 'scr-test-1',
-                'name' => 'Script 1',
-                'software_id' => 'soft-aaaaaaaa',
-                'sequence' => 1,
-                'script' => 'exit 0',
+                'id' => 'img-test',
             ])
             ->assertResponseStatus(200);
     }
