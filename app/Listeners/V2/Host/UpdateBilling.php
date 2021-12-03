@@ -100,7 +100,7 @@ class UpdateBilling implements Billable
      */
     public static function getKeyName(): string
     {
-        $argument = (count(func_get_args()) > 0) ? '.' . func_get_arg(0) : '';
-        return sprintf('host%s', $argument);
+        $argument = (count(func_get_args()) > 0) ? func_get_arg(0) : '';
+        return sprintf('host.%s', $argument);
     }
 }
