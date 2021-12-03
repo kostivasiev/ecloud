@@ -66,7 +66,7 @@ class UpdateVcpuBilling implements Billable
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
-        $billingMetric->friendlyName = $this->getFriendlyName();
+        $billingMetric->friendly_name = $this->getFriendlyName();
         $billingMetric->key = self::getKeyName();
         $billingMetric->value = $instance->vcpu_cores;
         $billingMetric->start = $time;
