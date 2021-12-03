@@ -35,7 +35,10 @@ class SetFriendlyNames extends Command
                 $metric->key,
                 $matches
             )) {
-                $friendlyName = $billableClasses[$matches[1]]::getFriendlyName($matches[2]);
+                $this->info('Setting: ' . $matches[0] . ' with key:' . $matches[1] . ' and value:' . $matches[2]);
+                if (array_key_exists($matches[1], $billableClasses)) {
+                    $friendlyName = $billableClasses[$matches[1]]::getFriendlyName($matches[2]);
+                }
             } else {
                 if ($metric->key == 'network.advanced') {
                     $metric->key = 'networking.advanced';
