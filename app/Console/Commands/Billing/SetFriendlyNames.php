@@ -6,6 +6,7 @@ use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class SetFriendlyNames extends Command
@@ -15,6 +16,7 @@ class SetFriendlyNames extends Command
 
     public function handle()
     {
+        Log::info('Setting friendly names for Billing Metrics' . PHP_EOL);
         $this->info('Setting friendly names for Billing Metrics' . PHP_EOL);
         $billableClasses = $this->getBillableClasses();
 
@@ -36,6 +38,7 @@ class SetFriendlyNames extends Command
                 $matches
             )) {
                 $this->info('Setting: ' . $matches[0] . ' with key:' . $matches[1] . ' and value:' . $matches[2]);
+                Log::info('Setting: ' . $matches[0] . ' with key:' . $matches[1] . ' and value:' . $matches[2]);
                 if (array_key_exists($matches[1], $billableClasses)) {
                     $friendlyName = $billableClasses[$matches[1]]::getFriendlyName($matches[2]);
                 }
@@ -50,6 +53,7 @@ class SetFriendlyNames extends Command
             if ($friendlyName === null) {
                 return;
             }
+            Log::info('Billing Metric: ' . $metric->id . ' : ' . $metric->key . ' setting friendly name to ' . $friendlyName);
             $this->info('Billing Metric: ' . $metric->id . ' : ' . $metric->key . ' setting friendly name to ' . $friendlyName);
             if (!$this->option('test-run')) {
                 $metric->setAttribute('friendly_name', $friendlyName)->saveQuietly();
