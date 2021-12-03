@@ -33,6 +33,7 @@ class CreateRequest extends FormRequest
                 ]),
             ],
             'reseller_id' => ['required', 'numeric'],
+            'friendly_name' => ['required', 'string'],
             'key' => ['required', 'string'],
             'value' => ['required', 'string'],
             'start' => ['required', 'date'],

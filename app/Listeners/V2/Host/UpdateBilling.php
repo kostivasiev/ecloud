@@ -2,8 +2,10 @@
 namespace App\Listeners\V2\Host;
 
 use App\Events\V2\Task\Updated;
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
+use App\Models\V2\HostSpec;
 use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -13,7 +15,7 @@ use Illuminate\Support\Facades\Log;
  * Add a billing metric when a dedicated host is created
  * @package App\Listeners\V2\Host
  */
-class UpdateBilling
+class UpdateBilling implements Billable
 {
     public function handle(Updated $event)
     {
@@ -45,7 +47,8 @@ class UpdateBilling
             'resource_id' => $host->id,
             'vpc_id' => $host->hostGroup->vpc->id,
             'reseller_id' => $host->hostGroup->vpc->reseller_id,
-            'key' => 'host.' . $host->hostGroup->hostSpec->id,
+            'friendly_name' => self::getFriendlyName($host->hostGroup->hostSpec),
+            'key' => self::getKeyName($host->hostGroup->hostSpec->id),
             'value' => 1,
             'start' => Carbon::now(),
             'category' => 'Compute',
@@ -70,5 +73,34 @@ class UpdateBilling
         Log::debug(get_class($this) . ': Added billing metric for ' . $host->id);
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        $argument = (count(func_get_args()) > 0) ? func_get_arg(0) : '';
+        /** @var HostSpec $hostSpec */
+        $hostSpec = HostSpec::withTrashed()->findOrFail($argument);
+        return sprintf(
+            'Host %d x %s, %d cores, %d GHz, %dGb RAM',
+            $hostSpec->cpu_sockets,
+            $hostSpec->cpu_type,
+            $hostSpec->cpu_cores,
+            $hostSpec->cpu_clock_speed,
+            $hostSpec->ram_capacity
+        );
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        $argument = (count(func_get_args()) > 0) ? '.' . func_get_arg(0) : '';
+        return sprintf('host%s', $argument);
     }
 }

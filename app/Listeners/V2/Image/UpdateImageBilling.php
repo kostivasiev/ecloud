@@ -2,15 +2,15 @@
 
 namespace App\Listeners\V2\Image;
 
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Product;
-use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
-class UpdateImageBilling
+class UpdateImageBilling implements Billable
 {
     public function handle($event)
     {
@@ -53,7 +53,7 @@ class UpdateImageBilling
         $volumeCapacity = (int)$metaData->value;
 
         $currentActiveMetric = BillingMetric::where('resource_id', $model->id)
-            ->where('key', '=', 'image.private')
+            ->where('key', '=', self::getKeyName())
             ->whereNull('end')
             ->first();
 
@@ -68,7 +68,8 @@ class UpdateImageBilling
             'resource_id' => $model->id,
             'vpc_id' => $model->vpc_id,
             'reseller_id' => $model->vpc->reseller_id,
-            'key' => 'image.private',
+            'friendly_name' => self::getFriendlyName(),
+            'key' => self::getKeyName(),
             'value' => $volumeCapacity,
             'start' => $time,
         ]);
@@ -81,7 +82,8 @@ class UpdateImageBilling
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load "' . $productName . '" billing product for availability zone ' . $availabilityZone->id
+                'Failed to load "' . $productName . '" billing product for availability zone '.
+                $availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;
@@ -91,5 +93,23 @@ class UpdateImageBilling
         $billingMetric->save();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        return 'Image per Gb';
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        return 'image.private';
     }
 }

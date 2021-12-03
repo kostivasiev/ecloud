@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Task\Updated;
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Models\V2\Volume;
@@ -10,7 +11,7 @@ use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
-class UpdateBackupBilling
+class UpdateBackupBilling implements Billable
 {
     /**
      * @param Updated $event
@@ -44,7 +45,7 @@ class UpdateBackupBilling
 
         $time = Carbon::now();
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'backup.quota');
+        $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName());
 
         if (!$instance->backup_enabled && empty($currentActiveMetric)) {
             return;
@@ -68,7 +69,8 @@ class UpdateBackupBilling
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
-        $billingMetric->key = 'backup.quota';
+        $billingMetric->friendly_name = self::getFriendlyName();
+        $billingMetric->key = self::getKeyName();
         $billingMetric->value = $instance->volumeCapacity;
         $billingMetric->start = $time;
 
@@ -84,5 +86,23 @@ class UpdateBackupBilling
 
         Log::info(get_class($this) . ' : backup.quota set to ' . $instance->volumeCapacity, ['instance' => $instance->id]);
         $billingMetric->save();
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        return 'Backup Capacity';
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        return 'backup.quota';
     }
 }
