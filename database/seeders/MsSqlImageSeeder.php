@@ -103,6 +103,12 @@ EOM,
 
             factory(ImageMetadata::class)->create([
                 'image_id' => $image->id,
+                'key' => 'ukfast.license.id',
+                'value' => '353',
+            ]);
+
+            factory(ImageMetadata::class)->create([
+                'image_id' => $image->id,
                 'key' => 'ukfast.license.mssql.edition',
                 'value' => Str::replace('windows 2019 ', '', $image->vm_template),
             ]);
