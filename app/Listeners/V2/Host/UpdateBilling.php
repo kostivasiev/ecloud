@@ -82,6 +82,9 @@ class UpdateBilling implements Billable
     public static function getFriendlyName(): string
     {
         $argument = (count(func_get_args()) > 0) ? func_get_arg(0) : '';
+        if ($argument instanceof HostSpec) {
+            $argument = $argument->id;
+        }
         /** @var HostSpec $hostSpec */
         $hostSpec = HostSpec::withTrashed()->findOrFail($argument);
         return sprintf(
