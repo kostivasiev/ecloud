@@ -47,7 +47,7 @@ class UpdateBilling implements Billable
             'resource_id' => $host->id,
             'vpc_id' => $host->hostGroup->vpc->id,
             'reseller_id' => $host->hostGroup->vpc->reseller_id,
-            'friendly_name' => self::getFriendlyName($host->hostGroup->hostSpec),
+            'friendly_name' => self::getFriendlyName($host->hostGroup->hostSpec->id),
             'key' => self::getKeyName($host->hostGroup->hostSpec->id),
             'value' => 1,
             'start' => Carbon::now(),
