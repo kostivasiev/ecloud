@@ -65,7 +65,7 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
 
     public function vpc()
     {
-        return $this->router->belongsTo(Vpc::class);
+        return $this->router->vpc();
     }
 
     public function nics()

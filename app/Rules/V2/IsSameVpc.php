@@ -28,10 +28,6 @@ class IsSameVpc implements Rule
 
         $resource1 = $resourceClass::findOrFail($this->resourceId);
 
-        if (!($resource1 instanceof Vpc)) {
-            return true;
-        }
-
         $resource2Class = Resource::classFromId($value);
         if (empty($resource2Class)) {
             return false;
@@ -43,7 +39,16 @@ class IsSameVpc implements Rule
             return true;
         }
 
-        return $resource1->id == $resource2->vpc->id;
+        if ($resource1 instanceof VpcAble) {
+            return $resource1->vpc->id == $resource2->vpc->id;
+        }
+
+        if ($resource1 instanceof Vpc) {
+            return $resource1->id == $resource2->vpc->id;
+        }
+
+        return true;
+
     }
 
     public function message()
