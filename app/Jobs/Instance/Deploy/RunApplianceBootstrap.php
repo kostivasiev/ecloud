@@ -90,13 +90,8 @@ class RunApplianceBootstrap extends Job
             empty($this->imageData['plesk_admin_email_address'])
         ) {
             $adminClient = app()->make(AdminClient::class)->setResellerId($this->model->getResellerId());
-            $primaryContactId = json_decode(
-                ($adminClient->contacts()->get('v1/customers/' . $this->model->getResellerId()))
-                    ->getBody()
-                    ->getContents()
-            )
-                ->data
-                ->primary_contact_id;
+            $primaryContactId = ($adminClient->customers()->getById($this->model->getResellerId()))
+                ->primaryContactId;
             $primaryContactEmail = $adminClient->contacts()->getById($primaryContactId)->emailAddress;
             $this->imageData['plesk_admin_email_address'] = $primaryContactEmail;
             $deployData['image_data'] = $this->imageData;
