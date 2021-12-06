@@ -6,6 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -44,6 +45,10 @@ class RegisterLicenses extends Job
 
         if ($this->imageMetadata->get('ukfast.license.type') == 'cpanel') {
             $this->registerCpanelLicense();
+        }
+
+        if ($this->imageMetadata->get('ukfast.license.type') == 'mssql') {
+            $this->registerMsSqlLicense();
         }
     }
 
@@ -101,5 +106,23 @@ class RegisterLicenses extends Job
             );
 
         Log::info(get_class($this) . ' : License ' . $response->getId() .' (cPanel) assigned to instance ' . $instance->id);
+    }
+
+    protected function registerMsSqlLicense()
+    {
+        $instance = $this->model;
+        $licensesAdminClient = app()->make(AdminClient::class)->setResellerId($instance->vpc->reseller_id);
+        Log::info(get_class($this) . ' : Submitting MSSQL license data for instance ' . $instance->id);
+
+        $response = $licensesAdminClient->licenses()
+            ->createEntity([
+                'owner_id' => $instance->id,
+                'owner_type' => 'ecloud',
+                'key_id' => $this->imageMetadata->get('ukfast.license.identifier'),
+                'license_type' => $this->imageMetadata->get('ukfast.license.type'),
+                'reseller_id' => $instance->vpc->reseller_id
+            ]);
+
+        Log::info(get_class($this) . ' : License ' . $response->getId() .' (MSSQL) assigned to instance ' . $instance->id);
     }
 }

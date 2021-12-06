@@ -24,6 +24,7 @@ use App\Resources\V2\CredentialResource;
 use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\SoftwareResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use Carbon\Carbon;
@@ -578,5 +579,16 @@ class InstanceController extends BaseController
         }
 
         return $this->responseTaskId($task->id);
+    }
+
+    public function software(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    {
+        $collection = Instance::forUser($request->user())->findOrFail($instanceId)->software();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return SoftwareResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

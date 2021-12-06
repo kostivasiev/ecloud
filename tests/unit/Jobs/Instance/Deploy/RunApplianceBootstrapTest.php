@@ -235,12 +235,12 @@ class RunApplianceBootstrapTest extends TestCase
 
         dispatch(new RunApplianceBootstrap($this->instance()));
 
-        $pleskAdminPassword = ($this->instance()
+        $pleskAdminCredential = $this->instance()
             ->credentials()
             ->where('name', '=', 'plesk_admin_password')
-            ->first())
-            ->password;
-        $this->assertEquals('somepassword', $pleskAdminPassword);
+            ->first();
+        $this->assertEquals('somepassword', $pleskAdminCredential->password);
+        $this->assertEquals(config('plesk.admin.port', 8880), $pleskAdminCredential->port);
 
         Event::assertNotDispatched(JobFailed::class);
     }

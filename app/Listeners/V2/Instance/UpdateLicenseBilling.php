@@ -33,6 +33,9 @@ class UpdateLicenseBilling
         }
 
         $licenseType = $instance->image->imagemetadata->where('key', 'ukfast.license.type')->first()->value;
+        if ($licenseType == 'mssql') {
+            return;
+        }
 
         // Check for an associated license billing product, if we find one, we want to bill for this license.
         $product = $instance->availabilityZone->products()

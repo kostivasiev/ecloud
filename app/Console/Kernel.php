@@ -26,6 +26,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Router\SetDefaultBilling::class,
         \App\Console\Commands\Conjurer\TestAuth::class,
         \App\Console\Commands\Queue\PopulateFailedJobsUuids::class,
+        \App\Console\Commands\Dev\CreateExampleTask::class,
         \App\Console\Commands\Artisan\TestAuth::class,
         \App\Console\Commands\Host\Delete::class,
         \App\Console\Commands\Billing\ProductCreate::class,
@@ -39,6 +40,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\IpAddress\PopulateNetworkId::class,
         \App\Console\Commands\VPC\ConvertBilling::class,
         \App\Console\Commands\Billing\CleanupAdvancedNetworking::class,
+        \App\Console\Commands\Credentials\AddPortToPleskCredential::class,
         \App\Console\Commands\Billing\FixPriceOnAdvancedNetworkingBillingMetrics::class,
     ];
 
