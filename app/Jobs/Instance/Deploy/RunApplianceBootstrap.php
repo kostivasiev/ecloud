@@ -35,11 +35,6 @@ class RunApplianceBootstrap extends Job
         $this->imageData = $instance->deploy_data['image_data'] ?? [];
         $this->getImageData();
 
-        if ($this->model->platform !== 'Linux') {
-            Log::info('RunApplianceBootstrap for ' . $instance->id . ', nothing to do for non-Linux platforms, skipping');
-            return;
-        }
-
         if (empty($this->model->image->script_template)) {
             Log::info('RunApplianceBootstrap for ' . $instance->id . ', no script template defined, skipping');
             return;
