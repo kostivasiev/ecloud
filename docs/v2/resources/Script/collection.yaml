@@ -25,31 +25,12 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/vips?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/scripts?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/vips?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/scripts?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/vips?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/scripts?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/vips?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/scripts?page=2'
   tags:
-    - Vips
-post:
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          allOf:
-            - $ref: 'schema.yaml'
-            - type: object
-              properties:
-                allocate_floating_ip:
-                  type: boolean
-                  required: false
-  responses:
-    202:
-      description: Accepted
-      $ref: 'responses/idResponse.yaml'
-  tags:
-    - Vips
+    - Scripts
