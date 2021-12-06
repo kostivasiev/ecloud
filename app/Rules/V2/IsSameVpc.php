@@ -48,7 +48,6 @@ class IsSameVpc implements Rule
         }
 
         return true;
-
     }
 
     public function message()
