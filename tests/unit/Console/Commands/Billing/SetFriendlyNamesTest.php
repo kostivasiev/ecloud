@@ -5,7 +5,6 @@ namespace Tests\unit\Console\Commands\Billing;
 use App\Console\Commands\Billing\SetFriendlyNames;
 use App\Models\V2\BillingMetric;
 use Database\Seeders\BillingMetricSeeder;
-use Symfony\Component\Console\Style\SymfonyStyle;
 use Tests\TestCase;
 
 class SetFriendlyNamesTest extends TestCase
