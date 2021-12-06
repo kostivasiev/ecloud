@@ -3,11 +3,13 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\Credential;
+use Faker\Factory;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\UploadedFile;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -156,6 +158,38 @@ class ConsoleTest extends TestCase
                 'url' => 'https://127.0.0.1/console/?title='.$this->instance()->id.'&session='.$uuid
             ]
         )->assertResponseStatus(200);
+    }
+
+    public function testGetScreenshotResult()
+    {
+        $fileName = 'testphoto.png';
+
+        // Create Kingpin Mock
+        $this->kingpinServiceMock()
+            ->shouldReceive('get')
+            ->withSomeOfArgs(
+                '/api/v2/vpc/vpc-test/instance/i-test/screenshot'
+            )
+            ->andReturnUsing(function () use ($fileName) {
+                return new Response(
+                    200,
+                    [
+                        'Content-Disposition' => 'attachment; filename=' . $fileName,
+                        'Content-Type'        => 'application/json; charset=utf-8'
+                    ],
+                    $this->loadData('Kingpin'.DIRECTORY_SEPARATOR.'GetConsoleScreenshot.json')
+                );
+            });
+
+        $this->be(new Consumer(1, [config('app.name') . '.read']));
+
+        // run test
+        $result = $this->get(
+            '/v2/instances/'.$this->instance()->id.'/console-screenshot'
+        );
+
+        $result->response->assertHeader('Content-Type', 'image/png');
+        $this->assertStringContainsString('data:image/png', $result->response->getContent());
     }
 
     public function testRestrictedConsoleNonAdmin()

@@ -214,6 +214,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('instances/{instanceId}/tasks', 'InstanceController@tasks');
         $router->get('instances/{instanceId}/floating-ips', 'InstanceController@floatingIps');
         $router->get('instances/{instanceId}/software', 'InstanceController@software');
+        $router->get('instances/{instanceId}/console-screenshot', 'InstanceController@consoleScreenshot');
         $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
         $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');

@@ -319,6 +319,58 @@ class InstanceController extends BaseController
         return response('', 204);
     }
 
+    public function consoleScreenshot(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
+
+        if (!$instance->vpc->console_enabled) {
+            if (!$this->isAdmin) {
+                return response()->json([
+                    'errors' => [
+                        'title' => 'Forbidden',
+                        'details' => 'Console access has been disabled for this resource',
+                        'status' => Response::HTTP_FORBIDDEN,
+                    ]
+                ], Response::HTTP_FORBIDDEN);
+            }
+        }
+
+        /** @var \GuzzleHttp\Psr7\Response $response */
+        $response = $instance->availabilityZone
+            ->kingpinService()
+            ->get(
+                '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->id.'/screenshot'
+            );
+
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::info(
+                __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console screenshot',
+                [
+                    'instance' => $instance,
+                    'response' => $response,
+                ]
+            );
+            return response()->json([
+                'errors' => [
+                    'title' => 'Bad Gateway',
+                    'details' => 'Console access to this instance is not available',
+                    'status' => Response::HTTP_BAD_GATEWAY,
+                ]
+            ], Response::HTTP_BAD_GATEWAY);
+        }
+
+        $name = $instance->vpc_id . '-' . $instance->id . '-' . date('d-m-Y') . '-screenshot';
+
+        return new Response(
+            json_decode($response->getBody()->getContents()),
+            200,
+            [
+                'Content-Disposition' => 'attachment; filename=' . $name,
+                'Content-Type'        => 'image/png'
+            ]
+        );
+    }
+
     public function consoleSession(Request $request, $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);

@@ -152,7 +152,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function firewallPolicy($id = 'fwp-test')
     {
         if (!$this->firewallPolicy) {
-            Model::withoutEvents(function() use ($id) {
+            Model::withoutEvents(function () use ($id) {
                 $this->firewallPolicy = factory(FirewallPolicy::class)->create([
                     'id' => $id,
                     'router_id' => $this->router()->id,
@@ -165,7 +165,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function ip($id = 'ip-aaaaaaaa-dev'): IpAddress
     {
         if (!$this->ip) {
-            Model::withoutEvents(function() use ($id) {
+            Model::withoutEvents(function () use ($id) {
                 $this->ip = IpAddress::factory()->create([
                     'id' => $id,
                     'ip_address' => '1.1.1.1',
@@ -181,7 +181,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function networkPolicy($id = 'np-test'): NetworkPolicy
     {
         if (!$this->networkPolicy) {
-            Model::withoutEvents(function() use ($id) {
+            Model::withoutEvents(function () use ($id) {
                 $this->networkPolicy = factory(NetworkPolicy::class)->create([
                     'id' => $id,
                     'network_id' => $this->network()->id,
@@ -194,7 +194,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function routerThroughput()
     {
         if (!$this->routerThroughput) {
-            Model::withoutEvents(function() {
+            Model::withoutEvents(function () {
                 $this->routerThroughput = factory(RouterThroughput::class)->create([
                     'id' => 'rtp-test',
                     'committed_bandwidth' => '1024',
@@ -208,7 +208,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function router()
     {
         if (!$this->router) {
-            Model::withoutEvents(function() {
+            Model::withoutEvents(function () {
                 $this->router = factory(Router::class)->create([
                     'id' => 'rtr-test',
                     'vpc_id' => $this->vpc()->id,
@@ -272,7 +272,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function instance()
     {
         if (!$this->instance) {
-            Instance::withoutEvents(function() {
+            Instance::withoutEvents(function () {
                 $this->instance = factory(Instance::class)->create([
                     'id' => 'i-test',
                     'vpc_id' => $this->vpc()->id,
@@ -299,7 +299,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function nic()
     {
         if (!$this->nic) {
-            Nic::withoutEvents(function() {
+            Nic::withoutEvents(function () {
                 $this->nic = factory(Nic::class)->create([
                     'id' => 'nic-test',
                     'mac_address' => 'AA:BB:CC:DD:EE:FF',
@@ -350,7 +350,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function network()
     {
         if (!$this->network) {
-            Model::withoutEvents(function() {
+            Model::withoutEvents(function () {
                 $this->network = factory(Network::class)->create([
                     'id' => 'net-test',
                     'name' => 'Manchester Network',
@@ -365,7 +365,7 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function hostGroup()
     {
         if (!$this->hostGroup) {
-            $this->hostGroup = Model::withoutEvents(function() {
+            $this->hostGroup = Model::withoutEvents(function () {
                 return factory(HostGroup::class)->create([
                     'id' => 'hg-test',
                     'name' => 'hg-test',
@@ -667,6 +667,11 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->conjurerServiceMock;
+    }
+
+    public function loadData($dataFile)
+    {
+        return file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'_data'.DIRECTORY_SEPARATOR.$dataFile) ?? false;
     }
 
     protected function setUp(): void
