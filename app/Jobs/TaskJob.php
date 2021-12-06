@@ -37,7 +37,7 @@ abstract class TaskJob extends Job
         $this->log(__FUNCTION__, $message, $context);
     }
 
-    public function warn($message, $context = [])
+    public function warning($message, $context = [])
     {
         $this->log(__FUNCTION__, $message, $context);
     }

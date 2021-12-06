@@ -4,18 +4,19 @@ namespace App\Traits\V2;
 
 use App\Exceptions\V2\TaskException;
 use App\Support\Sync;
+use Illuminate\Support\Facades\Log;
 
 trait Syncable
 {
     use Taskable;
 
-    // TODO: Make this abstract - we should force objects implementing Syncable to return job class
     public function getUpdateSyncJob()
     {
         $class = explode('\\', __CLASS__);
-        $syncJobClass = 'App\\Jobs\\Sync\\' . end($class) . '\\Update';
-        if (class_exists($syncJobClass)) {
-            return $syncJobClass;
+
+        // TODO: Remove this condition once all models using new Task method
+        if (file_exists(app()->basePath('app/Jobs/Sync/'. end($class) . '/Update.php'))) {
+            return 'App\\Jobs\\Sync\\' . end($class) . '\\Update';
         }
 
         return 'App\\Tasks\\Sync\\'. end($class) . '\\Update';
@@ -25,9 +26,10 @@ trait Syncable
     public function getDeleteSyncJob()
     {
         $class = explode('\\', __CLASS__);
-        $syncJobClass = 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
-        if (class_exists($syncJobClass)) {
-            return $syncJobClass;
+        
+        // TODO: Remove this condition once all models using new Task method
+        if (file_exists(app()->basePath('app/Jobs/Sync/'. end($class) . '/Delete.php'))) {
+            return 'App\\Jobs\\Sync\\' . end($class) . '\\Delete';
         }
 
         return 'App\\Tasks\\Sync\\'. end($class) . '\\Delete';
