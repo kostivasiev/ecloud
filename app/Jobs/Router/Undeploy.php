@@ -2,37 +2,27 @@
 
 namespace App\Jobs\Router;
 
-use App\Jobs\Job;
-use App\Models\V2\Router;
-use App\Traits\V2\LoggableModelJob;
+use App\Jobs\TaskJob;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
-class Undeploy extends Job
+class Undeploy extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private $model;
-
-    public function __construct(Router $router)
-    {
-        $this->model = $router;
-    }
-
     public function handle()
     {
+        $router = $this->task->resource;
+
         try {
-            $this->model->availabilityZone->nsxService()->get('policy/api/v1/infra/tier-1s/' . $this->model->id);
+            $router->availabilityZone->nsxService()->get('policy/api/v1/infra/tier-1s/' . $router->id);
         } catch (ClientException $e) {
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
-                Log::info("Router already removed, skipping");
+                $this->info("Router already removed, skipping");
                 return;
             }
             throw $e;
         }
 
         # Delete the router
-        $this->model->availabilityZone->nsxService()->delete('policy/api/v1/infra/tier-1s/' . $this->model->id);
+        $this->info("Removing router");
+        $router->availabilityZone->nsxService()->delete('policy/api/v1/infra/tier-1s/' . $router->id);
     }
 }

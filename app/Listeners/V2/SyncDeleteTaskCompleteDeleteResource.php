@@ -6,7 +6,7 @@ use App\Support\Sync;
 use App\Tasks\Task;
 use Illuminate\Support\Facades\Log;
 
-class SyncDeleteTaskComplete
+class SyncDeleteTaskCompleteDeleteResource
 {
     public function handle($event)
     {
