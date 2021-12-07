@@ -3,6 +3,8 @@
 namespace App\Http\Requests\V2\Image;
 
 use App\Models\V2\Image;
+use App\Models\V2\Software;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -71,6 +73,17 @@ class UpdateRequest extends FormRequest
                 'required',
                 'string',
                 'in:' . Image::VISIBILITY_PUBLIC . ','. Image::VISIBILITY_PRIVATE
+            ],
+            'software_ids' => [
+                'sometimes',
+                'nullable',
+                'array'
+            ],
+            'software_ids.*' => [
+                'sometimes',
+                'nullable',
+                'string',
+                Rule::exists(Software::class, 'id')->whereNull('deleted_at'),
             ],
         ];
     }

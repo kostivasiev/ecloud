@@ -478,6 +478,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('images/{imageId}', 'ImageController@show');
         $router->get('images/{imageId}/parameters', 'ImageController@parameters');
         $router->get('images/{imageId}/metadata', 'ImageController@metadata');
+        $router->get('images/{imageId}/software', 'ImageController@software');
 
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('images', 'ImageController@store');
@@ -580,6 +581,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         });
 
         $router->get('software/{softwareId}/scripts', 'SoftwareController@scripts');
+        $router->get('software/{softwareId}/images', 'SoftwareController@images');
     });
 
     /** Scripts */

@@ -25,31 +25,16 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/vips?page=1'
+                                # Change path in example below
+                                example: 'https://api.ukfast.io/ecloud/v2/references?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/vips?page=1'
+                                # Change path in example below
+                                example: 'https://api.ukfast.io/ecloud/v2/references?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/vips?page=2'
+                                # Change path in example below
+                                example: 'https://api.ukfast.io/ecloud/v2/references?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/vips?page=2'
+                                # Change path in example below
+                                example: 'https://api.ukfast.io/ecloud/v2/references?page=2'
   tags:
-    - Vips
-post:
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          allOf:
-            - $ref: 'schema.yaml'
-            - type: object
-              properties:
-                allocate_floating_ip:
-                  type: boolean
-                  required: false
-  responses:
-    202:
-      description: Accepted
-      $ref: 'responses/idResponse.yaml'
-  tags:
-    - Vips
+    - Instance Software

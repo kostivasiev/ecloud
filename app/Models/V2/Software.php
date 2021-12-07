@@ -47,6 +47,11 @@ class Software extends Model implements Filterable, Sortable
         return $this->hasMany(Script::class);
     }
 
+    public function images()
+    {
+        return $this->belongsToMany(Image::class);
+    }
+
     /**
      * @param $query
      * @param $user

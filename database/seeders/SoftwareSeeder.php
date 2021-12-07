@@ -16,7 +16,7 @@ class SoftwareSeeder extends Seeder
     {
         Software::factory()->create(
             [
-                'id' => 'soft-test',
+                'id' => 'soft-aaaaaaaa',
                 'name' => 'Test Software'
             ]
         );

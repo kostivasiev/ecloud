@@ -104,6 +104,11 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
         return $this->hasMany(ImageMetadata::class);
     }
 
+    public function software()
+    {
+        return $this->belongsToMany(Software::class);
+    }
+
     /**
      * Get a single metadata value by key or return all as key => value collection
      * @param $key

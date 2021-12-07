@@ -3,6 +3,7 @@
 namespace Tests\V2\Image;
 
 use App\Models\V2\Image;
+use Database\Seeders\SoftwareSeeder;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -192,6 +193,21 @@ class GetTest extends TestCase
             ->seeJson([
                 'img-private-test',
                 'vpc_id' => $this->vpc()->id,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testImageSoftware()
+    {
+        (new SoftwareSeeder())->run();
+
+        $this->image()->software()->sync(['soft-aaaaaaaa']);
+        
+        $this->get('/v2/images/' . $this->image()->id . '/software')
+            ->seeJson([
+                'id' => 'soft-aaaaaaaa',
+                'name' => 'Test Software',
+                'platform' => 'Linux',
             ])
             ->assertResponseStatus(200);
     }

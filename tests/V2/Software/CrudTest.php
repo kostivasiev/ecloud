@@ -21,7 +21,7 @@ class CrudTest extends TestCase
         // Assert public visibility is returned for non admin
         $this->get('/v2/software')
             ->seeJson([
-                'id' => 'soft-test',
+                'id' => 'soft-aaaaaaaa',
                 'name' => 'Test Software',
                 'platform' => 'Linux',
             ])
@@ -33,7 +33,7 @@ class CrudTest extends TestCase
         // Assert private visibility is not returned to non admin
         $this->get('/v2/software')
             ->dontSeeJson([
-                'id' => 'soft-test',
+                'id' => 'soft-aaaaaaaa',
                 'name' => 'Test Software',
                 'platform' => 'Linux',
         ])
@@ -41,9 +41,9 @@ class CrudTest extends TestCase
 
         // Assert private visibility is returned for admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->get('/v2/software/soft-test')
+        $this->get('/v2/software/soft-aaaaaaaa')
             ->seeJson([
-                'id' => 'soft-test',
+                'id' => 'soft-aaaaaaaa',
                 'name' => 'Test Software',
                 'platform' => 'Linux',
                 'visibility' => 'private',
@@ -54,9 +54,9 @@ class CrudTest extends TestCase
     public function testShow()
     {
         // Assert public visibility is returned for non admin
-        $this->get('/v2/software/soft-test')
+        $this->get('/v2/software/soft-aaaaaaaa')
             ->seeJson([
-                'id' => 'soft-test',
+                'id' => 'soft-aaaaaaaa',
                 'name' => 'Test Software',
                 'platform' => 'Linux',
             ])
@@ -65,11 +65,11 @@ class CrudTest extends TestCase
         // Assert private visibility is not returned to non admin
         $software = Software::first();
         $software->setAttribute('visibility', Software::VISIBILITY_PRIVATE)->save();
-        $this->get('/v2/software/soft-test')->assertResponseStatus(404);
+        $this->get('/v2/software/soft-aaaaaaaa')->assertResponseStatus(404);
 
         // Assert private visibility is returned for admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->get('/v2/software/soft-test')->assertResponseStatus(200);
+        $this->get('/v2/software/soft-aaaaaaaa')->assertResponseStatus(200);
     }
 
     public function testStore()
@@ -98,10 +98,10 @@ class CrudTest extends TestCase
         ];
 
         // Not admin fails
-        $this->patch('/v2/software/soft-test', $data)->assertResponseStatus(401);
+        $this->patch('/v2/software/soft-aaaaaaaa', $data)->assertResponseStatus(401);
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->patch('/v2/software/soft-test', $data)
+        $this->patch('/v2/software/soft-aaaaaaaa', $data)
             ->seeInDatabase('software', $data, 'ecloud')
             ->assertResponseStatus(200);
     }
@@ -109,14 +109,14 @@ class CrudTest extends TestCase
     public function testDestroy()
     {
         // Not admin fails
-        $this->delete('/v2/software/soft-test')->assertResponseStatus(401);
+        $this->delete('/v2/software/soft-aaaaaaaa')->assertResponseStatus(401);
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->delete('/v2/software/soft-test')
+        $this->delete('/v2/software/soft-aaaaaaaa')
             ->notSeeInDatabase(
                 'software',
                 [
-                    'id' => 'soft-test',
+                    'id' => 'soft-aaaaaaaa',
                     'deleted_at' => null,
                 ],
                 'ecloud'

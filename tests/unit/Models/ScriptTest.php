@@ -21,13 +21,13 @@ class ScriptTest extends TestCase
         Script::truncate();
 
         $script = Script::factory()->create([
-            'software_id' => 'soft-test',
+            'software_id' => 'soft-aaaaaaaa',
         ]);
 
         $this->assertEquals(1, $script->sequence);
 
         $script = Script::factory()->create([
-            'software_id' => 'soft-test',
+            'software_id' => 'soft-aaaaaaaa',
         ]);
 
         $this->assertEquals(2, $script->sequence);
@@ -35,7 +35,7 @@ class ScriptTest extends TestCase
         $script->delete();
 
         $script = Script::factory()->create([
-            'software_id' => 'soft-test',
+            'software_id' => 'soft-aaaaaaaa',
         ]);
 
         $this->assertEquals(2, $script->sequence);
