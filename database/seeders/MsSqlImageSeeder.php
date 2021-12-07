@@ -28,7 +28,7 @@ class MsSqlImageSeeder extends Seeder
                 'documentation_uri' => null,
                 'description' => null,
                 'script_template' => <<<'EOM'
-Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /PID=PMBDC-FXVM3-T777P-N4FY8-PKFF4 /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=`"$env:COMPUTERNAME\ukfast.support`" `"$env:COMPUTERNAME\graphite.rack`" /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait
+Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$env:COMPUTERNAME\Administrators /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait
 EOM,
                 'vm_template' => 'windows 2019 datacenter-mssql2019-standard',
                 'platform' => 'Windows',
@@ -43,7 +43,7 @@ EOM,
                 'documentation_uri' => null,
                 'description' => null,
                 'script_template' => <<<'EOM'
-Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /PID=33QQK-WWQNB-G6T46-C86YB-TX2PH /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=`"$env:COMPUTERNAME\ukfast.support`" `"$env:COMPUTERNAME\graphite.rack`" /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait
+Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$env:COMPUTERNAME\Administrators /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait
 EOM,
                 'vm_template' => 'windows 2019 datacenter-mssql2019-web',
                 'platform' => 'Windows',
@@ -58,7 +58,7 @@ EOM,
                 'documentation_uri' => null,
                 'description' => null,
                 'script_template' => <<<'EOM'
-Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /PID=2C9JR-K3RNG-QD4M4-JQ2HR-8468J /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=`"$env:COMPUTERNAME\ukfast.support`" `"$env:COMPUTERNAME\graphite.rack`" /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait
+Start-Process -FilePath "C:\Program Files\Microsoft SQL Server\150\Setup Bootstrap\SQL2019\setup.exe" -ArgumentList "/QS /ACTION=CompleteImage /INSTANCEID=MSSQLSERVER /INSTANCENAME=MSSQLSERVER /IAcceptSQLServerLicenseTerms=true /SQLSYSADMINACCOUNTS=$env:COMPUTERNAME\Administrators /BROWSERSVCSTARTUPTYPE=DISABLED /TCPENABLED=1" -Wait
 EOM,
                 'vm_template' => 'windows 2019 datacenter-mssql2019-enterprise',
                 'platform' => 'Windows',
