@@ -22,7 +22,6 @@ class AvailabilityZoneSeeder extends Seeder
             'name' => 'Dev Availability Zone',
             'datacentre_site_id' => 8,
             'region_id' => 'reg-aaaaaaaa',
-            'nsx_manager_endpoint' => 'https://185.197.63.88/',
             'san_name' => 'MCS-E-G0-3PAR-01',
             'ucs_compute_name' => 'GC-UCS-FI2-DEV-A',
             'is_public' => true,

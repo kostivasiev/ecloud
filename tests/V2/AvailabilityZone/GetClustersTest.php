@@ -45,4 +45,9 @@ class GetClustersTest extends TestCase
     {
         $this->assertFalse(Schema::hasColumn('availability_zones', 'nsx_edge_cluster_id'));
     }
+
+    public function testNsxManagerEndpointDoesntExist()
+    {
+        $this->assertFalse(Schema::hasColumn('availability_zones', 'nsx_manager_endpoint'));
+    }
 }

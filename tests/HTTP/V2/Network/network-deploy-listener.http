@@ -23,7 +23,6 @@ Content-Type:  application/json
   "code": "MAN1",
   "name": "Test AZ",
   "datacentre_site_id": 111,
-  "nsx_manager_endpoint": "https://185.197.63.88/",
   "region_id": "{{region_id}}"
 }
 

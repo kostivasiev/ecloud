@@ -76,7 +76,6 @@ class AvailabilityZoneController extends BaseController
             'datacentre_site_id',
             'is_public',
             'region_id',
-            'nsx_manager_endpoint',
             'san_name',
             'ucs_compute_name',
         ]));
@@ -99,7 +98,6 @@ class AvailabilityZoneController extends BaseController
             'datacentre_site_id',
             'is_public',
             'region_id',
-            'nsx_manager_endpoint',
             'san_name',
             'ucs_compute_name',
         ]));
