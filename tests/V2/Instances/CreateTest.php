@@ -8,7 +8,10 @@ use App\Models\V2\ApplianceVersionData;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
+use App\Models\V2\Network;
+use App\Models\V2\Router;
 use App\Models\V2\Task;
+use App\Models\V2\Vpc;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
@@ -348,6 +351,56 @@ class CreateTest extends TestCase
                 'title' => 'Validation Error',
                 'detail' => 'The Floating IP is already assigned to a resource',
                 'source' => 'floating_ip_id',
+            ]
+        )->assertResponseStatus(422);
+    }
+
+    public function testNetworkFromAnotherVpcCausesFail()
+    {
+        $secondVpc = Model::withoutEvents(function () {
+            return factory(Vpc::class)->create([
+                'id' => 'vpc-second',
+                'region_id' => $this->region()->id
+            ]);
+        });
+        $secondRouter = Model::withoutEvents(function () use ($secondVpc) {
+            return factory(Router::class)->create([
+                'id' => 'rtr-second',
+                'vpc_id' => $secondVpc->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'router_throughput_id' => $this->routerThroughput()->id,
+            ]);
+        });
+        $secondNetwork = Model::withoutEvents(function () use ($secondRouter) {
+            return factory(Network::class)->create([
+                'id' => 'net-second',
+                'name' => 'Manchester Network',
+                'subnet' => '10.0.0.0/24',
+                'router_id' => $secondRouter->id
+            ]);
+        });
+
+        $data = [
+            'vpc_id' => $this->vpc()->id,
+            'image_id' => $this->image()->id,
+            'network_id' => $secondNetwork->id,
+            'vcpu_cores' => 4,
+            'ram_capacity' => 1024,
+            'volume_capacity' => 30,
+            'volume_iops' => 600,
+        ];
+
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->seeJson(
+            [
+                'title' => 'Validation Error',
+                'detail' => 'Resources must be in the same Vpc'
             ]
         )->assertResponseStatus(422);
     }

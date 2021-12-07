@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Network extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Manageable
+class Network extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Manageable, VpcAble
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -61,6 +61,11 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
     public function router()
     {
         return $this->belongsTo(Router::class);
+    }
+
+    public function vpc()
+    {
+        return $this->router->vpc();
     }
 
     public function nics()

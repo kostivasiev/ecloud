@@ -20,7 +20,7 @@ use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sort;
 use UKFast\DB\Ditto\Sortable;
 
-class Instance extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Manageable
+class Instance extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Manageable, VpcAble
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
