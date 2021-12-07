@@ -22,7 +22,6 @@ trait Syncable
         return 'App\\Tasks\\Sync\\'. end($class) . '\\Update';
     }
 
-    // TODO: Make this abstract - we should force objects implementing Syncable to return job class
     public function getDeleteSyncJob()
     {
         $class = explode('\\', __CLASS__);
