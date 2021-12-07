@@ -147,7 +147,7 @@ class EventServiceProvider extends ServiceProvider
 
         // Task
         \App\Events\V2\Task\Created::class => [
-            \App\Listeners\V2\TaskCreated::class
+            \App\Listeners\V2\DispatchTaskJob::class
         ],
         \App\Events\V2\Task\Updated::class => [
             \App\Listeners\V2\SyncDeleteTaskCompleteDeleteResource::class,

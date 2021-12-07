@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class TaskCreated
+class DispatchTaskJob
 {
     public function handle($event)
     {

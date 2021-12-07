@@ -2,9 +2,7 @@
 
 namespace Tests\unit\Jobs\Router;
 
-use App\Jobs\Network\CreateManagementNetwork;
 use App\Jobs\Router\CreateManagementFirewallPolicies;
-use App\Listeners\V2\TaskCreated;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
@@ -12,7 +10,6 @@ use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class CreateManagementFirewallPoliciesTest extends TestCase
@@ -48,7 +45,7 @@ class CreateManagementFirewallPoliciesTest extends TestCase
             $this->router()->setAttribute('is_management', true)->saveQuietly();
             $this->task->resource()->associate($this->router());
         });
-        Event::fake(TaskCreated::class);
+
         Bus::fake();
         $job = new CreateManagementFirewallPolicies($this->task);
         $this->assertNull($job->handle());
@@ -68,7 +65,7 @@ class CreateManagementFirewallPoliciesTest extends TestCase
                 'management_network_id' => $this->managementNetwork->id,
             ])->saveQuietly();
         });
-        Event::fake(TaskCreated::class);
+
         Bus::fake();
 
         $job = new CreateManagementFirewallPolicies($this->task);

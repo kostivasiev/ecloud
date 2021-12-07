@@ -3,16 +3,12 @@
 namespace Tests\unit\Jobs\Network;
 
 use App\Jobs\Network\CreateManagementNetwork;
-use App\Listeners\V2\TaskCreated;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Event;
-use IPLib\Factory;
-use IPLib\Range\Subnet;
 use Tests\TestCase;
 
 class CreateManagementNetworkTest extends TestCase
@@ -45,7 +41,7 @@ class CreateManagementNetworkTest extends TestCase
             $this->task->resource()->associate($this->router());
             $this->task->save();
         });
-        Event::fake(TaskCreated::class);
+
         Bus::fake();
         $job = new CreateManagementNetwork($this->task);
         $job->handle();
@@ -66,7 +62,7 @@ class CreateManagementNetworkTest extends TestCase
             ];
             $this->task->save();
         });
-        Event::fake(TaskCreated::class);
+
         Bus::fake();
         $job = new CreateManagementNetwork($this->task);
         $job->handle();
@@ -91,7 +87,7 @@ class CreateManagementNetworkTest extends TestCase
             ];
             $this->task->save();
         });
-        Event::fake(TaskCreated::class);
+
         Bus::fake();
         $job = new CreateManagementNetwork($this->task);
         $job->handle();
