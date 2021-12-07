@@ -34,7 +34,7 @@ client.log('router_id: ' + response.body.data.id);
 %}
 ###
 
-DELETE https://{{host}}/{{version}}/vpcs/vpc-2f011a1d-dev
+DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 X-consumer-custom-id:  1-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
