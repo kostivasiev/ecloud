@@ -150,6 +150,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\TaskCreated::class
         ],
         \App\Events\V2\Task\Updated::class => [
+            \App\Listeners\V2\SyncDeleteTaskComplete::class,
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
             \App\Listeners\V2\Image\UpdateImageBilling::class,
