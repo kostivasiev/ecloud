@@ -5,5 +5,5 @@
 
 include:
   - project: 'ukfast/api.ukfast/gitlab-ci'
-    ref: master
+    ref: paratest-support
     file: '/templates/main.yml'
