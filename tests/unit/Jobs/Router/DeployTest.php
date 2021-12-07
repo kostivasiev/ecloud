@@ -4,6 +4,8 @@ namespace Tests\unit\Jobs\Router;
 
 use App\Jobs\Router\Deploy;
 use App\Models\V2\Router;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
@@ -16,11 +18,20 @@ use Tests\TestCase;
 
 class DeployTest extends TestCase
 {
-    protected Router $router;
+    protected Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->router());
+            $this->task->save();
+        });
     }
 
     public function testPopulatesTier0PathAndSucceeds()
@@ -84,7 +95,7 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->router()));
+        dispatch(new Deploy($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -136,7 +147,7 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->router()));
+        dispatch(new Deploy($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -144,14 +155,13 @@ class DeployTest extends TestCase
     public function testRouterNoThroughputFails()
     {
         Model::withoutEvents(function () {
-            $this->router = factory(Router::class)->create([
-                'id' => 'rtr-test',
-            ]);
+            $this->router()->router_throughput_id = '';
+            $this->router()->save();
         });
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->router));
+        dispatch(new Deploy($this->task));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
             return $event->exception->getMessage() == 'Failed determine router throughput settings for router rtr-test';
@@ -170,7 +180,7 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->router()));
+        dispatch(new Deploy($this->task));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
             return $event->exception->getMessage() == 'Failed to determine gateway QoS profile for router ' . $this->router()->id . ', with router_throughput_id ' . $this->routerThroughput()->id;
@@ -208,7 +218,7 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->router()));
+        dispatch(new Deploy($this->task));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
             return $event->exception->getMessage() == 'No tagged T0 could be found';
@@ -282,7 +292,7 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->router()));
+        dispatch(new Deploy($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
