@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Task\Updated;
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Traits\V2\Listeners\BillableListener;
@@ -12,7 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use UKFast\Admin\Licenses\AdminClient;
 
-class UpdateMsSqlLicenseBilling
+class UpdateMsSqlLicenseBilling implements Billable
 {
     use BillableListener;
 
@@ -48,7 +49,7 @@ class UpdateMsSqlLicenseBilling
         $license = $licenses[0]->keyId;
         $edition = Str::lower(Arr::last(Str::of($license)->explode('-')->toArray()));
 
-        $key = 'license.mssql.' . $edition;
+        $key = self::getKeyName($edition);
         $cores = $instance->vcpu_cores < 4 ? 4 : $instance->vcpu_cores;
         $packs = ceil($cores / 2);
 
@@ -56,7 +57,7 @@ class UpdateMsSqlLicenseBilling
         $product = $instance->availabilityZone->products()
             ->firstWhere('product_name', 'LIKE', $instance->availabilityZone->id . '%mssql%' . $edition . '%');
         if (!empty($product)) {
-            $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.mssql.' . $edition);
+            $currentActiveMetric = BillingMetric::getActiveByKey($instance, $key);
 
             if (!empty($currentActiveMetric)) {
                 if ($currentActiveMetric->value == $packs) {
@@ -70,6 +71,7 @@ class UpdateMsSqlLicenseBilling
                 'resource_id' => $instance->id,
                 'vpc_id' => $instance->vpc->id,
                 'reseller_id' => $instance->vpc->reseller_id,
+                'friendly_name' => self::getFriendlyName($edition),
                 'key' => $key,
                 'value' => $packs,
                 'start' => Carbon::now(),
@@ -80,5 +82,25 @@ class UpdateMsSqlLicenseBilling
 
             Log::info('Billing metric ' . $key . ' added for resource ' . $instance->id);
         }
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        $argument = (count(func_get_args()) > 0) ? ' ' . func_get_arg(0) . ' Edition' : '';
+        return ucwords(sprintf('Microsoft SQL Server%s', $argument));
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        $argument = (count(func_get_args()) > 0) ? func_get_arg(0) : '';
+        return sprintf('license.mssql.%s', $argument);
     }
 }

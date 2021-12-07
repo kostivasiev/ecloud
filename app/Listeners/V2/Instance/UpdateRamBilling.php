@@ -3,13 +3,14 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Task\Updated;
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
-class UpdateRamBilling
+class UpdateRamBilling implements Billable
 {
     /**
      * @param Updated $event
@@ -38,18 +39,21 @@ class UpdateRamBilling
 
         if (!empty($instance->host_group_id)) {
             $instance->billingMetrics()
-                ->whereIn('key', ['ram.capacity', 'ram.capacity.high'])
+                ->whereIn('key', json_decode(self::getKeyName()))
                 ->each(function ($billingMetric) use ($instance) {
                     $billingMetric->setEndDate();
                     Log::debug('End billing of `' . $billingMetric->key . '` for Instance ' . $instance->id);
                 });
-            Log::warning(get_class($this) . ': Instance ' . $instance->id . ' is in the host group ' . $instance->host_group_id . ', nothing to do');
+            Log::warning(
+                get_class($this) . ': Instance ' . $instance->id . ' is in the host group ' .
+                $instance->host_group_id . ', nothing to do'
+            );
             return;
         }
 
         $currentActiveMetrics = BillingMetric::where('resource_id', $instance->id)
             ->whereNull('end')
-            ->whereIn('key', ['ram.capacity', 'ram.capacity.high'])
+            ->whereIn('key', json_decode(self::getKeyName()))
             ->get();
 
         if (!empty($currentActiveMetrics)) {
@@ -66,7 +70,7 @@ class UpdateRamBilling
         // Standard tier billing
         $this->addBilling(
             $instance,
-            'ram.capacity',
+            json_decode(self::getKeyName())[0],
             ($instance->ram_capacity > $standardTierLimitMiB) ? $standardTierLimitMiB : $instance->ram_capacity,
             $instance->availabilityZone->id . ': ram-1mb'
         );
@@ -75,7 +79,7 @@ class UpdateRamBilling
         if ($instance->ram_capacity > $standardTierLimitMiB) {
             $this->addBilling(
                 $instance,
-                'ram.capacity.high',
+                json_decode(self::getKeyName())[1],
                 ($instance->ram_capacity - $standardTierLimitMiB),
                 $instance->availabilityZone->id . ': ram:high-1mb'
             );
@@ -88,6 +92,7 @@ class UpdateRamBilling
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
+        $billingMetric->friendly_name = self::getFriendlyName($key);
         $billingMetric->key = $key;
         $billingMetric->value = $value;
         $billingMetric->start = Carbon::now();
@@ -103,5 +108,29 @@ class UpdateRamBilling
         }
 
         $billingMetric->save();
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        $retVal = 'RAM';
+        if (count(func_get_args()) > 0) {
+            if (func_get_arg(0) == json_decode(self::getKeyName())[1]) {
+                $retVal = 'High Capacity RAM';
+            }
+        }
+        return $retVal;
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        return json_encode(['ram.capacity', 'ram.capacity.high']);
     }
 }

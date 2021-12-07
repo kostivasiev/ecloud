@@ -3,14 +3,17 @@
 namespace App\Listeners\V2\LoadBalancer;
 
 use App\Events\V2\Task\Updated;
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\LoadBalancer;
+use App\Models\V2\LoadBalancerSpecification;
 use App\Models\V2\Product;
 use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
-class UpdateBilling
+class UpdateBilling implements Billable
 {
     public function handle(Updated $event)
     {
@@ -37,12 +40,12 @@ class UpdateBilling
         $time = Carbon::now();
 
         $currentActiveMetric = BillingMetric::where('resource_id', $loadBalancer->id)
-            ->where('key', 'like', 'load-balancer.%')
+            ->where('key', 'like', self::getKeyName('%'))
             ->whereNull('end')
             ->first();
 
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->key == 'load-balancer.' . $loadBalancer->loadBalancerSpec->name) {
+            if ($currentActiveMetric->key == self::getKeyName($loadBalancer->loadBalancerSpec->name)) {
                 return;
             }
             $currentActiveMetric->end = $time;
@@ -54,12 +57,13 @@ class UpdateBilling
             'resource_id' => $loadBalancer->id,
             'vpc_id' => $loadBalancer->vpc->id,
             'reseller_id' => $loadBalancer->vpc->reseller_id,
-            'key' => 'load-balancer.' . $loadBalancer->loadBalancerSpec->name,
+            'friendly_name' => self::getFriendlyName($loadBalancer->loadBalancerSpec->name),
+            'key' => self::getKeyName($loadBalancer->loadBalancerSpec->name),
             'value' => 1,
             'start' => $time,
         ]);
 
-        $productName = $loadBalancer->availabilityZone->id . ': load balancer ' . $loadBalancer->loadBalancerSpec->name;
+        $productName = $loadBalancer->availabilityZone->id . ': ' . self::getFriendlyName($loadBalancer->loadBalancerSpec->name);
 
         /** @var Product $product */
         $product = $loadBalancer->availabilityZone
@@ -68,7 +72,8 @@ class UpdateBilling
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load "' . $productName . '" billing product for availability zone ' . $loadBalancer->availabilityZone->id
+                'Failed to load "' . $productName . '" billing product for availability zone '.
+                $loadBalancer->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;
@@ -78,5 +83,29 @@ class UpdateBilling
         $billingMetric->save();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        $argument = (count(func_get_args()) > 0) ? func_get_arg(0) : '';
+        $lbSpec = LoadBalancerSpecification::withTrashed()->find($argument);
+        if ($lbSpec) {
+            $argument = $lbSpec->name;
+        }
+        return sprintf('%s Load Balancer', ucwords($argument));
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        $argument = (count(func_get_args()) > 0) ? Str::lower(func_get_arg(0)) : '';
+        return sprintf('load-balancer.%s', $argument);
     }
 }
