@@ -8,5 +8,5 @@ variables:
 
 include:
   - project: 'ukfast/api.ukfast/gitlab-ci'
-    ref: paratest-support
+    ref: master
     file: '/templates/main.yml'
