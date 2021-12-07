@@ -8,6 +8,7 @@ use App\Models\V2\Image;
 use App\Resources\V2\ImageMetadataResource;
 use App\Resources\V2\ImageParameterResource;
 use App\Resources\V2\ImageResource;
+use App\Resources\V2\SoftwareResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -142,7 +143,7 @@ class ImageController extends BaseController
     {
         $collection = Image::forUser(Auth::user())->findOrFail($imageId)->software();
 
-        return ImageResource::collection($collection->paginate(
+        return SoftwareResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
