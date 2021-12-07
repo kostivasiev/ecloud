@@ -36,7 +36,6 @@ class TaskCreated
                     $task->failure_reason = $failureReasonCallback($e);
                     $task->save();
                 })->dispatch();
-
             } else {
                 Log::debug(get_class($this) . " : Dispatching job", ["job" => $event->model->job]);
                 dispatch($taskJob);
