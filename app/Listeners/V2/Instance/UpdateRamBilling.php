@@ -7,11 +7,13 @@ use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Sync;
+use App\Traits\V2\InstanceOnlineState;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateRamBilling implements Billable
 {
+    use InstanceOnlineState;
     /**
      * @param Updated $event
      * @return void
@@ -34,6 +36,10 @@ class UpdateRamBilling implements Billable
         }
 
         if ($instance->isManaged()) {
+            return;
+        }
+
+        if ($this->getOnlineStatus($instance)['online'] === false) {
             return;
         }
 

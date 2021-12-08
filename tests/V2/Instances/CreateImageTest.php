@@ -4,6 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Models\V2\Image;
 use App\Models\V2\Volume;
+use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
@@ -63,6 +64,14 @@ class CreateImageTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200);
             });
+
+        $this->kingpinServiceMock()->allows('get')
+            ->andReturn(
+                new Response(200, [], json_encode([
+                    'powerState' => KingpinService::INSTANCE_POWERSTATE_POWEREDOFF,
+                    'toolsRunningStatus' => KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING,
+                ]))
+            );
 
         $this->post(
             '/v2/instances/' . $this->instance()->id . '/create-image',

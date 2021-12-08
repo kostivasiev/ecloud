@@ -7,11 +7,13 @@ use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Sync;
+use App\Traits\V2\InstanceOnlineState;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateVcpuBilling implements Billable
 {
+    use InstanceOnlineState;
     /**
      * @param Updated $event
      * @return void
@@ -48,6 +50,10 @@ class UpdateVcpuBilling implements Billable
                 get_class($this) . ': Instance ' . $instance->id . ' is in the host group ' .
                 $instance->host_group_id . ', nothing to do'
             );
+            return;
+        }
+
+        if ($this->getOnlineStatus($instance)['online'] === false) {
             return;
         }
 
