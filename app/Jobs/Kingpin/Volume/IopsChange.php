@@ -27,11 +27,6 @@ class IopsChange extends Job
             return;
         }
 
-        if ($volume->is_shared) {
-            Log::info(get_class($this) . ' : Shared volume detected, skipping');
-            return;
-        }
-
         foreach ($volume->instances as $instance) {
             $getVolumeResponse = $volume->availabilityZone->kingpinService()->get('/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/volume/' . $volume->vmware_uuid);
             $getVolumeResponseJson = json_decode($getVolumeResponse->getBody()->getContents());
