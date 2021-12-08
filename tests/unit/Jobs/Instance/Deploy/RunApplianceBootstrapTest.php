@@ -6,7 +6,7 @@ use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Models\V2\Credential;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
-use Database\Seeders\CpanelImageSeeder;
+use Database\Seeders\Images\CpanelImageSeeder;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;

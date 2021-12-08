@@ -6,6 +6,7 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\Network;
+use App\Models\V2\Software;
 use App\Models\V2\SshKeyPair;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
@@ -17,6 +18,7 @@ use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\IsSameVpc;
 use App\Rules\V2\IsValidRamMultiple;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -129,7 +131,17 @@ class CreateRequest extends FormRequest
                 'sometimes',
                 'string',
                 new ExistsForUser(SshKeyPair::class),
-            ]
+            ],
+            'software_ids' => [
+                'sometimes',
+                'required',
+                'array'
+            ],
+            'software_ids.*' => [
+                'required',
+                'string',
+                Rule::exists(Software::class, 'id')->whereNull('deleted_at'),
+            ],
         ];
 
         if (Auth::user()->isAdmin()) {

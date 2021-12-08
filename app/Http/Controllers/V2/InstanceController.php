@@ -133,6 +133,7 @@ class InstanceController extends BaseController
             'image_data' => $imageData->toArray(),
             'user_script' => $request->input('user_script'),
             'ssh_key_pair_ids' => $request->input('ssh_key_pair_ids'),
+            'software_ids' => $request->input('software_ids'),
         ];
 
         $task = $instance->syncSave();

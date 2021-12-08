@@ -15,6 +15,7 @@ use App\Jobs\Instance\Deploy\CreateFloatingIp;
 use App\Jobs\Instance\Deploy\Deploy;
 use App\Jobs\Instance\Deploy\DeployCompleted;
 use App\Jobs\Instance\Deploy\ExpandOsDisk;
+use App\Jobs\Instance\Deploy\InstallSoftware;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
@@ -68,6 +69,9 @@ class Update extends Job
                     new RegisterLicenses($this->task->resource),
                     new RunApplianceBootstrap($this->task->resource),
                     new RunImageReadinessScript($this->task->resource),
+
+                    new InstallSoftware($this->task),
+
                     new RunBootstrapScript($this->task->resource),
                     new DeployCompleted($this->task->resource),
                 ],
