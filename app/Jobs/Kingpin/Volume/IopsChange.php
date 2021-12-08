@@ -44,6 +44,10 @@ class IopsChange extends Job
                 ]
             );
 
+            if ($volume->is_shared) {
+                sleep(10);
+            }
+
             Log::debug('Volume ' . $volume->id . ' iops changed to ' . $volume->iops . ' on instance ' . $instance->id);
         }
     }
