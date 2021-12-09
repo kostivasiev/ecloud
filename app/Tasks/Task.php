@@ -9,7 +9,7 @@ abstract class Task
 {
     abstract public function jobs();
 
-    public function failureReasonCallback()
+    public function failureReason(): callable
     {
         return function (Throwable $e) {
             return ($e instanceof RequestException && $e->hasResponse()) ?

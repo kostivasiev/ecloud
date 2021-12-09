@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class TaskCreated
+class DispatchTaskJob
 {
     public function handle($event)
     {
@@ -23,9 +23,10 @@ class TaskCreated
                 foreach ($taskJob->jobs() as $job) {
                     $jobs[] = new $job($task);
                 }
-                $failureReasonCallback = $taskJob->failureReasonCallback();
 
-                Log::debug(get_class($this) . " : Dispatching batch", ["id" => $event->model->id]);
+                $failureReasonCallback = $taskJob->failureReason();
+
+                Log::debug(get_class($this) . " : Dispatching batch", ['task_id' => $task->id, 'resource_id' => $task->resource->id]);
                 Bus::batch([$jobs])->then(function (Batch $batch) use ($task) {
                     Log::info("Setting task completed", ['task_id' => $task->id, 'resource_id' => $task->resource->id]);
                     $task->completed = true;

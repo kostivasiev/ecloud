@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\VpnSession;
 
 use App\Events\V2\Credential\Creating;
 use App\Events\V2\Task\Created;
+use App\Events\V2\Task\Updated;
 use App\Jobs\VpnSession\CreateNetworkNoSNats;
 use App\Jobs\VpnSession\CreatePreSharedKey;
 use App\Jobs\VpnSession\SyncNetworkNoSNats;
@@ -23,6 +24,8 @@ class SyncNetworkNoSNatsTest extends TestCase
 {
     use VpnSessionMock;
 
+    protected Task $task;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -32,7 +35,7 @@ class SyncNetworkNoSNatsTest extends TestCase
 
     public function testSingleLocalAndRemoteNetworksOneNoSNATRuleCreated()
     {
-        Event::fake([JobFailed::class, Created::class]);
+        Event::fake([JobFailed::class, Created::class, Updated::class]);
 
         $this->vpnSession->vpnSessionNetworks()->create([
             'id' => 'vpnsn-testlocal1',
@@ -64,7 +67,7 @@ class SyncNetworkNoSNatsTest extends TestCase
 
     public function testSingleLocalAndMultipleRemoteNetworksMultipleNoSNATRuleCreated()
     {
-        Event::fake([JobFailed::class, Created::class]);
+        Event::fake([JobFailed::class, Created::class, Updated::class]);
 
         $this->vpnSession->vpnSessionNetworks()->create([
             'id' => 'vpnsn-testlocal1',
@@ -105,7 +108,7 @@ class SyncNetworkNoSNatsTest extends TestCase
 
     public function testMultipleLocalAndMultipleRemoteNetworksMultipleNoSNATRuleCreated()
     {
-        Event::fake([JobFailed::class, Created::class]);
+        Event::fake([JobFailed::class, Created::class, Updated::class]);
 
         $this->vpnSession->vpnSessionNetworks()->create([
             'id' => 'vpnsn-testlocal1',
@@ -159,7 +162,7 @@ class SyncNetworkNoSNatsTest extends TestCase
 
     public function testRemoteNetworkRemovedNoSNATRuleRemoved()
     {
-        Event::fake([JobFailed::class, Created::class]);
+        Event::fake([JobFailed::class, Created::class, Updated::class]);
 
         $localNetwork1 = $this->vpnSession->vpnSessionNetworks()->create([
             'id' => 'vpnsn-testlocal1',
