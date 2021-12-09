@@ -32,7 +32,9 @@ class ChangeOwnership extends Command
         if ($this->option('date') === 'today') {
             $date = Carbon::now()->format('d/m/Y');
         } else {
-            if (!($formattedDate = Carbon::createFromFormat('d/m/Y', $this->option('date')))) {
+            try {
+                $formattedDate = Carbon::createFromFormat('d/m/Y', $this->option('date'));
+            } catch (\Exception $exception) {
                 $this->comment('Invalid Date,  try again with the format DD/MM/YYYY');
                 return Command::FAILURE;
             }
