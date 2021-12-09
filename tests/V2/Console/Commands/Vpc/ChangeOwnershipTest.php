@@ -24,7 +24,7 @@ class ChangeOwnershipTest extends TestCase
             'vpc_id' => $vpc->id,
             'start' => Carbon::now()->endOfDay()->subMonth(),
             'end' => null,
-            'reseller_id' => 1374
+            'reseller_id' => $currentResellerId
         ]);
 
         //check old metrics finished, new metrics started and vpc ownership changed
