@@ -31,7 +31,7 @@ class CreateCluster extends Job
             $client = app()->make(AdminClient::class)
                 ->setResellerId($loadbalancer->getResellerId());
             $response = $client->clusters()->createEntity(new Cluster([
-                'name' => $loadbalancer->name,
+                'name' => $loadbalancer->id,
                 'internal_name' => $loadbalancer->id,
                 'reseller_id' => $loadbalancer->getResellerId(),
             ]));
