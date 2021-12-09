@@ -63,6 +63,5 @@ class ChangeOwnershipTest extends TestCase
 
         //check old metrics finished, new metrics started and vpc ownership changed
         $this->assertEquals(BillingMetric::where('vpc_id', $vpc->id)->count(), 10);
-
     }
 }
