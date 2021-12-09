@@ -19,7 +19,7 @@ use Symfony\Component\Console\Command\Command as CommandResponse;
  */
 class ChangeOwnership extends Command
 {
-    protected $signature = 'vpc:change-ownership {--T|test-run}';
+    protected $signature = 'vpc:change-ownership {--vpc=} {--reseller=} {--date=today} {--T|test-run}';
     protected $description = 'Changes ownership of VPC to a new user';
 
     public function __construct()
@@ -29,45 +29,21 @@ class ChangeOwnership extends Command
 
     public function handle()
     {
-        //prepare
-        restart:
-        $vpcId = $this->ask('Please enter the VPC id:');
-        $resellerId = $this->ask('Please enter the Reseller id:');
-        $dateValid = false;
-        $date = null;
-
-        while ($dateValid === false) {
-            if (!($date = $this->ask('Please enter the Date to Move (Leave blank for today): DD/MM/YYYY'))) {
-                $date = Carbon::now()->format('d/m/Y');
-                $dateValid = true;
-            } else {
-                if (!($formattedDate = Carbon::createFromFormat('d/m/Y', $date))) {
-                    $this->comment('Invalid Date,  try again with the format DD/MM/YYYY');
-                } else {
-                    $date = $formattedDate->format('d/m/Y');
-                    $dateValid = true;
-                }
+        if ($this->option('date') === 'today') {
+            $date = Carbon::now()->format('d/m/Y');
+        } else {
+            if (!($formattedDate = Carbon::createFromFormat('d/m/Y', $this->option('date')))) {
+                $this->comment('Invalid Date,  try again with the format DD/MM/YYYY');
+                return Command::FAILURE;
             }
+            $date = $formattedDate->format('d/m/Y');
         }
 
-        $confirmed = false;
-        while ($confirmed === false) {
-            if (strtolower($this->ask(
-                sprintf(
-                    "Using VPC ID: [%s]. Reseller ID: [%s]. Date to Move: [%s]. Please type 'Y' to confirm.",
-                    $vpcId,
-                    $resellerId,
-                    $date
-                )
-            )) === 'y') {
-                $confirmed = true;
-            } else {
-                goto restart;
-            }
-        }
+        $vpc = Vpc::findOrFail($this->option('vpc'));
+        $reseller = $this->option('reseller');
 
         //act here
-        $currentMetrics = BillingMetric::where('vpc_id', $vpcId)->whereNull('end')->get();
+        $currentMetrics = BillingMetric::where('vpc_id', $vpc->id)->whereNull('end')->get();
         $currentMetricEndDate = Carbon::createFromFormat('d/m/Y', $date)->endOfDay();
         foreach ($currentMetrics as $currentMetric) {
             $newMetric = $currentMetric->toArray();
@@ -75,7 +51,7 @@ class ChangeOwnership extends Command
             unset($newMetric['updated_at']);
             unset($newMetric['id']);
             $newMetric['start'] = $currentMetricEndDate;
-            $newMetric['reseller_id'] = $resellerId;
+            $newMetric['reseller_id'] = $reseller;
             if (!$this->option('test-run')) {
                 BillingMetric::create($newMetric);
                 $currentMetric->end = $currentMetricEndDate;
@@ -83,15 +59,17 @@ class ChangeOwnership extends Command
             }
         }
         if (!$this->option('test-run')) {
-            Vpc::find($vpcId)->update(['reseller_id' => $resellerId]);
+            $vpc->update(['reseller_id' => $reseller]);
         }
 
         $this->info(
             sprintf(
                 'VPC Ownership of %s has been moved to reseller_id %s.',
-                $vpcId,
-                $resellerId
+                $vpc->id,
+                $reseller
             )
         );
+
+        return Command::SUCCESS;
     }
 }
