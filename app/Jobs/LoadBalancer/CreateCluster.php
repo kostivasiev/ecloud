@@ -28,7 +28,8 @@ class CreateCluster extends Job
     {
         $loadbalancer = $this->model;
         if ($loadbalancer->config_id === null) {
-            $client = app()->make(AdminClient::class);
+            $client = app()->make(AdminClient::class)
+                ->setResellerId($loadbalancer->getResellerId());
             $response = $client->clusters()->createEntity(new Cluster([
                 'name' => $loadbalancer->name,
                 'internal_name' => $loadbalancer->id,
