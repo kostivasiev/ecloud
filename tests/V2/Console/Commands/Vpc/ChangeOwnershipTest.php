@@ -4,6 +4,7 @@ namespace Tests\V2\Console\Commands\Vpc;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
 use Tests\TestCase;
 
 class ChangeOwnershipTest extends TestCase
@@ -31,7 +32,7 @@ class ChangeOwnershipTest extends TestCase
 
         $this->assertEquals(
             $this->artisan(sprintf('vpc:change-ownership --vpc=%s --reseller=%s', $vpc->id, $newResellerId)),
-            0
+            Command::SUCCESS
         );
 
         $this->assertEquals(BillingMetric::where('vpc_id', $vpc->id)->count(), 20);
