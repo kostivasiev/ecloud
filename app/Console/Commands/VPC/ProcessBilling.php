@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
  */
 class ProcessBilling extends Command
 {
-    protected $signature = 'vpc:process-billing {--D|debug} {--T|test-run}';
+    protected $signature = 'vpc:process-billing {--C|current-month} {--D|debug} {--T|test-run}';
     protected $description = 'Process eCloud VPC Billing';
 
     protected \DateTimeZone $timeZone;
@@ -43,6 +43,11 @@ class ProcessBilling extends Command
 
     public function handle()
     {
+        if ($this->option('current-month')) {
+            $this->startDate = Carbon::createFromTimeString("First day of this month 00:00:00", $this->timeZone);
+            $this->endDate = Carbon::createFromTimeString("last day of this month 23:59:59", $this->timeZone);
+        }
+
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
         // First calculate discount plan values
