@@ -2,13 +2,12 @@
 
 namespace Tests\unit\Jobs\Instance\Deploy;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Deploy\InstallSoftware;
-use App\Models\V2\FloatingIp;
-use App\Models\V2\InstanceSoftware;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Database\Seeders\Images\CentosWithMcafeeSeeder;
-use Database\Seeders\Software\McafeeLinuxSoftwareSeeder;
+use Database\Seeders\SoftwareSeeder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -22,8 +21,7 @@ class InstallSoftwareTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        (new McafeeLinuxSoftwareSeeder())->run();
-        (new CentosWithMcafeeSeeder())->run();
+        (new SoftwareSeeder())->run();
 
         Model::withoutEvents(function() {
             $this->task = new Task([
@@ -48,7 +46,9 @@ class InstallSoftwareTest extends TestCase
 
     public function testImageAssociatedSoftwareInstalls()
     {
-        Event::fake([JobFailed::class, JobProcessed::class]);
+        (new CentosWithMcafeeSeeder())->run();
+
+        Event::fake([Created::class, JobFailed::class, JobProcessed::class]);
 
         $this->instance()->setAttribute('image_id', 'img-centos-mcafee')->save();
 
@@ -60,11 +60,59 @@ class InstallSoftwareTest extends TestCase
 
         $this->assertTrue(isset($this->task->data['instance_software_ids']));
         $this->assertEquals(1, count($this->task->data['instance_software_ids']));
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
     }
 
-
-    public function testOptionaloftwareInstalls()
+    public function testOptionalSoftwareInstalls()
     {
+        Event::fake([Created::class, JobFailed::class, JobProcessed::class]);
 
+        $this->instance()->setAttribute('deploy_data', [
+            'software_ids' => [
+                'soft-aaaaaaaa'
+            ]
+        ])->save();
+
+        dispatch(new InstallSoftware($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        $this->task->refresh();
+
+        $this->assertTrue(isset($this->task->data['instance_software_ids']));
+        $this->assertEquals(1, count($this->task->data['instance_software_ids']));
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+    }
+
+    public function testImageAssociatedSoftwareAndOptionalSoftwareInstalls()
+    {
+        Event::fake([Created::class, JobFailed::class, JobProcessed::class]);
+
+        (new CentosWithMcafeeSeeder())->run();
+
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
+        $this->instance()->setAttribute('image_id', 'img-centos-mcafee')->save();
+
+        $this->instance()->setAttribute('deploy_data', [
+            'software_ids' => [
+                'soft-aaaaaaaa'
+            ]
+        ])->save();
+
+        dispatch(new InstallSoftware($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        $this->task->refresh();
+
+        $this->assertTrue(isset($this->task->data['instance_software_ids']));
+        $this->assertEquals(2, count($this->task->data['instance_software_ids']));
     }
 }

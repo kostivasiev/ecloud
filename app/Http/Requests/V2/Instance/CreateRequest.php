@@ -12,6 +12,7 @@ use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\FloatingIp\IsAssigned;
 use App\Rules\V2\HasHosts;
+use App\Rules\V2\Instance\SoftwarePlatformMatchesImagePlatform;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
 use App\Rules\V2\IsSameAvailabilityZone;
@@ -141,6 +142,7 @@ class CreateRequest extends FormRequest
                 'required',
                 'string',
                 Rule::exists(Software::class, 'id')->whereNull('deleted_at'),
+                new SoftwarePlatformMatchesImagePlatform($this->request->get('image_id'))
             ],
         ];
 

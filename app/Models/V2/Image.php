@@ -30,6 +30,9 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
     const VISIBILITY_PUBLIC = 'public';
     const VISIBILITY_PRIVATE = 'private';
 
+    const PLATFORM_LINUX = 'Linux';
+    const PLATFORM_WINDOWS = 'Windows';
+
     protected $casts = [
         'active' => 'boolean',
         'public' => 'boolean',

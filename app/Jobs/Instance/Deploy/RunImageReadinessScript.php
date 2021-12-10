@@ -24,6 +24,7 @@ class RunImageReadinessScript extends Job
         $this->model = $instance;
     }
 
+    // TODO: Update this to use RunsScripts trait
     public function handle()
     {
         $instance = $this->model;

@@ -69,9 +69,7 @@ class Update extends Job
                     new RegisterLicenses($this->task->resource),
                     new RunApplianceBootstrap($this->task->resource),
                     new RunImageReadinessScript($this->task->resource),
-
                     new InstallSoftware($this->task),
-
                     new RunBootstrapScript($this->task->resource),
                     new DeployCompleted($this->task->resource),
                 ],
