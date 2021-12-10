@@ -32,8 +32,7 @@ class CreateCluster extends Job
                 ->setResellerId($loadbalancer->getResellerId());
             $response = $client->clusters()->createEntity(new Cluster([
                 'name' => $loadbalancer->id,
-                'internal_name' => $loadbalancer->id,
-                'reseller_id' => $loadbalancer->getResellerId(),
+                'internal_name' => $loadbalancer->id
             ]));
             $loadbalancer->setAttribute('config_id', $response->getId())->saveQuietly();
         }
