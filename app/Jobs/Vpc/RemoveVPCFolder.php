@@ -42,6 +42,6 @@ class RemoveVPCFolder extends Job
         });
 
 
-        Log::info('Deleting VPC folder', ['vpcId'=>$this->model->id, 'count'=>$availabilityZones->count()]);
+        Log::info('Deleting VPC folder', ['vpcId' => $this->model->id, 'count' => $availabilityZones->count()]);
     }
 }

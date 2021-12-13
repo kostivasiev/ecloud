@@ -13,10 +13,6 @@ class RemoveVpcFolderTest extends TestCase
 {
     public function testRemoveVPCJobIsDispatched()
     {
-        factory(Region::class)->create([
-            'id' => 'reg-remove-me',
-            'is_public' => true,
-        ]);
         $vpc = factory(Vpc::class)->create([
             'id' => 'vpc-1',
             'region_id' => $this->region()->id
