@@ -8,6 +8,7 @@ use App\Models\V2\Task;
 use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Loadbalancers\AdminClient;
 use UKFast\Admin\Loadbalancers\Entities\Cluster;
 
@@ -27,7 +28,7 @@ class CreateCluster extends Job
     public function handle()
     {
         $loadbalancer = $this->model;
-        if ($loadBalancer->config_id !== null) {
+        if ($loadbalancer->config_id !== null) {
             Log::info('Loadbalancer has already been assigned a cluster id, skipping', [
                 'id' => $loadbalancer->id,
                 'cluster_id' => $loadbalancer->config_id,
