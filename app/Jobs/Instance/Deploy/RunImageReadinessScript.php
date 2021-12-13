@@ -4,6 +4,7 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\Instance;
+use App\Traits\V2\Jobs\RunsScripts;
 use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Bus\Batchable;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 
 class RunImageReadinessScript extends Job
 {
-    use Batchable, LoggableModelJob;
+    use Batchable, LoggableModelJob, RunsScripts;
 
     private $model;
 
@@ -24,7 +25,6 @@ class RunImageReadinessScript extends Job
         $this->model = $instance;
     }
 
-    // TODO: Update this to use RunsScripts trait
     public function handle()
     {
         $instance = $this->model;
@@ -34,46 +34,6 @@ class RunImageReadinessScript extends Job
             return;
         }
 
-        $guestAdminCredential = $instance->credentials()
-            ->where('username', ($instance->platform == 'Linux') ? 'root' : 'graphite.rack')
-            ->firstOrFail();
-        if (!$guestAdminCredential) {
-            $message = 'RunApplianceBootstrap failed for ' . $instance->id . ', no admin credentials found';
-            Log::error($message);
-            $this->fail(new \Exception($message));
-            return;
-        }
-
-        $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
-        /** @var Response $deployResponse */
-        $response = $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
-            [
-                'json' => [
-                    'encodedScript' => base64_encode($this->model->image->readiness_script),
-                    'username' => $guestAdminCredential->username,
-                    'password' => $guestAdminCredential->password,
-                ],
-            ]
-        );
-
-        $response = json_decode($response->getBody()->getContents());
-        if (!$response) {
-            throw new \Exception('Could not decode response from readiness script for ' . $instance->id);
-        }
-
-        // 0 = completed, 1 = error, any other = retry
-        switch ($response->exitCode) {
-            case 0:
-                Log::info(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' completed successfully', ['id' => $instance->id]);
-                return;
-            case 1:
-                Log::error(get_class($this) . ': Readiness script for instance ' .  $instance->id . ' failed', ['id' => $instance->id]);
-                $this->fail(new \Exception('Readiness script for ' . $instance->id . ' failed with exit code 1. Output: ' . $response->output));
-                return;
-            default:
-                Log::info(get_class($this) . ': Readiness script not yet complete, retrying in ' . $this->backoff . ' seconds');
-                $this->release($this->backoff);
-        }
+        $this->runScript($instance, $instance->image->readiness_script);
     }
 }

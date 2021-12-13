@@ -2,14 +2,12 @@
 
 namespace Tests\unit\Jobs\InstanceSoftware;
 
-use App\Jobs\Instance\Deploy\InstallSoftware;
 use App\Jobs\InstanceSoftware\RunScripts;
 use App\Models\V2\Credential;
 use App\Models\V2\InstanceSoftware;
 use App\Models\V2\Software;
 use App\Models\V2\Task;
 use App\Support\Sync;
-use Database\Seeders\Images\CentosWithMcafeeSeeder;
 use Database\Seeders\SoftwareSeeder;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
@@ -22,17 +20,19 @@ class RunScriptsTest extends TestCase
 {
     private Task $task;
 
+    private Software $software;
+
     public function setUp(): void
     {
         parent::setUp();
         (new SoftwareSeeder())->run();
 
-        $software = Software::find('soft-mcafee-' . strtolower(Software::PLATFORM_LINUX));
+        $this->software = Software::find('soft-aaaaaaaa');
 
         $instanceSoftware = app()->make(InstanceSoftware::class);
-        $instanceSoftware->name = $software->name;
+        $instanceSoftware->name = $this->software->name;
         $instanceSoftware->instance()->associate($this->instance());
-        $instanceSoftware->software()->associate($software);
+        $instanceSoftware->software()->associate($this->software);
         $instanceSoftware->save();
 
         // syncSave task on instanceSoftware
@@ -86,5 +86,67 @@ class RunScriptsTest extends TestCase
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
+    }
+
+    public function testScriptInProgressReleases()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/' . $this->instance()->vpc->id .
+                '/instance/' . $this->instance()->id .
+                '/guest/linux/script',
+                [
+                    'json' => [
+                        'encodedScript' => base64_encode('exit 0'),
+                        'username' => 'root',
+                        'password' => 'somepassword'
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'exitCode' => 2,
+                    'output' => ''
+                ]));
+            });
+
+        dispatch(new RunScripts($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return $event->job->isReleased();
+        });
+    }
+
+    public function testScriptFailedFails()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/' . $this->instance()->vpc->id .
+                '/instance/' . $this->instance()->id .
+                '/guest/linux/script',
+                [
+                    'json' => [
+                        'encodedScript' => base64_encode('exit 0'),
+                        'username' => 'root',
+                        'password' => 'somepassword'
+                    ]
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'exitCode' => 1,
+                    'output' => ''
+                ]));
+            });
+
+        dispatch(new RunScripts($this->task));
+
+        Event::assertDispatched(JobFailed::class);
     }
 }

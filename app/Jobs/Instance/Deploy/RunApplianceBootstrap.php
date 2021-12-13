@@ -8,6 +8,7 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Services\V2\PasswordService;
+use App\Traits\V2\Jobs\RunsScripts;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;

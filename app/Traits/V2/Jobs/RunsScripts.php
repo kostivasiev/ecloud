@@ -11,7 +11,7 @@ trait RunsScripts
 
     public $backoff = 30;
 
-    protected function runScript(Instance $instance, $script)
+    protected function runScript(Instance $instance, $script): bool
     {
         $code = ($script instanceof Script) ? $script->script : $script;
 
@@ -29,7 +29,7 @@ trait RunsScripts
             $message = 'Failed to load guest admin credentials for ' . $instance->id;
             Log::error(get_class($this) . ': ' . $message, $logData);
             $this->fail(new \Exception($message));
-            return;
+            return false;
         }
 
         $response = $instance->availabilityZone->kingpinService()->post(
@@ -57,16 +57,17 @@ trait RunsScripts
         switch ($response->exitCode) {
             case 0:
                 Log::info(get_class($this) . ': Script for instance ' .  $instance->id . ' completed successfully', $logData);
-                return;
+                return true;
             case 1:
                 $message = 'Script for instance ' .  $instance->id . ' failed';
                 $logData['output'] = $response->output;
                 Log::error(get_class($this) . ': ' . $message, $logData);
                 $this->fail(new \Exception($message . '. Output: ' . $response->output));
-                return;
+                return false;
             default:
                 Log::info(get_class($this) . ': Script for instance ' .  $instance->id . ' not yet complete, retrying in ' . $this->backoff . ' seconds', $logData);
                 $this->release($this->backoff);
+                return false;
         }
     }
 }
