@@ -183,7 +183,7 @@ class ConsoleTest extends TestCase
             [
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
-                'status' => '401',
+                'status' => 401,
             ]
         )->assertResponseStatus(403);
     }
