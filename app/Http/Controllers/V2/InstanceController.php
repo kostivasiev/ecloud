@@ -27,6 +27,7 @@ use App\Resources\V2\NicResource;
 use App\Resources\V2\SoftwareResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
+use App\Services\Kingpin\V2\KingpinEndpoints;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
@@ -323,23 +324,11 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        if (!$instance->vpc->console_enabled) {
-            if (!$this->isAdmin) {
-                return response()->json([
-                    'errors' => [
-                        'title' => 'Forbidden',
-                        'details' => 'Console access has been disabled for this resource',
-                        'status' => Response::HTTP_FORBIDDEN,
-                    ]
-                ], Response::HTTP_FORBIDDEN);
-            }
-        }
-
         /** @var \GuzzleHttp\Psr7\Response $response */
         $response = $instance->availabilityZone
             ->kingpinService()
             ->get(
-                '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->id.'/screenshot'
+                sprintf(KingpinEndpoints::GET_CONSOLE_SCREENSHOT, $instance->vpc_id, $instance->id)
             );
 
         if (!$response || $response->getStatusCode() !== 200) {
@@ -375,23 +364,11 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        if (!$instance->vpc->console_enabled) {
-            if (!$this->isAdmin) {
-                return response()->json([
-                    'errors' => [
-                        'title' => 'Forbidden',
-                        'details' => 'Console access has been disabled for this resource',
-                        'status' => Response::HTTP_FORBIDDEN,
-                    ]
-                ], Response::HTTP_FORBIDDEN);
-            }
-        }
-
         /** @var \GuzzleHttp\Psr7\Response $response */
         $response = $instance->availabilityZone
             ->kingpinService()
             ->post(
-                '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->id.'/console/session'
+                sprintf(KingpinEndpoints::GET_CONSOLE_SESSION, $instance->vpc_id, $instance->id)
             );
         if (!$response || $response->getStatusCode() !== 200) {
             Log::info(
