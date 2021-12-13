@@ -185,7 +185,7 @@ class ConsoleTest extends TestCase
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ]
-        )->assertResponseStatus(403);
+        )->assertResponseStatus(401);
     }
 
     public function testRestrictedConsoleAdmin()
