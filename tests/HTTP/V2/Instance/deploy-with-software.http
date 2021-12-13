@@ -24,6 +24,12 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
+GET https://{{host}}/{{version}}/instances/{{instance_id}}/software
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write

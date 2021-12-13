@@ -35,11 +35,7 @@ class CrudTest extends TestCase
         // 'private' visibility of related software does not display to non admin
         $this->get('/v2/scripts')
             ->dontSeeJson([
-                'id' => 'scr-test-1',
-                'name' => 'Script 1',
-                'software_id' => 'soft-aaaaaaaa',
-                'sequence' => 1,
-                'script' => 'exit 0',
+                'id' => 'scr-test-1'
             ])
             ->assertResponseStatus(200);
 

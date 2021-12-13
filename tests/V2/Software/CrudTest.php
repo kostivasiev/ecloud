@@ -27,16 +27,14 @@ class CrudTest extends TestCase
             ])
             ->assertResponseStatus(200);
 
-        $software = Software::first();
+        $software = Software::find('soft-aaaaaaaa');
         $software->setAttribute('visibility', Software::VISIBILITY_PRIVATE)->save();
 
         // Assert private visibility is not returned to non admin
         $this->get('/v2/software')
             ->dontSeeJson([
-                'id' => 'soft-aaaaaaaa',
-                'name' => 'Test Software',
-                'platform' => 'Linux',
-        ])
+                'id' => 'soft-aaaaaaaa'
+            ])
             ->assertResponseStatus(200);
 
         // Assert private visibility is returned for admin
