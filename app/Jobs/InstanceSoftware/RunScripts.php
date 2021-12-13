@@ -28,22 +28,15 @@ class RunScripts extends Job
         $instanceSoftware = $this->task->resource;
         $instance = $instanceSoftware->instance;
 
+            $completedScripts = $this->task->data['script_ids'] ?? [];
 
-        if (empty($this->task->data['script_ids'])) {
-            $instanceSoftware->software->scripts()->orderBy('sequence', 'asc')->each(function ($script) use ($instance) {
-                $this->runScript($instance, $script);
+            //  TODO: Need to update this to store in the task data the id of any completed scripts so that we can move on
+            $instanceSoftware->software->scripts()->orderBy('sequence', 'asc')->each(function ($script) use ($instance, &$completedScripts) {
+                if (!in_array($script->id, $completedScripts)) {
+                    $this->runScript($instance, $script);
+                }
+
+                $this->task->setAttribute('data', ['script_ids' => $completedScripts])->saveQuietly();
             });
-        }
-
-
-
-
-        //  TODO: Need to update this to store in the task data the id of any completed scripts so that we can move on
-        // to the next
-
-        //$this->task->setAttribute('data', ['instance_software_ids' => $instanceSoftwareIds])->saveQuietly();
-
-
-
     }
 }
