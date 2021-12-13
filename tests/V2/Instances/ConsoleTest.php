@@ -8,7 +8,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -16,6 +15,8 @@ class ConsoleTest extends TestCase
 {
     public function testFailedSessionResponse()
     {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))
+            ->setIsAdmin(true));
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withSomeOfArgs(
