@@ -35,12 +35,10 @@ class CreateInstances extends Job
         $loadBalancer = $this->model;
 
         if (empty($this->task->data['orchestrator_build_id'])) {
-            $image = Image::whereHas('imageMetadata', function ($query) {
-                $query->where('key', 'ukfast.loadbalancer.version');
-                $query->where('value', config('load-balancer.version'));
-            })->first();
+            $spec = $this->model->loadBalancerSpec;
+            $imageId = $spec->image_id;
 
-            if (!$image) {
+            if (!($image = Image::find($imageId))) {
                 $this->fail(new \Exception('Failed to load balancer image to create a new load balancer'));
                 return;
             }
