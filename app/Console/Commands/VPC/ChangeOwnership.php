@@ -52,7 +52,8 @@ class ChangeOwnership extends Command
                 ->fill([
                     'start' => $currentMetricEndDate,
                     'reseller_id' => $reseller,
-                ]);
+                ])
+                ->toArray();
             if (!$this->option('test-run')) {
                 BillingMetric::create($newMetric);
                 $currentMetric->end = $currentMetricEndDate;
