@@ -15,10 +15,21 @@ use Tests\TestCase;
 
 class AwaitNetworkPolicyRemovalTest extends TestCase
 {
+    protected Task $task;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->networkPolicy();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->network());
+            $this->task->save();
+        });
     }
 
     public function testHasAssociatedNetworkPolicyRetries()
@@ -27,7 +38,7 @@ class AwaitNetworkPolicyRemovalTest extends TestCase
 
         $this->assertEquals(1, $this->network()->networkPolicy()->count());
 
-        dispatch(new AwaitNetworkPolicyRemoval($this->network()));
+        dispatch(new AwaitNetworkPolicyRemoval($this->task));
 
         Log::shouldReceive('warning')->withSomeOfArgs('Network still has an associated network policy, retrying in 5 seconds', ['id' => $this->network()->id]);
 
@@ -40,7 +51,7 @@ class AwaitNetworkPolicyRemovalTest extends TestCase
 
         $this->assertEquals(0, $this->network()->networkPolicy()->count());
 
-        dispatch(new AwaitNetworkPolicyRemoval($this->network()));
+        dispatch(new AwaitNetworkPolicyRemoval($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -57,7 +68,7 @@ class AwaitNetworkPolicyRemovalTest extends TestCase
         $task->resource()->associate($this->networkPolicy());
         $task->save();
 
-        dispatch(new AwaitNetworkPolicyRemoval($this->network()));
+        dispatch(new AwaitNetworkPolicyRemoval($this->task));
 
         Event::assertDispatched(JobFailed::class);
     }
