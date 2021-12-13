@@ -8,6 +8,7 @@ use App\Jobs\Router\DeleteManagementRouters;
 use App\Jobs\Vpc\AwaitDhcpRemoval;
 use App\Jobs\Vpc\DeleteDhcps;
 use App\Jobs\Vpc\RemoveLanPolicies;
+use App\Jobs\Vpc\RemoveVPCFolder;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -32,6 +33,7 @@ class Delete extends Job
                 new RemoveLanPolicies($this->task->resource),
                 new DeleteDhcps($this->task->resource),
                 new AwaitDhcpRemoval($this->task->resource),
+                new RemoveVPCFolder($this->task->resource),
             ]
         ])->dispatch();
     }
