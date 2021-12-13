@@ -20,6 +20,10 @@ class SoftwarePlatformMatchesImagePlatform implements Rule
         $image = Image::find($this->imageId);
         $software = Software::find($value);
 
+        if (!$image || !$software) {
+            return false;
+        }
+
         return $image->platform == $software->platform;
     }
 
