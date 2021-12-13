@@ -28,7 +28,10 @@ class CreateCluster extends Job
     {
         $loadbalancer = $this->model;
         if ($loadBalancer->config_id !== null) {
-            Log::info('Loadbalancer Cluster already assigned, skipping');
+            Log::info('Loadbalancer has already been assigned a cluster id, skipping', [
+                'id' => $loadbalancer->id,
+                'cluster_id' => $loadbalancer->config_id,
+            ]);
             return;
         }
         $client = app()->make(AdminClient::class)
@@ -37,6 +40,10 @@ class CreateCluster extends Job
             'name' => $loadbalancer->id,
             'internal_name' => $loadbalancer->id
         ]));
+        Log::info('Setting Loadbalancer config id', [
+            'id' => $loadbalancer->id,
+            'cluster_id' => $response->getId(),
+        ]);
         $loadbalancer->setAttribute('config_id', $response->getId())->saveQuietly();
     }
 }
