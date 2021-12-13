@@ -27,8 +27,7 @@ class InstallSoftware extends Job
         $instance = $this->task->resource;
 
         if ($instance->image->software->count() < 1 && empty($instance->deploy_data['software_ids'])) {
-            Log::info(get_class($this) . ': No software to install for instance ' . $instance->id . ', skipping',
-                ['id' => $instance->id]);
+            Log::info(get_class($this) . ': No software to install for instance ' . $instance->id . ', skipping', ['id' => $instance->id]);
         }
 
         if (empty($this->task->data['instance_software_ids'])) {
@@ -44,8 +43,7 @@ class InstallSoftware extends Job
                 $softwareToInstall = $softwareToInstall->merge($optionalSoftware);
             }
             $softwareToInstall->each(function ($software) use ($instance, &$instanceSoftwareIds) {
-                Log::info(get_class($this) . ': Installing software ' . $software->name . ' (' . $software->id . ') on instance ' . $instance->id,
-                    ['id' => $instance->id]);
+                Log::info(get_class($this) . ': Installing software ' . $software->name . ' (' . $software->id . ') on instance ' . $instance->id, ['id' => $instance->id]);
 
                 $instanceSoftware = app()->make(InstanceSoftware::class);
                 $instanceSoftware->name = $software->name;
