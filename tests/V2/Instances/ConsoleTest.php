@@ -15,8 +15,6 @@ class ConsoleTest extends TestCase
 {
     public function testFailedSessionResponse()
     {
-        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))
-            ->setIsAdmin(true));
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withSomeOfArgs(
