@@ -28,6 +28,7 @@ use App\Resources\V2\SoftwareResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Services\Kingpin\V2\KingpinEndpoints;
+use App\Services\V2\KingpinService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
@@ -328,7 +329,7 @@ class InstanceController extends BaseController
         $response = $instance->availabilityZone
             ->kingpinService()
             ->get(
-                sprintf(KingpinEndpoints::GET_CONSOLE_SCREENSHOT, $instance->vpc_id, $instance->id)
+                sprintf(KingpinService::GET_CONSOLE_SCREENSHOT, $instance->vpc_id, $instance->id)
             );
 
         if (!$response || $response->getStatusCode() !== 200) {
@@ -368,7 +369,7 @@ class InstanceController extends BaseController
         $response = $instance->availabilityZone
             ->kingpinService()
             ->post(
-                sprintf(KingpinEndpoints::POST_CONSOLE_SESSION, $instance->vpc_id, $instance->id)
+                sprintf(KingpinService::POST_CONSOLE_SESSION, $instance->vpc_id, $instance->id)
             );
         if (!$response || $response->getStatusCode() !== 200) {
             Log::info(
