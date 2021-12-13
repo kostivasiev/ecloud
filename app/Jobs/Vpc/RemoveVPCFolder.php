@@ -3,6 +3,7 @@
 namespace App\Jobs\Vpc;
 
 use App\Jobs\Job;
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Vpc;
 use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\Jobs\AwaitTask;
@@ -30,8 +31,10 @@ class RemoveVPCFolder extends Job
     {
         $availabilityZones = $this->model->region->availabilityZones;
         $availabilityZones->each(function ($availabilityZone) {
+            /** @var AvailabilityZone $availabilityZone */
             try {
                 $availabilityZone->kingpinService()->delete('/api/v2/vpc/' . $this->model->id);
+                Log::info('Deleting VPC folder.', ['vpcId' => $this->model->id, 'availabilityZone' => $availabilityZone->name]);
             } catch (RequestException $exception) {
                 if ($exception->getCode() != 404) {
                     throw $exception;
@@ -40,8 +43,5 @@ class RemoveVPCFolder extends Job
                 Log::error('VPC folder not found on availability zone, going to next.', [$exception]);
             }
         });
-
-
-        Log::info('Deleting VPC folder', ['vpcId' => $this->model->id, 'count' => $availabilityZones->count()]);
     }
 }
