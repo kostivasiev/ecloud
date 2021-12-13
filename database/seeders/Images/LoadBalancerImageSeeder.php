@@ -1,11 +1,11 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Images;
 
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
-use App\Models\V2\ImageParameter;
 use Illuminate\Database\Seeder;
+use function factory;
 
 class LoadBalancerImageSeeder extends Seeder
 {

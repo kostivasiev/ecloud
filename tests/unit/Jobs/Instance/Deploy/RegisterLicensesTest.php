@@ -4,12 +4,10 @@ namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Jobs\Instance\Deploy\RegisterLicenses;
 use App\Models\V2\ImageMetadata;
-use GuzzleHttp\Psr7\Response;
-use Database\Seeders\CpanelImageSeeder;
-use Database\Seeders\PleskImageSeeder;
+use Database\Seeders\Images\CpanelImageSeeder;
+use Database\Seeders\Images\PleskImageSeeder;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Str;
 use Tests\TestCase;
 use UKFast\Admin\Licenses\AdminClient;
 use UKFast\Admin\Licenses\AdminLicensesClient;
