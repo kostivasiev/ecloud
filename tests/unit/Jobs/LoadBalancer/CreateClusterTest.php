@@ -63,7 +63,7 @@ class CreateClusterTest extends TestCase
         dispatch(new CreateCluster($task));
         Event::assertNotDispatched(JobFailed::class);
 
-        $this->assertNotNull($this->loadbalancer()->refresh()->config_id);
+        $this->assertNotNull($this->loadBalancer()->refresh()->config_id);
         $this->assertEquals($this->lbConfigId, $this->loadBalancer()->config_id);
     }
 }
