@@ -37,7 +37,7 @@ class RemoveVPCFolder extends Job
                     throw $exception;
                 }
 
-                Log::error('VPC folder not found on availability zone, going next.', [$exception]);
+                Log::error('VPC folder not found on availability zone, going to next.', [$exception]);
             }
         });
 
