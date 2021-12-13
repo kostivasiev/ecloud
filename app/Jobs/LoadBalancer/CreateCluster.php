@@ -27,14 +27,16 @@ class CreateCluster extends Job
     public function handle()
     {
         $loadbalancer = $this->model;
-        if ($loadbalancer->config_id === null) {
-            $client = app()->make(AdminClient::class)
-                ->setResellerId($loadbalancer->getResellerId());
-            $response = $client->clusters()->createEntity(new Cluster([
-                'name' => $loadbalancer->id,
-                'internal_name' => $loadbalancer->id
-            ]));
-            $loadbalancer->setAttribute('config_id', $response->getId())->saveQuietly();
+        if ($loadBalancer->config_id !== null) {
+            Log::info('Loadbalancer Cluster already assigned, skipping');
+            return;
         }
+        $client = app()->make(AdminClient::class)
+            ->setResellerId($loadbalancer->getResellerId());
+        $response = $client->clusters()->createEntity(new Cluster([
+            'name' => $loadbalancer->id,
+            'internal_name' => $loadbalancer->id
+        ]));
+        $loadbalancer->setAttribute('config_id', $response->getId())->saveQuietly();
     }
 }
