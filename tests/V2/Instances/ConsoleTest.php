@@ -15,6 +15,9 @@ class ConsoleTest extends TestCase
 {
     public function testFailedSessionResponse()
     {
+        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))
+            ->setIsAdmin(true));
+
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withSomeOfArgs(
@@ -41,6 +44,9 @@ class ConsoleTest extends TestCase
 
     public function testCredentialFailure()
     {
+        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))
+            ->setIsAdmin(true));
+
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withSomeOfArgs(
@@ -70,6 +76,9 @@ class ConsoleTest extends TestCase
 
     public function testCreateSessionFailure()
     {
+        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))
+            ->setIsAdmin(true));
+
         factory(Credential::class)->create([
             'name' => 'Envoy',
             'resource_id' => $this->availabilityZone()->id,
@@ -107,6 +116,9 @@ class ConsoleTest extends TestCase
 
     public function testValidClientResult()
     {
+        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))
+            ->setIsAdmin(true));
+
         // Create Credential
         factory(Credential::class)->create([
             'name' => 'Envoy',
@@ -157,38 +169,6 @@ class ConsoleTest extends TestCase
         )->assertResponseStatus(200);
     }
 
-    public function testGetScreenshotResult()
-    {
-        $fileName = 'testphoto.png';
-
-        // Create Kingpin Mock
-        $this->kingpinServiceMock()
-            ->shouldReceive('get')
-            ->withSomeOfArgs(
-                '/api/v2/vpc/vpc-test/instance/i-test/screenshot'
-            )
-            ->andReturnUsing(function () use ($fileName) {
-                return new Response(
-                    200,
-                    [
-                        'Content-Disposition' => 'attachment; filename=' . $fileName,
-                        'Content-Type'        => 'application/json; charset=utf-8'
-                    ],
-                    $this->loadData('Kingpin'.DIRECTORY_SEPARATOR.'GetConsoleScreenshot.json')
-                );
-            });
-
-        $this->be(new Consumer(1, [config('app.name') . '.read']));
-
-        // run test
-        $result = $this->get(
-            '/v2/instances/'.$this->instance()->id.'/console-screenshot'
-        );
-
-        $result->response->assertHeader('Content-Type', 'image/png');
-        $this->assertStringContainsString('data:image/png', $result->response->getContent());
-    }
-
     public function testRestrictedConsoleNonAdmin()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
@@ -201,8 +181,9 @@ class ConsoleTest extends TestCase
             []
         )->seeJson(
             [
-                'title' => 'Forbidden',
-                'details' => 'Console access has been disabled for this resource',
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
+                'status' => '401',
             ]
         )->assertResponseStatus(403);
     }
@@ -248,7 +229,7 @@ class ConsoleTest extends TestCase
         $consumer->setIsAdmin(true);
         $this->be($consumer);
         Model::withoutEvents(function () {
-            $this->vpc()->console_enabled = false;
+            $this->vpc()->console_enabled = true;
             $this->vpc()->save();
         });
         $this->post(
