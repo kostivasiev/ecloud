@@ -48,12 +48,11 @@ class ChangeOwnership extends Command
         $currentMetrics = BillingMetric::where('vpc_id', $vpc->id)->whereNull('end')->get();
         $currentMetricEndDate = Carbon::createFromFormat('d/m/Y', $date)->endOfDay();
         foreach ($currentMetrics as $currentMetric) {
-            $newMetric = $currentMetric->toArray();
-            unset($newMetric['created_at']);
-            unset($newMetric['updated_at']);
-            unset($newMetric['id']);
-            $newMetric['start'] = $currentMetricEndDate;
-            $newMetric['reseller_id'] = $reseller;
+            $newMetric = $currentMetric->replicate(['id', 'created_at', 'updated_at'])
+                ->fill([
+                    'start' => $currentMetricEndDate,
+                    'reseller_id' => $reseller,
+                ]);
             if (!$this->option('test-run')) {
                 BillingMetric::create($newMetric);
                 $currentMetric->end = $currentMetricEndDate;
