@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\LoadBalancer;
 
 use App\Jobs\Job;
+use App\Jobs\LoadBalancer\DeleteCluster;
 use App\Jobs\LoadBalancer\DeleteInstances;
 use App\Jobs\LoadBalancer\DeleteVips;
 use App\Models\V2\Task;
@@ -26,6 +27,7 @@ class Delete extends Job
             [
                 new DeleteVips($this->task),
                 new DeleteInstances($this->task),
+                new DeleteCluster($this->task),
             ],
         ])->dispatch();
     }
