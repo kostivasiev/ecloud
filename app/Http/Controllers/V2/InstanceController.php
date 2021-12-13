@@ -368,7 +368,7 @@ class InstanceController extends BaseController
         $response = $instance->availabilityZone
             ->kingpinService()
             ->post(
-                sprintf(KingpinEndpoints::GET_CONSOLE_SESSION, $instance->vpc_id, $instance->id)
+                sprintf(KingpinEndpoints::POST_CONSOLE_SESSION, $instance->vpc_id, $instance->id)
             );
         if (!$response || $response->getStatusCode() !== 200) {
             Log::info(

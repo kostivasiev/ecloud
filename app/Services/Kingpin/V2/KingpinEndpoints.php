@@ -10,5 +10,5 @@ namespace App\Services\Kingpin\V2;
 class KingpinEndpoints
 {
     public const GET_CONSOLE_SCREENSHOT = '/api/v2/vpc/%s/instance/%s/screenshot';
-    public const GET_CONSOLE_SESSION = '/api/v2/vpc/%s/instance/%s/console/session';
+    public const POST_CONSOLE_SESSION = '/api/v2/vpc/%s/instance/%s/console/session';
 }
