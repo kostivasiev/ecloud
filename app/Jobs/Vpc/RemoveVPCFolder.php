@@ -34,7 +34,7 @@ class RemoveVPCFolder extends Job
             /** @var AvailabilityZone $availabilityZone */
             try {
                 $availabilityZone->kingpinService()->delete('/api/v2/vpc/' . $this->model->id);
-                Log::info('Deleting VPC folder.', ['vpcId' => $this->model->id, 'availabilityZone' => $availabilityZone->name]);
+                Log::info('Deleting VPC folder.', ['id' => $this->model->id, 'availabilityZone' => $availabilityZone->name]);
             } catch (RequestException $exception) {
                 if ($exception->getCode() != 404) {
                     throw $exception;
