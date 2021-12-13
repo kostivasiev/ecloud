@@ -43,7 +43,7 @@ class ProcessBilling extends Command
 
     public function handle()
     {
-        if (!empty($this->getOptions()) && $this->option('current-month')) {
+        if ($this->option('current-month')) {
             $this->startDate = Carbon::createFromTimeString("First day of this month 00:00:00", $this->timeZone);
             $this->endDate = Carbon::createFromTimeString("last day of this month 23:59:59", $this->timeZone);
         }
