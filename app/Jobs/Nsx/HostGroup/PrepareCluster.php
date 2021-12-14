@@ -27,7 +27,7 @@ class PrepareCluster extends Job
         $transportNodeCollections = $this->getTransportNodeCollections($hostGroup->availabilityZone);
         if (!$transportNodeCollections || !count($transportNodeCollections->results)) {
             Log::error(get_class($this) . ' : Failed to get TransportNodeCollections', [
-                'hostgroup' => $hostGroup,
+                'hostgroup' => $hostGroup->id,
                 'transportNodeCollections' => $transportNodeCollections,
             ]);
             $this->fail(new \Exception('Failed to get TransportNodeCollections'));
@@ -50,7 +50,7 @@ class PrepareCluster extends Job
         $transportNodeProfiles = $this->getTransportNodeProfiles($hostGroup->availabilityZone, $hostGroup);
         if (!$transportNodeProfiles || !count($transportNodeProfiles->results)) {
             Log::error(get_class($this) . ' : Failed to get TransportNodeProfiles', [
-                'hostgroup' => $hostGroup,
+                'hostgroup' => $hostGroup->id,
                 'transportNodeCollections' => $transportNodeCollections,
             ]);
             $this->fail(new \Exception('Failed to get TransportNodeProfiles'));
@@ -61,7 +61,7 @@ class PrepareCluster extends Job
         $computeCollections = $this->getHostGroupComputeCollections($hostGroup->availabilityZone, $hostGroup);
         if (!$computeCollections || !count($computeCollections->results)) {
             Log::error(get_class($this) . ' : Failed to get ComputeCollections', [
-                'hostgroup' => $hostGroup,
+                'hostgroup' => $hostGroup->id,
                 'computeCollections' => $computeCollections,
             ]);
             $this->fail(new \Exception('Failed to get ComputeCollections'));
