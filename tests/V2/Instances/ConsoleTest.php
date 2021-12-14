@@ -41,9 +41,6 @@ class ConsoleTest extends TestCase
 
     public function testCredentialFailure()
     {
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))
-            ->setIsAdmin(true));
-
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withSomeOfArgs(
