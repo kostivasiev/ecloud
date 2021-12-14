@@ -43,6 +43,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Credentials\AddPortToPleskCredential::class,
         \App\Console\Commands\Billing\FixPriceOnAdvancedNetworkingBillingMetrics::class,
         \App\Console\Commands\Billing\SetFriendlyNames::class,
+        \App\Console\Commands\VPC\ChangeOwnership::class,
     ];
 
     /**
