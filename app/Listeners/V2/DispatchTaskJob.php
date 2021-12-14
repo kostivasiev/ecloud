@@ -24,6 +24,13 @@ class DispatchTaskJob
                     $jobs[] = new $job($task);
                 }
 
+                if (count($jobs) < 1) {
+                    Log::info("Setting task completed (no jobs to execute)", ['task_id' => $task->id, 'resource_id' => $task->resource->id]);
+                    $task->completed = true;
+                    $task->save();
+                    return;
+                }
+
                 $failureReasonCallback = $taskJob->failureReason();
 
                 Log::debug(get_class($this) . " : Dispatching batch", ['task_id' => $task->id, 'resource_id' => $task->resource->id]);
