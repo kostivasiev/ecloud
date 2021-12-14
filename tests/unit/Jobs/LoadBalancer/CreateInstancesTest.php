@@ -32,6 +32,9 @@ class CreateInstancesTest extends TestCase
             'value' => 'Ubuntu-20.04-LBv2',
         ]);
 
+        $this->loadBalancer()->loadBalancerSpec->update(['image_id' => $this->image()->id]);
+        $this->loadBalancer()->refresh();
+
         // Create the management network
         $this->router()->setAttribute('is_management', true)->save();
         $this->network();
