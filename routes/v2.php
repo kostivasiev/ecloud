@@ -206,7 +206,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => ['customer-max-instance', 'instance-requires-floating-ip']], function () use ($router) {
             $router->post('instances', 'InstanceController@store');
         });
-        $router->group(['middleware' => ['is-admin', 'instance-console-enabled']], function () use ($router) {
+        $router->group(['middleware' => ['instance-console-enabled']], function () use ($router) {
             $router->get('instances/{instanceId}/console-screenshot', 'InstanceController@consoleScreenshot');
             $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
         });

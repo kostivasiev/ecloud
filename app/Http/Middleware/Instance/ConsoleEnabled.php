@@ -12,7 +12,7 @@ class ConsoleEnabled
     {
         $instance = Instance::forUser($request->user())->findOrFail($request->route('instanceId'));
 
-        if (!$instance->vpc->console_enabled) {
+        if (!$instance->vpc->console_enabled && !$request->user()->isAdmin()) {
             return response()->json([
                 'errors' => [
                     'title' => 'Forbidden',
