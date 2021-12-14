@@ -45,6 +45,8 @@ class ProductCreate extends Command
 
         $price = $this->ask('Please enter the product hourly price', 0);
 
+        $costPrice = $this->ask('Please enter the product hourly cost price', 0);
+
         $insertOrSql = $this->choice(
             'Insert records or display SQL',
             ['Insert Records', 'Display SQL Only'],
@@ -53,7 +55,7 @@ class ProductCreate extends Command
 
         switch ($insertOrSql) {
             case 'Insert Records':
-                $availabilityZones->each(function ($availabilityZone) use ($productName, $category, $price) {
+                $availabilityZones->each(function ($availabilityZone) use ($productName, $category, $price, $costPrice) {
                     $name = $availabilityZone->id . ': ' . $productName;
 
                     if ($availabilityZone
@@ -76,7 +78,7 @@ class ProductCreate extends Command
                         'product_duration_type' => 'Hour',
                         'product_duration_length' => 1,
                         'product_cost_currency' => 'GBP',
-                        'product_cost_price' => 0,
+                        'product_cost_price' => $costPrice,
                     ]);
                     $product->save();
 
@@ -92,7 +94,7 @@ class ProductCreate extends Command
                 });
                 break;
             case 'Display SQL Only':
-                $availabilityZones->each(function ($availabilityZone) use ($productName, $category, $price) {
+                $availabilityZones->each(function ($availabilityZone) use ($productName, $category, $price, $costPrice) {
                     $name = $availabilityZone->id . ': ' . $productName;
 
                     $sql = <<<EOM
@@ -115,7 +117,7 @@ VALUES (0,
         'Hour',
         1,
         'GBP',
-        0);
+        $costPrice);
 
 INSERT INTO `product_price`
 (product_price_product_id,
