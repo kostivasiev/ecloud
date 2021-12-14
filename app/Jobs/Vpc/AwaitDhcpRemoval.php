@@ -16,7 +16,7 @@ class AwaitDhcpRemoval extends TaskJob
         $vpc = $this->task->resource;
 
         if ($vpc->dhcps()->count() > 0) {
-            foreach ( $vpc->dhcps as $dhcp) {
+            foreach ($vpc->dhcps as $dhcp) {
                 if ($dhcp->sync->status == Sync::STATUS_FAILED) {
                     $this->error('DHCP in failed sync state, abort', ['dhcp' => $dhcp->id]);
                     $this->fail(new \Exception("DHCP '" . $dhcp->id . "' in failed sync state"));
@@ -24,7 +24,7 @@ class AwaitDhcpRemoval extends TaskJob
                 }
             }
 
-            $this->warning( $vpc->dhcps()->count() . ' DHCP(s) still attached, retrying in ' . $this->backoff . ' seconds');
+            $this->warning($vpc->dhcps()->count() . ' DHCP(s) still attached, retrying in ' . $this->backoff . ' seconds');
 
             $this->release($this->backoff);
         }
