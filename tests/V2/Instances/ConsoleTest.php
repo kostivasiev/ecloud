@@ -171,7 +171,6 @@ class ConsoleTest extends TestCase
             [
                 'title' => 'Forbidden',
                 'details' => 'Console access has been disabled for this resource',
-                'status' => 401,
             ]
         )->assertResponseStatus(403);
     }
