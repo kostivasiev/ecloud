@@ -7,6 +7,7 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Command\Command as CommandResponse;
 
 /**
@@ -30,7 +31,7 @@ class ChangeOwnership extends Command
     public function handle()
     {
         if ($this->option('date') === 'today') {
-            $date = Carbon::now()->format('d/m/Y');
+            $date = Carbon::now()->startOfMonth()->format('d/m/Y');
         } else {
             try {
                 $formattedDate = Carbon::createFromFormat('d/m/Y', $this->option('date'));
@@ -46,7 +47,14 @@ class ChangeOwnership extends Command
 
         //act here
         $currentMetrics = BillingMetric::where('vpc_id', $vpc->id)->whereNull('end')->get();
-        $currentMetricEndDate = Carbon::createFromFormat('d/m/Y', $date)->endOfDay();
+        $currentMetricEndDate = Carbon::createFromFormat('d/m/Y', $date)->startOfDay();
+
+        if ($currentMetrics->first()->reseller_id == $reseller) {
+            $this->error(sprintf('Reseller %s already owns this vpc.', $reseller));
+
+            return Command::FAILURE;
+        }
+
         foreach ($currentMetrics as $currentMetric) {
             $newMetric = $currentMetric->replicate(['id', 'created_at', 'updated_at'])
                 ->fill([
@@ -63,13 +71,14 @@ class ChangeOwnership extends Command
             $vpc->update(['reseller_id' => $reseller]);
         }
 
-        $this->info(
-            sprintf(
-                'VPC Ownership of %s has been moved to reseller_id %s.',
-                $vpc->id,
-                $reseller
-            )
+        $feedback = sprintf(
+            'VPC Ownership of %s has been moved to reseller_id %s.',
+            $vpc->id,
+            $reseller
         );
+
+        $this->info($feedback);
+        Log::info($feedback);
 
         return Command::SUCCESS;
     }
