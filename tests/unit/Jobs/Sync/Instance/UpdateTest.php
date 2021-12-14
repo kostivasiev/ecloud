@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\unit\Jobs\Sync\LoadBalancer;
+namespace Tests\unit\Jobs\Sync\Instance;
 
-use App\Jobs\Sync\LoadBalancer\Update;
+use App\Jobs\Sync\Instance\Update;
 use App\Models\V2\Task;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +29,7 @@ class UpdateTest extends TestCase
                 'name' => 'test',
                 'data' => []
             ]);
-            $this->task->resource()->associate($this->loadBalancer());
+            $this->task->resource()->associate($this->instance());
         });
 
         Bus::fake();
@@ -37,7 +37,7 @@ class UpdateTest extends TestCase
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 2;
+            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 23;
         });
     }
 }

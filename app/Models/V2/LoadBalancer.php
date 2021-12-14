@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $loadBalancerId)
  * @method static forUser(string $user)
  */
-class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZoneable
+class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZoneable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, HasFactory;
 
@@ -72,6 +72,11 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
     public function vips()
     {
         return $this->hasMany(Vip::class);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->vpc->reseller_id;
     }
 
     /**
