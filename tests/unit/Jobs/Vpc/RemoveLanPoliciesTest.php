@@ -6,10 +6,13 @@ use App\Jobs\Conjurer\Host\PowerOff;
 use App\Jobs\Vpc\RemoveLanPolicies;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -18,6 +21,22 @@ use Tests\TestCase;
 
 class RemoveLanPoliciesTest extends TestCase
 {
+    protected Task $task;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->vpc());
+            $this->task->save();
+        });
+    }
+
     public function testSkipsWhenLANPolicyDoesntExist()
     {
         $this->conjurerServiceMock()
@@ -27,7 +46,7 @@ class RemoveLanPoliciesTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new RemoveLanPolicies($this->vpc()));
+        dispatch(new RemoveLanPolicies($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -47,7 +66,7 @@ class RemoveLanPoliciesTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new RemoveLanPolicies($this->vpc()));
+        dispatch(new RemoveLanPolicies($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
