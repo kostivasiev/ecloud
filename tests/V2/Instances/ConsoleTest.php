@@ -15,9 +15,6 @@ class ConsoleTest extends TestCase
 {
     public function testFailedSessionResponse()
     {
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))
-            ->setIsAdmin(true));
-
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withSomeOfArgs(
@@ -76,9 +73,6 @@ class ConsoleTest extends TestCase
 
     public function testCreateSessionFailure()
     {
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))
-            ->setIsAdmin(true));
-
         factory(Credential::class)->create([
             'name' => 'Envoy',
             'resource_id' => $this->availabilityZone()->id,
@@ -116,9 +110,6 @@ class ConsoleTest extends TestCase
 
     public function testValidClientResult()
     {
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))
-            ->setIsAdmin(true));
-
         // Create Credential
         factory(Credential::class)->create([
             'name' => 'Envoy',
@@ -181,11 +172,11 @@ class ConsoleTest extends TestCase
             []
         )->seeJson(
             [
-                'title' => 'Unauthorized',
-                'detail' => 'Unauthorized',
+                'title' => 'Forbidden',
+                'details' => 'Console access has been disabled for this resource',
                 'status' => 401,
             ]
-        )->assertResponseStatus(401);
+        )->assertResponseStatus(403);
     }
 
     public function testRestrictedConsoleAdmin()
@@ -229,7 +220,7 @@ class ConsoleTest extends TestCase
         $consumer->setIsAdmin(true);
         $this->be($consumer);
         Model::withoutEvents(function () {
-            $this->vpc()->console_enabled = true;
+            $this->vpc()->console_enabled = false;
             $this->vpc()->save();
         });
         $this->post(
