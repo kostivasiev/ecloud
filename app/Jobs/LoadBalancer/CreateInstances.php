@@ -39,7 +39,7 @@ class CreateInstances extends Job
             $imageId = $spec->image_id;
 
             if (!($image = Image::find($imageId))) {
-                $this->fail(new \Exception('Failed to load balancer image to create a new load balancer'));
+                $this->fail(new \Exception('Failed to find image to create a new load balancer'));
                 return;
             }
 
