@@ -26,6 +26,15 @@ class InstallSoftware extends Job
     {
         $instance = $this->task->resource;
 
+        Log::info(
+            get_class($this) . ': Install software on instance ' . $instance->id . ' started.' .
+            ' Image software count = ' . $instance->image->software->count() .
+            ' deploy_data = ' . json_encode($instance->deploy_data),
+            [
+                'id' => $instance->id
+            ]
+        );
+
         if ($instance->image->software->count() < 1 && empty($instance->deploy_data['software_ids'])) {
             Log::info(get_class($this) . ': No software to install for instance ' . $instance->id . ', skipping', ['id' => $instance->id]);
         }

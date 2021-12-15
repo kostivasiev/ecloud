@@ -30,7 +30,7 @@ class McafeeWindowsSoftwareSeeder extends Seeder
         $software = Software::factory()->create($data);
 
         Script::factory()
-            ->count(2)
+            ->count(1)
             ->state(new Sequence(
                 [
                     'name' => 'Install',
