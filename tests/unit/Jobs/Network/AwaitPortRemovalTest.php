@@ -3,9 +3,12 @@
 namespace Tests\unit\Jobs\Network;
 
 use App\Jobs\Network\AwaitPortRemoval;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -13,9 +16,20 @@ use Tests\TestCase;
 
 class AwaitPortRemovalTest extends TestCase
 {
+    protected Task $task;
+
     public function setUp(): void
     {
         parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->network());
+            $this->task->save();
+        });
     }
 
     public function testSuccessWhenNoVIFPortsFound()
@@ -44,7 +58,7 @@ class AwaitPortRemovalTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new AwaitPortRemoval($this->network()));
+        dispatch(new AwaitPortRemoval($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -59,7 +73,7 @@ class AwaitPortRemovalTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new AwaitPortRemoval($this->network()));
+        dispatch(new AwaitPortRemoval($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -90,7 +104,7 @@ class AwaitPortRemovalTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new AwaitPortRemoval($this->network()));
+        dispatch(new AwaitPortRemoval($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {

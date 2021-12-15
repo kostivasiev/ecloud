@@ -7,7 +7,6 @@ use App\Jobs\Router\DeleteFirewallPolicies;
 use App\Jobs\Router\Undeploy;
 use App\Jobs\Router\UndeployCheck;
 use App\Jobs\Router\UndeployRouterLocale;
-use App\Tasks\Sync\DeleteSyncTask;
 use App\Tasks\Task;
 
 class Delete extends Task

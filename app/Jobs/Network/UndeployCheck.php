@@ -2,37 +2,26 @@
 
 namespace App\Jobs\Network;
 
-use App\Jobs\Job;
-use App\Models\V2\Network;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
+use App\Jobs\TaskJob;
 
-class UndeployCheck extends Job
+class UndeployCheck extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
     // Wait up to 30 minutes
     public $tries = 360;
     public $backoff = 5;
 
-    private $model;
-
-    public function __construct(Network $network)
-    {
-        $this->model = $network;
-    }
-
     public function handle()
     {
-        $response = $this->model->router->availabilityZone->nsxService()->get(
-            'policy/api/v1/infra/tier-1s/' . $this->model->router->id . '/segments/?include_mark_for_delete_objects=true'
+        $network = $this->task->resource;
+
+        $response = $network->router->availabilityZone->nsxService()->get(
+            'policy/api/v1/infra/tier-1s/' . $network->router->id . '/segments/?include_mark_for_delete_objects=true'
         );
         $response = json_decode($response->getBody()->getContents());
         foreach ($response->results as $result) {
-            if ($this->model->id === $result->id) {
-                Log::info(
-                    'Waiting for ' . $this->model->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
+            if ($network->id === $result->id) {
+                $this->info(
+                    'Waiting for ' . $network->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
                 );
                 $this->release($this->backoff);
                 return;

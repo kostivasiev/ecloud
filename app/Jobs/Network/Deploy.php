@@ -2,45 +2,34 @@
 
 namespace App\Jobs\Network;
 
-use App\Jobs\Job;
-use App\Models\V2\Network;
-use App\Traits\V2\LoggableModelJob;
+use App\Jobs\TaskJob;
 use Exception;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 
-class Deploy extends Job
+class Deploy extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private Network $model;
-
-    public function __construct(Network $network)
-    {
-        $this->model = $network;
-    }
-
     public function handle()
     {
-        $dhcp = $this->model->router->vpc->dhcps()->where('availability_zone_id', $this->model->router->availability_zone_id)->first();
+        $network = $this->task->resource;
+
+        $dhcp = $network->router->vpc->dhcps()->where('availability_zone_id', $network->router->availability_zone_id)->first();
         if (empty($dhcp)) {
             $this->fail(new Exception('Unable to locate VPC DHCP server for router availability zone'));
             return;
         }
 
-        $subnet = Subnet::fromString($this->model->subnet);
+        $subnet = Subnet::fromString($network->subnet);
         //The first address is the network identification and the last one is the broadcast, they cannot be used as regular addresses.
         $networkAddress = $subnet->getStartAddress();
         $gatewayAddress = $networkAddress->getNextAddress();
         $dhcpServerAddress = $gatewayAddress->getNextAddress();
-        $message = 'Deploying Network: ' . $this->model->id . ': ';
-        Log::info($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix());
-        Log::info($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix());
-        Log::info($message . 'DHCP ID: ' . $dhcp->id);
+        $message = 'Deploying Network: ' . $network->id . ': ';
+        $this->debug($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix());
+        $this->debug($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix());
+        $this->debug($message . 'DHCP ID: ' . $dhcp->id);
 
-        $this->model->router->availabilityZone->nsxService()->patch(
-            'policy/api/v1/infra/tier-1s/' . $this->model->router->id . '/segments/' . $this->model->id,
+        $network->router->availabilityZone->nsxService()->patch(
+            'policy/api/v1/infra/tier-1s/' . $network->router->id . '/segments/' . $network->id,
             [
                 'json' => [
                     'resource_type' => 'Segment',
@@ -63,7 +52,7 @@ class Deploy extends Job
                     'tags' => [
                         [
                             'scope' => config('defaults.tag.scope'),
-                            'tag' => $this->model->router->vpc->id
+                            'tag' => $network->router->vpc->id
                         ]
                     ]
                 ]

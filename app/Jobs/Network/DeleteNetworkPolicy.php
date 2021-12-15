@@ -2,26 +2,16 @@
 
 namespace App\Jobs\Network;
 
-use App\Jobs\Job;
-use App\Models\V2\Network;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Jobs\TaskJob;
 
-class DeleteNetworkPolicy extends Job
+class DeleteNetworkPolicy extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private Network $model;
-
-    public function __construct(Network $network)
-    {
-        $this->model = $network;
-    }
-
     public function handle()
     {
-        if ($this->model->networkPolicy()->exists()) {
-            $this->model->networkPolicy->syncDelete();
+        $network = $this->task->resource;
+        
+        if ($network->networkPolicy()->exists()) {
+            $network->networkPolicy->syncDelete();
         }
     }
 }

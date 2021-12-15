@@ -6,6 +6,8 @@ use App\Jobs\Network\Deploy;
 use App\Jobs\Network\DeployDiscoveryProfile;
 use App\Jobs\Network\DeploySecurityProfile;
 use App\Models\V2\Router;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -17,9 +19,20 @@ use Tests\TestCase;
 
 class DeploySecurityProfileTest extends TestCase
 {
+    protected Task $task;
+
     public function setUp(): void
     {
         parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->network());
+            $this->task->save();
+        });
     }
 
     public function testUseExistingBindingMapAndSucceeds()
@@ -55,7 +68,7 @@ class DeploySecurityProfileTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeploySecurityProfile($this->network()));
+        dispatch(new DeploySecurityProfile($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -87,7 +100,7 @@ class DeploySecurityProfileTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeploySecurityProfile($this->network()));
+        dispatch(new DeploySecurityProfile($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
