@@ -3,6 +3,9 @@ properties:
     type: string
     example: 'bm-1a2b3c4d'
     readOnly: true
+  name:
+    type: string
+    example: 'RAM'
   resource_id:
     type: string
     required: true
