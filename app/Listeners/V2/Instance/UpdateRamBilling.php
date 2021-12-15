@@ -98,7 +98,7 @@ class UpdateRamBilling implements Billable
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
-        $billingMetric->friendly_name = self::getFriendlyName($key);
+        $billingMetric->name = self::getFriendlyName($key);
         $billingMetric->key = $key;
         $billingMetric->value = $value;
         $billingMetric->start = Carbon::now();

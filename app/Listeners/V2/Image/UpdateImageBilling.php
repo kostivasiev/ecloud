@@ -68,7 +68,7 @@ class UpdateImageBilling implements Billable
             'resource_id' => $model->id,
             'vpc_id' => $model->vpc_id,
             'reseller_id' => $model->vpc->reseller_id,
-            'friendly_name' => self::getFriendlyName(),
+            'name' => self::getFriendlyName(),
             'key' => self::getKeyName(),
             'value' => $volumeCapacity,
             'start' => $time,

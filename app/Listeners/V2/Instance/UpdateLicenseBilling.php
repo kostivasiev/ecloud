@@ -56,7 +56,7 @@ class UpdateLicenseBilling implements Billable
                 'resource_id' => $instance->id,
                 'vpc_id' => $instance->vpc->id,
                 'reseller_id' => $instance->vpc->reseller_id,
-                'friendly_name' => self::getFriendlyName($licenseType),
+                'name' => self::getFriendlyName($licenseType),
                 'key' => $key,
                 'value' => 1,
                 'start' => Carbon::now(),

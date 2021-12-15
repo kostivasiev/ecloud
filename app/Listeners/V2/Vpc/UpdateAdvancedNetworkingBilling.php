@@ -65,7 +65,7 @@ class UpdateAdvancedNetworkingBilling implements Billable
             $billingMetric->resource_id = $vpc->id;
             $billingMetric->vpc_id = $vpc->id;
             $billingMetric->reseller_id = $vpc->reseller_id;
-            $billingMetric->friendly_name = self::getFriendlyName();
+            $billingMetric->name = self::getFriendlyName();
             $billingMetric->key = self::getKeyName();
             $billingMetric->value = $value;
             $billingMetric->start = Carbon::now();

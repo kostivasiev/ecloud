@@ -44,7 +44,7 @@ class ToggleHostGroupBilling implements Billable
                         'resource_id' => $host->hostGroup->id,
                         'vpc_id' => $host->hostGroup->vpc->id,
                         'reseller_id' => $host->hostGroup->vpc->reseller_id,
-                        'friendly_name' => self::getFriendlyName(),
+                        'name' => self::getFriendlyName(),
                         'key' => self::getKeyName(),
                         'value' => 1,
                         'start' => Carbon::now(),

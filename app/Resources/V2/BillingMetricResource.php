@@ -13,7 +13,7 @@ class BillingMetricResource extends UKFastResource
             'id' => $this->id,
             'resource_id' => $this->resource_id,
             'vpc_id' => $this->vpc_id,
-            'friendly_name' => $this->friendly_name,
+            'name' => $this->name,
             'key' => $this->key,
             'value' => (float) $this->value,
             'category' => $this->category,
