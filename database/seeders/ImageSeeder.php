@@ -3,6 +3,10 @@
 namespace Database\Seeders;
 
 use App\Models\V2\Image;
+use Database\Seeders\Images\CpanelImageSeeder;
+use Database\Seeders\Images\CentosWithMcafeeSeeder;
+use Database\Seeders\Images\MsSqlImageSeeder;
+use Database\Seeders\Images\PleskImageSeeder;
 use Illuminate\Database\Seeder;
 
 class ImageSeeder extends Seeder
@@ -38,5 +42,6 @@ class ImageSeeder extends Seeder
         $this->call(PleskImageSeeder::class);
         $this->call(MsSqlImageSeeder::class);
         $this->call(CpanelImageSeeder::class);
+        $this->call(CentosWithMcafeeSeeder::class);
     }
 }

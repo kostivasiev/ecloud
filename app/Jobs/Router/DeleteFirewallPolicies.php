@@ -2,26 +2,15 @@
 
 namespace App\Jobs\Router;
 
-use App\Jobs\Job;
-use App\Models\V2\Router;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Jobs\TaskJob;
 
-class DeleteFirewallPolicies extends Job
+class DeleteFirewallPolicies extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private Router $model;
-
-    public function __construct(Router $router)
-    {
-        $this->model = $router;
-    }
-
     public function handle()
     {
-        $this->model->firewallPolicies()->each(function ($fwp) {
+        foreach ($this->task->resource->firewallPolicies as $fwp) {
+            $this->info("Triggering delete for firewall policy " . $fwp->id);
             $fwp->syncDelete();
-        });
+        }
     }
 }

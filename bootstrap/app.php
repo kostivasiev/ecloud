@@ -153,6 +153,7 @@ $app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider:
 $app->register(UKFast\ApiInternalCommunication\NetworkingAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\BillingAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\LicensesAdminClientServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\LoadbalancerAdminClientServiceProvider::class);
 
 
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);

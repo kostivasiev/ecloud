@@ -1,34 +1,20 @@
 <?php
 namespace App\Jobs\Router;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\Router;
-use App\Models\V2\Task;
-use App\Traits\V2\Jobs\AwaitResources;
-use App\Traits\V2\Jobs\AwaitTask;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
+use App\Traits\V2\TaskJobs\AwaitResources;
 
-class CreateManagementRouter extends Job
+class CreateManagementRouter extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources, AwaitTask;
-
-    private Task $task;
-    private Router $model;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
+    use AwaitResources;
 
     /**
      * @throws \Exception
      */
     public function handle()
     {
-        $router = $this->model;
+        $router = $this->task->resource;
         $managementRouter = null;
         if (empty($this->task->data['management_router_id'])) {
             $managementCount = $router->vpc->routers()->where(function ($query) use ($router) {
@@ -36,7 +22,7 @@ class CreateManagementRouter extends Job
                 $query->where('availability_zone_id', '=', $router->availability_zone_id);
             })->count();
             if ($managementCount == 0) {
-                Log::info(get_class($this) . ' - Create Management Router Start', ['router_id' => $router->id]);
+                $this->info('Create Management Router Start');
 
                 $managementRouter = app()->make(Router::class);
                 $managementRouter->vpc_id = $router->vpc_id;
@@ -51,8 +37,7 @@ class CreateManagementRouter extends Job
                 ];
                 $this->task->saveQuietly();
 
-                Log::info(get_class($this) . ' - Create Management Router End', [
-                    'router_id' => $router->id,
+                $this->info('Create Management Router End', [
                     'admin_router_id' => $managementRouter->id,
                 ]);
             }

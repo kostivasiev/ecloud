@@ -20,7 +20,7 @@ class UpdateFloatingIpCapacity implements ShouldQueue
      */
     public function handle(Deleted $event)
     {
-        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+        Log::info(get_class($this) . ' : Started');
 
         $floatingIp = FloatingIp::withTrashed()->findOrFail($event->model->id);
 
@@ -28,6 +28,6 @@ class UpdateFloatingIpCapacity implements ShouldQueue
             dispatch(new \App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity($availabilityZone));
         });
 
-        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
+        Log::info(get_class($this) . ' : Finished');
     }
 }

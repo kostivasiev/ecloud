@@ -37,7 +37,7 @@ abstract class TaskJob extends Job
         $this->log(__FUNCTION__, $message, $context);
     }
 
-    public function warn($message, $context = [])
+    public function warning($message, $context = [])
     {
         $this->log(__FUNCTION__, $message, $context);
     }
@@ -58,7 +58,7 @@ abstract class TaskJob extends Job
             $context['task_id'] = $this->task->id;
             $context['task_name'] = $this->task->name;
             $context['task_job_name'] = $this->getTaskJobName();
-            $context['resource_id'] = $this->task->resource->id;
+            $context['resource_id'] = $this->task->resource()->withTrashed()->get()->first()->id;
         }
 
         return $context;

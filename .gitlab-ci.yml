@@ -3,6 +3,9 @@
     - name: registry.devops.ukfast.co.uk/ukfast/team-projects/rnd/db-schema/mysql.ukfast.net:latest
       alias: mysql-ukfast-net
 
+variables:
+  PHP_TEST_BIN: ./vendor/bin/paratest
+
 include:
   - project: 'ukfast/api.ukfast/gitlab-ci'
     ref: master
