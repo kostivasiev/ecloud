@@ -54,6 +54,15 @@ class BillingMetric extends Model implements Filterable, Sortable
         parent::__construct($attributes);
     }
 
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->start)) {
+                $model->start = Carbon::now();
+            }
+        });
+    }
+
     public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {

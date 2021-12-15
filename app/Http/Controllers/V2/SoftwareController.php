@@ -39,6 +39,7 @@ class SoftwareController extends BaseController
             'name',
             'platform',
             'visibility',
+            'license',
         ]));
         $resource->save();
 
@@ -52,6 +53,7 @@ class SoftwareController extends BaseController
             'name',
             'platform',
             'visibility',
+            'license',
         ]));
         $resource->save();
         return $this->responseIdMeta($request, $resource->id, 200);
