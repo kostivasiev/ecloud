@@ -67,7 +67,7 @@ class UpdateWindowsLicenseBilling implements Billable
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
-        $billingMetric->friendly_name = self::getFriendlyName();
+        $billingMetric->name = self::getFriendlyName();
         $billingMetric->key = self::getKeyName();
         $billingMetric->value = $instance->vcpu_cores;
         $billingMetric->start = Carbon::now();

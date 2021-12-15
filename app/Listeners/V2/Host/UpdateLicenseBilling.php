@@ -62,7 +62,7 @@ class UpdateLicenseBilling implements Billable
         $billingMetric->resource_id = $host->id;
         $billingMetric->vpc_id = $host->hostGroup->vpc->id;
         $billingMetric->reseller_id = $host->hostGroup->vpc->reseller_id;
-        $billingMetric->friendly_name = self::getFriendlyName();
+        $billingMetric->name = self::getFriendlyName();
         $billingMetric->key = self::getKeyName();
         $billingMetric->value = $cores;
         $billingMetric->start = Carbon::now();

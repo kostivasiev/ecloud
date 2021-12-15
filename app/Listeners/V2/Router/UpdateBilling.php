@@ -64,7 +64,7 @@ class UpdateBilling implements Billable
             'resource_id' => $model->id,
             'vpc_id' => $model->vpc->id,
             'reseller_id' => $model->vpc->reseller_id,
-            'friendly_name' => self::getFriendlyName($model->routerThroughput->name),
+            'name' => self::getFriendlyName($model->routerThroughput->name),
             'key' => self::getKeyName($model->routerThroughput->name),
             'value' => 1,
             'start' => $time,

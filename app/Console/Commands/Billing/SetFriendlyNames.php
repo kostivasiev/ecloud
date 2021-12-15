@@ -21,7 +21,7 @@ class SetFriendlyNames extends Command
         if ($this->option('reset')) {
             BillingMetric::each(function ($metric) {
                 $this->info('Billing Metric: ' . $metric->id . ' setting friendly name to NULL');
-                $metric->setAttribute('friendly_name', null)->saveQuietly();
+                $metric->setAttribute('name', null)->saveQuietly();
                 return;
             });
             return Command::SUCCESS;
@@ -52,7 +52,7 @@ class SetFriendlyNames extends Command
             }
             $this->info('Billing Metric: ' . $metric->id . ' : ' . $metric->key . ' setting friendly name to ' . $friendlyName);
             if (!$this->option('test-run')) {
-                $metric->setAttribute('friendly_name', $friendlyName)->saveQuietly();
+                $metric->setAttribute('name', $friendlyName)->saveQuietly();
             }
         });
 
