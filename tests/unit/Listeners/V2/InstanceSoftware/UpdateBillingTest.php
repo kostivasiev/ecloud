@@ -87,7 +87,7 @@ class UpdateBillingTest extends TestCase
         $this->assertEquals($this->instanceSoftware->id, $billingMetric->resource_id);
         $this->assertEquals($this->vpc()->id, $billingMetric->vpc_id);
         $this->assertEquals($this->vpc()->reseller_id, $billingMetric->reseller_id);
-        $this->assertEquals('Software: Test Software', $billingMetric->friendly_name);
+        $this->assertEquals('Software: Test Software', $billingMetric->name);
         $this->assertEquals('software.test-software', $billingMetric->key);
         $this->assertEquals(1, $billingMetric->value);
     }

@@ -57,7 +57,7 @@ class UpdateBilling implements Billable
             'resource_id' => $instanceSoftware->id,
             'vpc_id' => $instance->vpc->id,
             'reseller_id' => $instance->vpc->reseller_id,
-            'friendly_name' => self::getFriendlyName($license),
+            'name' => self::getFriendlyName($license),
             'key' => self::getKeyName($license),
             'category' => $product->category,
             'price' => $product->getPrice($instance->vpc->reseller_id),
