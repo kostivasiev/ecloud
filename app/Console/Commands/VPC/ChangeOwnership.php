@@ -31,15 +31,15 @@ class ChangeOwnership extends Command
     public function handle()
     {
         if ($this->option('date') === 'today') {
-            $date = Carbon::now()->startOfMonth()->format('d/m/Y');
+            $date = Carbon::now()->startOfMonth()->format('Y-m-d');
         } else {
             try {
-                $formattedDate = Carbon::createFromFormat('d/m/Y', $this->option('date'));
+                $formattedDate = Carbon::createFromFormat('Y-m-d', $this->option('date'));
             } catch (\Exception $exception) {
-                $this->comment('Invalid Date,  try again with the format DD/MM/YYYY');
+                $this->comment('Invalid Date,  try again with the format YYYY-MM-DD');
                 return Command::FAILURE;
             }
-            $date = $formattedDate->format('d/m/Y');
+            $date = $formattedDate->format('Y-m-d');
         }
 
         $vpc = Vpc::findOrFail($this->option('vpc'));
@@ -47,7 +47,7 @@ class ChangeOwnership extends Command
 
         //act here
         $currentMetrics = BillingMetric::where('vpc_id', $vpc->id)->whereNull('end')->get();
-        $currentMetricEndDate = Carbon::createFromFormat('d/m/Y', $date)->startOfDay();
+        $currentMetricEndDate = Carbon::createFromFormat('Y-m-d', $date)->startOfDay();
 
         if ($currentMetrics->first()->reseller_id == $reseller) {
             $this->error(sprintf('Reseller %s already owns this vpc.', $reseller));
