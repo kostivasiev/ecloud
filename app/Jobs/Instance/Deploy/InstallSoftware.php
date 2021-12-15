@@ -29,7 +29,7 @@ class InstallSoftware extends Job
         Log::info(
             get_class($this) . ': Install software on instance ' . $instance->id . ' started.' .
             ' Image software count = ' . $instance->image->software->count() .
-            ' software_ids = ' . implode(',', array_values($instance->deploy_data['software_ids'])),
+            ' deploy_data = ' . json_encode($instance->deploy_data),
             [
                 'id' => $instance->id
             ]
