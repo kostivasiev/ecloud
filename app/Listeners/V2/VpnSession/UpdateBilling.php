@@ -45,7 +45,7 @@ class UpdateBilling implements Billable
             'resource_id' => $vpnSession->id,
             'vpc_id' => $vpnSession->vpnService->router->vpc->id,
             'reseller_id' => $vpnSession->vpnService->router->vpc->reseller_id,
-            'friendly_name' => self::getFriendlyName(),
+            'name' => self::getFriendlyName(),
             'key' => self::getKeyName(),
             'value' => 1,
             'start' => Carbon::now(),

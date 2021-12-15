@@ -27,7 +27,7 @@ class SetFriendlyNamesTest extends TestCase
         $this->commandMock->allows()->option()->with('test-run')->andReturnFalse();
 
         $this->commandMock->handle();
-        $metrics = BillingMetric::whereNull('friendly_name')->get();
+        $metrics = BillingMetric::whereNull('name')->get();
         $this->assertEquals(0, $metrics->count());
     }
 
@@ -36,7 +36,7 @@ class SetFriendlyNamesTest extends TestCase
         $this->commandMock->allows()->option()->with('reset')->andReturnTrue();
 
         $this->commandMock->handle();
-        $metrics = BillingMetric::whereNull('friendly_name')->get();
+        $metrics = BillingMetric::whereNull('name')->get();
         $this->assertNotEquals(0, $metrics->count());
     }
 }

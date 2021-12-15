@@ -72,7 +72,7 @@ class UpdateBilling implements Billable
         $billingMetric->resource_id = $volume->id;
         $billingMetric->vpc_id = $volume->vpc->id;
         $billingMetric->reseller_id = $volume->vpc->reseller_id;
-        $billingMetric->friendly_name = self::getFriendlyName($volume->iops);
+        $billingMetric->name = self::getFriendlyName($volume->iops);
         $billingMetric->key = self::getKeyName($volume->iops);
         $billingMetric->value = $volume->capacity;
         $billingMetric->start = $time;

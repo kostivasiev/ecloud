@@ -35,7 +35,7 @@ class UpdateRequest extends FormRequest
                 ]),
             ],
             'reseller_id' => ['sometimes', 'required', 'numeric'],
-            'friendly_name' => ['sometimes', 'required', 'string'],
+            'name' => ['sometimes', 'required', 'string'],
             'key' => ['sometimes', 'required', 'string'],
             'value' => ['sometimes', 'required', 'string'],
             'start' => ['sometimes', 'required', 'date'],
