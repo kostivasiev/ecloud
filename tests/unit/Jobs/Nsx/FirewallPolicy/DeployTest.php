@@ -4,6 +4,8 @@ namespace Tests\unit\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\Nsx\FirewallPolicy\Deploy;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -15,22 +17,24 @@ use Tests\TestCase;
 
 class DeployTest extends TestCase
 {
-    protected FirewallPolicy $firewallPolicy;
+    protected Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->firewallPolicy());
+            $this->task->save();
+        });
     }
 
     public function testPolicyNoRulesDeploys()
     {
-        $this->firewallPolicy = Model::withoutEvents(function () {
-            return factory(FirewallPolicy::class)->create([
-                'id' => 'fwp-test',
-                'router_id' => $this->router()->id,
-            ]);
-        });
-
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withArgs([
                 'policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
@@ -50,19 +54,14 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->firewallPolicy));
+        dispatch(new Deploy($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testPolicyWithRulesDeploys()
     {
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'id' => 'fwp-test',
-            'router_id' => $this->router()->id,
-        ]);
-
-        $this->firewallPolicy->firewallRules()->create([
+        $this->firewallPolicy()->firewallRules()->create([
             'id' => 'fwr-test-1',
             'name' => 'fwr-test-1',
             'sequence' => 2,
@@ -124,7 +123,7 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->firewallPolicy));
+        dispatch(new Deploy($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
