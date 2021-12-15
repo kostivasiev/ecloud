@@ -13,7 +13,7 @@ class RenameFriendlyNameToNameOnBillingMetrics extends Migration
      */
     public function up()
     {
-        Schema::table('billing_metrics', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('billing_metrics', function (Blueprint $table) {
             $table->renameColumn('friendly_name', 'name');
         });
     }
@@ -25,7 +25,7 @@ class RenameFriendlyNameToNameOnBillingMetrics extends Migration
      */
     public function down()
     {
-        Schema::table('billing_metrics', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('billing_metrics', function (Blueprint $table) {
             $table->renameColumn('name', 'friendly_name');
         });
     }
