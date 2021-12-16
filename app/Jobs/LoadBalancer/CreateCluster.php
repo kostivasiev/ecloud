@@ -50,25 +50,5 @@ class CreateCluster extends Job
             'cluster_id' => $response->getId(),
         ]);
         $loadbalancer->setAttribute('config_id', $response->getId())->saveQuietly();
-
-        // Credentials
-        $loadbalancer->credentials()->createMany([
-            [
-                'name' => 'keepalived',
-                'host' => null,
-                'username' => 'root',
-                'password' => $passwordService->generate(16),
-                'port' => null,
-                'is_hidden' => true,
-            ],
-            [
-                'name' => 'haproxy stats',
-                'host' => null,
-                'username' => 'root',
-                'password' => $passwordService->generate(8),
-                'port' => 8404,
-                'is_hidden' => false,
-            ]
-        ]);
     }
 }
