@@ -59,7 +59,7 @@ class DeployCheckTest extends TestCase
 
         $this->nsxServiceMock()->expects('get')
             ->withArgs([
-                'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'
+                '/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'
             ])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
@@ -94,7 +94,7 @@ class DeployCheckTest extends TestCase
 
         $this->nsxServiceMock()->expects('get')
             ->withArgs([
-                'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'
+                '/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'
             ])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
