@@ -77,6 +77,7 @@ class CreateInstances extends Job
                 'image_data' => $definition->get('image_data'),
                 'user_script' => $definition->get('user_script'),
                 'ssh_key_pair_ids' => $definition->get('ssh_key_pair_ids'),
+                'software_ids' => $definition->get('software_ids'),
             ];
 
             $instance->syncSave();
