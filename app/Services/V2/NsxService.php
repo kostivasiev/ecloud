@@ -8,13 +8,14 @@ use Illuminate\Support\Facades\Log;
 final class NsxService
 {
     // Gateway Policy
-    public const PATCH_GATEWAY_POLICY = 'policy/api/v1/infra/domains/default/gateway-policies/%s';
-    public const DELETE_GATEWAY_POLICY = 'policy/api/v1/infra/domains/default/gateway-policies/%s';
-    public const GET_GATEWAY_POLICY_RULES = 'policy/api/v1/infra/domains/default/gateway-policies/%s/rules';
-    public const DELETE_GATEWAY_POLICY_RULE = 'policy/api/v1/infra/domains/default/gateway-policies/%s/rules/%s';
+    public const GET_GATEWAY_POLICIES = '/policy/api/v1/infra/domains/default/gateway-policies/%s';
+    public const PATCH_GATEWAY_POLICY = '/policy/api/v1/infra/domains/default/gateway-policies/%s';
+    public const DELETE_GATEWAY_POLICY = '/policy/api/v1/infra/domains/default/gateway-policies/%s';
+    public const GET_GATEWAY_POLICY_RULES = '/policy/api/v1/infra/domains/default/gateway-policies/%s/rules';
+    public const DELETE_GATEWAY_POLICY_RULE = '/policy/api/v1/infra/domains/default/gateway-policies/%s/rules/%s';
 
     // Realised State
-    public const GET_REALISED_STATE_GATEWAY_POLICY = 'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/%s';
+    public const GET_REALISED_STATE_GATEWAY_POLICY = '/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/%s';
 
     /**
      * @var Client
