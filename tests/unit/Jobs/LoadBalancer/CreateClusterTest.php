@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\CreateCluster;
+use App\Models\V2\Credential;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
@@ -65,5 +66,18 @@ class CreateClusterTest extends TestCase
 
         $this->assertNotNull($this->loadBalancer()->refresh()->config_id);
         $this->assertEquals($this->lbConfigId, $this->loadBalancer()->config_id);
+
+        // Now verify that the credentials have been created
+        $keepAliveD = Credential::where([
+            ['resource_id', '=', $this->loadBalancer()->id],
+            ['name', '=', 'keepalived']
+        ])->first();
+        $this->assertNotNull($keepAliveD->password);
+
+        $statsCredentials = Credential::where([
+            ['resource_id', '=', $this->loadBalancer()->id],
+            ['name', '=', 'haproxy stats']
+        ])->first();
+        $this->assertNotNull($statsCredentials->password);
     }
 }

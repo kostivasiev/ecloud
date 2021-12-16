@@ -54,6 +54,11 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
         return $this->belongsTo(AvailabilityZone::class);
     }
 
+    public function credentials()
+    {
+        return $this->hasMany(Credential::class, 'resource_id', 'id');
+    }
+
     public function vpc()
     {
         return $this->belongsTo(Vpc::class);
