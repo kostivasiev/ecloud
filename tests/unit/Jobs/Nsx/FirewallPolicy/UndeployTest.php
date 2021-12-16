@@ -61,7 +61,7 @@ class UndeployTest extends TestCase
 
         $this->nsxServiceMock()->shouldReceive('delete')
             ->withArgs([
-                'policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
+                '/policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
             ])
             ->andReturnUsing(function () {
                 return new Response(200, [], '');

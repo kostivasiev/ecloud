@@ -37,7 +37,7 @@ class DeployTest extends TestCase
     {
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withArgs([
-                'policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
+                '/policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
                 [
                     'json' => [
                         "id" => "fwp-test",
@@ -74,7 +74,7 @@ class DeployTest extends TestCase
 
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withArgs([
-                'policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
+                '/policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
                 [
                     'json' => [
                         "id" => "fwp-test",

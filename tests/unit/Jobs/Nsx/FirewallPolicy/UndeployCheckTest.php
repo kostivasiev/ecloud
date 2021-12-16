@@ -35,7 +35,7 @@ class UndeployCheckTest extends TestCase
     public function testSucceeds()
     {
         $this->nsxServiceMock()->expects('get')
-            ->withSomeOfArgs('policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [],
@@ -52,7 +52,7 @@ class UndeployCheckTest extends TestCase
     public function testJobReleasedWhenStillExists()
     {
         $this->nsxServiceMock()->expects('get')
-            ->withSomeOfArgs('policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true')
+            ->withSomeOfArgs('/policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'results' => [
