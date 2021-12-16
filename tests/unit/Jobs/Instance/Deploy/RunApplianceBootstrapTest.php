@@ -259,7 +259,10 @@ class RunApplianceBootstrapTest extends TestCase
 
         $pleskAdminCredential = $this->instance()
             ->credentials()
-            ->where('name', '=', 'plesk_admin_password')
+            ->where([
+                ['name', '=', 'Plesk Administrator'],
+                ['username', '=', 'admin'],
+            ])
             ->first();
         $this->assertEquals('somepassword', $pleskAdminCredential->password);
         $this->assertEquals(config('plesk.admin.port', 8880), $pleskAdminCredential->port);

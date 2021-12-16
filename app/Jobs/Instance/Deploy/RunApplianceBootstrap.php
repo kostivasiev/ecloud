@@ -95,12 +95,12 @@ class RunApplianceBootstrap extends Job
         }
 
         if (!$this->model->credentials()
-            ->where('name', '=', 'plesk_admin_password')
+            ->where('name', '=', 'Plesk Administrator')
             ->exists()) {
             $credential = app()->make(Credential::class);
             $credential->fill([
-                'name' => 'plesk_admin_password',
-                'username' => 'plesk_admin_password',
+                'name' => 'Plesk Administrator',
+                'username' => 'admin',
                 'password' => (new PasswordService())->generate(),
                 'port' => config('plesk.admin.port', 8880),
             ]);
@@ -130,7 +130,13 @@ class RunApplianceBootstrap extends Job
             ->filter(function ($value) {
                 return $value->type == ImageParameter::TYPE_PASSWORD;
             })->each(function ($passwordParameter) {
-                $credential = $this->model->credentials()->where('username', $passwordParameter->key)->first();
+                $credential = $this->model->credentials()
+                    ->where('username', $passwordParameter->key)
+                    ->orWhere([
+                        ['name', '=', 'Plesk Administrator'],
+                        ['username', '=', 'admin'],
+                    ])
+                    ->first();
                 if ($credential) {
                     $this->imageData[$passwordParameter->key] = $credential->password;
                 }
