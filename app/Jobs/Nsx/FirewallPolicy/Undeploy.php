@@ -3,6 +3,7 @@
 namespace App\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\TaskJob;
+use App\Services\V2\NsxService;
 
 class Undeploy extends TaskJob
 {
@@ -18,7 +19,7 @@ class Undeploy extends TaskJob
         });
 
         $firewallPolicy->router->availabilityZone->nsxService()->delete(
-            'policy/api/v1/infra/domains/default/gateway-policies/' . $firewallPolicy->id
+            sprintf(NsxService::DELETE_GATEWAY_POLICY, $firewallPolicy->id)
         );
     }
 }

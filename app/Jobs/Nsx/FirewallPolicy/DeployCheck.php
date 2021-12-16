@@ -3,6 +3,7 @@
 namespace App\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\TaskJob;
+use App\Services\V2\NsxService;
 
 class DeployCheck extends TaskJob
 {
@@ -20,7 +21,7 @@ class DeployCheck extends TaskJob
         }
 
         $response = $firewallPolicy->router->availabilityZone->nsxService()->get(
-            'policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/' . $firewallPolicy->id
+            sprintf(NsxService::GET_REALISED_STATE_GATEWAY_POLICY, $firewallPolicy->id)
         );
         $response = json_decode($response->getBody()->getContents());
         if ($response->publish_status !== 'REALIZED') {

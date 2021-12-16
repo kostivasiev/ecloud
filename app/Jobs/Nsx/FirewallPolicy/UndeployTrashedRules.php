@@ -3,6 +3,7 @@
 namespace App\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\TaskJob;
+use App\Services\V2\NsxService;
 
 class UndeployTrashedRules extends TaskJob
 {
@@ -13,7 +14,7 @@ class UndeployTrashedRules extends TaskJob
         $availabilityZone = $router->availabilityZone;
 
         $rulesResponse = $availabilityZone->nsxService()->get(
-            '/policy/api/v1/infra/domains/default/gateway-policies/' . $firewallPolicy->id . '/rules'
+            sprintf(NsxService::GET_GATEWAY_POLICY_RULES, $firewallPolicy->id)
         );
         $rulesResponseBody = json_decode($rulesResponse->getBody()->getContents());
         $rulesToRemove = [];
@@ -33,7 +34,7 @@ class UndeployTrashedRules extends TaskJob
             $this->debug("Removing firewall rule", ['ruleToRemove' => $ruleToRemove]);
 
             $availabilityZone->nsxService()->delete(
-                '/policy/api/v1/infra/domains/default/gateway-policies/' . $firewallPolicy->id . '/rules/' . $ruleToRemove
+                sprintf(NsxService::DELETE_GATEWAY_POLICY_RULE, $firewallPolicy->id, $ruleToRemove)
             );
         }
     }

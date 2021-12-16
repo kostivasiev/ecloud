@@ -4,6 +4,7 @@ namespace App\Jobs\Nsx\FirewallPolicy;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\FirewallRulePort;
+use App\Services\V2\NsxService;
 
 class Deploy extends TaskJob
 {
@@ -17,7 +18,7 @@ class Deploy extends TaskJob
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
          */
         $availabilityZone->nsxService()->patch(
-            'policy/api/v1/infra/domains/default/gateway-policies/' . $firewallPolicy->id,
+            sprintf(NsxService::PATCH_GATEWAY_POLICY, $firewallPolicy->id),
             [
                 'json' => [
                     'id' => $firewallPolicy->id,
