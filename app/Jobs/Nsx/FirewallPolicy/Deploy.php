@@ -2,30 +2,42 @@
 
 namespace App\Jobs\Nsx\FirewallPolicy;
 
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRulePort;
-use App\Services\V2\NsxService;
+use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\ClientException;
+use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
 
-class Deploy extends TaskJob
+class Deploy extends Job
 {
+    use Batchable, LoggableModelJob;
+
+    private $model;
+
+    public function __construct(FirewallPolicy $firewallPolicy)
+    {
+        $this->model = $firewallPolicy;
+    }
+
     public function handle()
     {
-        $firewallPolicy = $this->task->resource;
-        $router = $firewallPolicy->router;
+        $router = $this->model->router;
         $availabilityZone = $router->availabilityZone;
 
         /**
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
          */
         $availabilityZone->nsxService()->patch(
-            sprintf(NsxService::PATCH_GATEWAY_POLICY, $firewallPolicy->id),
+            'policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id,
             [
                 'json' => [
-                    'id' => $firewallPolicy->id,
-                    'display_name' => $firewallPolicy->id,
-                    'description' => $firewallPolicy->name,
-                    'sequence_number' => $firewallPolicy->sequence,
-                    'rules' => $firewallPolicy->firewallRules->map(function ($rule) use ($router) {
+                    'id' => $this->model->id,
+                    'display_name' => $this->model->id,
+                    'description' => $this->model->name,
+                    'sequence_number' => $this->model->sequence,
+                    'rules' => $this->model->firewallRules->map(function ($rule) use ($router) {
                         return [
                             'action' => $rule->action,
                             'resource_type' => 'Rule',

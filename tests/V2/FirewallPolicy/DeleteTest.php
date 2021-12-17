@@ -14,7 +14,7 @@ class DeleteTest extends TestCase
 
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withArgs([
-                '/policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
+                'policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
                 [
                     'json' => [
                         'id' => 'fwp-test',
@@ -29,17 +29,17 @@ class DeleteTest extends TestCase
                 return new Response(200, [], '');
             });
         $this->nsxServiceMock()->shouldReceive('get')
-            ->withArgs(['/policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true'])
+            ->withArgs(['policy/api/v1/infra/domains/default/gateway-policies/?include_mark_for_delete_objects=true'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
             });
         $this->nsxServiceMock()->shouldReceive('get')
-            ->withArgs(['/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'])
+            ->withArgs(['policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/gateway-policies/fwp-test'])
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
             });
         $this->nsxServiceMock()->shouldReceive('delete')
-            ->withArgs(['/policy/api/v1/infra/domains/default/gateway-policies/fwp-test'])
+            ->withArgs(['policy/api/v1/infra/domains/default/gateway-policies/fwp-test'])
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });

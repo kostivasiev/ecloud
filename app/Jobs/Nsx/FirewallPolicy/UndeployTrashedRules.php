@@ -2,39 +2,52 @@
 
 namespace App\Jobs\Nsx\FirewallPolicy;
 
-use App\Jobs\TaskJob;
-use App\Services\V2\NsxService;
+use App\Jobs\Job;
+use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRulePort;
+use App\Traits\V2\LoggableModelJob;
+use GuzzleHttp\Exception\ClientException;
+use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
 
-class UndeployTrashedRules extends TaskJob
+class UndeployTrashedRules extends Job
 {
+    use Batchable, LoggableModelJob;
+
+    private $model;
+
+    public function __construct(FirewallPolicy $firewallPolicy)
+    {
+        $this->model = $firewallPolicy;
+    }
+
     public function handle()
     {
-        $firewallPolicy = $this->task->resource;
-        $router = $firewallPolicy->router;
+        $router = $this->model->router;
         $availabilityZone = $router->availabilityZone;
 
         $rulesResponse = $availabilityZone->nsxService()->get(
-            sprintf(NsxService::GET_GATEWAY_POLICY_RULES, $firewallPolicy->id)
+            '/policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id . '/rules'
         );
         $rulesResponseBody = json_decode($rulesResponse->getBody()->getContents());
         $rulesToRemove = [];
 
         foreach ($rulesResponseBody->results as $result) {
-            $trashedRule = $firewallPolicy->firewallRules()->withTrashed()->find($result->id);
+            $trashedRule = $this->model->firewallRules()->withTrashed()->find($result->id);
             if ($trashedRule != null && $trashedRule->trashed()) {
                 $rulesToRemove[] = $result->id;
             }
         }
 
         if (count($rulesToRemove) < 1) {
-            $this->debug('No rules to remove, skipping');
+            Log::debug('No rules to remove, skipping');
         }
 
         foreach ($rulesToRemove as $ruleToRemove) {
-            $this->debug("Removing firewall rule", ['ruleToRemove' => $ruleToRemove]);
+            Log::debug("Removing firewall rule", ['ruleToRemove' => $ruleToRemove]);
 
             $availabilityZone->nsxService()->delete(
-                sprintf(NsxService::DELETE_GATEWAY_POLICY_RULE, $firewallPolicy->id, $ruleToRemove)
+                '/policy/api/v1/infra/domains/default/gateway-policies/' . $this->model->id . '/rules/' . $ruleToRemove
             );
         }
     }
