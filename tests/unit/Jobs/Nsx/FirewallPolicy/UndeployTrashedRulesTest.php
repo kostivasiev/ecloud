@@ -5,6 +5,8 @@ namespace Tests\unit\Jobs\Nsx\FirewallPolicy;
 use App\Jobs\Nsx\FirewallPolicy\Deploy;
 use App\Jobs\Nsx\FirewallPolicy\UndeployTrashedRules;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -16,21 +18,25 @@ use Tests\TestCase;
 
 class UndeployTrashedRulesTest extends TestCase
 {
-    protected FirewallPolicy $firewallPolicy;
+    protected Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->firewallPolicy());
+            $this->task->save();
+        });
     }
 
     public function testPolicyRemovesRuleIfExistsAndTrashed()
     {
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'id' => 'fwp-test',
-            'router_id' => $this->router()->id,
-        ]);
-
-        $rule = $this->firewallPolicy->firewallRules()->create([
+        $rule = $this->firewallPolicy()->firewallRules()->create([
             'id' => 'test-rule-for-removal',
             'name' => 'test-rule-for-removal',
             'sequence' => 2,
@@ -62,19 +68,14 @@ class UndeployTrashedRulesTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new UndeployTrashedRules($this->firewallPolicy));
+        dispatch(new UndeployTrashedRules($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testPolicySkipRuleRemovalIfExistsAndNotTrashed()
     {
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'id' => 'fwp-test',
-            'router_id' => $this->router()->id,
-        ]);
-
-        $rule = $this->firewallPolicy->firewallRules()->create([
+        $rule = $this->firewallPolicy()->firewallRules()->create([
             'id' => 'test-rule-for-removal',
             'name' => 'test-rule-for-removal',
             'sequence' => 2,
@@ -99,18 +100,13 @@ class UndeployTrashedRulesTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new UndeployTrashedRules($this->firewallPolicy));
+        dispatch(new UndeployTrashedRules($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testPolicySkipRuleRemovalIfNotExists()
     {
-        $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-            'id' => 'fwp-test',
-            'router_id' => $this->router()->id,
-        ]);
-
         $this->nsxServiceMock()->expects('get')
             ->withArgs(['/policy/api/v1/infra/domains/default/gateway-policies/fwp-test/rules'])
             ->andReturnUsing(function () {
@@ -125,7 +121,7 @@ class UndeployTrashedRulesTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new UndeployTrashedRules($this->firewallPolicy));
+        dispatch(new UndeployTrashedRules($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
