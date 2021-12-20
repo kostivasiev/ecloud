@@ -16,13 +16,46 @@ class CrudTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 
+    public function testIndexAsAdmin()
+    {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+        $this->get('/v2/host-specs')
+            ->seeJson([
+                'id' => 'hs-test',
+                'name' => 'test-host-spec',
+                'ucs_specification_name' => 'test-host-spec',
+                'cpu_sockets' => 2,
+                'cpu_type' => 'E5-2643 v3',
+                'cpu_cores' => 6,
+                'cpu_clock_speed' => 4000,
+                'ram_capacity' => 64,
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testShowAsAdmin()
+    {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+        $this->get('/v2/host-specs/' . $this->hostSpec()->id)
+            ->seeJson([
+                'id' => 'hs-test',
+                'name' => 'test-host-spec',
+                'ucs_specification_name' => 'test-host-spec',
+                'cpu_sockets' => 2,
+                'cpu_type' => 'E5-2643 v3',
+                'cpu_cores' => 6,
+                'cpu_clock_speed' => 4000,
+                'ram_capacity' => 64,
+            ])
+            ->assertResponseStatus(200);
+    }
+
     public function testIndex()
     {
         $this->get('/v2/host-specs')
             ->seeJson([
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
-                'ucs_specification_name' => 'test-host-spec',
                 'cpu_sockets' => 2,
                 'cpu_type' => 'E5-2643 v3',
                 'cpu_cores' => 6,
@@ -38,7 +71,6 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
-                'ucs_specification_name' => 'test-host-spec',
                 'cpu_sockets' => 2,
                 'cpu_type' => 'E5-2643 v3',
                 'cpu_cores' => 6,
