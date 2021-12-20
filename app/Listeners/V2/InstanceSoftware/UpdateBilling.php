@@ -47,7 +47,7 @@ class UpdateBilling implements Billable
             return;
         }
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($instanceSoftware, self::getKeyName($license));
+        $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName($license));
         if (!empty($currentActiveMetric)) {
             return;
         }
