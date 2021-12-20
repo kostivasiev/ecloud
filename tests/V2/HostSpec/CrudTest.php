@@ -22,6 +22,7 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
+                'ucs_specification_name' => 'test-host-spec',
                 'cpu_sockets' => 2,
                 'cpu_type' => 'E5-2643 v3',
                 'cpu_cores' => 6,
@@ -37,6 +38,7 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
+                'ucs_specification_name' => 'test-host-spec',
                 'cpu_sockets' => 2,
                 'cpu_type' => 'E5-2643 v3',
                 'cpu_cores' => 6,
@@ -57,6 +59,7 @@ class CrudTest extends TestCase
 
         $data = [
             'name' =>  'test-host-spec',
+            'ucs_specification_name' => 'test-host-spec',
             'cpu_sockets' => 2,
             'cpu_type' => 'E5-2643 v3',
             'cpu_cores' => 6,
@@ -74,6 +77,7 @@ class CrudTest extends TestCase
 
         $data = [
             'name' => 'test-host-spec',
+            'ucs_specification_name' => 'test-host-spec',
             'cpu_sockets' => 2,
             'cpu_type' => 'E5-2643 v3',
             'cpu_cores' => 6,
@@ -107,6 +111,7 @@ class CrudTest extends TestCase
 
         $data = [
             'name' =>  'test-host-spec - RENAMED',
+            'ucs_specification_name' => 'test-host-spec',
             'cpu_sockets' => 1,
             'cpu_type' => "E5-2643 v3 - RENAMED",
             'cpu_cores' => 1,

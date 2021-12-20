@@ -45,17 +45,17 @@ class CreateProfile extends Job
             $lock->block(60);
 
             $response = $availabilityZone->conjurerService()->get(
-                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/specification/' . $this->model->hostGroup->hostSpec->name . '/host/available'
+                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/specification/' . $this->model->hostGroup->hostSpec->ucs_specification_name . '/host/available'
             );
             $response = json_decode($response->getBody()->getContents());
 
             if (!is_array($response)) {
-                $this->fail(new \Exception('Failed to determine available stock for specification ' . $this->model->hostGroup->hostSpec->name));
+                $this->fail(new \Exception('Failed to determine available stock for specification ' . $this->model->hostGroup->hostSpec->ucs_specification_name));
                 return false;
             }
 
             if (count($response) < 1) {
-                $this->fail(new \Exception('Insufficient stock for specification ' . $this->model->hostGroup->hostSpec->name));
+                $this->fail(new \Exception('Insufficient stock for specification ' . $this->model->hostGroup->hostSpec->ucs_specification_name));
                 return false;
             }
 
@@ -63,7 +63,7 @@ class CreateProfile extends Job
                 '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id .'/host',
                 [
                     'json' => [
-                        'specificationName' => $hostGroup->hostSpec->name,
+                        'specificationName' => $hostGroup->hostSpec->ucs_specification_name,
                         'hostId' => $this->model->id,
                     ],
                 ]

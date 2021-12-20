@@ -31,6 +31,7 @@ class HostSpec extends Model implements Filterable, Sortable
         $this->fillable([
             'id',
             'name',
+            'ucs_specification_name',
             'cpu_sockets',
             'cpu_type',
             'cpu_cores',
