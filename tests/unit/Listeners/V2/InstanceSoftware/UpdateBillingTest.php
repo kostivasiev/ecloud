@@ -81,10 +81,10 @@ class UpdateBillingTest extends TestCase
         $updateBillingListener = new \App\Listeners\V2\InstanceSoftware\UpdateBilling;
         $updateBillingListener->handle(new \App\Events\V2\Task\Updated($task));
 
-        $billingMetric = BillingMetric::getActiveByKey($this->instanceSoftware, 'software.test-software');
+        $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'software.test-software');
 
         $this->assertNotNull($billingMetric);
-        $this->assertEquals($this->instanceSoftware->id, $billingMetric->resource_id);
+        $this->assertEquals($this->instance()->id, $billingMetric->resource_id);
         $this->assertEquals($this->vpc()->id, $billingMetric->vpc_id);
         $this->assertEquals($this->vpc()->reseller_id, $billingMetric->reseller_id);
         $this->assertEquals('Software: Test Software', $billingMetric->name);

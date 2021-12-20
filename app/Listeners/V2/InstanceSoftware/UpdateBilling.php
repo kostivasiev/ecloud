@@ -47,14 +47,14 @@ class UpdateBilling implements Billable
             return;
         }
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($instanceSoftware, self::getKeyName($license));
+        $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName($license));
         if (!empty($currentActiveMetric)) {
             return;
         }
 
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->fill([
-            'resource_id' => $instanceSoftware->id,
+            'resource_id' => $instance->id,
             'vpc_id' => $instance->vpc->id,
             'reseller_id' => $instance->vpc->reseller_id,
             'name' => self::getFriendlyName($license),
