@@ -20,7 +20,8 @@ class McafeeWindowsSoftwareSeeder extends Seeder
         $data = [
             'name' => 'McAfee Antivirus',
             'visibility' => Software::VISIBILITY_PUBLIC,
-            'platform' => Software::PLATFORM_WINDOWS
+            'platform' => Software::PLATFORM_WINDOWS,
+            'license' => 'mcafee',
         ];
 
         if (app()->environment() != 'production') {
