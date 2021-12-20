@@ -208,11 +208,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         if ($user->isAdmin()) {
             return $query;
         }
-
-        if (in_array($user->resellerId(), config('reseller.internal'))) {
-            return $query;
-        }
-
         return $query->whereHas('region', function ($query) {
             $query->where('is_public', '=', true);
         })->where('is_public', '=', true);

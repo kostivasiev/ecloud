@@ -77,30 +77,6 @@ class GetTest extends TestCase
         $this->assertCount(1, $this->response->original);
     }
 
-    public function testGetCollectionAsInternalReseller()
-    {
-        // Availability Zone only visible to admins
-        factory(AvailabilityZone::class)->create([
-            'is_public' => false,
-        ]);
-
-        $this->availabilityZone()->is_public = true;
-        $this->availabilityZone()->save();
-
-        $this->get('/v2/availability-zones', [
-            'X-consumer-custom-id' => '7052-0',
-            'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
-            'id' => $this->availabilityZone()->id,
-            'name' => $this->availabilityZone()->name,
-        ])->seeJson([
-            'id' => $this->regionHiddenAz->id,
-            'name' => $this->regionHiddenAz->name,
-        ])->assertResponseStatus(200);
-
-        $this->assertCount(3, $this->response->original);
-    }
-
     public function testGetPublicAvailabilityZoneAsAdmin()
     {
         $this->availabilityZone()->is_public = true;
@@ -108,22 +84,6 @@ class GetTest extends TestCase
 
         $this->get('/v2/availability-zones/' . $this->availabilityZone()->id, [
             'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
-            'id' => $this->availabilityZone()->id,
-            'name' => $this->availabilityZone()->name,
-        ])->dontSeeJson([
-            'id' => $this->regionHiddenAz->id,
-        ])->assertResponseStatus(200);
-    }
-
-    public function testGetPublicAvailabilityZoneAsInternalReseller()
-    {
-        $this->availabilityZone()->is_public = true;
-        $this->availabilityZone()->save();
-
-        $this->get('/v2/availability-zones/' . $this->availabilityZone()->id, [
-            'X-consumer-custom-id' => '7052-0',
             'X-consumer-groups' => 'ecloud.read',
         ])->seeJson([
             'id' => $this->availabilityZone()->id,
