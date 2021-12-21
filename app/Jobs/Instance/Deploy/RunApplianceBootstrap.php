@@ -105,7 +105,6 @@ class RunApplianceBootstrap extends Job
         if (!$this->model->credentials()
             ->where('username', '=', 'plesk_admin_password')
             ->exists()) {
-
             Log::debug(get_class($this) . ' : Plesk image data does not contain plesk_admin_password, generating...');
 
             $credential = app()->make(Credential::class);
