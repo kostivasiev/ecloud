@@ -72,12 +72,16 @@ class RouterThroughput extends Model implements Filterable, Sortable, Availabili
         if ($user->isAdmin()) {
             return $query;
         }
-        return $query->whereHas(
-            'availabilityZone',
-            function ($query) {
-                $query->where('is_public', '=', 1);
-            }
-        );
+
+        if (in_array($user->resellerId(), config('reseller.internal'))) {
+            return $query;
+        }
+
+        return $query->whereHas('availabilityZone.region', function ($query) {
+            $query->where('is_public', '=', true);
+        })->whereHas('availabilityZone', function ($query) {
+            $query->where('is_public', '=', true);
+        });
     }
 
     /**

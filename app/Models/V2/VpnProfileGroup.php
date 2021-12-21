@@ -60,6 +60,11 @@ class VpnProfileGroup extends Model implements Filterable, Sortable, Availabilit
         if ($user->isAdmin()) {
             return $query;
         }
+
+        if (in_array($user->resellerId(), config('reseller.internal'))) {
+            return $query;
+        }
+
         return $query->whereHas('availabilityZone.region', function ($query) {
             $query->where('is_public', '=', true);
         })->whereHas('availabilityZone', function ($query) {
