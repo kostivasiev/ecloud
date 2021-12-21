@@ -107,7 +107,7 @@ class InstanceController extends BaseController
 
         $instance->save();
 
-        $imageData = collect($request->input('image_data'));
+        $imageData = collect($request->input('image_data'))->filter();
         $image->imageParameters
         ->filter(function ($value) use ($imageData) {
             return $value->type == ImageParameter::TYPE_PASSWORD &&
