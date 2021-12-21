@@ -34,6 +34,7 @@ class HostSpecController extends BaseController
         $model = app()->make(HostSpec::class);
         $model->fill($request->only([
             'name',
+            'ucs_specification_name',
             'cpu_sockets',
             'cpu_type',
             'cpu_cores',

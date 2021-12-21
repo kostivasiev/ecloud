@@ -11,5 +11,7 @@ $factory->define(HostSpec::class, function () {
         'cpu_cores' => 6,
         'cpu_clock_speed' => 4000,
         'ram_capacity' => 64,
+        'name' => 'test-host-spec',
+        'ucs_specification_name' => 'test-host-spec',
     ];
 });
