@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Jobs\Nsx\VpnService;
+namespace Jobs\VpnService\Nsx;
 
 use App\Jobs\Nsx\DeployCheck;
 use App\Models\V2\Task;
@@ -12,6 +12,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\VpnServiceMock;
 use Tests\TestCase;
+use function dispatch;
 
 class DeployCheckTest extends TestCase
 {

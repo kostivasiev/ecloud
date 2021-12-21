@@ -1,8 +1,8 @@
 <?php
-namespace Tests\unit\Jobs\Nsx\VpnService;
+namespace Jobs\VpnService\Nsx;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\Nsx\VpnService\Deploy;
+use App\Jobs\VpnService\Nsx\Deploy;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\VpnEndpointMock;
 use Tests\Mocks\Resources\VpnServiceMock;
 use Tests\TestCase;
+use function dispatch;
 
 class DeployTest extends TestCase
 {

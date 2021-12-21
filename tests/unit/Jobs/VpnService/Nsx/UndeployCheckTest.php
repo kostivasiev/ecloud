@@ -1,14 +1,16 @@
 <?php
 
-namespace Tests\unit\Jobs\Nsx\VpnService;
+namespace Jobs\VpnService\Nsx;
 
-use App\Jobs\Nsx\VpnService\UndeployCheck;
+use App\Jobs\VpnService\Nsx\UndeployCheck;
 use App\Models\V2\VpnService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use function dispatch;
+use function factory;
 
 class UndeployCheckTest extends TestCase
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\unit\Jobs\Nsx\VpnService;
+namespace Jobs\VpnService\Nsx;
 
-use App\Jobs\Nsx\VpnService\Undeploy;
+use App\Jobs\VpnService\Nsx\Undeploy;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -10,6 +10,7 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\VpnServiceMock;
 use Tests\TestCase;
+use function dispatch;
 
 class UndeployTest extends TestCase
 {
