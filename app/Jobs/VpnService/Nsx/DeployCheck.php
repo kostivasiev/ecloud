@@ -18,7 +18,7 @@ class DeployCheck extends TaskJob
         $availabilityZone = $vpnService->router->availabilityZone;
         $intentPath = '/infra/tier-1s/' . $vpnService->router->id .
             '/locale-services/' . $vpnService->router->id .
-            '/ipsec-vpn-services/';
+            '/ipsec-vpn-services/' . $vpnService->id;
 
         $this->awaitRealizedState($vpnService, $availabilityZone, $intentPath);
     }
