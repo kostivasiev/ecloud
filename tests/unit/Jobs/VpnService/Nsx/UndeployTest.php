@@ -3,9 +3,12 @@
 namespace Jobs\VpnService\Nsx;
 
 use App\Jobs\VpnService\Nsx\Undeploy;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\VpnServiceMock;
@@ -15,6 +18,22 @@ use function dispatch;
 class UndeployTest extends TestCase
 {
     use VpnServiceMock;
+
+    protected Task $task;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $this->task->resource()->associate($this->vpnService());
+            $this->task->save();
+        });
+    }
 
     public function testSuccess()
     {
@@ -30,7 +49,7 @@ class UndeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Undeploy($this->vpnService()));
+        dispatch(new Undeploy($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -49,7 +68,7 @@ class UndeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Undeploy($this->vpnService));
+        dispatch(new Undeploy($this->task));
 
         Event::assertDispatched(JobFailed::class);
     }
