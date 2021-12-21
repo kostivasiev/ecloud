@@ -69,6 +69,11 @@ class Region extends Model implements Filterable, Sortable
         if ($user->isAdmin()) {
             return $query;
         }
+
+        if (in_array($user->resellerId(), config('reseller.internal'))) {
+            return $query;
+        }
+
         return $query->where('is_public', '=', 1);
     }
 
