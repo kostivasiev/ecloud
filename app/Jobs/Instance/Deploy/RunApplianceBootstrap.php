@@ -52,6 +52,14 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
+        if ($this->model->image->getMetadata('ukfast.license.type') == 'plesk') {
+            Log::debug(get_class($this) . ' :Rendered Script: ' .
+                (new \Mustache_Engine())->loadTemplate($this->model->image->script_template)
+                    ->render($this->imageData));
+
+            Log::debug(get_class($this) . ' :Image Data: ' . json_encode($this->imageData));
+        }
+
         $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
         $instance->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
@@ -95,8 +103,10 @@ class RunApplianceBootstrap extends Job
         }
 
         if (!$this->model->credentials()
-            ->where('name', '=', 'plesk_admin_password')
+            ->where('username', '=', 'plesk_admin_password')
             ->exists()) {
+            Log::debug(get_class($this) . ' : Plesk image data does not contain plesk_admin_password, generating...');
+
             $credential = app()->make(Credential::class);
             $credential->fill([
                 'name' => 'plesk_admin_password',
