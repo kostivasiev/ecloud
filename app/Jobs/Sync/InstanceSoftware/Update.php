@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\InstanceSoftware;
 
 use App\Jobs\Job;
+use App\Jobs\InstanceSoftware\RunScripts;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
@@ -20,7 +21,10 @@ class Update extends Job
 
     public function handle()
     {
-        $this->task->completed = true;
-        $this->task->save();
+        $this->updateTaskBatch([
+            [
+                new RunScripts($this->task),
+            ],
+        ])->dispatch();
     }
 }

@@ -2,17 +2,13 @@
 
 namespace Tests\V2\Router\EventTests;
 
-use App\Listeners\V2\TaskCreated;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
-use App\Models\V2\RouterThroughput;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Faker\Generator;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DefaultAvailabilityZoneTest extends TestCase
@@ -36,7 +32,6 @@ class DefaultAvailabilityZoneTest extends TestCase
 
     public function testCreateRouterWithAvailabilityZone()
     {
-        Event::fake(TaskCreated::class);
         Bus::fake();
         $this->post(
             '/v2/routers',

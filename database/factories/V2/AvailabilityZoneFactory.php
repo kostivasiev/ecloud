@@ -9,7 +9,6 @@ $factory->define(AvailabilityZone::class, function () {
         'code' => 'LON1',
         'name' => 'London Zone 1',
         'datacentre_site_id' => 1,
-        'nsx_manager_endpoint' => 'https://www.ukfast.co.uk/',
         'san_name' => 'MCS-E-G0-3PAR-01',
         'ucs_compute_name' => 'GC-UCS-FI2-DEV-A',
         'is_public' => true,

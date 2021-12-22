@@ -14,13 +14,15 @@ class CrudTest extends TestCase
 {
     public $software;
 
+    public $instanceSoftware;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         (new SoftwareSeeder())->run();
 
-        $this->software = Software::find('soft-test');
+        $this->software = Software::find('soft-aaaaaaaa');
 
         $this->instanceSoftware = InstanceSoftware::factory()->make([
             'name' => 'McAfee'

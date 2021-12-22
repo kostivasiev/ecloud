@@ -109,7 +109,7 @@ class InstanceController extends BaseController
 
         $instance->save();
 
-        $imageData = collect($request->input('image_data'));
+        $imageData = collect($request->input('image_data'))->filter();
         $image->imageParameters
         ->filter(function ($value) use ($imageData) {
             return $value->type == ImageParameter::TYPE_PASSWORD &&
@@ -135,6 +135,7 @@ class InstanceController extends BaseController
             'image_data' => $imageData->toArray(),
             'user_script' => $request->input('user_script'),
             'ssh_key_pair_ids' => $request->input('ssh_key_pair_ids'),
+            'software_ids' => $request->input('software_ids'),
         ];
 
         $task = $instance->syncSave();
@@ -375,7 +376,7 @@ class InstanceController extends BaseController
             Log::info(
                 __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console session',
                 [
-                    'instance' => $instance,
+                    'instance' => $instance->id,
                     'response' => $response,
                 ]
             );
@@ -398,7 +399,7 @@ class InstanceController extends BaseController
         if (!$consoleResource) {
             Log::info(
                 __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console credentials',
-                ['instance' => $instance]
+                ['instance' => $instance->id]
             );
             return response()->json([
                 'errors' => [
@@ -436,7 +437,7 @@ class InstanceController extends BaseController
                 $message,
                 [
                     'data' => [
-                        'instance' => $instance,
+                        'instance' => $instance->id,
                         'host' => $consoleResource->host,
                         'exception' => $e ?? '',
                     ]
@@ -455,7 +456,7 @@ class InstanceController extends BaseController
         $uuid = $responseJson->uuid ?? '';
         if (empty($uuid)) {
             Log::info(__CLASS__ . '::' . __FUNCTION__ . ' : Failed to retrieve session UUID from host', [
-                'instance' => $instance,
+                'instance' => $instance->id,
                 'base_uri' => $consoleResource->host.':'.$consoleResource->port,
                 'status_code' => Response::HTTP_SERVICE_UNAVAILABLE,
             ]);

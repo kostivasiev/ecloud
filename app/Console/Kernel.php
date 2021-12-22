@@ -33,6 +33,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Image\Populate::class,
         \App\Console\Commands\Orchestrator\ScheduledDeploy::class,
         \App\Console\Commands\FloatingIp\SetPolymorphicRelationship::class,
+        \App\Console\Commands\FloatingIp\PopulateForIpRange::class,
         \App\Console\Commands\FloatingIp\PopulateAvailabilityZoneId::class,
         \App\Console\Commands\Health\FindOrphanedNats::class,
         \App\Console\Commands\Health\FindOrphanedNics::class,
@@ -42,6 +43,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Billing\CleanupAdvancedNetworking::class,
         \App\Console\Commands\Credentials\AddPortToPleskCredential::class,
         \App\Console\Commands\Billing\FixPriceOnAdvancedNetworkingBillingMetrics::class,
+        \App\Console\Commands\Billing\SetFriendlyNames::class,
+        \App\Console\Commands\VPC\ChangeOwnership::class,
     ];
 
     /**

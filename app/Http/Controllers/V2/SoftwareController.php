@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\Software\Create;
 use App\Http\Requests\V2\Software\Update;
 use App\Models\V2\Software;
+use App\Resources\V2\ImageResource;
 use App\Resources\V2\ScriptResource;
 use App\Resources\V2\SoftwareResource;
 use Illuminate\Http\Request;
@@ -38,6 +39,7 @@ class SoftwareController extends BaseController
             'name',
             'platform',
             'visibility',
+            'license',
         ]));
         $resource->save();
 
@@ -51,6 +53,7 @@ class SoftwareController extends BaseController
             'name',
             'platform',
             'visibility',
+            'license',
         ]));
         $resource->save();
         return $this->responseIdMeta($request, $resource->id, 200);
@@ -67,6 +70,18 @@ class SoftwareController extends BaseController
         $collection = Software::forUser(Auth::user())->findOrFail($softwareId)->scripts();
 
         return ScriptResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function images(Request $request, string $softwareId)
+    {
+        $collection = Software::forUser(Auth::user())
+            ->findOrFail($softwareId)
+            ->images()
+            ->forUser(Auth::user());
+
+        return ImageResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

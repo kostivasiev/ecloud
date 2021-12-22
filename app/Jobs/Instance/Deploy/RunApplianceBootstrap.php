@@ -7,11 +7,12 @@ use App\Models\V2\Credential;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
-use App\Services\AccountsService;
 use App\Services\V2\PasswordService;
+use App\Traits\V2\Jobs\RunsScripts;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
+use UKFast\Admin\Account\AdminClient;
 
 class RunApplianceBootstrap extends Job
 {
@@ -20,6 +21,7 @@ class RunApplianceBootstrap extends Job
     private $model;
 
     private $imageData;
+    private $deployData;
 
     public function __construct(Instance $instance)
     {
@@ -80,16 +82,23 @@ class RunApplianceBootstrap extends Job
         }
 
         $deployData = $this->model->deploy_data;
-        if (!in_array('plesk_admin_email_address', array_keys($this->imageData)) || empty($this->imageData['plesk_admin_email_address'])) {
-            $accountsService = app()->make(AccountsService::class);
-            $this->imageData['plesk_admin_email_address'] = $accountsService->getPrimaryContactEmail($this->model->getResellerId());
+        if (!in_array('plesk_admin_email_address', array_keys($this->imageData)) ||
+            empty($this->imageData['plesk_admin_email_address'])
+        ) {
+            $adminClient = app()->make(AdminClient::class)->setResellerId($this->model->getResellerId());
+            $primaryContactId = ($adminClient->customers()->getById($this->model->getResellerId()))
+                ->primaryContactId;
+            $primaryContactEmail = $adminClient->contacts()->getById($primaryContactId)->emailAddress;
+            $this->imageData['plesk_admin_email_address'] = $primaryContactEmail;
             $deployData['image_data'] = $this->imageData;
             $this->model->setAttribute('deploy_data', $deployData)->saveQuietly();
         }
 
         if (!$this->model->credentials()
-            ->where('name', '=', 'plesk_admin_password')
+            ->where('username', '=', 'plesk_admin_password')
             ->exists()) {
+            Log::debug(get_class($this) . ' : Plesk image data does not contain plesk_admin_password, generating...');
+
             $credential = app()->make(Credential::class);
             $credential->fill([
                 'name' => 'plesk_admin_password',

@@ -66,6 +66,8 @@ components:
       $ref: 'components/schemas/router.yaml'
     RouterThroughput:
       $ref: 'components/schemas/routerThroughput.yaml'
+    Software:
+      $ref: 'resources/Software/schema.yaml'
     SSHKeyPair:
       $ref: 'resources/SSHKeyPair/schema.yaml'
     Task:
@@ -232,10 +234,12 @@ paths:
     $ref: 'resources/Image/collection.yaml'
   '/ecloud/v2/images/{id}':
     $ref: 'resources/Image/item.yaml'
-  '/ecloud/v2/image/{id}/metadata':
+  '/ecloud/v2/images/{id}/metadata':
     $ref: 'resources/Image/metadata-collection.yaml'
-  '/ecloud/v2/image/{id}/parameters':
+  '/ecloud/v2/images/{id}/parameters':
     $ref: 'resources/Image/parameters-collection.yaml'
+  '/ecloud/v2/images/{id}/software':
+    $ref: 'resources/Image/software-collection.yaml'
   '/ecloud/v2/instances':
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':
@@ -262,6 +266,8 @@ paths:
     $ref: 'resources/Instance/poweronoff.yaml'
   '/ecloud/v2/instances/{instanceId}/power-shutdown':
     $ref: 'resources/Instance/poweronoff.yaml'
+  '/ecloud/v2/instances/{instanceId}/software':
+    $ref: 'resources/Instance/software-collection.yaml'
   '/ecloud/v2/instances/{instanceId}/tasks':
     $ref: 'resources/Instance/tasks-collection.yaml'
   '/ecloud/v2/instances/{instanceId}/floating-ips':
@@ -274,6 +280,10 @@ paths:
     $ref: 'resources/Instance/volume-attachdetach.yaml'
   '/ecloud/v2/instances/{instanceId}/volumes':
     $ref: 'resources/Instance/volumes.yaml'
+  '/ecloud/v2/instance-software' :
+    $ref : 'resources/InstanceSoftware/collection.yaml'
+  '/ecloud/v2/instance-software/{instanceSoftwareId}' :
+    $ref : 'resources/InstanceSoftware/item.yaml'
 #  '/ecloud/v2/load-balancers':
 #    $ref: 'resources/LoadBalancer/collection.yaml'
 #  '/ecloud/v2/load-balancers/{loadBalancerId}':
@@ -338,6 +348,18 @@ paths:
     $ref: 'resources/RouterThroughput/collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/item.yaml'
+  '/ecloud/v2/scripts':
+    $ref : 'resources/Script/collection.yaml'
+  '/ecloud/v2/scripts/{scriptId}':
+    $ref : 'resources/Script/item.yaml'
+  '/ecloud/v2/software':
+    $ref : 'resources/Software/collection.yaml'
+  '/ecloud/v2/software/{softwareId}':
+    $ref : 'resources/Software/item.yaml'
+  '/ecloud/v2/software/{softwareId}/images' :
+    $ref : 'resources/Software/images-collection.yaml'
+  '/ecloud/v2/software/{softwareId}/scripts' :
+    $ref : 'resources/Software/scripts-collection.yaml'
   '/ecloud/v2/ssh-key-pairs':
     $ref: 'resources/SSHKeyPair/collection.yaml'
   '/ecloud/v2/ssh-key-pairs/{keypairId}':

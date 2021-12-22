@@ -4,6 +4,8 @@ namespace Tests\unit\Jobs\Network;
 
 use App\Jobs\Network\Deploy;
 use App\Models\V2\Router;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -15,11 +17,22 @@ use Tests\TestCase;
 
 class DeployTest extends TestCase
 {
+    protected Task $task;
+
     public function setUp(): void
     {
         parent::setUp();
 
         $this->dhcp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->network());
+            $this->task->save();
+        });
     }
 
     public function testSucceeds()
@@ -61,7 +74,7 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->network()));
+        dispatch(new Deploy($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -73,7 +86,7 @@ class DeployTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Deploy($this->network()));
+        dispatch(new Deploy($this->task));
 
         Event::assertDispatched(JobFailed::class, function ($event) {
             return $event->exception->getMessage() == 'Unable to locate VPC DHCP server for router availability zone';

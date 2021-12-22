@@ -2,6 +2,7 @@
 namespace App\Listeners\V2\Host;
 
 use App\Events\V2\Task\Updated;
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
 use App\Support\Sync;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Log;
  * Toggle billing for a host group when a host is deleted as we want to bill for empty host groups.
  * @package App\Listeners\V2\Host
  */
-class ToggleHostGroupBilling
+class ToggleHostGroupBilling implements Billable
 {
     public function handle(Updated $event)
     {
@@ -29,7 +30,7 @@ class ToggleHostGroupBilling
 
         switch ($task->name) {
             case Sync::TASK_NAME_UPDATE:
-                $billingMetric = BillingMetric::getActiveByKey($host->hostGroup, 'hostgroup');
+                $billingMetric = BillingMetric::getActiveByKey($host->hostGroup, self::getKeyName());
                 if ($billingMetric) {
                     Log::debug(get_class($this) . ': Billing ended for non empty host group ' . $host->hostGroup->id);
                     $billingMetric->setEndDate();
@@ -37,13 +38,14 @@ class ToggleHostGroupBilling
                 break;
             case Sync::TASK_NAME_DELETE:
                 // <= 1 because the host hasn't been trashed yet
-                if ($host->hostGroup->hosts->count() <= 1 && (!BillingMetric::getActiveByKey($host->hostGroup, 'hostgroup'))) {
+                if ($host->hostGroup->hosts->count() <= 1 && (!BillingMetric::getActiveByKey($host->hostGroup, self::getKeyName()))) {
                     $billingMetric = app()->make(BillingMetric::class);
                     $billingMetric->fill([
                         'resource_id' => $host->hostGroup->id,
                         'vpc_id' => $host->hostGroup->vpc->id,
                         'reseller_id' => $host->hostGroup->vpc->reseller_id,
-                        'key' => 'hostgroup',
+                        'name' => self::getFriendlyName(),
+                        'key' => self::getKeyName(),
                         'value' => 1,
                         'start' => Carbon::now(),
                         'category' => 'Compute',
@@ -51,7 +53,7 @@ class ToggleHostGroupBilling
 
                     $product = $host->hostGroup->availabilityZone
                         ->products()
-                        ->where('product_name', $host->hostGroup->availabilityZone->id . ': hostgroup')
+                        ->where('product_name', $host->hostGroup->availabilityZone->id . ': ' . self::getKeyName())
                         ->first();
 
                     if (empty($product)) {
@@ -71,5 +73,23 @@ class ToggleHostGroupBilling
         }
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        return 'Host Group';
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        return 'hostgroup';
     }
 }

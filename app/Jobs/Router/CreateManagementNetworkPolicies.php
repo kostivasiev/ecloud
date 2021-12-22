@@ -1,45 +1,32 @@
 <?php
 namespace App\Jobs\Router;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
-use App\Models\V2\Router;
-use App\Models\V2\Task;
-use App\Traits\V2\Jobs\AwaitResources;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Traits\V2\TaskJobs\AwaitResources;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 
-class CreateManagementNetworkPolicies extends Job
+class CreateManagementNetworkPolicies extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources;
-
-    private Task $task;
-    private Router $model;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
+    use AwaitResources;
 
     /**
      * @throws \Exception
      */
     public function handle()
     {
-        $router = $this->model;
+        $router = $this->task->resource;
         if (!empty($this->task->data['management_router_id']) && !empty($this->task->data['management_network_id'])) {
             $networkPolicy = false;
             if ($router->vpc->advanced_networking) {
                 if (empty($this->task->data['network_policy_id'])) {
                     $managementNetwork = Network::find($this->task->data['management_network_id']);
                     if ($managementNetwork) {
-                        Log::info(get_class($this) . ' - Create Management Network Policy and Rules Start', [
+                        $this->info('Create Management Network Policy and Rules Start', [
                             'network_id' => $managementNetwork->id,
                         ]);
 
@@ -85,7 +72,7 @@ class CreateManagementNetworkPolicies extends Job
                         $this->task->data = Arr::add($this->task->data, 'network_policy_id', $networkPolicy->id);
                         $this->task->saveQuietly();
 
-                        Log::info(get_class($this) . ' - Create Management Network Policy and Rules End', [
+                        $this->info('Create Management Network Policy and Rules End', [
                             'network_id' => $managementNetwork->id,
                         ]);
                     }

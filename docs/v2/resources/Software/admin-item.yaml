@@ -1,0 +1,41 @@
+get:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: 'admin-schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Software
+patch:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: 'admin-schema.yaml'
+  responses:
+    202:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Software
+delete:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Software

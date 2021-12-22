@@ -3,28 +3,25 @@
 namespace App\Jobs\Vpc;
 
 use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\Vpc;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 
-class DeleteDhcps extends Job
+class DeleteDhcps extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private Vpc $model;
-
-    public function __construct(Vpc $vpc)
-    {
-        $this->model = $vpc;
-    }
-
     /**
      * @return bool
      */
     public function handle()
     {
-        $this->model->dhcps()->each(function ($dhcp) {
+        $vpc = $this->task->resource;
+
+        $vpc->dhcps()->each(function ($dhcp) {
+            $this->info('Trigger sync delete for DHCP ' . $dhcp->id);
             $dhcp->syncDelete();
         });
+
+        return true;
     }
 }

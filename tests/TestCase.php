@@ -598,25 +598,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         if (!$this->hostSpec) {
             $this->hostSpec = factory(HostSpec::class)->create([
                 'id' => 'hs-test',
-                'name' => 'test-host-spec',
             ]);
         }
         return $this->hostSpec;
-    }
-
-    public function accountsServiceMock()
-    {
-        if (!$this->accountsServiceMock) {
-            $this->accountsServiceMock = \Mockery::mock(new AccountsService(new Client([
-                'base_uri' => env('APIO_ACCOUNT_HOST'),
-                'timeout' => 2,
-                'verify' => app()->environment() === 'production',
-            ])))->makePartial();
-            app()->bind(AccountsService::class, function () {
-                return $this->accountsServiceMock;
-            });
-        }
-        return $this->accountsServiceMock;
     }
 
     public function artisanServiceMock()

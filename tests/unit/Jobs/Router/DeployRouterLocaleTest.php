@@ -4,18 +4,30 @@ namespace Tests\unit\Jobs\Router;
 
 use App\Jobs\Router\DeployRouterLocale;
 use App\Models\V2\Router;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class DeployRouterLocaleTest extends TestCase
 {
-    protected Router $router;
+    protected Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->router());
+            $this->task->save();
+        });
     }
 
     public function testSucceedsStandardNetworking()
@@ -58,7 +70,7 @@ class DeployRouterLocaleTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeployRouterLocale($this->router()));
+        dispatch(new DeployRouterLocale($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -105,7 +117,7 @@ class DeployRouterLocaleTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeployRouterLocale($this->router()));
+        dispatch(new DeployRouterLocale($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }

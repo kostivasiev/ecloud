@@ -38,6 +38,7 @@ class Software extends Model implements Filterable, Sortable
             'name',
             'platform',
             'visibility',
+            'license',
         ];
         parent::__construct($attributes);
     }
@@ -45,6 +46,11 @@ class Software extends Model implements Filterable, Sortable
     public function scripts(): HasMany
     {
         return $this->hasMany(Script::class);
+    }
+
+    public function images()
+    {
+        return $this->belongsToMany(Image::class);
     }
 
     /**
@@ -71,6 +77,7 @@ class Software extends Model implements Filterable, Sortable
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('platform', Filter::$stringDefaults),
             $factory->create('visibility', Filter::$enumDefaults),
+            $factory->create('license', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];
@@ -88,6 +95,7 @@ class Software extends Model implements Filterable, Sortable
             $factory->create('name'),
             $factory->create('platform'),
             $factory->create('visibility'),
+            $factory->create('license'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
         ];
@@ -114,6 +122,7 @@ class Software extends Model implements Filterable, Sortable
             'name' => 'name',
             'platform' => 'platform',
             'visibility' => 'visibility',
+            'license' => 'license',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
         ];

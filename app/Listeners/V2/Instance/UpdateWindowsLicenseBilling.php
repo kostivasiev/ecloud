@@ -3,13 +3,14 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Task\Updated;
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
-class UpdateWindowsLicenseBilling
+class UpdateWindowsLicenseBilling implements Billable
 {
     /**
      * @param Updated $event
@@ -42,16 +43,19 @@ class UpdateWindowsLicenseBilling
 
         if (!empty($instance->host_group_id)) {
             $instance->billingMetrics()
-                ->where('key', '=', 'license.windows')
+                ->where('key', '=', self::getKeyName())
                 ->each(function ($billingMetric) use ($instance) {
                     $billingMetric->setEndDate();
                     Log::debug('End billing of `' . $billingMetric->key . '` for Instance ' . $instance->id);
                 });
-            Log::warning(get_class($this) . ': Instance ' . $instance->id . ' is in the host group ' . $instance->host_group_id . ', nothing to do');
+            Log::warning(
+                get_class($this) . ': Instance ' . $instance->id . ' is in the host group ' .
+                $instance->host_group_id . ', nothing to do'
+            );
             return;
         }
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($instance, 'license.windows');
+        $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName());
         if (!empty($currentActiveMetric)) {
             if ($currentActiveMetric->value == $instance->vcpu_cores) {
                 return;
@@ -63,7 +67,8 @@ class UpdateWindowsLicenseBilling
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
-        $billingMetric->key = 'license.windows';
+        $billingMetric->name = self::getFriendlyName();
+        $billingMetric->key = self::getKeyName();
         $billingMetric->value = $instance->vcpu_cores;
         $billingMetric->start = Carbon::now();
 
@@ -72,7 +77,8 @@ class UpdateWindowsLicenseBilling
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load \'windows\' billing product for availability zone ' . $instance->availabilityZone->id
+                'Failed to load \'windows\' billing product for availability zone ' .
+                $instance->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;
@@ -80,5 +86,23 @@ class UpdateWindowsLicenseBilling
         }
 
         $billingMetric->save();
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        return 'Windows License (per core)';
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        return 'license.windows';
     }
 }

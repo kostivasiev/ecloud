@@ -17,11 +17,11 @@ class ScriptsTest extends TestCase
 
     public function testShow()
     {
-        $this->get('/v2/software/soft-test/scripts')
+        $this->get('/v2/software/soft-aaaaaaaa/scripts')
             ->seeJson([
                 'id' => 'scr-test-1',
                 'name' => 'Script 1',
-                'software_id' => 'soft-test',
+                'software_id' => 'soft-aaaaaaaa',
                 'sequence' => 1,
                 'script' => 'exit 0',
             ])

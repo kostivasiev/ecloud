@@ -6,11 +6,12 @@ use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Models\V2\Credential;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
-use Database\Seeders\CpanelImageSeeder;
+use Database\Seeders\Images\CpanelImageSeeder;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Admin\Account\AdminContactClient;
 
 class RunApplianceBootstrapTest extends TestCase
 {
@@ -208,12 +209,33 @@ class RunApplianceBootstrapTest extends TestCase
         ]);
         $this->instance()->credentials()->save($credential);
 
-        $this->accountsServiceMock()
-            ->allows('getPrimaryContactId')
-            ->andReturns('111');
-        $this->accountsServiceMock()
-            ->allows('getPrimaryContactEmail')
-            ->andReturns('captain.kirk@example.com');
+        $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+        $mockAccountAdminClient->allows('setResellerId')
+            ->withAnyArgs()
+            ->andReturnUsing(function () {
+                $mockAdminContactClient = \Mockery::mock(AdminContactClient::class)->makePartial();
+                $mockAdminContactClient->allows('customers')->andReturnSelf();
+                $mockAdminContactClient->allows('contacts')->andReturnSelf();
+                $mockAdminContactClient->allows('getById')
+                    ->with(1)
+                    ->andReturnUsing(function () {
+                        return new \UKFast\Admin\Account\Entities\Customer([
+                            'primaryContactId' => 111,
+                        ]);
+                    });
+                $mockAdminContactClient->allows('getById')
+                    ->with(111)
+                    ->andReturnUsing(function () {
+                        return new \UKFast\Admin\Account\Entities\Contact([
+                            'emailAddress' => 'captain.kirk@example.com',
+                        ]);
+                    });
+                return $mockAdminContactClient;
+            });
+
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
+            return $mockAccountAdminClient;
+        });
 
         $this->kingpinServiceMock()
             ->expects('post')

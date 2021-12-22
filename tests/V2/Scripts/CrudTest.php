@@ -23,7 +23,7 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => 'scr-test-1',
                 'name' => 'Script 1',
-                'software_id' => 'soft-test',
+                'software_id' => 'soft-aaaaaaaa',
                 'sequence' => 1,
                 'script' => 'exit 0',
             ])
@@ -35,11 +35,7 @@ class CrudTest extends TestCase
         // 'private' visibility of related software does not display to non admin
         $this->get('/v2/scripts')
             ->dontSeeJson([
-                'id' => 'scr-test-1',
-                'name' => 'Script 1',
-                'software_id' => 'soft-test',
-                'sequence' => 1,
-                'script' => 'exit 0',
+                'id' => 'scr-test-1'
             ])
             ->assertResponseStatus(200);
 
@@ -49,7 +45,7 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => 'scr-test-1',
                 'name' => 'Script 1',
-                'software_id' => 'soft-test',
+                'software_id' => 'soft-aaaaaaaa',
                 'sequence' => 1,
                 'script' => 'exit 0',
             ])
@@ -63,7 +59,7 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => 'scr-test-1',
                 'name' => 'Script 1',
-                'software_id' => 'soft-test',
+                'software_id' => 'soft-aaaaaaaa',
                 'sequence' => 1,
                 'script' => 'exit 0',
             ])
@@ -81,7 +77,7 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => 'scr-test-1',
                 'name' => 'Script 1',
-                'software_id' => 'soft-test',
+                'software_id' => 'soft-aaaaaaaa',
                 'sequence' => 1,
                 'script' => 'exit 0',
             ])
@@ -92,7 +88,7 @@ class CrudTest extends TestCase
     {
         $data = [
             'name' => 'Script Test',
-            'software_id' => 'soft-test',
+            'software_id' => 'soft-aaaaaaaa',
             'script' => 'exit 0'
         ];
 

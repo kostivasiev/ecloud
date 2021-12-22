@@ -1,30 +1,17 @@
 <?php
 namespace App\Jobs\Router;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Router;
-use App\Models\V2\Task;
-use App\Traits\V2\Jobs\AwaitResources;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Traits\V2\TaskJobs\AwaitResources;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 
-class CreateManagementFirewallPolicies extends Job
+class CreateManagementFirewallPolicies extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources;
-
-    private Task $task;
-    private Router $model;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
+    use AwaitResources;
 
     /**
      * @throws \Exception
@@ -36,7 +23,7 @@ class CreateManagementFirewallPolicies extends Job
             if (empty($this->task->data['firewall_policy_id'])) {
                 $managementRouter = Router::find($this->task->data['management_router_id']);
                 if ($managementRouter) {
-                    Log::info(get_class($this) . ' - Create Management Firewall Policy and Rules Start', [
+                    $this->info('Create Management Firewall Policy and Rules Start', [
                         'router_id' => $managementRouter->id,
                     ]);
 
@@ -83,7 +70,7 @@ class CreateManagementFirewallPolicies extends Job
                     $this->task->data = Arr::add($this->task->data, 'firewall_policy_id', $firewallPolicy->id);
                     $this->task->saveQuietly();
 
-                    Log::info(get_class($this) . ' - Create Firewall Policy and Rules End', [
+                    $this->info('Create Firewall Policy and Rules End', [
                         'router_id' => $managementRouter->id,
                     ]);
                 }
