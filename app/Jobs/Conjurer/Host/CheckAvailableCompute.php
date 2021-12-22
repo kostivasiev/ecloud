@@ -27,19 +27,19 @@ class CheckAvailableCompute extends Job
     {
         $availabilityZone = $this->model->hostGroup->availabilityZone;
         $response = $availabilityZone->conjurerService()->get(
-            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/specification/' . $this->model->hostGroup->hostSpec->name . '/host/available'
+            '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/specification/' . $this->model->hostGroup->hostSpec->ucs_specification_name . '/host/available'
         );
         $response = json_decode($response->getBody()->getContents());
 
         if (!is_array($response)) {
-            $message = 'Failed to determine available stock for specification ' . $this->model->hostGroup->hostSpec->name;
+            $message = 'Failed to determine available stock for specification ' . $this->model->hostGroup->hostSpec->ucs_specification_name;
             Log::error($message);
             $this->fail(new \Exception($message));
             return false;
         }
 
         if (count($response) < 1) {
-            $message = 'Insufficient stock for specification ' . $this->model->hostGroup->hostSpec->name;
+            $message = 'Insufficient stock for specification ' . $this->model->hostGroup->hostSpec->ucs_specification_name;
             Log::error($message);
             $this->fail(new \Exception($message));
             return false;

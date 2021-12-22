@@ -20,6 +20,7 @@ class HostSpecResource extends UKFastResource
         ];
 
         if ($request->user()->isAdmin()) {
+            $data['ucs_specification_name'] = $this->ucs_specification_name;
             $tz = new \DateTimeZone(config('app.timezone'));
             $data['created_at'] = $this->created_at === null ? null : Carbon::parse($this->created_at, $tz)->toIso8601String();
             $data['updated_at'] = $this->updated_at === null ? null : Carbon::parse($this->updated_at, $tz)->toIso8601String();

@@ -107,7 +107,7 @@ class InstanceController extends BaseController
 
         $instance->save();
 
-        $imageData = collect($request->input('image_data'));
+        $imageData = collect($request->input('image_data'))->filter();
         $image->imageParameters
         ->filter(function ($value) use ($imageData) {
             return $value->type == ImageParameter::TYPE_PASSWORD &&
@@ -118,7 +118,8 @@ class InstanceController extends BaseController
             $credential->fill([
                 'name' => $populatedPassword->key,
                 'username' => $populatedPassword->key,
-                'password' => $imageData->get($populatedPassword->key)
+                'password' => $imageData->get($populatedPassword->key),
+                'is_hidden' => true
             ]);
             $instance->credentials()->save($credential);
             $imageData->forget($populatedPassword->key);
