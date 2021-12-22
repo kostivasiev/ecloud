@@ -70,8 +70,8 @@ class ImageParameter extends Model implements Filterable, Sortable
 
         return $query
             ->whereHas('image.vpc', function ($query) use ($user) {
-            $query->where('reseller_id', $user->resellerId());
-        })
+                $query->where('reseller_id', $user->resellerId());
+            })
             ->orWhereHas('image', function ($query) use ($user) {
                 $query->where('public', true)->where('active', true);
             })
