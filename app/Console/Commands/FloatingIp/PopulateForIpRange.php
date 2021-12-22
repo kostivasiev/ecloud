@@ -11,7 +11,7 @@ use IPLib\Range\Subnet;
 
 class PopulateForIpRange extends Command
 {
-    protected $signature = 'floating-ip:populate-for-ip-range {vpc} {az} {--ip-range=*} {--dry-run}';
+    protected $signature = 'floating-ip:populate-for-ip-range {vpc} {az} {--ip-range=*} {--dry-run} {--force}';
     protected $description = 'Adds FIPs to VPC for given IP range in CIDR format, e.g. 1.2.3.0/24';
 
     public function handle()
@@ -53,7 +53,7 @@ class PopulateForIpRange extends Command
 
             $this->info("Parsed {$ipAddresses->count()} IP addresses to populate");
 
-            if (!$this->confirm('Continue?')) {
+            if (!$this->option('force') && !$this->confirm('Continue?')) {
                 $this->warn('Abort');
                 return Command::FAILURE;
             }
