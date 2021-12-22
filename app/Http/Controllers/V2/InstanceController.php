@@ -112,9 +112,7 @@ class InstanceController extends BaseController
         // Don't allow customers to set their own passwords.
         $image->imageParameters
         ->filter(function ($value) use ($imageData) {
-            return $value->type == ImageParameter::TYPE_PASSWORD &&
-                in_array($value->key, $imageData->keys()->toArray()) &&
-                $value->is_hidden;
+            return $value->is_hidden && in_array($value->key, $imageData->keys()->toArray());
         })
         ->each(function ($populatedPassword) use ($imageData) {
             $imageData->forget($populatedPassword->key);
