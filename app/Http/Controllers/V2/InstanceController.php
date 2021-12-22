@@ -114,8 +114,8 @@ class InstanceController extends BaseController
         ->filter(function ($value) use ($imageData) {
             return $value->is_hidden && in_array($value->key, $imageData->keys()->toArray());
         })
-        ->each(function ($populatedPassword) use ($imageData) {
-            $imageData->forget($populatedPassword->key);
+        ->each(function ($populatedParameter) use ($imageData) {
+            $imageData->forget($populatedParameter->key);
         });
 
         $instance->deploy_data = [
