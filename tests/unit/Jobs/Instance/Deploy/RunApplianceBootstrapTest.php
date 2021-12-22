@@ -330,6 +330,8 @@ class RunApplianceBootstrapTest extends TestCase
         $job = new RunApplianceBootstrap($this->instance());
         $job->handle();
 
+        $this->assertTrue(isset($job->imageData['plesk_admin_password']));
+        $this->assertNotEmpty($job->imageData['plesk_admin_password']);
 
         Event::assertNotDispatched(JobFailed::class);
     }

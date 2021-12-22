@@ -19,7 +19,7 @@ class RunApplianceBootstrap extends Job
 
     private $model;
 
-    private $imageData;
+    public $imageData;
     private $deployData;
 
     public function __construct(Instance $instance)
