@@ -11,7 +11,7 @@ use IPLib\Range\Subnet;
 
 class PopulateForIpRange extends Command
 {
-    protected $signature = 'floating-ip:populate-for-ip-range {vpc} {az} {--ip-range=*}';
+    protected $signature = 'floating-ip:populate-for-ip-range {vpc} {az} {--ip-range=*} {--debug}';
     protected $description = 'Adds FIPs to VPC for given IP range in CIDR format, e.g. 1.2.3.0/24';
 
     public function handle()
@@ -48,28 +48,37 @@ class PopulateForIpRange extends Command
                     break;
                 }
 
-                $ipAddresses->add($ip);
+                $ipAddresses->add($ip->toString());
             }
 
             $this->info("Parsed {$ipAddresses->count()} IP addresses to populate");
 
-            foreach ($ipAddresses as $ipAddress) {
-                $ipString = $ipAddress->toString();
+            if ($this->option('debug')) {
+                foreach ($ipAddresses as $ipAddress) {
+                    $this->info("IP address to add: " . $ipAddress);
+                }
+            }
 
+            if (!$this->confirm('Continue?')) {
+                $this->warn('Abort');
+                return Command::FAILURE;
+            }
+
+            foreach ($ipAddresses as $ipAddress) {
                 //check no other FIPs have this IP address
-                if (FloatingIp::where('ip_address', $ipString)
+                if (FloatingIp::where('ip_address', $ipAddress)
                         ->count() > 0) {
-                    $this->warn('IP address "' . $ipString . '" in use, skipping');
+                    $this->warn('IP address "' . $ipAddress . '" in use, skipping');
                     continue;
                 }
 
-                $this->info('Adding IP ' . $ipString);
+                $this->info('Adding IP ' . $ipAddress);
                 $floatingIp = new FloatingIp([
                     'vpc_id' => $vpc->id,
                     'availability_zone_id' => $az->id,
                 ]);
 
-                $floatingIp->ip_address = $ipString;
+                $floatingIp->ip_address = $ipAddress;
                 $floatingIp->syncSave();
             }
         }
