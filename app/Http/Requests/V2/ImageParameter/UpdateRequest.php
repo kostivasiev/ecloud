@@ -38,7 +38,12 @@ class UpdateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'boolean'
-            ]
+            ],
+            'is_hidden' => [
+                'sometimes',
+                'required',
+                'boolean'
+            ],
         ];
     }
 }

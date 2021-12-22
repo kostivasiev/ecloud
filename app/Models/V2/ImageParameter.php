@@ -26,10 +26,6 @@ class ImageParameter extends Model implements Filterable, Sortable
 
     const TYPE_PASSWORD = 'Password';
 
-    protected $casts = [
-        'required' => 'boolean',
-    ];
-
     public function __construct(array $attributes = [])
     {
         $this->incrementing = false;
@@ -44,8 +40,15 @@ class ImageParameter extends Model implements Filterable, Sortable
             'type',
             'description',
             'required',
+            'is_hidden',
             'validation_rule',
         ]);
+
+        $this->casts = [
+            'required' => 'boolean',
+            'is_hidden' => 'boolean'
+        ];
+
         parent::__construct($attributes);
     }
 
@@ -65,12 +68,14 @@ class ImageParameter extends Model implements Filterable, Sortable
             return $query;
         }
 
-        return $query->whereHas('image', function ($query) use ($user) {
+        return $query
+            ->whereHas('image.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         })
             ->orWhereHas('image', function ($query) use ($user) {
                 $query->where('public', true)->where('active', true);
-            });
+            })
+            ->where('is_hidden', false);
     }
 
     /**
@@ -86,7 +91,8 @@ class ImageParameter extends Model implements Filterable, Sortable
             $factory->create('key', Filter::$stringDefaults),
             $factory->create('type', Filter::$stringDefaults),
             $factory->create('description', Filter::$stringDefaults),
-            $factory->create('required', Filter::$enumDefaults),
+            $factory->boolean()->create('required', '1', '0'),
+            $factory->boolean()->create('is_hidden', '1', '0'),
             $factory->create('validation_rule', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -108,6 +114,7 @@ class ImageParameter extends Model implements Filterable, Sortable
             $factory->create('type'),
             $factory->create('description'),
             $factory->create('required'),
+            $factory->create('is_hidden'),
             $factory->create('validation_rule'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -136,6 +143,7 @@ class ImageParameter extends Model implements Filterable, Sortable
             'type' => 'type',
             'description' => 'description',
             'required' => 'required',
+            'is_hidden' => 'is_hidden',
             'validation_rule' => 'validation_rule',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

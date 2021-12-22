@@ -123,7 +123,7 @@ class ImageController extends BaseController
 
     public function parameters(Request $request, string $imageId)
     {
-        $collection = Image::forUser(Auth::user())->findOrFail($imageId)->imageParameters();
+        $collection = Image::forUser(Auth::user())->findOrFail($imageId)->imageParameters()->forUser(Auth::user());
 
         return ImageParameterResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))

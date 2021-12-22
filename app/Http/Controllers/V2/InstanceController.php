@@ -108,19 +108,15 @@ class InstanceController extends BaseController
         $instance->save();
 
         $imageData = collect($request->input('image_data'))->filter();
+
+        // Don't allow customers to set their own passwords.
         $image->imageParameters
         ->filter(function ($value) use ($imageData) {
             return $value->type == ImageParameter::TYPE_PASSWORD &&
-                in_array($value->key, $imageData->keys()->toArray());
+                in_array($value->key, $imageData->keys()->toArray()) &&
+                $value->is_hidden;
         })
-        ->each(function ($populatedPassword) use ($imageData, $instance) {
-            $credential = app()->make(Credential::class);
-            $credential->fill([
-                'name' => $populatedPassword->key,
-                'username' => $populatedPassword->key,
-                'password' => $imageData->get($populatedPassword->key)
-            ]);
-            $instance->credentials()->save($credential);
+        ->each(function ($populatedPassword) use ($imageData) {
             $imageData->forget($populatedPassword->key);
         });
 

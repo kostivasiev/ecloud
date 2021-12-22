@@ -211,4 +211,28 @@ class GetTest extends TestCase
             ])
             ->assertResponseStatus(200);
     }
+
+    public function testHiddenImageParamAdmn()
+    {
+        $this->imageParameter()->setAttribute('is_hidden', true)->save();
+
+        $this->get('/v2/images/' . $this->image()->id . '/parameters')
+            ->seeJson([
+                'id' => 'iparam-test',
+            ])
+            ->assertResponseStatus(200);
+    }
+
+    public function testHiddenImageParamNotAdmn()
+    {
+        $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
+
+        $this->imageParameter()->setAttribute('is_hidden', true)->save();
+
+        $this->get('/v2/images/' . $this->image()->id . '/parameters')
+            ->dontSeeJson([
+                'id' => 'iparam-test',
+            ])
+            ->assertResponseStatus(200);
+    }
 }
