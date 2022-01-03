@@ -11,13 +11,10 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
-use Tests\Mocks\HostGroup\TransportNodeProfile;
 use Tests\TestCase;
 
 class CreateHostGroupsTest extends TestCase
 {
-    use TransportNodeProfile;
-
     protected OrchestratorBuild $orchestratorBuild;
     protected OrchestratorConfig $orchestratorConfig;
     protected HostGroup $hostGroup;

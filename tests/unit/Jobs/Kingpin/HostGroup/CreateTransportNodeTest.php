@@ -3,7 +3,6 @@
 namespace Tests\unit\Jobs\Kingpin\HostGroup;
 
 use App\Jobs\Nsx\HostGroup\CreateTransportNodeProfile;
-use App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use App\Support\Sync;
@@ -11,13 +10,10 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\Mocks\HostGroup\TransportNodeProfile;
 use Tests\TestCase;
 
 class CreateTransportNodeTest extends TestCase
 {
-    use TransportNodeProfile;
     protected $hostGroup;
     protected Task $task;
 
