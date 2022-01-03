@@ -17,25 +17,27 @@ class DeleteTransportNodeProfile extends TaskJob
                 ->getContents()
         );
 
-        $transportNodeItem = collect($transportNodeProfileResponse->results)->first();
-        if (!empty($transportNodeItem)) {
+        $transportNodeProfileItem = collect($transportNodeProfileResponse->results)->first();
+        if (!empty($transportNodeProfileItem)) {
             $transportNodeCollectionResponse = json_decode(
                 $hostGroup->availabilityZone->nsxService()
-                    ->get('/api/v1/search/query?query=resource_type:TransportNodeCollection%20AND%20transport_node_profile_id:' . $transportNodeItem->id)
+                    ->get('/api/v1/search/query?query=resource_type:TransportNodeCollection%20AND%20transport_node_profile_id:' . $transportNodeProfileItem->id)
                     ->getBody()
                     ->getContents()
             );
 
             $transportNodeCollectionItem = collect($transportNodeCollectionResponse->results)->first();
             if (!empty($transportNodeCollectionItem)) {
+                $this->info('Deleting transport node collection ' . $transportNodeCollectionItem->id);
                 $hostGroup->availabilityZone->nsxService()->delete(
                     '/api/v1/transport-node-collections/' . $transportNodeCollectionItem->id
                 );
             }
 
             // Once the Profile is Detached it can be deleted
+            $this->info('Deleting transport node profile ' . $transportNodeProfileItem->id);
             $hostGroup->availabilityZone->nsxService()->delete(
-                '/api/v1/transport-node-profiles/' . $transportNodeItem->id
+                '/api/v1/transport-node-profiles/' . $transportNodeProfileItem->id
             );
         }
     }
