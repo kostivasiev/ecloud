@@ -43,6 +43,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'is_public',
         'san_name',
         'ucs_compute_name',
+        'is_active',
     ];
 
     protected $dispatchesEvents = [
@@ -54,6 +55,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     protected $casts = [
         'is_public' => 'boolean',
         'datacentre_site_id' => 'integer',
+        'is_active' => 'boolean',
     ];
 
     public $children = [
