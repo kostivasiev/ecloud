@@ -2,7 +2,7 @@
 
 namespace Tests\unit\Jobs\Nsx\VpnSession;
 
-use App\Jobs\Nsx\VpnSession\Undeploy;
+use App\Jobs\VpnSession\Nsx\Undeploy;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;

@@ -1,31 +1,16 @@
 <?php
 namespace App\Jobs\Nsx\VpnSession;
 
-use App\Jobs\Job;
-use App\Models\V2\VpnSession;
+use App\Jobs\TaskJob;
 use App\Models\V2\VpnSessionNetwork;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
 use Illuminate\Support\Str;
 use IPLib\Range\Subnet;
 
-class CreateVpnSession extends Job
+class CreateVpnSession extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private $model;
-
-    public function __construct(VpnSession $vpnSession)
-    {
-        $this->model = $vpnSession;
-    }
-
-    /**
-     * See: https://185.197.63.88/policy/api_includes/method_CreateOrPatchTier1IPSecVpnSession.html
-     */
     public function handle()
     {
-        $vpnSession = $this->model;
+        $vpnSession = $this->task->resource;
         $availabilityZone = $vpnSession->vpnService->router->availabilityZone;
 
         if (empty($vpnSession->psk)) {

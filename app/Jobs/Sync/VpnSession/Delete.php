@@ -3,11 +3,11 @@
 namespace App\Jobs\Sync\VpnSession;
 
 use App\Jobs\Job;
-use App\Jobs\Nsx\VpnSession\Undeploy;
 use App\Jobs\Nsx\VpnSession\UndeployCheck;
 use App\Jobs\Tasks\AwaitTasks;
 use App\Jobs\VpnSession\AwaitSyncNetworkNoSNatsTasks;
 use App\Jobs\VpnSession\DeletePreSharedKey;
+use App\Jobs\VpnSession\Nsx\Undeploy;
 use App\Jobs\VpnSession\RemoveNetworks;
 use App\Jobs\VpnSession\SyncNetworkNoSNats;
 use App\Models\V2\Task;
