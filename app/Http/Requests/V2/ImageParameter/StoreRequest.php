@@ -32,7 +32,12 @@ class StoreRequest extends FormRequest
             'required' => [
                 'required',
                 'boolean'
-            ]
+            ],
+            'is_hidden' => [
+                'sometimes',
+                'required',
+                'boolean'
+            ],
         ];
     }
 }
