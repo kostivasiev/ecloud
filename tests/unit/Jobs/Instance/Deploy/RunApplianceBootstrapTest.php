@@ -4,13 +4,13 @@ namespace Tests\unit\Jobs\Instance\Deploy;
 
 use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Models\V2\Credential;
-use App\Models\V2\ImageMetadata;
+use App\Models\V2\Image;
 use App\Models\V2\ImageParameter;
 use Database\Seeders\Images\CpanelImageSeeder;
+use Database\Seeders\Images\PleskImageSeeder;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use ReflectionClass;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminContactClient;
 
@@ -176,47 +176,19 @@ class RunApplianceBootstrapTest extends TestCase
 
     public function testGetsDefaultAdminEmailFromCustomerAccount()
     {
-        factory(ImageParameter::class)->create([
-            'image_id' => $this->image()->id,
-            'name' => 'Plesk Admin Password',
-            'key' => 'plesk_admin_password',
-            'type' => 'Password',
-            'description' => 'Plesk Admin Password',
-            'required' => true,
-            'validation_rule' => '/\w+/',
-        ]);
+        (new PleskImageSeeder())->run();
 
-        factory(ImageMetadata::class)->create([
-            'key' => 'ukfast.license.identifier',
-            'value' => 'PLESK-12-VPS-WEB-HOST-1M',
-            'image_id' => $this->image()->id
-        ]);
+        Image::find('img-plesk')
+            ->setAttribute('script_template', '{{{ plesk_admin_email_address }}}')
+            ->save();
 
-        factory(ImageMetadata::class)->create([
-            'key' => 'ukfast.license.type',
-            'value' => 'plesk',
-            'image_id' => $this->image()->id
-        ]);
-
-        $this->image()->setAttribute(
-            'script_template',
-            '{{{ plesk_admin_email_address }}} {{{ plesk_admin_password }}}'
-        )->save();
+        $this->instance()->setAttribute('image_id', 'img-plesk')->save();
 
         $credential = app()->make(Credential::class);
         $credential->fill([
             'name' => 'root',
             'username' => 'root',
             'password' => 'somepassword'
-        ]);
-        $this->instance()->credentials()->save($credential);
-
-        $credential = app()->make(Credential::class);
-        $credential->fill([
-            'name' => 'plesk_admin_password',
-            'username' => 'plesk_admin_password',
-            'password' => 'somepassword',
-            'is_hidden' => true
         ]);
         $this->instance()->credentials()->save($credential);
 
@@ -256,7 +228,7 @@ class RunApplianceBootstrapTest extends TestCase
                 '/guest/linux/script',
                 [
                     'json' => [
-                        'encodedScript' => base64_encode('captain.kirk@example.com somepassword'),
+                        'encodedScript' => base64_encode('captain.kirk@example.com'),
                         'username' => 'root',
                         'password' => 'somepassword'
                     ]
@@ -268,44 +240,12 @@ class RunApplianceBootstrapTest extends TestCase
 
         dispatch(new RunApplianceBootstrap($this->instance()));
 
-        $pleskAdminCredential = $this->instance()
-            ->credentials()
-            ->where('name', '=', 'Plesk Administrator')
-            ->first();
-        $this->assertEquals('somepassword', $pleskAdminCredential->password);
-        $this->assertEquals(config('plesk.admin.port', 8880), $pleskAdminCredential->port);
-
         Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testGeneratesRandomPassword()
     {
-        factory(ImageParameter::class)->create([
-            'image_id' => $this->image()->id,
-            'name' => 'Plesk Admin Password',
-            'key' => 'plesk_admin_password',
-            'type' => 'Password',
-            'description' => 'Plesk Admin Password',
-            'required' => false,
-            'validation_rule' => '/\w+/',
-        ]);
-
-        factory(ImageMetadata::class)->create([
-            'key' => 'ukfast.license.identifier',
-            'value' => 'PLESK-12-VPS-WEB-HOST-1M',
-            'image_id' => $this->image()->id
-        ]);
-
-        factory(ImageMetadata::class)->create([
-            'key' => 'ukfast.license.type',
-            'value' => 'plesk',
-            'image_id' => $this->image()->id
-        ]);
-
-        $this->image()->setAttribute(
-            'script_template',
-            '{{{ plesk_admin_email_address }}} {{{ plesk_admin_password }}}'
-        )->save();
+        (new PleskImageSeeder())->run();
 
         $credential = app()->make(Credential::class);
         $credential->fill([
@@ -315,11 +255,14 @@ class RunApplianceBootstrapTest extends TestCase
         ]);
         $this->instance()->credentials()->save($credential);
 
-        $this->instance()->setAttribute('deploy_data', [
-            'image_data' => [
-                'plesk_admin_email_address' => 'elmer.fudd@example.com'
-            ]
-        ])->save();
+        $this->instance()
+            ->setAttribute('deploy_data', [
+                'image_data' => [
+                    'plesk_admin_email_address' => 'elmer.fudd@example.com'
+                ]
+            ])
+            ->setAttribute('image_id', 'img-plesk')
+            ->save();
 
         $this->kingpinServiceMock()
             ->expects('post')
@@ -332,6 +275,51 @@ class RunApplianceBootstrapTest extends TestCase
 
         $this->assertTrue(isset($job->imageData['plesk_admin_password']));
         $this->assertNotEmpty($job->imageData['plesk_admin_password']);
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testGeneratesPleskCredentials()
+    {
+        (new PleskImageSeeder())->run();
+
+        $this->instance()->credentials()->save(
+            app()->make(Credential::class)
+            ->fill([
+                'name' => 'root',
+                'username' => 'root',
+                'password' => 'root'
+            ])
+        );
+
+        $this->instance()
+            ->setAttribute('deploy_data', [
+                'image_data' => [
+                    'plesk_admin_email_address' => 'elmer.fudd@example.com'
+                ]
+            ])
+            ->setAttribute('image_id', 'img-plesk')
+            ->save();
+
+        $this->kingpinServiceMock()
+            ->expects('post')
+            ->andReturnUsing(function () {
+                return new Response(200);
+            });
+
+        $job = new RunApplianceBootstrap($this->instance());
+        $job->handle();
+
+        $this->assertTrue(isset($job->imageData['plesk_admin_password']));
+        $this->assertNotEmpty($job->imageData['plesk_admin_password']);
+
+        $credential = Credential::where('name', 'Plesk Administrator')->first();
+
+        $this->assertNotNull($credential);
+        $this->assertEquals('Plesk Administrator', $credential->name);
+        $this->assertEquals('admin', $credential->username);
+        $this->assertEquals('somepassword', $credential->password);
+        $this->assertEquals(8880, $credential->port);
 
         Event::assertNotDispatched(JobFailed::class);
     }
