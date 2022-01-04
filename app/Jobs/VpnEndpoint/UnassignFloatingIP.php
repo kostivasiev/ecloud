@@ -2,36 +2,41 @@
 
 namespace App\Jobs\VpnEndpoint;
 
-use App\Jobs\TaskJob;
-use App\Models\V2\Task;
-use App\Traits\V2\TaskJobs\AwaitTask;
+use App\Jobs\Job;
+use App\Models\V2\VpnEndpoint;
+use App\Support\Sync;
+use App\Traits\V2\Jobs\AwaitResources;
+use App\Traits\V2\LoggableModelJob;
+use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
 
-class UnassignFloatingIP extends TaskJob
+class UnassignFloatingIP extends Job
 {
-    use AwaitTask;
+    use Batchable, LoggableModelJob, AwaitResources;
+    
+    private $model;
 
-    public $tries = 300;
-    public $backoff = 5;
+    public function __construct(VpnEndpoint $vpnEndpoint)
+    {
+        $this->model = $vpnEndpoint;
+    }
 
     public function handle()
     {
-        $vpnEndpoint = $this->task->resource;
+        $vpnEndpoint = $this->model;
 
-        if (!isset($this->task->data['floatingip_detach_task_id'])) {
-            if (!$vpnEndpoint->floatingIp()->exists()) {
-                return;
-            }
-
-            $task = $vpnEndpoint->floatingIp->createTaskWithLock(
-                'floating_ip_unassign',
-                \App\Jobs\Tasks\FloatingIp\Unassign::class
-            );
-            $this->info('Triggered floating_ip_unassign task ' . $task->id . ' for Floating IP (' . $vpnEndpoint->floatingIp->id . ')');
-            $this->task->setAttribute('data', ['floatingip_detach_task_id' => $task->id])->saveQuietly();
-        } else {
-            $task = Task::findOrFail($this->task->data['floatingip_detach_task_id']);
+        if (!$vpnEndpoint->floatingIp()->exists()) {
+            return;
         }
 
-        $this->awaitTaskWithRelease($task);
+        $task = $vpnEndpoint->floatingIp->createTaskWithLock(
+            'floating_ip_unassign',
+            \App\Jobs\Tasks\FloatingIp\Unassign::class
+        );
+        Log::info('Triggered floating_ip_unassign task ' . $task->id . ' for Floating IP (' . $vpnEndpoint->floatingIp->id . ')');
+
+        $this->awaitSyncableResources([
+            $vpnEndpoint->floatingIp->id,
+        ]);
     }
 }

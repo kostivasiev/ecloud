@@ -1,13 +1,25 @@
 <?php
 namespace App\Jobs\Nsx\VpnEndpoint;
 
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
+use App\Models\V2\VpnEndpoint;
+use App\Traits\V2\LoggableModelJob;
+use Illuminate\Bus\Batchable;
 
-class Undeploy extends TaskJob
+class Undeploy extends Job
 {
+    use Batchable, LoggableModelJob;
+
+    private VpnEndpoint $model;
+
+    public function __construct(VpnEndpoint $vpnEndpoint)
+    {
+        $this->model = $vpnEndpoint;
+    }
+
     public function handle()
     {
-        $vpnEndpoint = $this->task->resource;
+        $vpnEndpoint = $this->model;
         $router = $vpnEndpoint->vpnService->router;
 
         $router->availabilityZone->nsxService()->delete(

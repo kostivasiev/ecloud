@@ -2,16 +2,27 @@
 namespace App\Jobs\Nsx\VpnEndpoint;
 
 use App\Jobs\Job;
-use App\Jobs\TaskJob;
 use App\Models\V2\VpnEndpoint;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 
-class Deploy extends TaskJob
+class Deploy extends Job
 {
+    use Batchable, LoggableModelJob;
+
+    private VpnEndpoint $model;
+
+    public function __construct(VpnEndpoint $vpnEndpoint)
+    {
+        $this->model = $vpnEndpoint;
+    }
+
+    /**
+     * See: https://network-man0.ecloud-service.ukfast.co.uk/policy/api_includes/method_CreateOrPatchTier1IPSecVpnLocalEndpoint.html
+     */
     public function handle()
     {
-        $vpnEndpoint = $this->task->resource;
+        $vpnEndpoint = $this->model;
 
         if (!$vpnEndpoint->vpnService->router) {
             $this->fail(new \Exception('Failed to load router for VPN Service ' . $vpnEndpoint->vpnService->id));

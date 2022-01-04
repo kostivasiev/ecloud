@@ -2,16 +2,29 @@
 
 namespace App\Jobs\Nsx\VpnEndpoint;
 
-use App\Jobs\TaskJob;
+use App\Jobs\Job;
+use App\Models\V2\VpnEndpoint;
+use App\Traits\V2\LoggableModelJob;
+use Illuminate\Bus\Batchable;
+use Illuminate\Support\Facades\Log;
 
-class UndeployCheck extends TaskJob
+class UndeployCheck extends Job
 {
+    use Batchable, LoggableModelJob;
+
     public $tries = 360;
     public $backoff = 5;
 
+    private VpnEndpoint $model;
+
+    public function __construct(VpnEndpoint $vpnEndpoint)
+    {
+        $this->model = $vpnEndpoint;
+    }
+
     public function handle()
     {
-        $vpnEndpoint = $this->task->resource;
+        $vpnEndpoint = $this->model;
         $router = $vpnEndpoint->vpnService->router;
 
         $response = $router->availabilityZone->nsxService()->get(
@@ -24,7 +37,7 @@ class UndeployCheck extends TaskJob
 
         foreach ($response->results as $result) {
             if ($vpnEndpoint->id === $result->id) {
-                $this->info(
+                Log::info(
                     'Waiting for VPN Endpoint ' . $vpnEndpoint->id . ' being deleted, retrying in ' . $this->backoff . ' seconds'
                 );
                 $this->release($this->backoff);
