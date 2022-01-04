@@ -108,20 +108,30 @@ class InstanceController extends BaseController
         $instance->save();
 
         $imageData = collect($request->input('image_data'))->filter();
+
+        // Store password image parameters in the credentials table and remove from image_data
         $image->imageParameters
         ->filter(function ($value) use ($imageData) {
             return $value->type == ImageParameter::TYPE_PASSWORD &&
-                in_array($value->key, $imageData->keys()->toArray());
+                in_array($value->key, $imageData->keys()->toArray()) &&
+                !$value->is_hidden;
         })
-        ->each(function ($populatedPassword) use ($imageData, $instance) {
+        ->each(function ($imageParameter) use ($imageData, $instance) {
             $credential = app()->make(Credential::class);
             $credential->fill([
-                'name' => $populatedPassword->key,
-                'username' => $populatedPassword->key,
-                'password' => $imageData->get($populatedPassword->key)
+                'name' => $imageParameter->name,
+                'username' => $imageParameter->key,
+                'password' => $imageData->get($imageParameter->key),
+                'is_hidden' => true
             ]);
             $instance->credentials()->save($credential);
-            $imageData->forget($populatedPassword->key);
+            $imageData->forget($imageParameter->key);
+        });
+
+        // Don't allow customers to populate 'hidden' image parameters, these will be auto-generated passwords
+        $image->imageParameters->filter(fn($value) => $value->is_hidden && in_array($value->key, $imageData->keys()->toArray()))
+        ->each(function ($imageParameter) use ($imageData) {
+            $imageData->forget($imageParameter->key);
         });
 
         $instance->deploy_data = [
