@@ -2,8 +2,8 @@
 
 namespace App\Tasks\Sync\VpnEndpoint;
 
-use App\Jobs\Nsx\VpnEndpoint\Deploy;
 use App\Jobs\VpnEndpoint\CreateFloatingIp;
+use App\Jobs\VpnEndpoint\Nsx\Deploy;
 use App\Jobs\VpnEndpoint\Nsx\DeployCheck;
 use App\Tasks\Task;
 

@@ -2,8 +2,8 @@
 
 namespace App\Tasks\Sync\VpnEndpoint;
 
-use App\Jobs\Nsx\VpnEndpoint\Undeploy;
-use App\Jobs\Nsx\VpnEndpoint\UndeployCheck;
+use App\Jobs\VpnEndpoint\Nsx\Undeploy;
+use App\Jobs\VpnEndpoint\Nsx\UndeployCheck;
 use App\Jobs\VpnEndpoint\UnassignFloatingIP;
 use App\Tasks\Task;
 

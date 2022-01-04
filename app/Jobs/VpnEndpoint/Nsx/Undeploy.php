@@ -1,5 +1,6 @@
 <?php
-namespace App\Jobs\Nsx\VpnEndpoint;
+
+namespace App\Jobs\VpnEndpoint\Nsx;
 
 use App\Jobs\TaskJob;
 

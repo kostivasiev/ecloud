@@ -1,11 +1,8 @@
 <?php
-namespace App\Jobs\Nsx\VpnEndpoint;
 
-use App\Jobs\Job;
+namespace App\Jobs\VpnEndpoint\Nsx;
+
 use App\Jobs\TaskJob;
-use App\Models\V2\VpnEndpoint;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
 
 class Deploy extends TaskJob
 {
