@@ -8,30 +8,24 @@ use Illuminate\Console\Command;
 class UpdatePleskCredentials extends Command
 {
     protected $signature = 'credentials:update-plesk {--D|debug} {--T|test-run}';
-    protected $description = 'Show credentials for a resource';
-
-
+    protected $description = 'Create user friendly Plesk administrator credentials for existing Plesk installations';
 
     public function handle()
     {
-        $this->info('Updating Plesk Admin Credentials - Started');
-        Credential::where('name', '=', 'plesk_admin_password')->each(function ($credential) {
-            if ($this->option('debug')) {
-                $this->info(
-                    vsprintf(
-                        'Updating name and username for %s',
-                        [
-                            $credential->id,
-                        ]
-                    )
-                );
-            }
+        Credential::where('username', 'plesk_admin_password')->each(function ($credential) {
+            $this->info('Updating plesk administrator credentials [' . $credential->id . '] for instance ' . $credential->instance->id);
+
             if (!$this->option('test-run')) {
-                $credential->setAttribute('name', 'Plesk Administrator')
+                $credential
+                    ->setAttribute('name', 'Plesk Administrator')
                     ->setAttribute('username', 'admin')
-                    ->saveQuietly();
+                    ->setAttribute('port', config('plesk.admin.port', 8880))
+                    ->setAttribute('is_hidden', false)
+                    ->save();
             }
         });
+
         $this->info('Updating Plesk Admin Credentials - Finished');
+        return Command::SUCCESS;
     }
 }
