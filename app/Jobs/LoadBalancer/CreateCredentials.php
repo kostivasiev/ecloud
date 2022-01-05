@@ -43,7 +43,7 @@ class CreateCredentials extends Job
                     'host' => null,
                     'username' => 'ukfast_stats',
                     'password' => $passwordService->generate(8),
-                    'port' => 8404,
+                    'port' => 8090,
                     'is_hidden' => false,
                 ]
             ]);
