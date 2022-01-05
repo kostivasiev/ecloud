@@ -119,7 +119,7 @@ class InstanceController extends BaseController
         ->each(function ($imageParameter) use ($imageData, $instance) {
             $credential = app()->make(Credential::class);
             $credential->fill([
-                'name' => $imageParameter->name,
+                'name' => 'Deploy Data: ' . $imageParameter->name,
                 'username' => $imageParameter->key,
                 'password' => $imageData->get($imageParameter->key),
                 'is_hidden' => true

@@ -41,10 +41,10 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\IpAddress\PopulateNetworkId::class,
         \App\Console\Commands\VPC\ConvertBilling::class,
         \App\Console\Commands\Billing\CleanupAdvancedNetworking::class,
-        \App\Console\Commands\Credentials\AddPortToPleskCredential::class,
         \App\Console\Commands\Billing\FixPriceOnAdvancedNetworkingBillingMetrics::class,
         \App\Console\Commands\Billing\SetFriendlyNames::class,
         \App\Console\Commands\VPC\ChangeOwnership::class,
+        \App\Console\Commands\Credentials\UpdatePleskCredentials::class,
     ];
 
     /**
