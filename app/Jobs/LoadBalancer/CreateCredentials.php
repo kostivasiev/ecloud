@@ -41,7 +41,7 @@ class CreateCredentials extends Job
                 [
                     'name' => 'haproxy stats',
                     'host' => null,
-                    'username' => 'root',
+                    'username' => 'ukfast_stats',
                     'password' => $passwordService->generate(8),
                     'port' => 8404,
                     'is_hidden' => false,
