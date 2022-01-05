@@ -4,7 +4,6 @@ namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\CreateCluster;
-use App\Models\V2\Credential;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
@@ -33,13 +32,9 @@ class CreateClusterTest extends TestCase
                 $clusterMock->allows('createEntity')
                     ->withAnyArgs()
                     ->andReturnUsing(function () {
-                        $responseBody = json_decode(
-                            json_encode([
-                                'meta' => ['location' => env('app_domain')],
-                                'data' => ['id' => $this->lbConfigId],
-                            ])
-                        );
-                        return (new SelfResponse($responseBody));
+                        $mockSelfResponse = \Mockery::mock(SelfResponse::class)->makePartial();
+                        $mockSelfResponse->allows('getId')->andReturns($this->lbConfigId);
+                        return $mockSelfResponse;
                     });
                 return $clusterMock;
             });

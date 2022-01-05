@@ -27,25 +27,26 @@ class CreateCredentials extends Job
     {
         $loadbalancer = $this->model;
 
-        if ($loadbalancer->config_id !== null) {
-            $loadbalancer->credentials()->createMany([
-                [
-                    'name' => 'keepalived',
-                    'host' => null,
-                    'username' => 'keepalived',
-                    'password' => $passwordService->generate(8),
-                    'port' => null,
-                    'is_hidden' => true,
-                ],
-                [
-                    'name' => 'haproxy stats',
-                    'host' => null,
-                    'username' => 'ukfast_stats',
-                    'password' => $passwordService->generate(),
-                    'port' => 8090,
-                    'is_hidden' => true,
-                ]
-            ]);
-        }
+        $loadbalancer->credentials()->firstOrCreate(
+            ['username' => 'keepalived'],
+            [
+                'name' => 'keepalived',
+                'host' => null,
+                'password' => $passwordService->generate(8),
+                'port' => null,
+                'is_hidden' => true,
+            ]
+        );
+
+        $loadbalancer->credentials()->firstOrCreate(
+            ['username' => 'ukfast_stats'],
+            [
+                'name' => 'haproxy stats',
+                'host' => null,
+                'password' => $passwordService->generate(),
+                'port' => 8090,
+                'is_hidden' => true,
+            ]
+        );
     }
 }

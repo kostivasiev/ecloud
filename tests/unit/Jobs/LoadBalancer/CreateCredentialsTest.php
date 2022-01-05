@@ -16,22 +16,28 @@ class CreateCredentialsTest extends TestCase
 {
     use LoadBalancerMock;
 
+    private Task $task;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->loadBalancer());
+            $this->task->save();
+        });
+    }
+
     public function testCredentialsAreCreated()
     {
         $this->loadBalancer()->setAttribute('config_id', 11111)->saveQuietly();
 
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->loadBalancer());
-            $task->save();
-            return $task;
-        });
         Event::fake([JobFailed::class, Created::class]);
 
-        dispatch(new CreateCredentials($task));
+        dispatch(new CreateCredentials($this->task));
         Event::assertNotDispatched(JobFailed::class);
 
         $this->assertGreaterThan(0, $this->loadBalancer()->credentials()->count());
@@ -39,34 +45,35 @@ class CreateCredentialsTest extends TestCase
         // Now verify that the credentials have been created
         $keepAliveD = $this->loadBalancer()
             ->credentials()
-            ->where('name', '=', 'keepalived')
+            ->where('username', '=', 'keepalived')
             ->first();
         $this->assertNotNull($keepAliveD->password);
 
         $statsCredentials = $this->loadBalancer()
             ->credentials()
-            ->where('name', '=', 'haproxy stats')
+            ->where('username', '=', 'ukfast_stats')
             ->first();
         $this->assertNotNull($statsCredentials->password);
     }
 
     public function testCredentialsNotCreated()
     {
-        $this->loadBalancer()->setAttribute('config_id', null)->saveQuietly();
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->loadBalancer());
-            $task->save();
-            return $task;
-        });
         Event::fake([JobFailed::class, Created::class]);
 
-        dispatch(new CreateCredentials($task));
+        $this->loadBalancer()->credentials()->createMany([
+            [
+                'username' => 'keepalived',
+            ],
+            [
+                'username' => 'ukfast_stats',
+            ]
+        ]);
+
+        $this->assertEquals(2, $this->loadBalancer()->credentials()->count());
+
+        dispatch(new CreateCredentials($this->task));
         Event::assertNotDispatched(JobFailed::class);
 
-        $this->assertEquals(0, $this->loadBalancer()->credentials()->count());
+        $this->assertEquals(2, $this->loadBalancer()->credentials()->count());
     }
 }
