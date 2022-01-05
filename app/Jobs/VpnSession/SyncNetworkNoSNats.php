@@ -45,8 +45,7 @@ class SyncNetworkNoSNats extends TaskJob
                 if ($localNetwork->trashed()) {
                     foreach ($localNetwork->localNoSNATs as $localNoSNAT) {
                         if ($shouldDeleteNat($localNoSNAT)) {
-                            $this->warning("Removing No SNAT rule for deleted local network",
-                                ["vpn_session_network_id" => $localNetwork->id, "nat_id" => $localNoSNAT->id]);
+                            $this->warning("Removing No SNAT rule for deleted local network", ["vpn_session_network_id" => $localNetwork->id, "nat_id" => $localNoSNAT->id]);
                             $tasks[] = $localNoSNAT->syncDelete();
                             $deletedNatIDs[] = $localNoSNAT->id;
                         }
@@ -58,8 +57,7 @@ class SyncNetworkNoSNats extends TaskJob
                 if ($remoteNetwork->trashed()) {
                     foreach ($remoteNetwork->remoteNoSNATs as $remoteNoSNAT) {
                         if ($shouldDeleteNat($remoteNoSNAT)) {
-                            $this->warning("Removing No SNAT rule for deleted remote network",
-                                ["vpn_session_network_id" => $remoteNetwork->id, "nat_id" => $remoteNoSNAT->id]);
+                            $this->warning("Removing No SNAT rule for deleted remote network", ["vpn_session_network_id" => $remoteNetwork->id, "nat_id" => $remoteNoSNAT->id]);
                             $tasks[] = $remoteNoSNAT->syncDelete();
                             $deletedNatIDs[] = $remoteNoSNAT->id;
                         }
@@ -83,7 +81,7 @@ class SyncNetworkNoSNats extends TaskJob
 
             if (count($tasks) > 0) {
                 $data = $this->task->data ?? [];
-                $data[self::TASK_WAIT_DATA_KEY] = collect($tasks)->pluck('id');;
+                $data[self::TASK_WAIT_DATA_KEY] = collect($tasks)->pluck('id');
 
                 $this->task->data = $data;
                 $this->task->save();
