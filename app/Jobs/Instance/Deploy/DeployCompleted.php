@@ -25,8 +25,6 @@ class DeployCompleted extends Job
     {
         $this->model->deployed = true;
         //this->instance->deploy_data = '';
-
-        $this->model->credentials()->where('is_hidden', true)->delete();
         $this->model->saveQuietly();
     }
 }
