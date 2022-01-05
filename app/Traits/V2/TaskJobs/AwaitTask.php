@@ -9,6 +9,7 @@ trait AwaitTask
     {
         $backoff = $this->backoff ?? 5;
 
+        $incompleteTaskIDs = [];
         foreach ($tasks as $task) {
             $task->refresh();
 
@@ -19,10 +20,15 @@ trait AwaitTask
             }
 
             if ($task->status != Task::STATUS_COMPLETE) {
-                $this->debug("Task {$task->id} not complete, retrying in {$backoff} seconds");
-                $this->release($backoff);
-                return true;
+                $incompleteTaskIDs[] = $task->id;
             }
+        }
+
+        if (count($incompleteTaskIDs) > 0) {
+            $taskStr = implode(', ', $incompleteTaskIDs);
+            $this->debug("Task(s) {$taskStr} not complete, retrying in {$backoff} seconds");
+            $this->release($backoff);
+            return true;
         }
     }
 }
