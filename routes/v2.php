@@ -4,6 +4,7 @@
  * v2 Routes
  */
 
+use App\Models\V2\VolumeGroup;
 use Laravel\Lumen\Routing\Router;
 
 $middleware = [
@@ -362,7 +363,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('volume-groups/{volumeGroupId}/volumes', 'VolumeGroupController@volumes');
         $router->post('volume-groups', 'VolumeGroupController@store');
         $router->patch('volume-groups/{volumeGroupId}', 'VolumeGroupController@update');
-        $router->delete('volume-groups/{volumeGroupId}', 'VolumeGroupController@destroy');
+        $router->delete('volume-groups/{volumeGroupId}', [
+            'middleware' => 'can-be-deleted:' . VolumeGroup::class   . ',volumeGroupId',
+            'uses' => 'VolumeGroupController@destroy'
+        ]);
     });
 
     /** Nics */
