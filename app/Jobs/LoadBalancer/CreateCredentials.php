@@ -26,7 +26,6 @@ class CreateCredentials extends Job
     public function handle(PasswordService $passwordService)
     {
         $loadbalancer = $this->model;
-        $passwordService->special = true;
 
         if ($loadbalancer->config_id !== null) {
             $loadbalancer->credentials()->createMany([
@@ -42,9 +41,9 @@ class CreateCredentials extends Job
                     'name' => 'haproxy stats',
                     'host' => null,
                     'username' => 'ukfast_stats',
-                    'password' => $passwordService->generate(8),
+                    'password' => $passwordService->generate(),
                     'port' => 8090,
-                    'is_hidden' => false,
+                    'is_hidden' => true,
                 ]
             ]);
         }
