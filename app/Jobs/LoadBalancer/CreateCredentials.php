@@ -33,7 +33,7 @@ class CreateCredentials extends Job
                 [
                     'name' => 'keepalived',
                     'host' => null,
-                    'username' => 'root',
+                    'username' => 'keepalived',
                     'password' => $passwordService->generate(16),
                     'port' => null,
                     'is_hidden' => true,
