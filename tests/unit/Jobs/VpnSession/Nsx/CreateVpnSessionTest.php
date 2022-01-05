@@ -1,19 +1,40 @@
 <?php
-namespace Tests\unit\Jobs\Nsx\VpnSession;
+namespace Jobs\VpnSession\Nsx;
 
 use App\Jobs\Nsx\VpnSession\CreateVpnSession;
 use App\Models\V2\Credential;
+use App\Models\V2\Task;
 use App\Models\V2\VpnSessionNetwork;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Tests\Mocks\Resources\VpnSessionMock;
 use Tests\TestCase;
+use function dispatch;
+use function factory;
 
 class CreateVpnSessionTest extends TestCase
 {
     use VpnSessionMock;
+
+    protected Task $task;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->vpnSession());
+            $this->task->save();
+        });
+    }
 
     public function testSucess()
     {
@@ -64,7 +85,7 @@ class CreateVpnSessionTest extends TestCase
                 return new Response(200);
             });
 
-        dispatch(new CreateVpnSession($this->vpnSession()));
+        dispatch(new CreateVpnSession($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -73,7 +94,7 @@ class CreateVpnSessionTest extends TestCase
     {
         Event::fake([JobFailed::class]);
 
-        dispatch(new CreateVpnSession($this->vpnSession()));
+        dispatch(new CreateVpnSession($this->task));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -146,7 +167,7 @@ class CreateVpnSessionTest extends TestCase
                 return new Response(200);
             });
 
-        dispatch(new CreateVpnSession($this->vpnSession()));
+        dispatch(new CreateVpnSession($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
