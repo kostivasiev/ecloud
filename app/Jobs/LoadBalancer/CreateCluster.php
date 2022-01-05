@@ -28,6 +28,7 @@ class CreateCluster extends Job
     public function handle()
     {
         $loadbalancer = $this->model;
+
         if ($loadbalancer->config_id !== null) {
             Log::info('Loadbalancer has already been assigned a cluster id, skipping', [
                 'id' => $loadbalancer->id,

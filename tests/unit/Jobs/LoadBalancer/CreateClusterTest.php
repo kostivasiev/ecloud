@@ -32,13 +32,9 @@ class CreateClusterTest extends TestCase
                 $clusterMock->allows('createEntity')
                     ->withAnyArgs()
                     ->andReturnUsing(function () {
-                        $responseBody = json_decode(
-                            json_encode([
-                                'meta' => ['location' => env('app_domain')],
-                                'data' => ['id' => $this->lbConfigId],
-                            ])
-                        );
-                        return (new SelfResponse($responseBody));
+                        $mockSelfResponse = \Mockery::mock(SelfResponse::class)->makePartial();
+                        $mockSelfResponse->allows('getId')->andReturns($this->lbConfigId);
+                        return $mockSelfResponse;
                     });
                 return $clusterMock;
             });
