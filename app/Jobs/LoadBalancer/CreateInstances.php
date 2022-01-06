@@ -35,10 +35,7 @@ class CreateInstances extends Job
         $loadBalancer = $this->model;
 
         if (empty($this->task->data['orchestrator_build_id'])) {
-            $spec = $this->model->loadBalancerSpec;
-            $imageId = $spec->image_id;
-
-            if (!($image = Image::find($imageId))) {
+            if (!($image = Image::find($loadBalancer->loadBalancerSpec->image_id))) {
                 $this->fail(new \Exception('Failed to find image to create a new load balancer'));
                 return;
             }
@@ -73,7 +70,7 @@ class CreateInstances extends Job
 
             for ($i = 0; $i < $loadBalancer->loadBalancerSpec->node_count; $i++) {
                 $orchestratorData['instances'][] = [
-                    'name' => 'Load Balancer ' . $i,
+                    'name' => 'Load Balancer ' . ($i+1),
                     'vpc_id' => $loadBalancer->vpc->id,
                     'image_id' => $image->id,
                     'vcpu_cores' => $loadBalancer->loadBalancerSpec->cpu,

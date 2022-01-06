@@ -4,7 +4,6 @@ namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\CreateInstances;
-use App\Models\V2\ImageMetadata;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Task;
 use App\Support\Sync;
@@ -25,16 +24,6 @@ class CreateInstancesTest extends TestCase
 
     public function testSuccess()
     {
-        // Create the load balancer image and image metadata
-        factory(ImageMetadata::class)->create([
-            'image_id' => $this->image()->id,
-            'key' => 'ukfast.loadbalancer.version',
-            'value' => 'Ubuntu-20.04-LBv2',
-        ]);
-
-        $this->loadBalancer()->loadBalancerSpec->update(['image_id' => $this->image()->id]);
-        $this->loadBalancer()->refresh();
-
         // Create the management network
         $this->router()->setAttribute('is_management', true)->save();
         $this->network();
@@ -67,6 +56,4 @@ class CreateInstancesTest extends TestCase
 
         $this->assertNotNull($task->data['orchestrator_build_id']);
     }
-
-
 }
