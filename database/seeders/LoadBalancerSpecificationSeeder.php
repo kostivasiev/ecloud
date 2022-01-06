@@ -21,7 +21,7 @@ class LoadBalancerSpecificationSeeder extends Seeder
                 'ram' => 2,
                 'hdd' => 20,
                 'iops' => 300,
-                'image_id' => 'image-id-1',
+                'image_id' => 'img-loadbalancer',
         ]);
 
         factory(LoadBalancerSpecification::class)->create([
@@ -32,7 +32,7 @@ class LoadBalancerSpecificationSeeder extends Seeder
                 'ram' => 4,
                 'hdd' => 20,
                 'iops' => 300,
-                'image_id' => 'image-id-2',
+                'image_id' => 'img-loadbalancer',
         ]);
 
         factory(LoadBalancerSpecification::class)->create([
@@ -42,7 +42,7 @@ class LoadBalancerSpecificationSeeder extends Seeder
                 'ram' => 8,
                 'hdd' => 20,
                 'iops' => 300,
-                'image_id' => 'image-id-3',
+                'image_id' => 'img-loadbalancer',
         ]);
     }
 }

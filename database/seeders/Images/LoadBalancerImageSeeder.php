@@ -33,22 +33,5 @@ class LoadBalancerImageSeeder extends Seeder
 
         // Sync the pivot table
         $image->availabilityZones()->sync('az-aaaaaaaa');
-
-        factory(ImageMetadata::class)->create([
-            'image_id' => $image->id,
-            'key' => 'ukfast.loadbalancer.version',
-            'value' => 'Ubuntu-20.04-LBv2',
-        ]);
-
-//        factory(ImageParameter::class)->create([
-//            'name' => 'Statistics page password',
-//            'key' => 'stats_password',
-//            'type' => 'String',
-//            'description' => 'Password for accessing the haproxy stats page',
-//            'required' => true,
-//            'validation_rule' => '/.+/',
-//        ]);
-
-
     }
 }
