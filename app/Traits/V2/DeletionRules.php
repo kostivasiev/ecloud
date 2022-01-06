@@ -8,14 +8,17 @@ trait DeletionRules
 {
     public function canDelete()
     {
-        $relationships = collect(
-            $this->with($this->children)
-                ->findOrFail($this->id)
-                ->getRelations()
-        )->sum(function ($relation) {
+        $relationships = $this->getDependentRelationships()->sum(function ($relation) {
             return $relation->count();
         });
         return $relationships === 0;
+    }
+
+    public function getDependentRelationships()
+    {
+        return collect($this->with($this->children)
+            ->findOrFail($this->id)
+            ->getRelations());
     }
 
     public function getDeletionError()

@@ -20,7 +20,7 @@ class CanBeDeleted
                     'errors' => [
                         [
                             'title' => 'Precondition Failed',
-                            'detail' => 'The specified resource has dependant relationships and cannot be deleted',
+                            'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $model->getDependentRelationships()->flatten()->pluck('id')->join(', '),
                             'status' => Response::HTTP_PRECONDITION_FAILED,
                         ],
                     ],
