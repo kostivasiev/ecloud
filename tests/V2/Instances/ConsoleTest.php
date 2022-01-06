@@ -3,12 +3,12 @@
 namespace Tests\V2\Instances;
 
 use App\Models\V2\Credential;
+use App\Services\V2\KingpinService;
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -228,5 +228,30 @@ class ConsoleTest extends TestCase
                 'url' => 'https://127.0.0.1/console/?title='.$this->instance()->id.'&session='.$uuid
             ]
         )->assertResponseStatus(200);
+    }
+
+    public function testScreenshot()
+    {
+        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+
+        $this->kingpinServiceMock()
+            ->shouldReceive('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_CONSOLE_SCREENSHOT, $this->instance()->vpc_id, $this->instance()->id)
+            )
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode($this->loadData('Kingpin/GetConsoleScreenshot.json')));
+            });
+
+        $response = $this->get('/v2/instances/' . $this->instance()->id . '/console-screenshot');
+
+        $response->assertResponseStatus(200);
+
+        $this->assertEquals($this->loadData('Kingpin/GetConsoleScreenshot.json'), $response->response->getContent());
+
+        $this->assertEquals(
+            'attachment; filename=' . $this->instance()->vpc_id . '-' . $this->instance()->id . '-' . date('d-m-Y') . '-screenshot',
+            $response->response->headers->all()['content-disposition'][0]
+        );
     }
 }

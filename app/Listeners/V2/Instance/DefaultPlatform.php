@@ -32,6 +32,6 @@ class DefaultPlatform
 
         Log::info('Default platform on instance ' . $model->id . ' set to ' . $model->platform);
 
-        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
+        Log::info(get_class($this) . ' : Finished');
     }
 }

@@ -19,7 +19,7 @@ class RunApplianceBootstrap extends Job
 
     private $model;
 
-    private $imageData;
+    public $imageData;
     private $deployData;
 
     public function __construct(Instance $instance)
@@ -69,9 +69,9 @@ class RunApplianceBootstrap extends Job
 
     protected function getImageData()
     {
+        $this->getPasswords();
         $this->getCpanelImageData();
         $this->getPleskImageData();
-        $this->getPasswords();
     }
 
     protected function getPleskImageData()
@@ -93,19 +93,16 @@ class RunApplianceBootstrap extends Job
             $this->model->setAttribute('deploy_data', $deployData)->saveQuietly();
         }
 
-        if (!$this->model->credentials()
-            ->where('name', '=', 'plesk_admin_password')
-            ->exists()) {
-            $credential = app()->make(Credential::class);
-            $credential->fill([
-                'name' => 'plesk_admin_password',
-                'username' => 'plesk_admin_password',
-                'password' => (new PasswordService())->generate(),
-                'port' => config('plesk.admin.port', 8880),
-            ]);
-            $credential->save();
-            $this->model->credentials()->save($credential);
-        }
+        $this->imageData['plesk_admin_password'] ??= (new PasswordService())->generate();
+
+        $credential = app()->make(Credential::class);
+        $credential->fill([
+            'name' => 'Plesk Administrator',
+            'username' => 'admin',
+            'password' => $this->imageData['plesk_admin_password'],
+            'port' => config('plesk.admin.port', 8880),
+        ]);
+        $this->model->credentials()->save($credential);
     }
 
     protected function getCpanelImageData()
@@ -129,7 +126,10 @@ class RunApplianceBootstrap extends Job
             ->filter(function ($value) {
                 return $value->type == ImageParameter::TYPE_PASSWORD;
             })->each(function ($passwordParameter) {
-                $credential = $this->model->credentials()->where('username', $passwordParameter->key)->first();
+                $credential = $this->model->credentials()
+                    ->where('is_hidden', true)
+                    ->where('username', $passwordParameter->key)
+                    ->first();
                 if ($credential) {
                     $this->imageData[$passwordParameter->key] = $credential->password;
                 }

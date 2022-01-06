@@ -74,7 +74,7 @@ class Credential extends Model implements Filterable, Sortable
 
     public function instance()
     {
-        return $this->belongsTo(Instance::class, 'id', 'resource_id');
+        return $this->belongsTo(Instance::class, 'resource_id', 'id');
     }
 
     /**

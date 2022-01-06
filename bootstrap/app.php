@@ -49,6 +49,7 @@ $app->configure('volume-group');
 $app->configure('vpn-session');
 $app->configure('load-balancer');
 $app->configure('plesk');
+$app->configure('reseller');
 
 $app->alias('mailer', Illuminate\Mail\Mailer::class);
 $app->alias('mailer', Illuminate\Contracts\Mail\Mailer::class);
@@ -95,6 +96,7 @@ $app->routeMiddleware([
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
     'instance-is-locked' => \App\Http\Middleware\Instance\IsLocked::class,
+    'instance-console-enabled' => \App\Http\Middleware\Instance\ConsoleEnabled::class,
     'instance-requires-floating-ip' => \App\Http\Middleware\Instance\RequiresFloatingIp::class,
     'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
     'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class,
@@ -120,6 +122,7 @@ $app->routeMiddleware([
     'vpn-endpoint-can-delete' => \App\Http\Middleware\VpnEndpoint\CanDelete::class,
     'vpc-can-delete' => \App\Http\Middleware\Vpc\CanDelete::class,
     'load-balancer-is-max-for-customer' => \App\Http\Middleware\Loadbalancer\IsMaxForForCustomer::class,
+    'can-be-deleted' => \App\Http\Middleware\CanBeDeleted::class,
 ]);
 
 /*
@@ -153,6 +156,7 @@ $app->register(UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider:
 $app->register(UKFast\ApiInternalCommunication\NetworkingAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\BillingAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\LicensesAdminClientServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\LoadbalancerAdminClientServiceProvider::class);
 
 
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);

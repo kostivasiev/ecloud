@@ -36,7 +36,7 @@ class BillingMetric extends Model implements Filterable, Sortable
             'id',
             'resource_id',
             'vpc_id',
-            'friendly_name',
+            'name',
             'reseller_id',
             'key',
             'value',
@@ -52,6 +52,15 @@ class BillingMetric extends Model implements Filterable, Sortable
         ];
 
         parent::__construct($attributes);
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->start)) {
+                $model->start = Carbon::now();
+            }
+        });
     }
 
     public function scopeForUser($query, Consumer $user)
@@ -122,7 +131,7 @@ class BillingMetric extends Model implements Filterable, Sortable
             $factory->create('resource_id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$numericDefaults),
-            $factory->create('friendly_name', Filter::$stringDefaults),
+            $factory->create('name', Filter::$stringDefaults),
             $factory->create('key', Filter::$stringDefaults),
             $factory->create('value', Filter::$stringDefaults),
             $factory->create('start', Filter::$dateDefaults),
@@ -146,7 +155,7 @@ class BillingMetric extends Model implements Filterable, Sortable
             $factory->create('resource_id'),
             $factory->create('vpc_id'),
             $factory->create('reseller_id'),
-            $factory->create('friendly_name'),
+            $factory->create('name'),
             $factory->create('key'),
             $factory->create('value'),
             $factory->create('start'),
@@ -179,7 +188,7 @@ class BillingMetric extends Model implements Filterable, Sortable
             'resource_id' => 'resource_id',
             'vpc_id' => 'vpc_id',
             'reseller_id' => 'reseller_id',
-            'friendly_name' => 'friendly_name',
+            'name' => 'name',
             'key' => 'key',
             'value' => 'value',
             'start' => 'start',

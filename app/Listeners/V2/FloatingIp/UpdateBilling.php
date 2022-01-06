@@ -51,7 +51,7 @@ class UpdateBilling implements Billable
         $billingMetric->resource_id = $floatingIp->id;
         $billingMetric->vpc_id = $floatingIp->vpc->id;
         $billingMetric->reseller_id = $floatingIp->vpc->reseller_id;
-        $billingMetric->friendly_name = self::getFriendlyName();
+        $billingMetric->name = self::getFriendlyName();
         $billingMetric->key = self::getKeyName();
         $billingMetric->value = 1;
         $billingMetric->start = Carbon::now();

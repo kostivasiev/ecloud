@@ -43,6 +43,7 @@ class ImageParameterController extends BaseController
             'type',
             'description',
             'required',
+            'is_hidden',
             'validation_rule',
         ]));
         $image->imageParameters()->save($model);
@@ -61,6 +62,7 @@ class ImageParameterController extends BaseController
             'type',
             'description',
             'required',
+            'is_hidden',
             'validation_rule',
             'image_id'
         ]));

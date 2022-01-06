@@ -14,6 +14,8 @@ class CrudTest extends TestCase
 {
     public $software;
 
+    public $instanceSoftware;
+
     public function setUp(): void
     {
         parent::setUp();

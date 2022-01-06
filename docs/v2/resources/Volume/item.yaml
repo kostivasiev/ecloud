@@ -37,6 +37,8 @@ patch:
                   required: false
                 type:
                   readOnly: true
+                is_shared:
+                  readOnly: true
   responses:
     202:
       description: Accepted

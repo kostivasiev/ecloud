@@ -110,6 +110,12 @@ trait BillingMetricTrait
             ->andReturnUsing(function () {
                 return true;
             });
+        $this->command->expects('option')
+            ->with('current-month')
+            ->once()
+            ->andReturnUsing(function () {
+                return false;
+            });
         return;
     }
 

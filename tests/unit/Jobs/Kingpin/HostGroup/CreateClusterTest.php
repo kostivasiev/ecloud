@@ -2,33 +2,47 @@
 namespace Tests\unit\Jobs\Kingpin\HostGroup;
 
 use App\Jobs\Kingpin\HostGroup\CreateCluster;
+use App\Jobs\Nsx\Dhcp\Create;
+use App\Models\V2\Dhcp;
 use App\Models\V2\HostGroup;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateClusterTest extends TestCase
 {
-    protected $job;
     protected $hostGroup;
+    protected Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->hostGroup = factory(HostGroup::class)->create([
-            'id' => 'hg-test',
-            'name' => 'hg-test',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'host_spec_id' => $this->hostSpec()->id,
-            'windows_enabled' => true,
-        ]);
+        Model::withoutEvents(function () {
+            $this->hostGroup = factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+                'windows_enabled' => true,
+            ]);
 
-        $this->job = \Mockery::mock(CreateCluster::class, [$this->hostGroup])->makePartial();
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->hostGroup);
+            $this->task->save();
+        });
     }
 
     public function testHostGroupExists()
@@ -39,9 +53,12 @@ class CreateClusterTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200);
             });
-        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Started');
-        Log::shouldReceive('debug')->withSomeOfArgs(get_class($this->job) . ' : HostGroup already exists, nothing to do.');
-        $this->assertTrue($this->job->handle());
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new CreateCluster($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testCreateSuccessful()
@@ -56,8 +73,11 @@ class CreateClusterTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(201);
             });
-        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Started');
-        Log::shouldReceive('info')->withSomeOfArgs(get_class($this->job) . ' : Finished');
-        $this->assertNull($this->job->handle());
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new CreateCluster($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 }

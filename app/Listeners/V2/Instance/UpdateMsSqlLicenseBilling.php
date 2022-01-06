@@ -71,7 +71,7 @@ class UpdateMsSqlLicenseBilling implements Billable
                 'resource_id' => $instance->id,
                 'vpc_id' => $instance->vpc->id,
                 'reseller_id' => $instance->vpc->reseller_id,
-                'friendly_name' => self::getFriendlyName($edition),
+                'name' => self::getFriendlyName($edition),
                 'key' => $key,
                 'value' => $packs,
                 'start' => Carbon::now(),

@@ -57,7 +57,7 @@ class UpdateBilling implements Billable
             'resource_id' => $loadBalancer->id,
             'vpc_id' => $loadBalancer->vpc->id,
             'reseller_id' => $loadBalancer->vpc->reseller_id,
-            'friendly_name' => self::getFriendlyName($loadBalancer->loadBalancerSpec->name),
+            'name' => self::getFriendlyName($loadBalancer->loadBalancerSpec->name),
             'key' => self::getKeyName($loadBalancer->loadBalancerSpec->name),
             'value' => 1,
             'start' => $time,

@@ -36,6 +36,11 @@ class Create extends FormRequest
                 'string',
                 Rule::in([Software::VISIBILITY_PUBLIC, Software::VISIBILITY_PRIVATE]),
             ],
+            'license' => [
+                'sometimes',
+                'required',
+                'string',
+            ],
         ];
     }
 }

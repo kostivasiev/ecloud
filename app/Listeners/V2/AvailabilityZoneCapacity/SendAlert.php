@@ -15,7 +15,7 @@ class SendAlert implements ShouldQueue
 
     public function handle(Saved $event)
     {
-        Log::info(get_class($this) . ' : Started', ['event' => $event]);
+        Log::info(get_class($this) . ' : Started');
 
         $availabilityZoneCapacity = $event->model;
 
@@ -28,6 +28,6 @@ class SendAlert implements ShouldQueue
             );
         }
 
-        Log::info(get_class($this) . ' : Finished', ['event' => $event]);
+        Log::info(get_class($this) . ' : Finished');
     }
 }
