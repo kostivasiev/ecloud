@@ -677,6 +677,8 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         $this->nsxServiceMock();
 
         Event::fake([
+            // TODO: Fake Task Created event in here?
+
             // V1 hack
             \App\Events\V1\DatastoreCreatedEvent::class,
 
