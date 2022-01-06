@@ -11,6 +11,10 @@ final class KingpinService
     const INSTANCE_POWERSTATE_POWEREDOFF = 'poweredOff';
     const INSTANCE_TOOLSRUNNINGSTATUS_RUNNING = 'guestToolsRunning';
 
+    /** Endpoints; */
+    public const GET_CONSOLE_SCREENSHOT = '/api/v2/vpc/%s/instance/%s/screenshot';
+    public const POST_CONSOLE_SESSION = '/api/v2/vpc/%s/instance/%s/console/session';
+
     /**
      * @var Client
      */

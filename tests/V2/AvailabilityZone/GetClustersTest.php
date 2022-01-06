@@ -4,6 +4,7 @@ namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\LoadBalancer;
 use Faker\Factory as Faker;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class GetClustersTest extends TestCase
@@ -38,5 +39,15 @@ class GetClustersTest extends TestCase
                 'load_balancer_spec_id' => $this->loadBalancer->load_balancer_spec_id,
             ])
             ->assertResponseStatus(200);
+    }
+
+    public function testNsxClusterDoesntExist()
+    {
+        $this->assertFalse(Schema::hasColumn('availability_zones', 'nsx_edge_cluster_id'));
+    }
+
+    public function testNsxManagerEndpointDoesntExist()
+    {
+        $this->assertFalse(Schema::hasColumn('availability_zones', 'nsx_manager_endpoint'));
     }
 }

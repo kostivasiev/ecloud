@@ -33,7 +33,7 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/vips?page=2'
   tags:
-    - Rename This Tag
+    - Vips
 post:
   requestBody:
     required: true

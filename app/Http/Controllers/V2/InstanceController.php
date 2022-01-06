@@ -13,6 +13,7 @@ use App\Models\V2\Credential;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
+use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
@@ -23,8 +24,11 @@ use App\Resources\V2\CredentialResource;
 use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\NicResource;
+use App\Resources\V2\SoftwareResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
+use App\Services\Kingpin\V2\KingpinEndpoints;
+use App\Services\V2\KingpinService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
@@ -102,15 +106,46 @@ class InstanceController extends BaseController
         $instance->availabilityZone()->associate($network->router->availabilityZone);
 
         $instance->locked = $request->input('locked', false);
+
+        $instance->save();
+
+        $imageData = collect($request->input('image_data'))->filter();
+
+        // Store password image parameters in the credentials table and remove from image_data
+        $image->imageParameters
+        ->filter(function ($value) use ($imageData) {
+            return $value->type == ImageParameter::TYPE_PASSWORD &&
+                in_array($value->key, $imageData->keys()->toArray()) &&
+                !$value->is_hidden;
+        })
+        ->each(function ($imageParameter) use ($imageData, $instance) {
+            $credential = app()->make(Credential::class);
+            $credential->fill([
+                'name' => 'Deploy Data: ' . $imageParameter->name,
+                'username' => $imageParameter->key,
+                'password' => $imageData->get($imageParameter->key),
+                'is_hidden' => true
+            ]);
+            $instance->credentials()->save($credential);
+            $imageData->forget($imageParameter->key);
+        });
+
+        // Don't allow customers to populate 'hidden' image parameters, these will be auto-generated passwords
+        $image->imageParameters->filter(fn($value) => $value->is_hidden && in_array($value->key, $imageData->keys()->toArray()))
+        ->each(function ($imageParameter) use ($imageData) {
+            $imageData->forget($imageParameter->key);
+        });
+
         $instance->deploy_data = [
             'volume_capacity' => $request->input('volume_capacity', config('volume.capacity.' . strtolower($image->platform) . '.min')),
             'volume_iops' => $request->input('volume_iops', config('volume.iops.default')),
             'network_id' => $request->input('network_id', $network->id),
             'floating_ip_id' => $request->input('floating_ip_id'),
             'requires_floating_ip' => $request->input('requires_floating_ip', false),
-            'image_data' => $request->input('image_data'),
+            'image_data' => $imageData->toArray(),
             'user_script' => $request->input('user_script'),
             'ssh_key_pair_ids' => $request->input('ssh_key_pair_ids'),
+            'software_ids' => $request->input('software_ids'),
         ];
 
         $task = $instance->syncSave();
@@ -297,33 +332,61 @@ class InstanceController extends BaseController
         return response('', 204);
     }
 
-    public function consoleSession(Request $request, $instanceId)
+    public function consoleScreenshot(Request $request, $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
-        if (!$instance->vpc->console_enabled) {
-            if (!$this->isAdmin) {
-                return response()->json([
-                    'errors' => [
-                        'title' => 'Forbidden',
-                        'details' => 'Console access has been disabled for this resource',
-                        'status' => Response::HTTP_FORBIDDEN,
-                    ]
-                ], Response::HTTP_FORBIDDEN);
-            }
+        /** @var \GuzzleHttp\Psr7\Response $response */
+        $response = $instance->availabilityZone
+            ->kingpinService()
+            ->get(
+                sprintf(KingpinService::GET_CONSOLE_SCREENSHOT, $instance->vpc_id, $instance->id)
+            );
+
+        if (!$response || $response->getStatusCode() !== 200) {
+            Log::info(
+                __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console screenshot',
+                [
+                    'instance' => $instance,
+                    'response' => $response,
+                ]
+            );
+            return response()->json([
+                'errors' => [
+                    'title' => 'Bad Gateway',
+                    'details' => 'Console access to this instance is not available',
+                    'status' => Response::HTTP_BAD_GATEWAY,
+                ]
+            ], Response::HTTP_BAD_GATEWAY);
         }
+
+        $name = $instance->vpc_id . '-' . $instance->id . '-' . date('d-m-Y') . '-screenshot';
+
+        return new Response(
+            json_decode($response->getBody()->getContents()),
+            200,
+            [
+                'Content-Disposition' => 'attachment; filename=' . $name,
+                'Content-Type'        => 'image/png'
+            ]
+        );
+    }
+
+    public function consoleSession(Request $request, $instanceId)
+    {
+        $instance = Instance::forUser($request->user())->findOrFail($instanceId);
 
         /** @var \GuzzleHttp\Psr7\Response $response */
         $response = $instance->availabilityZone
             ->kingpinService()
             ->post(
-                '/api/v2/vpc/'.$instance->vpc_id.'/instance/'.$instance->id.'/console/session'
+                sprintf(KingpinService::POST_CONSOLE_SESSION, $instance->vpc_id, $instance->id)
             );
         if (!$response || $response->getStatusCode() !== 200) {
             Log::info(
                 __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console session',
                 [
-                    'instance' => $instance,
+                    'instance' => $instance->id,
                     'response' => $response,
                 ]
             );
@@ -346,7 +409,7 @@ class InstanceController extends BaseController
         if (!$consoleResource) {
             Log::info(
                 __CLASS__ . ':: ' . __FUNCTION__ . ' : Failed to retrieve console credentials',
-                ['instance' => $instance]
+                ['instance' => $instance->id]
             );
             return response()->json([
                 'errors' => [
@@ -384,7 +447,7 @@ class InstanceController extends BaseController
                 $message,
                 [
                     'data' => [
-                        'instance' => $instance,
+                        'instance' => $instance->id,
                         'host' => $consoleResource->host,
                         'exception' => $e ?? '',
                     ]
@@ -403,7 +466,7 @@ class InstanceController extends BaseController
         $uuid = $responseJson->uuid ?? '';
         if (empty($uuid)) {
             Log::info(__CLASS__ . '::' . __FUNCTION__ . ' : Failed to retrieve session UUID from host', [
-                'instance' => $instance,
+                'instance' => $instance->id,
                 'base_uri' => $consoleResource->host.':'.$consoleResource->port,
                 'status_code' => Response::HTTP_SERVICE_UNAVAILABLE,
             ]);
@@ -557,5 +620,16 @@ class InstanceController extends BaseController
         }
 
         return $this->responseTaskId($task->id);
+    }
+
+    public function software(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    {
+        $collection = Instance::forUser($request->user())->findOrFail($instanceId)->software();
+        $queryTransformer->config(Task::class)
+            ->transform($collection);
+
+        return SoftwareResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

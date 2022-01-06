@@ -24,7 +24,8 @@ class PowerOff extends Job
     {
         $this->updateTaskBatch([
             [
-                new \App\Jobs\Instance\PowerOff($this->task->resource)
+                new \App\Jobs\Instance\PowerOff($this->task->resource),
+                new \App\Jobs\Instance\EndComputeBilling($this->task->resource),
             ]
         ])->dispatch();
     }

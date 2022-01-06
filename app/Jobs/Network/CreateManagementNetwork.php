@@ -1,40 +1,27 @@
 <?php
 namespace App\Jobs\Network;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
-use App\Models\V2\Task;
-use App\Traits\V2\Jobs\AwaitResources;
-use App\Traits\V2\Jobs\AwaitTask;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Traits\V2\TaskJobs\AwaitResources;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use IPLib\Factory;
 
-class CreateManagementNetwork extends Job
+class CreateManagementNetwork extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources, AwaitTask;
+    use AwaitResources;
 
-    private Task $task;
-    private Router $model;
     public $lock;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
 
     public function handle()
     {
-        $router = $this->model;
+        $router = $this->task->resource;
         if (!empty($this->task->data['management_router_id'])) {
             $managementRouter = Router::find($this->task->data['management_router_id']);
             if (empty($this->task->data['management_network_id'])) {
-                Log::info(get_class($this) . ' - Create Management Network Start', ['router_id' => $managementRouter->id]);
+                $this->info('Create Management Network Start', ['router_id' => $managementRouter->id]);
 
                 $managementNetwork = app()->make(Network::class);
                 $managementNetwork->name = 'Management Network for ' . $managementRouter->id;
@@ -56,7 +43,7 @@ class CreateManagementNetwork extends Job
                 $this->task->data = Arr::add($this->task->data, 'management_network_id', $managementNetwork->id);
                 $this->task->saveQuietly();
 
-                Log::info(get_class($this) . ' - Create Management Network End', [
+                $this->info('Create Management Network End', [
                     'router_id' => $managementRouter->id,
                     'network_id' => $managementNetwork->id,
                 ]);
@@ -74,7 +61,7 @@ class CreateManagementNetwork extends Job
 
     public function getNextAvailableSubnet($subnet, $availabilityZoneId, $firstRun = true)
     {
-        Log::info(get_class($this) . ' - Start Subnet', ['subnet' => $subnet]);
+        $this->info('Start Subnet', ['subnet' => $subnet]);
         $range = Factory::rangeFromString($subnet);
         if ($firstRun) {
             $newFromInteger = ip2long($range->getStartAddress()) + 1024;
@@ -97,11 +84,11 @@ class CreateManagementNetwork extends Job
         foreach ($networkCollection as $network) {
             $range = Factory::rangeFromString($network->subnet);
             if ($range->containsRange($newRange)) {
-                Log::info(get_class($this) . ' - Subnet in use', ['subnet' => $subnet]);
+                $this->debug('Subnet in use', ['subnet' => $subnet]);
                 return $this->getNextAvailableSubnet($subnet, $availabilityZoneId, false);
             }
         }
-        Log::info(get_class($this) . ' - Next Subnet', ['subnet' => $subnet]);
+        $this->info('Next Subnet', ['subnet' => $subnet]);
         return $subnet;
     }
 }

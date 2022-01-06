@@ -23,8 +23,6 @@ class AvailabilityZoneResource extends UKFastResource
 
         if ($request->user()->isAdmin()) {
             $data['is_public'] = $this->is_public;
-            $data['nsx_manager_endpoint'] = $this->nsx_manager_endpoint;
-            $data['nsx_edge_cluster_id'] = $this->nsx_edge_cluster_id;
             $data['san_name'] = $this->san_name;
             $data['ucs_compute_name'] = $this->ucs_compute_name;
 

@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Support\Resource;
 use App\Traits\V2\CustomKey;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
@@ -35,6 +36,7 @@ class BillingMetric extends Model implements Filterable, Sortable
             'id',
             'resource_id',
             'vpc_id',
+            'name',
             'reseller_id',
             'key',
             'value',
@@ -52,6 +54,15 @@ class BillingMetric extends Model implements Filterable, Sortable
         parent::__construct($attributes);
     }
 
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->start)) {
+                $model->start = Carbon::now();
+            }
+        });
+    }
+
     public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {
@@ -63,6 +74,21 @@ class BillingMetric extends Model implements Filterable, Sortable
     public function instance()
     {
         return $this->belongsTo(Instance::class, 'resource_id', 'id');
+    }
+
+    public function vpc()
+    {
+        return $this->belongsTo(Vpc::class);
+    }
+
+    public function getResource()
+    {
+        $class = Resource::classFromId($this->resource_id);
+        if (empty($class)) {
+            return false;
+        }
+
+        return $class::find($this->resource_id) ?? false;
     }
 
     /**
@@ -105,6 +131,7 @@ class BillingMetric extends Model implements Filterable, Sortable
             $factory->create('resource_id', Filter::$stringDefaults),
             $factory->create('vpc_id', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$numericDefaults),
+            $factory->create('name', Filter::$stringDefaults),
             $factory->create('key', Filter::$stringDefaults),
             $factory->create('value', Filter::$stringDefaults),
             $factory->create('start', Filter::$dateDefaults),
@@ -128,6 +155,7 @@ class BillingMetric extends Model implements Filterable, Sortable
             $factory->create('resource_id'),
             $factory->create('vpc_id'),
             $factory->create('reseller_id'),
+            $factory->create('name'),
             $factory->create('key'),
             $factory->create('value'),
             $factory->create('start'),
@@ -160,6 +188,7 @@ class BillingMetric extends Model implements Filterable, Sortable
             'resource_id' => 'resource_id',
             'vpc_id' => 'vpc_id',
             'reseller_id' => 'reseller_id',
+            'name' => 'name',
             'key' => 'key',
             'value' => 'value',
             'start' => 'start',

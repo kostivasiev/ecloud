@@ -13,6 +13,7 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -40,7 +41,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         'datacentre_site_id',
         'region_id',
         'is_public',
-        'nsx_edge_cluster_id',
         'san_name',
         'ucs_compute_name',
     ];
@@ -175,6 +175,30 @@ class AvailabilityZone extends Model implements Filterable, Sortable
     }
 
     /**
+     * @param bool $advanced
+     * @return string
+     * @throws \Exception
+     */
+    public function getNsxEdgeClusterId(Bool $advanced = false): string
+    {
+        $searchEdgeClusterResponse = json_decode($this->nsxService()->get(
+            'api/v1/search/query?query=resource_type:EdgeCluster' .
+            '%20AND%20tags.scope:' . config('defaults.tag.scope') .
+            '%20AND%20tags.tag:' . ($advanced ? config('defaults.tag.networking.advanced') : config('defaults.tag.networking.default'))
+        )->getBody()->getContents());
+
+        if ($searchEdgeClusterResponse->result_count != 1) {
+            throw new \Exception(
+                'Failed to determine ' .
+                ($advanced ? 'advanced networking' : 'standard') .
+                ' edge cluster ID for availability zone ' . $this->id
+            );
+        }
+
+        return $searchEdgeClusterResponse->results[0]->id;
+    }
+
+    /**
      * @param $query
      * @param $user
      * @return mixed
@@ -184,6 +208,11 @@ class AvailabilityZone extends Model implements Filterable, Sortable
         if ($user->isAdmin()) {
             return $query;
         }
+
+        if (in_array($user->resellerId(), config('reseller.internal'))) {
+            return $query;
+        }
+
         return $query->whereHas('region', function ($query) {
             $query->where('is_public', '=', true);
         })->where('is_public', '=', true);
@@ -202,7 +231,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('datacentre_site_id', Filter::$numericDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('is_public', Filter::$numericDefaults),
-            $factory->create('nsx_edge_cluster_id', Filter::$stringDefaults),
             $factory->create('san_name', Filter::$stringDefaults),
             $factory->create('ucs_compute_name', Filter::$stringDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -224,7 +252,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             $factory->create('datacentre_site_id'),
             $factory->create('region_id'),
             $factory->create('is_public'),
-            $factory->create('nsx_edge_cluster_id'),
             $factory->create('san_name'),
             $factory->create('ucs_compute_name'),
             $factory->create('created_at'),
@@ -253,7 +280,6 @@ class AvailabilityZone extends Model implements Filterable, Sortable
             'datacentre_site_id' => 'datacentre_site_id',
             'region_id' => 'region_id',
             'is_public' => 'is_public',
-            'nsx_edge_cluster_id' => 'nsx_edge_cluster_id',
             'san_name' => 'san_name',
             'ucs_compute_name' => 'ucs_compute_name',
             'created_at' => 'created_at',

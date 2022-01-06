@@ -5,7 +5,9 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
+use App\Services\V2\KingpinService;
 use App\Support\Sync;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
@@ -67,6 +69,14 @@ class UpdateRamBillingTest extends TestCase
         app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
             return $mockAccountAdminClient;
         });
+
+        $this->kingpinServiceMock()->allows('get')
+            ->andReturn(
+                new Response(200, [], json_encode([
+                    'powerState' => KingpinService::INSTANCE_POWERSTATE_POWEREDON,
+                    'toolsRunningStatus' => KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING,
+                ]))
+            );
     }
 
     public function testInstanceCreatedStandardTierBilling()
@@ -114,7 +124,7 @@ class UpdateRamBillingTest extends TestCase
 
         $this->instance()->ram_capacity = 2048;
 
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'sync-1',
                 'completed' => true,

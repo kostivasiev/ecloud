@@ -56,6 +56,8 @@ components:
               required: false
               type: boolean
               example: 'true'
+    Software:
+      $ref: 'resources/Software/schema.yaml'
     Task:
       $ref: 'components/schemas/task.yaml'
     Volume:
@@ -212,14 +214,21 @@ paths:
     $ref: 'resources/Image/metadata-collection.yaml'
   '/ecloud/v2/images/{id}/parameters':
     $ref: 'resources/Image/parameters-collection.yaml'
-
+  '/ecloud/v2/images/{id}/software':
+    $ref: 'resources/Image/admin-software-collection.yaml'
+  '/ecloud/v2/instances/{instanceId}/software':
+    $ref: 'resources/Instance/admin-software-collection.yaml'
+  '/ecloud/v2/instance-software' :
+    $ref : 'resources/InstanceSoftware/collection.yaml'
+  '/ecloud/v2/instance-software/{instanceSoftwareId}' :
+    $ref : 'resources/InstanceSoftware/item.yaml'
   '/ecloud/v2/ip-addresses' :
     $ref : 'resources/IpAddress/admin-collection.yaml'
   '/ecloud/v2/ip-addresses/{ipAddressId}' :
     $ref : 'resources/IpAddress/admin-item.yaml'
   '/ecloud/v2/ip-addresses/{ipAddressId}/nics' :
     $ref : 'resources/IpAddress/nic-collection.yaml'
-  '/ecloud/v2/load-balancers':
+#  '/ecloud/v2/load-balancers':
 #    $ref: 'resources/LoadBalancer/collection.yaml'
 #  '/ecloud/v2/load-balancers/{loadBalancerId}':
 #    $ref: 'resources/LoadBalancer/item.yaml'
@@ -271,6 +280,18 @@ paths:
     $ref: 'resources/RouterThroughput/admin-collection.yaml'
   '/ecloud/v2/router-throughputs/{routerThroughputId}':
     $ref: 'resources/RouterThroughput/admin-item.yaml'
+  '/ecloud/v2/scripts':
+    $ref : 'resources/Script/admin-collection.yaml'
+  '/ecloud/v2/scripts/{scriptId}':
+    $ref : 'resources/Script/admin-item.yaml'
+  '/ecloud/v2/software' :
+    $ref : 'resources/Software/admin-collection.yaml'
+  '/ecloud/v2/software/{softwareId}' :
+    $ref : 'resources/Software/admin-item.yaml'
+  '/ecloud/v2/software/{softwareId}/images' :
+    $ref : 'resources/Software/admin-images-collection.yaml'
+  '/ecloud/v2/software/{softwareId}/scripts' :
+    $ref : 'resources/Software/admin-scripts-collection.yaml'
   '/ecloud/v2/tasks':
     $ref: 'resources/Task/admin-collection.yaml'
   '/ecloud/v2/tasks/{taskId}':

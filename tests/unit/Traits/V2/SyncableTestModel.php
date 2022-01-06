@@ -17,4 +17,14 @@ class SyncableTestModel extends Model
     {
         return true;
     }
+
+    public function getUpdateSyncJob()
+    {
+        return 'App\\Jobs\\Sync\\SyncableTestModel\\Update';
+    }
+
+    public function getDeleteSyncJob()
+    {
+        return 'App\\Jobs\\Sync\\SyncableTestModel\\Delete';
+    }
 }

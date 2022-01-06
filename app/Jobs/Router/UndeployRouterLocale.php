@@ -2,41 +2,31 @@
 
 namespace App\Jobs\Router;
 
-use App\Jobs\Job;
-use App\Models\V2\Router;
-use App\Traits\V2\LoggableModelJob;
+use App\Jobs\TaskJob;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
-class UndeployRouterLocale extends Job
+class UndeployRouterLocale extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-    
-    private Router $model;
-
-    public function __construct(Router $router)
-    {
-        $this->model = $router;
-    }
-
     /**
      * @throws \Exception
      */
     public function handle()
     {
+        $router = $this->task->resource;
+
         try {
-            $this->model->availabilityZone->nsxService()->get('policy/api/v1/infra/tier-1s/' . $this->model->id . '/locale-services/' . $this->model->id);
+            $router->availabilityZone->nsxService()->get('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id);
         } catch (ClientException $e) {
             if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
-                Log::info("Router locale already removed, skipping");
+                $this->info("Router locale already removed, skipping");
                 return;
             }
 
             throw $e;
         }
 
-        $this->model->availabilityZone->nsxService()
-            ->delete('policy/api/v1/infra/tier-1s/' . $this->model->id . '/locale-services/' . $this->model->id);
+        $this->info("Removing router locale");
+        $router->availabilityZone->nsxService()
+            ->delete('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id);
     }
 }

@@ -3,13 +3,14 @@
 namespace App\Listeners\V2\Host;
 
 use App\Events\V2\Task\Updated;
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
 use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
-class UpdateLicenseBilling
+class UpdateLicenseBilling implements Billable
 {
     /**
      * @param Updated $event
@@ -38,7 +39,7 @@ class UpdateLicenseBilling
             return;
         }
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($host, 'host.license.windows');
+        $currentActiveMetric = BillingMetric::getActiveByKey($host, self::getKeyName());
         if (!empty($currentActiveMetric)) {
             return;
         }
@@ -61,7 +62,8 @@ class UpdateLicenseBilling
         $billingMetric->resource_id = $host->id;
         $billingMetric->vpc_id = $host->hostGroup->vpc->id;
         $billingMetric->reseller_id = $host->hostGroup->vpc->reseller_id;
-        $billingMetric->key = 'host.license.windows';
+        $billingMetric->name = self::getFriendlyName();
+        $billingMetric->key = self::getKeyName();
         $billingMetric->value = $cores;
         $billingMetric->start = Carbon::now();
 
@@ -80,5 +82,23 @@ class UpdateLicenseBilling
         }
 
         $billingMetric->save();
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        return 'Host Windows License';
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        return 'host.license.windows';
     }
 }

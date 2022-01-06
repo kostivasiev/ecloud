@@ -26,17 +26,25 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Router\SetDefaultBilling::class,
         \App\Console\Commands\Conjurer\TestAuth::class,
         \App\Console\Commands\Queue\PopulateFailedJobsUuids::class,
+        \App\Console\Commands\Dev\CreateExampleTask::class,
         \App\Console\Commands\Artisan\TestAuth::class,
         \App\Console\Commands\Host\Delete::class,
         \App\Console\Commands\Billing\ProductCreate::class,
         \App\Console\Commands\Image\Populate::class,
         \App\Console\Commands\Orchestrator\ScheduledDeploy::class,
         \App\Console\Commands\FloatingIp\SetPolymorphicRelationship::class,
+        \App\Console\Commands\FloatingIp\PopulateForIpRange::class,
         \App\Console\Commands\FloatingIp\PopulateAvailabilityZoneId::class,
         \App\Console\Commands\Health\FindOrphanedNats::class,
         \App\Console\Commands\Health\FindOrphanedNics::class,
         \App\Console\Commands\Task\TimeoutStuck::class,
         \App\Console\Commands\IpAddress\PopulateNetworkId::class,
+        \App\Console\Commands\VPC\ConvertBilling::class,
+        \App\Console\Commands\Billing\CleanupAdvancedNetworking::class,
+        \App\Console\Commands\Billing\FixPriceOnAdvancedNetworkingBillingMetrics::class,
+        \App\Console\Commands\Billing\SetFriendlyNames::class,
+        \App\Console\Commands\VPC\ChangeOwnership::class,
+        \App\Console\Commands\Credentials\UpdatePleskCredentials::class,
     ];
 
     /**
@@ -50,9 +58,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         if ($this->app->environment() == 'production') {
-            $schedule->command('vpc:process-billing')
+            $schedule->command('vpc:process-billing --debug')
                 ->monthlyOn(1, '01:00')
                 ->emailOutputTo(config('alerts.billing.to'));
+                
             $schedule->command('orchestrator:deploy')
                 ->everyMinute();
 

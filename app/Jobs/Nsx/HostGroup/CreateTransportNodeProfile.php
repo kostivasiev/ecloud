@@ -2,45 +2,30 @@
 
 namespace App\Jobs\Nsx\HostGroup;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Vpc;
-use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\RequestException;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
-class CreateTransportNodeProfile extends Job
+class CreateTransportNodeProfile extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private $model;
-
-    public function __construct(HostGroup $model)
-    {
-        $this->model = $model;
-    }
-
     public function handle()
     {
-        $hostGroup = $this->model;
+        $hostGroup = $this->task->resource;
+
         $transportNodeProfiles = $this->getTransportNodeProfiles($hostGroup->availabilityZone);
         if (!$transportNodeProfiles) {
             $this->fail(new \Exception('Failed to get TransportNodeProfiles'));
             return false;
         }
 
-        $transportNodeProfileDisplayName =  'tnp-' . $this->model->id;
+        $transportNodeProfileDisplayName =  'tnp-' . $hostGroup->id;
         $exists = collect($transportNodeProfiles->results)->filter(function ($result) use (
             $transportNodeProfileDisplayName
         ) {
             return ($result->display_name === $transportNodeProfileDisplayName);
         })->count();
         if ($exists) {
-            Log::info(get_class($this) . ' : Skipped', [
-                'id' => $this->model->id,
-            ]);
+            $this->debug('Already exists, skipping');
             return true;
         }
 
@@ -52,10 +37,6 @@ class CreateTransportNodeProfile extends Job
 
         $transportZones = $this->getTransportZones($hostGroup->availabilityZone);
         if (!$transportZones || !isset($transportZones->results) || !count($transportZones->results)) {
-            Log::error(get_class($this) . ': Failed to get TransportZones', [
-                'hostgroup' => $hostGroup,
-                'transportZones' => $transportZones,
-            ]);
             $this->fail(new \Exception('Failed to get TransportZones'));
             return false;
         }
@@ -63,10 +44,6 @@ class CreateTransportNodeProfile extends Job
 
         $uplinkHostSwitchProfiles = $this->getUplinkHostSwitchProfiles($hostGroup->availabilityZone);
         if (!$uplinkHostSwitchProfiles || !isset($uplinkHostSwitchProfiles->results) || !count($uplinkHostSwitchProfiles->results)) {
-            Log::error(get_class($this) . ': Failed to get UplinkHostSwitchProfiles', [
-                'hostgroup' => $hostGroup,
-                'uplinkHostSwitchProfiles' => $uplinkHostSwitchProfiles,
-            ]);
             $this->fail(new \Exception('Failed to get UplinkHostSwitchProfiles'));
             return false;
         }
@@ -74,10 +51,6 @@ class CreateTransportNodeProfile extends Job
 
         $vtepIpPools = $this->getVtepIpPools($hostGroup->availabilityZone);
         if (!$vtepIpPools || !isset($vtepIpPools->results) || !count($vtepIpPools->results)) {
-            Log::error(get_class($this) . ': Failed to get VtepIpPools', [
-                'hostgroup' => $hostGroup,
-                'vtepIpPools' => $vtepIpPools,
-            ]);
             $this->fail(new \Exception('Failed to get VtepIpPools'));
             return false;
         }

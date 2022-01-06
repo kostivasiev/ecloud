@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RegionSeeder::class);
         $this->call(AvailabilityZoneSeeder::class);
         $this->call(RouterThroughputSeeder::class);
+        $this->call(SoftwareSeeder::class);
         $this->call(ImageSeeder::class);
         $this->call(LoadBalancerSeeder::class);
 

@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\Volume;
 
 use App\Events\V2\Task\Updated;
+use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
@@ -10,7 +11,7 @@ use App\Support\Sync;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
-class UpdateBilling
+class UpdateBilling implements Billable
 {
     /**
      * @param Updated $event
@@ -56,11 +57,11 @@ class UpdateBilling
 
         $time = Carbon::now();
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($volume, 'disk.capacity.%', 'LIKE');
+        $currentActiveMetric = BillingMetric::getActiveByKey($volume, self::getKeyName('%'), 'LIKE');
 
         if (!empty($currentActiveMetric)) {
             if (($currentActiveMetric->value == $volume->capacity) &&
-                ($currentActiveMetric->key == 'disk.capacity.'.$volume->iops)) {
+                ($currentActiveMetric->key == self::getKeyName($volume->iops))) {
                 return;
             }
             $currentActiveMetric->end = $time;
@@ -71,7 +72,8 @@ class UpdateBilling
         $billingMetric->resource_id = $volume->id;
         $billingMetric->vpc_id = $volume->vpc->id;
         $billingMetric->reseller_id = $volume->vpc->reseller_id;
-        $billingMetric->key = 'disk.capacity.'.$volume->iops;
+        $billingMetric->name = self::getFriendlyName($volume->iops);
+        $billingMetric->key = self::getKeyName($volume->iops);
         $billingMetric->value = $volume->capacity;
         $billingMetric->start = $time;
 
@@ -81,7 +83,8 @@ class UpdateBilling
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load \'volume\' billing product for availability zone ' . $volume->availabilityZone->id
+                'Failed to load \'volume\' billing product for availability zone '.
+                $volume->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;
@@ -91,5 +94,25 @@ class UpdateBilling
         $billingMetric->save();
 
         Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+    }
+
+    /**
+     * Gets the friendly name for the billing metric
+     * @return string
+     */
+    public static function getFriendlyName(): string
+    {
+        $argument = (count(func_get_args()) > 0) ? func_get_arg(0) . ' IOPS' : '';
+        return sprintf('Volume %s', $argument);
+    }
+
+    /**
+     * Gets the billing metric key
+     * @return string
+     */
+    public static function getKeyName(): string
+    {
+        $argument = (count(func_get_args()) > 0) ? '.' . func_get_arg(0) : '';
+        return sprintf('disk.capacity%s', $argument);
     }
 }

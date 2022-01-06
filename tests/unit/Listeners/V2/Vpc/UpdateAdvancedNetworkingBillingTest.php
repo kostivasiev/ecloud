@@ -27,13 +27,30 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
                 'product_price_sale_price' => 0.001388889,
             ]);
         });
+
+        $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+        $mockAdminCustomerClient = \Mockery::mock(\UKFast\Admin\Account\AdminCustomerClient::class)->makePartial();
+        $mockAdminCustomerClient->shouldReceive('getById')->andReturn(
+            new \UKFast\Admin\Account\Entities\Customer(
+                [
+                    'accountStatus' => ''
+                ]
+            )
+        );
+        $mockAccountAdminClient->shouldReceive('customers')->andReturn(
+            $mockAdminCustomerClient
+        );
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
+            return $mockAccountAdminClient;
+        });
     }
 
     public function testCreateInstanceUpdatesAdvancedNetworkingBillingMetric()
     {
+        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
         $this->assertNull(BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced'));
 
-        $task = Model::withoutEvents(function() {
+        $task = Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
@@ -46,7 +63,6 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
         $listener = new \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling();
         $listener->handle(new \App\Events\V2\Task\Updated($task));
 
-
         $metric = BillingMetric::getActiveByKey($this->vpc(), 'networking.advanced');
         $this->assertNotNull($metric);
         $this->assertEquals(1024, $metric->value);
@@ -54,6 +70,7 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
 
     public function testResizeInstanceUpdatesAdvancedNetworkingBillingMetric()
     {
+        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
         $originalMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test',
             'resource_id' => $this->vpc()->id,
@@ -66,7 +83,7 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
         $this->instance()->ram_capacity = 2048;
         $this->instance()->saveQuietly();
 
-        $task = Model::withoutEvents(function() {
+        $task = Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'sync-1',
                 'completed' => true,
@@ -89,15 +106,18 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
 
     public function testDeleteInstanceUpdatesAdvancedNetworkingBillingMetric()
     {
-        $instance = Instance::withoutEvents(function() {
+        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
+        $instance = Instance::withoutEvents(function () {
             factory(Instance::class)->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ram_capacity' => 1024,
             ]);
             return factory(Instance::class)->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ram_capacity' => 1024,
             ]);
         });
@@ -135,7 +155,8 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
 
     public function testDeleteAllInstancesEndsBillingMetric()
     {
-        $instance = Instance::withoutEvents(function() {
+        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
+        $instance = Instance::withoutEvents(function () {
             return factory(Instance::class)->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,

@@ -4,8 +4,10 @@ namespace Tests\unit\Jobs\Tasks\Instance;
 use App\Jobs\Instance\EndPublicBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
+use App\Services\V2\KingpinService;
 use App\Support\Sync;
 use Carbon\Carbon;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 
@@ -16,6 +18,14 @@ class MigrateBillingTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->kingpinServiceMock()->allows('get')
+            ->andReturn(
+                new Response(200, [], json_encode([
+                    'powerState' => KingpinService::INSTANCE_POWERSTATE_POWEREDON,
+                    'toolsRunningStatus' => KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING,
+                ]))
+            );
     }
 
     public function testBillingEndsOnPublicInstance()
@@ -67,7 +77,7 @@ class MigrateBillingTest extends TestCase
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $updateVcpuBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
         $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
-        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
+        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $this->instance()->refresh();
 
@@ -99,7 +109,7 @@ class MigrateBillingTest extends TestCase
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $updateVcpuBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
         $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
-        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
+        $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $this->instance()->refresh();
 

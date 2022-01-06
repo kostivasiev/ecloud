@@ -103,7 +103,7 @@ Content-Type:  application/json
 
 {
   "vpc_id": "{{dev_vpc_id}}",
-  "name": "Test",
+  "name": "Test 2",
   "vcpu_cores": 1,
   "ram_capacity": 1024,
   "image_id": "{{dev_image_id}}",
@@ -249,7 +249,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Detach volume group from secondary instance', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -286,7 +286,7 @@ Content-Type:  application/json
 
 > {%
 client.test('Detach volume group from primary instance', function () {
-    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
@@ -304,7 +304,7 @@ Content-Type: application/json
 
 > {%
 client.test("Remove Volume From Volume Group", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
@@ -318,7 +318,7 @@ Content-Type: application/json
 
 > {%
 client.test("Delete Volume Group", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
@@ -332,7 +332,7 @@ Content-Type: application/json
 
 > {%
 client.test("Delete Volume", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
@@ -346,7 +346,7 @@ Content-Type: application/json
 
 > {%
 client.test("Delete Secondary Instance", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}
 
@@ -360,6 +360,6 @@ Content-Type: application/json
 
 > {%
 client.test("Delete Primary Instance", function() {
-  client.assert(response.status === 204, "Response status is not 204");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 %}

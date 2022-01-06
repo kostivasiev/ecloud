@@ -2,57 +2,35 @@
 
 namespace App\Jobs\Nsx\HostGroup;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
-use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\RequestException;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
-class PrepareCluster extends Job
+class PrepareCluster extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private $model;
-
-    public function __construct(HostGroup $model)
-    {
-        $this->model = $model;
-    }
-
     public function handle()
     {
-        $hostGroup = $this->model;
+        $hostGroup = $this->task->resource;
+
         $transportNodeCollections = $this->getTransportNodeCollections($hostGroup->availabilityZone);
         if (!$transportNodeCollections || !count($transportNodeCollections->results)) {
-            Log::error(get_class($this) . ' : Failed to get TransportNodeCollections', [
-                'hostgroup' => $hostGroup,
-                'transportNodeCollections' => $transportNodeCollections,
-            ]);
             $this->fail(new \Exception('Failed to get TransportNodeCollections'));
             return false;
         }
 
-        $transportNodeCollectionDisplayName = 'tnc-' . $this->model->id;
+        $transportNodeCollectionDisplayName = 'tnc-' . $hostGroup->id;
         $exists = collect($transportNodeCollections->results)->filter(function ($result) use (
             $transportNodeCollectionDisplayName
         ) {
             return ($result->display_name === $transportNodeCollectionDisplayName);
         })->count();
         if ($exists) {
-            Log::info(get_class($this) . ' : Skipped', [
-                'id' => $this->model->id,
-            ]);
+            $this->debug('Already exists, skipping');
             return true;
         }
 
         $transportNodeProfiles = $this->getTransportNodeProfiles($hostGroup->availabilityZone, $hostGroup);
         if (!$transportNodeProfiles || !count($transportNodeProfiles->results)) {
-            Log::error(get_class($this) . ' : Failed to get TransportNodeProfiles', [
-                'hostgroup' => $hostGroup,
-                'transportNodeCollections' => $transportNodeCollections,
-            ]);
             $this->fail(new \Exception('Failed to get TransportNodeProfiles'));
             return false;
         }
@@ -60,10 +38,6 @@ class PrepareCluster extends Job
 
         $computeCollections = $this->getHostGroupComputeCollections($hostGroup->availabilityZone, $hostGroup);
         if (!$computeCollections || !count($computeCollections->results)) {
-            Log::error(get_class($this) . ' : Failed to get ComputeCollections', [
-                'hostgroup' => $hostGroup,
-                'computeCollections' => $computeCollections,
-            ]);
             $this->fail(new \Exception('Failed to get ComputeCollections'));
             return false;
         }

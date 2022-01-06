@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\V2\Instance\UpdateMsSqlLicenseBilling;
 use Laravel\Lumen\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -146,14 +147,17 @@ class EventServiceProvider extends ServiceProvider
 
         // Task
         \App\Events\V2\Task\Created::class => [
-            \App\Listeners\V2\TaskCreated::class
+            \App\Listeners\V2\DispatchTaskJob::class
         ],
         \App\Events\V2\Task\Updated::class => [
+            \App\Listeners\V2\DeleteSyncTaskResource::class,
             \App\Listeners\V2\Volume\UpdateBilling::class,
             \App\Listeners\V2\Router\UpdateBilling::class,
             \App\Listeners\V2\Image\UpdateImageBilling::class,
             \App\Listeners\V2\Instance\UpdateRamBilling::class,
             \App\Listeners\V2\Instance\UpdateVcpuBilling::class,
+            \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling::class,
+            \App\Listeners\V2\Instance\UpdateMsSqlLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
             \App\Listeners\V2\Host\UpdateBilling::class,
@@ -163,6 +167,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling::class,
             \App\Listeners\V2\VpnSession\UpdateBilling::class,
             \App\Listeners\V2\LoadBalancer\UpdateBilling::class,
+            \App\Listeners\V2\InstanceSoftware\UpdateBilling::class,
         ],
     ];
 }

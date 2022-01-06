@@ -2,8 +2,8 @@
 
 namespace Tests\V2\Instances;
 
+use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -24,6 +24,14 @@ class PowerOffTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200);
             });
+
+        $this->kingpinServiceMock()->allows('get')
+            ->andReturn(
+                new Response(200, [], json_encode([
+                    'powerState' => KingpinService::INSTANCE_POWERSTATE_POWEREDOFF,
+                    'toolsRunningStatus' => KingpinService::INSTANCE_TOOLSRUNNINGSTATUS_RUNNING,
+                ]))
+            );
 
         $this->put(
             '/v2/instances/' . $this->instance()->id . '/power-off',

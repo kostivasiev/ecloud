@@ -3,165 +3,149 @@ namespace Tests\unit\Jobs\Nsx\HostGroup;
 
 use App\Jobs\Nsx\HostGroup\DeleteTransportNodeProfile;
 use App\Models\V2\HostGroup;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Psr7\Request;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Log;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Tests\Mocks\HostGroup\TransportNodeProfile;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class DeleteTransportNodeProfileTest extends TestCase
 {
-    use TransportNodeProfile;
-
-    protected $job;
     protected $hostGroup;
+    protected Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->hostGroup = factory(HostGroup::class)->create([
-            'id' => 'hg-test',
-            'name' => 'hg-test',
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'host_spec_id' => $this->hostSpec()->id,
-            'windows_enabled' => true,
-        ]);
-        $this->job = \Mockery::mock(DeleteTransportNodeProfile::class, [$this->hostGroup])->makePartial();
+
+        Model::withoutEvents(function () {
+            $this->hostGroup = factory(HostGroup::class)->create([
+                'id' => 'hg-test',
+                'name' => 'hg-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id,
+                'windows_enabled' => true,
+            ]);
+
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $this->task->resource()->associate($this->hostGroup);
+            $this->task->save();
+        });
     }
 
-    /**
-     * @test Compute Collection returns a 404 error
-     */
-    public function testNoComputeCollectionFound404()
+    public function testNoTransportNodeProfileFoundSucceeds()
     {
-        $message = 'Not Found';
-        $code = 404;
-        $this->noComputeCollectionItem($code, $message);
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs([
+                '/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-' . $this->hostGroup->id
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'result_count' => 0,
+                    'results' => []
+                ]));
+            });
 
-        $this->assertNull($this->job->handle());
+        Event::fake([JobFailed::class]);
+
+        dispatch(new DeleteTransportNodeProfile($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 
-    /**
-     * @test Compute Collection returns a 500 error
-     */
-    public function testNoComputeCollectionFound500()
+    public function testTransportNodeCollectionNotFoundSucceeds()
     {
-        $message = 'Server Error';
-        $code = 500;
-        $this->noComputeCollectionItem($code, $message);
-        $this->job->expects('fail')->with(\Mockery::capture($exception));
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs([
+                '/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-' . $this->hostGroup->id
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'result_count' => 1,
+                    'results' => [
+                        [
+                            'id' => 'testtransportnodeprofile'
+                        ]
+                    ]
+                ]));
+            });
 
-        // null return from running the job
-        $this->assertNull($this->job->handle());
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs([
+                '/api/v1/search/query?query=resource_type:TransportNodeCollection%20AND%20transport_node_profile_id:testtransportnodeprofile'
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'result_count' => 0,
+                    'results' => []
+                ]));
+            });
 
-        // but we do expect a fail to be called with exception info
-        $this->assertNotNull($exception);
-        $this->assertEquals($message, $exception->getMessage());
-        $this->assertEquals($code, $exception->getCode());
+
+        $this->nsxServiceMock()->expects('delete')
+            ->withArgs([
+                '/api/v1/transport-node-profiles/testtransportnodeprofile'
+            ]);
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new DeleteTransportNodeProfile($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 
-    /**
-     * @test TransportNode Collection returns a 404 error
-     */
-    public function testNoTransportNodeCollection404()
+    public function testTransportNodeCollectionFoundSucceeds()
     {
-        $message = 'Not Found';
-        $code = 404;
-        $this->noTransportNodeCollectionItem($code, $message);
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs([
+                '/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-' . $this->hostGroup->id
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'result_count' => 1,
+                    'results' => [
+                        [
+                            'id' => 'testtransportnodeprofile'
+                        ]
+                    ]
+                ]));
+            });
 
-        $this->assertNull($this->job->handle());
-    }
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs([
+                '/api/v1/search/query?query=resource_type:TransportNodeCollection%20AND%20transport_node_profile_id:testtransportnodeprofile'
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'result_count' => 1,
+                    'results' => [
+                        [
+                            'id' => 'testtransportnodecollection'
+                        ]
+                    ]
+                ]));
+            });
 
-    /**
-     * @test TransportNode Collection returns a 500 error
-     */
-    public function testNoTransportNodeCollection500()
-    {
-        $message = 'Server Error';
-        $code = 500;
-        $this->noTransportNodeCollectionItem($code, $message);
-        $this->job->expects('fail')->with(\Mockery::capture($exception));
+        $this->nsxServiceMock()->expects('delete')
+            ->withArgs([
+                '/api/v1/transport-node-collections/testtransportnodecollection'
+            ]);
 
-        // null return from running the job
-        $this->assertNull($this->job->handle());
+        $this->nsxServiceMock()->expects('delete')
+            ->withArgs([
+                '/api/v1/transport-node-profiles/testtransportnodeprofile'
+            ]);
 
-        // but we do expect a fail to be called with exception info
-        $this->assertNotNull($exception);
-        $this->assertEquals($message, $exception->getMessage());
-        $this->assertEquals($code, $exception->getCode());
-    }
+        Event::fake([JobFailed::class]);
 
-    public function testNoTransportNodeCollectionNoException()
-    {
-        $this->noTransportNodeCollectionItemNoException();
+        dispatch(new DeleteTransportNodeProfile($this->task));
 
-        // null return from running the job
-        $this->assertNull($this->job->handle());
-    }
-
-    /**
-     * @test DetachNode returns a 404 error
-     */
-    public function testDetachNodeUnsuccessful404()
-    {
-        $message = 'Not Found';
-        $code = 404;
-        $this->detachNodeFail($code, $message);
-
-        $this->assertNull($this->job->handle());
-    }
-
-    /**
-     * @test DetachNode returns a 500 error
-     */
-    public function testDetachNodeUnsuccessful500()
-    {
-        $message = 'Server Error';
-        $code = 500;
-        $this->detachNodeFail($code, $message);
-        $this->job->expects('fail')->with(\Mockery::capture($exception));
-
-        // null return from running the job
-        $this->assertNull($this->job->handle());
-
-        // but we do expect a fail to be called with exception info
-        $this->assertNotNull($exception);
-        $this->assertEquals($message, $exception->getMessage());
-        $this->assertEquals($code, $exception->getCode());
-    }
-
-    public function testDeleteNodeUnsuccessful404()
-    {
-        $message = 'Not Found';
-        $code = 404;
-        $this->deleteNodeFail($code, $message);
-
-        $this->assertNull($this->job->handle());
-    }
-
-    public function testDeleteNodeUnsuccessful500()
-    {
-        $message = 'Server Error';
-        $code = 500;
-        $this->deleteNodeFail($code, $message);
-        $this->job->expects('fail')->with(\Mockery::capture($exception));
-
-        // null return from running the job
-        $this->assertNull($this->job->handle());
-
-        // but we do expect a fail to be called with exception info
-        $this->assertNotNull($exception);
-        $this->assertEquals($message, $exception->getMessage());
-        $this->assertEquals($code, $exception->getCode());
-    }
-
-    public function testSuccessful()
-    {
-        $this->deleteNodeSuccessful();
-        $this->assertNull($this->job->handle());
+        Event::assertNotDispatched(JobFailed::class);
     }
 }

@@ -3,7 +3,6 @@
 namespace Tests\V2\Host;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\Host;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
@@ -16,12 +15,6 @@ class CrudTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
-        // bind data so we can use Conjurer mocks with expected host ID
-        app()->bind(Host::class, function () {
-            return $this->host();
-        });
-
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 

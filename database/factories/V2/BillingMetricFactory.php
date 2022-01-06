@@ -9,6 +9,7 @@ $factory->define(BillingMetric::class, function () {
         'resource_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         'vpc_id' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
         'reseller_id' => 1,
+        'name' => 'RAM (per Megabyte)',
         'key' => 'ram.capacity',
         'value' => '16GB',
         'start' => '2020-07-07T10:30:00+01:00',

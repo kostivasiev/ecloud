@@ -35,16 +35,6 @@ class CreateInstances extends Job
         $loadBalancer = $this->model;
 
         if (empty($this->task->data['orchestrator_build_id'])) {
-            $image = Image::whereHas('imageMetadata', function ($query) {
-                $query->where('key', 'ukfast.loadbalancer.version');
-                $query->where('value', config('load-balancer.version'));
-            })->first();
-
-            if (!$image) {
-                $this->fail(new \Exception('Failed to load balancer image to create a new load balancer'));
-                return;
-            }
-
             $managementRouter = $loadBalancer->availabilityZone->routers()
                 ->where('is_management', true)
                 ->whereHas('vpc', function ($query) use ($loadBalancer) {
@@ -75,9 +65,9 @@ class CreateInstances extends Job
 
             for ($i = 0; $i < $loadBalancer->loadBalancerSpec->node_count; $i++) {
                 $orchestratorData['instances'][] = [
-                    'name' => 'Load Balancer ' . $i,
+                    'name' => 'Load Balancer ' . ($i+1),
                     'vpc_id' => $loadBalancer->vpc->id,
-                    'image_id' => $image->id,
+                    'image_id' => $loadBalancer->loadBalancerSpec->image_id,
                     'vcpu_cores' => $loadBalancer->loadBalancerSpec->cpu,
                     'ram_capacity' => (1024 * $loadBalancer->loadBalancerSpec->ram),
                     'network_id' => $managementNetwork->id,

@@ -5,7 +5,10 @@ namespace Tests\unit\Jobs\Router;
 use App\Jobs\Router\DeployRouterDefaultRule;
 use App\Jobs\Router\DeployRouterLocale;
 use App\Models\V2\Router;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
@@ -13,11 +16,20 @@ use Tests\TestCase;
 
 class DeployRouterDefaultRuleTest extends TestCase
 {
-    protected Router $router;
+    protected Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->router());
+            $this->task->save();
+        });
     }
 
     public function testSucceeds()
@@ -48,7 +60,7 @@ class DeployRouterDefaultRuleTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DeployRouterDefaultRule($this->router()));
+        dispatch(new DeployRouterDefaultRule($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }

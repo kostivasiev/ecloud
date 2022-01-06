@@ -2,13 +2,11 @@
 namespace Tests\unit\Jobs\Router;
 
 use App\Jobs\Router\CreateManagementRouter;
-use App\Listeners\V2\TaskCreated;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class CreateManagementRouterTest extends TestCase
@@ -29,7 +27,7 @@ class CreateManagementRouterTest extends TestCase
             ]);
             $this->task->resource()->associate($this->router());
         });
-        Event::fake(TaskCreated::class);
+
         Bus::fake();
         $job = new CreateManagementRouter($this->task);
         $job->handle();

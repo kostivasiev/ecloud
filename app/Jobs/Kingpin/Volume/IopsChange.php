@@ -5,7 +5,6 @@ namespace App\Jobs\Kingpin\Volume;
 use App\Jobs\Job;
 use App\Models\V2\Volume;
 use App\Traits\V2\LoggableModelJob;
-use GuzzleHttp\Exception\ServerException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
@@ -44,6 +43,10 @@ class IopsChange extends Job
                     ],
                 ]
             );
+
+            if ($volume->is_shared) {
+                sleep(10);
+            }
 
             Log::debug('Volume ' . $volume->id . ' iops changed to ' . $volume->iops . ' on instance ' . $instance->id);
         }

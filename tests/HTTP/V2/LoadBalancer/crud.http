@@ -44,8 +44,6 @@ Content-Type:  application/json
   "code": "MAN1",
   "name": "Test AZ - LbcCrud",
   "datacentre_site_id": 111,
-  "nsx_manager_endpoint": "https://185.197.63.88/",
-  "nsx_edge_cluster_id": "8bc61267-583e-4988-b5d9-16b46f7fe900",
   "region_id": "{{region_id}}"
 }
 
@@ -64,8 +62,6 @@ Content-Type:  application/json
   "code": "MAN1",
   "name": "Test AZ 2- LbcCrud",
   "datacentre_site_id": 111,
-  "nsx_manager_endpoint": "https://185.197.63.88/",
-  "nsx_edge_cluster_id": "8bc61267-583e-4988-b5d9-16b46f7fe900",
   "region_id": "{{region_id}}"
 }
 

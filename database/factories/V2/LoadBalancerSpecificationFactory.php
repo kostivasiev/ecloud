@@ -14,6 +14,6 @@ $factory->define(LoadBalancerSpecification::class, function () {
             'ram' => 2,
             'hdd' => 20,
             'iops' => 300,
-            'image_id' => 'img-aaaaaaaa',
+            'image_id' => 'img-test',
         ];
 });

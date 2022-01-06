@@ -31,8 +31,7 @@ class NsxServiceProvider extends ServiceProvider
                     ],
                     'timeout' => 30,
                     'verify' => $this->app->environment() === 'production',
-                ]),
-                $availabilityZone->nsx_edge_cluster_id
+                ])
             );
         });
     }

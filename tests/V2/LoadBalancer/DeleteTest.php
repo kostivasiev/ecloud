@@ -8,6 +8,8 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
+use UKFast\Admin\Loadbalancers\AdminClient;
+use UKFast\Admin\Loadbalancers\AdminClusterClient;
 
 class DeleteTest extends TestCase
 {
@@ -62,6 +64,23 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
+        $this->loadBalancer->setAttribute('config_id', 123456)
+            ->saveQuietly();
+
+        app()->bind(AdminClient::class, function () {
+            $mock = \Mockery::mock(AdminClient::class)->makePartial();
+            $mock->allows('setResellerId')
+                ->andReturnSelf();
+            $mock->allows('clusters')->andReturnUsing(function () {
+                $clusterMock = \Mockery::mock(AdminClusterClient::class)->makePartial();
+                $clusterMock->allows('deleteById')
+                    ->with(123456)
+                    ->andReturnTrue();
+                return $clusterMock;
+            });
+            return $mock;
+        });
+
         $this->delete(
             '/v2/load-balancers/' . $this->loadBalancer->id,
             [],
@@ -70,7 +89,8 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(204);
+            ->assertResponseStatus(202);
+
         $resource = LoadBalancer::withTrashed()->findOrFail($this->loadBalancer->id);
         $this->assertNotNull($resource->deleted_at);
     }

@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
  */
 class ProcessBilling extends Command
 {
-    protected $signature = 'vpc:process-billing {--D|debug} {--T|test-run}';
+    protected $signature = 'vpc:process-billing {--current-month} {--D|debug} {--T|test-run}';
     protected $description = 'Process eCloud VPC Billing';
 
     protected \DateTimeZone $timeZone;
@@ -43,6 +43,11 @@ class ProcessBilling extends Command
 
     public function handle()
     {
+        if ($this->option('current-month')) {
+            $this->startDate = Carbon::createFromTimeString("First day of this month 00:00:00", $this->timeZone);
+            $this->endDate = Carbon::createFromTimeString("last day of this month 23:59:59", $this->timeZone);
+        }
+
         $this->info('VPC billing for period ' . $this->startDate . ' - ' . $this->endDate . PHP_EOL);
 
         // First calculate discount plan values
@@ -127,7 +132,7 @@ class ProcessBilling extends Command
                             $start = $this->startDate;
                             $end = $this->endDate;
 
-                            if ($metric->start > $this->startDate) {
+                            if (($metric->start > $this->startDate)) {
                                 $start = Carbon::parse($metric->start, $this->timeZone);
                             }
 
@@ -303,8 +308,11 @@ class ProcessBilling extends Command
                 $query->whereBetween('start', [$this->startDate, $this->endDate]);
 
                 // any metrics that start before the billing period and end within it
-                $query->orWhere('start', '<=', $this->startDate)
-                    ->where('end', '<=', $this->endDate);
+                $query->orWhere(function ($query) {
+                    $query->where('start', '<=', $this->startDate);
+                    $query->where('end', '<=', $this->endDate);
+                    $query->where('end', '>', $this->startDate);
+                });
 
                 // any metrics that start before the billing period are still active
                 $query->orWhere(function ($query) {

@@ -22,14 +22,6 @@ properties:
     type: string
     example: 'reg-a63dd78c'
     readOnly: false
-  nsx_manager_endpoint:
-    type: string
-    example: 'https://127.0.0.1'
-    readOnly: false
-  nsx_edge_cluster_id:
-    type : string
-    example : '5dcd393e-5ae4-436f-bb0a-c978980bc301'
-    readOnly : false
   ucs_compute_name:
     type : string
     example : AA-UCS-A12-RAD-A'

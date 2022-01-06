@@ -3,6 +3,8 @@
 namespace App\Http\Requests\V2\Image;
 
 use App\Models\V2\Image;
+use App\Models\V2\Software;
+use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
@@ -11,6 +13,7 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => [
+                'sometimes',
                 'required',
                 'string',
                 'max:255'
@@ -21,6 +24,7 @@ class UpdateRequest extends FormRequest
                 'array'
             ],
             'availability_zone_ids.*' => [
+                'sometimes',
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
@@ -39,6 +43,10 @@ class UpdateRequest extends FormRequest
                 'nullable'
             ],
             'script_template' => [
+                'sometimes',
+                'nullable'
+            ],
+            'readiness_script' => [
                 'sometimes',
                 'nullable'
             ],
@@ -65,6 +73,17 @@ class UpdateRequest extends FormRequest
                 'required',
                 'string',
                 'in:' . Image::VISIBILITY_PUBLIC . ','. Image::VISIBILITY_PRIVATE
+            ],
+            'software_ids' => [
+                'sometimes',
+                'nullable',
+                'array'
+            ],
+            'software_ids.*' => [
+                'sometimes',
+                'nullable',
+                'string',
+                Rule::exists(Software::class, 'id')->whereNull('deleted_at'),
             ],
         ];
     }

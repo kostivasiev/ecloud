@@ -15,11 +15,14 @@ use App\Jobs\Instance\Deploy\CreateFloatingIp;
 use App\Jobs\Instance\Deploy\Deploy;
 use App\Jobs\Instance\Deploy\DeployCompleted;
 use App\Jobs\Instance\Deploy\ExpandOsDisk;
+use App\Jobs\Instance\Deploy\InstallSoftware;
 use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
+use App\Jobs\Instance\Deploy\RegisterLicenses;
 use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Jobs\Instance\Deploy\RunBootstrapScript;
+use App\Jobs\Instance\Deploy\RunImageReadinessScript;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
@@ -63,7 +66,10 @@ class Update extends Job
                     new ExpandOsDisk($this->task->resource),
                     new ConfigureWinRm($this->task->resource),
                     new ActivateWindows($this->task->resource),
+                    new RegisterLicenses($this->task->resource),
                     new RunApplianceBootstrap($this->task->resource),
+                    new RunImageReadinessScript($this->task->resource),
+                    new InstallSoftware($this->task),
                     new RunBootstrapScript($this->task->resource),
                     new DeployCompleted($this->task->resource),
                 ],
@@ -72,9 +78,8 @@ class Update extends Job
             $this->updateTaskBatch([
                 [
                     new ComputeUpdate($this->task->resource),
-// Commented out in order to unblock https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/issues/1067
-//                    new VolumeGroupAttach($this->task),
-//                    new VolumeGroupDetach($this->task),
+                    new VolumeGroupAttach($this->task),
+                    new VolumeGroupDetach($this->task),
                 ]
             ])->dispatch();
         }

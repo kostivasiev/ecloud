@@ -1,6 +1,6 @@
-###
+### Create VPC
 POST https://{{host}}/{{version}}/vpcs
-X-consumer-custom-id:  1-0
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
@@ -10,44 +10,75 @@ Content-Type:  application/json
 }
 
 > {%
+client.test('Create VPC', function () {
+    client.assert(response.status === 202, '202 Response Not Received');
+});
 client.global.set('vpc_id', response.body.data.id);
 client.log('VPC Id : ' + response.body.data.id);
 %}
 
-###
-GET https://{{host}}/{{version}}/vpcs
-X-consumer-custom-id:  7052-0
+### Get VPC Collection
+GET https://{{host}}/{{version}}/vpcs?id:eq={{vpc_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
-###
 
-###
+> {%
+client.test('Get VPC Collection', function () {
+    client.assert(response.status === 200, '200 Response Not Received');
+});
+%}
+
+### Get VPC Resource
 GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
-X-consumer-custom-id:  7052-0
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
-###
 
-GET https://{{host}}/{{version}}/vpcs/vpc-47100759/tasks
-X-consumer-custom-id:  7052-0
+> {%
+client.test('Get VPC Resource', function () {
+    client.assert(response.status === 200, '200 Response Not Received');
+});
+%}
+
+### Get VPC Tasks
+GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}/tasks
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
-###
 
-PATCH https://{{host}}/{{version}}/vpcs/vpc-47100759
-X-consumer-custom-id:  7052-0
+> {%
+client.test('Get VPC Tasks', function () {
+    client.assert(response.status === 200, '200 Response Not Received');
+});
+%}
+
+### Update VPC Resource
+PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json###
+Content-Type:  application/json
 
 {
     "name": "updated name"
 }
 
+> {%
+client.test('Update VPC Resource', function () {
+    client.assert(response.status === 202, '202 Response Not Received');
+});
+%}
 
-###
+### Delete VPC Resource
 DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 7052-0
+X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
+> {%
+client.test('Delete VPC Resource', function () {
+    client.assert(response.status === 202, '202 Response Not Received');
+});
+%}

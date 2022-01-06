@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\V2\LoadBalancer;
+use Database\Seeders\Images\LoadBalancerImageSeeder;
 use Illuminate\Database\Seeder;
 
 class LoadBalancerSeeder extends Seeder

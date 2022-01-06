@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Sortable;
  * Class RouterThroughput
  * @package App\Models\V2
  */
-class RouterThroughput extends Model implements Filterable, Sortable
+class RouterThroughput extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
@@ -72,12 +72,16 @@ class RouterThroughput extends Model implements Filterable, Sortable
         if ($user->isAdmin()) {
             return $query;
         }
-        return $query->whereHas(
-            'availabilityZone',
-            function ($query) {
-                $query->where('is_public', '=', 1);
-            }
-        );
+
+        if (in_array($user->resellerId(), config('reseller.internal'))) {
+            return $query;
+        }
+
+        return $query->whereHas('availabilityZone.region', function ($query) {
+            $query->where('is_public', '=', true);
+        })->whereHas('availabilityZone', function ($query) {
+            $query->where('is_public', '=', true);
+        });
     }
 
     /**

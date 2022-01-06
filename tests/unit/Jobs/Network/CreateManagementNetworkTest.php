@@ -3,16 +3,12 @@
 namespace Tests\unit\Jobs\Network;
 
 use App\Jobs\Network\CreateManagementNetwork;
-use App\Listeners\V2\TaskCreated;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Event;
-use IPLib\Factory;
-use IPLib\Range\Subnet;
 use Tests\TestCase;
 
 class CreateManagementNetworkTest extends TestCase
@@ -43,8 +39,9 @@ class CreateManagementNetworkTest extends TestCase
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
             $this->task->resource()->associate($this->router());
+            $this->task->save();
         });
-        Event::fake(TaskCreated::class);
+
         Bus::fake();
         $job = new CreateManagementNetwork($this->task);
         $job->handle();
@@ -63,8 +60,9 @@ class CreateManagementNetworkTest extends TestCase
             $this->task->data = [
                 'management_router_id' => $this->managementRouter->id,
             ];
+            $this->task->save();
         });
-        Event::fake(TaskCreated::class);
+
         Bus::fake();
         $job = new CreateManagementNetwork($this->task);
         $job->handle();
@@ -87,8 +85,9 @@ class CreateManagementNetworkTest extends TestCase
             $this->task->data = [
                 'management_router_id' => $this->managementRouter->id,
             ];
+            $this->task->save();
         });
-        Event::fake(TaskCreated::class);
+
         Bus::fake();
         $job = new CreateManagementNetwork($this->task);
         $job->handle();
@@ -100,8 +99,22 @@ class CreateManagementNetworkTest extends TestCase
 
     public function testSubnetAvailability()
     {
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->router()->setAttribute('is_management', true)->saveQuietly();
+            $this->task->resource()->associate($this->router());
+            $this->task->data = [
+                'management_router_id' => $this->managementRouter->id,
+            ];
+            $this->task->save();
+        });
+
+        $job = new CreateManagementNetwork($this->task);
+
         $this->router()->setAttribute('is_management', true)->saveQuietly();
-        $job = \Mockery::mock(CreateManagementNetwork::class)->makePartial();
         $subnet = $job->getNextAvailableSubnet('192.168.0.0/17', $this->availabilityZone()->id);
         $this->assertEquals('192.168.4.0/28', $subnet);
 
