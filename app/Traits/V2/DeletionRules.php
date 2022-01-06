@@ -21,7 +21,6 @@ trait DeletionRules
             ->getRelations());
     }
 
-
     /**
      * @deprecated Use App\Http\Middleware\CanBeDeleted middleware instead
      */
