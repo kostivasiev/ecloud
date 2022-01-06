@@ -244,6 +244,8 @@ paths:
     $ref: 'resources/Instance/collection.yaml'
   '/ecloud/v2/instances/{instanceId}':
     $ref: 'resources/Instance/item.yaml'
+  '/ecloud/v2/instances/{instanceId}/console-screensot':
+    $ref: 'resources/Instance/console-screenshot.yaml'
   '/ecloud/v2/instances/{instanceId}/console-session':
     $ref: 'resources/Instance/console.yaml'
   '/ecloud/v2/instances/{instanceId}/create-image':
