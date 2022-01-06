@@ -109,6 +109,7 @@ EOM,
             'description' => 'Plesk Admin Password',
             'required' => false,
             'validation_rule' => '/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/',
+            'is_hidden' => true
         ]);
     }
 }

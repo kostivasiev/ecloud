@@ -4,7 +4,9 @@ namespace Tests\unit\Jobs\Nsx\Dhcp;
 
 use App\Jobs\Nsx\Dhcp\Create;
 use App\Models\V2\Dhcp;
+use App\Models\V2\Task;
 use App\Models\V2\Volume;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
@@ -14,10 +16,26 @@ use Tests\TestCase;
 class CreateTest extends TestCase
 {
     protected $dhcp;
+    protected Task $task;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->dhcp = factory(Dhcp::class)->create([
+                'id' => 'dhcp-test',
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+            ]);
+
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->dhcp);
+            $this->task->save();
+        });
     }
 
     public function testSucceedsStandardNetworking()
@@ -38,14 +56,6 @@ class CreateTest extends TestCase
                     ]
                 ]));
             });
-
-        Model::withoutEvents(function() {
-            $this->dhcp = factory(Dhcp::class)->create([
-                'id' => 'dhcp-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-            ]);
-        });
 
         $this->nsxServiceMock()->expects('put')
             ->withArgs([
@@ -70,7 +80,7 @@ class CreateTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Create($this->dhcp));
+        dispatch(new Create($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -96,14 +106,6 @@ class CreateTest extends TestCase
                 ]));
             });
 
-        Model::withoutEvents(function() {
-            $this->dhcp = factory(Dhcp::class)->create([
-                'id' => 'dhcp-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-            ]);
-        });
-
         $this->nsxServiceMock()->expects('put')
             ->withArgs([
                 '/policy/api/v1/infra/dhcp-server-configs/dhcp-test',
@@ -127,7 +129,7 @@ class CreateTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Create($this->dhcp));
+        dispatch(new Create($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -151,20 +153,12 @@ class CreateTest extends TestCase
                 ]));
             });
 
-        Volume::withoutEvents(function() {
-            $this->dhcp = factory(Dhcp::class)->create([
-                'id' => 'dhcp-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-            ]);
-        });
-
         $this->expectException(\Exception::class);
 
         $this->nsxServiceMock()->expects('put')
             ->withSomeOfArgs('/policy/api/v1/infra/dhcp-server-configs/dhcp-test')
             ->andThrows(new \Exception());
 
-        dispatch(new Create($this->dhcp));
+        dispatch(new Create($this->task));
     }
 }

@@ -167,6 +167,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling::class,
             \App\Listeners\V2\VpnSession\UpdateBilling::class,
             \App\Listeners\V2\LoadBalancer\UpdateBilling::class,
+            \App\Listeners\V2\InstanceSoftware\UpdateBilling::class,
         ],
     ];
 }

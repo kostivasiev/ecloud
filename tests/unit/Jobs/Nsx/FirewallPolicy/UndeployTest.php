@@ -7,6 +7,8 @@ use App\Jobs\Nsx\FirewallPolicy\Undeploy;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
@@ -16,24 +18,28 @@ use Tests\TestCase;
 
 class UndeployTest extends TestCase
 {
-    protected FirewallPolicy $firewallPolicy;
+    protected Task $task;
     protected FirewallRule $firewallRule;
     protected FirewallRulePort $firewallRulePort;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->firewallPolicy());
+            $this->task->save();
+        });
     }
 
     public function testPolicyRemovedAndRulesDeleted()
     {
         Model::withoutEvents(function () {
-            $this->firewallPolicy = factory(FirewallPolicy::class)->create([
-                'id' => 'fwp-test',
-                'router_id' => $this->router()->id,
-            ]);
-
-            $this->firewallRule = $this->firewallPolicy->firewallRules()->create([
+            $this->firewallRule = $this->firewallPolicy()->firewallRules()->create([
                 'id' => 'fwr-test-1',
                 'name' => 'fwr-test-1',
                 'sequence' => 2,
@@ -55,7 +61,7 @@ class UndeployTest extends TestCase
 
         $this->nsxServiceMock()->shouldReceive('delete')
             ->withArgs([
-                'policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
+                '/policy/api/v1/infra/domains/default/gateway-policies/fwp-test',
             ])
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
@@ -63,7 +69,7 @@ class UndeployTest extends TestCase
 
         Event::fake([JobFailed::class, Deleted::class]);
 
-        dispatch(new Undeploy($this->firewallPolicy));
+        dispatch(new Undeploy($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 

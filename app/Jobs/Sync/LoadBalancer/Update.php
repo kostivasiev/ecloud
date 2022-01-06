@@ -4,6 +4,7 @@ namespace App\Jobs\Sync\LoadBalancer;
 
 use App\Jobs\Job;
 use App\Jobs\LoadBalancer\CreateCluster;
+use App\Jobs\LoadBalancer\CreateCredentials;
 use App\Jobs\LoadBalancer\CreateInstances;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
@@ -26,6 +27,7 @@ class Update extends Job
             [
                 new CreateInstances($this->task),
                 new CreateCluster($this->task),
+                new CreateCredentials($this->task),
             ],
         ])->dispatch();
     }

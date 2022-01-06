@@ -78,6 +78,36 @@ client.test("Get Loadbalancer Data", function() {
 });
 %}
 
+### Check Keepalived credential was created
+GET https://{{host}}/{{version}}/credentials/?resource_id:eq={{load_balancer_id}}&name:eq=keepalived
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Check keepalived credential was created", function () {
+    client.assert(response.status === 200, 'Response status is not 200');
+    client.assert(response.body.meta.pagination.total === 1, 'No records retrieved');
+});
+%}
+
+### Check Stats credential was created
+GET https://{{host}}/{{version}}/credentials/?resource_id:eq={{load_balancer_id}}&name:eq=haproxy%20stats
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Check Stats credential was created", function () {
+    client.assert(response.status === 200, 'Response status is not 200');
+    client.assert(response.body.meta.pagination.total === 1, 'No records retrieved');
+});
+%}
+
 ### Delete the loadbalancer
 DELETE https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
 Accept: */*

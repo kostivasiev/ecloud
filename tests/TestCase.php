@@ -598,7 +598,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         if (!$this->hostSpec) {
             $this->hostSpec = factory(HostSpec::class)->create([
                 'id' => 'hs-test',
-                'name' => 'test-host-spec',
             ]);
         }
         return $this->hostSpec;

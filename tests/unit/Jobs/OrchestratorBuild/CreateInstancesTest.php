@@ -3,8 +3,10 @@ namespace Tests\unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateInstances;
+use App\Models\V2\Instance;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
+use Database\Seeders\SoftwareSeeder;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -19,6 +21,7 @@ class CreateInstancesTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        (new SoftwareSeeder())->run();
         $this->orchestratorConfig = factory(OrchestratorConfig::class)->create([
             'data' => json_encode([
                 'instances' => [
@@ -41,7 +44,10 @@ class CreateInstancesTest extends TestCase
                             "mysql_root_password" => "EnCrYpTeD-PaSsWoRd",
                             "mysql_wordpress_user_password" => "EnCrYpTeD-PaSsWoRd",
                             "wordpress_url" => "mydomain.com"
-                        ]
+                        ],
+                        "software_ids" => [
+                            "soft-aaaaaaaa",
+                        ],
                     ]
                 ]
             ])
@@ -108,5 +114,23 @@ class CreateInstancesTest extends TestCase
         $this->assertNotNull($this->orchestratorBuild->state['instance']);
 
         $this->assertEquals(1, count($this->orchestratorBuild->state['instance']));
+    }
+
+    public function testSoftwareIdsInDeployData()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        dispatch(new CreateInstances($this->orchestratorBuild));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+
+        Event::assertDispatched(Created::class);
+
+        $this->orchestratorBuild->refresh();
+        $instance = Instance::findOrFail($this->orchestratorBuild->state['instance'][0]);
+        $this->assertEquals('soft-aaaaaaaa', $instance->deploy_data['software_ids'][0]);
     }
 }

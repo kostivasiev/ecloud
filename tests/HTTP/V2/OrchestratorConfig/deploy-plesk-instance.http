@@ -91,7 +91,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### Get the Credential entry
-GET https://{{host}}/{{version}}/credentials?resource_id:eq={{instance_id}}&name:eq=plesk_admin_password
+GET https://{{host}}/{{version}}/credentials?resource_id:eq={{instance_id}}&name:eq=Plesk%20Administrator
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
