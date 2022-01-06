@@ -26,7 +26,7 @@ class DeleteCredentialsTest extends TestCase
                     'name' => 'keepalived',
                     'resource_id' => $this->loadBalancer()->id,
                     'host' => null,
-                    'username' => 'root',
+                    'username' => 'keepalived',
                     'password' => 'randomPasswordHere',
                     'port' => null,
                     'is_hidden' => true,
@@ -35,10 +35,10 @@ class DeleteCredentialsTest extends TestCase
                     'name' => 'haproxy stats',
                     'resource_id' => $this->loadBalancer()->id,
                     'host' => null,
-                    'username' => 'root',
+                    'username' => 'ukfast_stats',
                     'password' => 'abcdefgh',
-                    'port' => 8404,
-                    'is_hidden' => false,
+                    'port' => 8090,
+                    'is_hidden' => true,
                 ]
             ]);
     }
