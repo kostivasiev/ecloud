@@ -96,6 +96,7 @@ $app->routeMiddleware([
     'paginator-limit' => UKFast\Api\Paginator\Middleware\PaginatorLimit::class,
     'has-reseller-id' => \App\Http\Middleware\HasResellerId::class,
     'instance-is-locked' => \App\Http\Middleware\Instance\IsLocked::class,
+    'instance-console-enabled' => \App\Http\Middleware\Instance\ConsoleEnabled::class,
     'instance-requires-floating-ip' => \App\Http\Middleware\Instance\RequiresFloatingIp::class,
     'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
     'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class,

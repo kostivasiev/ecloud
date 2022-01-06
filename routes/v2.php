@@ -206,6 +206,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => ['customer-max-instance', 'instance-requires-floating-ip']], function () use ($router) {
             $router->post('instances', 'InstanceController@store');
         });
+        $router->group(['middleware' => ['instance-console-enabled']], function () use ($router) {
+            $router->get('instances/{instanceId}/console-screenshot', 'InstanceController@consoleScreenshot');
+            $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
+        });
         $router->get('instances', 'InstanceController@index');
         $router->get('instances/{instanceId}', 'InstanceController@show');
         $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');
@@ -216,7 +220,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('instances/{instanceId}/software', 'InstanceController@software');
         $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
         $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
-        $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
         $router->post('instances/{instanceId}/create-image', 'InstanceController@createImage');
         $router->post('instances/{instanceId}/migrate', 'InstanceController@migrate');
 
