@@ -21,6 +21,10 @@ trait DeletionRules
             ->getRelations());
     }
 
+
+    /**
+     * @deprecated Use App\Http\Middleware\CanBeDeleted middleware instead
+     */
     public function getDeletionError()
     {
         return response()->json(
