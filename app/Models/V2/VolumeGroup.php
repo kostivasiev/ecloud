@@ -33,7 +33,8 @@ class VolumeGroup extends Model implements Filterable, Sortable, ResellerScopeab
     ];
 
     public $children = [
-        'volumes'
+        'volumes',
+        'instances'
     ];
 
     public function getResellerId(): int
