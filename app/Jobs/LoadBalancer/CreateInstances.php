@@ -35,11 +35,6 @@ class CreateInstances extends Job
         $loadBalancer = $this->model;
 
         if (empty($this->task->data['orchestrator_build_id'])) {
-            if (!($image = Image::find($loadBalancer->loadBalancerSpec->image_id))) {
-                $this->fail(new \Exception('Failed to find image to create a new load balancer'));
-                return;
-            }
-
             $managementRouter = $loadBalancer->availabilityZone->routers()
                 ->where('is_management', true)
                 ->whereHas('vpc', function ($query) use ($loadBalancer) {
@@ -72,7 +67,7 @@ class CreateInstances extends Job
                 $orchestratorData['instances'][] = [
                     'name' => 'Load Balancer ' . ($i+1),
                     'vpc_id' => $loadBalancer->vpc->id,
-                    'image_id' => $image->id,
+                    'image_id' => $loadBalancer->loadBalancerSpec->image_id,
                     'vcpu_cores' => $loadBalancer->loadBalancerSpec->cpu,
                     'ram_capacity' => (1024 * $loadBalancer->loadBalancerSpec->ram),
                     'network_id' => $managementNetwork->id,
