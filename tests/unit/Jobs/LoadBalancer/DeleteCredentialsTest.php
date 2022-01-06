@@ -4,7 +4,6 @@ namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\DeleteCredentials;
-use App\Models\V2\Credential;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
