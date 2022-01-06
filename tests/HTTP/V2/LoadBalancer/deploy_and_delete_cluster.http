@@ -122,6 +122,21 @@ client.test("Delete the loadbalancer", function() {
 });
 %}
 
+### Verify no credentials exist for loadbalancer
+GET https://{{host}}/{{version}}/credentials?resource_id:eq={{load_balancer_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Verify no credentials exist for loadbalancer', function () {
+    client.assert(response.status === 200, "Response status is not 200");
+    client.assert(response.body.meta.pagination.total === 0, 'Credentials were found');
+})
+%}
+
 ### Delete the router
 DELETE https://{{host}}/{{version}}/routers/{{router_id}}
 Accept: */*
