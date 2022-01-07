@@ -4,15 +4,12 @@ namespace App\Jobs\Vip;
 
 use App\Jobs\Job;
 use App\Jobs\Tasks\Nic\AssociateIp;
-use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Models\V2\Vip;
 use App\Traits\V2\Jobs\AwaitTask;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Log;
 
 class AssignToNics extends Job
 {

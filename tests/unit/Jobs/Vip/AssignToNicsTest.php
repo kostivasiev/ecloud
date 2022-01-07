@@ -75,7 +75,6 @@ class AssignToNicsTest extends TestCase
 
         dispatch(new AssignToNics($task));
 
-
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == AssociateIp::$name;
         });

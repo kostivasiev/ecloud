@@ -17,7 +17,7 @@ class AssignIpAddressTest extends TestCase
     {
         Event::fake([JobFailed::class]);
 
-        dispatch(new AssignIpAddress($this->vip()));
+        dispatch(new AssignIpAddress($this->createSyncUpdateTask($this->vip())));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -28,14 +28,13 @@ class AssignIpAddressTest extends TestCase
         $this->assertEquals(IpAddress::TYPE_CLUSTER, $this->vip()->ipAddress->type);
     }
 
-
     public function testIpAddressAlreadyAssignedSkips()
     {
         Event::fake([JobFailed::class]);
 
         $ipAddress = $this->vip()->assignClusterIp();
 
-        dispatch(new AssignIpAddress($this->vip()));
+        dispatch(new AssignIpAddress($this->createSyncUpdateTask($this->vip())));
 
         Event::assertNotDispatched(JobFailed::class);
 

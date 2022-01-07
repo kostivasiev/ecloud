@@ -2,27 +2,14 @@
 
 namespace App\Jobs\Vip;
 
-use App\Jobs\Job;
-use App\Models\V2\IpAddress;
-use App\Models\V2\Vip;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Jobs\TaskJob;
 use Illuminate\Support\Facades\Log;
 
-class AssignIpAddress extends Job
+class AssignIpAddress extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private Vip $model;
-
-    public function __construct(Vip $vip)
-    {
-        $this->model = $vip;
-    }
-
     public function handle()
     {
-        $vip = $this->model;
+        $vip = $this->task->resource;
 
         if (!$vip->ipAddress()->exists()) {
             $ipAddress = $vip->assignClusterIp();
