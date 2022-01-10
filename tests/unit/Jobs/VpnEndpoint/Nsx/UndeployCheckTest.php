@@ -1,19 +1,39 @@
 <?php
 
-namespace Tests\unit\Jobs\Nsx\VpnEndpoint;
+namespace Jobs\VpnEndpoint\Nsx;
 
-use App\Jobs\Nsx\VpnEndpoint\UndeployCheck;
+use App\Jobs\VpnEndpoint\Nsx\UndeployCheck;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\VpnEndpointMock;
 use Tests\Mocks\Resources\VpnServiceMock;
 use Tests\TestCase;
+use function dispatch;
 
 class UndeployCheckTest extends TestCase
 {
     use VpnServiceMock, VpnEndpointMock;
+
+    protected Task $task;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $this->task->resource()->associate($this->vpnEndpoint());
+            $this->task->save();
+        });
+    }
 
     public function testNotFoundSucceeds()
     {
@@ -32,7 +52,7 @@ class UndeployCheckTest extends TestCase
                 ]));
             });
 
-        dispatch(new UndeployCheck($this->vpnEndpoint()));
+        dispatch(new UndeployCheck($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -62,7 +82,7 @@ class UndeployCheckTest extends TestCase
                 ]));
             });
 
-        dispatch(new UndeployCheck($this->vpnEndpoint()));
+        dispatch(new UndeployCheck($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
