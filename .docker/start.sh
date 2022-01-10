@@ -3,6 +3,8 @@ set -e
 
 tail -F /var/www/html/storage/logs/lumen.log &
 
+/bin/bash /newrelic.sh
+
 ROLE=$1
 if [ "$ROLE" = "app" ]; then
     exec apache2-foreground
