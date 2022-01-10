@@ -8,6 +8,22 @@ RUN docker-php-ext-install pdo_mysql \
                            opcache \
                            pcntl
 
+ARG APP_ENV=dev
+RUN if [ ${APP_ENV} = "prod" ]; then \
+apt update && \
+    apt install -y \
+    wget \
+    gnupg; \
+echo 'deb http://apt.newrelic.com/debian/ newrelic non-free' | tee /etc/apt/sources.list.d/newrelic.list; \
+wget -O /tmp/nr.key https://download.newrelic.com/548C16BF.gpg && apt-key add /tmp/nr.key && rm -f /tmp/nr.key; \
+apt-get update; \
+apt-get -y install newrelic-php5; \
+NR_INSTALL_SILENT=1 newrelic-install install; \
+fi
+
+###########################################################################
+## Composer builder stage - downloads and installs composer dependencies ##
+###########################################################################
 FROM apio AS composer-builder
 RUN apt update && \
     apt install -y \
@@ -50,6 +66,7 @@ RUN update-ca-certificates
 COPY .docker/php.ini /usr/local/etc/php/php.ini
 COPY .docker/apache.conf /etc/apache2/sites-available/000-default.conf
 COPY .docker/start.sh /start.sh
+COPY .docker/newrelic.sh /newrelic.sh
 
 COPY --chown=www-data:www-data . /var/www/html
 COPY --from=composer-builder --chown=www-data:www-data /build/vendor /var/www/html/vendor/
