@@ -26,7 +26,7 @@ class AddResourceIdIndexOntoCredentialsTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('credentials', function (Blueprint $table) {
-            $table->dropIndex('resource_id');
+            $table->dropIndex(['resource_id']);
         });
     }
 }
