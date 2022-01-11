@@ -25,11 +25,10 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
-                new CreateInstances($this->task),
                 new CreateCluster($this->task),
                 new CreateCredentials($this->task),
-                // Todo
-                //new AddNetworks($this->task)
+                new CreateInstances($this->task),
+                // Todo new AddNetworks($this->task)
             ],
         ])->dispatch();
     }
