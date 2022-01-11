@@ -79,6 +79,15 @@ class DeployInstanceTest extends TestCase
         $job = new DeployInstance($task);
         $job->handle();
 
+        $this->loadBalancerInstance()->refresh();
         $this->assertEquals($this->loadBalancerInstance()->id, $task->data['loadbalancer_instance_id']);
+        $this->assertArrayHasKey('stats_password', $this->loadBalancerInstance()->deploy_data);
+        $this->assertArrayHasKey('nats_credentials', $this->loadBalancerInstance()->deploy_data);
+        $this->assertArrayHasKey('node_id', $this->loadBalancerInstance()->deploy_data);
+        $this->assertArrayHasKey('group_id', $this->loadBalancerInstance()->deploy_data);
+        $this->assertArrayHasKey('nats_servers', $this->loadBalancerInstance()->deploy_data);
+        $this->assertArrayHasKey('primary', $this->loadBalancerInstance()->deploy_data);
+        $this->assertArrayHasKey('keepalived_password', $this->loadBalancerInstance()->deploy_data);
+        $this->assertEquals($this->loadBalancer()->config_id, $this->loadBalancerInstance()->deploy_data['group_id']);
     }
 }
