@@ -28,7 +28,7 @@ class Update extends Job
                 new CreateCluster($this->task),
                 new CreateCredentials($this->task),
                 new CreateInstances($this->task),
-                // Todo new AddNetworks($this->task)
+                new AddNetworks($this->task)
             ],
         ])->dispatch();
     }
