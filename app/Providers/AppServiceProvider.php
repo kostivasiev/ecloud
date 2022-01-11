@@ -6,6 +6,7 @@ use App\Models\V2\Dhcp;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
+use App\Models\V2\LoadBalancerNode;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\OrchestratorBuild;
@@ -71,6 +72,7 @@ class AppServiceProvider extends ServiceProvider
             'vpns' => VpnSession::class,
             'vpnp' => VpnProfile::class,
             'ip' => IpAddress::class,
+            'ln' => LoadBalancerNode::class,
         ]);
 
         Queue::exceptionOccurred(function (JobExceptionOccurred $event) {

@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateLoadBalancerNodesTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::connection('ecloud')->create('load_balancer_nodes', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->uuid('load_balancer_id')->index();
+            $table->uuid('instance_id')->index();
+            $table->integer('node_id')->nullable()->index();
+            $table->softDeletes();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::connection('ecloud')->dropIfExists('load_balancer_nodes');
+    }
+}
