@@ -308,11 +308,11 @@ $router->group($baseRouteParameters, function () use ($router) {
 
     /** Load balancers */
     $router->group([], function () use ($router) {
-
         $router->get('load-balancers', 'LoadBalancerController@index');
         $router->get('load-balancers/{loadBalancerId}', 'LoadBalancerController@show');
         $router->patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
         $router->delete('load-balancers/{loadBalancerId}', 'LoadBalancerController@destroy');
+        $router->get('load-balancers/{loadBalancerId}/networks', 'LoadBalancerController@networks');
 
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->get('load-balancers/{loadBalancerId}/nodes', 'LoadBalancerController@nodes');
@@ -613,5 +613,14 @@ $router->group($baseRouteParameters, function () use ($router) {
             $router->patch('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@update');
             $router->delete('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@destroy');
         });
+    });
+
+    /** Load Balancer Network */
+    $router->group([], function () use ($router) {
+        $router->get('load-balancer-networks', 'LoadBalancerNetworkController@index');
+        $router->get('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@show');
+        $router->post('load-balancer-networks', 'LoadBalancerNetworkController@store');
+        $router->patch('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@update');
+        $router->delete('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@destroy');
     });
 });
