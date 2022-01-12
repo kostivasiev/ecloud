@@ -22,6 +22,7 @@ use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
+use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\AccountsService;
@@ -29,6 +30,7 @@ use App\Services\V2\ArtisanService;
 use App\Services\V2\ConjurerService;
 use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
+use App\Support\Sync;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
@@ -656,6 +658,32 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function loadData($dataFile)
     {
         return file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'_data'.DIRECTORY_SEPARATOR.$dataFile) ?? false;
+    }
+
+    public function createSyncUpdateTask($resource, $data = null) : Task {
+        return Task::withoutEvents(function () use ($resource, $data) {
+            $task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+                'data' => $data
+            ]);
+            $task->resource()->associate($resource);
+            $task->save();
+            return $task;
+        });
+    }
+
+    public function createSyncDeleteTask($resource, $data = null) : Task {
+        return Task::withoutEvents(function () use ($resource, $data) {
+            $task = new Task([
+                'id' => 'sync-delete',
+                'name' => Sync::TASK_NAME_DELETE,
+                'data' => $data
+            ]);
+            $task->resource()->associate($resource);
+            $task->save();
+            return $task;
+        });
     }
 
     protected function setUp(): void

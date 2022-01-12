@@ -10,8 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 
 trait LoadBalancerMock
 {
-   protected $loadBalancerSpecification;
-
+    protected $loadBalancerSpecification;
     protected $loadBalancer;
     protected $loadBalancerInstance;
     protected $loadBalancerNetwork;

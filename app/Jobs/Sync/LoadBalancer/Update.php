@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\LoadBalancer;
 
 use App\Jobs\Job;
+use App\Jobs\LoadBalancer\AddNetworks;
 use App\Jobs\LoadBalancer\CreateCluster;
 use App\Jobs\LoadBalancer\CreateCredentials;
 use App\Jobs\LoadBalancer\CreateInstances;

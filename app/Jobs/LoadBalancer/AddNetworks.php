@@ -4,9 +4,8 @@ namespace App\Jobs\LoadBalancer;
 
 use App\Jobs\Job;
 use App\Models\V2\LoadBalancer;
+use App\Models\V2\LoadBalancerNetwork;
 use App\Models\V2\Network;
-use App\Models\V2\OrchestratorBuild;
-use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Task;
 use App\Traits\V2\Jobs\AwaitResources;
 use App\Traits\V2\LoggableModelJob;
@@ -16,7 +15,7 @@ use Illuminate\Support\Facades\Log;
 class AddNetworks extends Job
 {
     use Batchable, LoggableModelJob, AwaitResources;
-    
+
     private LoadBalancer $model;
 
     private Task $task;
@@ -35,34 +34,32 @@ class AddNetworks extends Job
         $loadBalancer = $this->model;
 
         if (empty($this->task->data['network_ids'])) {
+            Log::info(get_class($this) . ': No networks to add, skipping');
             return;
         }
 
         if (empty($this->task->data['load_balancer_network_ids'])) {
-            $loadBalancerNetworkIds = [];
+            $data = $this->task->data;
 
-            $networks = collect($this->task->data['network_ids'])
-                ->map(fn($networkId) => !Network::find($networkId))
-                ->filter();
+            foreach ($this->task->data['network_ids'] as $networkId) {
+                $network = Network::find($networkId);
+                if (!$network) {
+                    Log::warning(get_class($this) . ': Failed to load network to associate with load balancer: ' . $networkId, ['id' => $loadBalancer->id]);
+                    continue;
+                }
 
-
-
-            $networks->each(function ($network) use ($loadBalancer, &$loadBalancerNetworkIds) {
                 Log::info(get_class($this) . ': Adding network ' . $network->id . ' to load balancer ' . $loadBalancer->id, ['id' => $loadBalancer->id]);
 
-                $instanceSoftware = app()->make(InstanceSoftware::class);
-                $instanceSoftware->name = $software->name;
-                $instanceSoftware->instance()->associate($instance);
-                $instanceSoftware->software()->associate($software);
-                $instanceSoftware->syncSave();
+                $loadBalancerNetwork = app()->make(LoadBalancerNetwork::class);
+                $loadBalancerNetwork->loadBalancer()->associate($loadBalancer);
+                $loadBalancerNetwork->network()->associate($network);
+                $loadBalancerNetwork->syncSave();
 
-                $instanceSoftwareIds[] = $instanceSoftware->id;
-            });
-
-
+                $data['load_balancer_network_ids'][] = $loadBalancerNetwork->id;
+            }
             $this->task->setAttribute('data', $data)->saveQuietly();
         } else {
             $this->awaitSyncableResources($this->task->data['load_balancer_network_ids']);
         }
-
+    }
 }

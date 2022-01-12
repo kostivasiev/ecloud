@@ -4,13 +4,9 @@ namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\AddNetworks;
-use App\Jobs\LoadBalancer\CreateInstances;
-use App\Models\V2\OrchestratorBuild;
-use App\Models\V2\Task;
-use App\Support\Sync;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
@@ -25,36 +21,58 @@ class AddNetworksTest extends TestCase
 
     public function testSuccess()
     {
-        // Create the management network
-        $this->router()->setAttribute('is_management', true)->save();
-        $this->network();
-
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->loadBalancer());
-            $task->save();
-            return $task;
-        });
-
-
         Event::fake([JobFailed::class, Created::class]);
+
+        $task = $this->createSyncUpdateTask(
+            $this->loadBalancer(),
+            ['network_ids' => [$this->network()->id]]
+        );
 
         dispatch(new AddNetworks($task));
 
-        Event::assertDispatched(Created::class, function ($event) {
-            return (
-                $event->model->resource instanceof OrchestratorBuild
-                && $event->model->name == Sync::TASK_NAME_UPDATE
-            );
+        Event::assertNotDispatched(JobFailed::class);
+
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
         });
+
+        $task->refresh();
+
+        $this->assertNotNull($task->data['load_balancer_network_ids']);
+    }
+
+    public function testNoNetworkIdsSucceeds()
+    {
+        Event::fake([JobFailed::class, Created::class]);
+
+        $task = $this->createSyncUpdateTask($this->loadBalancer());
+
+        dispatch(new AddNetworks($task));
 
         Event::assertNotDispatched(JobFailed::class);
 
         $task->refresh();
 
-        $this->assertNotNull($task->data['orchestrator_build_id']);
+        $this->assertNotTrue(isset($task->data['load_balancer_network_ids']));
+    }
+
+    public function testNetworkNotFoundWarns()
+    {
+        Event::fake([JobFailed::class, Created::class]);
+
+        $task = $this->createSyncUpdateTask(
+            $this->loadBalancer(),
+            ['network_ids' => ['net-123']]
+        );
+
+        Log::shouldReceive('error')->zeroOrMoreTimes();
+        Log::shouldReceive('debug')->zeroOrMoreTimes();
+        Log::shouldReceive('warning')
+            ->withSomeOfArgs(AddNetworks::class . ': Failed to load network to associate with load balancer: net-123');
+
+        dispatch(new AddNetworks($task));
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 }

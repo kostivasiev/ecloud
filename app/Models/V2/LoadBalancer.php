@@ -102,6 +102,11 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
         );
     }
 
+    public function loadBalancerNetworks()
+    {
+        return $this->hasMany(LoadBalancerNetwork::class);
+    }
+
     /**
      * @param $query
      * @param Consumer $user
