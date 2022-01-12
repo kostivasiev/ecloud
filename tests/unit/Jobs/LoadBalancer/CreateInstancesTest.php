@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\CreateInstances;
+use App\Models\V2\LoadBalancerNode;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Task;
 use App\Support\Sync;
@@ -45,7 +46,7 @@ class CreateInstancesTest extends TestCase
 
         Event::assertDispatched(Created::class, function ($event) {
             return (
-                $event->model->resource instanceof OrchestratorBuild
+                $event->model->resource instanceof LoadBalancerNode
                 && $event->model->name == Sync::TASK_NAME_UPDATE
             );
         });
@@ -53,7 +54,9 @@ class CreateInstancesTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
 
         $task->refresh();
+        $loadBalancerNodes = $task->resource->loadBalancerNodes;
 
-        $this->assertNotNull($task->data['orchestrator_build_id']);
+        // Check that the number of nodes created is correct according to the LB Spec
+        $this->assertEquals($this->loadBalancerSpecification()->node_count, $loadBalancerNodes->count());
     }
 }

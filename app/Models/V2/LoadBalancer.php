@@ -8,6 +8,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -67,6 +68,11 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
     public function loadBalancerSpec()
     {
         return $this->belongsTo(LoadBalancerSpecification::class);
+    }
+
+    public function loadBalancerNodes(): HasMany
+    {
+        return $this->hasMany(LoadBalancerNode::class);
     }
 
     public function instances()
