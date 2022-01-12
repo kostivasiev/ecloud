@@ -5,13 +5,19 @@ namespace Tests\V2\LoadBalancer;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerSpecification;
+use App\Models\V2\Network;
 use App\Models\V2\Region;
+use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Support\Sync;
 use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Bus;
 use Tests\TestCase;
+use UKFast\Admin\Loadbalancers\AdminClient;
+use UKFast\Admin\Loadbalancers\AdminClusterClient;
+use UKFast\SDK\SelfResponse;
 
 class CreateTest extends TestCase
 {
@@ -20,6 +26,8 @@ class CreateTest extends TestCase
     protected $vpc;
     protected $lbs;
     protected $availabilityZone;
+
+    private $lbConfigId = 123456;
 
     public function setUp(): void
     {
@@ -40,6 +48,42 @@ class CreateTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id
         ]);
+
+        $managementRouter = Model::withoutEvents(function () {
+            return factory(Router::class)->create([
+                'id' => 'rtr-mgmt',
+                'vpc_id' => $this->vpc->id,
+                'availability_zone_id' => $this->availabilityZone->id,
+                'router_throughput_id' => $this->routerThroughput()->id,
+                'is_management' => true,
+            ]);
+        });
+
+        Model::withoutEvents(function () use ($managementRouter) {
+            return factory(Network::class)->create([
+                'id' => 'net-mgmt',
+                'name' => 'Manchester Network',
+                'subnet' => '10.0.0.0/24',
+                'router_id' => $managementRouter->id
+            ]);
+        });
+
+        app()->bind(AdminClient::class, function () {
+            $mock = \Mockery::mock(AdminClient::class)->makePartial();
+            $mock->allows('setResellerId')->andReturnSelf();
+            $mock->allows('clusters')->andReturnUsing(function () {
+                $clusterMock = \Mockery::mock(AdminClusterClient::class)->makePartial();
+                $clusterMock->allows('createEntity')
+                    ->withAnyArgs()
+                    ->andReturnUsing(function () {
+                        $mockSelfResponse = \Mockery::mock(SelfResponse::class)->makePartial();
+                        $mockSelfResponse->allows('getId')->andReturns($this->lbConfigId);
+                        return $mockSelfResponse;
+                    });
+                return $clusterMock;
+            });
+            return $mock;
+        });
     }
 
     public function testInvalidVpcIdIsFailed()
@@ -157,6 +201,7 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
+        Bus::fake();
         $data = [
             'name' => 'My Load Balancer',
             'vpc_id' => $this->vpc->id,
