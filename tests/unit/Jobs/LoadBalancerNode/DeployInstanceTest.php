@@ -7,7 +7,6 @@ use App\Models\V2\Task;
 use App\Providers\EncryptionServiceProvider;
 use App\Services\V2\PasswordService;
 use App\Support\Sync;
-use Illuminate\Bus\PendingBatch;
 use Illuminate\Support\Facades\Bus;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
