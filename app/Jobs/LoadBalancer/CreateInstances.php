@@ -61,7 +61,8 @@ class CreateInstances extends Job
         }
 
         for ($i = 0; $i < $loadBalancer->loadBalancerSpec->node_count; $i++) {
-            $instance = app()->make(Instance::class, [
+            $instance = app()->make(Instance::class);
+            $instance->fill([
                 'name' => 'Load Balancer ' . ($i+1),
                 'vpc_id' => $loadBalancer->vpc->id,
                 'image_id' => $loadBalancer->loadBalancerSpec->image_id,
@@ -77,7 +78,8 @@ class CreateInstances extends Job
             ]);
             $instance->save();
 
-            $node = app()->make(LoadBalancerNode::class, [
+            $node = app()->make(LoadBalancerNode::class);
+            $node->fill([
                 'load_balancer_id' => $loadBalancer->id,
                 'instance_id' => $instance->id,
                 'node_id' => null,
