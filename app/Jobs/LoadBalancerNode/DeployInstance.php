@@ -3,6 +3,7 @@
 namespace App\Jobs\LoadBalancerNode;
 
 use App\Jobs\Job;
+use App\Models\V2\Credential;
 use App\Models\V2\LoadBalancerNode;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
@@ -37,7 +38,7 @@ class DeployInstance extends Job
                     'nats_credentials' => decrypt($this->task->data['warden_credentials']),
                     'node_id' => $loadBalancerNode->node_id,
                     'group_id' => $loadBalancerNode->loadBalancer->config_id,
-                    'nats_servers' => ['tls://localhost:4222'],
+                    'nats_servers' => $this->getNatsServers(),
                     'primary' => false,
                     'keepalived_password' => $this->getKeepAliveDPassword()
                 ];
@@ -64,5 +65,19 @@ class DeployInstance extends Job
             ->where('username', '=', 'keepalived')
             ->first()
             ->password;
+    }
+
+    public function getNatsServers(): array
+    {
+        $natsServer = 'lb_nats_server';
+        if ($this->model->loadBalancer->vpc->advanced_networking) {
+            $natsServer.= '_advanced';
+        }
+        $cred = Credential::where([
+                ['resource_id', '=', $this->model->loadBalancer->availabilityZone->id],
+                ['username', '=', $natsServer]
+            ])
+            ->first();
+        return [$cred->host.':'.$cred->port];
     }
 }
