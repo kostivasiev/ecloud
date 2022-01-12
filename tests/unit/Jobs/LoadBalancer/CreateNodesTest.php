@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
-class CreateInstancesTest extends TestCase
+class CreateNodesTest extends TestCase
 {
     use LoadBalancerMock;
 
