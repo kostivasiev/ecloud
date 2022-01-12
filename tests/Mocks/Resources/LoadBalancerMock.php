@@ -4,6 +4,7 @@ namespace Tests\Mocks\Resources;
 
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancer;
+use App\Models\V2\LoadBalancerNetwork;
 use App\Models\V2\LoadBalancerSpecification;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,6 +14,7 @@ trait LoadBalancerMock
 
     protected $loadBalancer;
     protected $loadBalancerInstance;
+    protected $loadBalancerNetwork;
 
     public function loadBalancerSpecification($id = 'lbs-test'): LoadBalancerSpecification
     {
@@ -68,5 +70,17 @@ trait LoadBalancerMock
             });
         }
         return $this->loadBalancerInstance;
+    }
+
+    public function loadBalancerNetwork($id = 'lbn-test'): LoadBalancerNetwork
+    {
+        if (!isset($this->loadBalancerNetwork)) {
+            $this->loadBalancerNetwork = LoadBalancerNetwork::factory()->make(['id' => $id]);
+            $this->loadBalancerNetwork->loadBalancer()->associate($this->loadBalancer());
+            $this->loadBalancerNetwork->network()->associate($this->network());
+            $this->loadBalancerNetwork->save();
+        }
+
+        return $this->loadBalancerNetwork;
     }
 }

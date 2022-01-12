@@ -6,8 +6,10 @@ use App\Http\Requests\V2\LoadBalancer\CreateRequest;
 use App\Http\Requests\V2\LoadBalancer\UpdateRequest;
 use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancer;
+use App\Models\V2\LoadBalancerNetwork;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerResource;
+use App\Resources\V2\NetworkResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -56,7 +58,7 @@ class LoadBalancerController extends BaseController
             $request->only(['name', 'availability_zone_id', 'vpc_id', 'load_balancer_spec_id'])
         );
 
-        $task = $loadBalancer->syncSave();
+        $task = $loadBalancer->syncSave($request->has('network_ids') ? ['network_ids' => $request->input('network_ids')] : null);
         return $this->responseIdMeta($request, $loadBalancer->id, 202, $task->id);
     }
 
@@ -87,6 +89,17 @@ class LoadBalancerController extends BaseController
             ->transform($collection);
 
         return InstanceResource::collection($collection->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function networks(Request $request, QueryTransformer $queryTransformer, string $loadBalancerId)
+    {
+        $collection = LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId)->networks();
+        $queryTransformer->config(LoadBalancerNetwork::class)
+            ->transform($collection);
+
+        return NetworkResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

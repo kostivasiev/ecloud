@@ -27,9 +27,11 @@ class Delete extends Job
         $this->deleteTaskBatch([
             [
                 new DeleteVips($this->task),
+//              TODO:  new DeleteNetworks($this->task)
                 new DeleteInstances($this->task),
                 new DeleteCluster($this->task),
                 new DeleteCredentials($this->task),
+
             ],
         ])->dispatch();
     }
