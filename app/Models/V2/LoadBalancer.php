@@ -107,7 +107,7 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
 
     public function getNodesAttribute(): int
     {
-        return (int) $this->instances()->count();
+        return (int) $this->loadBalancerNodes()->count();
     }
 
     /**

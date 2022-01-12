@@ -65,14 +65,22 @@ class CreateInstances extends Job
             $instance->fill([
                 'name' => 'Load Balancer ' . ($i+1),
                 'vpc_id' => $loadBalancer->vpc->id,
+                'availability_zone_id' => $loadBalancer->availabilityZone->id,
                 'image_id' => $loadBalancer->loadBalancerSpec->image_id,
                 'vcpu_cores' => $loadBalancer->loadBalancerSpec->cpu,
                 'ram_capacity' => (1024 * $loadBalancer->loadBalancerSpec->ram),
-                'network_id' => $managementNetwork->id,
-                'volume_capacity' => $loadBalancer->loadBalancerSpec->hdd,
-                'volume_iops' => $loadBalancer->loadBalancerSpec->iops,
-                'image_data' => [
-                    "node_id" => ($i+1),
+                'deploy_data' => [
+                    'network_id' => $managementNetwork->id,
+                    'volume_capacity' => $loadBalancer->loadBalancerSpec->hdd,
+                    'volume_iops' => $loadBalancer->loadBalancerSpec->iops,
+                    'requires_floating_ip' => false,
+                    'floating_ip_id' => null,
+                    'user_script' => null,
+                    'ssh_key_pair_ids' => null,
+                    'software_ids' => null,
+                    'image_data' => [
+                        "node_id" => ($i+1),
+                    ],
                 ],
                 'is_hidden' => true
             ]);

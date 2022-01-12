@@ -26,6 +26,9 @@ class DeployInstance extends Job
     {
         $loadBalancerNode = $this->model;
         $instance = $loadBalancerNode->instance;
+        if ($instance->deploy_data === null) {
+            $instance->setAttribute('deploy_data', [])->saveQuietly();
+        }
 
         if (empty($this->task->data['loadbalancer_instance_id'])) {
             // Now populate the remaining deploy_data elements
@@ -36,7 +39,7 @@ class DeployInstance extends Job
                     'group_id' => $loadBalancerNode->loadBalancer->config_id,
                     'nats_servers' => ['tls://localhost:4222'],
                     'primary' => false,
-                    'keepalived_password' => $this->getKeepAliveDPassword(),
+                    'keepalived_password' => $this->getKeepAliveDPassword()
                 ];
             $instance->setAttribute('deploy_data', $deployData)->syncSave();
             $this->task->setAttribute('data', ['loadbalancer_instance_id' => $instance->id])->saveQuietly();
