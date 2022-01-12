@@ -4,7 +4,7 @@ namespace App\Tasks\Sync\LoadBalancer;
 
 use App\Jobs\LoadBalancer\CreateCluster;
 use App\Jobs\LoadBalancer\CreateCredentials;
-use App\Jobs\LoadBalancer\CreateInstances;
+use App\Jobs\LoadBalancer\CreateNodes;
 use App\Tasks\Task;
 
 class Update extends Task
@@ -14,7 +14,7 @@ class Update extends Task
         return [
             CreateCluster::class,
             CreateCredentials::class,
-            CreateInstances::class,
+            CreateNodes::class,
         ];
     }
 }

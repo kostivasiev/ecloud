@@ -16,7 +16,7 @@ class CreateLoadBalancerNodesTable extends Migration
         Schema::connection('ecloud')->create('load_balancer_nodes', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('load_balancer_id')->index();
-            $table->uuid('instance_id')->index();
+            $table->uuid('instance_id')->nullable()->index();
             $table->integer('node_id')->nullable()->index();
             $table->softDeletes();
             $table->timestamps();

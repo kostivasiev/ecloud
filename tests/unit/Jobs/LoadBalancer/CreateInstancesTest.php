@@ -3,7 +3,7 @@
 namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\LoadBalancer\CreateInstances;
+use App\Jobs\LoadBalancer\CreateNodes;
 use App\Models\V2\LoadBalancerNode;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Task;
@@ -42,7 +42,7 @@ class CreateInstancesTest extends TestCase
 
         Event::fake([JobFailed::class, Created::class]);
 
-        dispatch(new CreateInstances($task));
+        dispatch(new CreateNodes($task));
 
         Event::assertDispatched(Created::class, function ($event) {
             return (
