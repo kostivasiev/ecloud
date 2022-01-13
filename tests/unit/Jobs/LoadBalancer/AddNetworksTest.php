@@ -14,11 +14,6 @@ class AddNetworksTest extends TestCase
 {
     use LoadBalancerMock;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     public function testSuccess()
     {
         Event::fake([JobFailed::class, Created::class]);
@@ -31,7 +26,6 @@ class AddNetworksTest extends TestCase
         dispatch(new AddNetworks($task));
 
         Event::assertNotDispatched(JobFailed::class);
-
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
