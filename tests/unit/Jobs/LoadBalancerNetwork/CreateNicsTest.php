@@ -79,6 +79,8 @@ class CreateNicsTest extends TestCase
 
         dispatch(new CreateNics($task));
 
+        $this->assertCount(1, $this->loadBalancerInstance()->nics);
+
         Event::assertNotDispatched(JobFailed::class);
     }
 
