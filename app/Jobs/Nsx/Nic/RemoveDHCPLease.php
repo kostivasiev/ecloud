@@ -39,7 +39,7 @@ class RemoveDHCPLease extends Job
         Log::info('DHCP static binding deleted for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $nic->ip_address);
 
         $nic->refresh();
-        $ipAddress = $nic->ipAddresses()->where('type', IpAddress::TYPE_NORMAL)->first();
+        $ipAddress = $nic->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->first();
 
         if (!empty($ipAddress)) {
             $nic->ipAddresses()->detach($ipAddress->id);
