@@ -95,10 +95,9 @@ class CreateInstances extends Job
             $orchestratorBuild->syncSave();
 
             // Store the management router id, so we can backoff everything else
-            $this->task->data = [
-                'orchestrator_build_id' => $orchestratorBuild->id
-            ];
-            $this->task->saveQuietly();
+            $data = $this->task->data;
+            $data['orchestrator_build_id'] = $orchestratorBuild->id;
+            $this->task->setAttribute('data', $data)->saveQuietly();
         } else {
             $orchestratorBuild = OrchestratorBuild::findOrFail($this->task->data['orchestrator_build_id']);
         }

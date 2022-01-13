@@ -3,11 +3,12 @@
 namespace App\Jobs\LoadBalancerNetwork;
 
 use App\Jobs\TaskJob;
-use App\Jobs\Tasks\Nic\AssociateIp;
-use App\Models\V2\Nic;
+use App\Traits\V2\TaskJobs\AwaitResources;
 
 class CreateNics extends TaskJob
 {
+    use AwaitResources;
+
     /**
      * Create a new NIC on the lb's instances if the supplied network doesn't have a NIC already
      * @return void
@@ -16,47 +17,44 @@ class CreateNics extends TaskJob
     {
         $loadBalancerNetwork = $this->task->resource;
 
-        $network = $loadBalancerNetwork->network;
-
         $loadBalancer = $loadBalancerNetwork->loadBalancer;
 
+        if (empty($this->task->data['nic_ids'])) {
+            $data = $this->task->data;
+            $data['nic_ids'] = [];
 
-        $nic = new Nic($request->only([
+            $loadBalancer->instances->each(function ($instance) use ($loadBalancerNetwork, &$data) {
+                $nic = $instance->nics()->firstOrNew(
+                    ['network_id' => $loadBalancerNetwork->network_id],
+                    [
+                        'instance_id' => $instance->id,
+                    ]
+                );
 
-        ]));
+                if ($nic->isDirty()) {
+                    $response = $instance->availabilityZone->kingpinService()->post(
+                        '/api/v2/vpc/' . $instance->vpc->id .
+                        '/instance/' . $instance->id .
+                        '/nic',
+                        [
+                            'json' => [
+                                'networkId' => $loadBalancerNetwork->network_id,
+                            ],
+                        ]
+                    );
 
+                    $nic->mac_address = json_decode($response->getBody()->getContents())->macAddress;
+                    $nic->syncSave();
 
+                    $this->info('Created new NIC ' . $nic->id . ' on load balancer node ' . $instance->id . ' for network ' . $loadBalancerNetwork->network_id);
 
-
-        /api/v2/vpc/{vpcId}/instance/{instanceId}/nic
-
-        $nic = $loadBalancer->nodes->each(function ($node) use ($loadBalancerNetwork) {
-            $node->nics()->firstOrNew(
-                ['network_id' => $loadBalancerNetwork->network_id],
-                [
-                    'name',
-                    'mac_address',
-                    'instance_id',
-                    'network_id',
-                ]
-            );
-
-        });
-
-        $task = $nic->syncSave();
-
-
-
-
-        Nic::where('network_id', '=', $vip->network_id)
-            ->whereHas('instance.loadbalancer', function ($query) use ($vip) {
-                $query->where('id', '=', $vip->loadbalancer->id);
-            })->each(function ($nic) use ($vip, &$taskIds) {
-                if (!$nic->ipAddresses()->where('id', $vip->ipAddress->id)->exists()) {
-                    $task = $nic->createTaskWithLock(AssociateIp::$name, AssociateIp::class, ['ip_address_id' => $vip->ipAddress->id]);
-                    $taskIds[] = $task->id;
+                    $data['nic_ids'][] = $nic->id;
                 }
             });
 
+            $this->task->setAttribute('data', $data)->saveQuietly();
+        } else {
+            $this->awaitSyncableResources($this->task->data['nic_ids']);
+        }
     }
 }

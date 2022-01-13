@@ -76,15 +76,6 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
         return $this->hasMany(Instance::class);
     }
 
-    /**
-     * @alias Alias for instances()
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function nodes()
-    {
-        return $this->instances();
-    }
-
     public function vips()
     {
         return $this->hasMany(Vip::class);
