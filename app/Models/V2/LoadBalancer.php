@@ -77,7 +77,15 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
 
     public function instances()
     {
-        return $this->hasMany(Instance::class);
+        return $this->hasManyThrough(
+            Instance::class,
+            LoadBalancerNode::class,
+            'load_balancer_id',
+            'id',
+            'id',
+            'instance_id'
+        );
+
     }
 
     public function vips()
