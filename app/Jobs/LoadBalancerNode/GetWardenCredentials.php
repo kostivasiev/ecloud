@@ -2,30 +2,15 @@
 
 namespace App\Jobs\LoadBalancerNode;
 
-use App\Jobs\Job;
-use App\Models\V2\LoadBalancerNode;
-use App\Models\V2\Task;
-use App\Traits\V2\Jobs\AwaitResources;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Jobs\TaskJob;
 use UKFast\Admin\Loadbalancers\AdminClient;
 
-class GetWardenCredentials extends Job
+class GetWardenCredentials extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources;
-
-    private LoadBalancerNode $model;
-    private Task $task;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
-
     public function handle()
     {
-        $loadBalancer = $this->model->loadBalancer;
+        $loadBalancerNode = $this->task->resource;
+        $loadBalancer = $loadBalancerNode->loadBalancer;
         $client = app()->make(AdminClient::class)
             ->setResellerId($loadBalancer->getResellerId());
         $response = $client->clusters()->get(

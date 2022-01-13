@@ -2,31 +2,15 @@
 
 namespace App\Jobs\LoadBalancerNode;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
-use App\Models\V2\LoadBalancerNode;
-use App\Models\V2\Task;
-use App\Traits\V2\LoggableModelJob;
-use App\Traits\V2\TaskJobs\AwaitResources;
-use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CreateInstance extends Job
+class CreateInstance extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources;
-
-    private LoadBalancerNode $model;
-    private Task $task;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
-
     public function handle()
     {
-        $loadBalancerNode = $this->model;
+        $loadBalancerNode = $this->task->resource;
         $loadBalancer = $loadBalancerNode->loadBalancer;
         $nodeIndex = $this->task->data['node_index'];
 

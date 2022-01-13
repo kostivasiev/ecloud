@@ -2,31 +2,16 @@
 
 namespace App\Jobs\LoadBalancerNode;
 
-use App\Jobs\Job;
-use App\Models\V2\LoadBalancerNode;
-use App\Models\V2\Task;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Jobs\TaskJob;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Loadbalancers\AdminClient;
 use UKFast\Admin\Loadbalancers\Entities\Node;
 
-class RegisterNode extends Job
+class RegisterNode extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private LoadBalancerNode $model;
-    private Task $task;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
-
     public function handle()
     {
-        $loadBalancerNode = $this->model;
+        $loadBalancerNode = $this->task->resource;
         if ($loadBalancerNode->loadBalancer->id === null) {
             Log::info('RegisterNode for ' . $loadBalancerNode->loadBalancer->id . ', no loadbalancer so nothing to do');
             return;
