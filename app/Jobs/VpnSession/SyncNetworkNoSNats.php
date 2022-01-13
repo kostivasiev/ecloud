@@ -24,36 +24,22 @@ class SyncNetworkNoSNats extends TaskJob
             $tasks = [];
             $deletedNatIDs = [];
 
-            $shouldDeleteNat = function ($nat) use (&$deletedNatIDs) {
-                foreach ($deletedNatIDs as $deletedNatID) {
-                    if ($nat->id == $deletedNatID) {
-                        return false;
-                    }
-                }
-
-                return true;
-            };
-
-            foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->withTrashed()->get() as $localNetwork) {
-                if ($localNetwork->trashed()) {
-                    foreach ($localNetwork->localNoSNATs as $localNoSNAT) {
-                        if ($shouldDeleteNat($localNoSNAT)) {
-                            $this->warning("Removing No SNAT rule for deleted local network", ["vpn_session_network_id" => $localNetwork->id, "nat_id" => $localNoSNAT->id]);
-                            $tasks[] = $localNoSNAT->syncDelete();
-                            $deletedNatIDs[] = $localNoSNAT->id;
-                        }
+            foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->onlyTrashed()->get() as $localNetwork) {
+                foreach ($localNetwork->localNoSNATs as $localNoSNAT) {
+                    if (!in_array($localNoSNAT->id, $deletedNatIDs)) {
+                        $this->warning("Removing No SNAT rule for deleted local network", ["vpn_session_network_id" => $localNetwork->id, "nat_id" => $localNoSNAT->id]);
+                        $tasks[] = $localNoSNAT->syncDelete();
+                        $deletedNatIDs[] = $localNoSNAT->id;
                     }
                 }
             }
 
-            foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE)->withTrashed()->get() as $remoteNetwork) {
-                if ($remoteNetwork->trashed()) {
-                    foreach ($remoteNetwork->remoteNoSNATs as $remoteNoSNAT) {
-                        if ($shouldDeleteNat($remoteNoSNAT)) {
-                            $this->warning("Removing No SNAT rule for deleted remote network", ["vpn_session_network_id" => $remoteNetwork->id, "nat_id" => $remoteNoSNAT->id]);
-                            $tasks[] = $remoteNoSNAT->syncDelete();
-                            $deletedNatIDs[] = $remoteNoSNAT->id;
-                        }
+            foreach ($vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_REMOTE)->onlyTrashed()->get() as $remoteNetwork) {
+                foreach ($remoteNetwork->remoteNoSNATs as $remoteNoSNAT) {
+                    if (!in_array($remoteNoSNAT->id, $deletedNatIDs)) {
+                        $this->warning("Removing No SNAT rule for deleted remote network", ["vpn_session_network_id" => $remoteNetwork->id, "nat_id" => $remoteNoSNAT->id]);
+                        $tasks[] = $remoteNoSNAT->syncDelete();
+                        $deletedNatIDs[] = $remoteNoSNAT->id;
                     }
                 }
             }
