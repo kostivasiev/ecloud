@@ -114,8 +114,8 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
             return $this->attributes['ip_address'];
         }
 
-        if ($this->ipAddresses()->where('type', IpAddress::TYPE_NORMAL)->exists()) {
-            return $this->ipAddresses()->where('type', IpAddress::TYPE_NORMAL)->first()->ip_address;
+        if ($this->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->exists()) {
+            return $this->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->first()->ip_address;
         }
 
         return null;
