@@ -87,7 +87,7 @@ trait LoadBalancerMock
         }
         return $this->loadBalancerNode;
     }
-    
+
     public function loadBalancerNetwork($id = 'lbn-test'): LoadBalancerNetwork
     {
         if (!isset($this->loadBalancerNetwork)) {
