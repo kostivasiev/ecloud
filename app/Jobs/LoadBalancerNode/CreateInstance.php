@@ -12,7 +12,7 @@ class CreateInstance extends TaskJob
     {
         $loadBalancerNode = $this->task->resource;
         $loadBalancer = $loadBalancerNode->loadBalancer;
-        $nodeIndex = $this->task->data['node_index'];
+        $nodeIndex = $loadBalancerNode->loadBalancer->instances->count() + 1;
 
         $managementRouter = $loadBalancer->availabilityZone->routers()
             ->where('is_management', true)

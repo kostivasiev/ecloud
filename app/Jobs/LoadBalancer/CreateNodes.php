@@ -35,9 +35,7 @@ class CreateNodes extends Job
                     'instance_id' => null,
                     'node_id' => null,
                 ]);
-                $node->syncSave([
-                    'node_index' => $i + 1,
-                ]);
+                $node->syncSave();
                 $nodeArray[] = $node->id;
             }
             $this->task->setAttribute('data', ['loadbalancer_node_ids' => json_encode($nodeArray)])->saveQuietly();
