@@ -85,7 +85,6 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
             'id',
             'instance_id'
         );
-
     }
 
     public function vips()
