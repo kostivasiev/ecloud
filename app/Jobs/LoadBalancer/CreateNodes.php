@@ -2,32 +2,19 @@
 
 namespace App\Jobs\LoadBalancer;
 
-use App\Jobs\Job;
-use App\Models\V2\LoadBalancer;
+use App\Jobs\TaskJob;
 use App\Models\V2\LoadBalancerNode;
-use App\Models\V2\Task;
-use App\Traits\V2\Jobs\AwaitResources;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Traits\V2\TaskJobs\AwaitResources;
 
-class CreateNodes extends Job
+class CreateNodes extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources;
-    
-    private LoadBalancer $model;
-    private Task $task;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
+    use AwaitResources;
 
     public function handle()
     {
-        $loadBalancer = $this->model;
+        $loadBalancer = $this->task->resource;
+        $loadBalancerNodes = [];
         if (empty($this->task->data['loadbalancer_node_ids'])) {
-            $nodeArray = [];
             for ($i = 0; $i < $loadBalancer->loadBalancerSpec->node_count; $i++) {
                 $node = app()->make(LoadBalancerNode::class);
                 $node->fill([
@@ -36,11 +23,15 @@ class CreateNodes extends Job
                     'node_id' => null,
                 ]);
                 $node->syncSave();
-                $nodeArray[] = $node->id;
+                $loadBalancerNodes[] = $node->id;
             }
-            $this->task->setAttribute('data', ['loadbalancer_node_ids' => json_encode($nodeArray)])->saveQuietly();
+            $this->task->setAttribute('data', ['loadbalancer_node_ids' => $loadBalancerNodes])->saveQuietly();
         } else {
-            $this->awaitSyncableResources($this->task->data['loadbalancer_node_ids']);
+            $loadBalancerNodes = LoadBalancerNode::whereIn('id', $this->task->data['loadbalancer_node_ids'])
+                ->get()
+                ->pluck('id')
+                ->toArray();
         }
+        $this->awaitSyncableResources($loadBalancerNodes);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Jobs\LoadBalancerNode;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\Credential;
+use App\Models\V2\Instance;
 use App\Traits\V2\TaskJobs\AwaitResources;
 
 class DeployInstance extends TaskJob
@@ -32,8 +33,10 @@ class DeployInstance extends TaskJob
             $instance->setAttribute('deploy_data', $deployData)->syncSave();
             $this->task->setAttribute('data', ['loadbalancer_instance_id' => $instance->id])->saveQuietly();
         } else {
-            $this->awaitSyncableResources($this->task->data['loadbalancer_instance_id']);
+            $instance = Instance::where('id', '=', $this->task->data['loadbalancer_instance_id'])
+                ->first();
         }
+        $this->awaitSyncableResources([$instance->id]);
     }
 
     public function getStatsPassword()
