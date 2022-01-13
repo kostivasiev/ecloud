@@ -2,18 +2,11 @@
 
 namespace App\Jobs\VpnSession;
 
-use App\Jobs\Job;
 use App\Jobs\TaskJob;
-use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
-use App\Models\V2\Nic;
 use App\Models\V2\Task;
-use App\Models\V2\VpnSession;
 use App\Models\V2\VpnSessionNetwork;
-use App\Traits\V2\LoggableModelJob;
 use App\Traits\V2\TaskJobs\AwaitTask;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class SyncNetworkNoSNats extends TaskJob
 {
