@@ -11,6 +11,9 @@ class PowerOn extends Job
 {
     use Batchable, LoggableModelJob;
 
+    public $tries = 15;
+    public $backoff = 20;
+
     private $model;
 
     public function __construct(Instance $instance)

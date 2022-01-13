@@ -2,6 +2,7 @@
 
 namespace Tests\V2\LoadBalancer;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerSpecification;
@@ -14,6 +15,7 @@ use App\Support\Sync;
 use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Admin\Loadbalancers\AdminClient;
 use UKFast\Admin\Loadbalancers\AdminClusterClient;
@@ -202,6 +204,8 @@ class CreateTest extends TestCase
     public function testValidDataSucceeds()
     {
         Bus::fake();
+        Event::fake(Created::class);
+
         $data = [
             'name' => 'My Load Balancer',
             'vpc_id' => $this->vpc->id,
@@ -218,8 +222,8 @@ class CreateTest extends TestCase
         )
             ->assertResponseStatus(202);
 
-        $resourceId = (json_decode($this->response->getContent()))->data->id;
-        $resource = LoadBalancer::find($resourceId);
-        $this->assertNotNull($resource);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 }
