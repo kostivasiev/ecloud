@@ -149,7 +149,7 @@ client.test("Request executed successfully", function() {
 ### Clean Up!
 
 ###
-DELETE https://{{host}}/{{version}}/routers/{{router_id}}
+DELETE https://{{host}}/{{version}}/networks/{{network_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
@@ -157,7 +157,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 ###
-DELETE https://{{host}}/{{version}}/networks/{{network_id}}
+DELETE https://{{host}}/{{version}}/routers/{{router_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
