@@ -34,6 +34,9 @@ class DeleteInstancesTest extends TestCase
             $task = new Task([
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_DELETE,
+                'data' => [
+                    'instance_ids' => [$this->loadBalancerInstance()->id],
+                ],
             ]);
             $task->resource()->associate($this->loadBalancer());
             $task->save();
