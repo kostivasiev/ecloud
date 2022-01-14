@@ -45,7 +45,9 @@ class DeleteNetworks extends Job
             });
 
             $this->task->setAttribute('data', $data)->saveQuietly();
-        } else {
+        }
+
+        if (isset($this->task->data['load_balancer_network_ids'])) {
             $this->awaitSyncableResources($this->task->data['load_balancer_network_ids']);
         }
     }

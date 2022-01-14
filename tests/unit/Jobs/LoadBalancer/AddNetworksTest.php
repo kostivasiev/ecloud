@@ -4,6 +4,7 @@ namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\AddNetworks;
+use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -33,15 +34,21 @@ class AddNetworksTest extends TestCase
         $this->assertNotNull($task->data['load_balancer_network_ids']);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            $event->model->setAttribute('completed', true)->saveQuietly();
-            return $event->model->name == 'sync_update';
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
         });
+
+        $event = Event::dispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        })->first()[0];
+        $event->model->setAttribute('completed', true)->saveQuietly();
 
         dispatch(new AddNetworks($task));
 
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
+
+        Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testReleasedWhenSyncing()
