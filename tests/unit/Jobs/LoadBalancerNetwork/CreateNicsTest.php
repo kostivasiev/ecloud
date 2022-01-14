@@ -3,12 +3,15 @@
 namespace Tests\unit\Jobs\LoadBalancerNetwork;
 
 use App\Events\V2\Task\Created;
+use App\Jobs\LoadBalancer\AddNetworks;
 use App\Jobs\LoadBalancerNetwork\CreateNics;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
@@ -19,7 +22,7 @@ class CreateNicsTest extends TestCase
 
     public function testInstanceDosNotHaveNicOnSameNetworkCreates()
     {
-        Event::fake([JobFailed::class, Created::class]);
+        Event::fake([JobFailed::class, Created::class, JobProcessed::class]);
 
         $this->assertCount(0, $this->loadBalancerInstance()->nics);
 
@@ -43,7 +46,7 @@ class CreateNicsTest extends TestCase
         dispatch(new CreateNics($task));
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == 'sync_update';
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
         });
 
         $this->assertCount(1, $this->loadBalancerInstance()->refresh()->nics);
@@ -58,6 +61,51 @@ class CreateNicsTest extends TestCase
         $this->assertNotNull($task->data['nic_ids']);
 
         Event::assertNotDispatched(JobFailed::class);
+
+        $event = Event::dispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        })->first()[0];
+        $event->model->setAttribute('completed', true)->saveQuietly();
+
+        dispatch(new CreateNics($task));
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+    }
+
+    public function testReleasedWhenSyncing()
+    {
+        Event::fake([JobFailed::class, Created::class, JobProcessed::class]);
+
+        $this->assertCount(0, $this->loadBalancerInstance()->nics);
+
+        $this->kingpinServiceMock()->expects('post')
+            ->withArgs([
+                '/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->loadBalancerInstance()->id . '/nic',
+                [
+                    'json' => [
+                        'networkId' => $this->loadBalancerNetwork()->network_id,
+                    ],
+                ]
+            ])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'macAddress' => '00:50:56:8a:eb:f2'
+                ]));
+            });
+
+        $task = $this->createSyncUpdateTask($this->loadBalancerNetwork());
+
+        dispatch(new CreateNics($task));
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return $event->job->isReleased();
+        });
     }
 
     public function testInstanceHasNicOnSameNetworkSkips()

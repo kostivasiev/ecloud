@@ -53,7 +53,9 @@ class CreateNics extends TaskJob
             });
 
             $this->task->setAttribute('data', $data)->saveQuietly();
-        } else {
+        }
+
+        if (isset($this->task->data['nic_ids'])) {
             $this->awaitSyncableResources($this->task->data['nic_ids']);
         }
     }
