@@ -14,21 +14,16 @@ class DeleteInstances extends TaskJob
      */
     public function handle()
     {
-        $loadBalancer = $this->task->resource;
-        if (empty($this->task->data['instance_ids'])) {
-            $instanceIds = [];
-            $loadBalancer->instances()->each(function ($instance) use (&$instanceIds) {
-                $instance->syncDelete();
-                $instanceIds[] = $instance->id;
-            });
-            $this->task->setAttribute('data', [
-                'instance_ids' => $instanceIds
-            ])->saveQuietly();
-        } else {
-            $instanceIds = Instance::whereIn('id', $this->task->data['instance_ids'])
-                ->get()
-                ->pluck('id')
-                ->toArray();
+        $taskData = $this->task->data;
+        $instanceIds = [];
+        if (!empty($taskData['instance_ids'])) {
+            Instance::whereIn('id', $taskData['instance_ids'])
+                ->each(function ($instance) use (&$instanceIds) {
+                    $instance->syncDelete();
+                    $instanceIds[] = $instance->id;
+                });
+            $taskData['instance_ids'] = $instanceIds;
+            $this->task->setAttribute('data', $taskData)->saveQuietly();
         }
         $this->awaitSyncableResources($instanceIds);
     }

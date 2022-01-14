@@ -15,8 +15,9 @@ class Delete extends Task
     {
         return [
             DeleteVips::class,
-            DeleteInstances::class,
             DeleteNodes::class,
+            // <!-- ConfigureCluster step to go here -->
+            DeleteInstances::class,
             DeleteCluster::class,
             DeleteCredentials::class,
         ];
