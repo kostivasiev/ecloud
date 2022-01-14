@@ -60,6 +60,8 @@ class AddNetworks extends Job
             $this->task->setAttribute('data', $data)->saveQuietly();
         }
 
-        $this->awaitSyncableResources($this->task->data['load_balancer_network_ids']);
+        if (isset($this->task->data['load_balancer_network_ids'])) {
+            $this->awaitSyncableResources($this->task->data['load_balancer_network_ids']);
+        }
     }
 }
