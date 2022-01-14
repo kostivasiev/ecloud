@@ -7,9 +7,6 @@ tail -F /var/www/html/storage/logs/lumen.log &
 
 ROLE=$1
 if [ "$ROLE" = "app" ]; then
-    ## debug
-    sed -i -E 's/^LogLevel.+/LogLevel debug/g' /etc/apache2/apache2.conf
-    sed -i -E 's/^ErrorLog .+/ErrorLog \/var\/log\/apache2\/apacheerr/g' /etc/apache2/apache2.conf
     exec apache2-foreground
 elif [ "$ROLE" = "queue" ]; then
     exec php /var/www/html/artisan queue:work --verbose --tries 3 --timeout=900
