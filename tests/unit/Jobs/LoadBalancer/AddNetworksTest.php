@@ -5,6 +5,7 @@ namespace Tests\unit\Jobs\LoadBalancer;
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\AddNetworks;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Tests\Mocks\Resources\LoadBalancerMock;
@@ -16,7 +17,36 @@ class AddNetworksTest extends TestCase
 
     public function testSuccess()
     {
-        Event::fake([JobFailed::class, Created::class]);
+        Event::fake([JobFailed::class, Created::class, JobProcessed::class]);
+
+        $task = $this->createSyncUpdateTask(
+            $this->loadBalancer(),
+            ['network_ids' => [$this->network()->id]]
+        );
+
+        dispatch(new AddNetworks($task));
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        $task->refresh();
+
+        $this->assertNotNull($task->data['load_balancer_network_ids']);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            $event->model->setAttribute('completed', true)->saveQuietly();
+            return $event->model->name == 'sync_update';
+        });
+
+        dispatch(new AddNetworks($task));
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+    }
+
+    public function testReleasedWhenSyncing()
+    {
+        Event::fake([JobFailed::class, Created::class, JobProcessed::class]);
 
         $task = $this->createSyncUpdateTask(
             $this->loadBalancer(),
@@ -34,6 +64,10 @@ class AddNetworksTest extends TestCase
         $task->refresh();
 
         $this->assertNotNull($task->data['load_balancer_network_ids']);
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return $event->job->isReleased();
+        });
     }
 
     public function testNoNetworkIdsSucceeds()
