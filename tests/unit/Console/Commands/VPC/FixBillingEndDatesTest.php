@@ -5,7 +5,6 @@ namespace Tests\unit\Console\Commands\VPC;
 use App\Console\Commands\VPC\FixBillingEndDates;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
