@@ -52,7 +52,7 @@ class FixBillingEndDates extends Command
         $this->info('Affected Instances: ' . $instanceCount);
         $metricString = 'Metrics Modified: ';
         if ($this->option('test-run')) {
-            $metricString = 'Metrics the would be modified: ';
+            $metricString = 'Metrics that would be modified: ';
         }
         $this->info($metricString . $metricCount);
 
