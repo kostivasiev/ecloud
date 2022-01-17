@@ -27,6 +27,9 @@ class FixBillingEndDatesTest extends TestCase
             ->withArgs(function ($argument) {
                 Log::info($argument);
             })->andReturnTrue();
+        $this->command->allows('option')
+            ->withAnyArgs()
+            ->andReturnFalse();
 
         $reflectionClass = new \ReflectionClass($this->command);
         $property = $reflectionClass->getProperty('output');

@@ -25,8 +25,10 @@ class FixBillingEndDates extends Command
                         ->first();
                     if ($instanceMetric) {
                         $this->info('Modifying: ' . $billingMetric->id);
-                        $billingMetric->setAttribute('end', Carbon::createFromDate($instanceMetric->created_at))
-                            ->saveQuietly();
+                        if (!$this->option('test-run')) {
+                            $billingMetric->setAttribute('end', Carbon::createFromDate($instanceMetric->created_at))
+                                ->saveQuietly();
+                        }
                     }
                 }
             });
