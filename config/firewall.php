@@ -90,7 +90,7 @@ return [
                         [
                             'protocol' => 'TCP',
                             'source' => 'ANY',
-                            'destination' => '1668'
+                            'destination' => '1688'
                         ]
                     ]
                 ],
