@@ -3,10 +3,7 @@
 namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\LoadBalancer\DeleteInstances;
 use App\Jobs\LoadBalancer\DeleteVips;
-use App\Models\V2\LoadBalancer;
-use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
