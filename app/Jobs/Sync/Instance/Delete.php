@@ -5,7 +5,6 @@ namespace App\Jobs\Sync\Instance;
 use App\Jobs\Instance\PowerOff;
 use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
 use App\Jobs\Instance\Undeploy\AwaitVolumeRemoval;
-use App\Jobs\Instance\Undeploy\DeleteLoadBalancerNodes;
 use App\Jobs\Instance\Undeploy\DeleteNics;
 use App\Jobs\Instance\Undeploy\DeleteVolumes;
 use App\Jobs\Instance\Undeploy\DetachSharedVolumes;
