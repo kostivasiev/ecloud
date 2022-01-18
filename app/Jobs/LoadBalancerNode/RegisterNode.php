@@ -3,7 +3,6 @@
 namespace App\Jobs\LoadBalancerNode;
 
 use App\Jobs\TaskJob;
-use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Loadbalancers\AdminClient;
 use UKFast\Admin\Loadbalancers\Entities\Node;
 
@@ -12,11 +11,6 @@ class RegisterNode extends TaskJob
     public function handle()
     {
         $loadBalancerNode = $this->task->resource;
-        if ($loadBalancerNode->loadBalancer->id === null) {
-            Log::info('RegisterNode for ' . $loadBalancerNode->loadBalancer->id . ', no loadbalancer so nothing to do');
-            return;
-        }
-
         $client = app()->make(AdminClient::class)
             ->setResellerId($loadBalancerNode->loadBalancer->getResellerId());
         $response = $client->nodes()->createEntity(
