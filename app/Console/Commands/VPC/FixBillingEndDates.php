@@ -20,31 +20,39 @@ class FixBillingEndDates extends Command
         $metricCount = 0;
         $lastReseller = null;
         $lastInstance = null;
+        $lastMetric = null;
 
         BillingMetric::whereIn('key', ['ram.capacity', 'ram.capacity.high', 'vcpu.count'])
+            ->where('resource_id', 'LIKE', 'i-%')
+            ->orderBy('created_at', 'asc')
             ->each(function ($billingMetric) use (&$resellerCount, &$instanceCount, &$metricCount, &$lastReseller, &$lastInstance) {
                 if ($billingMetric->instance) {
-                    $instanceMetric = $billingMetric->instance->billingMetrics()
+                    $billingMetric->instance->billingMetrics()
                         ->where('key', '=', $billingMetric->key)
                         ->whereDate('start', '>', Carbon::createFromDate($billingMetric->start))
-                        ->orderByDesc('created_at')
-                        ->first();
-                    if ($instanceMetric) {
-                        if ($billingMetric->reseller_id !== $lastReseller) {
-                            $lastReseller = $billingMetric->reseller_id;
-                            $resellerCount++;
-                        }
-                        if ($billingMetric->instance->id !== $lastInstance) {
-                            $lastInstance = $billingMetric->instance->id;
-                            $instanceCount++;
-                        }
-                        $this->info('Modifying: ' . $billingMetric->id);
-                        if (!$this->option('test-run')) {
-                            $billingMetric->setAttribute('end', Carbon::createFromDate($instanceMetric->created_at))
-                                ->saveQuietly();
-                        }
-                        $metricCount++;
-                    }
+                        ->orderBy('created_at', 'asc')
+                        ->each(function ($instanceMetric) use (&$billingMetric, &$lastReseller, &$resellerCount, &$lastInstance, &$instanceCount, &$lastMetric, &$metricCount) {
+                            if ($instanceMetric->end === null) {
+                                return;
+                            }
+                            if ($billingMetric->id !== $lastMetric) {
+                                $lastMetric = $billingMetric->id;
+                                if ($instanceMetric->reseller_id !== $lastReseller) {
+                                    $lastReseller = $instanceMetric->reseller_id;
+                                    $resellerCount++;
+                                }
+                                if ($instanceMetric->instance->id !== $lastInstance) {
+                                    $lastInstance = $instanceMetric->instance->id;
+                                    $instanceCount++;
+                                }
+                                $this->info('Modifying: ' . $billingMetric->id);
+                                if (!$this->option('test-run')) {
+                                    $billingMetric->setAttribute('end', Carbon::createFromDate($instanceMetric->created_at))
+                                        ->saveQuietly();
+                                }
+                                $metricCount++;
+                            }
+                        });
                 }
             });
 

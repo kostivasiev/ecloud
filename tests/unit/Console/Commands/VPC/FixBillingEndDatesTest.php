@@ -46,11 +46,11 @@ class FixBillingEndDatesTest extends TestCase
     {
         $this->command->handle();
 
-        $vcpuReference = BillingMetric::findOrFail('bm-dcf09a8b')->created_at->format('Y-m-d H:i:s');
-        $ramReference = BillingMetric::findOrFail('bm-ed3d1aef')->created_at->format('Y-m-d H:i:s');
+        $vcpuReference = BillingMetric::findOrFail('bm-ece6058a')->updated_at->format('Y-m-d H:i:s');
+        $ramReference = BillingMetric::findOrFail('bm-f47ccd89')->updated_at->format('Y-m-d H:i:s');
 
-        $this->assertEquals($vcpuReference, BillingMetric::find('bm-85693516')->end);
-        $this->assertEquals($ramReference, BillingMetric::find('bm-0d934e7d')->end);
+        $this->assertEquals($vcpuReference, BillingMetric::find('bm-ece6058a')->end);
+        $this->assertEquals($ramReference, BillingMetric::find('bm-f47ccd89')->end);
     }
 
     public function populateData()
