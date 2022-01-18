@@ -22,10 +22,7 @@ class DeleteCluster extends TaskJob
             ->setResellerId($loadBalancer->getResellerId());
         $status = $client->clusters()->deleteById($loadBalancer->config_id);
         if ($status) {
-            Log::info('Loadbalancer cluster has been deleted.', [
-                'id' => $loadBalancer->id,
-                'cluster_id' => $loadBalancer->config_id,
-            ]);
+            $this->info('Loadbalancer cluster has been deleted.', ['cluster_id' => $loadBalancer->config_id]);
         }
     }
 }
