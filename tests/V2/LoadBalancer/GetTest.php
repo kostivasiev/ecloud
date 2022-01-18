@@ -2,8 +2,6 @@
 
 namespace Tests\V2\LoadBalancer;
 
-use App\Models\V2\LoadBalancer;
-use App\Models\V2\LoadBalancerSpecification;
 use Faker\Factory as Faker;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
