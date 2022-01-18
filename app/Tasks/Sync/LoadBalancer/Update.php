@@ -2,6 +2,7 @@
 
 namespace App\Tasks\Sync\LoadBalancer;
 
+use App\Jobs\LoadBalancer\AddNetworks;
 use App\Jobs\LoadBalancer\CreateCluster;
 use App\Jobs\LoadBalancer\CreateCredentials;
 use App\Jobs\LoadBalancer\CreateNodes;
@@ -15,6 +16,7 @@ class Update extends Task
             CreateCluster::class,
             CreateCredentials::class,
             CreateNodes::class,
+            AddNetworks::class
         ];
     }
 }
