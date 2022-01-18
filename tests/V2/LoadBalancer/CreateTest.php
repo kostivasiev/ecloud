@@ -4,7 +4,6 @@ namespace Tests\V2\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerSpecification;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
