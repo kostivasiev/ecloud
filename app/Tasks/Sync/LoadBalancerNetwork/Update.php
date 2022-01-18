@@ -9,7 +9,7 @@ class Update extends Task
     public function jobs()
     {
         return [
-            DeleteNics::Class,
+            DeleteNics::class,
         ];
     }
 }
