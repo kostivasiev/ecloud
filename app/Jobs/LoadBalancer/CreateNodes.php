@@ -19,8 +19,6 @@ class CreateNodes extends TaskJob
                 $node = app()->make(LoadBalancerNode::class);
                 $node->fill([
                     'load_balancer_id' => $loadBalancer->id,
-                    'instance_id' => null,
-                    'node_id' => null,
                 ]);
                 $node->syncSave();
                 $loadBalancerNodes[] = $node->id;
