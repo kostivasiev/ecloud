@@ -15,9 +15,7 @@ class DeleteCluster extends TaskJob
     {
         $loadBalancer = $this->task->resource;
         if ($loadBalancer->config_id === null) {
-            Log::info('No Loadbalancer Cluster available, skipping', [
-                'id' => $loadBalancer->id,
-            ]);
+            $this->info('No Loadbalancer Cluster available, skipping');
             return;
         }
         $client = app()->make(AdminClient::class)
