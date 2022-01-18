@@ -11,7 +11,7 @@ class DeleteCredentials extends TaskJob
     {
         $loadbalancer = $this->task->resource;
         if ($loadbalancer->credentials()->count() == 0) {
-            Log::info('No credentials to cleanup, skipping', ['id' => $loadbalancer->id]);
+            $this->info('No credentials to delete, skipping');
             return;
         }
         $loadbalancer->credentials->each(function ($credential) {
