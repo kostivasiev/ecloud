@@ -20,9 +20,12 @@ class IsMaxForForCustomer
 
         $limit = config('load-balancer.customer_max_per_az');
 
-        $nodes = LoadBalancer::forUser(Auth::user())
+        $nodes = 0;
+        LoadBalancer::forUser(Auth::user())
             ->where('availability_zone_id', $request->input('availability_zone_id'))
-            ->get()->pluck('nodes')->sum();
+            ->each(function ($loadBalancer) use (&$nodes) {
+                $nodes = $nodes + $loadBalancer->loadBalancerNodes->count();
+            });
 
         $loadBalancerSpec = LoadBalancerSpecification::findOrFail($request->input('load_balancer_spec_id'));
 

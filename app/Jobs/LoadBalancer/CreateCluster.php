@@ -2,36 +2,19 @@
 
 namespace App\Jobs\LoadBalancer;
 
-use App\Jobs\Job;
-use App\Models\V2\LoadBalancer;
-use App\Models\V2\Task;
-use App\Traits\V2\Jobs\AwaitResources;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Jobs\TaskJob;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Loadbalancers\AdminClient;
 use UKFast\Admin\Loadbalancers\Entities\Cluster;
 
-class CreateCluster extends Job
+class CreateCluster extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources;
-
-    private LoadBalancer $model;
-    private Task $task;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
-
     public function handle()
     {
-        $loadbalancer = $this->model;
+        $loadbalancer = $this->task->resource;
 
         if ($loadbalancer->config_id !== null) {
-            Log::info('Loadbalancer has already been assigned a cluster id, skipping', [
-                'id' => $loadbalancer->id,
+            $this->info('Loadbalancer has already been assigned a cluster id, skipping', [
                 'cluster_id' => $loadbalancer->config_id,
             ]);
             return;
@@ -42,10 +25,7 @@ class CreateCluster extends Job
             'name' => $loadbalancer->id,
             'internal_name' => $loadbalancer->id
         ]));
-        Log::info('Setting Loadbalancer config id', [
-            'id' => $loadbalancer->id,
-            'cluster_id' => $response->getId(),
-        ]);
+        $this->info('Setting Loadbalancer config id', ['cluster_id' => $response->getId()]);
         $loadbalancer->setAttribute('config_id', $response->getId())->saveQuietly();
     }
 }
