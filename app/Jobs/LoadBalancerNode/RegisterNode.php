@@ -27,8 +27,8 @@ class RegisterNode extends TaskJob
             ])
         );
         $this->info('Registering instance as loadbalancer node', [
-                'cluster_id' => $loadBalancerNode->loadBalancer->config_id, 
-                'node_id' => $response->getId(),
+            'cluster_id' => $loadBalancerNode->loadBalancer->config_id,
+            'node_id' => $response->getId(),
         ]);
         $loadBalancerNode->setAttribute('node_id', $response->getId())->saveQuietly();
     }
