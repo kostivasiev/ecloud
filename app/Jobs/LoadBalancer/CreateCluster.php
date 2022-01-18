@@ -25,10 +25,7 @@ class CreateCluster extends TaskJob
             'name' => $loadbalancer->id,
             'internal_name' => $loadbalancer->id
         ]));
-        Log::info('Setting Loadbalancer config id', [
-            'id' => $loadbalancer->id,
-            'cluster_id' => $response->getId(),
-        ]);
+        $this->info('Setting Loadbalancer config id', ['cluster_id' => $response->getId()]);
         $loadbalancer->setAttribute('config_id', $response->getId())->saveQuietly();
     }
 }
