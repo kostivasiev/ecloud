@@ -8,6 +8,8 @@ class Update extends Task
 {
     public function jobs()
     {
-        return [];
+        return [
+            DeleteNics::Class,
+        ];
     }
 }
