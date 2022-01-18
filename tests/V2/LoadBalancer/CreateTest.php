@@ -14,7 +14,6 @@ use App\Models\V2\Vpc;
 use App\Support\Sync;
 use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Admin\Loadbalancers\AdminClient;
