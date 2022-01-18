@@ -26,10 +26,9 @@ class RegisterNode extends TaskJob
                 'vendor_id' => $loadBalancerNode->instance_id,
             ])
         );
-        Log::info('Registering instance as loadbalancer node', [
-            'id' => $loadBalancerNode->instance->id,
-            'cluster_id' => $loadBalancerNode->loadBalancer->config_id,
-            'node_id' => $response->getId(),
+        $this->info('Registering instance as loadbalancer node', [
+                'cluster_id' => $loadBalancerNode->loadBalancer->config_id, 
+                'node_id' => $response->getId(),
         ]);
         $loadBalancerNode->setAttribute('node_id', $response->getId())->saveQuietly();
     }
