@@ -5,7 +5,6 @@ namespace Tests\unit\Jobs\LoadBalancer;
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\CreateNodes;
 use App\Models\V2\LoadBalancerNode;
-use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;

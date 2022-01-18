@@ -16,13 +16,25 @@ class DeleteNodesTest extends TestCase
 {
     use LoadBalancerMock;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+    }
+
     public function testSuccess()
     {
-        $this->loadBalancerNode();
+        // Create the management network
+        $this->router()->setAttribute('is_management', true)->save();
+        $this->network();
+        $this->loadBalancerInstance();
+
         $task = Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_DELETE,
+                'data' => [
+                    'instance_ids' => [$this->loadBalancerInstance()->id],
+                ],
             ]);
             $task->resource()->associate($this->loadBalancer());
             $task->save();
@@ -34,5 +46,9 @@ class DeleteNodesTest extends TestCase
         dispatch(new DeleteNodes($task));
 
         Event::assertNotDispatched(JobFailed::class);
+
+        $task->refresh();
+
+        $this->assertNotNull($task->data['instance_ids']);
     }
 }

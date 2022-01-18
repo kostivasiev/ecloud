@@ -59,9 +59,7 @@ class CreateInstance extends TaskJob
                 'user_script' => null,
                 'ssh_key_pair_ids' => null,
                 'software_ids' => null,
-                'image_data' => [
-                    "node_id" => $nodeIndex,
-                ],
+                'image_data' => [],
             ],
             'is_hidden' => true
         ]);

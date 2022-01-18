@@ -4,7 +4,6 @@ namespace Tests\V2\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerSpecification;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
@@ -14,7 +13,6 @@ use App\Models\V2\Vpc;
 use App\Support\Sync;
 use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Admin\Loadbalancers\AdminClient;
@@ -203,7 +201,6 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        Bus::fake();
         Event::fake(Created::class);
 
         $data = [

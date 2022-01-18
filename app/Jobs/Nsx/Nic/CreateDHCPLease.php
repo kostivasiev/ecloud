@@ -3,6 +3,7 @@
 namespace App\Jobs\Nsx\Nic;
 
 use App\Jobs\Job;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -28,6 +29,7 @@ class CreateDHCPLease extends Job
         $network = $nic->network;
         $router = $nic->network->router;
         $nsxService = $router->availabilityZone->nsxService();
+
         /**
          * Get DHCP static bindings to determine used IP addresses on the network
          * @see https://185.197.63.88/policy/api_includes/method_ListSegmentDhcpStaticBinding.html
@@ -49,7 +51,12 @@ class CreateDHCPLease extends Job
             $cursor = $response->cursor ?? null;
         } while (!empty($cursor));
 
-        $ipAddress = $nic->assignIpAddress($assignedIpsNsx->toArray());
+
+        if (!$nic->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->exists()) {
+            $ipAddress = $nic->assignIpAddress($assignedIpsNsx->toArray());
+        } else {
+            $ipAddress = $nic->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->first();
+        }
 
         $nic->refresh();
 
