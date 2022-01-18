@@ -15,16 +15,17 @@ class DeleteNodes extends TaskJob
     public function handle()
     {
         $taskData = $this->task->data;
-        $instanceIds = [];
-        if (!empty($taskData['instance_ids'])) {
-            Instance::whereIn('id', $taskData['instance_ids'])
-                ->each(function ($instance) use (&$instanceIds) {
-                    $instance->syncDelete();
-                    $instanceIds[] = $instance->id;
-                });
-            $taskData['instance_ids'] = $instanceIds;
-            $this->task->setAttribute('data', $taskData)->saveQuietly();
+        if (empty($taskData['instances_deleting'])) {
+            if (!empty($taskData['instance_ids'])) {
+                Instance::whereIn('id', $taskData['instance_ids'])
+                    ->each(function ($instance) {
+                        $instance->syncDelete();
+                    });
+                $taskData['instances_deleting'] = true;
+                $this->task->setAttribute('data', $taskData)->saveQuietly();
+            }
+        } else {
+            $this->awaitSyncableResources($taskData['instance_ids']);
         }
-        $this->awaitSyncableResources($instanceIds);
     }
 }
