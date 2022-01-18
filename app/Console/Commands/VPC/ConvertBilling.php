@@ -140,7 +140,7 @@ class ConvertBilling extends Command
             return $metric->price;
         }
 
-        $availabilityZone = $metric->vpc->region->availabilityZones()->first(); // fallback
+        $availabilityZone = $metric->instance->availabilityZone; // fallback
         if ($resource && $resource instanceof AvailabilityZoneable) {
             $availabilityZone = $resource->availabilityZone;
         }
