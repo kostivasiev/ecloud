@@ -203,7 +203,6 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        Bus::fake();
         Event::fake(Created::class);
 
         $data = [
