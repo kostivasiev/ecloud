@@ -3,7 +3,6 @@
 namespace Tests\unit\Jobs\LoadBalancerNetwork;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\LoadBalancer\AddNetworks;
 use App\Jobs\LoadBalancerNetwork\CreateNics;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
@@ -23,6 +22,8 @@ class CreateNicsTest extends TestCase
     public function testInstanceDosNotHaveNicOnSameNetworkCreates()
     {
         Event::fake([JobFailed::class, Created::class, JobProcessed::class]);
+
+        $this->loadBalancerNode();
 
         $this->assertCount(0, $this->loadBalancerInstance()->nics);
 
@@ -77,6 +78,8 @@ class CreateNicsTest extends TestCase
     public function testReleasedWhenSyncing()
     {
         Event::fake([JobFailed::class, Created::class, JobProcessed::class]);
+
+        $this->loadBalancerNode();
 
         $this->assertCount(0, $this->loadBalancerInstance()->nics);
 
@@ -134,6 +137,8 @@ class CreateNicsTest extends TestCase
 
     public function testInstanceHasNicsOnDifferentNetworksCreates()
     {
+        $this->loadBalancerNode();
+
         Event::fake([JobFailed::class, Created::class]);
 
         $network = Model::withoutEvents(function () {
