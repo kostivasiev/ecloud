@@ -14,8 +14,7 @@ class CreateCluster extends TaskJob
         $loadbalancer = $this->task->resource;
 
         if ($loadbalancer->config_id !== null) {
-            Log::info('Loadbalancer has already been assigned a cluster id, skipping', [
-                'id' => $loadbalancer->id,
+            $this->info('Loadbalancer has already been assigned a cluster id, skipping', [
                 'cluster_id' => $loadbalancer->config_id,
             ]);
             return;
