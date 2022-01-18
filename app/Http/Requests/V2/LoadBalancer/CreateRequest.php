@@ -57,6 +57,7 @@ class CreateRequest extends FormRequest
                 'required',
                 'string',
                 new ExistsForUser(Network::class),
+                new IsResourceAvailable(Network::class),
             ],
         ];
     }
