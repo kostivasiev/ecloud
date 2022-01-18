@@ -5,7 +5,7 @@ use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
 use App\Traits\V2\TaskJobs\AwaitResources;
 
-class DeleteInstances extends TaskJob
+class DeleteNodes extends TaskJob
 {
     use AwaitResources;
 

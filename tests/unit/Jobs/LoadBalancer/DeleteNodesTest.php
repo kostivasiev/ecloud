@@ -3,9 +3,7 @@
 namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\LoadBalancer\DeleteInstances;
-use App\Models\V2\LoadBalancer;
-use App\Models\V2\OrchestratorBuild;
+use App\Jobs\LoadBalancer\DeleteNodes;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +12,7 @@ use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Mocks\Resources\LoadBalancerMock;
 
-class DeleteInstancesTest extends TestCase
+class DeleteNodesTest extends TestCase
 {
     use LoadBalancerMock;
 
@@ -42,7 +40,7 @@ class DeleteInstancesTest extends TestCase
 
         Event::fake([JobFailed::class, Created::class]);
 
-        dispatch(new DeleteInstances($task));
+        dispatch(new DeleteNodes($task));
 
         Event::assertNotDispatched(JobFailed::class);
 
