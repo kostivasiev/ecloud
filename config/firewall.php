@@ -78,6 +78,22 @@ return [
                         ]
                     ]
                 ],
+                [
+                    'name' => 'Windows Activation',
+                    'action' => 'ALLOW',
+                    'sequence' => 1,
+                    'direction' => 'OUT',
+                    'enabled' => true,
+                    'source' => 'ANY',
+                    'destination' => 'ANY',
+                    'ports' => [
+                        [
+                            'protocol' => 'TCP',
+                            'source' => 'ANY',
+                            'destination' => '1668'
+                        ]
+                    ]
+                ],
             ]
         ],
         [
