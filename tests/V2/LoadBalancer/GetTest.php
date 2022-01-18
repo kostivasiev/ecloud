@@ -2,13 +2,13 @@
 
 namespace Tests\V2\LoadBalancer;
 
-use App\Models\V2\LoadBalancer;
-use App\Models\V2\LoadBalancerSpecification;
 use Faker\Factory as Faker;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 
 class GetTest extends TestCase
 {
+    use LoadBalancerMock;
     protected $loadBalancer;
     protected $loadBalancerSpec;
 
@@ -16,12 +16,9 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->loadBalancerSpec = factory(LoadBalancerSpecification::class)->create();
-        $this->loadBalancer = factory(LoadBalancer::class)->create([
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'vpc_id' => $this->vpc()->id,
-            'load_balancer_spec_id' => $this->loadBalancerSpec->id
-        ]);
+        $this->loadBalancerSpecification();
+        $this->loadBalancer();
+        $this->loadBalancerNode();
     }
 
     public function testGetCollection()
@@ -34,30 +31,28 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->loadBalancer->id,
-                'name' => $this->loadBalancer->name,
-                'vpc_id' => $this->loadBalancer->vpc_id,
-                'load_balancer_spec_id' => $this->loadBalancer->load_balancer_spec_id,
+                'id' => $this->loadBalancer()->id,
+                'name' => $this->loadBalancer()->name,
+                'vpc_id' => $this->loadBalancer()->vpc_id,
+                'load_balancer_spec_id' => $this->loadBalancer()->load_balancer_spec_id,
             ])
             ->assertResponseStatus(200);
     }
 
     public function testGetItemDetail()
     {
-        $this->loadBalancer->instances()->save($this->instance());
-
         $this->get(
-            '/v2/load-balancers/' . $this->loadBalancer->id,
+            '/v2/load-balancers/' . $this->loadBalancer()->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->loadBalancer->id,
-                'name' => $this->loadBalancer->name,
-                'vpc_id' => $this->loadBalancer->vpc_id,
-                'load_balancer_spec_id' => $this->loadBalancer->load_balancer_spec_id,
+                'id' => $this->loadBalancer()->id,
+                'name' => $this->loadBalancer()->name,
+                'vpc_id' => $this->loadBalancer()->vpc_id,
+                'load_balancer_spec_id' => $this->loadBalancer()->load_balancer_spec_id,
                 'nodes' => 1,
             ])
             ->assertResponseStatus(200);

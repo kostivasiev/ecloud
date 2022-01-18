@@ -65,7 +65,7 @@ class AddNetworksTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == 'sync_update';
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
         });
 
         $task->refresh();

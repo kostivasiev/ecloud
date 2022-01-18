@@ -84,7 +84,9 @@ class LoadBalancerController extends BaseController
 
     public function nodes(Request $request, QueryTransformer $queryTransformer, string $loadBalancerId)
     {
-        $collection = LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId)->instances();
+        $collection = LoadBalancer::forUser($request->user())
+            ->findOrFail($loadBalancerId)
+            ->instances();
         $queryTransformer->config(Instance::class)
             ->transform($collection);
 

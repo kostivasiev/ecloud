@@ -2,39 +2,25 @@
 
 namespace App\Jobs\LoadBalancer;
 
-use App\Jobs\Job;
-use App\Models\V2\LoadBalancer;
+use App\Jobs\TaskJob;
 use App\Models\V2\LoadBalancerNetwork;
 use App\Models\V2\Network;
-use App\Models\V2\Task;
-use App\Traits\V2\Jobs\AwaitResources;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Traits\V2\TaskJobs\AwaitResources;
 use Illuminate\Support\Facades\Log;
 
-class AddNetworks extends Job
+class AddNetworks extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources;
-
-    private LoadBalancer $model;
-
-    private Task $task;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
+    use AwaitResources;
 
     /**
      * @throws \Exception
      */
     public function handle()
     {
-        $loadBalancer = $this->model;
+        $loadBalancer = $this->task->resource;
 
         if (empty($this->task->data['network_ids'])) {
-            Log::info(get_class($this) . ': No networks to add, skipping');
+            $this->info('No networks to add, skipping');
             return;
         }
 

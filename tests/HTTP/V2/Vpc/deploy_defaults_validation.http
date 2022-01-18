@@ -1,0 +1,181 @@
+### 1. Create a Region
+POST https://{{host}}/{{version}}/regions
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "TestRegion"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 201");
+});
+
+client.global.set('region_id', response.body.data.id);
+client.log('Region ID: ' + response.body.data.id);
+%}
+
+### 2. Create an AZ in that region
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test AZ",
+  "code": "MAN1",
+  "datacentre_site_id": 111,
+  "is_public": true,
+  "region_id": "{{region_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 201");
+});
+
+client.global.set('availability_zone_id', response.body.data.id);
+client.log('Availability Zone ID: ' + response.body.data.id);
+%}
+
+### 3. Create VPC
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "TEST VPC",
+    "region_id": "{{dev_region_id}}"
+}
+
+> {%
+client.test('Create VPC', function () {
+    client.assert(response.status === 202, '202 Response Not Received');
+});
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC Id : ' + response.body.data.id);
+%}
+
+### 4. Deploy Defaults using the new AZ
+POST https://{{host}}/{{version}}/vpcs/{{vpc_id}}/deploy-defaults
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "availability_zone_id": "{{availability_zone_id}}"
+}
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 422, "Response status is not 422");
+});
+%}
+
+### 5. Deploy Defaults using the existing AZ
+POST https://{{host}}/{{version}}/vpcs/{{vpc_id}}/deploy-defaults
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### 6. Get Router ID
+GET https://{{host}}/{{version}}/routers/?vpc_id:eq={{vpc_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 200, "Response status is not 200");
+});
+client.global.set('router_id', response.body.data[0].id);
+client.log("Router ID: " + response.body.data[0].id);
+%}
+
+### 7. Get Network ID
+GET https://{{host}}/{{version}}/networks/?router_id:eq={{router_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 200, "Response status is not 200");
+});
+client.global.set('network_id', response.body.data[0].id);
+client.log("Network ID: " + response.body.data[0].id);
+%}
+
+### 8. Delete Network
+DELETE https://{{host}}/{{version}}/networks/{{network_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+### 9. Delete Router
+DELETE https://{{host}}/{{version}}/routers/{{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+### 10. Cleanup VPC
+DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+### 11. Cleanup AZ
+DELETE https://{{host}}/{{version}}/availability-zones/{{availability_zone_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+### 12. Cleanup Region
+DELETE https://{{host}}/{{version}}/regions/{{region_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+

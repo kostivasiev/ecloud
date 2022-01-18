@@ -2,34 +2,20 @@
 
 namespace App\Jobs\LoadBalancer;
 
-use App\Jobs\Job;
-use App\Models\V2\LoadBalancer;
-use App\Models\V2\Task;
-use App\Traits\V2\Jobs\AwaitResources;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Jobs\TaskJob;
+use App\Traits\V2\TaskJobs\AwaitResources;
 use Illuminate\Support\Facades\Log;
 
-class DeleteNetworks extends Job
+class DeleteNetworks extends TaskJob
 {
-    use Batchable, LoggableModelJob, AwaitResources;
-
-    private LoadBalancer $model;
-
-    private Task $task;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
+    use AwaitResources;
 
     /**
      * @throws \Exception
      */
     public function handle()
     {
-        $loadBalancer = $this->model;
+        $loadBalancer = $this->task->resource;
 
         if ($loadBalancer->loadBalancerNetworks()->count() == 0) {
             return;

@@ -267,6 +267,28 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'id' => 'az-test',
                 'region_id' => $this->region()->id,
             ]);
+
+            factory(Credential::class)->create([
+                'id' => 'cred-lbnats',
+                'name' => 'LB Nats Server',
+                'resource_id'=> $this->availabilityZone->id,
+                'host'=> 'tls://some.nats.server',
+                'username'=> 'lb_nats_server',
+                'password'=> null,
+                'port'=> 4222,
+                'is_hidden'=> false,
+            ]);
+
+            factory(Credential::class)->create([
+                'id' => 'cred-lbnats-adv',
+                'name' => 'LB Nats Server (Advanced Networking)',
+                'resource_id'=> $this->availabilityZone->id,
+                'host'=> 'tls://some.nats.server.advanced',
+                'username'=> 'lb_nats_server_advanced',
+                'password'=> null,
+                'port'=> 4222,
+                'is_hidden'=> false,
+            ]);
         }
         return $this->availabilityZone;
     }

@@ -20,7 +20,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class Vpc extends Model implements Filterable, Sortable, ResellerScopeable
+class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, RegionAble
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
