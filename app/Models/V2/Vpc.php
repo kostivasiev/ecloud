@@ -35,6 +35,7 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
         'reseller_id',
         'region_id',
         'console_enabled',
+        'support_enabled',
         'advanced_networking',
     ];
 
@@ -55,6 +56,7 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
 
     protected $casts = [
         'console_enabled' => 'bool',
+        'support_enabled' => 'bool',
         'advanced_networking' => 'bool',
     ];
 
@@ -132,21 +134,18 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
      */
     public function getSupportEnabledAttribute(): bool
     {
-        return $this->vpcSupports->filter(function ($vpcSupport) {
-            return $vpcSupport->active;
-        })->count() > 0;
+        return $this->support_enabled;
     }
 
     public function enableSupport($date = null)
     {
-        if ($this->supportEnabled) {
+        if ($this->support_enabled) {
             return true;
         }
 
-        $vpcSupport = app()->make(VpcSupport::class);
-        $vpcSupport->start_date = $date ?? Carbon::now(new \DateTimeZone(config('app.timezone')));
-        $vpcSupport->vpc()->associate($this);
-        return $vpcSupport->save();
+        $this->support_enabled = true;
+
+        return $this->save();
     }
 
     public function disableSupport()
@@ -155,11 +154,9 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
             return true;
         }
 
-        $vpcSupport = $this->vpcSupports->filter(function ($vpcSupport) {
-            return $vpcSupport->active;
-        })->first();
-        $vpcSupport->end_date = Carbon::now(new \DateTimeZone(config('app.timezone')));
-        return $vpcSupport->save();
+        $this->support_enabled = false;
+
+        return $this->save();
     }
 
     /**
@@ -174,6 +171,7 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
             $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
             $factory->create('console_enabled', Filter::$enumDefaults),
+            $factory->create('support_enabled', Filter::$enumDefaults),
             $factory->create('advanced_networking', Filter::$enumDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
@@ -193,6 +191,7 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
             $factory->create('reseller_id'),
             $factory->create('region_id'),
             $factory->create('console_enabled'),
+            $factory->create('support_enabled'),
             $factory->create('advanced_networking'),
             $factory->create('created_at'),
             $factory->create('updated_at'),
@@ -222,6 +221,7 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
             'reseller_id' => 'reseller_id',
             'region_id' => 'region_id',
             'console_enabled' => 'console_enabled',
+            'support_enabled' => 'support_enabled',
             'advanced_networking' => 'advanced_networking',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',

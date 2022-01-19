@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddConsoleEnabledColumnToVpcsTable extends Migration
+class AddSupportEnabledToVpcs extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class AddConsoleEnabledColumnToVpcsTable extends Migration
      */
     public function up()
     {
-`        Schema::connection('ecloud')->table('vpcs', function (Blueprint $table) {
-            $table->boolean('console_enabled')->default(true)->after('reseller_id');
-        });`
+        Schema::connection('ecloud')->table('vpcs', function (Blueprint $table) {
+            $table->boolean('support_enabled')->default(false)->after('console_enabled');
+        });
     }
 
     /**
@@ -26,7 +26,7 @@ class AddConsoleEnabledColumnToVpcsTable extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('vpcs', function (Blueprint $table) {
-            $table->dropColumn(['console_enabled']);
+            $table->dropColumn('support_enabled');
         });
     }
 }

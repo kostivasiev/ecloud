@@ -5,10 +5,8 @@ namespace App\Jobs\OrchestratorBuild;
 use App\Jobs\Job;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Vpc;
-use App\Models\V2\VpcSupport;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class CreateVpcs extends Job
