@@ -40,7 +40,7 @@ class UpdateImageBilling implements Billable
             $model = Image::find($event->model->data['image_id']);
         }
 
-        if (!isset($model) || get_class($model) != Image::class) {
+        if (get_class($model) != Image::class) {
             Log::info(get_class($this) . ' : Image class not found, skipping');
             return;
         }
@@ -74,8 +74,7 @@ class UpdateImageBilling implements Billable
             'start' => $time,
         ]);
 
-        $availabilityZone = $event->model->resource->availabilityZone;
-
+        $availabilityZone = $model->availabilityZones()->first();
         $productName = $availabilityZone->id . ': volume-1gb';
         /** @var Product $product */
         $product = $availabilityZone->products()
