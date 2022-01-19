@@ -28,7 +28,7 @@ API User Example - Retrieve a vpc collection so that I can perform actions on my
 <!--- set product or project milestone - If appropriate  -->
 /milestone %
 
-<!--- set initial issue status, priority, weight & estimate - see handbook if unsure  -->
-/label ~"To Do" ~P2
+<!--- set initial issue status, risk, priority, weight & estimate - see handbook if unsure  -->
+/label ~"To Do" ~P2 ~"risk::low" 
 /weight 
 /estimate 
