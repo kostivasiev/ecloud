@@ -33,49 +33,13 @@ class AssignFloatingIpTest extends TestCase
     {
         Event::fake([JobFailed::class, Created::class]);
 
-        factory(Instance::class, 2)->create([
-            'vpc_id' => $this->vpc()->id,
-            'name' => 'Load Balancer Instance ' . uniqid(),
-            'image_id' => $this->image()->id,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'platform' => 'Linux',
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'load_balancer_id' => $this->loadBalancer()->id
-        ])->each(function ($instance) {
-            factory(Nic::class)->create([
-                'mac_address' => $this->faker->macAddress,
-                'instance_id' => $instance->id,
-                'network_id' => $this->network()->id,
-            ]);                                                                   
-        });
-
         $ipAddress = $this->vip()->assignClusterIp();
 
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'task-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-                'data' => [
-                    'allocate_floating_ip' => true
-                ]
-            ]);
-            $task->resource()->associate($this->vip());
-            $task->save();
-            return $task;
-        });
-//
-//        $nic = $this->loadBalancer()->instances()->first()->nics()->first();
-//
-//        // Bind and return completed ID on creation
-//        app()->bind(Task::class, function () use ($nic) {
-//            $task = new Task([
-//                'completed' => true,
-//                'name' => AssociateIp::$name
-//            ]);
-//            $task->resource()->associate($nic);
-//            return $task;
-//        });
+
+        $task = $this->createSyncUpdateTask($this->vip(), ['allocate_floating_ip' => true]);
+
+
+
 
         dispatch(new AssignFloatingIp($task));
 

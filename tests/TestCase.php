@@ -627,19 +627,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
         return $this->hostSpec;
     }
 
-    public function createSyncUpdateTask($resource) : Task {
-        return Task::withoutEvents(function () use ($resource) {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-
-            $task->resource()->associate($resource);
-            $task->save();
-            return $task;
-        });
-    }
-
     public function artisanServiceMock()
     {
         if (!$this->artisanServiceMock) {

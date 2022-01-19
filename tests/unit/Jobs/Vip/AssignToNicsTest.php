@@ -5,73 +5,69 @@ namespace Tests\unit\Jobs\Vip;
 use App\Events\V2\Task\Created;
 use App\Jobs\Tasks\Nic\AssociateIp;
 use App\Jobs\Vip\AssignToNics;
-use App\Models\V2\Instance;
-use App\Models\V2\Nic;
-use App\Models\V2\Task;
-use App\Support\Sync;
-use Faker\Factory as Faker;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\Mocks\Resources\VipMock;
 use Tests\TestCase;
 
 class AssignToNicsTest extends TestCase
 {
-    use VipMock;
+    use VipMock, LoadBalancerMock;
 
-    protected \Faker\Generator $faker;
-
-    public function setUp(): void
+    public function testAssignToNicsSuccess()
     {
-        parent::setUp();
-        $this->faker = Faker::create();
+        Event::fake([JobFailed::class, Created::class, JobProcessed::class]);
+
+        // Create a VIP and assign a cluster IP to it.
+        $this->vip()->assignClusterIp();
+
+        // Create am instance/node and associate it with the load balancer
+        $this->loadBalancerNode();
+
+        // Create a NIC on the instance/mode
+        $this->nic()->setAttribute('instance_id', $this->loadBalancerInstance()->id)->saveQuietly();
+
+        $task = $this->createSyncUpdateTask($this->vip());
+
+        dispatch(new AssignToNics($task));
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == AssociateIp::$name;
+        });
+
+        $task->refresh();
+
+        $this->assertNotNull($task->data['task.' . AssociateIp::$name . '.ids']);
+
+        // Mark the Associate IP Task as completed
+        $event = Event::dispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == AssociateIp::$name;
+        })->first()[0];
+
+        $event->model->setAttribute('completed', true)->saveQuietly();
+
+        dispatch(new AssignToNics($task));
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
     }
 
-    public function testAssignIpAddress()
+    public function testAssignToNicsNotSyncedReleases()
     {
-        Event::fake([JobFailed::class, Created::class]);
-
-        factory(Instance::class, 2)->create([
-            'vpc_id' => $this->vpc()->id,
-            'name' => 'Load Balancer Instance ' . uniqid(),
-            'image_id' => $this->image()->id,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'platform' => 'Linux',
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'load_balancer_id' => $this->loadBalancer()->id
-        ])->each(function ($instance) {
-            factory(Nic::class)->create([
-                'mac_address' => $this->faker->macAddress,
-                'instance_id' => $instance->id,
-                'network_id' => $this->network()->id,
-            ]);
-        });
+        Event::fake([JobFailed::class, Created::class, JobProcessed::class]);
 
         $this->vip()->assignClusterIp();
 
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'task-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->vip());
-            $task->save();
-            return $task;
-        });
+        $this->loadBalancerNode();
 
-        $nic = $this->loadBalancer()->instances()->first()->nics()->first();
+        $this->nic()->setAttribute('instance_id', $this->loadBalancerInstance()->id)->saveQuietly();
 
-        // Bind and return completed ID on creation
-        app()->bind(Task::class, function () use ($nic) {
-            $task = new Task([
-                'completed' => true,
-                'name' => AssociateIp::$name
-            ]);
-            $task->resource()->associate($nic);
-            return $task;
-        });
+        $task = $this->createSyncUpdateTask($this->vip());
 
         dispatch(new AssignToNics($task));
 
@@ -82,44 +78,25 @@ class AssignToNicsTest extends TestCase
         $task->refresh();
 
         $this->assertNotNull($task->data['task.' . AssociateIp::$name . '.ids']);
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return $event->job->isReleased();
+        });
     }
 
-    public function testIpAddressAlreadyAssignedSkips()
+    public function testAssignToNicsAlreadyAssignedSkips()
     {
-        Event::fake([JobFailed::class]);
+        Event::fake([JobFailed::class, Created::class, JobProcessed::class]);
 
-        factory(Instance::class)->create([
-            'vpc_id' => $this->vpc()->id,
-            'name' => 'Load Balancer Instance ' . uniqid(),
-            'image_id' => $this->image()->id,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'platform' => 'Linux',
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'load_balancer_id' => $this->loadBalancer()->id
-        ])->each(function ($instance) {
-            factory(Nic::class)->create([
-                'mac_address' => $this->faker->macAddress,
-                'instance_id' => $instance->id,
-                'network_id' => $this->network()->id,
-            ]);
-        });
+        $this->vip()->assignClusterIp();
 
-        $ipAddress = $this->vip()->assignClusterIp();
+        $this->loadBalancerNode();
 
-        $nic = $this->loadBalancer()->instances()->first()->nics()->first();
+        $this->nic()->setAttribute('instance_id', $this->loadBalancerInstance()->id)->saveQuietly();
 
-        $nic->ipAddresses()->save($ipAddress);
+        $task = $this->createSyncUpdateTask($this->vip());
 
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'task-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->vip());
-            $task->save();
-            return $task;
-        });
+        $this->nic()->ipAddresses()->save($this->vip()->ipAddress);
 
         dispatch(new AssignToNics($task));
 

@@ -3,17 +3,20 @@
 namespace App\Jobs\Vip;
 
 use App\Jobs\TaskJob;
-use Illuminate\Support\Facades\Log;
 
 class AssignIpAddress extends TaskJob
 {
+    /**
+     * Assign an IP address to the vip
+     * @return void
+     */
     public function handle()
     {
         $vip = $this->task->resource;
 
         if (!$vip->ipAddress()->exists()) {
             $ipAddress = $vip->assignClusterIp();
-            Log::info('IP Address ' . $ipAddress->id . ' (' . $ipAddress->getIPAddress() . ') assigned to VIP ' . $vip->id);
+            $this->info('IP Address ' . $ipAddress->id . ' (' . $ipAddress->getIPAddress() . ') assigned to VIP ' . $vip->id);
         }
     }
 }
