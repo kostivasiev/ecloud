@@ -40,7 +40,7 @@ class UpdateImageBilling implements Billable
             $image = Image::find($event->model->data['image_id']);
         }
 
-        if (get_class($image) != Image::class) {
+        if (!isset($image) || get_class($image) != Image::class) {
             Log::info(get_class($this) . ' : Image class not found, skipping');
             return;
         }
