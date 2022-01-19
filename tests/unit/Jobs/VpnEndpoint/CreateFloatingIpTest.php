@@ -41,7 +41,7 @@ class CreateFloatingIpTest extends TestCase
 
         $this->assertNull($task->data);
 
-        dispatch(new CreateFloatingIp($this->vpnEndpoint(), $task));
+        dispatch(new CreateFloatingIp($task));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -77,7 +77,7 @@ class CreateFloatingIpTest extends TestCase
             return $task;
         });
 
-        dispatch(new CreateFloatingIp($this->vpnEndpoint(), $task));
+        dispatch(new CreateFloatingIp($task));
 
         Event::assertNotDispatched(JobFailed::class);
 

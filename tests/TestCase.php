@@ -267,6 +267,28 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                 'id' => 'az-test',
                 'region_id' => $this->region()->id,
             ]);
+
+            factory(Credential::class)->create([
+                'id' => 'cred-lbnats',
+                'name' => 'LB Nats Server',
+                'resource_id'=> $this->availabilityZone->id,
+                'host'=> 'tls://some.nats.server',
+                'username'=> 'lb_nats_server',
+                'password'=> null,
+                'port'=> 4222,
+                'is_hidden'=> false,
+            ]);
+
+            factory(Credential::class)->create([
+                'id' => 'cred-lbnats-adv',
+                'name' => 'LB Nats Server (Advanced Networking)',
+                'resource_id'=> $this->availabilityZone->id,
+                'host'=> 'tls://some.nats.server.advanced',
+                'username'=> 'lb_nats_server_advanced',
+                'password'=> null,
+                'port'=> 4222,
+                'is_hidden'=> false,
+            ]);
         }
         return $this->availabilityZone;
     }
@@ -671,6 +693,32 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     public function loadData($dataFile)
     {
         return file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'_data'.DIRECTORY_SEPARATOR.$dataFile) ?? false;
+    }
+
+    public function createSyncUpdateTask($resource, $data = null) : Task {
+        return Task::withoutEvents(function () use ($resource, $data) {
+            $task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+                'data' => $data
+            ]);
+            $task->resource()->associate($resource);
+            $task->save();
+            return $task;
+        });
+    }
+
+    public function createSyncDeleteTask($resource, $data = null) : Task {
+        return Task::withoutEvents(function () use ($resource, $data) {
+            $task = new Task([
+                'id' => 'sync-delete',
+                'name' => Sync::TASK_NAME_DELETE,
+                'data' => $data
+            ]);
+            $task->resource()->associate($resource);
+            $task->save();
+            return $task;
+        });
     }
 
     protected function setUp(): void

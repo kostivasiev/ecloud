@@ -26,7 +26,7 @@ use UKFast\DB\Ditto\Sortable;
  * @package App\Models\V2
  * @method static findOrFail(string $zoneId)
  */
-class AvailabilityZone extends Model implements Filterable, Sortable
+class AvailabilityZone extends Model implements Filterable, Sortable, RegionAble
 {
     use CustomKey, SoftDeletes, DeletionRules;
 

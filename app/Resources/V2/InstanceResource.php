@@ -51,7 +51,7 @@ class InstanceResource extends UKFastResource
         }
         if (Auth::user()->isAdmin()) {
             $response['is_hidden'] = $this->isHidden();
-            $response['load_balancer_id'] = $this->load_balancer_id;
+            $response['load_balancer_id'] = ($this->loadBalancerNode) ? $this->loadBalancerNode->load_balancer_id : null;
         }
 
         return $response;

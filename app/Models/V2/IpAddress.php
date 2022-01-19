@@ -89,6 +89,11 @@ class IpAddress extends Model implements Filterable, Sortable, Natable, RouterSc
         });
     }
 
+    public function scopeWithType($query, $type)
+    {
+        return $query->where('type', $type);
+    }
+
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]

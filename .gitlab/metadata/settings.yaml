@@ -52,12 +52,12 @@ Team:
 Feedback:
 
 # Project Roles
-ProductManager: C.Evans
+ProductManager: andrew.west-moore
 LeadEngineer: gavin.taylor
-ProjectManager: james.littlefair
+ProjectManager: andrew.west-moore
 TeamManager: gavin.taylor
 Sponsor: chris.folkerd
-Triager: james.littlefair
+Triager: gavin.taylor
 
 # Is this project a deliverable with an end goal? Will it require a one pager?
 # If so, that is a PMOProject and this should be marked as `true`.

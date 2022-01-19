@@ -3,6 +3,7 @@
 namespace App\Http\Requests\V2\LoadBalancer;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
@@ -46,7 +47,18 @@ class CreateRequest extends FormRequest
                 'exists:ecloud.vpcs,id,deleted_at,NULL',
                 new ExistsForUser(Vpc::class),
                 new IsResourceAvailable(Vpc::class),
-            ]
+            ],
+            'network_ids' => [
+                'sometimes',
+                'required',
+                'array'
+            ],
+            'network_ids.*' => [
+                'required',
+                'string',
+                new ExistsForUser(Network::class),
+                new IsResourceAvailable(Network::class),
+            ],
         ];
     }
 

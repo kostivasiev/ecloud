@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\Vpc;
 
 use App\Models\V2\AvailabilityZone;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsSameRegion;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -19,12 +20,14 @@ class DeployDefaultsRequest extends FormRequest
      */
     public function rules()
     {
+        $vpcId = app('request')->route('vpcId');
         return [
             'availability_zone_id' => [
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
                 new ExistsForUser(AvailabilityZone::class),
+                new IsSameRegion($vpcId),
             ],
         ];
     }

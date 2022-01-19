@@ -22,5 +22,7 @@ checklist of the tasks required to determine this issue as done
 <!--- set product or project labels if available  -->
 
 
-<!--- set initial issue status and weight  -->
-/label ~"To Do" 
+<!--- set initial issue status, risk and weight  -->
+/label ~"To Do" ~"risk::low" 
+/weight
+/estimate

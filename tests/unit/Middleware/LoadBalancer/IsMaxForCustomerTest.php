@@ -22,7 +22,7 @@ class IsMaxForCustomerTest extends TestCase
 
     public function testLimitReachedFails()
     {
-        Config::set('load-balancer.customer_max_per_az', 2);
+        Config::set('load-balancer.customer_max_per_az', 1);
         $this->loadBalancer();
 
         factory(Instance::class, 2)->create([

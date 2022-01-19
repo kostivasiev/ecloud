@@ -113,8 +113,8 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
             return $this->attributes['ip_address'];
         }
 
-        if ($this->ipAddresses()->where('type', IpAddress::TYPE_NORMAL)->exists()) {
-            return $this->ipAddresses()->where('type', IpAddress::TYPE_NORMAL)->first()->ip_address;
+        if ($this->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->exists()) {
+            return $this->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->first()->ip_address;
         }
 
         return null;
@@ -128,7 +128,7 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
      */
     public function assignIpAddress(array $denyList = [], string $type = IpAddress::TYPE_NORMAL) : IpAddress
     {
-        $lock = Cache::lock("ip_address." . $this->id, 60);
+        $lock = Cache::lock("ip_address." . $this->network->id, 60);
         try {
             $lock->block(60);
 

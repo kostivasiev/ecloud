@@ -8,6 +8,8 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -69,9 +71,21 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
         return $this->belongsTo(LoadBalancerSpecification::class);
     }
 
+    public function loadBalancerNodes(): HasMany
+    {
+        return $this->hasMany(LoadBalancerNode::class);
+    }
+
     public function instances()
     {
-        return $this->hasMany(Instance::class);
+        return $this->hasManyThrough(
+            Instance::class,
+            LoadBalancerNode::class,
+            'load_balancer_id',
+            'id',
+            'id',
+            'instance_id'
+        );
     }
 
     public function vips()
@@ -82,6 +96,27 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
     public function getResellerId(): int
     {
         return $this->vpc->reseller_id;
+    }
+
+    /**
+     * Loads networks using the LoadBalancerNetworks pivot
+     * @return HasManyThrough
+     */
+    public function networks(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Network::class,
+            LoadBalancerNetwork::class,
+            'load_balancer_id',
+            'id',
+            'id',
+            'network_id'
+        );
+    }
+
+    public function loadBalancerNetworks()
+    {
+        return $this->hasMany(LoadBalancerNetwork::class);
     }
 
     /**
@@ -101,7 +136,7 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
 
     public function getNodesAttribute(): int
     {
-        return (int) $this->instances()->count();
+        return (int) $this->loadBalancerNodes()->count();
     }
 
     /**

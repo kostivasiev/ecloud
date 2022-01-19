@@ -52,7 +52,7 @@ Nice to Have - It's not a critical update, for a rainy day
 <!-- If technical risks are identified, please also list the steps taken to mitigate the risk --> 
 
 - [x] A formal risk analysis is required by this issue
-
+/label ~"risk::low" 
 
 ### Design and documentation
 <!--

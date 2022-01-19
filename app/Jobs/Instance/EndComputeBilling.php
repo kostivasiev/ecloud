@@ -32,6 +32,7 @@ class EndComputeBilling extends Job
         if (!($this->getOnlineStatus($instance)['online'])) {
             $instance->billingMetrics()
                 ->whereIn('key', ['ram.capacity', 'ram.capacity.high', 'vcpu.count'])
+                ->whereNull('end')
                 ->each(function ($billingMetric) {
                     Log::debug('End billing of `' . $billingMetric->key . '` for Instance ' . $this->model->id);
                     $billingMetric->setEndDate();
