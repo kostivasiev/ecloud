@@ -37,22 +37,22 @@ class UpdateImageBilling implements Billable
                 Log::info(get_class($this) . ' : no data found, skipping');
                 return;
             }
-            $image = Image::find($event->model->data['image_id']);
+            $model = Image::find($event->model->data['image_id']);
         }
 
-        if (!isset($image) || get_class($image) != Image::class) {
+        if (!isset($model) || get_class($model) != Image::class) {
             Log::info(get_class($this) . ' : Image class not found, skipping');
             return;
         }
 
         $time = Carbon::now();
 
-        $metaData = $image->imageMetadata()
+        $metaData = $model->imageMetadata()
             ->where('key', '=', 'ukfast.spec.volume.min')
             ->first();
         $volumeCapacity = (int)$metaData->value;
 
-        $currentActiveMetric = BillingMetric::where('resource_id', $image->id)
+        $currentActiveMetric = BillingMetric::where('resource_id', $model->id)
             ->where('key', '=', self::getKeyName())
             ->whereNull('end')
             ->first();
@@ -65,16 +65,16 @@ class UpdateImageBilling implements Billable
         }
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->fill([
-            'resource_id' => $image->id,
-            'vpc_id' => $image->vpc_id,
-            'reseller_id' => $image->vpc->reseller_id,
+            'resource_id' => $model->id,
+            'vpc_id' => $model->vpc_id,
+            'reseller_id' => $model->vpc->reseller_id,
             'name' => self::getFriendlyName(),
             'key' => self::getKeyName(),
             'value' => $volumeCapacity,
             'start' => $time,
         ]);
 
-        $availabilityZone = $model->availabilityZone;
+        $availabilityZone = $event->model->resource->availabilityZone;
 
         $productName = $availabilityZone->id . ': volume-1gb';
         /** @var Product $product */
@@ -88,7 +88,7 @@ class UpdateImageBilling implements Billable
             );
         } else {
             $billingMetric->category = $product->category;
-            $billingMetric->price = $product->getPrice($image->vpc->reseller_id);
+            $billingMetric->price = $product->getPrice($model->vpc->reseller_id);
         }
 
         $billingMetric->save();
