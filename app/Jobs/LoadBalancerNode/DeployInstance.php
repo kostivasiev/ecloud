@@ -24,7 +24,8 @@ class DeployInstance extends TaskJob
         if (empty($this->task->data['loadbalancer_instance_id'])) {
             $natsServers = $this->getNatsServers();
             if ($natsServers === null) {
-                throw new \Exception('No nats servers found for ' . $availabilityZone->id);
+                $this->fail(new \Exception('No nats servers found for ' . $availabilityZone->id));
+                return;
             }
             // Now populate the remaining deploy_data elements
             $deployData = $instance->deploy_data + [
