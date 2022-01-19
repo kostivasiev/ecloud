@@ -15,11 +15,17 @@ class DeployInstance extends TaskJob
     {
         $loadBalancerNode = $this->task->resource;
         $instance = $loadBalancerNode->instance;
+        $availabilityZone = $loadBalancerNode->loadBalancer->availabilityZone;
+
         if ($instance->deploy_data === null) {
             $instance->setAttribute('deploy_data', [])->saveQuietly();
         }
 
         if (empty($this->task->data['loadbalancer_instance_id'])) {
+            $natsServers = $this->getNatsServers();
+            if ($natsServers === null) {
+                throw new \Exception('No nats servers found for ' . $availabilityZone->id);
+            }
             // Now populate the remaining deploy_data elements
             $deployData = $instance->deploy_data + [
                     'stats_password' => $this->getStatsPassword(),
@@ -59,7 +65,7 @@ class DeployInstance extends TaskJob
             ->password;
     }
 
-    public function getNatsServers(): array
+    public function getNatsServers(): ?array
     {
         $loadBalancerNode = $this->task->resource;
         $natsServer = 'lb_nats_server';
@@ -71,6 +77,6 @@ class DeployInstance extends TaskJob
                 ['username', '=', $natsServer]
             ])
             ->first();
-        return [$cred->host.':'.$cred->port];
+        return $cred ? [$cred->host.':'.$cred->port] : null;
     }
 }
