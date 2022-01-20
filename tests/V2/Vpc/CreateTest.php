@@ -3,6 +3,7 @@
 namespace Tests\V2\Vpc;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -143,6 +144,7 @@ class CreateTest extends TestCase
         app()->bind(Vpc::class, function () {
             return factory(Vpc::class)->create([
                 'id' => 'vpc-test2',
+                'support_enabled' => false,
             ]);
         });
         $this->post(
@@ -156,10 +158,13 @@ class CreateTest extends TestCase
         )->assertResponseStatus(202);
 
         $vpc = Vpc::findOrFail('vpc-test2');
+
         $this->assertTrue($vpc->support_enabled);
 
-        $this->assertEquals(1, $vpc->vpcSupports->count());
+        $metric = BillingMetric::getActiveByKey($vpc, VPC::getSupportKeyName());
 
-        $this->assertEquals($vpc->created_at, $vpc->vpcSupports->first()->start_date);
+        $this->assertEquals(1, $metric->count());
+
+        $this->assertEquals($vpc->created_at, $metric->start);
     }
 }

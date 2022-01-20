@@ -13,6 +13,7 @@ use App\Traits\V2\Taskable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -131,9 +132,19 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
 
     public function enableSupport($date = null)
     {
-        if ($this->supportEnabled) {
+        if ($this->support_enabled) {
             return true;
         }
+
+        $billingMetric = app()->make(BillingMetric::class);
+        $billingMetric->resource_id = $this->id;
+        $billingMetric->vpc_id = $this->id;
+        $billingMetric->reseller_id = $this->reseller_id;
+        $billingMetric->name = self::getSupportKeyDisplayName();
+        $billingMetric->key = self::getSupportKeyName();
+        $billingMetric->value = 1;
+        $billingMetric->start = $date ?? Carbon::now(new \DateTimeZone(config('app.timezone')));
+        $billingMetric->save();
 
         $this->support_enabled = true;
 
@@ -142,13 +153,32 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
 
     public function disableSupport()
     {
-        if (!$this->supportEnabled) {
+        if (!$this->support_enabled) {
             return true;
         }
+
+        $currentActiveMetric = BillingMetric::getActiveByKey($this, self::getSupportKeyName());
+        $currentActiveMetric->setEndDate(Carbon::now(new \DateTimeZone(config('app.timezone'))));
 
         $this->support_enabled = false;
 
         return $this->save();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSupportKeyDisplayName()
+    {
+        return "VPC Support";
+    }
+
+    /**
+     * @return string
+     */
+    public function getSupportKeyName()
+    {
+        return "vpc.support";
     }
 
     /**
