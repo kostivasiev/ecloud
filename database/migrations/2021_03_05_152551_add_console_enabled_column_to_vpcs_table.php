@@ -13,9 +13,9 @@ class AddConsoleEnabledColumnToVpcsTable extends Migration
      */
     public function up()
     {
-`        Schema::connection('ecloud')->table('vpcs', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('vpcs', function (Blueprint $table) {
             $table->boolean('console_enabled')->default(true)->after('reseller_id');
-        });`
+        });
     }
 
     /**
