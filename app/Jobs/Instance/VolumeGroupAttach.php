@@ -33,12 +33,12 @@ class VolumeGroupAttach extends Job
 
         if (!empty($instance->volume_group_id)) {
             $instance->volumeGroup->volumes()->each(function ($volume) use ($instance) {
-                if (isset($this->task->data['volume_attach_task_id'])) {
+                if (empty($this->task->data['volume_attach_task_id'])) {
                     $task = Task::findOrFail($this->task->data['volume_attach_task_id']);
                     if (!$task->completed) {
                         $this->awaitTaskWithRelease($task);
                     }
-                    $this->task->setAttribute('data', null)->saveQuietly();
+                    $this->task->updateData('volume_attach_task_id', null);
                 }
                 if ($instance->volumes()->where('id', '=', $volume->id)->count() > 0) {
                     Log::info(
@@ -60,7 +60,7 @@ class VolumeGroupAttach extends Job
                 );
 
                 $task = $instance->createTask('volume_attach', VolumeAttach::class, ['volume_id' => $volume->id]);
-                $this->task->setAttribute('data', ['volume_attach_task_id' => $task->id])->saveQuietly();
+                $this->task->updateData('volume_attach_task_id', $task->id);
                 $this->awaitTaskWithRelease($task);
             });
         }

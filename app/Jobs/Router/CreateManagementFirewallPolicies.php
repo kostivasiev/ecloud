@@ -67,8 +67,7 @@ class CreateManagementFirewallPolicies extends TaskJob
                     ]))->save();
                     $firewallPolicy->syncSave();
 
-                    $this->task->data = Arr::add($this->task->data, 'firewall_policy_id', $firewallPolicy->id);
-                    $this->task->saveQuietly();
+                    $this->task->updateData('firewall_policy_id', $firewallPolicy->id);
 
                     $this->info('Create Firewall Policy and Rules End', [
                         'router_id' => $managementRouter->id,

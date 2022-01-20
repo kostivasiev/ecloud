@@ -33,12 +33,12 @@ class AssignVolumeGroup extends Job
 
         if (!empty($volume->volume_group_id)) {
             $volume->volumeGroup->instances()->each(function ($instance) use ($volume) {
-                if (isset($this->task->data['instance_attach_task_id'])) {
+                if (empty($this->task->data['instance_attach_task_id'])) {
                     $task = Task::findOrFail($this->task->data['instance_attach_task_id']);
                     if (!$task->completed) {
                         $this->awaitTaskWithRelease($task);
                     }
-                    $this->task->setAttribute('data', null)->saveQuietly();
+                    $this->task->updateData('instance_attach_task_id', null);
                     if ($instance->volumes()->where('id', '=', $volume->id)->count() > 0) {
                         Log::info(
                             'Volume is already associated with a volume group, skipping',
@@ -60,7 +60,7 @@ class AssignVolumeGroup extends Job
                 );
 
                 $task = $instance->createTask('volume_attach', VolumeAttach::class, ['volume_id' => $volume->id]);
-                $this->task->setAttribute('data', ['instance_attach_task_id' => $task->id])->saveQuietly();
+                $this->task->updateData('instance_attach_task_id', $task->id);
                 $this->awaitTaskWithRelease($task);
             });
         }

@@ -20,12 +20,6 @@ class GetWardenCredentials extends TaskJob
             )
         );
         $wardenCredentials = (json_decode($response->getBody()->getContents()))->data->warden_credentials;
-        if ($this->task->data === null) {
-            $this->task->data = [];
-        }
-        $this->task
-            ->setAttribute('data', $this->task->data + [
-                'warden_credentials' => encrypt($wardenCredentials)
-            ])->saveQuietly();
+        $this->task->updateData('warden_credentials', encrypt($wardenCredentials));
     }
 }
