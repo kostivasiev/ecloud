@@ -8,5 +8,7 @@ $factory->define(Vpc::class, function () {
     return [
         'name' => 'Virtual Private Cloud Name',
         'reseller_id' => 1,
+        'support_enabled' => false,
+        'console_enabled' => false,
     ];
 });
