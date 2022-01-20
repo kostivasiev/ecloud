@@ -4,11 +4,8 @@ namespace Tests\V2\Vpc;
 
 use App\Events\V2\Task\Created;
 use App\Events\V2\Vpc\Saved;
-use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
