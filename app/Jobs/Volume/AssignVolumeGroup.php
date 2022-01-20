@@ -33,7 +33,7 @@ class AssignVolumeGroup extends Job
 
         if (!empty($volume->volume_group_id)) {
             $volume->volumeGroup->instances()->each(function ($instance) use ($volume) {
-                if (empty($this->task->data['instance_attach_task_id'])) {
+                if (!empty($this->task->data['instance_attach_task_id'])) {
                     $task = Task::findOrFail($this->task->data['instance_attach_task_id']);
                     if (!$task->completed) {
                         $this->awaitTaskWithRelease($task);

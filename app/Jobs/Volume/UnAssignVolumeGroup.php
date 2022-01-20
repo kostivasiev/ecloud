@@ -49,7 +49,7 @@ class UnAssignVolumeGroup extends Job
                     'instance_id' => $instance->id,
                     'volume_id' => $volume->id,
                 ]);
-                if (empty($this->task->data['instance_detach_task_id'])) {
+                if (!empty($this->task->data['instance_detach_task_id'])) {
                     $task = Task::findOrFail($this->task->data['instance_detach_task_id']);
                     if (!$task->completed) {
                         $this->awaitTaskWithRelease($task);

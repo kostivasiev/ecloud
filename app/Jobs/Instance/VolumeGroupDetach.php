@@ -40,7 +40,7 @@ class VolumeGroupDetach extends Job
         }
         $instance->volumes()->where('is_shared', '=', true)
             ->each(function ($volume) use ($instance) {
-                if (empty($this->task->data['volume_detach_task_id'])) {
+                if (!empty($this->task->data['volume_detach_task_id'])) {
                     $task = Task::findOrFail($this->task->data['volume_detach_task_id']);
                     if (!$task->completed) {
                         $this->awaitTaskWithRelease($task);
