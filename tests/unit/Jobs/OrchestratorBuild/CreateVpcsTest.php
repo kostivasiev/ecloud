@@ -3,6 +3,7 @@ namespace Tests\unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateVpcs;
+use App\Models\V2\BillingMetric;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Vpc;
@@ -114,11 +115,13 @@ class CreateVpcsTest extends TestCase
 
         $vpc = Vpc::findOrFail($this->orchestratorBuild->state['vpc'][0]);
 
-        $this->assertEquals(1, $vpc->vpcSupports->count());
+        $metric = BillingMetric::getActiveByKey($vpc, VPC::getSupportKeyName());
+
+        $this->assertEquals(1, $metric->count());
 
         $this->assertEquals(
             Carbon::parse($vpc->created_at, new DateTimeZone(config('app.timezone')))->format('Y-m-d'),
-            Carbon::parse($vpc->vpcSupports->first()->start_date, new DateTimeZone(config('app.timezone')))->format('Y-m-d')
+            Carbon::parse($metric->start, new DateTimeZone(config('app.timezone')))->format('Y-m-d')
         );
     }
 
