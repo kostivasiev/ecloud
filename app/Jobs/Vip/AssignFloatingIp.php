@@ -3,14 +3,16 @@
 namespace App\Jobs\Vip;
 
 use App\Jobs\TaskJob;
+use App\Jobs\Tasks\FloatingIp\Assign;
 use App\Models\V2\FloatingIp;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
+use App\Traits\V2\TaskJobs\AwaitTask;
 
 class AssignFloatingIp extends TaskJob
 {
+    use AwaitTask;
 
     /**
+     * Assign floating IP to the cluster IP of the VIP
      * If I request a fIP then the NAT exists to the VIP, the fIP is locked from deletion and is only removed on vip deletion (for mvp)
      * @return void
      */
@@ -18,33 +20,41 @@ class AssignFloatingIp extends TaskJob
     {
         $vip = $this->task->resource;
 
-        if ($this->task->data['allocate_floating_ip'] != true) {
+        if (empty($this->task->data['allocate_floating_ip'])) {
+            $this->info('No floating IP required, skipping');
             return;
         }
 
-        exit(print_r(
-           'here'
-        ));
+        if ($vip->ipAddress->floatingIp()->exists()) {
+            $this->info('Floating IP ' . $vip->ipAddress->floatingIp->id . ' already assigned to the VIP, skipping');
+            return;
+        }
 
-        // assign floating ip to the cluster ip of the vip
+        $floatingIp = FloatingIp::find($this->task->data['floating_ip_id']);
+        if (!$floatingIp) {
+            $this->fail(new \Exception('Failed to load floating IP for VIP ' . $vip->id));
+            return;
+        }
 
-        $ipAddress = $vip->ipAddress;
+        $assignIpTask = 'task.' . Assign::$name . '.ids';
 
-        $floatingIp = app()->make(FloatingIp::class);
-        $floatingIp->vpc_id = $vip->network->router->vpc->id;
-        $floatingIp->availability_zone_id = $this->model->availability_zone_id;
-        $floatingIp->syncSave();
+        if (empty($this->task->data[$assignIpTask])) {
+            $data = $this->task->data;
 
-        // Todo: await sync
+            $task = $floatingIp->createTaskWithLock(
+                Assign::$name,
+                \App\Jobs\Tasks\FloatingIp\Assign::class,
+                ['resource_id' => $vip->ipAddress->id]
+            );
 
+            $this->info('Assigning floating ' . $floatingIp->id . ' to cluster IP ' . $vip->ipAddress->id . ' for VIP ' . $vip->id);
 
-        $task = $floatingIp->createTaskWithLock(
-            'floating_ip_assign',
-            \App\Jobs\Tasks\FloatingIp\Assign::class,
-            ['resource_id' => $request->resource_id]
-        );
+            $data[$assignIpTask][] = $task->id;
+            $this->task->setAttribute('data', $data)->saveQuietly();
+        }
 
-        //Todo: await task
-
+        if (!empty($this->task->data[$assignIpTask])) {
+            $this->awaitTasks($this->task->data[$assignIpTask]);
+        }
     }
 }

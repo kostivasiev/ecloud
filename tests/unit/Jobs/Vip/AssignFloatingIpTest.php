@@ -3,16 +3,12 @@
 namespace Tests\unit\Jobs\Vip;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\Tasks\Nic\AssociateIp;
+use App\Jobs\Tasks\FloatingIp\Assign;
 use App\Jobs\Vip\AssignFloatingIp;
-use App\Jobs\Vip\AssignToNics;
-use App\Models\V2\Instance;
-use App\Models\V2\Nic;
 use App\Models\V2\Task;
-use App\Support\Sync;
-use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\VipMock;
 use Tests\TestCase;
@@ -21,79 +17,92 @@ class AssignFloatingIpTest extends TestCase
 {
     use VipMock;
 
-    protected \Faker\Generator $faker;
-
-    public function setUp(): void
+    public function testAssignFloatingIpSuccess()
     {
-        parent::setUp();
-        $this->faker = Faker::create();
-    }
+        Event::fake([JobProcessed::class, JobFailed::class, Created::class]);
 
-    public function testAssignFloatingIp()
-    {
-        Event::fake([JobFailed::class, Created::class]);
+        $this->vip()->assignClusterIp();
 
-        $ipAddress = $this->vip()->assignClusterIp();
-
-
-        $task = $this->createSyncUpdateTask($this->vip(), ['allocate_floating_ip' => true]);
-
-
-
+        $task = $this->createSyncUpdateTask($this->vip(), [
+            'allocate_floating_ip' => true,
+            'floating_ip_id' => $this->floatingIp()->id
+        ]);
 
         dispatch(new AssignFloatingIp($task));
 
-
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == AssociateIp::$name;
+            return $event->model->name == Assign::$name;
         });
 
         $task->refresh();
 
-        $this->assertNotNull($task->data['task.' . AssociateIp::$name . '.ids']);
+        $this->assertNotNull($task->data['task.' . Assign::$name . '.ids']);
+
+        // Mark the fip assign task as completed
+        $assignTask = Event::dispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == Assign::$name;
+        })->first()[0];
+
+        $assignTask->model->setAttribute('completed', true)->saveQuietly();
+
+        dispatch(new AssignFloatingIp($task));
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
     }
 
-    public function testIpAddressAlreadyAssignedSkips()
+    public function testAssignFloatingIpTaskNotCompleteIsReleased()
     {
-        Event::fake([JobFailed::class]);
+        Event::fake([JobProcessed::class, JobFailed::class, Created::class]);
 
-        factory(Instance::class)->create([
-            'vpc_id' => $this->vpc()->id,
-            'name' => 'Load Balancer Instance ' . uniqid(),
-            'image_id' => $this->image()->id,
-            'vcpu_cores' => 1,
-            'ram_capacity' => 1024,
-            'platform' => 'Linux',
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'load_balancer_id' => $this->loadBalancer()->id
-        ])->each(function ($instance) {
-            factory(Nic::class)->create([
-                'mac_address' => $this->faker->macAddress,
-                'instance_id' => $instance->id,
-                'network_id' => $this->network()->id,
-            ]);
-        });
+        $this->vip()->assignClusterIp();
 
-        $ipAddress = $this->vip()->assignClusterIp();
-
-        $nic = $this->loadBalancer()->instances()->first()->nics()->first();
-
-        $nic->ipAddresses()->save($ipAddress);
-
-        $task = Model::withoutEvents(function () {
+        $floatingIpAssignTask = Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'task-1',
-                'name' => Sync::TASK_NAME_UPDATE,
+                'completed' => false,
+                'name' => Assign::$name,
             ]);
-            $task->resource()->associate($this->vip());
+            $task->resource()->associate($this->floatingIp());
             $task->save();
             return $task;
         });
 
-        dispatch(new AssignToNics($task));
+        $task = $this->createSyncUpdateTask($this->vip(), [
+            'allocate_floating_ip' => true,
+            'floating_ip_id' => $this->floatingIp()->id,
+            'task.' . Assign::$name . '.ids' => [$floatingIpAssignTask->id]
+        ]);
 
-        $task->refresh();
+        dispatch(new AssignFloatingIp($task));
 
-        $this->assertNull($task->data);
+        Event::assertNotDispatched(Created::class);
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return $event->job->isReleased();
+        });
+    }
+
+    public function testFloatingIpAlreadyAssignedSkips()
+    {
+        Event::fake([JobProcessed::class, JobFailed::class, Created::class]);
+
+        $clusterIp = $this->vip()->assignClusterIp();
+
+        $this->floatingIp()->resource()->associate($clusterIp)->save();
+
+        $task = $this->createSyncUpdateTask($this->vip(), [
+            'allocate_floating_ip' => true,
+            'floating_ip_id' => $this->floatingIp()->id
+        ]);
+
+        dispatch(new AssignFloatingIp($task));
+
+        Event::assertNotDispatched(Created::class);
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
     }
 }

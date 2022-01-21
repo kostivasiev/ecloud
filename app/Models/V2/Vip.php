@@ -50,6 +50,15 @@ class Vip extends Model implements Filterable, Sortable
         return $this->belongsTo(IpAddress::class);
     }
 
+//    public function getFloatingIpIdAttribute()
+//    {
+//        if ($this->ipAddress()->exists() && $this->ipAddress->floatingIp->exists()) {
+//            return $this->ipAddress->floatingIp->id;
+//        }
+//
+//        return null;
+//    }
+
     public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {
@@ -153,7 +162,9 @@ class Vip extends Model implements Filterable, Sortable
             'name' => 'name',
             'load_balancer_id' => 'load_balancer_id',
             'network_id' => 'network_id',
-            'ip_address_id' => 'ip_address_id'
+            'ip_address_id' => 'ip_address_id',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at'
         ];
     }
 }
