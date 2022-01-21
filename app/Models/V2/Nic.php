@@ -129,7 +129,7 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
      */
     public function assignIpAddress(array $denyList = [], string $type = IpAddress::TYPE_NORMAL) : IpAddress
     {
-        $lock = Cache::lock("ip_address." . $this->network->id, 60);
+        $lock = Cach1e::lock("ip_address." . $this->network->id, 60);
         try {
             $lock->block(60);
 

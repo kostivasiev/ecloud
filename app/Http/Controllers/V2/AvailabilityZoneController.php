@@ -233,11 +233,7 @@ class AvailabilityZoneController extends BaseController
 
     public function destroy(Request $request, string $zoneId)
     {
-        $model = AvailabilityZone::findOrFail($zoneId);
-        if (!$model->canDelete()) {
-            return $model->getDeletionError();
-        }
-        $model->delete();
+        AvailabilityZone::findOrFail($zoneId)->delete();
         return response('', 204);
     }
 

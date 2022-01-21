@@ -65,14 +65,7 @@ class NicController extends BaseController
 
     public function destroy(Request $request, string $nicId)
     {
-        $nic = Nic::forUser($request->user())->findOrFail($nicId);
-
-        if (!$nic->canDelete()) {
-            return $nic->getDeletionError();
-        }
-
-        $task = $nic->syncDelete();
-
+        $task = Nic::forUser($request->user())->findOrFail($nicId)->syncDelete();
         return $this->responseTaskId($task->id);
     }
 
