@@ -64,6 +64,6 @@ class CreateInstance extends TaskJob
             'is_hidden' => true
         ]);
         $instance->save();
-        $this->task->updateData('instance_id', $instance->id);
+        $loadBalancerNode->setAttribute('instance_id', $instance->id)->saveQuietly();
     }
 }
