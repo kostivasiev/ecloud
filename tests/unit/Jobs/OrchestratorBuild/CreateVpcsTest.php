@@ -7,7 +7,6 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Vpc;
-use App\Models\V2\VpcSupport;
 use DateTimeZone;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;

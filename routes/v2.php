@@ -396,16 +396,16 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->delete('credentials/{credentialsId}', 'CredentialsController@destroy');
     });
 
-    /** Support */
-    $router->group([], function () use ($router) {
-        $router->get('support', 'VpcSupportController@index');
-        $router->get('support/{vpcSupportId}', 'VpcSupportController@show');
-        $router->group(['middleware' => 'can-enable-support'], function () use ($router) {
-            $router->post('support', 'VpcSupportController@create');
-            $router->patch('support/{vpcSupportId}', 'VpcSupportController@update');
-        });
-        $router->delete('support/{vpcSupportId}', 'VpcSupportController@destroy');
-    });
+//    /** Support */
+//    $router->group([], function () use ($router) {
+//        $router->get('support', 'VpcSupportController@index');
+//        $router->get('support/{vpcSupportId}', 'VpcSupportController@show');
+//        $router->group(['middleware' => 'can-enable-support'], function () use ($router) {
+//            $router->post('support', 'VpcSupportController@create');
+//            $router->patch('support/{vpcSupportId}', 'VpcSupportController@update');
+//        });
+//        $router->delete('support/{vpcSupportId}', 'VpcSupportController@destroy');
+//    });
 
     /** Discount Plans */
     $router->group([], function () use ($router) {

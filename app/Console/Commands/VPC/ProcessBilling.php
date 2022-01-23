@@ -6,7 +6,6 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\DiscountPlan;
 use App\Models\V2\Product;
 use App\Models\V2\Vpc;
-use App\Models\V2\VpcSupport;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use UKFast\Admin\Account\AdminClient as AccountAdminClient;
@@ -158,13 +157,13 @@ class ProcessBilling extends Command
                     'pro-rata' => false
                 ];
 
-                $vpcSupport = $this->getVpcSupport($vpc->id);
+                $vpcSupport = $this->getSupportBillingMetric($vpc->id);
 
                 if (!empty($vpcSupport)) {
                     $this->billing[$vpc->reseller_id][$vpc->id]['support']['enabled'] = true;
 
                     // Incomplete month
-                    if ($vpcSupport->start_date > $this->startDate) {
+                    if ($vpcSupport->start > $this->startDate) {
                         $this->billing[$vpc->reseller_id][$vpc->id]['support']['pro-rata'] = true;
                     }
                 }
@@ -334,18 +333,19 @@ class ProcessBilling extends Command
 
     /**
      * @param $vpcId
-     * @return VpcSupport|null
+     * @return BillingMetric|null
      */
-    protected function getVpcSupport($vpcId): ?VpcSupport
+    protected function getSupportBillingMetric($vpcId): ?BillingMetric
     {
-        return VpcSupport::where('vpc_id', $vpcId)
+        return BillingMetric::where('resource_id', $vpcId)
+            ->where('key', '=', Vpc::getSupportKeyName())
             ->where(function ($query) {
-                $query->where('start_date', '<=', $this->startDate);
-                $query->orWhereBetween('start_date', [$this->startDate, $this->endDate]);
+                $query->where('start', '<=', $this->startDate);
+                $query->orWhereBetween('start', [$this->startDate, $this->endDate]);
             })
             ->where(function ($query) {
-                $query->where('end_date', '>=', $this->endDate);
-                $query->orWhereNull('end_date');
+                $query->where('end', '>=', $this->endDate);
+                $query->orWhereNull('end');
             })
             ->first();
     }

@@ -100,11 +100,6 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
         return $this->hasMany(LoadBalancer::class);
     }
 
-    public function vpcSupports()
-    {
-        return $this->hasMany(VpcSupport::class);
-    }
-
     public function hostGroups()
     {
         return $this->hasMany(HostGroup::class);
