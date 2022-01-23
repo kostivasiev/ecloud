@@ -20,6 +20,7 @@ use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class VpcController extends BaseController
@@ -94,6 +95,10 @@ class VpcController extends BaseController
 
         if ($request->has('support_enabled')) {
             if ($request->input('support_enabled') === true && !$vpc->support_enabled) {
+                $supportError = $this->canEnableSupport(Auth::user());
+                if ($supportError !== true) {
+                    return $supportError;
+                }
                 $vpc->enableSupport();
             }
 
@@ -166,5 +171,48 @@ class VpcController extends BaseController
         $this->dispatch(new ConfigureVpcDefaults($vpc, $availabilityZone));
 
         return response('', 202);
+    }
+
+    /**
+     * @param $user
+     * @return false|\Illuminate\Http\JsonResponse
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    private function canEnableSupport($user)
+    {
+        if ($user->isScoped()) {
+            $accountAdminClient = app()->make(\UKFast\Admin\Account\AdminClient::class);
+            try {
+                $customer = $accountAdminClient->customers()->getById($user->resellerId());
+            } catch (\Exception $e) {
+                if ($e->getResponse()->getStatusCode() !== 404) {
+                    Log::info($e);
+                    throw($e);
+                }
+                return response()->json([
+                    'errors' => [
+                        [
+                            'title' => 'Not Found',
+                            'detail' => 'The customer account is not available',
+                            'status' => 403,
+                        ]
+                    ]
+                ], 403);
+            }
+
+            if ($customer->paymentMethod == 'Credit Card') {
+                return response()->json([
+                    'errors' => [
+                        [
+                            'title' => 'Payment Required',
+                            'detail' => 'Payment is required before support can be enabled',
+                            'status' => 402,
+                        ]
+                    ]
+                ], 402);
+            }
+        }
+
+        return true;
     }
 }

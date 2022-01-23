@@ -41,8 +41,8 @@ class CanEnableSupportTest extends TestCase
             return $mockClient;
         });
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->post('/v2/support', [
-            'vpc_id' => $this->vpc()->id
+        $this->patch('/v2/vpcs/'.$this->vpc()->id, [
+            'support_enabled' => true
         ])->seeJson(
             [
                 'title' => 'Not Found',
@@ -69,8 +69,8 @@ class CanEnableSupportTest extends TestCase
         });
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->post('/v2/support', [
-            'vpc_id' => $this->vpc()->id
+        $this->patch('/v2/vpcs/'.$this->vpc()->id, [
+            'support_enabled' => true
         ])->seeJson(
             [
                 'title' => 'Payment Required',
@@ -97,8 +97,8 @@ class CanEnableSupportTest extends TestCase
         });
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->post('/v2/support', [
-            'vpc_id' => $this->vpc()->id
-        ])->assertResponseStatus(201);
+        $this->patch('/v2/vpcs/'.$this->vpc()->id, [
+            'support_enabled' => true
+        ])->assertResponseStatus(202);
     }
 }
