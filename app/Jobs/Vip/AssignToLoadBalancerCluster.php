@@ -27,9 +27,6 @@ class AssignToLoadBalancerCluster extends TaskJob
             $vipEntity->externalCidr = $vip->ipAddress->floatingIp->getIPAddress(). '/32';
         }
 
-        // TODO: Do we need to set this optional parameter? and what to? The created NICs have mac addresses? but we will have multiple.
-//        $vip->macAddress =
-
         $response = $adminClient->vips()->createEntity($vip->loadbalancer->config_id, $vipEntity);
 
         $this->info('VIP was assigned to the load balancer cluster with ID: ' . $response->getId());
