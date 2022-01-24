@@ -20,7 +20,7 @@ class IsNetworkAssignedToLoadBalancer implements Rule
             return false;
         }
 
-       return  $this->loadBalancer->loadBalancerNetworks()->where('network_id', $value)->count() > 0;
+        return  $this->loadBalancer->loadBalancerNetworks()->where('network_id', $value)->count() > 0;
     }
 
     /**
