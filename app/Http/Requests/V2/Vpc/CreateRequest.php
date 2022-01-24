@@ -2,7 +2,8 @@
 
 namespace App\Http\Requests\V2\Vpc;
 
-use App\Rules\V2\IsMaxVpcLimitReached;
+use App\Rules\V2\IsScoped;
+use App\Rules\V2\PaymentRequired;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -37,7 +38,12 @@ class CreateRequest extends FormRequest
             ],
             'console_enabled' => 'sometimes|boolean',
             'advanced_networking' => 'sometimes|boolean',
-            'support_enabled' => 'sometimes|boolean',
+            'support_enabled' => [
+                'sometimes',
+                'boolean',
+                new IsScoped(),
+                new PaymentRequired(),
+            ],
         ];
     }
 }
