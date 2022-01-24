@@ -31,14 +31,15 @@ class AssignToNics extends TaskJob
 
             Nic::where('network_id', '=', $vip->network_id)
                 ->whereHas('instance.loadbalancer', function ($query) use ($vip) {
-                $query->where('id', '=', $vip->loadbalancer->id);
-            })->each(function ($nic) use ($vip, &$data, $associateIpTasks) {
-                if (!$nic->ipAddresses()->where('id', $vip->ipAddress->id)->exists()) {
-                    $this->info('Assigning VIP ' . $vip->id . ' to NIC ' . $nic->id);
-                    $task = $nic->createTaskWithLock(AssociateIp::$name, AssociateIp::class, ['ip_address_id' => $vip->ipAddress->id]);
-                    $data[$associateIpTasks][] = $task->id;
-                }
-            });
+                    $query->where('id', '=', $vip->loadbalancer->id);
+                })->each(function ($nic) use ($vip, &$data, $associateIpTasks) {
+                    if (!$nic->ipAddresses()->where('id', $vip->ipAddress->id)->exists()) {
+                        $this->info('Assigning VIP ' . $vip->id . ' to NIC ' . $nic->id);
+                        $task = $nic->createTaskWithLock(AssociateIp::$name, AssociateIp::class,
+                            ['ip_address_id' => $vip->ipAddress->id]);
+                        $data[$associateIpTasks][] = $task->id;
+                    }
+                });
 
             if (!empty($data[$associateIpTasks])) {
                 $this->task->setAttribute('data', $data)->saveQuietly();

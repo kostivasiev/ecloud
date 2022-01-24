@@ -13,7 +13,7 @@ class AssociateIp extends Job
 {
     use TaskableBatch, Batchable, LoggableTaskJob;
 
-    static string $name = 'associate_ip';
+    public static string $name = 'associate_ip';
 
     private Task $task;
 
