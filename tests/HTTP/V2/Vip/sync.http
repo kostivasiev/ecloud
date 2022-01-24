@@ -43,7 +43,7 @@ client.global.set('network_id', response.body.data.id);
 client.log('Network ID: ' + response.body.data.id);
 %}
 
-### Create a loadbalancer service with a network_id
+### Create a loadbalancer service with a network
 POST https://{{host}}/{{version}}/load-balancers
 Accept: */*
 Cache-Control: no-cache

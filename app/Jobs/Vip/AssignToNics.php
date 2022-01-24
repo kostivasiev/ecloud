@@ -12,7 +12,7 @@ class AssignToNics extends TaskJob
     use AwaitTask;
 
     /**
-     * Assign VIP's IP address to each of the load balancer instances NICs with the same network as the Vip
+     * Assign VIP's cluster IP address to each of the load balancer instances NICs with the same network as the Vip
      */
     public function handle()
     {
@@ -29,9 +29,11 @@ class AssignToNics extends TaskJob
             $data = $this->task->data;
             $data[$associateIpTasks] = [];
 
+
+
             Nic::where('network_id', '=', $vip->network_id)
-                ->whereHas('instance.loadbalancer', function ($query) use ($vip) {
-                    $query->where('id', '=', $vip->loadbalancer->id);
+                ->whereHas('instance.loadBalancerNode', function ($query) use ($vip) {
+                    $query->where('load_balancer_id', '=', $vip->loadbalancer->id);
                 })->each(function ($nic) use ($vip, &$data, $associateIpTasks) {
                     if (!$nic->ipAddresses()->where('id', $vip->ipAddress->id)->exists()) {
                         $this->info('Assigning VIP ' . $vip->id . ' to NIC ' . $nic->id);
