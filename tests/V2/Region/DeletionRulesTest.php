@@ -40,7 +40,7 @@ class DeletionRulesTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->seeJson([
-            'detail' => 'The specified resource has dependant relationships and cannot be deleted',
+            'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->availability_zone->id,
         ])->assertResponseStatus(412);
         $region = Region::withTrashed()->findOrFail($this->region->id);
         $this->assertNull($region->deleted_at);

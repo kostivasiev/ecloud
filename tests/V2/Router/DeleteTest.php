@@ -3,45 +3,29 @@
 namespace Tests\V2\Router;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Credential;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-    protected $availability_zone;
-    protected $region;
-    protected $router;
-    protected $vpc;
+    private Consumer $consumer;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        factory(Credential::class)->create([
-            'name' => 'NSX',
-            'resource_id' => $this->availability_zone->id,
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availability_zone->id,
-        ]);
+        $this->consumer = new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']);
+        $this->consumer->setIsAdmin(true);
 
-        $this->nsxServiceMock()->shouldReceive('delete')
+        $this->nsxServiceMock()
+            ->allows('delete')
             ->andReturnUsing(function () {
                 return new Response(204, [], '');
             });
-        $this->nsxServiceMock()->shouldReceive('get')
+        $this->nsxServiceMock()
+            ->allows('get')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
             });
@@ -49,11 +33,23 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
+        $this->be($this->consumer);
         Event::fake(Created::class);
-        $this->delete('/v2/routers/' . $this->router->id, [], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        $this->delete('/v2/routers/' . $this->router()->id)
+            ->assertResponseStatus(202);
         Event::assertDispatched(Created::class);
+    }
+
+    public function testDeleteFailsIfChildPresent()
+    {
+        $this->be($this->consumer);
+        $this->network();
+        $this->delete('/v2/routers/' . $this->router()->id)
+            ->seeJson(
+                [
+                    'title' => 'Precondition Failed',
+                    'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->network()->id,
+                ]
+            )->assertResponseStatus(412);
     }
 }

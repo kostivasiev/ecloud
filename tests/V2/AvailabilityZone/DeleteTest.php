@@ -2,50 +2,40 @@
 
 namespace Tests\V2\AvailabilityZone;
 
-use App\Models\V2\AvailabilityZone;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
     protected $faker;
+    private Consumer $consumer;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
+        $this->consumer = new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']);
+        $this->consumer->setIsAdmin(true);
     }
 
     public function testNonAdminIsDenied()
     {
-        $zone = factory(AvailabilityZone::class)->create();
+        $this->consumer->setIsAdmin(false);
+        $this->be($this->consumer);
         $this->delete(
-            '/v2/availability-zones/' . $zone->id,
-            [],
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
-            ->seeJson([
-                'title' => 'Unauthorized',
-                'detail' => 'Unauthorized',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
+            '/v2/availability-zones/' . $this->availabilityZone()->id
+        )->seeJson([
+            'title' => 'Unauthorized',
+            'detail' => 'Unauthorized',
+            'status' => 401,
+        ])->assertResponseStatus(401);
     }
 
     public function testFailInvalidId()
     {
-        $this->delete(
-            '/v2/availability-zones/' . $this->faker->uuid,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->be($this->consumer);
+        $this->delete('/v2/availability-zones/' . $this->faker->uuid)
             ->seeJson([
                 'title' => 'Not found',
                 'detail' => 'No Availability Zone with that ID was found',
@@ -56,18 +46,24 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $zone = factory(AvailabilityZone::class)->create();
-        $this->delete(
-            '/v2/availability-zones/' . $zone->id,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->be($this->consumer);
+        $this->delete('/v2/availability-zones/' . $this->availabilityZone()->id)
             ->assertResponseStatus(204);
-        $availabilityZone = AvailabilityZone::withTrashed()->findOrFail($zone->id);
-        $this->assertNotNull($availabilityZone->deleted_at);
+        $this->availabilityZone()->refresh();
+        $this->assertNotNull($this->availabilityZone()->deleted_at);
+    }
+
+    public function testDeleteFailsIfChildPresent()
+    {
+        $this->router();
+        $this->be($this->consumer);
+        $this->delete('/v2/availability-zones/' . $this->availabilityZone()->id)
+            ->seeJson(
+                [
+                    'title' => 'Precondition Failed',
+                    'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->router()->id,
+                ]
+            )->assertResponseStatus(412);
     }
 
 }

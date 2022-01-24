@@ -2,21 +2,15 @@
 
 namespace Tests\unit\Jobs\VpnSession;
 
-use App\Events\V2\Credential\Creating;
 use App\Events\V2\Task\Created;
 use App\Events\V2\Task\Updated;
-use App\Jobs\VpnSession\CreateNetworkNoSNats;
-use App\Jobs\VpnSession\CreatePreSharedKey;
 use App\Jobs\VpnSession\SyncNetworkNoSNats;
-use App\Models\V2\Credential;
 use App\Models\V2\Nat;
 use App\Models\V2\Task;
-use App\Models\V2\VpnSession;
 use App\Models\V2\VpnSessionNetwork;
 use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Str;
 use Tests\Mocks\Resources\VpnSessionMock;
 use Tests\TestCase;
 

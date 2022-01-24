@@ -5,7 +5,10 @@ namespace Tests\unit\Jobs\VpnSession;
 use App\Events\V2\Credential\Creating;
 use App\Jobs\VpnSession\CreatePreSharedKey;
 use App\Models\V2\Credential;
+use App\Models\V2\Task;
 use App\Models\V2\VpnSession;
+use App\Support\Sync;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
@@ -16,11 +19,27 @@ class CreatePreSharedKeyTest extends TestCase
 {
     use VpnSessionMock;
 
+    protected Task $task;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        Model::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->task->resource()->associate($this->vpnSession());
+            $this->task->save();
+        });
+    }
+
     public function testSuccessful()
     {
         $this->assertFalse($this->vpnSession()->credentials()->where('username', 'PSK')->exists());
 
-        dispatch(new CreatePreSharedKey($this->vpnSession()));
+        dispatch(new CreatePreSharedKey($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -44,7 +63,7 @@ class CreatePreSharedKeyTest extends TestCase
             $this->vpnSession()->credentials()->save($credential);
         });
 
-        dispatch(new CreatePreSharedKey($this->vpnSession()));
+        dispatch(new CreatePreSharedKey($this->task));
 
         Event::assertNotDispatched(Creating::class);
     }
