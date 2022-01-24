@@ -36,7 +36,8 @@ class AssignToNics extends TaskJob
                     if (!$nic->ipAddresses()->where('id', $vip->ipAddress->id)->exists()) {
                         $this->info('Assigning VIP ' . $vip->id . ' to NIC ' . $nic->id);
                         $task = $nic->createTaskWithLock(
-                            AssociateIp::$name, AssociateIp::class,
+                            AssociateIp::$name,
+                            AssociateIp::class,
                             ['ip_address_id' => $vip->ipAddress->id]
                         );
                         $data[$associateIpTasks][] = $task->id;
