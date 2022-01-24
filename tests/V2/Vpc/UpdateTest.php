@@ -103,7 +103,9 @@ class UpdateTest extends TestCase
             [
                 'support_enabled' => true,
             ]
-        )->assertResponseStatus(202);
+        );//->assertResponseStatus(202);
+
+        dd($this->response->getContent(), $this->response->headers);
 
         $this->vpc()->refresh();
 
