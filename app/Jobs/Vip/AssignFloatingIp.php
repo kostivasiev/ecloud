@@ -13,7 +13,6 @@ class AssignFloatingIp extends TaskJob
 
     /**
      * Assign floating IP to the cluster IP of the VIP
-     * If I request a fIP then the NAT exists to the VIP, the fIP is locked from deletion and is only removed on vip deletion (for mvp)
      * @return void
      */
     public function handle()
