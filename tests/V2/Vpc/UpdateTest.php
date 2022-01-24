@@ -95,9 +95,8 @@ class UpdateTest extends TestCase
         Event::fake(Created::class);
 
         $this->vpc()->disableSupport();
-        $this->vpc()->refresh();
 
-        $this->assertFalse($this->vpc()->support_enabled);
+        $this->assertFalse($this->vpc()->refresh()->support_enabled);
 
         $this->patch(
             '/v2/vpcs/' . $this->vpc()->id,
