@@ -231,7 +231,7 @@ class AvailabilityZoneController extends BaseController
         ));
     }
 
-    public function destroy(Request $request, string $zoneId)
+    public function destroy(string $zoneId)
     {
         AvailabilityZone::findOrFail($zoneId)->delete();
         return response('', 204);
