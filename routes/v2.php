@@ -32,7 +32,10 @@ $router->group($baseRouteParameters, function () use ($router) {
     $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->post('availability-zones', 'AvailabilityZoneController@create');
         $router->patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
-        $router->delete('availability-zones/{zoneId}', 'AvailabilityZoneController@destroy');
+        $router->delete('availability-zones/{zoneId}', [
+            'middleware' => 'can-be-deleted:' . \App\Models\V2\AvailabilityZone::class   . ',zoneId',
+            'uses' => 'AvailabilityZoneController@destroy'
+        ]);
         $router->get('availability-zones/{zoneId}/routers', 'AvailabilityZoneController@routers');
         $router->get('availability-zones/{zoneId}/dhcps', 'AvailabilityZoneController@dhcps');
         $router->get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
@@ -95,6 +98,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('networks', 'NetworkController@create');
         $router->patch('networks/{networkId}', 'NetworkController@update');
         $router->delete('networks/{networkId}', 'NetworkController@destroy');
+        $router->delete('networks/{networkId}', [
+            'middleware' => 'can-be-deleted:' . \App\Models\V2\Network::class   . ',networkId',
+            'uses' => 'NetworkController@destroy'
+        ]);
     });
 
     /** Network Policy */
@@ -141,7 +148,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('vpn-services/{vpnServiceId}/endpoints', 'VpnServiceController@endpoints');
         $router->post('vpn-services', 'VpnServiceController@create');
         $router->patch('vpn-services/{vpnServiceId}', 'VpnServiceController@update');
-        $router->delete('vpn-services/{vpnServiceId}', 'VpnServiceController@destroy');
+        $router->delete('vpn-services/{vpnServiceId}', [
+            'middleware' => 'can-be-deleted:' . \App\Models\V2\VpnService::class   . ',vpnServiceId',
+            'uses' => 'VpnServiceController@destroy'
+        ]);
     });
 
     /** VPN Endpoints */
@@ -198,7 +208,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('routers/{routerId}/tasks', 'RouterController@tasks');
         $router->post('routers', 'RouterController@create');
         $router->patch('routers/{routerId}', 'RouterController@update');
-        $router->delete('routers/{routerId}', 'RouterController@destroy');
+        $router->delete('routers/{routerId}', [
+            'middleware' => 'can-be-deleted:' . \App\Models\V2\Router::class   . ',routerId',
+            'uses' => 'RouterController@destroy'
+        ]);
         $router->post('routers/{routerId}/configure-default-policies', 'RouterController@configureDefaultPolicies');
     });
 
@@ -302,7 +315,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('regions', 'RegionController@create');
             $router->patch('regions/{regionId}', 'RegionController@update');
-            $router->delete('regions/{regionId}', 'RegionController@destroy');
+            $router->delete('regions/{regionId}', [
+                'middleware' => 'can-be-deleted:' . \App\Models\V2\Region::class   . ',regionId',
+                'uses' => 'RegionController@destroy'
+            ]);
         });
     });
 
@@ -443,7 +459,10 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->post('router-throughputs', 'RouterThroughputController@store');
             $router->patch('router-throughputs/{routerThroughputId}', 'RouterThroughputController@update');
-            $router->delete('router-throughputs/{routerThroughputId}', 'RouterThroughputController@destroy');
+            $router->delete('router-throughputs/{routerThroughputId}', [
+                'middleware' => 'can-be-deleted:' . \App\Models\V2\RouterThroughput::class   . ',routerThroughputId',
+                'uses' => 'RouterThroughputController@destroy'
+            ]);
         });
     });
 

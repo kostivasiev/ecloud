@@ -3,53 +3,25 @@
 namespace Tests\V2\Network;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Credential;
-use App\Models\V2\Network;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-    protected $faker;
-
-    protected $region;
-    protected $availabilityZone;
-    protected $vpc;
-    protected $router;
-    protected $network;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id,
-        ]);
-        factory(Credential::class)->create([
-            'name' => 'NSX',
-            'resource_id' => $this->availabilityZone->id,
-        ]);
-        $this->router = factory(Router::class)->create([
-            'vpc_id' => $this->vpc()->id,
-            'availability_zone_id' => $this->availabilityZone->id
-        ]);
-        $this->network = factory(Network::class)->create([
-            'name' => 'Manchester Network',
-            'router_id' => $this->router->id,
-        ]);
-
-        $this->nsxServiceMock()->shouldReceive('delete')
+        $this->nsxServiceMock()
+            ->allows('delete')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
-        $this->nsxServiceMock()->shouldReceive('get')
+        $this->nsxServiceMock()
+            ->allows('get')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['results' => [['id' => 0]]]));
             });
@@ -58,7 +30,7 @@ class DeleteTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $this->delete(
-            '/v2/networks/' . $this->network->id,
+            '/v2/networks/' . $this->network()->id,
             [],
             []
         )
@@ -72,14 +44,8 @@ class DeleteTest extends TestCase
 
     public function testFailInvalidId()
     {
-        $this->delete(
-            '/v2/networks/NOT_FOUND',
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->delete('/v2/networks/NOT_FOUND')
             ->seeJson([
                 'title' => 'Not found',
                 'detail' => 'No Network with that ID was found',
@@ -90,15 +56,25 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         Event::fake(Created::class);
-        $this->delete(
-            '/v2/networks/' . $this->network->id,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->delete('/v2/networks/' . $this->network()->id)
             ->assertResponseStatus(202);
+    }
+
+    public function testDependentResourcesFailsDelete()
+    {
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        Event::fake(Created::class);
+        $this->ip()->nics()->sync($this->nic());
+        $this->delete('/v2/networks/' . $this->network()->id)
+            ->seeJson([
+                'title' => 'Precondition Failed',
+                'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->nic()->id,
+            ])
+            ->assertResponseStatus(412);
+
+        $this->network()->refresh();
+        $this->assertNull($this->network()->deleted_at);
     }
 }
