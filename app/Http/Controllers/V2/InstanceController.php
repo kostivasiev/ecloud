@@ -265,10 +265,6 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new PowerOn($instance));
-        });
-
         $task = $instance->createTaskWithLock('power_on', \App\Jobs\Tasks\Instance\PowerOn::class);
 
         return $this->responseTaskId($task->id);
