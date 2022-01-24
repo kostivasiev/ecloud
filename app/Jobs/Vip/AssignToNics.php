@@ -29,8 +29,6 @@ class AssignToNics extends TaskJob
             $data = $this->task->data;
             $data[$associateIpTasks] = [];
 
-
-
             Nic::where('network_id', '=', $vip->network_id)
                 ->whereHas('instance.loadBalancerNode', function ($query) use ($vip) {
                     $query->where('load_balancer_id', '=', $vip->loadbalancer->id);
