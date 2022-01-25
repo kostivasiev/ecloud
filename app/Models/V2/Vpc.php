@@ -124,21 +124,11 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
         return $query->where('reseller_id', '=', $user->resellerId());
     }
 
-    public function enableSupport($date = null)
+    public function enableSupport()
     {
         if ($this->support_enabled) {
             return true;
         }
-
-        $billingMetric = app()->make(BillingMetric::class);
-        $billingMetric->resource_id = $this->id;
-        $billingMetric->vpc_id = $this->id;
-        $billingMetric->reseller_id = $this->reseller_id;
-        $billingMetric->name = self::getSupportKeyDisplayName();
-        $billingMetric->key = self::getSupportKeyName();
-        $billingMetric->value = 1;
-        $billingMetric->start = $date ?? Carbon::now(new \DateTimeZone(config('app.timezone')));
-        $billingMetric->save();
 
         $this->support_enabled = true;
 
@@ -150,9 +140,6 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
         if (!$this->support_enabled) {
             return true;
         }
-
-        $currentActiveMetric = BillingMetric::getActiveByKey($this, self::getSupportKeyName());
-        $currentActiveMetric->setEndDate(Carbon::now(new \DateTimeZone(config('app.timezone'))));
 
         $this->support_enabled = false;
 

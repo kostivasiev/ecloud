@@ -67,7 +67,7 @@ class VpcController extends BaseController
         $task = $vpc->syncSave();
 
         if ($request->has('support_enabled') && $request->input('support_enabled') === true) {
-            $vpc->enableSupport($vpc->created_at);
+            $vpc->enableSupport();
         }
 
         return $this->responseIdMeta($request, $vpc->id, 202, $task->id);
