@@ -125,7 +125,7 @@ class UpdateTest extends TestCase
             [
                 'support_enabled' => true,
             ]
-        );
+        )->assertResponseStatus(202);
 
         $this->vpc()->refresh();
 
@@ -144,7 +144,7 @@ class UpdateTest extends TestCase
         $this->vpc()->support_enabled = true;
         $this->vpc()->save();
 
-        $this->assertTrue($this->vpc()->refresh()->support_enabled);
+        $this->assertTrue($this->vpc()->support_enabled);
 
         $this->patch(
             '/v2/vpcs/' . $this->vpc()->id,

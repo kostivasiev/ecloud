@@ -3,16 +3,12 @@ namespace Tests\unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateVpcs;
-use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
-use App\Models\V2\BillingMetric;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Vpc;
 use App\Support\Sync;
-use DateTimeZone;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 

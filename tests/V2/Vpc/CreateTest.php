@@ -6,6 +6,7 @@ use App\Events\V2\Task\Created;
 use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
+use App\Support\Sync;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminClient;
@@ -176,6 +177,10 @@ class CreateTest extends TestCase
         )->assertResponseStatus(202);
 
         $vpc = Vpc::findOrFail('vpc-test2');
+
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
 
         $this->assertTrue($vpc->support_enabled);
     }
