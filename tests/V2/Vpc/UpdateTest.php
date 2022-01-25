@@ -118,7 +118,7 @@ class UpdateTest extends TestCase
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
         Event::fake(Created::class);
 
-        $this->assertFalse($this->vpc()->refresh()->support_enabled);
+        $this->assertFalse($this->vpc()->support_enabled);
 
         $this->patch(
             '/v2/vpcs/' . $this->vpc()->id,
@@ -129,7 +129,7 @@ class UpdateTest extends TestCase
 
         $this->vpc()->refresh();
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == Sync::TASK_NAME_UPDATE;
         });
 
@@ -155,7 +155,7 @@ class UpdateTest extends TestCase
 
         $this->vpc()->refresh();
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == Sync::TASK_NAME_UPDATE;
         });
 
