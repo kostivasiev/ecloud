@@ -124,28 +124,6 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
         return $query->where('reseller_id', '=', $user->resellerId());
     }
 
-    public function enableSupport()
-    {
-        if ($this->support_enabled) {
-            return true;
-        }
-
-        $this->support_enabled = true;
-
-        return $this->save();
-    }
-
-    public function disableSupport()
-    {
-        if (!$this->support_enabled) {
-            return true;
-        }
-
-        $this->support_enabled = false;
-
-        return $this->save();
-    }
-
     /**
      * @param FilterFactory $factory
      * @return array|Filter[]

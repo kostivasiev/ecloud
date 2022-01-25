@@ -4,13 +4,37 @@ namespace Tests\V2\Vpc;
 
 use App\Events\V2\Task\Created;
 use App\Events\V2\Vpc\Saved;
-use App\Models\V2\Vpc;
+use App\Support\Sync;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Admin\Account\AdminClient;
+use UKFast\Admin\Account\AdminCustomerClient;
+use UKFast\Admin\Account\Entities\Customer;
 use UKFast\Api\Auth\Consumer;
 
 class UpdateTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        app()->bind(AdminClient::class, function () {
+            $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
+            $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
+
+            $mockCustomer->shouldReceive('getById')
+                ->andReturn(
+                    new Customer([
+                        'paymentMethod' => 'Invoice',
+                    ])
+                );
+            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
+            return $mockClient;
+        });
+
+    }
+
     public function testNoPermsIsDenied()
     {
         $this->patch('/v2/vpcs/' . $this->vpc()->id, [
@@ -105,7 +129,9 @@ class UpdateTest extends TestCase
 
         $this->vpc()->refresh();
 
-        ///
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
 
         $this->assertTrue($this->vpc()->support_enabled);
     }
@@ -115,7 +141,8 @@ class UpdateTest extends TestCase
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
         Event::fake(Created::class);
 
-        $this->vpc()->enableSupport();
+        $this->vpc()->support_enabled = true;
+        $this->vpc()->save();
 
         $this->assertTrue($this->vpc()->refresh()->support_enabled);
 
