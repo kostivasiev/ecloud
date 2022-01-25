@@ -6,28 +6,25 @@ use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
+use App\Models\V2\Vpc;
+use App\Traits\V2\Listeners\BillableListener;
+use bar\foo\baz\ClassConstBowOutTest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateSupportEnabledBilling implements Billable
 {
+    use BillableListener;
+
+    const RESOURCE = Vpc::class;
+
     public function handle(Updated $event)
     {
         Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
 
-        if (!($event->model instanceof Task) || !($event->model->resource instanceof Instance)) {
-            return;
-        }
+        $this->validateBillableResourceEvent($event);
 
-        if (!$event->model->completed) {
-            return;
-        }
-
-        if ($event->model->resource->isManaged()) {
-            return;
-        }
-
-        $vpc = $event->model->resource->vpc;
+        $vpc = $event->model->resource;
 
         $time = Carbon::now();
 

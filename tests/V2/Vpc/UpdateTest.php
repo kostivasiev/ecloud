@@ -94,8 +94,6 @@ class UpdateTest extends TestCase
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
         Event::fake(Created::class);
 
-        $this->vpc()->disableSupport();
-
         $this->assertFalse($this->vpc()->refresh()->support_enabled);
 
         $this->patch(
@@ -103,11 +101,11 @@ class UpdateTest extends TestCase
             [
                 'support_enabled' => true,
             ]
-        );//->assertResponseStatus(202);
-
-        dd($this->response->getContent(), $this->response->headers);
+        );
 
         $this->vpc()->refresh();
+
+        ///
 
         $this->assertTrue($this->vpc()->support_enabled);
     }
