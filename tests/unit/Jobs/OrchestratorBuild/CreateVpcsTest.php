@@ -3,6 +3,7 @@ namespace Tests\unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateVpcs;
+use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
@@ -114,7 +115,7 @@ class CreateVpcsTest extends TestCase
 
         $vpc = Vpc::findOrFail($this->orchestratorBuild->state['vpc'][0]);
 
-        $metric = BillingMetric::getActiveByKey($vpc, VPC::getSupportKeyName());
+        $metric = BillingMetric::getActiveByKey($vpc, UpdateSupportEnabledBilling::getKeyName());
 
         $this->assertEquals(1, $metric->count());
 

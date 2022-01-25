@@ -7,6 +7,9 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Admin\Account\AdminClient;
+use UKFast\Admin\Account\AdminCustomerClient;
+use UKFast\Admin\Account\Entities\Customer;
 use UKFast\Api\Auth\Consumer;
 
 class CreateTest extends TestCase
@@ -138,6 +141,20 @@ class CreateTest extends TestCase
 
     public function testSupportEnabled()
     {
+        app()->bind(AdminClient::class, function () {
+            $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
+            $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
+
+            $mockCustomer->shouldReceive('getById')
+                ->andReturn(
+                    new Customer([
+                        'paymentMethod' => 'Invoice',
+                    ])
+                );
+            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
+            return $mockClient;
+        });
+
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
         Event::fake(Created::class);
 

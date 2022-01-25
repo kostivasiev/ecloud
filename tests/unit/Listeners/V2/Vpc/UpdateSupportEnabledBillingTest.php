@@ -1,17 +1,24 @@
 <?php
 namespace Tests\unit\Listeners\V2\Vpc;
 
+use App\Events\V2\Task\Created;
 use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Admin\Account\AdminClient;
+use UKFast\Admin\Account\AdminCustomerClient;
+use UKFast\Admin\Account\Entities\Customer;
+use UKFast\Api\Auth\Consumer;
 
 class UpdateSupportEnabledBillingTest extends TestCase
 {
     public function testStartsBillingMetricForSupportEnabled()
     {
+        Event::fake(Created::class);
         $this->vpc()->setAttribute('support_enabled', true)->saveQuietly();
         $this->assertNull(BillingMetric::getActiveByKey($this->vpc(), UpdateSupportEnabledBilling::getKeyName()));
 
@@ -21,7 +28,7 @@ class UpdateSupportEnabledBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->vpc());
             return $task;
         });
 

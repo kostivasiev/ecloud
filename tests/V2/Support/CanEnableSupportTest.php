@@ -45,11 +45,11 @@ class CanEnableSupportTest extends TestCase
             'support_enabled' => true
         ])->seeJson(
             [
-                'title' => 'Not Found',
-                'detail' => 'The customer account is not available',
-                'status' => 403,
+                'title' => 'Validation Error',
+                'detail' => 'Customer not found or payment required',
+                'status' => 422,
             ]
-        )->assertResponseStatus(403);
+        )->assertResponseStatus(422);
     }
 
     public function testWithValidCustomerAndCreditCard()
@@ -73,11 +73,11 @@ class CanEnableSupportTest extends TestCase
             'support_enabled' => true
         ])->seeJson(
             [
-                'title' => 'Payment Required',
-                'detail' => 'Payment is required before support can be enabled',
-                'status' => 402,
+                'title' => 'Validation Error',
+                'detail' => 'Customer not found or payment required',
+                'status' => 422,
             ]
-        )->assertResponseStatus(402);
+        )->assertResponseStatus(422);
     }
 
     public function testWithValidCustomerAndAccount()
