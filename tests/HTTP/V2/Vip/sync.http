@@ -1,4 +1,3 @@
-### Pre-requesit is that management networking is deployed
 ### Create Router (to deploy management networking)
 POST https://{{host}}/{{version}}/routers
 Accept: */*
@@ -14,26 +13,37 @@ Content-Type: application/json
 }
 
 > {%
-client.test("Request executed successfully", function() {
+client.test("Create Router", function() {
     client.assert(response.status === 202, "Response status is not 202");
 });
+
 client.global.set('router_id', response.body.data.id);
 client.log('Router ID: ' + response.body.data.id);
 %}
 
-###
-GET https://{{host}}/{{version}}/load-balancer-specs?name:eq=medium
+### Create a network
+POST https://{{host}}/{{version}}/networks
+Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
+{
+  "router_id": "{{router_id}}",
+  "subnet": "192.168.1.1/24"
+}
+
 > {%
-client.global.set('load_balancer_spec_id', response.body.data[0].id);
-client.log('Load Balancer Spec ID: ' + response.body.data[0].id);
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('network_id', response.body.data.id);
+client.log('Network ID: ' + response.body.data.id);
 %}
 
-###
+### Create a loadbalancer service with a network
 POST https://{{host}}/{{version}}/load-balancers
 Accept: */*
 Cache-Control: no-cache
@@ -45,7 +55,10 @@ Content-Type: application/json
   "name": "Test",
   "availability_zone_id": "{{dev_availability_zone_id}}",
   "vpc_id": "{{dev_vpc_id}}",
-  "load_balancer_spec_id": "{{load_balancer_spec_id}}"
+  "load_balancer_spec_id": "{{dev_load_balancer_spec_id}}",
+  "network_ids": [
+      "{{network_id}}"
+  ]
 }
 
 > {%
@@ -57,10 +70,28 @@ client.global.set('load_balancer_id', response.body.data.id);
 client.log('Load Balancer ID: ' + response.body.data.id);
 %}
 
-###
-
-GET https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
+### Create VIP (with fip)
+POST https://{{host}}/{{version}}/vips
 Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "load_balancer_id" : "{{load_balancer_id}}",
+  "network_id": "{{network_id}}",
+  "allocate_floating_ip": true
+}
+> {%
+client.test('Create', function () {
+    client.global.set('vip_id', response.body.data.id);
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 3 Get Item
+GET https://{{host}}/{{version}}/vips/{{vip_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
@@ -69,45 +100,48 @@ Content-Type: application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data.id == client.global.get('load_balancer_id'), "Incorrect resource ID returned");
-  client.assert(response.body.data.nodes === 2, "Incorrect node count");
 });
 %}
 
-### Clean up
 
-## Get the instance ID's here so we can delete them
-GET https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}/nodes
+
+### Delete the VIP
+DELETE https://{{host}}/{{version}}/vips/{{vip_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
-client.global.set('instance_id_1', response.body.data[0].id);
-client.global.set('instance_id_2', response.body.data[1].id);
 %}
 
+### Destroy the load balancer
+DELETE https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
 
-### Use the instance ID's from above to clean up
-DELETE https://{{host}}/{{version}}/instances/{{instance_id_1}}
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
 
-
-### Use the instance ID's from above to clean up
-DELETE https://{{host}}/{{version}}/instances/{{instance_id_2}}
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
+### Delete VIP from the LB API as we have no sync delete yet - swap the ID for your VIP's ID, it will be in the logs
+DELETE https://kong.staging.rnd.ukfast/loadbalancers/v2/vips/13980
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
 Content-Type:  application/json
 
 ###
-DELETE https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
+DELETE https://{{host}}/{{version}}/networks/{{network_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
@@ -121,3 +155,4 @@ Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+

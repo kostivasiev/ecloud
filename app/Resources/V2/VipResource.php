@@ -2,6 +2,7 @@
 
 namespace App\Resources\V2;
 
+use App\Models\V2\IpAddress;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
@@ -29,6 +30,7 @@ class VipResource extends UKFastResource
             'load_balancer_id' => $this->load_balancer_id,
             'network_id' => $this->network_id,
             'ip_address_id' => $this->ip_address_id,
+//            'floating_ip_id' => $this->floating_ip_id,
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,

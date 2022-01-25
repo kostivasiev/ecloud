@@ -9,6 +9,8 @@ use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -48,6 +50,15 @@ class Vip extends Model implements Filterable, Sortable
         return $this->belongsTo(IpAddress::class);
     }
 
+//    public function getFloatingIpIdAttribute()
+//    {
+//        if ($this->ipAddress()->exists() && $this->ipAddress->floatingIp->exists()) {
+//            return $this->ipAddress->floatingIp->id;
+//        }
+//
+//        return null;
+//    }
+
     public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {
@@ -57,6 +68,42 @@ class Vip extends Model implements Filterable, Sortable
             ->whereHas('network.router.vpc', function ($query) use ($user) {
                 $query->where('reseller_id', $user->resellerId());
             });
+    }
+
+    /**
+     * @param array $denyList
+     * @param string $type
+     * @return mixed|void
+     * @throws \Exception
+     */
+    public function assignClusterIp() : IpAddress
+    {
+        if ($this->ipAddress()->exists()) {
+            throw new \Exception('Cluster IP address already assigned to VIP');
+        }
+
+        $lock = Cache::lock("ip_address." . $this->id, 60);
+        try {
+            $lock->block(60);
+
+            $ip = $this->network->getNextAvailableIp();
+
+            $ipAddress = app()->make(IpAddress::class);
+            $ipAddress->fill([
+                'ip_address' => $ip,
+                'network_id' => $this->network->id,
+                'type' => IpAddress::TYPE_CLUSTER
+            ]);
+            $ipAddress->save();
+
+            $this->ipAddress()->associate($ipAddress)->save();
+
+            Log::info(IpAddress::TYPE_CLUSTER . ' IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to VIP ' . $this->id);
+
+            return $ipAddress;
+        } finally {
+            $lock->release();
+        }
     }
 
     /**
@@ -115,7 +162,9 @@ class Vip extends Model implements Filterable, Sortable
             'name' => 'name',
             'load_balancer_id' => 'load_balancer_id',
             'network_id' => 'network_id',
-            'ip_address_id' => 'ip_address_id'
+            'ip_address_id' => 'ip_address_id',
+            'created_at' => 'created_at',
+            'updated_at' => 'updated_at'
         ];
     }
 }

@@ -31,4 +31,12 @@ trait AwaitTask
             return true;
         }
     }
+
+    public function awaitTasks(Array $taskIds = [])
+    {
+        foreach ($taskIds as $id) {
+            $task = Task::findOrFail($id);
+            $this->awaitTaskWithRelease($task);
+        }
+    }
 }
