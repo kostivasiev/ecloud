@@ -147,22 +147,6 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
     }
 
     /**
-     * @return string
-     */
-    public function getSupportKeyDisplayName()
-    {
-        return "VPC Support";
-    }
-
-    /**
-     * @return string
-     */
-    public function getSupportKeyName()
-    {
-        return "vpc.support";
-    }
-
-    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */
