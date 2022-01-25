@@ -24,7 +24,7 @@ class AssignToLoadBalancerClusterTest extends TestCase
         $this->loadBalancer()->setAttribute('config_id', 321)->saveQuietly();
 
         $vipEntity = app()->make(Vip::class);
-        $vipEntity->internalCidr = '10.0.0.4/32';
+        $vipEntity->internalCidr = '10.0.0.4/24';
         $vipEntity->externalCidr = '1.1.1.1/32';
 
         $mockAdminLoadbalancersClient = \Mockery::mock(AdminClient::class);

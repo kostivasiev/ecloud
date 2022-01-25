@@ -6,3 +6,10 @@ Authorization: myukfast
 Content-Type:  application/json
 
 <> 2021-11-10T141220.200.json
+
+### Delete VIP
+DELETE https://kong.staging.rnd.ukfast/loadbalancers/v2/vips/13980
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
