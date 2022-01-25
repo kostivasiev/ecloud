@@ -83,6 +83,7 @@ class CreateVpcsTest extends TestCase
 
         $this->assertEquals(2, count($this->orchestratorBuild->state['vpc']));
     }
+
     public function testEnableSupport()
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
