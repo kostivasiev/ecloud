@@ -8,6 +8,7 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Vpc;
+use App\Support\Sync;
 use DateTimeZone;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -93,10 +94,10 @@ class CreateVpcsTest extends TestCase
             'vpcs' => [
                 [
                     'name' => 'vpc-2',
-                        'region_id' => 'reg-test',
-                        'console_enabled' => true,
-                        'advanced_networking' => true,
-                        'support_enabled' => true
+                    'region_id' => 'reg-test',
+                    'console_enabled' => true,
+                    'advanced_networking' => true,
+                    'support_enabled' => true
                 ]
             ]
         ]);
@@ -109,20 +110,15 @@ class CreateVpcsTest extends TestCase
             return !$event->job->isReleased();
         });
 
-        Event::assertDispatched(Created::class);
-
         $this->orchestratorBuild->refresh();
+
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
 
         $vpc = Vpc::findOrFail($this->orchestratorBuild->state['vpc'][0]);
 
-        $metric = BillingMetric::getActiveByKey($vpc, UpdateSupportEnabledBilling::getKeyName());
-
-        $this->assertEquals(1, $metric->count());
-
-        $this->assertEquals(
-            Carbon::parse($vpc->created_at, new DateTimeZone(config('app.timezone')))->format('Y-m-d'),
-            Carbon::parse($metric->start, new DateTimeZone(config('app.timezone')))->format('Y-m-d')
-        );
+        $this->assertTrue($vpc->support_enabled);
     }
 
 }

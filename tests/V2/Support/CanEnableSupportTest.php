@@ -15,14 +15,6 @@ use UKFast\Api\Auth\Consumer;
 
 class CanEnableSupportTest extends TestCase
 {
-    protected CanEnableSupport $canEnableSupport;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->canEnableSupport = new CanEnableSupport();
-    }
-
     public function testWithBadCustomerAccount()
     {
         app()->bind(AdminClient::class, function () {

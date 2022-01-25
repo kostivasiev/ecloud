@@ -3,6 +3,7 @@
 namespace Tests\V2\Vpc;
 
 use App\Events\V2\Task\Created;
+use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Event;
@@ -178,7 +179,7 @@ class CreateTest extends TestCase
 
         $this->assertTrue($vpc->support_enabled);
 
-        $metric = BillingMetric::getActiveByKey($vpc, VPC::getSupportKeyName());
+        $metric = BillingMetric::getActiveByKey($vpc, UpdateSupportEnabledBilling::getKeyName());
 
         $this->assertEquals(1, $metric->count());
 
