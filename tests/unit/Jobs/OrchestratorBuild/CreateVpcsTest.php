@@ -44,7 +44,8 @@ class CreateVpcsTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
-        });    }
+        });
+    }
 
     public function testVpcAlreadyExistsSkips()
     {
