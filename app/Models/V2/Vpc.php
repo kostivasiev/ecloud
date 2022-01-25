@@ -135,9 +135,9 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
             $factory->create('name', Filter::$stringDefaults),
             $factory->create('reseller_id', Filter::$stringDefaults),
             $factory->create('region_id', Filter::$stringDefaults),
-            $factory->create('console_enabled', Filter::$enumDefaults),
-            $factory->create('support_enabled', Filter::$enumDefaults),
-            $factory->create('advanced_networking', Filter::$enumDefaults),
+            $factory->boolean()->create('console_enabled', '1', '0'),
+            $factory->boolean()->create('support_enabled', '1', '0'),
+            $factory->boolean()->create('advanced_networking', '1', '0'),
             $factory->create('created_at', Filter::$dateDefaults),
             $factory->create('updated_at', Filter::$dateDefaults),
         ];

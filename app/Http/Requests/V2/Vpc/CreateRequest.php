@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\V2\Vpc;
 
-use App\Rules\V2\IsScoped;
 use App\Rules\V2\PaymentRequired;
 use UKFast\FormRequests\FormRequest;
 
@@ -41,7 +40,6 @@ class CreateRequest extends FormRequest
             'support_enabled' => [
                 'sometimes',
                 'boolean',
-                new IsScoped(),
                 new PaymentRequired(),
             ],
         ];

@@ -4,11 +4,8 @@ namespace App\Listeners\V2\Vpc;
 use App\Events\V2\Task\Updated;
 use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Traits\V2\Listeners\BillableListener;
-use bar\foo\baz\ClassConstBowOutTest;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -40,7 +37,6 @@ class UpdateSupportEnabledBilling implements Billable
             $billingMetric->name = self::getFriendlyName();
             $billingMetric->key = self::getKeyName();
             $billingMetric->value = 1;
-            $billingMetric->start = $date ?? Carbon::now(new \DateTimeZone(config('app.timezone')));
             $billingMetric->save();
         }
 
