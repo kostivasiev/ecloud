@@ -155,6 +155,10 @@ class UpdateTest extends TestCase
 
         $this->vpc()->refresh();
 
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
+
         $this->assertFalse($this->vpc()->support_enabled);
     }
 }
