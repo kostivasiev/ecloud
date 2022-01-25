@@ -3,6 +3,7 @@
 namespace Tests\V2\Nic;
 
 use App\Models\V2\Nic;
+use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -15,10 +16,10 @@ class DeletionRulesTest extends TestCase
         $this->floatingIp()->resource()->associate($this->nic());
         $this->floatingIp()->save();
 
-        $this->delete('/v2/nics/' . $this->nic()->id
-        )->seeJson([
-            'detail' => 'The specified resource has dependant relationships and cannot be deleted',
-        ])->assertResponseStatus(412);
+        $this->delete('/v2/nics/' . $this->nic()->id)
+            ->seeJson([
+                'detail' => 'The specified resource has dependant relationships and cannot be deleted',
+            ])->assertResponseStatus(412);
         $nic = Nic::withTrashed()->findOrFail($this->nic()->id);
         $this->assertNull($nic->deleted_at);
     }

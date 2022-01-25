@@ -72,7 +72,6 @@ class NicController extends BaseController
         }
 
         $task = $nic->syncDelete();
-
         return $this->responseTaskId($task->id);
     }
 

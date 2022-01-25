@@ -54,7 +54,7 @@
 <!--- set product or project milestone - If appropriate  -->
 /milestone %
 
-<!--- set initial issue status, priority, weight & estimate - see handbook if unsure  -->
-/label ~"To Do" ~P2
+<!--- set initial issue status, risk, priority, weight & estimate - see handbook if unsure  -->
+/label ~"To Do" ~P2 ~"risk::low" 
 /weight 
 /estimate 
