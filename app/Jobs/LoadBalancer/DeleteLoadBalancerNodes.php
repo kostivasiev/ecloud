@@ -3,6 +3,7 @@
 namespace App\Jobs\LoadBalancer;
 
 use App\Jobs\TaskJob;
+use App\Models\V2\LoadBalancerNode;
 use App\Traits\V2\TaskJobs\AwaitResources;
 
 class DeleteLoadBalancerNodes extends TaskJob
@@ -12,16 +13,24 @@ class DeleteLoadBalancerNodes extends TaskJob
     public function handle()
     {
         $loadBalancer = $this->task->resource;
-        $taskData = $this->task->data ?? [];
+        $loadBalancerNodeIds = [];
         if (empty($taskData['load_balancer_node_ids'])) {
-            $loadBalancer->loadBalancerNodes()->each(function ($loadBalancerNode) use (&$taskData) {
-                $taskData['load_balancer_node_ids'][] = $loadBalancerNode->id;
-                $loadBalancerNode->syncDelete([
-                    'instance_id' => $loadBalancerNode->instance_id,
-                ]);
-            });
+            $loadBalancer->loadBalancerNodes()
+                ->each(function ($loadBalancerNode) use (&$loadBalancerNodeIds) {
+                    $loadBalancerNodeIds[] = $loadBalancerNode->id;
+                    $loadBalancerNode->syncDelete([
+                        'instance_id' => $loadBalancerNode->instance_id,
+                    ]);
+                });
+            $taskData = $this->task->data;
+            $taskData['load_balancer_node_ids'] = $loadBalancerNodeIds;
             $this->task->setAttribute('data', $taskData)->saveQuietly();
+        } else {
+            $loadBalancerNodeIds = LoadBalancerNode::whereIn('id', $this->task->data['load_balancer_node_ids'])
+                ->get()
+                ->pluck('id')
+                ->toArray();
         }
-        $this->awaitSyncableResources($this->task->data['load_balancer_node_ids']);
+        $this->awaitSyncableResources($loadBalancerNodeIds);
     }
 }
