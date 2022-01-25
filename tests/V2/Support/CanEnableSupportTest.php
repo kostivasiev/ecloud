@@ -2,10 +2,13 @@
 
 namespace Tests\V2\Support;
 
+use App\Events\V2\Task\Created;
 use App\Http\Middleware\CanEnableSupport;
+use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminClient;
@@ -17,6 +20,8 @@ class CanEnableSupportTest extends TestCase
 {
     public function testWithBadCustomerAccount()
     {
+        Event::fake(Created::class);
+
         app()->bind(AdminClient::class, function () {
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
             $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
@@ -42,10 +47,14 @@ class CanEnableSupportTest extends TestCase
                 'status' => 422,
             ]
         )->assertResponseStatus(422);
+
+        Event::assertNotDispatched(Created::class);
     }
 
     public function testWithValidCustomerAndCreditCard()
     {
+        Event::fake(Created::class);
+
         app()->bind(AdminClient::class, function () {
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
             $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
@@ -70,10 +79,14 @@ class CanEnableSupportTest extends TestCase
                 'status' => 422,
             ]
         )->assertResponseStatus(422);
+
+        Event::assertNotDispatched(Created::class);
     }
 
     public function testWithValidCustomerAndAccount()
     {
+        Event::fake(Created::class);
+
         app()->bind(AdminClient::class, function () {
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
             $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
@@ -92,5 +105,9 @@ class CanEnableSupportTest extends TestCase
         $this->patch('/v2/vpcs/'.$this->vpc()->id, [
             'support_enabled' => true
         ])->assertResponseStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
     }
 }
