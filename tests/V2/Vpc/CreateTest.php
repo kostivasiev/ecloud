@@ -178,11 +178,5 @@ class CreateTest extends TestCase
         $vpc = Vpc::findOrFail('vpc-test2');
 
         $this->assertTrue($vpc->support_enabled);
-
-        $metric = BillingMetric::getActiveByKey($vpc, UpdateSupportEnabledBilling::getKeyName());
-
-        $this->assertEquals(1, $metric->count());
-
-        $this->assertEquals($vpc->created_at, $metric->start);
     }
 }
