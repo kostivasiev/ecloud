@@ -18,9 +18,7 @@ class DeleteLoadBalancerNodes extends TaskJob
             $loadBalancer->loadBalancerNodes()
                 ->each(function ($loadBalancerNode) use (&$loadBalancerNodeIds) {
                     $loadBalancerNodeIds[] = $loadBalancerNode->id;
-                    $loadBalancerNode->syncDelete([
-                        'instance_id' => $loadBalancerNode->instance_id,
-                    ]);
+                    $loadBalancerNode->syncDelete();
                 });
             $taskData = $this->task->data;
             $taskData['load_balancer_node_ids'] = $loadBalancerNodeIds;

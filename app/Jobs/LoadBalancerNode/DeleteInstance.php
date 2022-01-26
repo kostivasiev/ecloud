@@ -16,22 +16,15 @@ class DeleteInstance extends TaskJob
     {
         $loadBalancerNode = $this->task->resource;
 
-        if (empty($this->task->data['instance_id'])) {
-            $this->info('No instance to remove, skipping', [
-                'loadbalancer_node_id' => $loadBalancerNode->id,
-            ]);
-            return;
-        }
-        $instance = Instance::find($this->task->data['instance_id']);
-
+        $instance = Instance::find($loadBalancerNode->instance_id);
         if (!$instance) {
             $this->info('Instance not found, nothing to delete', [
                 'loadbalancer_node_id' => $loadBalancerNode->id,
-                'instance_id' => $this->task->data['instance_id'],
+                'instance_id' => $loadBalancerNode->instance_id,
             ]);
             return;
         }
         $instance->syncDelete();
-        $this->awaitSyncableResources([$this->task->data['instance_id']]);
+        $this->awaitSyncableResources([$instance->id]);
     }
 }
