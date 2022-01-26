@@ -52,5 +52,4 @@ class UpdateNode extends TaskJob
             $query->where('instances.id', '=', $loadBalancerNode->instance_id);
         })->first();
     }
-
 }
