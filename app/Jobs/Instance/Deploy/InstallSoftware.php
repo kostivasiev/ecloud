@@ -63,7 +63,7 @@ class InstallSoftware extends Job
                 $instanceSoftwareIds[] = $instanceSoftware->id;
             });
 
-            $this->task->setAttribute('data', ['instance_software_ids' => $instanceSoftwareIds])->saveQuietly();
+            $this->task->updateData('instance_software_ids', $instanceSoftwareIds);
         } else {
             $this->awaitSyncableResources($this->task->data['instance_software_ids']);
         }

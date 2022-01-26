@@ -6,12 +6,14 @@ use App\Models\V2\Dhcp;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
+use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerNode;
 use App\Models\V2\LoadBalancerNetwork;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Router;
+use App\Models\V2\Vip;
 use App\Models\V2\Volume;
 use App\Models\V2\VolumeGroup;
 use App\Models\V2\Vpc;
@@ -75,6 +77,8 @@ class AppServiceProvider extends ServiceProvider
             'ip' => IpAddress::class,
             'ln' => LoadBalancerNode::class,
             'lbn' => LoadBalancerNetwork::class,
+            'vip' => Vip::class,
+            'lb' => LoadBalancer::class,
         ]);
 
         Queue::exceptionOccurred(function (JobExceptionOccurred $event) {
