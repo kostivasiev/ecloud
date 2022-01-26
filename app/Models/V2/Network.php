@@ -153,6 +153,15 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
     }
 
     /**
+     * Get subnet prefix, eg 10.0.0.1/24 returns 24
+     * @return int
+     */
+    public function getNetworkPrefix()
+    {
+        return Subnet::fromString($this->subnet)->getNetworkPrefix();
+    }
+
+    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */

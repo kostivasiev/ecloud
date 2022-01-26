@@ -22,9 +22,7 @@ class DeleteVips extends TaskJob
                 $vip->syncDelete();
                 $vipIds[] = $vip->id;
             });
-            $this->task->setAttribute('data', [
-                'vip_ids' => $vipIds
-            ])->saveQuietly();
+            $this->task->updateData('vip_ids', $vipIds);
         } else {
             $vipIds = Vip::whereIn('id', $this->task->data['vip_ids'])
                 ->get()

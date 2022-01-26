@@ -23,9 +23,7 @@ class CreateNodes extends TaskJob
                 $node->syncSave();
                 $loadBalancerNodes[] = $node->id;
             }
-            $data = $this->task->data;
-            $data['loadbalancer_node_ids'] = $loadBalancerNodes;
-            $this->task->setAttribute('data', $data)->saveQuietly();
+            $this->task->updateData('loadbalancer_node_ids', $loadBalancerNodes);
         } else {
             $loadBalancerNodes = LoadBalancerNode::whereIn('id', $this->task->data['loadbalancer_node_ids'])
                 ->get()
