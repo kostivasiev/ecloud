@@ -21,9 +21,7 @@ class DeleteNodes extends TaskJob
                 $instance->syncDelete();
                 $instanceIds[] = $instance->id;
             });
-            $this->task->setAttribute('data', [
-                'instance_ids' => $instanceIds
-            ])->saveQuietly();
+            $this->task->updateData('instance_ids', $instanceIds);
         } else {
             $instanceIds = Instance::whereIn('id', $this->task->data['instance_ids'])
                 ->get()

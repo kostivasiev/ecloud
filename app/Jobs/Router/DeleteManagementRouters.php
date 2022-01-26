@@ -20,10 +20,7 @@ class DeleteManagementRouters extends TaskJob
                 $managementRoutersIds[] = $router->id;
             });
 
-            $this->task->data = [
-                'management_router_ids' => $managementRoutersIds,
-            ];
-            $this->task->saveQuietly();
+            $this->task->updateData('management_router_ids', $managementRoutersIds);
         } else {
             $managementRoutersIds = Router::whereIn('id', $this->task->data['management_router_ids'])
                 ->get()

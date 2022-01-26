@@ -33,7 +33,7 @@ class RunScripts extends Job
                 if (!$this->runScript($instance, $script)) {
                     return;
                 }
-                $this->task->setAttribute('data', ['script_ids' => $completedScripts])->saveQuietly();
+                $this->task->updateData('script_ids', $completedScripts);
             }
         }
     }

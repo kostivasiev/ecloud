@@ -138,4 +138,11 @@ class Task extends Model implements Filterable, Sortable
             'updated_at' => 'updated_at',
         ];
     }
+
+    public function updateData(string $key, $value): bool
+    {
+        $taskData = $this->data ?? [];
+        $taskData[$key] = $value;
+        return $this->setAttribute('data', $taskData)->saveQuietly();
+    }
 }

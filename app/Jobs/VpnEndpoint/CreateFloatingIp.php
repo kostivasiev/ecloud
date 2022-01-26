@@ -23,10 +23,7 @@ class CreateFloatingIp extends TaskJob
             $floatingIp->syncSave();
 
             // Add floating ip id to task data
-            $this->task->data = [
-                'floating_ip_id' => $floatingIp->id,
-            ];
-            $this->task->saveQuietly();
+            $this->task->updateData('floating_ip_id', $floatingIp->id);
             $this->info('Floating IP ' . $floatingIp->id . 'created for VPN Endpoint ' . $vpnEndpoint->id);
         }
         if (!$floatingIp) {

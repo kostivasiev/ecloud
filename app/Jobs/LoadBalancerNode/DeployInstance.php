@@ -38,7 +38,7 @@ class DeployInstance extends TaskJob
                     'keepalived_password' => $this->getKeepAliveDPassword()
                 ];
             $instance->setAttribute('deploy_data', $deployData)->syncSave();
-            $this->task->setAttribute('data', ['loadbalancer_instance_id' => $instance->id])->saveQuietly();
+            $this->task->updateData('loadbalancer_instance_id', $instance->id);
         } else {
             $instance = Instance::where('id', '=', $this->task->data['loadbalancer_instance_id'])
                 ->first();

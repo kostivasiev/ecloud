@@ -22,15 +22,14 @@ class DeleteNetworks extends TaskJob
         }
 
         if (empty($this->task->data['load_balancer_network_ids'])) {
-            $data = $this->task->data;
+            $data = [];
 
             $loadBalancer->loadBalancerNetworks()->each(function ($loadBalancerNetwork) use (&$data, $loadBalancer) {
                 Log::info(get_class($this) . ': Deleting load balancer network ' . $loadBalancerNetwork->id, ['id' => $loadBalancer->id]);
                 $loadBalancerNetwork->syncDelete();
-                $data['load_balancer_network_ids'][] = $loadBalancerNetwork->id;
+                $data[] = $loadBalancerNetwork->id;
             });
-
-            $this->task->setAttribute('data', $data)->saveQuietly();
+            $this->task->updateData('load_balancer_network_ids', $data);
         }
 
         if (isset($this->task->data['load_balancer_network_ids'])) {
