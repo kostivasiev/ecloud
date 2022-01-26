@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6835aaa46094929be330c7b014bf36f2",
+    "content-hash": "67bf1eaa4430238883d0dcb0e1b28c00",
     "packages": [
         {
             "name": "brick/math",
@@ -7345,11 +7345,11 @@
         },
         {
             "name": "ukfast/admin-client",
-            "version": "v2.0.2",
+            "version": "v2.0.4",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git",
-                "reference": "fe25d26437ca97437c61938810e9536de4c4d1ce"
+                "reference": "686980fd3452351f79df9a2912ac89b204d02b0e"
             },
             "require": {
                 "ext-json": "*",
@@ -7380,7 +7380,7 @@
             "support": {
                 "email": "developers@ukfast.co.uk"
             },
-            "time": "2022-01-21T11:57:02+00:00"
+            "time": "2022-01-26T14:03:55+00:00"
         },
         {
             "name": "ukfast/api-auth",
