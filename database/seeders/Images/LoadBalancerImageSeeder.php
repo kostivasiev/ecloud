@@ -24,7 +24,7 @@ class LoadBalancerImageSeeder extends Seeder
             'documentation_uri' => null,
             'description' => 'Load Balancer Image',
             'script_template' => '',
-            'vm_template' => 'CentOS7 x86_64',
+            'vm_template' => 'ubuntu2004-lbv2-v1.0.0',
             'platform' => 'Linux',
             'active' => true,
             'public' => false,
