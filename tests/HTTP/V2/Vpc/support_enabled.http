@@ -1,22 +1,25 @@
-### Create VPC
+### 1. Create VPC
 POST https://{{host}}/{{version}}/vpcs
-X-consumer-custom-id:  1-0
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "name": "test-vpc-support-enabled",
+    "name": "TEST VPC SUPPORT ENABLED",
     "region_id": "{{dev_region_id}}",
-    "support_enabled": true
+    "support_enabled": false
 }
 
 > {%
+client.test('Create VPC', function () {
+    client.assert(response.status === 202, '202 Response Not Received');
+});
 client.global.set('vpc_id', response.body.data.id);
 client.log('VPC Id : ' + response.body.data.id);
 %}
 
-###
-GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+### 2. Check support_enabled is false + no billing metric
+GET https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -27,9 +30,37 @@ Content-Type: application/json
 client.assert(response.body.data.support_enabled === true, "Support was not enabled");
 %}
 
-###
-PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
-X-consumer-custom-id:  1-0
+### 3. Check billing metric made after short while and support_enabled = true
+PATCH https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
+X-consumer-custom-id: 0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "support_enabled": true
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### 4. Check support_enabled = true
+GET https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.assert(response.body.data.support_enabled === false, "Support was not enabled");
+%}
+
+### 5. Check billing metric ended after short while
+PATCH https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
+X-consumer-custom-id: 0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
@@ -43,8 +74,8 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-###
-GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+### 6. Check support_enabled = false
+https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -54,40 +85,3 @@ Content-Type: application/json
 > {%
 client.assert(response.body.data.support_enabled === false, "Support was not enabled");
 %}
-
-###
-PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
-X-consumer-custom-id:  1-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-{
-    "support_enabled": true
-}
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 202, "Response status is not 202");
-});
-%}
-
-###
-GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-> {%
-client.assert(response.body.data.support_enabled === true, "Support was not enabled");
-%}
-
-
-### Delete VPC
-DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
