@@ -15,6 +15,8 @@ class Unassign extends Job
 {
     use Batchable, TaskableBatch, LoggableTaskJob;
 
+    public static string $name = 'floating_ip_unassign';
+
     private Task $task;
 
     private FloatingIp $model;

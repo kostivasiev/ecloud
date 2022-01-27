@@ -3,8 +3,8 @@
 namespace Tests\unit\Jobs\Vip;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\Tasks\Nic\AssociateIp;
 use App\Jobs\Vip\AssignToNics;
+use App\Tasks\Nic\AssociateIp;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;

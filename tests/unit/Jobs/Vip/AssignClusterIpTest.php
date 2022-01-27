@@ -2,14 +2,14 @@
 
 namespace Tests\unit\Jobs\Vip;
 
-use App\Jobs\Vip\AssignIpAddress;
+use App\Jobs\Vip\AssignClusterIp;
 use App\Models\V2\IpAddress;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\VipMock;
 use Tests\TestCase;
 
-class AssignIpAddressTest extends TestCase
+class AssignClusterIpTest extends TestCase
 {
     use VipMock;
 
@@ -17,7 +17,7 @@ class AssignIpAddressTest extends TestCase
     {
         Event::fake([JobFailed::class]);
 
-        dispatch(new AssignIpAddress($this->createSyncUpdateTask($this->vip())));
+        dispatch(new AssignClusterIp($this->createSyncUpdateTask($this->vip())));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -34,7 +34,7 @@ class AssignIpAddressTest extends TestCase
 
         $ipAddress = $this->vip()->assignClusterIp();
 
-        dispatch(new AssignIpAddress($this->createSyncUpdateTask($this->vip())));
+        dispatch(new AssignClusterIp($this->createSyncUpdateTask($this->vip())));
 
         Event::assertNotDispatched(JobFailed::class);
 
