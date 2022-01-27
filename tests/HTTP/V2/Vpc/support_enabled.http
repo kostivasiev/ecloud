@@ -75,7 +75,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 6. Check support_enabled = false
-https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
