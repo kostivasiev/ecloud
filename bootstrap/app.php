@@ -98,7 +98,7 @@ $app->routeMiddleware([
     'instance-is-locked' => \App\Http\Middleware\Instance\IsLocked::class,
     'instance-console-enabled' => \App\Http\Middleware\Instance\ConsoleEnabled::class,
     'instance-requires-floating-ip' => \App\Http\Middleware\Instance\RequiresFloatingIp::class,
-    'can-enable-support' => \App\Http\Middleware\CanEnableSupport::class,
+    'can-enable-support' => \App\Http\Middleware\Vpc\CanEnableSupport::class,
     'is-pending' => \App\Http\Middleware\DiscountPlan\IsPending::class,
     'customer-max-vpc' => \App\Http\Middleware\IsMaxVpcForCustomer::class,
     'customer-max-instance' => \App\Http\Middleware\IsMaxInstanceForCustomer::class,

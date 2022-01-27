@@ -53,12 +53,14 @@ $router->group($baseRouteParameters, function () use ($router) {
     /** Virtual Private Clouds */
     $router->group([], function () use ($router) {
         $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
-            $router->group(['middleware' => 'customer-max-vpc'], function () use ($router) {
+            $router->group(['middleware' => ['customer-max-vpc', 'can-enable-support']], function () use ($router) {
                 $router->post('vpcs', 'VpcController@create');
             });
             $router->post('vpcs/{vpcId}/deploy-defaults', 'VpcController@deployDefaults');
         });
-        $router->patch('vpcs/{vpcId}', 'VpcController@update');
+        $router->group(['middleware' => 'can-enable-support'], function () use ($router) {
+            $router->patch('vpcs/{vpcId}', 'VpcController@update');
+        });
         $router->get('vpcs', 'VpcController@index');
         $router->get('vpcs/{vpcId}', 'VpcController@show');
 

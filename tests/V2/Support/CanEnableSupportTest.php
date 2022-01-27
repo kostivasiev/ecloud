@@ -3,13 +3,10 @@
 namespace Tests\V2\Support;
 
 use App\Events\V2\Task\Created;
-use App\Http\Middleware\CanEnableSupport;
 use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminClient;
 use UKFast\Admin\Account\AdminCustomerClient;
@@ -42,11 +39,11 @@ class CanEnableSupportTest extends TestCase
             'support_enabled' => true
         ])->seeJson(
             [
-                'title' => 'Validation Error',
-                'detail' => 'Customer not found or payment required',
-                'status' => 422,
+                'title' => 'Not Found',
+                'detail' => 'The customer account is not available',
+                'status' => 403,
             ]
-        )->assertResponseStatus(422);
+        )->assertResponseStatus(403);
 
         Event::assertNotDispatched(Created::class);
     }
@@ -74,11 +71,11 @@ class CanEnableSupportTest extends TestCase
             'support_enabled' => true
         ])->seeJson(
             [
-                'title' => 'Validation Error',
-                'detail' => 'Customer not found or payment required',
-                'status' => 422,
+                'title' => 'Payment Required',
+                'detail' => 'Payment is required before support can be enabled',
+                'status' => 402,
             ]
-        )->assertResponseStatus(422);
+        )->assertResponseStatus(402);
 
         Event::assertNotDispatched(Created::class);
     }

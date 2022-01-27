@@ -23,7 +23,7 @@ class PaymentRequired implements Rule
             } catch (\Exception $e) {
                 if ($e->getResponse()->getStatusCode() !== 404) {
                     Log::info($e);
-                    throw($e);
+                    return false;
                 }
                 return false;
             }

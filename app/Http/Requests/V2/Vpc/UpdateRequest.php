@@ -35,7 +35,6 @@ class UpdateRequest extends FormRequest
             'support_enabled' => [
                 'sometimes',
                 'boolean',
-                new PaymentRequired(),
             ],
         ];
     }

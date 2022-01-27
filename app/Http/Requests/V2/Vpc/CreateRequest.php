@@ -40,7 +40,6 @@ class CreateRequest extends FormRequest
             'support_enabled' => [
                 'sometimes',
                 'boolean',
-                new PaymentRequired(),
             ],
         ];
     }
