@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../resources/VpcSupport/parameters/vpcSupportId.yaml'
+    - $ref: '../../resources/AvailabilityZoneCapacity/parameters/capacityId.yaml'
   responses:
     200:
       description: success
@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../components/schemas/vpcSupport.yaml'
+                - $ref: '../../components/schemas/availabilityZoneCapacity.yaml'
               meta:
                 type: object
   tags:
@@ -41,7 +41,7 @@ patch:
                   required: false
   responses:
     200:
-      $ref: '../../resources/VpcSupport/responses/idResponse.yaml'
+      $ref: '../../resources/AvailabilityZoneCapacity/responses/idResponse.yaml'
   tags:
     - Availability Zone Capacities
 

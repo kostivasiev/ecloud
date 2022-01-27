@@ -372,10 +372,6 @@ paths:
     $ref: 'resources/SSHKeyPair/collection.yaml'
   '/ecloud/v2/ssh-key-pairs/{keypairId}':
     $ref: 'resources/SSHKeyPair/item.yaml'
-  '/ecloud/v2/support':
-    $ref: 'resources/VpcSupport/collection.yaml'
-  '/ecloud/v2/support/{supportId}':
-    $ref: 'resources/VpcSupport/item.yaml'
   '/ecloud/v2/tasks':
     $ref: 'resources/Task/collection.yaml'
   '/ecloud/v2/tasks/{taskId}':

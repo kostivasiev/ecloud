@@ -1,6 +1,0 @@
-in: path
-name: supportId
-required: true
-schema:
-  type: string
-example: sup-2b66bb79
