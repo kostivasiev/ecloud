@@ -28,7 +28,7 @@ class ProcessBilling extends Command
     protected Carbon $endDate;
 
     protected array $billing;
-    protected array $discountBilling;
+    protected array $discountBilling = [];
     protected float $runningTotal;
 
     public function __construct()
