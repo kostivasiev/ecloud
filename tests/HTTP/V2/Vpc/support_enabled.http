@@ -19,7 +19,7 @@ client.log('VPC Id : ' + response.body.data.id);
 %}
 
 ### 2. Check support_enabled is false + no billing metric
-GET https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
+GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -31,7 +31,7 @@ client.assert(response.body.data.support_enabled === true, "Support was not enab
 %}
 
 ### 3. Check billing metric made after short while and support_enabled = true
-PATCH https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
+PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 X-consumer-custom-id: 0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -47,7 +47,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 4. Check support_enabled = true
-GET https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
+GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -59,7 +59,7 @@ client.assert(response.body.data.support_enabled === false, "Support was not ena
 %}
 
 ### 5. Check billing metric ended after short while
-PATCH https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
+PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 X-consumer-custom-id: 0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -75,7 +75,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### 6. Check support_enabled = false
-https://{{host}}/{{version}}/vpcs/vpc-b4aa1cdb-dev
+https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
