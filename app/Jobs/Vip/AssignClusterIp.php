@@ -14,7 +14,7 @@ class AssignClusterIp extends TaskJob
     {
         $vip = $this->task->resource;
 
-        if ($vip->ipAddress()->exists()) {
+        if (!$vip->ipAddress()->exists()) {
             $ipAddress = $vip->assignClusterIp();
             $this->info('IP Address ' . $ipAddress->id . ' (' . $ipAddress->getIPAddress() . ') assigned to VIP ' . $vip->id);
         }

@@ -39,7 +39,7 @@ class UnassignFromNics extends TaskJob
                 });
 
             if (!empty($taskIds)) {
-                $this->task->updateData($disassociateIpTasks,$taskIds);
+                $this->task->updateData($disassociateIpTasks, $taskIds);
             }
         }
 
