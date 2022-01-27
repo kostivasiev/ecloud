@@ -39,6 +39,7 @@ class CanEnableSupportTest extends TestCase
         });
         $request = \Mockery::mock(Request::class)->makePartial();
         $request->shouldReceive('user')->andReturnSelf();
+        $request->shouldReceive('has')->andReturnTrue();
         $request->shouldReceive('isScoped')->andReturnTrue();
         $request->shouldReceive('resellerId')->andReturn(1);
         $response = $this->canEnableSupport->handle($request, function () {
