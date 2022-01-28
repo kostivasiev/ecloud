@@ -33,7 +33,7 @@ class UnassignFloatingIp extends TaskJob
                 ($floatingIp->createTaskWithLock(Unassign::$name, Unassign::class))->id
             );
 
-            $this->info('Unassigning floating ' . $floatingIp->id . ' from cluster IP ' . $vip->ipAddress->id . ' for VIP ' . $vip->id);
+            $this->info('Unassigning floating IP ' . $floatingIp->id . ' from cluster IP ' . $vip->ipAddress->id . ' for VIP ' . $vip->id);
         }
 
         if (!empty($this->task->data[$unassignIpTask])) {

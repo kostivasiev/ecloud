@@ -90,7 +90,7 @@ client.test('Create', function () {
 });
 %}
 
-### 3 Get Item
+### Get Item VIP
 GET https://{{host}}/{{version}}/vips/{{vip_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
