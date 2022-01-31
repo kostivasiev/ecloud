@@ -3,7 +3,6 @@
 namespace App\Tasks\Sync\LoadBalancerNode;
 
 use App\Jobs\LoadBalancerNode\CreateInstance;
-use App\Jobs\LoadBalancerNode\CreateTargetGroup;
 use App\Jobs\LoadBalancerNode\DeployInstance;
 use App\Jobs\LoadBalancerNode\GetWardenCredentials;
 use App\Jobs\LoadBalancerNode\RegisterNode;
@@ -18,7 +17,6 @@ class Update extends Task
             CreateInstance::class,
             RegisterNode::class,
             DeployInstance::class,
-            CreateTargetGroup::class,
         ];
     }
 }
