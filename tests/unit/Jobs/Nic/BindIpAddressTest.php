@@ -4,6 +4,8 @@ namespace Tests\unit\Jobs\Nic;
 
 use App\Jobs\Nsx\Nic\BindIpAddress;
 use App\Models\V2\IpAddress;
+use App\Models\V2\Task;
+use App\Tasks\Nic\AssociateIp;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
@@ -11,13 +13,34 @@ use Tests\TestCase;
 
 class BindIpAddressTest extends TestCase
 {
-    public function testBindIpAddress()
+    public IpAddress $ipAddress;
+
+    public Task $task;
+
+    public function setUp(): void
     {
-        $ipAddress = IpAddress::factory()->create([
+        parent::setUp();
+
+        $this->ipAddress = IpAddress::factory()->create([
             'network_id' => $this->network()->id,
             'type' => 'cluster'
         ]);
 
+        Task::withoutEvents(function () {
+            $this->task = new Task([
+                'id' => 'sync-1',
+                'name' => AssociateIp::$name,
+                'data' => [
+                    'ip_address_id' => $this->ipAddress->id
+                ],
+            ]);
+            $this->task->resource()->associate($this->nic());
+            $this->task->save();
+        });
+    }
+
+    public function testBindIpAddress()
+    {
         $this->nsxServiceMock()->expects('patch')
             ->withArgs([
                 '/policy/api/v1/infra/tier-1s/' . $this->router()->id .
@@ -42,7 +65,7 @@ class BindIpAddressTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new BindIpAddress($this->nic(), $ipAddress));
+        dispatch(new BindIpAddress($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -51,11 +74,6 @@ class BindIpAddressTest extends TestCase
 
     public function testBindMultipleIpAddresses()
     {
-        $ipAddress = IpAddress::factory()->create([
-            'network_id' => $this->network()->id,
-            'type' => 'cluster'
-        ]);
-
         $this->nsxServiceMock()->expects('patch')
             ->withArgs([
                 '/policy/api/v1/infra/tier-1s/' . $this->router()->id .
@@ -89,7 +107,7 @@ class BindIpAddressTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new BindIpAddress($this->nic(), $ipAddress));
+        dispatch(new BindIpAddress($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -100,11 +118,6 @@ class BindIpAddressTest extends TestCase
 
     public function testOnlyClusterIpsAreBound()
     {
-        $ipAddress = IpAddress::factory()->create([
-            'network_id' => $this->network()->id,
-            'type' => 'cluster'
-        ]);
-
         $this->nsxServiceMock()->expects('patch')
             ->withArgs([
                 '/policy/api/v1/infra/tier-1s/' . $this->router()->id .
@@ -115,7 +128,7 @@ class BindIpAddressTest extends TestCase
                         'resource_type' => 'SegmentPort',
                         "address_bindings" => [
                             [
-                                'ip_address' => $ipAddress->ip_address,
+                                'ip_address' => $this->ipAddress->ip_address,
                                 'mac_address' => 'AA:BB:CC:DD:EE:FF'
                             ]
                         ]
@@ -135,7 +148,7 @@ class BindIpAddressTest extends TestCase
             'ip_address' => '2.2.2.2'
         ]));
 
-        dispatch(new BindIpAddress($this->nic(), $ipAddress));
+        dispatch(new BindIpAddress($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
