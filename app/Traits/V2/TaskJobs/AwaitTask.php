@@ -5,7 +5,7 @@ use App\Models\V2\Task;
 
 trait AwaitTask
 {
-    public $tries = 60;
+    public $tries = 150;
 
     public $backoff = 5;
 
