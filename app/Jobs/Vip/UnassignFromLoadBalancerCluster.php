@@ -3,8 +3,8 @@
 namespace App\Jobs\Vip;
 
 use App\Jobs\TaskJob;
-use GuzzleHttp\Exception\RequestException;
 use UKFast\Admin\Loadbalancers\AdminClient;
+use UKFast\SDK\Exception\ApiException;
 
 class UnassignFromLoadBalancerCluster extends TaskJob
 {
@@ -27,8 +27,8 @@ class UnassignFromLoadBalancerCluster extends TaskJob
 
         try {
             $adminClient->vips()->destroy($vip->config_id);
-        } catch (RequestException $exception) {
-            if ($exception->getCode() != 404) {
+        } catch (ApiException $exception) {
+            if ($exception->getStatusCode() != 404) {
                 throw $exception;
             }
         }

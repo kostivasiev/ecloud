@@ -3,9 +3,6 @@
 namespace Tests\unit\Jobs\Vip;
 
 use App\Jobs\Vip\UnassignFromLoadBalancerCluster;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -45,9 +42,10 @@ class UnassignFromLoadBalancerClusterTest extends TestCase
 
         $mockAdminLoadbalancersClient = \Mockery::mock(AdminClient::class);
         $mockAdminLoadbalancersClient->allows('setResellerId')->andReturns($mockAdminLoadbalancersClient);
-        $mockAdminLoadbalancersClient->allows('vips->destroy')->andThrow(
-            new RequestException('Not Found', new Request('GET', 'test'), new Response(404))
-        );
+
+        $notFoundException = \Mockery::mock(\UKFast\SDK\Exception\NotFoundException::class)->makePartial();
+        $notFoundException->allows('getStatusCode')->andReturns(404);
+        $mockAdminLoadbalancersClient->allows('vips->destroy')->andThrow($notFoundException);
 
         app()->bind(AdminClient::class, function () use ($mockAdminLoadbalancersClient) {
             return $mockAdminLoadbalancersClient;
@@ -81,9 +79,10 @@ class UnassignFromLoadBalancerClusterTest extends TestCase
 
         $mockAdminLoadbalancersClient = \Mockery::mock(AdminClient::class);
         $mockAdminLoadbalancersClient->allows('setResellerId')->andReturns($mockAdminLoadbalancersClient);
-        $mockAdminLoadbalancersClient->allows('vips->destroy')->andThrow(
-            new RequestException('Server Error', new Request('DELETE', 'test'), new Response(500))
-        );
+
+        $apiException = \Mockery::mock(\UKFast\SDK\Exception\ApiException::class)->makePartial();
+        $apiException->allows('getStatusCode')->andReturns(500);
+        $mockAdminLoadbalancersClient->allows('vips->destroy')->andThrow($apiException);
 
         app()->bind(AdminClient::class, function () use ($mockAdminLoadbalancersClient) {
             return $mockAdminLoadbalancersClient;
@@ -93,7 +92,7 @@ class UnassignFromLoadBalancerClusterTest extends TestCase
 
         $task = $this->createSyncDeleteTask($this->vip());
 
-        $this->expectExceptionCode(500);
+        $this->expectException(\UKFast\SDK\Exception\ApiException::class);
 
         dispatch(new UnassignFromLoadBalancerCluster($task));
 
