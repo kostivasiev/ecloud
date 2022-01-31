@@ -24,6 +24,6 @@ class RegisterNode extends TaskJob
             'cluster_id' => $loadBalancerNode->loadBalancer->config_id,
             'node_id' => $response->getId(),
         ]);
-        $this->task->updateData('node_id', $response->getId());
+        $loadBalancerNode->setAttribute('node_id', $response->getId())->saveQuietly();
     }
 }
