@@ -35,18 +35,12 @@ class DeployCluster extends TaskJob
             return;
         }
 
-        try {
-            $this->info('Loadbalancer deployed, starting update', [
-                'load_balancer_id' => $vip->loadbalancer->id,
-                'cluster_id' => $vip->loadbalancer->config_id,
-            ]);
+        $this->info('Loadbalancer deployed, starting update', [
+            'load_balancer_id' => $vip->loadbalancer->id,
+            'cluster_id' => $vip->loadbalancer->config_id,
+        ]);
 
-            $adminClient->clusters()->deploy($vip->loadbalancer->config_id);
-        } catch (ApiException $exception) {
-            if ($exception->getStatusCode() !== 404) {
-                throw $exception;
-            }
-        }
+        $adminClient->clusters()->deploy($vip->loadbalancer->config_id);
 
         $this->info('Loadbalancer deployment completed', [
             'load_balancer_id' => $vip->loadbalancer->id,
