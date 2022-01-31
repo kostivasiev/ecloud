@@ -15,6 +15,8 @@ class Assign extends Job
 {
     use Batchable, TaskableBatch, LoggableTaskJob;
 
+    public static string $name = 'floating_ip_assign';
+
     private Task $task;
 
     public function __construct(Task $task)

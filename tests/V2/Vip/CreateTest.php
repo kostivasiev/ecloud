@@ -16,6 +16,8 @@ class CreateTest extends TestCase
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
+        $this->loadBalancerNetwork();
+
         Event::fake(Created::class);
 
         $this->post(
@@ -43,6 +45,8 @@ class CreateTest extends TestCase
     public function testValidDataWithFipSucceeds()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+
+        $this->loadBalancerNetwork();
 
         Event::fake(Created::class);
 

@@ -162,13 +162,7 @@ class NetworkController extends BaseController
 
     public function destroy(Request $request, string $networkId)
     {
-        $network = Network::forUser($request->user())->findOrFail($networkId);
-
-        if (!$network->canDelete()) {
-            return $network->getDeletionError();
-        }
-
-        $task = $network->syncDelete();
+        $task = Network::forUser($request->user())->findOrFail($networkId)->syncDelete();
         return $this->responseTaskId($task->id);
     }
 

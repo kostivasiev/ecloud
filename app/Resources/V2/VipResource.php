@@ -2,6 +2,7 @@
 
 namespace App\Resources\V2;
 
+use App\Models\V2\IpAddress;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
@@ -23,12 +24,13 @@ class VipResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'load_balancer_id' => $this->load_balancer_id,
             'network_id' => $this->network_id,
             'ip_address_id' => $this->ip_address_id,
+//            'floating_ip_id' => $this->floating_ip_id,
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
@@ -39,5 +41,11 @@ class VipResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if ($request->user()->isAdmin()) {
+            $data['config_id'] = $this->config_id;
+        }
+
+        return $data;
     }
 }

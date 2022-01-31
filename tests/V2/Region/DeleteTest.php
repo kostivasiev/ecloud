@@ -6,10 +6,12 @@ use App\Models\V2\Region;
 use Faker\Factory as Faker;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
     protected $faker;
+    private Consumer $consumer;
 
     protected $region;
 
@@ -17,19 +19,14 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
+
+        $this->consumer = new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']);
+        $this->consumer->setIsAdmin(true);
     }
 
     public function testNotAdminIsDenied()
     {
-        $this->delete(
-            '/v2/regions/' . $this->region->id,
-            [],
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write'
-            ]
-        )
+        $this->delete('/v2/regions/' . $this->region()->id)
             ->seeJson([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
@@ -40,14 +37,8 @@ class DeleteTest extends TestCase
 
     public function testFailInvalidId()
     {
-        $this->delete(
-            '/v2/regions/' . $this->faker->uuid,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->be($this->consumer);
+        $this->delete('/v2/regions/' . $this->faker->uuid)
             ->seeJson([
                 'title' => 'Not found',
                 'detail' => 'No Region with that ID was found',
@@ -58,17 +49,24 @@ class DeleteTest extends TestCase
 
     public function testSuccessfulDelete()
     {
-        $this->delete(
-            '/v2/regions/' . $this->region->id,
-            [],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->availabilityZone()->delete();
+        $this->be($this->consumer);
+        $this->delete('/v2/regions/' . $this->region()->id)
             ->assertResponseStatus(204);
-        $region = Region::withTrashed()->findOrFail($this->region->id);
-        $this->assertNotNull($region->deleted_at);
+        $this->region()->refresh();
+        $this->assertNotNull($this->region()->deleted_at);
+    }
+
+    public function testDeleteFailsWhenChildPresent()
+    {
+        $this->be($this->consumer);
+        $this->delete('/v2/regions/' . $this->region()->id)
+            ->seeJson(
+                [
+                    'title' => 'Precondition Failed',
+                    'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->availabilityZone()->id,
+                ]
+            )->assertResponseStatus(412);
     }
 
 }

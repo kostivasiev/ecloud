@@ -69,7 +69,7 @@ Content-Type: application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data.id === client.global.get('load_balancer_id'), "Incorrect resource ID returned");
+  client.assert(response.body.data.id == client.global.get('load_balancer_id'), "Incorrect resource ID returned");
   client.assert(response.body.data.nodes === 2, "Incorrect node count");
 });
 %}

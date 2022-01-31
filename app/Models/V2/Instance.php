@@ -96,7 +96,7 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
 
     public function loadBalancerNode()
     {
-        return $this->belongsTo(LoadBalancerNode::class);
+        return $this->hasOne(LoadBalancerNode::class);
     }
 
     public function nics()

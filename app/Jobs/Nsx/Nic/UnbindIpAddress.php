@@ -2,28 +2,11 @@
 
 namespace App\Jobs\Nsx\Nic;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\IpAddress;
-use App\Models\V2\Nic;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
-class UnbindIpAddress extends Job
+class UnbindIpAddress extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private $model;
-
-    private IpAddress $ipAddress;
-
-    public function __construct(Nic $nic, IpAddress $ipAddress)
-    {
-        $this->model = $nic;
-
-        $this->ipAddress = $ipAddress;
-    }
-
     /**
      * Patch a Tier-1 segment port with an IP address binding
      * @see: https://vdc-download.vmware.com/vmwb-repository/dcr-public/787988e9-6348-4b2a-8617-e6d672c690ee/a187360c-77d5-4c0c-92a8-8e07aa161a27/api_includes/method_PatchTier1SegmentPort.html
@@ -32,9 +15,9 @@ class UnbindIpAddress extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
+        $nic = $this->task->resource;
 
-        $nic = $this->model;
+        $ipAddress = IpAddress::findOrFail($this->task->data['ip_address_id']);
 
         $network = $nic->network;
         $router = $nic->network->router;
@@ -43,8 +26,8 @@ class UnbindIpAddress extends Job
 
         $ipAddresses = $nic->ipAddresses->where('type', IpAddress::TYPE_CLUSTER);
 
-        $ipAddresses = $ipAddresses->reject(function ($ipAddress) {
-            return $ipAddress->id == $this->ipAddress->id;
+        $ipAddresses = $ipAddresses->reject(function ($nicIpAddress) use ($ipAddress) {
+            return $nicIpAddress->id == $ipAddress->id;
         });
 
         $nsxService->patch(
@@ -64,10 +47,8 @@ class UnbindIpAddress extends Job
             ]
         );
 
-        $nic->ipAddresses()->detach($this->ipAddress);
+        $nic->ipAddresses()->detach($ipAddresses);
 
-        Log::info('Address binding removed for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $this->ipAddress->ip_address);
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $nic->id]);
+        $this->info('Address binding removed for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $ipAddress->ip_address);
     }
 }

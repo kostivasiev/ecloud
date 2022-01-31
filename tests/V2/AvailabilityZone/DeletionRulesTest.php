@@ -5,9 +5,7 @@ namespace Tests\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
-use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeletionRulesTest extends TestCase
@@ -16,7 +14,6 @@ class DeletionRulesTest extends TestCase
     protected $availabilityZone;
     protected $region;
     protected $router;
-    protected $vpc;
 
     public function setUp(): void
     {
@@ -44,7 +41,7 @@ class DeletionRulesTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->seeJson([
-            'detail' => 'The specified resource has dependant relationships and cannot be deleted',
+            'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->router->id,
         ])->assertResponseStatus(412);
         $availabilityZone = AvailabilityZone::withTrashed()->findOrFail($this->availabilityZone->id);
         $this->assertNull($availabilityZone->deleted_at);

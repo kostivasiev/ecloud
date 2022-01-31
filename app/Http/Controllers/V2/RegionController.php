@@ -52,11 +52,7 @@ class RegionController extends BaseController
 
     public function destroy(Request $request, string $regionId)
     {
-        $model = Region::findOrFail($regionId);
-        if (!$model->canDelete()) {
-            return $model->getDeletionError();
-        }
-        $model->delete();
+        Region::findOrFail($regionId)->delete();
         return response('', 204);
     }
 

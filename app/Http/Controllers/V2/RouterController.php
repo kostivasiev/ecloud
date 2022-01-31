@@ -68,13 +68,7 @@ class RouterController extends BaseController
 
     public function destroy(Request $request, string $routerId)
     {
-        $router = Router::forUser($request->user())->findOrFail($routerId);
-
-        if (!$router->canDelete()) {
-            return $router->getDeletionError();
-        }
-
-        $task = $router->syncDelete();
+        $task = Router::forUser($request->user())->findOrFail($routerId)->syncDelete();
         return $this->responseTaskId($task->id);
     }
 

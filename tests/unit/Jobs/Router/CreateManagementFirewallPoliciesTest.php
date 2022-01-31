@@ -60,10 +60,8 @@ class CreateManagementFirewallPoliciesTest extends TestCase
             ]);
             $this->router()->setAttribute('is_management', true)->saveQuietly();
             $this->task->resource()->associate($this->router());
-            $this->task->setAttribute('data', [
-                'management_router_id' => $this->managementRouter->id,
-                'management_network_id' => $this->managementNetwork->id,
-            ])->saveQuietly();
+            $this->task->updateData('management_router_id', $this->managementRouter->id);
+            $this->task->updateData('management_network_id', $this->managementNetwork->id);
         });
 
         Bus::fake();

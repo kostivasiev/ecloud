@@ -40,8 +40,7 @@ class CreateManagementNetwork extends TaskJob
                 }
 
                 // Store the management network id, so we can backoff everything else
-                $this->task->data = Arr::add($this->task->data, 'management_network_id', $managementNetwork->id);
-                $this->task->saveQuietly();
+                $this->task->updateData('management_network_id', $managementNetwork->id);
 
                 $this->info('Create Management Network End', [
                     'router_id' => $managementRouter->id,

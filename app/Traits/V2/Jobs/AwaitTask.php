@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Log;
 
 trait AwaitTask
 {
+    public $tries = 60;
+
+    public $backoff = 5;
+
     public function awaitTask(Task $task, $timeoutSeconds = 600, $sleep = 10)
     {
         $end = Carbon::now()->addSeconds($timeoutSeconds);
@@ -36,22 +40,28 @@ trait AwaitTask
         return false;
     }
 
-    public function awaitTaskWithRelease(Task $task, $backoff = 10)
+    public function awaitTaskWithRelease(Task $task)
     {
         $task->refresh();
 
-        if ($task->completed == true) {
-            Log::info(get_class($this) . ': Waiting for task to complete - COMPLETED', ['id' => $this->model->id, 'resource' => $task->id]);
-            return true;
-        }
-
-        if (!empty($task->failure_reason)) {
+        if ($task->status == Task::STATUS_FAILED) {
             Log::error(get_class($this) . ': Task in failed state, abort', ['id' => $this->model->id, 'resource' => $task->id]);
             $this->fail(new \Exception("Task '" . $task->id . "' in failed state"));
-            return false;
+            return;
         }
 
-        $this->release($backoff);
-        return true;
+        if ($task->status != Task::STATUS_COMPLETE) {
+            Log::warning(get_class($this) . ': Task not completed, retrying in ' . $this->backoff . ' seconds', ['id' => $task->id]);
+            $this->release($this->backoff);
+            return;
+        }
+    }
+
+    public function awaitTasks(Array $taskIds = [])
+    {
+        foreach ($taskIds as $id) {
+            $task = Task::findOrFail($id);
+            $this->awaitTaskWithRelease($task);
+        }
     }
 }
