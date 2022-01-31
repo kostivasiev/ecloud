@@ -24,7 +24,7 @@ class VipResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
             'load_balancer_id' => $this->load_balancer_id,
@@ -41,5 +41,11 @@ class VipResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if ($request->user()->isAdmin()) {
+            $data['config_id'] = $this->config_id;
+        }
+
+        return $data;
     }
 }

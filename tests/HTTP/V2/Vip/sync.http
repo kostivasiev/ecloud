@@ -90,7 +90,7 @@ client.test('Create', function () {
 });
 %}
 
-### 3 Get Item
+### Get Item VIP
 GET https://{{host}}/{{version}}/vips/{{vip_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
@@ -132,13 +132,6 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 202, "Response status is not 202");
 });
 %}
-
-### Delete VIP from the LB API as we have no sync delete yet - swap the ID for your VIP's ID, it will be in the logs
-DELETE https://kong.staging.rnd.ukfast/loadbalancers/v2/vips/13980
-Accept: */*
-Cache-Control: no-cache
-Authorization: myukfast
-Content-Type:  application/json
 
 ###
 DELETE https://{{host}}/{{version}}/networks/{{network_id}}

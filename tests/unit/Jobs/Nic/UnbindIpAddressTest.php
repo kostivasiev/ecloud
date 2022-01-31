@@ -4,6 +4,8 @@ namespace Tests\unit\Jobs\Nic;
 
 use App\Jobs\Nsx\Nic\UnbindIpAddress;
 use App\Models\V2\IpAddress;
+use App\Models\V2\Task;
+use App\Tasks\Nic\DisassociateIp;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
@@ -52,7 +54,20 @@ class UnbindIpAddressTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new UnbindIpAddress($this->nic(), $ipAddress));
+        $task = Task::withoutEvents(function () use ($ipAddress) {
+            $task = new Task([
+                'id' => 'sync-1',
+                'name' => DisassociateIp::$name,
+                'data' => [
+                    'ip_address_id' => $ipAddress->id
+                ],
+            ]);
+            $task->resource()->associate($this->nic());
+            $task->save();
+            return $task;
+        });
+
+        dispatch(new UnbindIpAddress($task));
 
         Event::assertNotDispatched(JobFailed::class);
 

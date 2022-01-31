@@ -4,7 +4,7 @@ namespace App\Tasks\Sync\Vip;
 
 use App\Jobs\LoadBalancer\DeployCluster;
 use App\Jobs\Vip\AssignFloatingIp;
-use App\Jobs\Vip\AssignIpAddress;
+use App\Jobs\Vip\AssignClusterIp;
 use App\Jobs\Vip\AssignToLoadBalancerCluster;
 use App\Jobs\Vip\AssignToNics;
 use App\Jobs\Vip\CreateFloatingIp;
@@ -15,7 +15,7 @@ class Update extends Task
     public function jobs()
     {
         return [
-            AssignIpAddress::class,
+            AssignClusterIp::class,
             AssignToNics::class,
             CreateFloatingIp::class,
             AssignFloatingIp::class,

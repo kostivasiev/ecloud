@@ -64,7 +64,7 @@ class ImageParameter extends Model implements Filterable, Sortable
      */
     public function scopeForUser($query, Consumer $user)
     {
-        if (!$user->isScoped()) {
+        if (!$user->isScoped() || in_array($user->resellerId(), config('reseller.internal'))) {
             return $query;
         }
 

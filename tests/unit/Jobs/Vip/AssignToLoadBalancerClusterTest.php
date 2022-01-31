@@ -44,6 +44,8 @@ class AssignToLoadBalancerClusterTest extends TestCase
 
         dispatch(new AssignToLoadBalancerCluster($task));
 
+        $this->assertEquals(111, $this->vip()->refresh()->config_id);
+
         Event::assertNotDispatched(JobFailed::class);
     }
 }
