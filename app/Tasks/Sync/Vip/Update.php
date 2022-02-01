@@ -2,6 +2,7 @@
 
 namespace App\Tasks\Sync\Vip;
 
+use App\Jobs\LoadBalancer\DeployCluster;
 use App\Jobs\Vip\AssignFloatingIp;
 use App\Jobs\Vip\AssignClusterIp;
 use App\Jobs\Vip\AssignToLoadBalancerCluster;
@@ -18,7 +19,8 @@ class Update extends Task
             AssignToNics::class,
             CreateFloatingIp::class,
             AssignFloatingIp::class,
-            AssignToLoadBalancerCluster::Class
+            AssignToLoadBalancerCluster::class,
+            DeployCluster::class,
         ];
     }
 }
