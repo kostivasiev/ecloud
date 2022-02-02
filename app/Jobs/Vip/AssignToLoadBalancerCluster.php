@@ -17,18 +17,20 @@ class AssignToLoadBalancerCluster extends TaskJob
     {
         $vip = $this->task->resource;
 
-        $adminClient = app()->make(AdminClient::class)->setResellerId($vip->loadbalancer->getResellerId());
+        $loadBalancer = $vip->loadBalancerNetwork->loadbalancer;
+
+        $adminClient = app()->make(AdminClient::class)->setResellerId($loadBalancer->getResellerId());
 
         $vipEntity = app()->make(Vip::class);
 
-        $vipEntity->internalCidr = $vip->ipAddress->getIPAddress() . '/' . $vip->network->getNetworkPrefix();
+        $vipEntity->internalCidr = $vip->ipAddress->getIPAddress() . '/' . $vip->loadBalancerNetwork->network->getNetworkPrefix();
 
         if ($vip->ipAddress->floatingIp()->exists()) {
             // convert to CIDR format /32 is 1 IP address in subnet
             $vipEntity->externalCidr = $vip->ipAddress->floatingIp->getIPAddress(). '/32';
         }
 
-        $response = $adminClient->vips()->createEntity($vip->loadbalancer->config_id, $vipEntity);
+        $response = $adminClient->vips()->createEntity($loadBalancer->config_id, $vipEntity);
 
         $vip->setAttribute('config_id', $response->getId())->save();
 

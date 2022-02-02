@@ -32,8 +32,8 @@ class CreateFloatingIp extends TaskJob
             $data = $this->task->data;
 
             $floatingIp = app()->make(FloatingIp::class);
-            $floatingIp->vpc_id = $vip->network->router->vpc->id;
-            $floatingIp->availability_zone_id = $vip->network->availabilityZone->id;
+            $floatingIp->vpc_id = $vip->loadBalancerNetwork->network->router->vpc->id;
+            $floatingIp->availability_zone_id = $vip->loadBalancerNetwork->network->availabilityZone->id;
             $floatingIp->syncSave();
             $this->info('Floating IP ' . $floatingIp->id . ' created for VIP ' . $vip->id);
 

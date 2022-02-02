@@ -7,7 +7,6 @@ use App\Traits\V2\TaskJobs\AwaitResources;
 
 class DeleteVips extends TaskJob
 {
-
     use AwaitResources;
 
     /**

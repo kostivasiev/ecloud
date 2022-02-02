@@ -23,7 +23,7 @@ class UnassignFromLoadBalancerCluster extends TaskJob
             return;
         }
 
-        $adminClient = app()->make(AdminClient::class)->setResellerId($vip->loadbalancer->getResellerId());
+        $adminClient = app()->make(AdminClient::class)->setResellerId($vip->loadBalancerNetwork->loadbalancer->getResellerId());
 
         try {
             $adminClient->vips()->destroy($vip->config_id);

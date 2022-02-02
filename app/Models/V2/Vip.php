@@ -8,6 +8,7 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -35,14 +36,9 @@ class Vip extends Model implements Filterable, Sortable
         'config_id',
     ];
 
-    public function loadBalancer()
+    public function loadBalancerNetwork(): BelongsTo
     {
-        return $this->belongsTo(LoadBalancer::class);
-    }
-
-    public function network()
-    {
-        return $this->belongsTo(Network::class);
+        return $this->belongsTo(LoadBalancerNetwork::class);
     }
 
     public function ipAddress()
@@ -86,12 +82,14 @@ class Vip extends Model implements Filterable, Sortable
         try {
             $lock->block(60);
 
-            $ip = $this->network->getNextAvailableIp();
+            $network = $this->loadBalancerNetwork->network;
+
+            $ip = $network->getNextAvailableIp();
 
             $ipAddress = app()->make(IpAddress::class);
             $ipAddress->fill([
                 'ip_address' => $ip,
-                'network_id' => $this->network->id,
+                'network_id' => $network->id,
                 'type' => IpAddress::TYPE_CLUSTER
             ]);
             $ipAddress->save();

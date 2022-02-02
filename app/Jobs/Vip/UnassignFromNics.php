@@ -23,9 +23,9 @@ class UnassignFromNics extends TaskJob
         if (empty($this->task->data[$disassociateIpTasks])) {
             $taskIds = [];
 
-            Nic::where('network_id', '=', $vip->network_id)
+            Nic::where('network_id', '=', $vip->loadBalancerNetwork->network_id)
                 ->whereHas('instance.loadBalancerNode', function ($query) use ($vip) {
-                    $query->where('load_balancer_id', '=', $vip->loadbalancer->id);
+                    $query->where('load_balancer_id', '=', $vip->loadBalancerNetwork->loadbalancer->id);
                 })->each(function ($nic) use ($vip, &$taskIds) {
                     if ($nic->ipAddresses()->where('id', $vip->ipAddress->id)->exists()) {
                         $this->info('Unassigning VIP ' . $vip->id . ' from NIC ' . $nic->id);

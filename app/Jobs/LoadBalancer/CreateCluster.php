@@ -3,7 +3,6 @@
 namespace App\Jobs\LoadBalancer;
 
 use App\Jobs\TaskJob;
-use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Loadbalancers\AdminClient;
 use UKFast\Admin\Loadbalancers\Entities\Cluster;
 
