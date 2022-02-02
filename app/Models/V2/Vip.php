@@ -30,8 +30,7 @@ class Vip extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
-        'load_balancer_id',
-        'network_id',
+        'load_balancer_network_id',
         'ip_address_id',
         'config_id',
     ];
@@ -116,8 +115,7 @@ class Vip extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('load_balancer_id', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('load_balancer_network_id', Filter::$stringDefaults),
             $factory->create('ip_address_id', Filter::$stringDefaults),
             $factory->create('config_id', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -135,8 +133,7 @@ class Vip extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('load_balancer_id', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('load_balancer_network_id', Filter::$stringDefaults),
             $factory->create('ip_address_id', Filter::$stringDefaults),
             $factory->create('config_id', Filter::$numericDefaults),
             $factory->create('created_at'),
@@ -163,8 +160,7 @@ class Vip extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
-            'load_balancer_id' => 'load_balancer_id',
-            'network_id' => 'network_id',
+            'load_balancer_network_id' => 'load_balancer_network_id',
             'ip_address_id' => 'ip_address_id',
             'config_id' => 'config_id',
             'created_at' => 'created_at',
