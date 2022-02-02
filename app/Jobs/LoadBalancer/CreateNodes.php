@@ -10,6 +10,12 @@ class CreateNodes extends TaskJob
 {
     use AwaitResources;
 
+    public function __construct($task)
+    {
+        parent::__construct($task);
+        $this->tries = (180 * $this->task->resource->loadBalancerSpec->node_count);
+    }
+
     public function handle()
     {
         $loadBalancer = $this->task->resource;
