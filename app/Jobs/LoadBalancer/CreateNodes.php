@@ -13,6 +13,7 @@ class CreateNodes extends TaskJob
     public function __construct($task)
     {
         parent::__construct($task);
+        // Set timeout to 15 mins per node
         $this->tries = (180 * $this->task->resource->loadBalancerSpec->node_count);
     }
 
