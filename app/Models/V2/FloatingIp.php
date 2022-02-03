@@ -36,7 +36,6 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
 
     protected $dispatchesEvents = [
         'deleted' => Deleted::class,
-        'created' => Created::class,
     ];
 
     public function getResellerId(): int
