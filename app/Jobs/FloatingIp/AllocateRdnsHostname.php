@@ -15,11 +15,6 @@ class AllocateRdnsHostname extends Job
     use Batchable, LoggableModelJob;
 
     public FloatingIp $model;
-
-    public string $dnsSuffix = 'in-addr.arpa';
-
-    private string $defaultHostname = '1.2.3.4.srvlist.ukfast.net';
-
     private bool $hasUpdated = false;
     private Record $rdns;
 
@@ -47,7 +42,7 @@ class AllocateRdnsHostname extends Job
             if (!empty($this->rdns->content) && $this->rdns) {
                 $this->model->rdns_hostname = $this->rdns->content;
             } else {
-                $this->model->rdns_hostname = $this->defaultHostname;
+                $this->model->rdns_hostname = $safednsClient->defaultHostname;
             }
             $this->model->save();
 

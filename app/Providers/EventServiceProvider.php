@@ -72,6 +72,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\FloatingIp\Deleted::class => [
             \App\Listeners\V2\AvailabilityZoneCapacity\UpdateFloatingIpCapacity::class,
             \App\Listeners\V2\BillingMetric\End::class,
+            \App\Listeners\V2\FloatingIP\ResetRdnsHostname::class,
         ],
 
         // Host
