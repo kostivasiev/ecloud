@@ -1,0 +1,6 @@
+### Check IP is valid
+GET https://kong.staging.rnd.ukfast/safedns/v1/records?name=89.163.37.46.in-addr.arpa
+Authorization: myukfast
+Content-Type:  application/json
+## Should show Content; "46.37.163.89.srvlist.ukfast.net"
+
