@@ -161,6 +161,9 @@ $app->register(UKFast\ApiInternalCommunication\LoadbalancerAdminClientServicePro
 
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);
 
+// Sieve
+$app->register(UKFast\Sieve\SieveServiceProvider::class);
+
 
 // ecloud service providers
 $app->register(App\Providers\KingpinServiceProvider::class);
