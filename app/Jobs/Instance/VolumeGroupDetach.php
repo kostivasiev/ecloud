@@ -40,12 +40,12 @@ class VolumeGroupDetach extends Job
         }
         $instance->volumes()->where('is_shared', '=', true)
             ->each(function ($volume) use ($instance) {
-                if (isset($this->task->data['volume_detach_task_id'])) {
+                if (!empty($this->task->data['volume_detach_task_id'])) {
                     $task = Task::findOrFail($this->task->data['volume_detach_task_id']);
                     if (!$task->completed) {
                         $this->awaitTaskWithRelease($task);
                     }
-                    $this->task->setAttribute('data', null)->saveQuietly();
+                    $this->task->updateData('volume_detach_task_id', null);
                 }
 
                 Log::info(
@@ -57,7 +57,7 @@ class VolumeGroupDetach extends Job
                 );
 
                 $task = $instance->createTask('volume_detach', VolumeDetach::class, ['volume_id' => $volume->id]);
-                $this->task->setAttribute('data', ['volume_detach_task_id' => $task->id])->saveQuietly();
+                $this->task->updateData('volume_detach_task_id', $task->id);
                 $this->awaitTaskWithRelease($task);
             });
     }

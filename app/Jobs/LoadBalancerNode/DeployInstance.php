@@ -11,6 +11,12 @@ class DeployInstance extends TaskJob
 {
     use AwaitResources;
 
+    public function __construct($task)
+    {
+        parent::__construct($task);
+        $this->tries = 180;
+    }
+
     public function handle()
     {
         $loadBalancerNode = $this->task->resource;
@@ -38,7 +44,7 @@ class DeployInstance extends TaskJob
                     'keepalived_password' => $this->getKeepAliveDPassword()
                 ];
             $instance->setAttribute('deploy_data', $deployData)->syncSave();
-            $this->task->setAttribute('data', ['loadbalancer_instance_id' => $instance->id])->saveQuietly();
+            $this->task->updateData('loadbalancer_instance_id', $instance->id);
         } else {
             $instance = Instance::where('id', '=', $this->task->data['loadbalancer_instance_id'])
                 ->first();

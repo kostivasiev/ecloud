@@ -30,6 +30,8 @@ class AssignToLoadBalancerCluster extends TaskJob
 
         $response = $adminClient->vips()->createEntity($vip->loadbalancer->config_id, $vipEntity);
 
+        $vip->setAttribute('config_id', $response->getId())->save();
+
         $this->info('VIP was assigned to the load balancer cluster with ID: ' . $response->getId());
     }
 }

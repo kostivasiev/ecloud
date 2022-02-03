@@ -5,10 +5,12 @@ use App\Models\V2\Task;
 
 trait AwaitTask
 {
+    public $tries = 150;
+
+    public $backoff = 5;
+
     public function awaitTaskWithRelease(...$tasks)
     {
-        $backoff = $this->backoff ?? 5;
-
         $incompleteTaskIDs = [];
         foreach ($tasks as $task) {
             $task->refresh();
@@ -26,8 +28,8 @@ trait AwaitTask
 
         if (count($incompleteTaskIDs) > 0) {
             $taskStr = implode(', ', $incompleteTaskIDs);
-            $this->debug("Task(s) {$taskStr} not complete, retrying in {$backoff} seconds");
-            $this->release($backoff);
+            $this->debug("Task(s) {$taskStr} not complete, retrying in {$this->backoff} seconds");
+            $this->release($this->backoff);
             return true;
         }
     }

@@ -23,10 +23,7 @@ class DeleteManagementNetworks extends TaskJob
                     $managementNetworkIds[] = $network->id;
                 });
             });
-            $this->task->data = [
-                'management_network_ids' => $managementNetworkIds,
-            ];
-            $this->task->saveQuietly();
+            $this->task->updateData('management_network_ids', $managementNetworkIds);
         } else {
             $managementNetworkIds = Network::whereIn('id', $this->task->data['management_network_ids'])
                 ->get()

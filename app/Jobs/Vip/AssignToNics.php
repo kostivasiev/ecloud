@@ -3,8 +3,8 @@
 namespace App\Jobs\Vip;
 
 use App\Jobs\TaskJob;
-use App\Jobs\Tasks\Nic\AssociateIp;
 use App\Models\V2\Nic;
+use App\Tasks\Nic\AssociateIp;
 use App\Traits\V2\TaskJobs\AwaitTask;
 
 class AssignToNics extends TaskJob
