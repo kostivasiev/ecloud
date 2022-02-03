@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\FloatingIp;
 
 use App\Jobs\FloatingIp\AllocateIp;
+use App\Jobs\FloatingIp\AllocateRdnsHostname;
 use App\Jobs\Job;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
@@ -23,7 +24,8 @@ class Update extends Job
     {
         $this->updateTaskBatch([
             [
-                new AllocateIp($this->task->resource)
+                new AllocateIp($this->task->resource),
+                new AllocateRdnsHostname($this->task->resource),
             ]
         ])->dispatch();
     }

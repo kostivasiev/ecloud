@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\FloatingIp\Deleted;
+use App\Events\V2\FloatingIp\Created;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -30,10 +31,12 @@ class FloatingIp extends Model implements Filterable, Sortable, ResellerScopeabl
         'name',
         'vpc_id',
         'availability_zone_id',
+        'rdns_hostname',
     ];
 
     protected $dispatchesEvents = [
-        'deleted' => Deleted::class
+        'deleted' => Deleted::class,
+        'created' => Created::class,
     ];
 
     public function getResellerId(): int
