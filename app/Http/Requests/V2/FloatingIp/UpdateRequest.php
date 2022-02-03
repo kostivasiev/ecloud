@@ -2,8 +2,7 @@
 
 namespace App\Http\Requests\V2\FloatingIp;
 
-use App\Rules\V2\IpAddress\IsAvailable;
-use App\Rules\V2\IpAddress\IsInSubnet;
+use UKFast\Api\Validation\Rules\Dns\Records\Hostname;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -31,12 +30,9 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => ['nullable', 'string', 'max:255'],
-            'hostname' => [
+            'rdns_hostname' => [
                 'sometimes',
-                'ip',
-                new IsInSubnet(app('request')->input('hostname')),
-                'bail',
-                new IsAvailable(app('request')->input('hostname')),
+                new Hostname(app('request')->input('hostname')),
             ],
         ];
     }

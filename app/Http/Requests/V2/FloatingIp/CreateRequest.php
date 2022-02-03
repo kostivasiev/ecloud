@@ -5,9 +5,8 @@ namespace App\Http\Requests\V2\FloatingIp;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\IpAddress\IsAvailable;
-use App\Rules\V2\IpAddress\IsInSubnet;
 use App\Rules\V2\IsResourceAvailable;
+use UKFast\Api\Validation\Rules\Dns\Records\Hostname;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -48,12 +47,9 @@ class CreateRequest extends FormRequest
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
                 new ExistsForUser(AvailabilityZone::class),
             ],
-            'hostname' => [
+            'rdns_hostname' => [
                 'sometimes',
-                'ip',
-                new IsInSubnet(app('request')->input('hostname')),
-                'bail',
-                new IsAvailable(app('request')->input('hostname')),
+                new Hostname(app('request')->input('hostname')),
             ],
         ];
     }
