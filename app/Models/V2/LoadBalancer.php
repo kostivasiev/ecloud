@@ -88,11 +88,6 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
         );
     }
 
-    public function vips()
-    {
-        return $this->hasMany(Vip::class);
-    }
-
     public function getResellerId(): int
     {
         return $this->vpc->reseller_id;

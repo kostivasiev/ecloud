@@ -61,9 +61,6 @@ class LoadBalancerNetwork extends Model implements Filterable, Sortable
     }
 
 
-
-
-
     /**
      * @param $query
      * @param Consumer $user

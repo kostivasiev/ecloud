@@ -23,7 +23,7 @@ class DeleteNics extends TaskJob
     {
         $loadBalancerNetwork = $this->task->resource;
 
-        $taskIdsKey = 'task.' . Sync::TASK_NAME_DELETE. '.ids';
+        $taskIdsKey = 'task.' . Sync::TASK_NAME_DELETE . '.ids';
 
         if (empty($this->task->data[$taskIdsKey])) {
             $ids = [];
@@ -33,33 +33,33 @@ class DeleteNics extends TaskJob
                     $query->where('load_balancer_id', '=', $loadBalancerNetwork->loadbalancer->id);
                 })->get();
 
-                foreach ($nics as $nic) {
-                    if ($nic->ipAddresses()->withType(IpAddress::TYPE_CLUSTER)->exists()) {
-                        $this->fail(new \Exception('Failed to delete NIC ' . $nic->id . ', ' . IpAddress::TYPE_CLUSTER . ' IP detected'));
-                        return;
-                    }
-
-                    $instance = $nic->instance;
-
-                    try {
-                        $instance->availabilityZone->kingpinService()->delete(
-                            '/api/v2/vpc/' . $instance->vpc->id .
-                            '/instance/' . $instance->id .
-                            '/nic/' . $nic->mac_address
-                        );
-                        $this->info('NIC ' . $nic->id . ' was removed from instance ' . $instance->id);
-                    } catch (RequestException $exception) {
-                        if ($exception->getCode() != 404) {
-                            throw $exception;
-                        }
-                        $this->info('NIC was not found on the instance, nothing to do, skipping.');
-                    }
-
-                    $this->info('Deleting NIC ' . $nic->id);
-                    $task = $nic->syncDelete();
-
-                    $ids[] = $task->id;
+            foreach ($nics as $nic) {
+                if ($nic->ipAddresses()->withType(IpAddress::TYPE_CLUSTER)->exists()) {
+                    $this->fail(new \Exception('Failed to delete NIC ' . $nic->id . ', ' . IpAddress::TYPE_CLUSTER . ' IP detected'));
+                    return;
                 }
+
+                $instance = $nic->instance;
+
+                try {
+                    $instance->availabilityZone->kingpinService()->delete(
+                        '/api/v2/vpc/' . $instance->vpc->id .
+                        '/instance/' . $instance->id .
+                        '/nic/' . $nic->mac_address
+                    );
+                    $this->info('NIC ' . $nic->id . ' was removed from instance ' . $instance->id);
+                } catch (RequestException $exception) {
+                    if ($exception->getCode() != 404) {
+                        throw $exception;
+                    }
+                    $this->info('NIC was not found on the instance, nothing to do, skipping.');
+                }
+
+                $this->info('Deleting NIC ' . $nic->id);
+                $task = $nic->syncDelete();
+
+                $ids[] = $task->id;
+            }
 
             $this->task->updateData($taskIdsKey, $ids);
         }

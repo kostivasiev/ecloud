@@ -43,7 +43,7 @@ client.global.set('network_id', response.body.data.id);
 client.log('Network ID: ' + response.body.data.id);
 %}
 
-### Create a loadbalancer service
+### Create a loadbalancer service - This will take a few minutes, wait for it to complete before proceeding
 POST https://{{host}}/{{version}}/load-balancers
 Accept: */*
 Cache-Control: no-cache
@@ -121,8 +121,6 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-
-
 ### Try to delete the load balancer network with a VIP assigned - should fail
 DELETE https://{{host}}/{{version}}/load-balancer-networks/{{load_balancer_network_id}}
 Accept: */*
@@ -137,21 +135,8 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### Delete the VIP
-DELETE https://{{host}}/{{version}}/vips/{{vip_id}}
+DELETE https://{{host}}/{{version}}/vips/vip-f93686f0-dev
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
@@ -164,8 +149,25 @@ client.test("Request executed successfully", function() {
 });
 %}
 
+### Delete the load balancer network - this is our main test, check the logs
+DELETE https://{{host}}/{{version}}/load-balancer-networks/{{load_balancer_network_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+    client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+
+### CLEAN UP!
+
 ### Destroy the load balancer
-DELETE https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
+DELETE https://{{host}}/{{version}}/load-balancers/lb-74802bc8-dev
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
