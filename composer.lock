@@ -7345,11 +7345,11 @@
         },
         {
             "name": "ukfast/admin-client",
-            "version": "v2.0.3",
+            "version": "v2.0.4",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git",
-                "reference": "5672a3a9233820e6de9be923a3eb6f0f4a8b1f65"
+                "reference": "686980fd3452351f79df9a2912ac89b204d02b0e"
             },
             "require": {
                 "ext-json": "*",

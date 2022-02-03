@@ -11,6 +11,12 @@ class DeployInstance extends TaskJob
 {
     use AwaitResources;
 
+    public function __construct($task)
+    {
+        parent::__construct($task);
+        $this->tries = 180;
+    }
+
     public function handle()
     {
         $loadBalancerNode = $this->task->resource;
