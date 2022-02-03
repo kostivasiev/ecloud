@@ -61,7 +61,7 @@ class Vip extends Model implements Filterable, Sortable
             return $query;
         }
         return $query
-            ->whereHas('network.router.vpc', function ($query) use ($user) {
+            ->whereHas('loadBalancerNetwork.network.router.vpc', function ($query) use ($user) {
                 $query->where('reseller_id', $user->resellerId());
             });
     }

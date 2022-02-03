@@ -31,7 +31,7 @@ Content-Type: application/json
 
 {
   "router_id": "{{router_id}}",
-  "subnet": "192.168.1.1/24"
+  "subnet": "172.16.22.4/29"
 }
 
 > {%
@@ -97,8 +97,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "load_balancer_id" : "{{load_balancer_id}}",
-  "network_id": "{{network_id}}",
+  "load_balancer_network_id" : "{{load_balancer_network_id}}",
   "allocate_floating_ip": true
 }
 > {%
@@ -118,13 +117,25 @@ Content-Type: application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.load_balancer_network_id == client.global.get('load_balancer_network_id'), "Incorrect load_balancer_network_id");
 });
 %}
 
 
 
-### Try to delete the load balancer network
+### Try to delete the load balancer network with a VIP assigned - should fail
+DELETE https://{{host}}/{{version}}/load-balancer-networks/{{load_balancer_network_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
 
+> {%
+client.test("Request executed successfully", function() {
+    client.assert(response.status === 412, "Response status is not 412");
+});
+%}
 
 
 

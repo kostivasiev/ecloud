@@ -10,7 +10,6 @@ use UKFast\Responses\UKFastResource;
  * Class VipResource
  * @package App\Http\Resources\V2
  * @property string id
- * @property string load_balancer_id
  * @property string network_id
  * @property string deleted_at
  * @property string created_at
