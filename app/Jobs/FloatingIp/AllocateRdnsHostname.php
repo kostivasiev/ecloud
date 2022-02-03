@@ -42,7 +42,7 @@ class AllocateRdnsHostname extends Job
             if (!empty($this->rdns->content) && $this->rdns) {
                 $this->model->rdns_hostname = $this->rdns->content;
             } else {
-                $this->model->rdns_hostname = $safednsClient->defaultHostname;
+                $this->model->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
             }
             $this->model->save();
 
@@ -59,7 +59,7 @@ class AllocateRdnsHostname extends Job
         return sprintf(
             '%s.%s',
             implode('.', array_reverse(explode('.', $ip))),
-            $this->dnsSuffix
+            config('defaults.floating-ip.rdns.dns_suffix')
         );
     }
 

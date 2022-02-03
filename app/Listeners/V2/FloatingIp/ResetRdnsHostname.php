@@ -29,7 +29,7 @@ class ResetRdnsHostname implements ShouldQueue
         $this->safednsClient = app()->make(RecordClient::class);
         $floatingIp = FloatingIp::withTrashed()->findOrFail($event->model->id);
 
-        $floatingIp->rdns_hostname = $this->safednsClient->defaultHostname;
+        $floatingIp->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
         $floatingIp->save();
 
         $dnsName = $this->reverseIpLookup($floatingIp->ip_address);
@@ -45,7 +45,7 @@ class ResetRdnsHostname implements ShouldQueue
         return sprintf(
             '%s.%s',
             implode('.', array_reverse(explode('.', $ip))),
-            $this->safednsClient->dnsSuffix
+            config('defaults.floating-ip.rdns.dns_suffix')
         );
     }
 
@@ -55,7 +55,7 @@ class ResetRdnsHostname implements ShouldQueue
             'id' => $this->rdns->id,
             'name' => $this->rdns->name,
             'zone' => $this->rdns->zone,
-            'content' => $this->safednsClient->defaultHostname,
+            'content' => config('defaults.floating-ip.rdns.default_hostname'),
         ];
 
         return new Record($record);
