@@ -179,18 +179,15 @@ class AvailabilityZoneController extends BaseController
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function instances(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function instances(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->instances();
-        $queryTransformer->config(Instance::class)
-            ->transform($collection);
 
-        return InstanceResource::collection($collection->paginate(
+        return InstanceResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
