@@ -167,7 +167,7 @@ client.test("Request executed successfully", function() {
 ### CLEAN UP!
 
 ### Destroy the load balancer
-DELETE https://{{host}}/{{version}}/load-balancers/lb-74802bc8-dev
+DELETE https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
