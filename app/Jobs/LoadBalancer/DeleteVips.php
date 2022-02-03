@@ -22,6 +22,7 @@ class DeleteVips extends TaskJob
                 $query->where('id', '=', $loadBalancer->id);
             })->each(function ($vip) use (&$vipIds) {
                 $vip->syncDelete();
+                $this->info('Deleting VIP ' . $vip->id);
                 $vipIds[] = $vip->id;
             });
             $this->task->updateData('vip_ids', $vipIds);
