@@ -14,7 +14,7 @@ class AddRdnsHostnameToFloatingIps extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('floating_ips', function (Blueprint $table) {
-            $table->string('rdns_hostname')->after('ip_address')->default('4.3.2.1.in-addr.arpa');
+            $table->string('rdns_hostname')->after('ip_address')->nullable();
         });
     }
 
