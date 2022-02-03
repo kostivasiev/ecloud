@@ -3,7 +3,6 @@
 namespace App\Tasks\Sync\LoadBalancerNode;
 
 use App\Jobs\LoadBalancerNode\DeleteInstance;
-use App\Jobs\LoadBalancerNode\PrepareInstance;
 use App\Jobs\LoadBalancerNode\UnregisterNode;
 use App\Tasks\Task;
 
