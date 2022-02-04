@@ -7,6 +7,7 @@ use App\Models\V2\FloatingIp;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
+use UKFast\Admin\SafeDNS\AdminRecordClient;
 use UKFast\SDK\SafeDNS\Entities\Record;
 use UKFast\SDK\SafeDNS\RecordClient;
 
@@ -34,13 +35,21 @@ class AllocateRdnsHostname extends Job
             return;
         }
 
-        $safednsClient = app()->make(RecordClient::class);
+        $safednsClient = app()->make(AdminRecordClient::class);
         $dnsName = $this->reverseIpLookup($this->model->ip_address);
-        $this->rdns = $safednsClient->getByName($dnsName);
+        $this->rdns = $safednsClient->getPage(1, 15, ['name:eq' => $dnsName]);
+
+        if (count($this->rdns->getItems()) !== 1) {
+            log::info("More than one RDNS found");
+            $this->fail(new \Exception('More than one RDNS found ' . $this->model->id));
+            return;
+        }
+
+        $this->rdns = $this->rdns->getItems()[0];
 
         if (empty($this->model->rdns_hostname)) {
-            if (!empty($this->rdns->content) && $this->rdns) {
-                $this->model->rdns_hostname = $this->rdns->content;
+            if (!empty($this->rdns['content']) && $this->rdns) {
+                $this->model->rdns_hostname = $this->rdns['content'];
             } else {
                 $this->model->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
             }
@@ -66,9 +75,9 @@ class AllocateRdnsHostname extends Job
     private function createRecord(): Record
     {
         $record = [
-            'id' => $this->rdns->id,
-            'name' => $this->rdns->name,
-            'zone' => $this->rdns->zone,
+            'id' => $this->rdns['id'],
+            'name' => $this->rdns['name'],
+            'zone' => $this->rdns['zone'],
             'content' => $this->model->rdns_hostname,
         ];
 
