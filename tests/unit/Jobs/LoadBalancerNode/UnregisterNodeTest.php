@@ -55,8 +55,5 @@ class UnregisterNodeTest extends TestCase
         dispatch(new UnregisterNode($task));
 
         Event::assertNotDispatched(JobFailed::class);
-
-        $this->loadBalancerNode()->refresh();
-        $this->assertNull($this->loadBalancerNode()->node_id);
     }
 }
