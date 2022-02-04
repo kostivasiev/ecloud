@@ -20,7 +20,7 @@ class DeleteLoadBalancerNodes extends TaskJob
                     $loadBalancerNodeIds[] = $loadBalancerNode->id;
                     $loadBalancerNode->syncDelete();
                 });
-            $this->task->updateData('load_balancer_node_ids', loadBalancerNodeIds);
+            $this->task->updateData('load_balancer_node_ids', $loadBalancerNodeIds);
         } else {
             $loadBalancerNodeIds = LoadBalancerNode::whereIn('id', $this->task->data['load_balancer_node_ids'])
                 ->get()
