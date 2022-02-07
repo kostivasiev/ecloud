@@ -25,12 +25,25 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/instance-software?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancers?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/instance-software?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancers?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/instance-software?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancers?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/instance-software?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancers?page=2'
   tags:
-    - Instance Software
+    - Load Balancers
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: 'schema.yaml'
+  responses:
+    202:
+      description: Accepted
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Load Balancers

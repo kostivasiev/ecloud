@@ -290,7 +290,7 @@ paths:
     $ref : 'resources/InstanceSoftware/item.yaml'
 
   '/ecloud/v2/load-balancers':
-    $ref: 'resources/LoadBalancer/collection.yaml'
+    $ref: 'resources/LoadBalancerNew/collection.yaml'
 #  '/ecloud/v2/load-balancers/{loadBalancerId}':
 #    $ref: 'resources/LoadBalancer/item.yaml'
 #  '/ecloud/v2/load-balancers/{loadBalancerId}/networks' :
