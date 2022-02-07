@@ -99,13 +99,6 @@ class BillingMetric extends Model implements Filterable, Sortable
      */
     public static function getActiveByKey($resource, $key, $operator = '=', $includeFuture = false): ?BillingMetric
     {
-        dd(self::where('resource_id', $resource->id)
-            ->where(function ($model) {
-                return $model->where('end', '>', Carbon::now())
-                    ->orWhereNull('end');
-            })
-            ->where('key', $operator, $key)
-            ->toSql());
         return self::where('resource_id', $resource->id)
             ->where(function ($model) {
                 return $model->where('end', '>', Carbon::now())
