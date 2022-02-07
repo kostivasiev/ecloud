@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../resources/LoadBalancer/parameters/loadBalancerId.yaml'
+    - $ref: 'parameters/id.yaml'
   responses:
     200:
       description: success
@@ -10,14 +10,14 @@ get:
             type: object
             properties:
               data:
-                $ref: '../../components/schemas/loadBalancer.yaml'
+                $ref: '#components/schemas/LoadBalancer'
               meta:
                 type: object
   tags:
     - Load Balancers
 patch:
   parameters:
-    - $ref: '../../resources/LoadBalancer/parameters/loadBalancerId.yaml'
+    - $ref: 'parameters/id.yaml'
   requestBody:
     required: true
     content:
@@ -25,23 +25,33 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '../../components/schemas/loadBalancer.yaml'
-            - type: object
-              properties:
-                vpc_id:
+            - $ref: '#components/schemas/LoadBalancer'
+            # Change column properties here
+            - type : object
+              properties :
+                vpc_id :
                   required: false
-#                nodes:
-#                  required: false
+                  readOnly: true
+                availability_zone_id :
+                  required : false
+                  readOnly : true
+                load_balancer_spec_id :
+                  required : false
+                  readOnly : true
+                network_ids :
+                  required : false
+                  readOnly : true
   responses:
-    200:
-      $ref: '../../resources/LoadBalancer/responses/idResponse.yaml'
+    202:
+      $ref: 'responses/idResponse.yaml'
   tags:
     - Load Balancers
 delete:
   parameters:
-    - $ref: '../../resources/LoadBalancer/parameters/loadBalancerId.yaml'
+    - $ref: 'parameters/id.yaml'
   responses:
-    204:
-      description: Success
+    202:
+      description: Accepted
   tags:
     - Load Balancers
+

@@ -1,6 +1,0 @@
-in: path
-name: lbcId
-required: true
-schema:
-  type: string
-example: lb-2b66bb79

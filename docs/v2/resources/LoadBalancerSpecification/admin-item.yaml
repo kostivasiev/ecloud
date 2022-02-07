@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/loadBalancerSpecificationId.yaml'
+    - $ref: 'parameters/id.yaml'
   responses:
     200:
       description: Success
@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: 'schema.yaml'
+                  $ref: '#components/schemas/LoadBalancerSpecification'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -35,7 +35,7 @@ get:
     - Load Balancer Specification
 patch:
   parameters:
-    - $ref: 'parameters/loadBalancerSpecificationId.yaml'
+    - $ref: 'parameters/id.yaml'
   requestBody:
     required: true
     content:
@@ -43,7 +43,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: 'schema.yaml'
+            - $ref: '#components/schemas/LoadBalancerSpecification'
   responses:
     200:
       $ref: 'responses/idResponse.yaml'
@@ -51,7 +51,7 @@ patch:
     - Load Balancer Specification
 delete:
   parameters:
-    - $ref: 'parameters/loadBalancerSpecificationId.yaml'
+    - $ref: 'parameters/id.yaml'
   responses:
     204:
       description: Success

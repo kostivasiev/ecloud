@@ -70,9 +70,9 @@ class LoadBalancerController extends BaseController
     public function update(UpdateRequest $request, string $loadBalancerId)
     {
         $loadBalancer = LoadBalancer::forUser(Auth::user())->findOrFail($loadBalancerId);
-        $loadBalancer->fill($request->only(['name', 'availability_zone_id', 'vpc_id', 'load_balancer_spec_id']));
-        $loadBalancer->save();
-        return $this->responseIdMeta($request, $loadBalancer->id, 200);
+        $loadBalancer->fill($request->only(['name']));
+        $task = $loadBalancer->syncSave();
+        return $this->responseIdMeta($request, $loadBalancer->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $loadBalancerId)

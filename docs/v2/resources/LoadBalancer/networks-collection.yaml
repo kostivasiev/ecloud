@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: 'parameters/loadBalancerId.yaml'
+    - $ref: 'parameters/id.yaml'
   responses:
     200:
       description: Success
@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../components/schemas/network.yaml'
+                  $ref: '#components/schemas/Network'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

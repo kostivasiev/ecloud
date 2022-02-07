@@ -44,8 +44,10 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
+    LoadBalancer:
+      $ref: 'resources/LoadBalancer/schema.yaml'
     LoadBalancerSpecification:
-      $ref: 'resources/LoadBalancerSpecification/public_schema.yaml'
+      $ref: 'resources/LoadBalancerSpecification/schema.yaml'
     IpAddress :
       $ref : 'resources/IpAddress/schema.yaml'
     Meta:
@@ -101,7 +103,7 @@ components:
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     LoadBalancerSpecificationId:
-      $ref: 'resources/LoadBalancerSpecification/parameters/loadBalancerSpecificationId.yaml'
+      $ref: 'resources/LoadBalancerSpecification/parameters/id.yaml'
     NetworkPolicyId:
       $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
     NetworkRulePortId:
@@ -288,14 +290,12 @@ paths:
     $ref : 'resources/InstanceSoftware/collection.yaml'
   '/ecloud/v2/instance-software/{instanceSoftwareId}' :
     $ref : 'resources/InstanceSoftware/item.yaml'
-
   '/ecloud/v2/load-balancers':
-    $ref: 'resources/LoadBalancerNew/collection.yaml'
-#  '/ecloud/v2/load-balancers/{loadBalancerId}':
-#    $ref: 'resources/LoadBalancer/item.yaml'
-#  '/ecloud/v2/load-balancers/{loadBalancerId}/networks' :
-#    $ref : 'resources/LoadBalancer/networks-collection.yaml'
-
+    $ref: 'resources/LoadBalancer/collection.yaml'
+  '/ecloud/v2/load-balancers/{loadBalancerId}':
+    $ref: 'resources/LoadBalancer/item.yaml'
+  '/ecloud/v2/load-balancers/{loadBalancerId}/networks' :
+    $ref : 'resources/LoadBalancer/networks-collection.yaml'
   '/ecloud/v2/load-balancer-networks' :
     $ref : 'resources/LoadBalancerNetwork/collection.yaml'
   '/ecloud/v2/load-balancer-networks/{loadBalancerNetworkId}' :
@@ -416,6 +416,8 @@ paths:
     $ref: 'resources/Vpc/tasks-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/volumes':
     $ref: 'resources/Vpc/volumes-collection.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/load-balancers':
+    $ref: 'resources/Vpc/load-balancers-collection.yaml'
   '/ecloud/v2/vpn-endpoints':
     $ref: 'resources/VpnEndpoint/collection.yaml'
   '/ecloud/v2/vpn-endpoints/{vpnEndpointId}':

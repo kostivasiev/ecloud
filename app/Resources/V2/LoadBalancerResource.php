@@ -32,7 +32,6 @@ class LoadBalancerResource extends UKFastResource
             'vpc_id' => $this->vpc_id,
             'load_balancer_spec_id' => $this->load_balancer_spec_id,
             'sync' => $this->sync,
-            'config_id' => $this->config_id,
             'nodes' => $this->nodes,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
@@ -43,6 +42,10 @@ class LoadBalancerResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if ($request->user()->isAdmin()) {
+            $data['config_id'] = $this->config_id;
+        }
 
         return $data;
     }

@@ -1,0 +1,9 @@
+allOf:
+  - $ref: "schema.yaml"
+  - type: object
+    properties:
+      config_id:
+        description: Identification on the LBv2 cluster
+        type: string
+        readOnly: true
+        example: 123

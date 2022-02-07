@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../resources/Vpc/parameters/vpcId.yaml'
+    - $ref: 'parameters/vpcId.yaml'
   responses:
     200:
       description: Success
@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../resources/LoadBalancer/schema.yaml'
+                  $ref: '#components/schemas/LoadBalancer'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
