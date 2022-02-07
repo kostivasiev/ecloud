@@ -1,4 +1,3 @@
-# The '#components/schemas/Resource' definition on public-openapi.yaml should point to this file.
 properties:
   id:
     type: string

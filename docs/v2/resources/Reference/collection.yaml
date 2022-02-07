@@ -13,8 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  # Change path in example below
-                  $ref: '#components/schemas/Resource'
+                  $ref: 'schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -45,7 +44,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '#components/schemas/Resource'
+          $ref: 'schema.yaml'
   responses:
     202:
       description: Accepted
