@@ -23,12 +23,10 @@ class UpdateSupportEnabledBilling implements Billable
 
         $vpc = $event->model->resource;
 
-        $time = Carbon::now();
-
         $currentActiveMetric = BillingMetric::getActiveByKey($vpc, self::getKeyName());
 
         if ($vpc->support_enabled === false && !empty($currentActiveMetric)) {
-            $currentActiveMetric->setEndDate($time);
+            $currentActiveMetric->setEndDate();
         } elseif ($vpc->support_enabled === true && empty($currentActiveMetric)) {
             $billingMetric = app()->make(BillingMetric::class);
             $billingMetric->resource_id = $vpc->id;

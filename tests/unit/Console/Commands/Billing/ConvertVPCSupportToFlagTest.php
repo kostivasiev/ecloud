@@ -7,6 +7,8 @@ use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\VpcSupport;
 use Carbon\Carbon;
+use Illuminate\Console\Command;
+use Illuminate\Console\Concerns\InteractsWithIO;
 use Tests\TestCase;
 
 class ConvertVPCSupportToFlagTest extends TestCase
@@ -33,8 +35,8 @@ class ConvertVPCSupportToFlagTest extends TestCase
 
     public function testCommand()
     {
-        $this->artisan('vpc:convert-support-flag')
-            ->expectsQuestion('Would you like to include history? (Y/N)', 'N');
+        $job = new ConvertVpcSupportToFlag;
+        $job->handle(true);
 
         $this->vpc()->refresh();
 

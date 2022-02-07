@@ -45,8 +45,6 @@ class UpdateImageBilling implements Billable
             return;
         }
 
-        $time = Carbon::now();
-
         $metaData = $model->imageMetadata()
             ->where('key', '=', 'ukfast.spec.volume.min')
             ->first();
@@ -61,7 +59,7 @@ class UpdateImageBilling implements Billable
             if ($currentActiveMetric->value === $volumeCapacity) {
                 return;
             }
-            $currentActiveMetric->setEndDate($time);
+            $currentActiveMetric->setEndDate();
         }
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->fill([
@@ -71,7 +69,6 @@ class UpdateImageBilling implements Billable
             'name' => self::getFriendlyName(),
             'key' => self::getKeyName(),
             'value' => $volumeCapacity,
-            'start' => $time,
         ]);
 
         $availabilityZone = $model->availabilityZones()->first();
