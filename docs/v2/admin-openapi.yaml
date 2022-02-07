@@ -65,7 +65,7 @@ components:
     Software:
       $ref: 'resources/Software/schema.yaml'
     Task:
-      $ref: 'components/schemas/task.yaml'
+      $ref: 'components/schemas/admin/task.yaml'
     Volume:
       allOf:
         - $ref: 'components/schemas/volume.yaml'
