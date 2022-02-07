@@ -17,17 +17,24 @@ class ResetRdnsHostname implements ShouldQueue
     private $rdns;
     private RecordClient $safednsClient;
 
+    private $model;
+
+    public function __construct(FloatingIp $model)
+    {
+        $this->model = $model;
+    }
+
     /**
      * @param Deleted $event
      * @return void
      * @throws \Exception
      */
-    public function handle(Deleted $event)
+    public function handle()
     {
         Log::info(get_class($this) . ' : Started');
 
         $this->safednsClient = app()->make(RecordClient::class);
-        $floatingIp = FloatingIp::withTrashed()->findOrFail($event->model->id);
+        $floatingIp = FloatingIp::withTrashed()->findOrFail($this->model->id);
 
         $floatingIp->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
         $floatingIp->save();

@@ -7,7 +7,6 @@ use App\Models\V2\FloatingIp;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
-use UKFast\Admin\SafeDNS\AdminRecordClient;
 use UKFast\SDK\SafeDNS\Entities\Record;
 use UKFast\SDK\SafeDNS\RecordClient;
 
@@ -17,7 +16,7 @@ class AllocateRdnsHostname extends Job
 
     public FloatingIp $model;
     private bool $hasUpdated = false;
-    private Record $rdns;
+    private $rdns;
 
     public function __construct(FloatingIp $floatingIp)
     {
@@ -35,7 +34,7 @@ class AllocateRdnsHostname extends Job
             return;
         }
 
-        $safednsClient = app()->make(AdminRecordClient::class);
+        $safednsClient = app()->make(RecordClient::class);
         $dnsName = $this->reverseIpLookup($this->model->ip_address);
         $this->rdns = $safednsClient->getPage(1, 15, ['name:eq' => $dnsName]);
 
@@ -55,7 +54,7 @@ class AllocateRdnsHostname extends Job
             }
             $this->model->save();
 
-            log::info('RDNS assigned.', $this->model->id);
+            log::info(sprintf('RDNS assigned [%s]', $this->model->id));
         } else {
             $safednsClient->update($this->createRecord());
 
