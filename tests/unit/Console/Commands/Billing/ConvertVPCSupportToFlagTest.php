@@ -29,12 +29,6 @@ class ConvertVPCSupportToFlagTest extends TestCase
             'start_date' => $this->dates['start_date'],
             'end_date' => $this->dates['end_date'],
         ]);
-
-        $this->job = \Mockery::mock(ConvertVpcSupportToFlag::class)
-            ->shouldAllowMockingProtectedMethods()
-            ->makePartial();
-        $this->job->allows('info')->withAnyArgs()->andReturnTrue();
-        $this->job->allows('option')->withAnyArgs()->andReturnFalse();
     }
 
     public function testCommand()
