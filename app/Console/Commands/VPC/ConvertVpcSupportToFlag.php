@@ -4,7 +4,6 @@ namespace App\Console\Commands\VPC;
 use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\VpcSupport;
-use App\Rules\V2\PaymentRequired;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
