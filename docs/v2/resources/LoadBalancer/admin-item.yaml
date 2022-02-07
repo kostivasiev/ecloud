@@ -10,7 +10,7 @@ get:
             type: object
             properties:
               data:
-                $ref: 'schema.yaml'
+                $ref: 'admin-schema.yaml'
               meta:
                 type: object
   tags:
@@ -25,7 +25,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: 'schema.yaml'
+            - $ref: 'admin-schema.yaml'
             # Change column properties here
             - type : object
               properties :

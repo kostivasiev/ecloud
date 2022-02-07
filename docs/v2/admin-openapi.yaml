@@ -230,10 +230,12 @@ paths:
     $ref : 'resources/IpAddress/admin-item.yaml'
   '/ecloud/v2/ip-addresses/{ipAddressId}/nics' :
     $ref : 'resources/IpAddress/nic-collection.yaml'
+
   '/ecloud/v2/load-balancers':
-    $ref: 'resources/LoadBalancer/collection.yaml'
+    $ref: 'resources/LoadBalancer/admin-collection.yaml'
+
   '/ecloud/v2/load-balancers/{loadBalancerId}':
-    $ref: 'resources/LoadBalancer/item.yaml'
+    $ref: 'resources/LoadBalancer/admin-item.yaml'
   '/ecloud/v2/load-balancers/{loadBalancerId}/networks' :
     $ref : 'resources/LoadBalancer/networks-collection.yaml'
   '/ecloud/v2/load-balancers/{loadBalancerId}/nodes':

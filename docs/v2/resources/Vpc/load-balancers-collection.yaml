@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '#components/schemas/LoadBalancer'
+                  $ref: '../../resources/LoadBalancer/schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

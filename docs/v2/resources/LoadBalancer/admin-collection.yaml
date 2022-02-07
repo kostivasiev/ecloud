@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: 'schema.yaml'
+                  $ref: 'admin-schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -40,7 +40,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: 'schema.yaml'
+          $ref: 'admin-schema.yaml'
   responses:
     202:
       description: Accepted

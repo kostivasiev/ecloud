@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '#components/schemas/Instance'
+                  $ref: '../../resources/Instance/admin-schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

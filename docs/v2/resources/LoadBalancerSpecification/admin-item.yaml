@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '#components/schemas/LoadBalancerSpecification'
+                  $ref: 'admin-schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -43,7 +43,7 @@ patch:
         schema:
           type: object
           allOf:
-            - $ref: '#components/schemas/LoadBalancerSpecification'
+            - $ref: 'admin-schema.yaml'
   responses:
     200:
       $ref: 'responses/idResponse.yaml'
