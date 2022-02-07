@@ -1,14 +1,12 @@
 <?php
 
-namespace Tests\unit\Console\Commands\Billing;
+namespace Tests\unit\Console\Commands\VPC;
 
 use App\Console\Commands\VPC\ConvertVpcSupportToFlag;
 use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\VpcSupport;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
-use Illuminate\Console\Concerns\InteractsWithIO;
 use Tests\TestCase;
 
 class ConvertVPCSupportToFlagTest extends TestCase
