@@ -8,6 +8,7 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -30,20 +31,14 @@ class Vip extends Model implements Filterable, Sortable
     protected $fillable = [
         'id',
         'name',
-        'load_balancer_id',
-        'network_id',
+        'load_balancer_network_id',
         'ip_address_id',
         'config_id',
     ];
 
-    public function loadBalancer()
+    public function loadBalancerNetwork(): BelongsTo
     {
-        return $this->belongsTo(LoadBalancer::class);
-    }
-
-    public function network()
-    {
-        return $this->belongsTo(Network::class);
+        return $this->belongsTo(LoadBalancerNetwork::class);
     }
 
     public function ipAddress()
@@ -66,7 +61,7 @@ class Vip extends Model implements Filterable, Sortable
             return $query;
         }
         return $query
-            ->whereHas('network.router.vpc', function ($query) use ($user) {
+            ->whereHas('loadBalancerNetwork.network.router.vpc', function ($query) use ($user) {
                 $query->where('reseller_id', $user->resellerId());
             });
     }
@@ -87,12 +82,14 @@ class Vip extends Model implements Filterable, Sortable
         try {
             $lock->block(60);
 
-            $ip = $this->network->getNextAvailableIp();
+            $network = $this->loadBalancerNetwork->network;
+
+            $ip = $network->getNextAvailableIp();
 
             $ipAddress = app()->make(IpAddress::class);
             $ipAddress->fill([
                 'ip_address' => $ip,
-                'network_id' => $this->network->id,
+                'network_id' => $network->id,
                 'type' => IpAddress::TYPE_CLUSTER
             ]);
             $ipAddress->save();
@@ -116,8 +113,7 @@ class Vip extends Model implements Filterable, Sortable
         return [
             $factory->create('id', Filter::$stringDefaults),
             $factory->create('name', Filter::$stringDefaults),
-            $factory->create('load_balancer_id', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('load_balancer_network_id', Filter::$stringDefaults),
             $factory->create('ip_address_id', Filter::$stringDefaults),
             $factory->create('config_id', Filter::$numericDefaults),
             $factory->create('created_at', Filter::$dateDefaults),
@@ -135,8 +131,7 @@ class Vip extends Model implements Filterable, Sortable
         return [
             $factory->create('id'),
             $factory->create('name'),
-            $factory->create('load_balancer_id', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
+            $factory->create('load_balancer_network_id', Filter::$stringDefaults),
             $factory->create('ip_address_id', Filter::$stringDefaults),
             $factory->create('config_id', Filter::$numericDefaults),
             $factory->create('created_at'),
@@ -163,8 +158,7 @@ class Vip extends Model implements Filterable, Sortable
         return [
             'id' => 'id',
             'name' => 'name',
-            'load_balancer_id' => 'load_balancer_id',
-            'network_id' => 'network_id',
+            'load_balancer_network_id' => 'load_balancer_network_id',
             'ip_address_id' => 'ip_address_id',
             'config_id' => 'config_id',
             'created_at' => 'created_at',

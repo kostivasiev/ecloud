@@ -91,7 +91,10 @@ trait LoadBalancerMock
     public function loadBalancerNetwork($id = 'lbn-test'): LoadBalancerNetwork
     {
         if (!isset($this->loadBalancerNetwork)) {
-            $this->loadBalancerNetwork = LoadBalancerNetwork::factory()->make(['id' => $id]);
+            $this->loadBalancerNetwork = LoadBalancerNetwork::factory()->make([
+                'id' => $id,
+                'name' => $id
+            ]);
             $this->loadBalancerNetwork->loadBalancer()->associate($this->loadBalancer());
             $this->loadBalancerNetwork->network()->associate($this->network());
             $this->loadBalancerNetwork->save();
