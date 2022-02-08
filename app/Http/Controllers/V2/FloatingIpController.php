@@ -5,6 +5,8 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\FloatingIp\AssignRequest;
 use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
+use App\Jobs\Tasks\FloatingIp\Assign;
+use App\Jobs\Tasks\FloatingIp\Unassign;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Task;
@@ -88,8 +90,8 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
         $task = $floatingIp->createTaskWithLock(
-            'floating_ip_assign',
-            \App\Jobs\Tasks\FloatingIp\Assign::class,
+            Assign::$name,
+            Assign::class,
             ['resource_id' => $request->resource_id]
         );
 
@@ -100,7 +102,7 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $task = $floatingIp->createTaskWithLock('floating_ip_unassign', \App\Jobs\Tasks\FloatingIp\Unassign::class);
+        $task = $floatingIp->createTaskWithLock(Unassign::$name, Unassign::class);
 
         return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }

@@ -52,9 +52,9 @@ class VipController extends BaseController
     {
         $vip = new Vip($request->only([
             'name',
-            'load_balancer_id',
-            'network_id'
+            'load_balancer_network_id'
         ]));
+
         $task = $vip->syncSave([
             'allocate_floating_ip' => $request->input('allocate_floating_ip', false)
         ]);

@@ -1,6 +1,6 @@
 get:
   parameters:
-    - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
+    - $ref: 'parameters/vpcId.yaml'
   responses:
     200:
       description: Success
@@ -12,10 +12,10 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../public-openapi.yaml#/components/schemas/LoadBalancerCluster'
+                  $ref: '../../resources/LoadBalancer/schema.yaml'
               meta:
                 allOf:
-                  - $ref: "../../public-openapi.yaml#/components/schemas/Meta"
+                  - $ref: '../../components/schemas/meta.yaml'
                   - type: object
                     properties:
                       pagination:
@@ -24,12 +24,12 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/clusters?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/load-balancers?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/clusters?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/load-balancers?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/clusters?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/load-balancers?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/clusters?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/load-balancers?page=2'
   tags:
     - Virtual Private Clouds

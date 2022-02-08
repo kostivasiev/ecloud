@@ -6,6 +6,7 @@ use App\Jobs\LoadBalancerNode\CreateInstance;
 use App\Jobs\LoadBalancerNode\DeployInstance;
 use App\Jobs\LoadBalancerNode\GetWardenCredentials;
 use App\Jobs\LoadBalancerNode\RegisterNode;
+use App\Jobs\LoadBalancerNode\UpdateNode;
 use App\Tasks\Task;
 
 class Update extends Task
@@ -17,6 +18,7 @@ class Update extends Task
             CreateInstance::class,
             RegisterNode::class,
             DeployInstance::class,
+            UpdateNode::class,
         ];
     }
 }

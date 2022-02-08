@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../components/schemas/task.yaml'
+                  $ref: '../../components/schemas/admin/task.yaml'
               meta:
                 allOf:
                   - $ref: "../../admin-openapi.yaml#/components/schemas/Meta"

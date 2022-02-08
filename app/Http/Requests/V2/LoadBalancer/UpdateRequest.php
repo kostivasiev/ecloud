@@ -2,9 +2,6 @@
 
 namespace App\Http\Requests\V2\LoadBalancer;
 
-use App\Models\V2\Vpc;
-use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\IsResourceAvailable;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -31,16 +28,7 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|string',
-            'availability_zone_id' => 'sometimes|required|string|exists:ecloud.availability_zones,id,deleted_at,NULL',
-            'vpc_id' => [
-                'sometimes',
-                'required',
-                'string',
-                'exists:ecloud.vpcs,id,deleted_at,NULL',
-                new ExistsForUser(Vpc::class),
-                new IsResourceAvailable(Vpc::class),
-            ]
+            'name' => 'nullable|string'
         ];
     }
 
@@ -51,9 +39,6 @@ class UpdateRequest extends FormRequest
      */
     public function messages()
     {
-        return [
-            'availability_zone_id.exists' => 'The specified :attribute was not found',
-            'vpc_id.exists' => 'The specified :attribute was not found'
-        ];
+        return [];
     }
 }

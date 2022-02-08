@@ -640,6 +640,11 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@show');
         $router->post('load-balancer-networks', 'LoadBalancerNetworkController@store');
         $router->patch('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@update');
-        $router->delete('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@destroy');
+
+        $router->delete('load-balancer-networks/{loadBalancerNetworkId}', [
+            'middleware' => 'can-be-deleted:' . \App\Models\V2\LoadBalancerNetwork::class   . ',loadBalancerNetworkId',
+            'uses' => 'LoadBalancerNetworkController@destroy'
+        ]);
+
     });
 });

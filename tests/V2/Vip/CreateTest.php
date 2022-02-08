@@ -3,14 +3,16 @@
 namespace Tests\V2\Vip;
 
 use App\Events\V2\Task\Created;
+use App\Support\Sync;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\LoadBalancerMock;
+use Tests\Mocks\Resources\VipMock;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class CreateTest extends TestCase
 {
-    use LoadBalancerMock;
+    use LoadBalancerMock, VipMock;
 
     public function testValidDataSucceeds()
     {
@@ -23,14 +25,13 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/vips',
             [
-                'load_balancer_id' => $this->loadBalancer()->id,
-                'network_id' => $this->network()->id,
+                'load_balancer_network_id' => $this->loadBalancerNetwork()->id,
             ]
-        )  ->seeInDatabase(
+        )
+            ->seeInDatabase(
             'vips',
             [
-                'load_balancer_id' => $this->loadBalancer()->id,
-                'network_id' => $this->network()->id
+                'load_balancer_network_id' => $this->loadBalancerNetwork()->id,
             ],
             'ecloud'
         )
@@ -38,7 +39,7 @@ class CreateTest extends TestCase
 
         Event::assertDispatched(Created::class, function ($event) {
             $this->assertFalse($event->model->data['allocate_floating_ip']);
-            return $event->model->name == 'sync_update';
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
         });
     }
 
@@ -53,15 +54,13 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/vips',
             [
-                'load_balancer_id' => $this->loadBalancer()->id,
-                'network_id' => $this->network()->id,
+                'load_balancer_network_id' => $this->loadBalancerNetwork()->id,
                 'allocate_floating_ip' => true
             ]
         )  ->seeInDatabase(
             'vips',
             [
-                'load_balancer_id' => $this->loadBalancer()->id,
-                'network_id' => $this->network()->id
+                'load_balancer_network_id' => $this->loadBalancerNetwork()->id,
             ],
             'ecloud'
         )
@@ -69,7 +68,7 @@ class CreateTest extends TestCase
 
         Event::assertDispatched(Created::class, function ($event) {
             $this->assertTrue($event->model->data['allocate_floating_ip']);
-            return $event->model->name == 'sync_update';
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
         });
     }
 }

@@ -10,9 +10,6 @@ class UnassignFloatingIP extends TaskJob
 {
     use AwaitTask;
 
-    public $tries = 300;
-    public $backoff = 5;
-
     public function handle()
     {
         $vpnEndpoint = $this->task->resource;
