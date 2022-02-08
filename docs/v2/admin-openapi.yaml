@@ -42,7 +42,7 @@ components:
     Instance :
       $ref : 'resources/Instance/admin-schema.yaml'
     LoadBalancer:
-      $ref: 'resources/LoadBalancer/admin-schema.yaml'
+      $ref: 'resources/LoadBalancer/schema.yaml'
     LoadBalancerSpecification:
       $ref: 'resources/LoadBalancerSpecification/admin-schema.yaml'
     Meta:
