@@ -1,0 +1,12 @@
+allOf:
+  - $ref: "../../components/schemas/instance.yaml"
+  - type: object
+    properties:
+      load_balancer_id:
+        type: string
+        readOnly: true
+        example: "lb-abc123"
+      is_hidden :
+        type : boolean
+        readOnly : true
+        example : false

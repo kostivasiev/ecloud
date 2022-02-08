@@ -1,6 +1,6 @@
 in: path
-name: lbcId
+name: id
 required: true
 schema:
   type: string
-example: lbc-2b66bb79
+example: lb-3f112f25

@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: 'public_schema.yaml'
+                  $ref: 'schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
