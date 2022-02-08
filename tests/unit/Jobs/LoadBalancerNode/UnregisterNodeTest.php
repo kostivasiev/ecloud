@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Jobs\LoadBalancerNode;
+namespace Tests\unit\Jobs\LoadBalancerNode;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancerNode\UnregisterNode;
