@@ -58,9 +58,6 @@ class UnregisterNodeTest extends TestCase
         dispatch(new UnregisterNode($task));
 
         Event::assertNotDispatched(JobFailed::class);
-
-        $task->refresh();
-        $this->assertEquals($this->lbNodeId, $task->data['load_balancer_node_id']);
     }
 
     public function testDeleteNodeThatDoesNotExist()
