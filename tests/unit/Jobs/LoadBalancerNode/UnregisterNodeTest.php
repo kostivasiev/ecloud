@@ -43,15 +43,7 @@ class UnregisterNodeTest extends TestCase
     public function testSuccess()
     {
         $this->loadBalancerNode()->setAttribute('node_id', $this->lbNodeId)->saveQuietly();
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_DELETE,
-            ]);
-            $task->resource()->associate($this->loadBalancerNode());
-            $task->save();
-            return $task;
-        });
+        $task = $this->createSyncDeleteTask($this->loadBalancerNode());
 
         Event::fake([JobFailed::class, Created::class]);
 
@@ -67,15 +59,7 @@ class UnregisterNodeTest extends TestCase
         $this->expectExceptionMessage($exceptionMessage);
 
         $this->loadBalancerNode()->setAttribute('node_id', 123456)->saveQuietly();
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_DELETE,
-            ]);
-            $task->resource()->associate($this->loadBalancerNode());
-            $task->save();
-            return $task;
-        });
+        $task = $this->createSyncDeleteTask($this->loadBalancerNode());
 
         app()->bind(AdminClient::class, function () {
             $clientMock = \Mockery::mock(AdminClient::class)->makePartial();
