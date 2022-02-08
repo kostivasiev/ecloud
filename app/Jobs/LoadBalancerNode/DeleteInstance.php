@@ -33,7 +33,7 @@ class DeleteInstance extends TaskJob
         }
 
         if (isset($this->task->data[$taskIdKey])) {
-            $this->awaitTasks($this->task->data[$taskIdKey]);
+            $this->awaitTasks([$this->task->data[$taskIdKey]]);
         }
     }
 }
