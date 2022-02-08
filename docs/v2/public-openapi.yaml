@@ -290,6 +290,10 @@ paths:
     $ref : 'resources/InstanceSoftware/collection.yaml'
   '/ecloud/v2/instance-software/{instanceSoftwareId}' :
     $ref : 'resources/InstanceSoftware/item.yaml'
+  '/ecloud/v2/ip-addresses' :
+    $ref : 'resources/IpAddress/collection.yaml'
+  '/ecloud/v2/ip-addresses/{ipAddressId}' :
+    $ref : 'resources/IpAddress/item.yaml'
   '/ecloud/v2/load-balancers':
     $ref: 'resources/LoadBalancer/collection.yaml'
   '/ecloud/v2/load-balancers/{loadBalancerId}':

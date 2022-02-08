@@ -159,6 +159,8 @@ $app->register(UKFast\ApiInternalCommunication\LicensesAdminClientServiceProvide
 $app->register(UKFast\ApiInternalCommunication\LoadbalancerAdminClientServiceProvider::class);
 
 
+$app->register(UKFast\Sieve\SieveServiceProvider::class);
+
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);
 
 

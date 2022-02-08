@@ -34,3 +34,16 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/ip-addresses?page=2'
   tags:
     - IP Addresses
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: 'schema.yaml'
+  responses:
+    202:
+      description: Accepted
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - IP Addresses

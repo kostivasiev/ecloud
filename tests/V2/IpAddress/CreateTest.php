@@ -29,15 +29,23 @@ class CreateTest extends TestCase
             )->assertResponseStatus(201);
     }
 
-    public function testNotAdminUnauthorised()
+    public function testSuccessNotAdmin()
     {
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
-        $this->post('/v2/ip-addresses', [
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
+
+        $data = [
             'name' => 'Test',
             'ip_address' => '10.0.0.4',
             'network_id' => $this->network()->id,
             'type' => 'normal',
-        ])->assertResponseStatus(401);
+        ];
+
+        $this->post('/v2/ip-addresses', $data)
+            ->seeInDatabase(
+                'ip_addresses',
+                $data,
+                'ecloud'
+            )->assertResponseStatus(201);
     }
 
     public function testIpAddressNotInSubnetFails()
