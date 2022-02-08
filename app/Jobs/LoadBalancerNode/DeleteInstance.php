@@ -28,8 +28,8 @@ class DeleteInstance extends TaskJob
                 ]);
                 return;
             }
-            $instance->syncDelete();
-            $this->task->updateData($taskIdKey, $instance->id);
+            $task = $instance->syncDelete();
+            $this->task->updateData($taskIdKey, $task->id);
         }
 
         if (isset($this->task->data[$taskIdKey])) {

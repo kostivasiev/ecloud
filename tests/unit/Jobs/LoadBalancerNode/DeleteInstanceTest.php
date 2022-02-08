@@ -20,15 +20,8 @@ class DeleteInstanceTest extends TestCase
 
     public function testSuccess()
     {
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_DELETE,
-            ]);
-            $task->resource()->associate($this->loadBalancerNode());
-            $task->save();
-            return $task;
-        });
+        $taskIdKey = 'task.' . Sync::TASK_NAME_DELETE . '.id';
+        $task = $this->createSyncDeleteTask($this->loadBalancerNode());
 
         Event::fake([JobFailed::class, Created::class]);
 
@@ -37,7 +30,7 @@ class DeleteInstanceTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
 
         $task->refresh();
-        $this->assertNotNull($task->data['instance_id']);
+        $this->assertNotNull($task->data[$taskIdKey]);
     }
 
     public function testWhenTheInstanceDoesNotExist()
@@ -47,15 +40,7 @@ class DeleteInstanceTest extends TestCase
         $this->expectExceptionMessage($exceptionMessage);
 
         $this->loadBalancerNode()->setAttribute('instance_id', 'i-dddddd')->saveQuietly();
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_DELETE,
-            ]);
-            $task->resource()->associate($this->loadBalancerNode());
-            $task->save();
-            return $task;
-        });
+        $task = $this->createSyncDeleteTask($this->loadBalancerNode());
 
         $job = \Mockery::mock(DeleteInstance::class, [$task])
             ->shouldAllowMockingProtectedMethods()
