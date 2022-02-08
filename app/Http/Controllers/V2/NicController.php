@@ -88,13 +88,11 @@ class NicController extends BaseController
         ));
     }
 
-    public function ipAddresses(Request $request, QueryTransformer $queryTransformer, string $nicId)
+    public function ipAddresses(Request $request, string $nicId)
     {
         $collection = Nic::forUser($request->user())->findOrFail($nicId)->ipAddresses();
-        $queryTransformer->config(IpAddress::class)
-            ->transform($collection);
 
-        return IpAddressResource::collection($collection->paginate(
+        return IpAddressResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

@@ -17,11 +17,7 @@ class IpAddressController extends BaseController
     {
         $collection = IpAddress::forUser($request->user());
 
-        (new QueryTransformer($request))
-            ->config(IpAddress::class)
-            ->transform($collection);
-
-        return IpAddressResource::collection($collection->paginate(
+        return IpAddressResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

@@ -8,13 +8,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class IpAddress extends Model implements Filterable, Sortable, Natable, RouterScopable
+class IpAddress extends Model implements Searchable, Natable, RouterScopable
 {
     use CustomKey, SoftDeletes, DefaultName, HasFactory;
 
@@ -94,63 +91,16 @@ class IpAddress extends Model implements Filterable, Sortable, Natable, RouterSc
         return $query->where('type', $type);
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('ip_address', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
-            $factory->create('type', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('ip_address'),
-            $factory->create('network_id'),
-            $factory->create('type'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('created_at', 'desc'),
-        ];
-    }
-
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'ip_address' => 'ip_address',
-            'network_id' => 'network_id',
-            'type' => 'type',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'ip_address' => $filter->string(),
+            'network_id' => $filter->string(),
+            'type' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }
