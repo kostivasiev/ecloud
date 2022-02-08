@@ -4,10 +4,11 @@ namespace App\Jobs\LoadBalancerNode;
 use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
 use App\Traits\V2\TaskJobs\AwaitResources;
+use App\Traits\V2\TaskJobs\AwaitTask;
 
 class DeleteInstance extends TaskJob
 {
-    use AwaitResources;
+    use AwaitTask;
 
     /**
      * @throws \Exception
@@ -15,8 +16,9 @@ class DeleteInstance extends TaskJob
     public function handle()
     {
         $loadBalancerNode = $this->task->resource;
+        $taskIdKey = 'task.' . Sync::TASK_NAME_DELETE . '.id';
 
-        if (empty($this->task->data['instance_id'])) {
+        if (empty($this->task->data[$taskIdKey])) {
             $instance = Instance::find($loadBalancerNode->instance_id);
             if (!$instance) {
                 $this->info('Instance not found, nothing to delete', [
@@ -26,8 +28,11 @@ class DeleteInstance extends TaskJob
                 return;
             }
             $instance->syncDelete();
-            $this->task->updateData('instance_id', $instance->id);
+            $this->task->updateData($taskIdKey, $instance->id);
         }
-        $this->awaitSyncableResources([$this->task->data['instance_id']]);
+
+        if (isset($this->task->data[$taskIdKey])) {
+            $this->awaitTasks($this->task->data[$taskIdKey]);
+        }
     }
 }
