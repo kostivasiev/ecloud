@@ -3,6 +3,7 @@ namespace App\Jobs\LoadBalancerNode;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\Instance;
+use App\Support\Sync;
 use App\Traits\V2\TaskJobs\AwaitResources;
 use App\Traits\V2\TaskJobs\AwaitTask;
 
