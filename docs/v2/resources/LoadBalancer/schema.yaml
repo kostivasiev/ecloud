@@ -40,6 +40,11 @@ properties:
       type:
         description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
         example: update
+  config_id:
+    description: Load balancer cluster config ID
+    type: string
+    readOnly: true
+    example: 123
   nodes:
     type: integer
     required: false
