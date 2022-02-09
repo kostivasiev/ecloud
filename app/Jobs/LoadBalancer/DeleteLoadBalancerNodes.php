@@ -14,7 +14,7 @@ class DeleteLoadBalancerNodes extends TaskJob
     {
         $loadBalancer = $this->task->resource;
         $loadBalancerNodeIds = [];
-        if (empty($taskData['load_balancer_node_ids'])) {
+        if (empty($this->task->data['load_balancer_node_ids'])) {
             $loadBalancer->loadBalancerNodes()
                 ->each(function ($loadBalancerNode) use (&$loadBalancerNodeIds) {
                     $loadBalancerNodeIds[] = $loadBalancerNode->id;
