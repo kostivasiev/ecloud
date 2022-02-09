@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "67bf1eaa4430238883d0dcb0e1b28c00",
+    "content-hash": "269fa31905d149a136d36d5293a58eac",
     "packages": [
         {
             "name": "brick/math",
@@ -7345,11 +7345,11 @@
         },
         {
             "name": "ukfast/admin-client",
-            "version": "v2.2.7",
+            "version": "v2.3.0",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git",
-                "reference": "631404e06f1a28a87086410884cbee4dfdc4c83e"
+                "reference": "3d56b1a6cd58ffa835012d3cb042ace243835f3b"
             },
             "require": {
                 "ext-json": "*",
@@ -7380,7 +7380,7 @@
             "support": {
                 "email": "developers@ukfast.co.uk"
             },
-            "time": "2022-02-08T10:18:15+00:00"
+            "time": "2022-02-09T13:50:46+00:00"
         },
         {
             "name": "ukfast/api-auth",
@@ -7925,6 +7925,51 @@
                 "source": "https://github.com/ukfast/laravel-health-check/tree/master"
             },
             "time": "2021-12-21T09:20:39+00:00"
+        },
+        {
+            "name": "ukfast/laravel-sieve",
+            "version": "v0.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ukfast/laravel-sieve.git",
+                "reference": "ea13bb1f752ae9d7fbb0bc411d5ff877cec6debc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ukfast/laravel-sieve/zipball/ea13bb1f752ae9d7fbb0bc411d5ff877cec6debc",
+                "reference": "ea13bb1f752ae9d7fbb0bc411d5ff877cec6debc",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^6.0|^7.0|^8.0",
+                "illuminate/http": "^6.0|^7.0|^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^4.0|^5.0|^6.0",
+                "phpunit/phpunit": "^9.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "UKFast\\Sieve\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "George Kelly",
+                    "email": "george.kelly@ukfast.co.uk"
+                }
+            ],
+            "description": "A library for filtering eloquent queries",
+            "support": {
+                "issues": "https://github.com/ukfast/laravel-sieve/issues",
+                "source": "https://github.com/ukfast/laravel-sieve/tree/v0.4.1"
+            },
+            "time": "2022-01-20T12:26:48+00:00"
         },
         {
             "name": "ukfast/log-provider",

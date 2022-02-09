@@ -3,8 +3,8 @@
 namespace App\Jobs\Vip;
 
 use App\Jobs\TaskJob;
-use App\Jobs\Tasks\Nic\AssociateIp;
 use App\Models\V2\Nic;
+use App\Tasks\Nic\AssociateIp;
 use App\Traits\V2\TaskJobs\AwaitTask;
 
 class AssignToNics extends TaskJob
@@ -29,9 +29,9 @@ class AssignToNics extends TaskJob
             $data = $this->task->data;
             $data[$associateIpTasks] = [];
 
-            Nic::where('network_id', '=', $vip->network_id)
+            Nic::where('network_id', '=', $vip->loadBalancerNetwork->network->id)
                 ->whereHas('instance.loadBalancerNode', function ($query) use ($vip) {
-                    $query->where('load_balancer_id', '=', $vip->loadbalancer->id);
+                    $query->where('load_balancer_id', '=', $vip->loadBalancerNetwork->loadbalancer->id);
                 })->each(function ($nic) use ($vip, &$data, $associateIpTasks) {
                     if (!$nic->ipAddresses()->where('id', $vip->ipAddress->id)->exists()) {
                         $this->info('Assigning VIP ' . $vip->id . ' to NIC ' . $nic->id);

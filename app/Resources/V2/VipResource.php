@@ -10,7 +10,6 @@ use UKFast\Responses\UKFastResource;
  * Class VipResource
  * @package App\Http\Resources\V2
  * @property string id
- * @property string load_balancer_id
  * @property string network_id
  * @property string deleted_at
  * @property string created_at
@@ -24,11 +23,10 @@ class VipResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
-            'load_balancer_id' => $this->load_balancer_id,
-            'network_id' => $this->network_id,
+            'load_balancer_network_id' => $this->load_balancer_network_id,
             'ip_address_id' => $this->ip_address_id,
 //            'floating_ip_id' => $this->floating_ip_id,
             'sync' => $this->sync,
@@ -41,5 +39,11 @@ class VipResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if ($request->user()->isAdmin()) {
+            $data['config_id'] = $this->config_id;
+        }
+
+        return $data;
     }
 }

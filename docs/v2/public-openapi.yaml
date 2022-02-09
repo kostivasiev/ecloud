@@ -44,8 +44,10 @@ components:
       $ref: 'resources/ImageParameter/schema.yaml'
     Instance:
       $ref: 'components/schemas/instance.yaml'
+    LoadBalancer:
+      $ref: 'resources/LoadBalancer/schema.yaml'
     LoadBalancerSpecification:
-      $ref: 'resources/LoadBalancerSpecification/public_schema.yaml'
+      $ref: 'resources/LoadBalancerSpecification/schema.yaml'
     IpAddress :
       $ref : 'resources/IpAddress/schema.yaml'
     Meta:
@@ -101,7 +103,7 @@ components:
     FirewallPolicyId:
       $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
     LoadBalancerSpecificationId:
-      $ref: 'resources/LoadBalancerSpecification/parameters/loadBalancerSpecificationId.yaml'
+      $ref: 'resources/LoadBalancerSpecification/parameters/id.yaml'
     NetworkPolicyId:
       $ref: 'resources/NetworkPolicy/parameters/networkPolicyId.yaml'
     NetworkRulePortId:
@@ -124,6 +126,7 @@ components:
       $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
     VpnSessionId:
       $ref: 'resources/VpnSession/parameters/vpnSessionId.yaml'
+    #    ^^ DEPRECATED - don't add these directly in this file anymore.
     #    When adding a path parameter use the following format, and remember to add it alphabetically to the list!
     #    ReferenceId:
     #      $ref: 'resources/References/parameters/id.yaml'
@@ -133,7 +136,7 @@ components:
     Page:
       $ref: 'components/parameters/page.yaml'
   responses:
-    # DEPRECATED - don't add these directly in this file any more.
+    # DEPRECATED - don't add these directly in this file anymore.
     DhcpIdResponse:
       $ref: 'resources/Dhcp/responses/idResponse.yaml'
     DiscountPlanResponse:
@@ -158,6 +161,7 @@ components:
       $ref: 'resources/VpnService/responses/idResponse.yaml'
     VpnSessionIdResponse:
       $ref: 'resources/VpnSession/responses/idResponse.yaml'
+#    ^^ DEPRECATED - don't add these directly in this file anymore.
 #    When adding a new response id, use the following format
 #    ReferenceIdResponse:
 #      $ref: 'resources/References/responses/idResponse.yaml'
@@ -286,12 +290,16 @@ paths:
     $ref : 'resources/InstanceSoftware/collection.yaml'
   '/ecloud/v2/instance-software/{instanceSoftwareId}' :
     $ref : 'resources/InstanceSoftware/item.yaml'
-#  '/ecloud/v2/load-balancers':
-#    $ref: 'resources/LoadBalancer/collection.yaml'
-#  '/ecloud/v2/load-balancers/{loadBalancerId}':
-#    $ref: 'resources/LoadBalancer/item.yaml'
-#  '/ecloud/v2/load-balancers/{loadBalancerId}/networks' :
-#    $ref : 'resources/LoadBalancer/networks-collection.yaml'
+  '/ecloud/v2/ip-addresses' :
+    $ref : 'resources/IpAddress/collection.yaml'
+  '/ecloud/v2/ip-addresses/{ipAddressId}' :
+    $ref : 'resources/IpAddress/item.yaml'
+  '/ecloud/v2/load-balancers':
+    $ref: 'resources/LoadBalancer/collection.yaml'
+  '/ecloud/v2/load-balancers/{loadBalancerId}':
+    $ref: 'resources/LoadBalancer/item.yaml'
+  '/ecloud/v2/load-balancers/{loadBalancerId}/networks' :
+    $ref : 'resources/LoadBalancer/networks-collection.yaml'
   '/ecloud/v2/load-balancer-networks' :
     $ref : 'resources/LoadBalancerNetwork/collection.yaml'
   '/ecloud/v2/load-balancer-networks/{loadBalancerNetworkId}' :
@@ -406,10 +414,14 @@ paths:
     $ref: 'resources/Vpc/deploy-defaults.yaml'
   '/ecloud/v2/vpcs/{vpcId}/instances':
     $ref: 'resources/Vpc/instances-collection.yaml'
+#  '/ecloud/v2/vpcs/{vpcId}/load-balancers':
+#    $ref: 'resources/Vpc/load-balancers-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/tasks':
     $ref: 'resources/Vpc/tasks-collection.yaml'
   '/ecloud/v2/vpcs/{vpcId}/volumes':
     $ref: 'resources/Vpc/volumes-collection.yaml'
+  '/ecloud/v2/vpcs/{vpcId}/load-balancers':
+    $ref: 'resources/Vpc/load-balancers-collection.yaml'
   '/ecloud/v2/vpn-endpoints':
     $ref: 'resources/VpnEndpoint/collection.yaml'
   '/ecloud/v2/vpn-endpoints/{vpnEndpointId}':

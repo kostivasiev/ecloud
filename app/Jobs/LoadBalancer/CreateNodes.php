@@ -10,6 +10,13 @@ class CreateNodes extends TaskJob
 {
     use AwaitResources;
 
+    public function __construct($task)
+    {
+        parent::__construct($task);
+        // Set timeout to 20 mins per node
+        $this->tries = (240 * $this->task->resource->loadBalancerSpec->node_count);
+    }
+
     public function handle()
     {
         $loadBalancer = $this->task->resource;
@@ -23,9 +30,7 @@ class CreateNodes extends TaskJob
                 $node->syncSave();
                 $loadBalancerNodes[] = $node->id;
             }
-            $data = $this->task->data;
-            $data['loadbalancer_node_ids'] = $loadBalancerNodes;
-            $this->task->setAttribute('data', $data)->saveQuietly();
+            $this->task->updateData('loadbalancer_node_ids', $loadBalancerNodes);
         } else {
             $loadBalancerNodes = LoadBalancerNode::whereIn('id', $this->task->data['loadbalancer_node_ids'])
                 ->get()

@@ -4,7 +4,7 @@ namespace App\Jobs\Vip;
 
 use App\Jobs\TaskJob;
 
-class AssignIpAddress extends TaskJob
+class AssignClusterIp extends TaskJob
 {
     /**
      * Assign an IP address to the vip

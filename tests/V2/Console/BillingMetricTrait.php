@@ -116,6 +116,12 @@ trait BillingMetricTrait
             ->andReturnUsing(function () {
                 return false;
             });
+        $this->command->expects('option')
+            ->with('reseller')
+            ->once()
+            ->andReturnUsing(function () {
+                return false;
+            });
         return;
     }
 

@@ -13,6 +13,8 @@ use App\Models\V2\Task;
 use App\Resources\V2\IpAddressResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
+use App\Tasks\Nic\AssociateIp;
+use App\Tasks\Nic\DisassociateIp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -86,13 +88,11 @@ class NicController extends BaseController
         ));
     }
 
-    public function ipAddresses(Request $request, QueryTransformer $queryTransformer, string $nicId)
+    public function ipAddresses(Request $request, string $nicId)
     {
         $collection = Nic::forUser($request->user())->findOrFail($nicId)->ipAddresses();
-        $queryTransformer->config(IpAddress::class)
-            ->transform($collection);
 
-        return IpAddressResource::collection($collection->paginate(
+        return IpAddressResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -102,8 +102,8 @@ class NicController extends BaseController
         $nic = Nic::forUser(Auth::user())->findOrFail($nicId);
 
         $task = $nic->createTaskWithLock(
-            'associate_ip',
-            \App\Jobs\Tasks\Nic\AssociateIp::class,
+            AssociateIp::$name,
+            AssociateIp::class,
             [
                 'ip_address_id' => $request->input('ip_address_id')
             ]
@@ -118,8 +118,8 @@ class NicController extends BaseController
         $ipAddress = IpAddress::forUser(Auth::user())->findOrFail($ipAddressId);
 
         $task = $nic->createTaskWithLock(
-            'disassociate_ip',
-            \App\Jobs\Tasks\Nic\DisassociateIp::class,
+            DisassociateIp::$name,
+            DisassociateIp::class,
             [
                 'ip_address_id' => $ipAddress->id
             ]

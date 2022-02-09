@@ -160,6 +160,8 @@ $app->register(UKFast\ApiInternalCommunication\LoadbalancerAdminClientServicePro
 $app->register(UKFast\ApiInternalCommunication\SafeDNSAdminClientServiceProvider::class);
 
 
+$app->register(UKFast\Sieve\SieveServiceProvider::class);
+
 $app->register(UKFast\FormRequests\FormRequestServiceProvider::class);
 
 

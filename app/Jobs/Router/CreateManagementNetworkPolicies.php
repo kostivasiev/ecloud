@@ -69,8 +69,7 @@ class CreateManagementNetworkPolicies extends TaskJob
                         ]))->save();
                         $networkPolicy->syncSave();
 
-                        $this->task->data = Arr::add($this->task->data, 'network_policy_id', $networkPolicy->id);
-                        $this->task->saveQuietly();
+                        $this->task->updateData('network_policy_id', $networkPolicy->id);
 
                         $this->info('Create Management Network Policy and Rules End', [
                             'network_id' => $managementNetwork->id,

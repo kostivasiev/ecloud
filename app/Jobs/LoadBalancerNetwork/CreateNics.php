@@ -20,8 +20,7 @@ class CreateNics extends TaskJob
         $loadBalancer = $loadBalancerNetwork->loadBalancer;
 
         if (empty($this->task->data['nic_ids'])) {
-            $data = $this->task->data;
-            $data['nic_ids'] = [];
+            $data = $this->task->data ?? [];
 
             $loadBalancer->instances->each(function ($instance) use ($loadBalancerNetwork, &$data) {
                 $nic = $instance->nics()->firstOrNew(
@@ -48,11 +47,10 @@ class CreateNics extends TaskJob
 
                     $this->info('Created new NIC ' . $nic->id . ' on load balancer node ' . $instance->id . ' for network ' . $loadBalancerNetwork->network_id);
 
-                    $data['nic_ids'][] = $nic->id;
+                    $data[] = $nic->id;
                 }
             });
-
-            $this->task->setAttribute('data', $data)->saveQuietly();
+            $this->task->updateData('nic_ids', $data);
         }
 
         if (isset($this->task->data['nic_ids'])) {

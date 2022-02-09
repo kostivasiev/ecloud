@@ -47,6 +47,7 @@ class CreateRequest extends FormRequest
             'subnet' => [
                 'required',
                 'string',
+                'bail',
                 new ValidCidrSubnet(),
                 new isPrivateSubnet(),
                 new isNotOverlappingSubnet(),

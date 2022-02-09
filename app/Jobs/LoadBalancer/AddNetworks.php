@@ -25,7 +25,7 @@ class AddNetworks extends TaskJob
         }
 
         if (empty($this->task->data['load_balancer_network_ids'])) {
-            $data = $this->task->data;
+            $data = [];
 
             foreach ($this->task->data['network_ids'] as $networkId) {
                 $network = Network::find($networkId);
@@ -41,9 +41,9 @@ class AddNetworks extends TaskJob
                 $loadBalancerNetwork->network()->associate($network);
                 $loadBalancerNetwork->syncSave();
 
-                $data['load_balancer_network_ids'][] = $loadBalancerNetwork->id;
+                $data[] = $loadBalancerNetwork->id;
             }
-            $this->task->setAttribute('data', $data)->saveQuietly();
+            $this->task->updateData('load_balancer_network_ids', $data);
         }
 
         if (isset($this->task->data['load_balancer_network_ids'])) {

@@ -18,8 +18,7 @@ trait VipMock
                 $this->vip = Vip::factory()->create([
                     'id' => $id,
                     'name' => $id,
-                    'load_balancer_id' => $this->loadBalancer()->id,
-                    'network_id' => $this->network()->id,
+                    'load_balancer_network_id' => $this->loadBalancerNetwork()->id,
                 ]);
             });
         }

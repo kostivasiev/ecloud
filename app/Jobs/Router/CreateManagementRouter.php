@@ -32,10 +32,7 @@ class CreateManagementRouter extends TaskJob
                 $managementRouter->syncSave();
 
                 // Store the management router id, so we can backoff everything else
-                $this->task->data = [
-                    'management_router_id' => $managementRouter->id
-                ];
-                $this->task->saveQuietly();
+                $this->task->updateData('management_router_id', $managementRouter->id);
 
                 $this->info('Create Management Router End', [
                     'admin_router_id' => $managementRouter->id,

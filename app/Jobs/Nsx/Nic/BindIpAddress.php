@@ -2,28 +2,11 @@
 
 namespace App\Jobs\Nsx\Nic;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\IpAddress;
-use App\Models\V2\Nic;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
-class BindIpAddress extends Job
+class BindIpAddress extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
-    private $model;
-
-    private IpAddress $ipAddress;
-
-    public function __construct(Nic $nic, IpAddress $ipAddress)
-    {
-        $this->model = $nic;
-
-        $this->ipAddress = $ipAddress;
-    }
-
     /**
      * Patch a Tier-1 segment port with an IP address binding
      * @see: https://vdc-download.vmware.com/vmwb-repository/dcr-public/787988e9-6348-4b2a-8617-e6d672c690ee/a187360c-77d5-4c0c-92a8-8e07aa161a27/api_includes/method_PatchTier1SegmentPort.html
@@ -32,9 +15,8 @@ class BindIpAddress extends Job
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $this->model->id]);
-
-        $nic = $this->model;
+        $nic = $this->task->resource;
+        $ipAddress = IpAddress::findOrFail($this->task->data['ip_address_id']);
 
         $network = $nic->network;
         $router = $nic->network->router;
@@ -43,7 +25,7 @@ class BindIpAddress extends Job
         $nic->refresh();
 
         $ipAddresses = $nic->ipAddresses->where('type', IpAddress::TYPE_CLUSTER);
-        $ipAddresses->push($this->ipAddress);
+        $ipAddresses->push($ipAddress);
 
         $nsxService->patch(
             '/policy/api/v1/infra/tier-1s/' . $router->id .
@@ -62,9 +44,7 @@ class BindIpAddress extends Job
             ]
         );
 
-        $nic->ipAddresses()->save($this->ipAddress);
-        Log::info('Address binding created for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $this->ipAddress->ip_address);
-
-        Log::info(get_class($this) . ' : Finished', ['id' => $nic->id]);
+        $nic->ipAddresses()->save($ipAddress);
+        $this->info('Address binding created for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $ipAddress->ip_address);
     }
 }

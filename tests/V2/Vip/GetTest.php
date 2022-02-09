@@ -22,9 +22,8 @@ class GetTest extends TestCase
 
         $this->get('/v2/vips')
             ->seeJson([
-            'id' => $this->vip()->id,
-            'load_balancer_id' => $this->vip()->load_balancer_id,
-            'network_id' => $this->vip()->network_id
+                'id' => $this->vip()->id,
+                'load_balancer_network_id' => $this->loadBalancerNetwork()->id,
         ])->assertResponseStatus(200);
     }
 
@@ -32,8 +31,7 @@ class GetTest extends TestCase
     {
         $this->get('/v2/vips/' . $this->vip()->id)->seeJson([
             'id' => $this->vip()->id,
-            'load_balancer_id' => $this->vip()->load_balancer_id,
-            'network_id' => $this->vip()->network_id
+            'load_balancer_network_id' => $this->loadBalancerNetwork()->id,
         ])->assertResponseStatus(200);
     }
 }

@@ -49,12 +49,12 @@ class UnAssignVolumeGroup extends Job
                     'instance_id' => $instance->id,
                     'volume_id' => $volume->id,
                 ]);
-                if (isset($this->task->data['instance_detach_task_id'])) {
+                if (!empty($this->task->data['instance_detach_task_id'])) {
                     $task = Task::findOrFail($this->task->data['instance_detach_task_id']);
                     if (!$task->completed) {
                         $this->awaitTaskWithRelease($task);
                     }
-                    $this->task->setAttribute('data', null)->saveQuietly();
+                    $this->task->updateData('instance_detach_task_id', null);
                 }
 
                 Log::info(
@@ -66,7 +66,7 @@ class UnAssignVolumeGroup extends Job
                 );
 
                 $task = $instance->createTask('volume_detach', VolumeDetach::class, ['volume_id' => $volume->id]);
-                $this->task->setAttribute('data', ['instance_detach_task_id' => $task->id]);
+                $this->task->updateData('instance_detach_task_id', $task->id);
                 $this->awaitTaskWithRelease($task);
                 $volume->setAttribute('port', null)->saveQuietly();
             }
