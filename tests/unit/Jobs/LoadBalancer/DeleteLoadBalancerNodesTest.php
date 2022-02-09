@@ -3,7 +3,7 @@
 namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\LoadBalancer\DeleteNodes;
+use App\Jobs\LoadBalancer\DeleteLoadBalancerNodes;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
@@ -12,21 +12,16 @@ use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use Tests\Mocks\Resources\LoadBalancerMock;
 
-class DeleteNodesTest extends TestCase
+class DeleteLoadBalancerNodesTest extends TestCase
 {
     use LoadBalancerMock;
 
-    public function setUp(): void
+    public function testNodesAreDeleted()
     {
-        parent::setUp();
-    }
-
-    public function testSuccess()
-    {
-        // Create the management network
-        $this->router()->setAttribute('is_management', true)->save();
-        $this->network();
-        $this->loadBalancerInstance();
+        $this->loadBalancerNode()
+            ->setAttribute('node_id', 123456)
+            ->saveQuietly();
+        $this->loadBalancerNode()->instance()->associate($this->instance());
 
         $task = Model::withoutEvents(function () {
             $task = new Task([
@@ -40,12 +35,11 @@ class DeleteNodesTest extends TestCase
 
         Event::fake([JobFailed::class, Created::class]);
 
-        dispatch(new DeleteNodes($task));
+        dispatch(new DeleteLoadBalancerNodes($task));
 
         Event::assertNotDispatched(JobFailed::class);
 
         $task->refresh();
-
-        $this->assertNotNull($task->data['instance_ids']);
+        $this->assertNotNull($task->data['load_balancer_node_ids']);
     }
 }
