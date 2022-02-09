@@ -171,7 +171,7 @@ Content-Type:  application/json
 > {%
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
-  client.assert(response.body.data[0].id == client.global.get('network_id'), "Incorrect id");
+  client.assert(response.body.data[0].id == client.global.get('load_balancer_network_id'), "Incorrect id");
 });
 %}
 
