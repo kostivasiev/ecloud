@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
  */
 class ProcessBilling extends Command
 {
-    protected $signature = 'vpc:process-billing {--current-month} {--D|debug} {--T|test-run}';
+    protected $signature = 'vpc:process-billing {--current-month} {--D|debug} {--T|test-run} {--reseller=}';
     protected $description = 'Process eCloud VPC Billing';
 
     protected \DateTimeZone $timeZone;
@@ -30,6 +30,8 @@ class ProcessBilling extends Command
     protected array $billing;
     protected array $discountBilling;
     protected float $runningTotal;
+
+    protected $optReseller = null;
 
     public function __construct()
     {
@@ -43,6 +45,7 @@ class ProcessBilling extends Command
 
     public function handle()
     {
+        $this->optReseller = $this->option('reseller');
         if ($this->option('current-month')) {
             $this->startDate = Carbon::createFromTimeString("First day of this month 00:00:00", $this->timeZone);
             $this->endDate = Carbon::createFromTimeString("last day of this month 23:59:59", $this->timeZone);
@@ -56,6 +59,11 @@ class ProcessBilling extends Command
                 $query->where('term_start_date', '<=', $this->startDate);
                 $query->orWhereBetween('term_start_date', [$this->startDate, $this->endDate]);
             })->where('term_end_date', '>=', $this->endDate)
+            ->where(function ($query) {
+                if ($this->optReseller) {
+                    $query->where('reseller_id', '=', $this->optReseller);
+                }
+            })
             ->each(function ($discountPlan) {
                 if ($this->isUkFastAccount($discountPlan->reseller_id)) {
                     return;
@@ -111,6 +119,11 @@ class ProcessBilling extends Command
         Vpc::withTrashed()
             ->where('deleted_at', '>=', $this->startDate)
             ->orWhereNull('deleted_at')
+            ->where(function ($query) {
+                if ($this->optReseller) {
+                    $query->where('reseller_id', '=', $this->optReseller);
+                }
+            })
             ->each(function ($vpc) {
                 if ($this->isUkFastAccount($vpc->reseller_id)) {
                     return;
@@ -303,6 +316,11 @@ class ProcessBilling extends Command
     protected function getVpcMetrics($vpcId)
     {
         $metrics = BillingMetric::where('vpc_id', $vpcId)
+            ->where(function ($query) {
+                if ($this->optReseller) {
+                    $query->where('reseller_id', '=', $this->optReseller);
+                }
+            })
             ->where(function ($query) {
                 // any billing metrics for the vpc that start within the billing period
                 $query->whereBetween('start', [$this->startDate, $this->endDate]);
