@@ -7,8 +7,8 @@ use App\Models\V2\FloatingIp;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
+use UKFast\Admin\SafeDNS\AdminClient;
 use UKFast\SDK\SafeDNS\Entities\Record;
-use UKFast\SDK\SafeDNS\RecordClient;
 
 class AllocateRdnsHostname extends Job
 {
@@ -31,16 +31,18 @@ class AllocateRdnsHostname extends Job
         if (empty($this->model->ip_address)) {
             log::info("Floating IP has not been assigned, RDNS host not generated.");
             $this->fail(new \Exception('Floating IP has not been assigned, RDNS host not generated ' . $this->model->id));
+
             return;
         }
 
-        $safednsClient = app()->make(RecordClient::class);
+        $safednsClient = app()->make(AdminClient::class);
         $dnsName = $this->reverseIpLookup($this->model->ip_address);
-        $this->rdns = $safednsClient->getPage(1, 15, ['name:eq' => $dnsName]);
+        $this->rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
 
         if (count($this->rdns->getItems()) !== 1) {
             log::info("More than one RDNS found");
             $this->fail(new \Exception('More than one RDNS found ' . $this->model->id));
+
             return;
         }
 
@@ -56,7 +58,7 @@ class AllocateRdnsHostname extends Job
 
             log::info(sprintf('RDNS assigned [%s]', $this->model->id));
         } else {
-            $safednsClient->update($this->createRecord());
+            $safednsClient->records()->update($this->createRecord());
 
             log::info('RDNS updated.', $this->model->id);
         }

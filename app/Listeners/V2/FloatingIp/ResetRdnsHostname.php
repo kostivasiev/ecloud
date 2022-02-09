@@ -7,15 +7,15 @@ use App\Models\V2\FloatingIp;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
+use UKFast\Admin\SafeDNS\AdminClient;
 use UKFast\SDK\SafeDNS\Entities\Record;
-use UKFast\SDK\SafeDNS\RecordClient;
 
 class ResetRdnsHostname implements ShouldQueue
 {
     use InteractsWithQueue;
 
     private $rdns;
-    private RecordClient $safednsClient;
+    private $safednsClient;
 
     private $model;
 
@@ -33,16 +33,24 @@ class ResetRdnsHostname implements ShouldQueue
     {
         Log::info(get_class($this) . ' : Started');
 
-        $this->safednsClient = app()->make(RecordClient::class);
+        $this->safednsClient = app()->make(AdminClient::class);
         $floatingIp = FloatingIp::withTrashed()->findOrFail($this->model->id);
 
         $floatingIp->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
         $floatingIp->save();
 
         $dnsName = $this->reverseIpLookup($floatingIp->ip_address);
-        $this->rdns = $this->safednsClient->getByName($dnsName);
 
-        $this->safednsClient->update($this->createRecord());
+        $this->rdns = $this->safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
+
+        if (count($this->rdns->getItems()) !== 1) {
+            log::info("Unable to determine RDNS record, can not update.");
+            $this->fail(new \Exception('Unable to determine RDNS record, can not update.' . $this->model->id));
+
+            return;
+        }
+
+        $this->safednsClient->records()->update($this->createRecord());
 
         Log::info(get_class($this) . ' : Finished');
     }

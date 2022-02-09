@@ -10,10 +10,11 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Admin\SafeDNS\AdminClient;
+use UKFast\Admin\SafeDNS\AdminRecordClient;
 use UKFast\SDK\SafeDNS\Entities\Record;
-use UKFast\SDK\SafeDNS\RecordClient;
 
-class AllocateRdnsTest extends TestCase
+class AllocateRdnsHostnameTest extends TestCase
 {
     protected FloatingIp $floatingIp;
     protected $mockRecordAdminClient;
@@ -22,9 +23,18 @@ class AllocateRdnsTest extends TestCase
     {
         parent::setUp();
 
-        $this->mockRecordAdminClient = \Mockery::mock(RecordClient::class);
+        $this->mockRecordAdminClient = \Mockery::mock(AdminRecordClient::class);
 
-        app()->bind(RecordClient::class, function () {
+        $mockSafednsAdminClient = \Mockery::mock(AdminClient::class);
+
+        $mockSafednsAdminClient->shouldReceive('records')->andReturn(
+            $this->mockRecordAdminClient
+        );
+        app()->bind(AdminClient::class, function () use ($mockSafednsAdminClient) {
+            return $mockSafednsAdminClient;
+        });
+
+        app()->bind(AdminRecordClient::class, function () {
             return $this->mockRecordAdminClient;
         });
 
