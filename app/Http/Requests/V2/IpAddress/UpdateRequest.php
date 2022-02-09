@@ -21,21 +21,12 @@ class UpdateRequest extends FormRequest
         $ipAddress = IpAddress::forUser(Auth::user())
             ->findOrFail(app('request')
                 ->route('ipAddressId'));
-
-        return [
+        $rules = [
             'name' => [
                 'sometimes',
                 'required',
                 'string',
                 'max:255'
-            ],
-            'ip_address' => [
-                'sometimes',
-                'required',
-                'ip',
-                new IsInSubnet($ipAddress->network->id),
-                'bail',
-                new IsAvailable($ipAddress->network->id),
             ],
             'type' => [
                 'sometimes',
@@ -44,5 +35,17 @@ class UpdateRequest extends FormRequest
                 Rule::in([IpAddress::TYPE_NORMAL,IpAddress::TYPE_CLUSTER])
             ]
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $rules['ip_address'] = [
+                'sometimes',
+                'required',
+                'ip',
+                new IsInSubnet($ipAddress->network->id),
+                'bail',
+                new IsAvailable($ipAddress->network->id),
+            ];
+        }
+        return $rules;
     }
 }

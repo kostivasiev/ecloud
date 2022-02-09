@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -13,9 +14,10 @@ use UKFast\Sieve\Sieve;
 
 class IpAddress extends Model implements Searchable, Natable, RouterScopable
 {
-    use CustomKey, SoftDeletes, DefaultName, HasFactory;
+    use CustomKey, SoftDeletes, DefaultName, HasFactory, DeletionRules;
 
     public $keyPrefix = 'ip';
+    public $children;
 
     const TYPE_NORMAL = 'normal';
     const TYPE_CLUSTER = 'cluster';
@@ -25,6 +27,10 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
         $this->incrementing = false;
         $this->keyType = 'string';
         $this->connection = 'ecloud';
+        $this->children = [
+            'nics',
+            'vip',
+        ];
 
         $this->fillable([
             'id',
@@ -35,6 +41,11 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
         ]);
 
         parent::__construct($attributes);
+    }
+
+    public function canDelete()
+    {
+        return ((empty($this->nics()->count() > 0)) && (empty($this->vip)));
     }
 
     /**

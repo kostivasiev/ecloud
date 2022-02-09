@@ -587,14 +587,16 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('ip-addresses', 'IpAddressController@index');
         $router->get('ip-addresses/{ipAddressId}', 'IpAddressController@show');
         $router->post('ip-addresses', 'IpAddressController@store');
+
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->get('ip-addresses/{ipAddressId}/nics', 'IpAddressController@nics');
-            $router->patch('ip-addresses/{ipAddressId}', 'IpAddressController@update');
-
-            $router->group(['middleware' => 'ip-address-can-delete'], function () use ($router) {
-                $router->delete('ip-addresses/{ipAddressId}', 'IpAddressController@destroy');
-            });
         });
+
+        $router->patch('ip-addresses/{ipAddressId}', 'IpAddressController@update');
+        $router->delete('ip-addresses/{ipAddressId}', [
+            'middleware' => 'can-be-deleted:' . \App\Models\V2\IpAddress::class   . ',ipAddressId',
+            'uses' => 'IpAddressController@destroy'
+        ]);
     });
 
     /** Software */

@@ -47,11 +47,15 @@ class IpAddressController extends BaseController
     {
         $ipAddress = IpAddress::forUser(Auth::user())->findOrFail($ipAddressId);
 
-        $ipAddress->fill($request->only([
+        $allow = [
             'name',
-            'ip_address',
-            'type'
-        ]));
+            'type',
+        ];
+        if ($this->isAdmin) {
+            $allow[] = 'ip_address';
+        }
+
+        $ipAddress->fill($request->only($allow));
         $ipAddress->save();
 
         return $this->responseIdMeta($request, $ipAddress->id, 200);
