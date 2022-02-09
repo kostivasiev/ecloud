@@ -50,9 +50,14 @@ class ResetRdnsHostname implements ShouldQueue
             return;
         }
 
-        $this->safednsClient->records()->update($this->createRecord());
+        $this->rdns = $this->rdns->getItems()[0];
 
-        Log::info(get_class($this) . ' : Finished');
+        if ($this->safednsClient->records()->update($this->createRecord())) {
+            Log::info(get_class($this) . ' : Finished');
+        } else {
+            Log::error("Failed to reset SafeDNS Record for FIP." . $this->model->id);
+            $this->fail("Failed to reset SafeDNS Record for FIP." . $this->model->id);
+        }
     }
 
     private function reverseIpLookup($ip): string
