@@ -35,6 +35,10 @@ class AllocateRdnsHostname extends Job
             return;
         }
 
+        if (empty($this->model->rdns_hostname)) {
+            $this->model->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
+        }
+
         $safednsClient = app()->make(AdminClient::class);
         $dnsName = $this->reverseIpLookup($this->model->ip_address);
         $this->rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
@@ -48,20 +52,11 @@ class AllocateRdnsHostname extends Job
 
         $this->rdns = $this->rdns->getItems()[0];
 
-        if (empty($this->model->rdns_hostname)) {
-            if (!empty($this->rdns['content']) && $this->rdns) {
-                $this->model->rdns_hostname = $this->rdns['content'];
-            } else {
-                $this->model->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
-            }
-            $this->model->save();
+        $safednsClient->records()->update($this->createRecord());
 
-            log::info(sprintf('RDNS assigned [%s]', $this->model->id));
-        } else {
-            $safednsClient->records()->update($this->createRecord());
+        $this->model->save();
 
-            log::info('RDNS updated.', $this->model->id);
-        }
+        log::info(sprintf('RDNS assigned [%s]', $this->model->id));
     }
 
     private function reverseIpLookup($ip): string
