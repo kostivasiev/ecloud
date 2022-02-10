@@ -304,7 +304,6 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
                     'image_id' => $this->image()->id,
                     'vcpu_cores' => 1,
                     'ram_capacity' => 1024,
-                    'platform' => 'Linux',
                     'availability_zone_id' => $this->availabilityZone()->id,
                     'deploy_data' => [
                         'network_id' => $this->network()->id,
