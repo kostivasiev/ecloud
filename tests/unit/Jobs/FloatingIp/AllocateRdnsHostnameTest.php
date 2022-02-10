@@ -49,7 +49,7 @@ class AllocateRdnsHostnameTest extends TestCase
                             "zone" => "1.2.3.in-addr.arpa",
                             "name" => "1.2.3.4.in-addr.arpa",
                             "type" => "PTR",
-                            "content" => config('defaults.floating-ip.rdns.default_hostname'),
+                            "content" => "198.172.168.0.svrlist.co.uk",
                             "updated_at" => "1970-01-01T01:00:00+01:00",
                             "ttl" => 86400,
                             "priority" => null
@@ -60,6 +60,8 @@ class AllocateRdnsHostnameTest extends TestCase
 
             return $mockRecord;
         });
+
+        $this->mockRecordAdminClient->expects('update')->andReturnTrue();
     }
 
     public function testRdnsAllocated()

@@ -52,7 +52,9 @@ class AllocateRdnsHostname extends Job
 
         $this->rdns = $this->rdns->getItems()[0];
 
-        $safednsClient->records()->update($this->createRecord());
+        if ($this->rdns['content'] != trim($this->model->rdns_hostname)) {
+            $safednsClient->records()->update($this->createRecord());
+        }
 
         $this->model->save();
 
