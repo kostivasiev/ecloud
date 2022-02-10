@@ -34,7 +34,7 @@ return [
         ],
         'rdns' => [
             'default_hostname' => '4.3.2.1.svrlist.ukfast.net',
-            'dns_suffix' => 'inaddr.appr'
+            'dns_suffix' => 'in-addr.arpa'
         ]
     ],
     'firewall_rule' => [

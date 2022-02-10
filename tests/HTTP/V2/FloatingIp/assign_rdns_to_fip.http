@@ -3,25 +3,7 @@
 ###############################################################################
 ###############################################################################
 
-### 1. Check IP is valid
-GET https://kong.staging.rnd.ukfast/safedns/v1/records?name=89.163.37.46.in-addr.arpa
-Accept: */*
-Cache-Control: no-cache
-Authorization: myukfast
-Content-Type:  application/json
-
-> {%
-client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
-});
-
-client.global.set('zone_id', response.body.data[0].zone);
-client.global.set('rdns_content', response.body.data[0].content);
-client.log('Zone ID: ' + response.body.data[0].zone);
-client.log('RDNS Content: ' + response.body.data[0].content);
-%}
-
-### 2. Create FIP (make sure queue running.)
+### 1. Create FIP (make sure queue running.)
 POST https://{{host}}/{{version}}/floating-ips
 Accept: */*
 Cache-Control: no-cache
@@ -50,3 +32,5 @@ Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
+### 4. check rdns_hostname was assigned to FIP (this might take a couple of tries, FIPs on rdns only set up for 89-94)

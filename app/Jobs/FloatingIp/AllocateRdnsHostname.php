@@ -28,6 +28,7 @@ class AllocateRdnsHostname extends Job
      */
     public function handle()
     {
+        Log::info('Banana');
         if (empty($this->model->ip_address)) {
             log::info("Floating IP has not been assigned, RDNS host not generated.");
             $this->fail(new \Exception('Floating IP has not been assigned, RDNS host not generated ' . $this->model->id));
@@ -42,6 +43,9 @@ class AllocateRdnsHostname extends Job
         $safednsClient = app()->make(AdminClient::class);
         $dnsName = $this->reverseIpLookup($this->model->ip_address);
         $this->rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
+
+
+        Log::info("DNS NAME: ". $dnsName);
 
         if (count($this->rdns->getItems()) !== 1) {
             log::info("More than one RDNS found");
