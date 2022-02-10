@@ -4,14 +4,14 @@ namespace App\Jobs\FloatingIp;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\FloatingIp;
-use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
+use Illuminate\Queue\InteractsWithQueue;
 use UKFast\Admin\SafeDNS\AdminClient;
 use UKFast\SDK\SafeDNS\Entities\Record;
 
 class AllocateRdnsHostname extends TaskJob
 {
-    use Batchable, LoggableModelJob;
+    use Batchable, InteractsWithQueue;
 
     public FloatingIp $model;
     private $rdns;

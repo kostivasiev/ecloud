@@ -4,6 +4,8 @@ namespace Tests\unit\Jobs\FloatingIp;
 
 use App\Jobs\FloatingIp\AllocateRdnsHostname;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -18,6 +20,7 @@ class AllocateRdnsHostnameTest extends TestCase
 {
     protected FloatingIp $floatingIp;
     protected $mockRecordAdminClient;
+    private Task $task;
 
     public function setUp(): void
     {
@@ -74,10 +77,19 @@ class AllocateRdnsHostnameTest extends TestCase
                 'ip_address' => '10.0.0.1',
             ]);
         });
+        $this->task = Task::withoutEvents(function () {
+            $task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $task->resource()->associate($this->floatingIp);
+            $task->save();
+            return $task;
+        });
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new AllocateRdnsHostname($this->floatingIp));
+        dispatch(new AllocateRdnsHostname($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {

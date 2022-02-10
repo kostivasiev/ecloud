@@ -25,7 +25,7 @@ class Update extends Job
         $this->updateTaskBatch([
             [
                 new AllocateIp($this->task->resource),
-                new AllocateRdnsHostname($this->task->resource),
+                new AllocateRdnsHostname($this->task),
             ]
         ])->dispatch();
     }

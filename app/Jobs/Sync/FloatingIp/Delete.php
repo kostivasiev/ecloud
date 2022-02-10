@@ -24,7 +24,7 @@ class Delete extends Job
         $floatingIp = $this->task->resource;
         $this->deleteTaskBatch([
             [
-                new ResetRdnsHostname($floatingIp),
+                new ResetRdnsHostname($this->task),
             ],
         ])->dispatch();
         $this->task->completed = true;

@@ -1,6 +1,8 @@
 <?php
 namespace Tests\unit\Listeners\V2\FloatingIp;
 
+use App\Models\V2\Task;
+use App\Support\Sync;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use App\Events\V2\FloatingIp\Deleted;
@@ -17,13 +19,17 @@ use UKFast\Admin\SafeDNS\AdminRecordClient;
 use UKFast\SDK\SafeDNS\Entities\Record;
 use UKFast\SDK\SafeDNS\RecordClient;
 
-class ResetRdnsTest extends TestCase
+class ResetRdnsHostnameTest extends TestCase
 {
     protected Deleted $event;
 
     protected FloatingIp $floatingIp;
 
     protected Generator $faker;
+    /**
+     * @var mixed
+     */
+    private $task;
 
     public function setUp(): void
     {
@@ -38,6 +44,15 @@ class ResetRdnsTest extends TestCase
             ]);
         });
 
+        $this->task = Task::withoutEvents(function () {
+            $task = new Task([
+                'id' => 'sync-1',
+                'name' => Sync::TASK_NAME_DELETE,
+            ]);
+            $task->resource()->associate($this->floatingIp);
+            $task->save();
+            return $task;
+        });
 
         $mockRecordAdminClient = \Mockery::mock(AdminRecordClient::class);
 
@@ -88,7 +103,7 @@ class ResetRdnsTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new ResetRdnsHostname($this->floatingIp));
+        dispatch(new ResetRdnsHostname($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
