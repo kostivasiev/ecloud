@@ -1,40 +1,36 @@
 <?php
 
-namespace App\Listeners\V2\FloatingIp;
+namespace App\Jobs\FloatingIp;
 
-use App\Events\V2\FloatingIp\Deleted;
+use App\Jobs\TaskJob;
 use App\Models\V2\FloatingIp;
+use GuzzleHttp\Exception\GuzzleException;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\SafeDNS\AdminClient;
 use UKFast\SDK\SafeDNS\Entities\Record;
 
-class ResetRdnsHostname implements ShouldQueue
+class ResetRdnsHostname extends TaskJob implements ShouldQueue
 {
-    use InteractsWithQueue;
+    use InteractsWithQueue, Batchable;
 
     private $rdns;
     private $safednsClient;
 
-    private $model;
-
-    public function __construct(FloatingIp $model)
-    {
-        $this->model = $model;
-    }
-
     /**
-     * @param Deleted $event
      * @return void
-     * @throws \Exception
+     * @throws GuzzleException
      */
     public function handle()
     {
-        Log::info(get_class($this) . ' : Started');
+        /** @var FloatingIp $model */
+        $model = $this->task->resource;
+        $this->info(get_class($this) . ' : Started');
 
         $this->safednsClient = app()->make(AdminClient::class);
-        $floatingIp = FloatingIp::withTrashed()->findOrFail($this->model->id);
+        $floatingIp = FloatingIp::withTrashed()->findOrFail($model->id);
 
         $floatingIp->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
         $floatingIp->save();
@@ -44,8 +40,8 @@ class ResetRdnsHostname implements ShouldQueue
         $this->rdns = $this->safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
 
         if (count($this->rdns->getItems()) !== 1) {
-            log::info("Unable to determine RDNS record, can not update.");
-            $this->fail(new \Exception('Unable to determine RDNS record, can not update.' . $this->model->id));
+            $this->info("Unable to determine RDNS record, can not update.");
+            $this->fail(new \Exception('Unable to determine RDNS record, can not update.' . $model->id));
 
             return;
         }
@@ -53,10 +49,10 @@ class ResetRdnsHostname implements ShouldQueue
         $this->rdns = $this->rdns->getItems()[0];
 
         if ($this->safednsClient->records()->update($this->createRecord())) {
-            Log::info(get_class($this) . ' : Finished');
+            $this->info(get_class($this) . ' : Finished');
         } else {
-            Log::error("Failed to reset SafeDNS Record for FIP." . $this->model->id);
-            $this->fail("Failed to reset SafeDNS Record for FIP." . $this->model->id);
+            Log::error("Failed to reset SafeDNS Record for FIP." . $model->id);
+            $this->fail("Failed to reset SafeDNS Record for FIP." . $model->id);
         }
     }
 

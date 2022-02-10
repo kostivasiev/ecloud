@@ -4,7 +4,7 @@ namespace Tests\unit\Listeners\V2\FloatingIp;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use App\Events\V2\FloatingIp\Deleted;
-use App\Listeners\V2\FloatingIp\ResetRdnsHostname;
+use App\Jobs\FloatingIp\ResetRdnsHostname;
 use App\Models\V2\FloatingIp;
 use Faker\Factory as Faker;
 use Faker\Generator;

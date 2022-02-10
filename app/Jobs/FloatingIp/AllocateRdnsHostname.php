@@ -2,34 +2,28 @@
 
 namespace App\Jobs\FloatingIp;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\FloatingIp;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 use UKFast\Admin\SafeDNS\AdminClient;
 use UKFast\SDK\SafeDNS\Entities\Record;
 
-class AllocateRdnsHostname extends Job
+class AllocateRdnsHostname extends TaskJob
 {
     use Batchable, LoggableModelJob;
 
     public FloatingIp $model;
-    private bool $hasUpdated = false;
     private $rdns;
-
-    public function __construct(FloatingIp $floatingIp)
-    {
-        $this->model = $floatingIp;
-    }
 
     /**
      * @throws \Exception
      */
     public function handle()
     {
+        $this->model = $this->task->resource;
         if (empty($this->model->ip_address)) {
-            log::info("Floating IP has not been assigned, RDNS host not generated.");
+            $this->info("Floating IP has not been assigned, RDNS host not generated.", ['floating_ip_id' => $this->model->id]);
             $this->fail(new \Exception('Floating IP has not been assigned, RDNS host not generated ' . $this->model->id));
 
             return;
@@ -44,7 +38,7 @@ class AllocateRdnsHostname extends Job
         $this->rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
 
         if (count($this->rdns->getItems()) !== 1) {
-            log::info("More than one RDNS found");
+            $this->info("More than one RDNS found", ['floating_ip_id' => $this->model->id]);
             $this->fail(new \Exception('More than one RDNS found ' . $this->model->id));
 
             return;
@@ -58,7 +52,7 @@ class AllocateRdnsHostname extends Job
 
         $this->model->save();
 
-        log::info(sprintf('RDNS assigned [%s]', $this->model->id));
+        $this->info(sprintf('RDNS assigned [%s]', $this->model->id));
     }
 
     private function reverseIpLookup($ip): string

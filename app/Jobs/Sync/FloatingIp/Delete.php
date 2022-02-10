@@ -3,7 +3,7 @@
 namespace App\Jobs\Sync\FloatingIp;
 
 use App\Jobs\Job;
-use App\Listeners\V2\FloatingIp\ResetRdnsHostname;
+use App\Jobs\FloatingIp\ResetRdnsHostname;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableTaskJob;
 use App\Traits\V2\TaskableBatch;
