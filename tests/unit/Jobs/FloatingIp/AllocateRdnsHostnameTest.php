@@ -3,10 +3,6 @@
 namespace Tests\unit\Jobs\FloatingIp;
 
 use App\Jobs\FloatingIp\AllocateRdnsHostname;
-use App\Models\V2\FloatingIp;
-use App\Models\V2\Task;
-use App\Support\Sync;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Collection;
@@ -18,9 +14,7 @@ use UKFast\SDK\SafeDNS\Entities\Record;
 
 class AllocateRdnsHostnameTest extends TestCase
 {
-    protected FloatingIp $floatingIp;
     protected $mockRecordAdminClient;
-    private Task $task;
 
     public function setUp(): void
     {
@@ -69,35 +63,20 @@ class AllocateRdnsHostnameTest extends TestCase
 
     public function testRdnsAllocated()
     {
-        Model::withoutEvents(function () {
-            $this->floatingIp = factory(FloatingIp::class)->create([
-                'id' => 'fip-test',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-                'ip_address' => '10.0.0.1',
-            ]);
-        });
-        $this->task = Task::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->floatingIp);
-            $task->save();
-            return $task;
-        });
+        $this->floatingIp()->setAttribute('ip_address', '10.0.0.1')->saveQuietly();
+        $task = $this->createSyncUpdateTask($this->floatingIp());
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new AllocateRdnsHostname($this->task));
+        dispatch(new AllocateRdnsHostname($task));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
 
-        $this->floatingIp->refresh();
+        $this->floatingIp()->refresh();
 
-        $this->assertEquals($this->floatingIp->rdns_hostname, config('defaults.floating-ip.rdns.default_hostname'));
+        $this->assertEquals($this->floatingIp()->rdns_hostname, config('defaults.floating-ip.rdns.default_hostname'));
     }
 }

@@ -23,36 +23,12 @@ class ResetRdnsHostnameTest extends TestCase
 {
     protected Deleted $event;
 
-    protected FloatingIp $floatingIp;
-
     protected Generator $faker;
-    /**
-     * @var mixed
-     */
-    private $task;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-
-        Model::withoutEvents(function () {
-            $this->floatingIp = factory(FloatingIp::class)->create([
-                'id' => 'fip-' . uniqid(),
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id
-            ]);
-        });
-
-        $this->task = Task::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_DELETE,
-            ]);
-            $task->resource()->associate($this->floatingIp);
-            $task->save();
-            return $task;
-        });
 
         $mockRecordAdminClient = \Mockery::mock(AdminRecordClient::class);
 
@@ -101,15 +77,17 @@ class ResetRdnsHostnameTest extends TestCase
 
     public function testResetRdnsSuccess()
     {
+        $task = $this->createSyncDeleteTask($this->floatingIp());
+
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new ResetRdnsHostname($this->task));
+        dispatch(new ResetRdnsHostname($task));
 
         Event::assertNotDispatched(JobFailed::class);
 
-        $this->floatingIp->refresh();
+        $this->floatingIp()->refresh();
 
-        $this->assertEquals($this->floatingIp->rdns_hostname, config('defaults.floating-ip.rdns.default_hostname'));
+        $this->assertEquals($this->floatingIp()->rdns_hostname, config('defaults.floating-ip.rdns.default_hostname'));
     }
 
 }
