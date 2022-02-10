@@ -211,7 +211,15 @@ X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
-### 13. Delete Ip Address Resource (should pass)
+### 13. Delete the Nic
+DELETE https://{{host}}/{{version}}/nics/{{nic_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 14. Delete Ip Address Resource (should pass)
 DELETE https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -224,14 +232,6 @@ client.test('Delete succeeded', function () {
     client.assert(response.status === 204, '204 response not received');
 });
 %}
-
-### 14. Delete the Nic
-DELETE https://{{host}}/{{version}}/nics/{{nic_id}}
-Accept: */*
-Cache-Control: no-cache
-X-consumer-custom-id: 0-0
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
 
 ### 15. Delete the Instance
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
