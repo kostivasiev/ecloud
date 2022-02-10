@@ -49,10 +49,9 @@ class IpAddressController extends BaseController
 
         $allow = [
             'name',
-            'type',
         ];
         if ($this->isAdmin) {
-            $allow[] = 'ip_address';
+            $allow[] = 'type';
         }
 
         $ipAddress->fill($request->only($allow));
