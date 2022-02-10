@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile.dev
     deploy:
       mode: replicated
-      replicas: 5
+      replicas: 1
     image: apio-ecloud-dev
     command: queue
     environment:

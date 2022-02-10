@@ -33,9 +33,9 @@ Content-Type: application/json
     "load-balancers": [
         {
             "name": "My Load Balancer",
-            "availability_zone_id": {{dev_availability_zone_id}},
-            "vpc_id": {{dev_vpc_id}},
-            "load_balancer_spec_id": {{dev_load_balancer_spec_id}}
+            "availability_zone_id": "{{dev_availability_zone_id}}",
+            "vpc_id": "{{dev_vpc_id}}",
+            "load_balancer_spec_id": "{{dev_load_balancer_spec_id}}"
         }
     ]
 }

@@ -192,7 +192,7 @@ client.test("Request executed successfully", function() {
 
 ###
 
-DELETE https://{{host}}/{{version}}/load-balancers/{{lbc_id}}
+DELETE https://{{host}}/{{version}}/load-balancers/lb-93d33315-dev
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
