@@ -16,12 +16,8 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $ipAddress = IpAddress::factory()->create([
-            'network_id' => $this->network()->id
-        ]);
-
         $this->patch(
-            '/v2/ip-addresses/' . $ipAddress->id,
+            '/v2/ip-addresses/' . $this->ip()->id,
             [
                 'name' => 'UPDATED',
                 'ip_address' => '10.0.0.6',
@@ -31,14 +27,14 @@ class UpdateTest extends TestCase
             'ip_addresses',
             [
                 'name' => 'UPDATED',
-                'ip_address' => '10.0.0.6',
+                'ip_address' => $this->ip()->ip_address,
                 'type' => 'cluster',
                 ],
             'ecloud'
         )->assertResponseStatus(200);
     }
 
-    public function testNonAdminCantChangeIpAddress()
+    public function testCantChangeIpAddress()
     {
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write'])));
 
@@ -54,7 +50,7 @@ class UpdateTest extends TestCase
             [
                 'name' => 'UPDATED',
                 'ip_address' => $this->ip()->ip_address,
-                'type' => 'cluster',
+                'type' => 'normal',
             ],
             'ecloud'
         )->assertResponseStatus(200);
