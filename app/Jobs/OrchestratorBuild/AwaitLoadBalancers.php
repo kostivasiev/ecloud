@@ -35,7 +35,8 @@ class AwaitLoadBalancers extends Job
             });
 
             // Set timeout to 20 mins per node
-            $this->tries = (240 * $nodeCount);
+            $timeout = (240 * $nodeCount);
+            $this->tries = ($timeout > $this->tries) ? $timeout : $this->tries;
         }
     }
 
