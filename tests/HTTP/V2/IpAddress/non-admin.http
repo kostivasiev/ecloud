@@ -30,7 +30,7 @@ Content-Type: application/json
 
 {
     "name": "Test",
-    "ip_address": "172.22.2.2",
+    "ip_address": "10.0.7.5",
     "network_id": "{{network_id}}",
     "type": "cluster"
 }
