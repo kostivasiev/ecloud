@@ -63,7 +63,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### Get the load_balancer_id from the build
+### Get the load_balancer_id from the build - eventually this will complete syncing
 GET https://{{host}}/{{version}}/orchestrator-builds/{{orchestrator_build_id}}
 Accept: */*
 Cache-Control: no-cache
