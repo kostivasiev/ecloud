@@ -34,7 +34,8 @@ class DeployInstance extends TaskJob
                 return;
             }
             // Now populate the remaining deploy_data elements
-            $deployData = $instance->deploy_data + [
+            $deployData = $instance->deploy_data;
+            $deployData['image_data'] = [
                     'stats_password' => $this->getStatsPassword(),
                     'nats_credentials' => decrypt($this->task->data['warden_credentials']),
                     'node_id' => $loadBalancerNode->node_id,
