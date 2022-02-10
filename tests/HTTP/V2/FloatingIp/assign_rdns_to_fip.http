@@ -25,12 +25,10 @@ client.global.set('fip_id', response.body.data.id);
 client.log('Floating IP ID: ' + response.body.data.id);
 %}
 
-### 3. wait until IP is populated
+### 3. wait until rdns_hostname is populated
 GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
-
-### 4. check rdns_hostname was assigned to FIP (this might take a couple of tries, FIPs on rdns only set up for 89-94)
