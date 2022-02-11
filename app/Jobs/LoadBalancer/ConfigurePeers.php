@@ -4,6 +4,7 @@ namespace App\Jobs\LoadBalancer;
 
 use App\Jobs\TaskJob;
 use UKFast\Admin\Loadbalancers\AdminClient;
+use UKFast\SDK\Exception\ServerException;
 
 class ConfigurePeers extends TaskJob
 {
@@ -12,6 +13,12 @@ class ConfigurePeers extends TaskJob
         $loadbalancer = $this->task->resource;
         $client = app()->make(AdminClient::class)
             ->setResellerId($loadbalancer->getResellerId());
-        $client->clusters()->configurePeers($loadbalancer->config_id);
+        try {
+            $client->clusters()->configurePeers($loadbalancer->config_id);
+        } catch (\Exception $exception) {
+            if ($exception->getMessage() !== 'Bad Gateway') {
+                $this->fail($exception);
+            }
+        }
     }
 }
