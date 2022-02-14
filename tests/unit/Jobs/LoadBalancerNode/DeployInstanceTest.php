@@ -80,7 +80,7 @@ class DeployInstanceTest extends TestCase
 
         $this->loadBalancerInstance()->refresh();
         $this->assertEquals($this->loadBalancerInstance()->id, $task->data['loadbalancer_instance_id']);
-        $imageData = json_decode($this->loadBalancerInstance()->deploy_data['image_data'], true);
+        $imageData = $this->loadBalancerInstance()->deploy_data['image_data'];
         $this->assertArrayHasKey('stats_password', $imageData);
         $this->assertArrayHasKey('nats_credentials', $imageData);
         $this->assertArrayHasKey('node_id', $imageData);
