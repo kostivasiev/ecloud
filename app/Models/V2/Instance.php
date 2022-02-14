@@ -12,15 +12,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Exceptions\InvalidSortException;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sort;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class Instance extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Manageable, VpcAble
+class Instance extends Model implements Searchable, ResellerScopeable, AvailabilityZoneable, Manageable, VpcAble
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
@@ -38,7 +33,6 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         'availability_zone_id',
         'locked',
         'is_hidden',
-        'platform',
         'backup_enabled',
         'deployed',
         'deploy_data',
@@ -113,6 +107,11 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
         return $sum;
     }
 
+    public function getPlatformAttribute()
+    {
+        return $this->image ? $this->image->platform : null;
+    }
+
     public function volumes()
     {
         return $this->belongsToMany(Volume::class)->using(InstanceVolume::class);
@@ -176,87 +175,29 @@ class Instance extends Model implements Filterable, Sortable, ResellerScopeable,
     }
 
     /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
+     * Configures a sieve instance so that query builders
+     * can be modified
+     *
+     * @return void
      */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('image_id', Filter::$stringDefaults),
-            $factory->create('vcpu_cores', Filter::$stringDefaults),
-            $factory->create('ram_capacity', Filter::$stringDefaults),
-            $factory->create('availability_zone_id', Filter::$stringDefaults),
-            $factory->boolean()->create('locked', '1', '0'),
-            $factory->boolean()->create('is_hidden', '1', '0'),
-            $factory->create('platform', Filter::$stringDefaults),
-            $factory->create('backup_enabled', Filter::$stringDefaults),
-            $factory->create('host_group_id', Filter::$stringDefaults),
-            $factory->create('volume_group_id', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|Sort[]
-     * @throws InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('vpc_id'),
-            $factory->create('image_id'),
-            $factory->create('vcpu_cores'),
-            $factory->create('ram_capacity'),
-            $factory->create('availability_zone_id'),
-            $factory->create('locked'),
-            $factory->create('platform'),
-            $factory->create('backup_enabled'),
-            $factory->create('host_group_id'),
-            $factory->create('volume_group_id'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|Sort|Sort[]|null
-     * @throws InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('created_at', 'desc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'vpc_id' => 'vpc_id',
-            'image_id' => 'image_id',
-            'vcpu_cores' => 'vcpu_cores',
-            'ram_capacity' => 'ram_capacity',
-            'availability_zone_id' => 'availability_zone_id',
-            'locked' => 'locked',
-            'platform' => 'platform',
-            'backup_enabled' => 'backup_enabled',
-            'host_group_id' => 'host_group_id',
-            'volume_group_id' => 'volume_group_id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'vpc_id' => $filter->string(),
+            'image_id' => $filter->string(),
+            'vcpu_cores' => $filter->string(),
+            'ram_capacity' => $filter->string(),
+            'availability_zone_id' => $filter->string(),
+            'locked' => $filter->boolean(),
+            'is_hidden' => $filter->boolean(),
+            'platform' => $filter->for('image.platform')->string(),
+            'backup_enabled' => $filter->string(),
+            'host_group_id' => $filter->string(),
+            'volume_group_id' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

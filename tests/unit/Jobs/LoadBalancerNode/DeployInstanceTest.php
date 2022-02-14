@@ -80,13 +80,14 @@ class DeployInstanceTest extends TestCase
 
         $this->loadBalancerInstance()->refresh();
         $this->assertEquals($this->loadBalancerInstance()->id, $task->data['loadbalancer_instance_id']);
-        $this->assertArrayHasKey('stats_password', $this->loadBalancerInstance()->deploy_data);
-        $this->assertArrayHasKey('nats_credentials', $this->loadBalancerInstance()->deploy_data);
-        $this->assertArrayHasKey('node_id', $this->loadBalancerInstance()->deploy_data);
-        $this->assertArrayHasKey('group_id', $this->loadBalancerInstance()->deploy_data);
-        $this->assertArrayHasKey('nats_servers', $this->loadBalancerInstance()->deploy_data);
-        $this->assertArrayHasKey('primary', $this->loadBalancerInstance()->deploy_data);
-        $this->assertArrayHasKey('keepalived_password', $this->loadBalancerInstance()->deploy_data);
-        $this->assertEquals($this->loadBalancer()->config_id, $this->loadBalancerInstance()->deploy_data['group_id']);
+        $imageData = json_decode($this->loadBalancerInstance()->deploy_data['image_data'], true);
+        $this->assertArrayHasKey('stats_password', $imageData);
+        $this->assertArrayHasKey('nats_credentials', $imageData);
+        $this->assertArrayHasKey('node_id', $imageData);
+        $this->assertArrayHasKey('group_id', $imageData);
+        $this->assertArrayHasKey('nats_servers', $imageData);
+        $this->assertArrayHasKey('primary', $imageData);
+        $this->assertArrayHasKey('keepalived_password', $imageData);
+        $this->assertEquals($this->loadBalancer()->config_id, $imageData['group_id']);
     }
 }

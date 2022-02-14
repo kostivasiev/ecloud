@@ -31,7 +31,7 @@ class UpdateWindowsLicenseBillingTest extends TestCase
     public function testInstertWindowsLicenseBilling()
     {
         $this->instance()->vcpu_cores = 1;
-        $this->instance()->platform = 'Windows';
+        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
@@ -53,7 +53,7 @@ class UpdateWindowsLicenseBillingTest extends TestCase
         ]);
 
         $this->instance()->vcpu_cores = 5;
-        $this->instance()->platform = 'Windows';
+        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
@@ -70,7 +70,7 @@ class UpdateWindowsLicenseBillingTest extends TestCase
     public function testLoadBalancerInstancesIgnored()
     {
         $this->instance()->vcpu_cores = 1;
-        $this->instance()->platform = 'Windows'; // LB nodes are not Windows, but just for testing...
+        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly(); // LB nodes are not Windows, but just for testing...
 
         $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
 
