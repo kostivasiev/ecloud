@@ -5,6 +5,7 @@ namespace Tests\V2\LoadBalancer;
 use Faker\Factory as Faker;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class GetTest extends TestCase
 {
@@ -19,17 +20,13 @@ class GetTest extends TestCase
         $this->loadBalancerSpecification();
         $this->loadBalancer();
         $this->loadBalancerNode();
+
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
     }
 
     public function testGetCollection()
     {
-        $this->get(
-            '/v2/load-balancers',
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
+        $this->get('/v2/load-balancers')
             ->seeJson([
                 'id' => $this->loadBalancer()->id,
                 'name' => $this->loadBalancer()->name,
@@ -41,13 +38,7 @@ class GetTest extends TestCase
 
     public function testGetItemDetail()
     {
-        $this->get(
-            '/v2/load-balancers/' . $this->loadBalancer()->id,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.read',
-            ]
-        )
+        $this->get('/v2/load-balancers/' . $this->loadBalancer()->id)
             ->seeJson([
                 'id' => $this->loadBalancer()->id,
                 'name' => $this->loadBalancer()->name,
@@ -58,4 +49,16 @@ class GetTest extends TestCase
             ->assertResponseStatus(200);
     }
 
+    public function testGetLoadBalancerNetworksCollection()
+    {
+        $this->loadBalancerNetwork();
+        $this->get('/v2/load-balancers/' . $this->loadBalancer()->id . '/networks')
+            ->seeJson([
+                'id' => $this->loadBalancerNetwork()->id,
+                'name' => $this->loadBalancerNetwork()->name,
+                'load_balancer_id' => $this->loadBalancer()->id,
+                'network_id' => $this->network()->id,
+            ])
+            ->assertResponseStatus(200);
+    }
 }

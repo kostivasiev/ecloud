@@ -12,7 +12,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../components/schemas/network.yaml'
+                  $ref: '../../resources/LoadBalancerNetwork/schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
