@@ -4,7 +4,6 @@ namespace App\Jobs\LoadBalancer;
 
 use App\Jobs\TaskJob;
 use UKFast\Admin\Loadbalancers\AdminClient;
-use UKFast\SDK\Exception\ServerException;
 
 class ConfigurePeers extends TaskJob
 {
