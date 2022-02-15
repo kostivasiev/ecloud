@@ -74,8 +74,6 @@ class AwaitLoadBalancersTest extends TestCase
 
         $job = new AwaitLoadBalancers($this->orchestratorBuild);
 
-        $this->assertEquals(480, $job->tries);
-
         dispatch($job);
 
         Event::assertNotDispatched(JobFailed::class);
@@ -83,5 +81,22 @@ class AwaitLoadBalancersTest extends TestCase
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
+    }
+
+    public function testTimeout()
+    {
+        Event::fake([Created::class]);
+
+        $this->orchestratorBuild->updateState('load_balancer', 0, $this->loadBalancer()->id);
+
+        $this->createSyncUpdateTask($this->loadBalancer())
+            ->setAttribute('completed', true)
+            ->saveQuietly();
+
+        $job = new AwaitLoadBalancers($this->orchestratorBuild);
+
+        $job->handle();
+
+        $this->assertEquals(480, $job->tries);
     }
 }

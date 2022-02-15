@@ -5,7 +5,6 @@ namespace App\Jobs\OrchestratorBuild;
 use App\Jobs\Job;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\OrchestratorBuild;
-use App\Models\V2\Router;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
