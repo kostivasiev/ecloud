@@ -13,6 +13,8 @@ Content-Type: application/json
 }
 
 > {%
+client.global.set("router_id", response.body.data.id);
+
 client.test("Create Router", function() {
     client.assert(response.status === 202, "Response status is not 202");
 });
@@ -101,7 +103,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### Cleanup
-DELETE https://{{host}}/{{version}}/load-balancers{{load_balancer_id}}
+DELETE https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
 X-consumer-custom-id:  {{dev_reseller_id_admin}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
@@ -123,5 +125,19 @@ Content-Type: application/json
 > {%
 client.test('Request executed successfully', function () {
     client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+### Delete Router
+DELETE https://{{host}}/{{version}}/routers/{{router_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Create Router", function() {
+    client.assert(response.status === 202, "Response status is not 202");
 });
 %}

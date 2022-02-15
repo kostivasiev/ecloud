@@ -22,8 +22,9 @@ class AwaitLoadBalancers extends Job
     public function __construct(OrchestratorBuild $orchestratorBuild)
     {
         $this->model = $orchestratorBuild;
+        $orchestratorBuild->refresh();
 
-        $this->state = collect($orchestratorBuild->refresh()->state);
+        $this->state = collect($orchestratorBuild->state);
 
         $nodeCount = 0;
         if ($this->state->has('load_balancer')) {
