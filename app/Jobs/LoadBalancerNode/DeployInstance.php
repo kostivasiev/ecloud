@@ -35,7 +35,7 @@ class DeployInstance extends TaskJob
             }
             // Now populate the remaining deploy_data elements
             $deployData = $instance->deploy_data;
-            $deployData['image_data'] = json_encode([
+            $deployData['image_data'] = [
                     'stats_password' => $this->getStatsPassword(),
                     'nats_credentials' => decrypt($this->task->data['warden_credentials']),
                     'node_id' => $loadBalancerNode->node_id,
@@ -43,8 +43,9 @@ class DeployInstance extends TaskJob
                     'nats_servers' => $this->getNatsServers(),
                     'primary' => false,
                     'keepalived_password' => $this->getKeepAliveDPassword()
-                ]);
-            $instance->setAttribute('deploy_data', $deployData)->syncSave();
+                ];
+            $instance->deploy_data = $deployData;
+            $instance->syncSave();
             $this->task->updateData('loadbalancer_instance_id', $instance->id);
         } else {
             $instance = Instance::where('id', '=', $this->task->data['loadbalancer_instance_id'])
@@ -85,6 +86,6 @@ class DeployInstance extends TaskJob
                 ['username', '=', $natsServer]
             ])
             ->first();
-        return $cred ? json_encode([$cred->host.':'.$cred->port]) : null;
+        return $cred ? $cred->host.':'.$cred->port : null;
     }
 }

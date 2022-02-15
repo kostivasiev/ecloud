@@ -51,6 +51,14 @@ class RunApplianceBootstrap extends Job
             return;
         }
 
+        Log::info(
+            get_class($this) . ': Appliance bootstrap on instance ' . $instance->id . ' started.' .
+            ' image_data = ' . json_encode($this->imageData),
+            [
+                'id' => $instance->id
+            ]
+        );
+
         $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
         $instance->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
