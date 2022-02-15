@@ -26,8 +26,8 @@ class AwaitLoadBalancers extends Job
         $this->state = collect($orchestratorBuild->refresh()->state);
 
         $nodeCount = 0;
-        if ($this->state->has('load-balancer')) {
-            collect($this->state->get('load-balancer'))->each(function ($loadBalancerId) use (&$nodeCount) {
+        if ($this->state->has('load_balancer')) {
+            collect($this->state->get('load_balancer'))->each(function ($loadBalancerId) use (&$nodeCount) {
                 $loadBalancer = Resource::classFromId($loadBalancerId)::find($loadBalancerId);
                 if ($loadBalancer) {
                     $nodeCount += $loadBalancer->loadBalancerSpec->node_count;
@@ -42,11 +42,11 @@ class AwaitLoadBalancers extends Job
 
     public function handle()
     {
-        if (!$this->state->has('load-balancer')) {
+        if (!$this->state->has('load_balancer')) {
             Log::info(get_class($this) . ' : No load balancer\'s detected in build state, skipping', ['id' => $this->model->id]);
             return;
         }
 
-        $this->awaitSyncableResources($this->state->get('load-balancer'));
+        $this->awaitSyncableResources($this->state->get('load_balancer'));
     }
 }

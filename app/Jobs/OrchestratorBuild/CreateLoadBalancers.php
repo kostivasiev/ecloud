@@ -34,7 +34,7 @@ class CreateLoadBalancers extends Job
 
         collect($data->get('load-balancers'))->each(function ($definition, $index) use ($orchestratorBuild) {
             // Check if a resource has already been created
-            if (isset($orchestratorBuild->state['load-balancer']) && isset($orchestratorBuild->state['load-balancer'][$index])) {
+            if (isset($orchestratorBuild->state['load_balancer']) && isset($orchestratorBuild->state['load_balancer'][$index])) {
                 Log::info(get_class($this) . ' : OrchestratorBuild load balancer. ' . $index . ' has already been initiated, skipping', ['id' => $this->model->id]);
                 return;
             }
@@ -47,7 +47,7 @@ class CreateLoadBalancers extends Job
 
             Log::info(get_class($this) . ' : OrchestratorBuild created load balancer ' . $loadBalancer->id, ['id' => $this->model->id]);
 
-            $orchestratorBuild->updateState('load-balancer', $index, $loadBalancer->id);
+            $orchestratorBuild->updateState('load_balancer', $index, $loadBalancer->id);
         });
     }
 }

@@ -16,6 +16,7 @@ Content-Type: application/json
 client.test("Create Router", function() {
     client.assert(response.status === 202, "Response status is not 202");
 });
+%}
 
 ### Build Orchestrator Config
 POST https://{{host}}/{{version}}/orchestrator-configs
@@ -100,7 +101,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### Cleanup
-DELETE https://{{host}}/{{version}}/load-balancers/lb-62938ed6-dev
+DELETE https://{{host}}/{{version}}/load-balancers{{load_balancer_id}}
 X-consumer-custom-id:  {{dev_reseller_id_admin}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

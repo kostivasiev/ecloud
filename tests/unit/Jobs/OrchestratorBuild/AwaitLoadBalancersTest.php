@@ -34,7 +34,7 @@ class AwaitLoadBalancersTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        $this->orchestratorBuild->updateState('load-balancer', 0, $this->loadBalancer()->id);
+        $this->orchestratorBuild->updateState('load_balancer', 0, $this->loadBalancer()->id);
 
         $this->createSyncUpdateTask($this->loadBalancer());
 
@@ -50,7 +50,7 @@ class AwaitLoadBalancersTest extends TestCase
     {
         Event::fake(JobFailed::class);
 
-        $this->orchestratorBuild->updateState('load-balancer', 0, $this->loadBalancer()->id);
+        $this->orchestratorBuild->updateState('load_balancer', 0, $this->loadBalancer()->id);
 
         $this->createSyncUpdateTask($this->loadBalancer())
             ->setAttribute('completed', false)
@@ -66,7 +66,7 @@ class AwaitLoadBalancersTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->orchestratorBuild->updateState('load-balancer', 0, $this->loadBalancer()->id);
+        $this->orchestratorBuild->updateState('load_balancer', 0, $this->loadBalancer()->id);
 
         $this->createSyncUpdateTask($this->loadBalancer())
             ->setAttribute('completed', true)

@@ -3,7 +3,6 @@ namespace Tests\unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateLoadBalancers;
-use App\Jobs\OrchestratorBuild\CreateRouters;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
@@ -62,7 +61,9 @@ class CreateLoadBalancersTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->orchestratorBuild->updateState('load-balancer', 0, 'lb-test');
+        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
+
+        $this->orchestratorBuild->updateState('load_balancer', 0, 'lb-test');
 
         dispatch(new CreateLoadBalancers($this->orchestratorBuild));
 
@@ -74,18 +75,16 @@ class CreateLoadBalancersTest extends TestCase
 
         $this->orchestratorBuild->refresh();
 
-        $this->assertNotNull($this->orchestratorBuild->state['load-balancer']);
+        $this->assertNotNull($this->orchestratorBuild->state['load_balancer']);
 
-        $this->assertEquals(1, count($this->orchestratorBuild->state['load-balancer']));
+        $this->assertEquals(1, count($this->orchestratorBuild->state['load_balancer']));
     }
 
     public function testSuccess()
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->availabilityZone();
-        $this->vpc();
-        $this->orchestratorBuild->updateState('vpc', 0, 'vpc-test');
+        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
 
         dispatch(new CreateLoadBalancers($this->orchestratorBuild));
 
@@ -102,9 +101,9 @@ class CreateLoadBalancersTest extends TestCase
 
         $this->orchestratorBuild->refresh();
 
-        $this->assertNotNull($this->orchestratorBuild->state['load-balancer']);
+        $this->assertNotNull($this->orchestratorBuild->state['load_balancer']);
 
-        $this->assertEquals(1, count($this->orchestratorBuild->state['load-balancer']));
+        $this->assertEquals(1, count($this->orchestratorBuild->state['load_balancer']));
     }
 
     public function testIdPlaceholdersIgnoredSuccess()
@@ -123,9 +122,7 @@ class CreateLoadBalancersTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->availabilityZone();
-        $this->vpc();
-        $this->orchestratorBuild->updateState('vpc', 0, 'vpc-test');
+        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
 
         dispatch(new CreateLoadBalancers($this->orchestratorBuild));
 
@@ -142,8 +139,8 @@ class CreateLoadBalancersTest extends TestCase
 
         $this->orchestratorBuild->refresh();
 
-        $this->assertNotNull($this->orchestratorBuild->state['load-balancer']);
+        $this->assertNotNull($this->orchestratorBuild->state['load_balancer']);
 
-        $this->assertEquals(1, count($this->orchestratorBuild->state['load-balancer']));
+        $this->assertEquals(1, count($this->orchestratorBuild->state['load_balancer']));
     }
 }
