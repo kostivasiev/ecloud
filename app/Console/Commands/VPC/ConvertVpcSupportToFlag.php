@@ -42,7 +42,7 @@ class ConvertVpcSupportToFlag extends Command
                 if (!empty($vpcHistory->vpc)) {
                     $this->saveSupport(
                         $vpcHistory->vpc,
-                        Carbon::parse($vpcHistory->start_date),
+                        Carbon::parse($vpcHistory->start_date ?? $vpcHistory->created_at),
                         $vpcHistory->end_date ? Carbon::parse($vpcHistory->end_date) : null,
                         false
                     );
@@ -59,7 +59,7 @@ class ConvertVpcSupportToFlag extends Command
             if (!empty($vpcActive->vpc)) {
                 $this->saveSupport(
                     $vpcActive->vpc,
-                    Carbon::parse($vpcActive->start_date),
+                    Carbon::parse($vpcActive->start_date ?? $vpcActive->created_at),
                     $vpcActive->end_date ? Carbon::parse($vpcActive->end_date) : null
                 );
                 $i++;
