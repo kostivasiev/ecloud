@@ -8,7 +8,7 @@ Content-Type: application/json
 
 {
   "router_id": "{{dev_router_id}}",
-  "subnet": "10.0.7.0/24"
+  "subnet": "10.0.17.0/24"
 }
 
 > {%
@@ -30,7 +30,7 @@ Content-Type: application/json
 
 {
     "name": "Test",
-    "ip_address": "10.0.7.5",
+    "ip_address": "10.0.17.5",
     "network_id": "{{network_id}}",
     "type": "cluster"
 }
@@ -107,7 +107,7 @@ client.test('Update Resource', function () {
 });
 %}
 
-### 7. Verify Ip Address Resource (ip_address should not have changed)
+### 7. Verify Ip Address Resource (ip_address and type should not have changed)
 GET https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
 Accept: */*
 Cache-Control: no-cache
