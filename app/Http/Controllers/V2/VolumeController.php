@@ -147,13 +147,11 @@ class VolumeController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function instances(Request $request, QueryTransformer $queryTransformer, string $volumeId)
+    public function instances(Request $request, string $volumeId)
     {
         $collection = Volume::forUser($request->user())->findOrFail($volumeId)->instances();
-        $queryTransformer->config(Instance::class)
-            ->transform($collection);
 
-        return InstanceResource::collection($collection->paginate(
+        return InstanceResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

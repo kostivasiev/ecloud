@@ -123,13 +123,11 @@ class VpcController extends BaseController
         ));
     }
 
-    public function instances(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    public function instances(Request $request, string $vpcId)
     {
         $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->instances();
-        $queryTransformer->config(Instance::class)
-            ->transform($collection);
 
-        return InstanceResource::collection($collection->paginate(
+        return InstanceResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
