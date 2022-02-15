@@ -53,14 +53,11 @@ class InstanceController extends BaseController
      * @param QueryTransformer $queryTransformer
      * @return Response
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Instance::forUser($request->user());
 
-        $queryTransformer->config(Instance::class)
-            ->transform($collection);
-
-        return InstanceResource::collection($collection->paginate(
+        return InstanceResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -106,7 +103,6 @@ class InstanceController extends BaseController
         $instance->availabilityZone()->associate($network->router->availabilityZone);
 
         $instance->locked = $request->input('locked', false);
-
         $instance->save();
 
         $imageData = collect($request->input('image_data'))->filter();
@@ -264,10 +260,6 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
-
-        $instance->withTaskLock(function ($instance) {
-            $this->dispatch(new PowerOn($instance));
-        });
 
         $task = $instance->createTaskWithLock('power_on', \App\Jobs\Tasks\Instance\PowerOn::class);
 
