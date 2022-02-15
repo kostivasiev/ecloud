@@ -12,12 +12,6 @@ class ConfigurePeers extends TaskJob
         $loadbalancer = $this->task->resource;
         $client = app()->make(AdminClient::class)
             ->setResellerId($loadbalancer->getResellerId());
-        try {
-            $client->clusters()->configurePeers($loadbalancer->config_id);
-        } catch (\Exception $exception) {
-            if ($exception->getMessage() !== 'Bad Gateway') {
-                $this->fail($exception);
-            }
-        }
+        $client->clusters()->configurePeers($loadbalancer->config_id);
     }
 }
