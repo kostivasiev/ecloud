@@ -31,7 +31,7 @@ class InstanceResource extends UKFastResource
             'vcpu_cores' => $this->vcpu_cores,
             'ram_capacity' => $this->ram_capacity,
             'locked' => $this->locked,
-            'platform' => $this->platform,
+            'platform' => $this->image->platform,
             'backup_enabled' => $this->backup_enabled,
             'host_group_id' => !empty($this->host_group_id) ? $this->host_group_id : null,
             'volume_group_id' => !empty($this->volume_group_id) ? $this->volume_group_id : null,

@@ -31,7 +31,6 @@ class IsMaxForCustomerTest extends TestCase
             'image_id' => $this->image()->id,
             'vcpu_cores' => 1,
             'ram_capacity' => 1024,
-            'platform' => 'Linux',
             'availability_zone_id' => $this->availabilityZone()->id,
             'load_balancer_id' => $this->loadBalancer()->id
         ]);

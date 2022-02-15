@@ -61,7 +61,7 @@ class MigrateBillingTest extends TestCase
         ]);
 
         $this->instance()->host_group_id = 'hg-aaabbbccc';
-        $this->instance()->platform = 'Windows';
+        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -93,7 +93,7 @@ class MigrateBillingTest extends TestCase
     public function testBillingStartsOnAPublicInstance()
     {
         $this->instance()->host_group_id = '';
-        $this->instance()->platform = 'Windows';
+        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
