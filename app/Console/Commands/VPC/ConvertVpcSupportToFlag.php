@@ -21,6 +21,8 @@ class ConvertVpcSupportToFlag extends Command
     protected $signature = 'vpc:convert-support-flag {--T|test-run}';
     protected $description = 'Converts VPC Support entries to flags tracked by billing metrics.';
 
+    public string $category = 'Support';
+
     private Collection $vpcSupportActive;
     private Collection $vpcSupportHistory;
 
@@ -91,6 +93,7 @@ class ConvertVpcSupportToFlag extends Command
         $billingMetric->resource_id = $vpc->id;
         $billingMetric->vpc_id = $vpc->id;
         $billingMetric->reseller_id = $vpc->reseller_id;
+        $billingMetric->category = $this->category;
         $billingMetric->start = $start;
         $billingMetric->name = UpdateSupportEnabledBilling::getFriendlyName();
         $billingMetric->key = UpdateSupportEnabledBilling::getKeyName();
