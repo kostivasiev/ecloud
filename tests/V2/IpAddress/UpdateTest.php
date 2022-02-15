@@ -26,10 +26,9 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'ip_addresses',
             [
+                'id' => $this->ip()->id,
                 'name' => 'UPDATED',
-                'ip_address' => $this->ip()->ip_address,
-                'type' => 'cluster',
-                ],
+            ],
             'ecloud'
         )->assertResponseStatus(200);
     }
