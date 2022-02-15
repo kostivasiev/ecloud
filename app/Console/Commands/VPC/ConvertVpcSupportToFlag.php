@@ -42,13 +42,21 @@ class ConvertVpcSupportToFlag extends Command
                 if (!empty($vpcHistory->vpc)) {
                     $this->saveSupport(
                         $vpcHistory->vpc,
-                        Carbon::parse($vpcHistory->start_date),
+                        Carbon::parse($vpcHistory->start_date ?? $vpcHistory->created_at),
                         $vpcHistory->end_date ? Carbon::parse($vpcHistory->end_date) : null,
                         false
                     );
                     $i++;
+                    if (!$this->testMode) {
+                        $this->info(sprintf('[SUCCESS] VPC Support has VPC, Vpc Support ID: %s', $vpcHistory->id));
+                    }
                 } else {
-                    $this->info('[History] VPC Support has no VPC, Vpc Support ID: %s', $vpcHistory->id);
+                    if (!$this->testMode) {
+                        $this->info(sprintf(
+                            '[FAIL-History] VPC Support has no VPC, Vpc Support ID: %s',
+                            $vpcHistory->id
+                        ));
+                    }
                 }
             }
         }
@@ -58,12 +66,17 @@ class ConvertVpcSupportToFlag extends Command
             if (!empty($vpcActive->vpc)) {
                 $this->saveSupport(
                     $vpcActive->vpc,
-                    Carbon::parse($vpcActive->start_date),
+                    Carbon::parse($vpcActive->start_date ?? $vpcActive->created_at),
                     $vpcActive->end_date ? Carbon::parse($vpcActive->end_date) : null
                 );
                 $i++;
+                if (!$this->testMode) {
+                    $this->info(sprintf('[SUCCESS] VPC Support has VPC, Vpc Support ID: %s', $vpcActive->id));
+                }
             } else {
-                $this->info('[Active] VPC Support has no VPC, Vpc Support ID: %s', $vpcActive->id);
+                if (!$this->testMode) {
+                    $this->info(sprintf('[FAIL-Active] VPC Support has no VPC, Vpc Support ID: %s', $vpcActive->id));
+                }
             }
         }
 
