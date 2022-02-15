@@ -95,11 +95,11 @@ class VpcController extends BaseController
         }
 
         if ($request->has('support_enabled')) {
-            if ($request->input('support_enabled') === true && !$vpc->support_enabled) {
+            if ($request->input('support_enabled') == true && !$vpc->support_enabled) {
                 $vpc->support_enabled = true;
             }
 
-            if ($request->input('support_enabled') === false && $vpc->support_enabled) {
+            if ($request->input('support_enabled') == false && $vpc->support_enabled) {
                 $vpc->support_enabled = false;
             }
         }
