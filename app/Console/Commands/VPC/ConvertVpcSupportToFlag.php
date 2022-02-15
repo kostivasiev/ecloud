@@ -37,16 +37,34 @@ class ConvertVpcSupportToFlag extends Command
         $this->vpcSupportActive = VpcSupport::withoutTrashed()->get();
         $this->vpcSupportHistory = VpcSupport::onlyTrashed()->get();
         $i = 0;
-        if (!$this->testMode && $this->ask("Would you like to include history? (Y/N)") === 'Y') {
+        if (!$this->testMode && strtoupper($this->ask("Would you like to include history? (Y/N)")) === 'Y') {
             foreach ($this->vpcSupportHistory as $vpcHistory) {
-                $this->saveSupport($vpcHistory->vpc, Carbon::parse($vpcHistory->start_date), $vpcHistory->end_date ? Carbon::parse($vpcHistory->end_date) : null, false);
-                $i++;
+                if (!empty($vpcHistory->vpc)) {
+                    $this->saveSupport(
+                        $vpcHistory->vpc,
+                        Carbon::parse($vpcHistory->start_date),
+                        $vpcHistory->end_date ? Carbon::parse($vpcHistory->end_date) : null,
+                        false
+                    );
+                    $i++;
+                } else {
+                    $this->info('[History] VPC Support has no VPC, Vpc Support ID: %s', $vpcHistory->id);
+                }
             }
         }
 
+
         foreach ($this->vpcSupportActive as $vpcActive) {
-            $this->saveSupport($vpcActive->vpc, Carbon::parse($vpcActive->start_date), $vpcActive->end_date ? Carbon::parse($vpcActive->end_date) : null);
-            $i++;
+            if (!empty($vpcActive->vpc)) {
+                $this->saveSupport(
+                    $vpcActive->vpc,
+                    Carbon::parse($vpcActive->start_date),
+                    $vpcActive->end_date ? Carbon::parse($vpcActive->end_date) : null
+                );
+                $i++;
+            } else {
+                $this->info('[Active] VPC Support has no VPC, Vpc Support ID: %s', $vpcActive->id);
+            }
         }
 
         if (!$this->testMode) {
