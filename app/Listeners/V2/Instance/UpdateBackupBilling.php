@@ -43,8 +43,6 @@ class UpdateBackupBilling implements Billable
             return;
         }
 
-        $time = Carbon::now();
-
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName());
 
         if (!$instance->backup_enabled && empty($currentActiveMetric)) {
@@ -52,7 +50,7 @@ class UpdateBackupBilling implements Billable
         }
 
         if (!$instance->backup_enabled && !empty($currentActiveMetric)) {
-            $currentActiveMetric->setEndDate($time);
+            $currentActiveMetric->setEndDate();
             Log::info(get_class($this) . ' : Backup was disabled for instance', ['instance' => $instance->id]);
             return;
         }
@@ -62,7 +60,7 @@ class UpdateBackupBilling implements Billable
                 return;
             }
 
-            $currentActiveMetric->setEndDate($time);
+            $currentActiveMetric->setEndDate();
         }
 
         $billingMetric = app()->make(BillingMetric::class);
@@ -72,7 +70,6 @@ class UpdateBackupBilling implements Billable
         $billingMetric->name = self::getFriendlyName();
         $billingMetric->key = self::getKeyName();
         $billingMetric->value = $instance->volumeCapacity;
-        $billingMetric->start = $time;
 
         $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'backup');
         if (empty($product)) {

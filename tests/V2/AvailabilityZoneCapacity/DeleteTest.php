@@ -6,8 +6,6 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use App\Models\V2\VpcSupport;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase

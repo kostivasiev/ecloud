@@ -3,9 +3,15 @@
 namespace Tests\V2\Vpc;
 
 use App\Events\V2\Task\Created;
+use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
+use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
+use App\Support\Sync;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Admin\Account\AdminClient;
+use UKFast\Admin\Account\AdminCustomerClient;
+use UKFast\Admin\Account\Entities\Customer;
 use UKFast\Api\Auth\Consumer;
 
 class CreateTest extends TestCase
@@ -137,12 +143,27 @@ class CreateTest extends TestCase
 
     public function testSupportEnabled()
     {
+        app()->bind(AdminClient::class, function () {
+            $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
+            $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
+
+            $mockCustomer->shouldReceive('getById')
+                ->andReturn(
+                    new Customer([
+                        'paymentMethod' => 'Invoice',
+                    ])
+                );
+            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
+            return $mockClient;
+        });
+
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
         Event::fake(Created::class);
 
         app()->bind(Vpc::class, function () {
             return factory(Vpc::class)->create([
                 'id' => 'vpc-test2',
+                'support_enabled' => false,
             ]);
         });
         $this->post(
@@ -156,10 +177,11 @@ class CreateTest extends TestCase
         )->assertResponseStatus(202);
 
         $vpc = Vpc::findOrFail('vpc-test2');
+
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
+
         $this->assertTrue($vpc->support_enabled);
-
-        $this->assertEquals(1, $vpc->vpcSupports->count());
-
-        $this->assertEquals($vpc->created_at, $vpc->vpcSupports->first()->start_date);
     }
 }

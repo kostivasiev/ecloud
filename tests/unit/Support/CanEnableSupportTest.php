@@ -2,15 +2,13 @@
 
 namespace Tests\unit\Support;
 
-use App\Http\Middleware\CanEnableSupport;
+use App\Http\Middleware\Vpc\CanEnableSupport;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Request;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminClient;
 use UKFast\Admin\Account\AdminCustomerClient;
-use UKFast\Api\Auth\Consumer;
 
 class CanEnableSupportTest extends TestCase
 {
@@ -41,6 +39,7 @@ class CanEnableSupportTest extends TestCase
         });
         $request = \Mockery::mock(Request::class)->makePartial();
         $request->shouldReceive('user')->andReturnSelf();
+        $request->shouldReceive('has')->andReturnTrue();
         $request->shouldReceive('isScoped')->andReturnTrue();
         $request->shouldReceive('resellerId')->andReturn(1);
         $response = $this->canEnableSupport->handle($request, function () {

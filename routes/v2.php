@@ -56,12 +56,14 @@ $router->group($baseRouteParameters, function () use ($router) {
     /** Virtual Private Clouds */
     $router->group([], function () use ($router) {
         $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
-            $router->group(['middleware' => 'customer-max-vpc'], function () use ($router) {
+            $router->group(['middleware' => ['customer-max-vpc', 'can-enable-support']], function () use ($router) {
                 $router->post('vpcs', 'VpcController@create');
             });
             $router->post('vpcs/{vpcId}/deploy-defaults', 'VpcController@deployDefaults');
         });
-        $router->patch('vpcs/{vpcId}', 'VpcController@update');
+        $router->group(['middleware' => 'can-enable-support'], function () use ($router) {
+            $router->patch('vpcs/{vpcId}', 'VpcController@update');
+        });
         $router->get('vpcs', 'VpcController@index');
         $router->get('vpcs/{vpcId}', 'VpcController@show');
 
@@ -410,17 +412,6 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->post('credentials', 'CredentialsController@store');
         $router->patch('credentials/{credentialsId}', 'CredentialsController@update');
         $router->delete('credentials/{credentialsId}', 'CredentialsController@destroy');
-    });
-
-    /** Support */
-    $router->group([], function () use ($router) {
-        $router->get('support', 'VpcSupportController@index');
-        $router->get('support/{vpcSupportId}', 'VpcSupportController@show');
-        $router->group(['middleware' => 'can-enable-support'], function () use ($router) {
-            $router->post('support', 'VpcSupportController@create');
-            $router->patch('support/{vpcSupportId}', 'VpcSupportController@update');
-        });
-        $router->delete('support/{vpcSupportId}', 'VpcSupportController@destroy');
     });
 
     /** Discount Plans */

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\Vpc;
 
+use App\Rules\V2\PaymentRequired;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -31,7 +32,10 @@ class UpdateRequest extends FormRequest
             'name' => 'sometimes|required|string|max:255',
             'reseller_id' => 'sometimes|required|integer',
             'console_enabled' => 'sometimes|boolean',
-            'support_enabled' => 'sometimes|boolean',
+            'support_enabled' => [
+                'sometimes',
+                'boolean',
+            ],
         ];
     }
 }

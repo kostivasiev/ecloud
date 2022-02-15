@@ -1,24 +1,21 @@
 <?php
 
-namespace Tests\V2\Support;
+namespace Tests\unit\Rules\V2;
 
-use App\Events\V2\Task\Created;
-use App\Support\Sync;
+use App\Rules\V2\PaymentRequired;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminClient;
 use UKFast\Admin\Account\AdminCustomerClient;
 use UKFast\Admin\Account\Entities\Customer;
 use UKFast\Api\Auth\Consumer;
 
-class CanEnableSupportTest extends TestCase
+class PaymentRequiredTest extends TestCase
 {
-    public function testWithBadCustomerAccount()
+    public function testPaymentRequired()
     {
-        Event::fake(Created::class);
-
         app()->bind(AdminClient::class, function () {
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
             $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
@@ -27,7 +24,7 @@ class CanEnableSupportTest extends TestCase
                 ->andThrow(
                     new ClientException(
                         'Not Found',
-                        new \GuzzleHttp\Psr7\Request('GET', '/'),
+                        new Request('GET', '/'),
                         new Response(404)
                     )
                 );
@@ -35,23 +32,12 @@ class CanEnableSupportTest extends TestCase
             return $mockClient;
         });
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->patch('/v2/vpcs/'.$this->vpc()->id, [
-            'support_enabled' => true
-        ])->seeJson(
-            [
-                'title' => 'Not Found',
-                'detail' => 'The customer account is not available',
-                'status' => 403,
-            ]
-        )->assertResponseStatus(403);
-
-        Event::assertNotDispatched(Created::class);
+        $rule = new PaymentRequired();
+        $this->assertFalse($rule->passes('', ''));
     }
 
-    public function testWithValidCustomerAndCreditCard()
+    public function testPaymentRequiredCreditCard()
     {
-        Event::fake(Created::class);
-
         app()->bind(AdminClient::class, function () {
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
             $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
@@ -65,25 +51,13 @@ class CanEnableSupportTest extends TestCase
             $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
             return $mockClient;
         });
-
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->patch('/v2/vpcs/'.$this->vpc()->id, [
-            'support_enabled' => true
-        ])->seeJson(
-            [
-                'title' => 'Payment Required',
-                'detail' => 'Payment is required before support can be enabled',
-                'status' => 402,
-            ]
-        )->assertResponseStatus(402);
-
-        Event::assertNotDispatched(Created::class);
+        $rule = new PaymentRequired();
+        $this->assertFalse($rule->passes('', ''));
     }
 
-    public function testWithValidCustomerAndAccount()
+    public function testPaymentNotRequired()
     {
-        Event::fake(Created::class);
-
         app()->bind(AdminClient::class, function () {
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
             $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
@@ -97,14 +71,8 @@ class CanEnableSupportTest extends TestCase
             $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
             return $mockClient;
         });
-
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->patch('/v2/vpcs/'.$this->vpc()->id, [
-            'support_enabled' => true
-        ])->assertResponseStatus(202);
-
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == Sync::TASK_NAME_UPDATE;
-        });
+        $rule = new PaymentRequired();
+        $this->assertTrue($rule->passes('', ''));
     }
 }
