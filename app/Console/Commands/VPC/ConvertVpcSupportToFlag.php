@@ -47,8 +47,9 @@ class ConvertVpcSupportToFlag extends Command
                         false
                     );
                     $i++;
+                    $this->info(sprintf('[SUCCESS] VPC Support has VPC, Vpc Support ID: %s', $vpcHistory->id));
                 } else {
-                    $this->info('[History] VPC Support has no VPC, Vpc Support ID: %s', $vpcHistory->id);
+                    $this->info(sprintf('[FAIL-History] VPC Support has no VPC, Vpc Support ID: %s', $vpcHistory->id));
                 }
             }
         }
@@ -62,8 +63,9 @@ class ConvertVpcSupportToFlag extends Command
                     $vpcActive->end_date ? Carbon::parse($vpcActive->end_date) : null
                 );
                 $i++;
+                $this->info(sprintf('[SUCCESS] VPC Support has VPC, Vpc Support ID: %s', $vpcActive->id));
             } else {
-                $this->info('[Active] VPC Support has no VPC, Vpc Support ID: %s', $vpcActive->id);
+                $this->info(sprintf('[FAIL-Active] VPC Support has no VPC, Vpc Support ID: %s', $vpcActive->id));
             }
         }
 
