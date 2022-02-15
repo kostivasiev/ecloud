@@ -1,3 +1,22 @@
+### Create Router (to deploy management networking)
+POST https://{{host}}/{{version}}/routers
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test router",
+  "vpc_id": "{{dev_vpc_id}}",
+  "availability_zone_id" : "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Create Router", function() {
+    client.assert(response.status === 202, "Response status is not 202");
+});
+
 ### Build Orchestrator Config
 POST https://{{host}}/{{version}}/orchestrator-configs
 Accept: */*
@@ -81,7 +100,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ### Cleanup
-DELETE https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
+DELETE https://{{host}}/{{version}}/load-balancers/lb-62938ed6-dev
 X-consumer-custom-id:  {{dev_reseller_id_admin}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
