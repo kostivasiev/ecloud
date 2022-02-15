@@ -79,6 +79,8 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
+        $firewallRule->source = preg_replace('/\s+/', '', $firewallRule->source);
+        $firewallRule->destination = preg_replace('/\s+/', '', $firewallRule->destination);
 
         $task = $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
             $firewallRule->save();
@@ -115,6 +117,8 @@ class FirewallRuleController extends BaseController
             'direction',
             'enabled'
         ]));
+        $firewallRule->source = preg_replace('/\s+/', '', $firewallRule->source);
+        $firewallRule->destination = preg_replace('/\s+/', '', $firewallRule->destination);
 
         $task = $firewallRule->firewallPolicy->withTaskLock(function () use ($request, $firewallRule) {
             $firewallRule->save();
