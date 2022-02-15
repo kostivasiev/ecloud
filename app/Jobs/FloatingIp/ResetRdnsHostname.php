@@ -4,17 +4,17 @@ namespace App\Jobs\FloatingIp;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\FloatingIp;
+use App\Traits\V2\Jobs\FloatingIp\RdnsTrait;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\SafeDNS\AdminClient;
-use UKFast\SDK\SafeDNS\Entities\Record;
 
 class ResetRdnsHostname extends TaskJob implements ShouldQueue
 {
-    use InteractsWithQueue, Batchable;
+    use InteractsWithQueue, Batchable, RdnsTrait;
 
     private $rdns;
     private $safednsClient;
@@ -32,7 +32,7 @@ class ResetRdnsHostname extends TaskJob implements ShouldQueue
         $this->safednsClient = app()->make(AdminClient::class);
         $floatingIp = FloatingIp::withTrashed()->findOrFail($model->id);
 
-        $floatingIp->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
+        $floatingIp->rdns_hostname = $this->reverseIpDefault($model->ip_address);
         $floatingIp->save();
 
         $dnsName = $this->reverseIpLookup($floatingIp->ip_address);
@@ -48,32 +48,16 @@ class ResetRdnsHostname extends TaskJob implements ShouldQueue
 
         $this->rdns = $this->rdns->getItems()[0];
 
-        if ($this->safednsClient->records()->update($this->createRecord())) {
+        if ($this->safednsClient->records()->update($this->createRecord(
+            $this->rdns->id,
+            $this->rdns->name,
+            $this->rdns->zone,
+            $floatingIp->rdns_hostname
+        ))) {
             $this->info(get_class($this) . ' : Finished');
         } else {
             Log::error("Failed to reset SafeDNS Record for FIP." . $model->id);
             $this->fail("Failed to reset SafeDNS Record for FIP." . $model->id);
         }
-    }
-
-    private function reverseIpLookup($ip): string
-    {
-        return sprintf(
-            '%s.%s',
-            implode('.', array_reverse(explode('.', $ip))),
-            config('defaults.floating-ip.rdns.dns_suffix')
-        );
-    }
-
-    private function createRecord(): Record
-    {
-        $record = [
-            'id' => $this->rdns->id,
-            'name' => $this->rdns->name,
-            'zone' => $this->rdns->zone,
-            'content' => config('defaults.floating-ip.rdns.default_hostname'),
-        ];
-
-        return new Record($record);
     }
 }

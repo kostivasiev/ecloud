@@ -4,14 +4,14 @@ namespace App\Jobs\FloatingIp;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\FloatingIp;
+use App\Traits\V2\Jobs\FloatingIp\RdnsTrait;
 use Illuminate\Bus\Batchable;
 use Illuminate\Queue\InteractsWithQueue;
 use UKFast\Admin\SafeDNS\AdminClient;
-use UKFast\SDK\SafeDNS\Entities\Record;
 
 class AllocateRdnsHostname extends TaskJob
 {
-    use Batchable, InteractsWithQueue;
+    use Batchable, InteractsWithQueue, RdnsTrait;
 
     public FloatingIp $model;
     private $rdns;
@@ -30,7 +30,7 @@ class AllocateRdnsHostname extends TaskJob
         }
 
         if (empty($this->model->rdns_hostname)) {
-            $this->model->rdns_hostname = config('defaults.floating-ip.rdns.default_hostname');
+            $this->model->rdns_hostname = $this->reverseIpDefault($this->model->ip_address);
         }
 
         $safednsClient = app()->make(AdminClient::class);
@@ -47,32 +47,16 @@ class AllocateRdnsHostname extends TaskJob
         $this->rdns = $this->rdns->getItems()[0];
 
         if ($this->rdns['content'] != trim($this->model->rdns_hostname)) {
-            $safednsClient->records()->update($this->createRecord());
+            $safednsClient->records()->update($this->createRecord(
+                $this->rdns['id'],
+                $this->rdns['name'],
+                $this->rdns['zone'],
+                $this->model->rdns_hostname
+            ));
         }
 
         $this->model->save();
 
         $this->info(sprintf('RDNS assigned [%s]', $this->model->id));
-    }
-
-    private function reverseIpLookup($ip): string
-    {
-        return sprintf(
-            '%s.%s',
-            implode('.', array_reverse(explode('.', $ip))),
-            config('defaults.floating-ip.rdns.dns_suffix')
-        );
-    }
-
-    private function createRecord(): Record
-    {
-        $record = [
-            'id' => $this->rdns['id'],
-            'name' => $this->rdns['name'],
-            'zone' => $this->rdns['zone'],
-            'content' => $this->model->rdns_hostname,
-        ];
-
-        return new Record($record);
     }
 }

@@ -1,16 +1,13 @@
 <?php
 namespace Tests\unit\Listeners\V2\FloatingIp;
 
-use App\Models\V2\Task;
-use App\Support\Sync;
+use App\Traits\V2\Jobs\FloatingIp\RdnsTrait;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use App\Events\V2\FloatingIp\Deleted;
 use App\Jobs\FloatingIp\ResetRdnsHostname;
-use App\Models\V2\FloatingIp;
 use Faker\Factory as Faker;
 use Faker\Generator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Tests\TestCase;
@@ -21,6 +18,8 @@ use UKFast\SDK\SafeDNS\RecordClient;
 
 class ResetRdnsHostnameTest extends TestCase
 {
+    use RdnsTrait;
+
     protected Deleted $event;
 
     protected Generator $faker;
@@ -87,7 +86,7 @@ class ResetRdnsHostnameTest extends TestCase
 
         $this->floatingIp()->refresh();
 
-        $this->assertEquals($this->floatingIp()->rdns_hostname, config('defaults.floating-ip.rdns.default_hostname'));
+        $this->assertEquals($this->floatingIp()->rdns_hostname, $this->reverseIpDefault($this->floatingIp()->ip_address));
     }
 
 }

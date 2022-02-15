@@ -33,8 +33,8 @@ return [
             'sequence' => 1000
         ],
         'rdns' => [
-            'default_hostname' => '4.3.2.1.svrlist.ukfast.net',
-            'dns_suffix' => 'in-addr.arpa'
+            'default_rdns' => '%s.svrlist.ukfast.net',
+            'dns_suffix' => '%s.in-addr.arpa'
         ]
     ],
     'firewall_rule' => [

@@ -3,6 +3,7 @@
 namespace Tests\unit\Jobs\FloatingIp;
 
 use App\Jobs\FloatingIp\AllocateRdnsHostname;
+use App\Traits\V2\Jobs\FloatingIp\RdnsTrait;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Collection;
@@ -14,6 +15,8 @@ use UKFast\SDK\SafeDNS\Entities\Record;
 
 class AllocateRdnsHostnameTest extends TestCase
 {
+    use RdnsTrait;
+
     protected $mockRecordAdminClient;
 
     public function setUp(): void
@@ -63,7 +66,8 @@ class AllocateRdnsHostnameTest extends TestCase
 
     public function testRdnsAllocated()
     {
-        $this->floatingIp()->setAttribute('ip_address', '10.0.0.1')->saveQuietly();
+        $ip = '10.0.0.1';
+        $this->floatingIp()->setAttribute('ip_address', $ip)->saveQuietly();
         $task = $this->createSyncUpdateTask($this->floatingIp());
 
         Event::fake([JobFailed::class, JobProcessed::class]);
@@ -77,6 +81,6 @@ class AllocateRdnsHostnameTest extends TestCase
 
         $this->floatingIp()->refresh();
 
-        $this->assertEquals($this->floatingIp()->rdns_hostname, config('defaults.floating-ip.rdns.default_hostname'));
+        $this->assertEquals($this->floatingIp()->rdns_hostname, $this->reverseIpDefault($ip));
     }
 }
