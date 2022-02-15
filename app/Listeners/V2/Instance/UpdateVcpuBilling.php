@@ -57,15 +57,13 @@ class UpdateVcpuBilling implements Billable
             return;
         }
 
-        $time = Carbon::now();
-
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName());
 
         if (!empty($currentActiveMetric)) {
             if ($currentActiveMetric->value == $instance->vcpu_cores) {
                 return;
             }
-            $currentActiveMetric->setEndDate($time);
+            $currentActiveMetric->setEndDate();
         }
 
         $billingMetric = app()->make(BillingMetric::class);
@@ -75,7 +73,6 @@ class UpdateVcpuBilling implements Billable
         $billingMetric->name = $this->getFriendlyName();
         $billingMetric->key = self::getKeyName();
         $billingMetric->value = $instance->vcpu_cores;
-        $billingMetric->start = $time;
 
         $product = $instance->availabilityZone->products()->get()->firstWhere('name', 'vcpu');
         if (empty($product)) {

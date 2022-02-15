@@ -43,6 +43,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Billing\FixPriceOnAdvancedNetworkingBillingMetrics::class,
         \App\Console\Commands\Billing\SetFriendlyNames::class,
         \App\Console\Commands\VPC\ChangeOwnership::class,
+        \App\Console\Commands\VPC\ConvertVpcSupportToFlag::class,
         \App\Console\Commands\Credentials\UpdatePleskCredentials::class,
         \App\Console\Commands\VPC\FixBillingEndDates::class,
     ];

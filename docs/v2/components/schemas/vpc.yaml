@@ -22,7 +22,6 @@ properties:
     example: 'reg-a63dd78c'
   support_enabled:
     type: boolean
-    readOnly: true
     example: true
   console_enabled:
     type: boolean

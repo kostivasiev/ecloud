@@ -8,8 +8,8 @@ use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerNetwork;
 use App\Resources\V2\InstanceResource;
+use App\Resources\V2\LoadBalancerNetworkResource;
 use App\Resources\V2\LoadBalancerResource;
-use App\Resources\V2\NetworkResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\DB\Ditto\QueryTransformer;
@@ -97,11 +97,11 @@ class LoadBalancerController extends BaseController
 
     public function networks(Request $request, QueryTransformer $queryTransformer, string $loadBalancerId)
     {
-        $collection = LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId)->networks();
+        $collection = LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId)->loadBalancerNetworks();
         $queryTransformer->config(LoadBalancerNetwork::class)
             ->transform($collection);
 
-        return NetworkResource::collection($collection->paginate(
+        return LoadBalancerNetworkResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
