@@ -21,7 +21,7 @@ class ValidFirewallRuleSourceDestination implements Rule
         if ($value === 'ANY') {
             return true;
         }
-
+        $value = preg_replace('/\s+/', '', $value);
         return (new ValidIpFormatCsvString())->passes($attribute, $value);
     }
 
