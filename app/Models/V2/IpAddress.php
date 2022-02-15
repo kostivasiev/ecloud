@@ -43,11 +43,6 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
         parent::__construct($attributes);
     }
 
-    public function canDelete()
-    {
-        return ((empty($this->nics()->count() > 0)) && (empty($this->vip)));
-    }
-
     /**
      * Pivot table ip_address_nic
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
