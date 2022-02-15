@@ -46,15 +46,7 @@ class IpAddressController extends BaseController
     public function update(UpdateRequest $request, string $ipAddressId)
     {
         $ipAddress = IpAddress::forUser(Auth::user())->findOrFail($ipAddressId);
-
-        $allow = [
-            'name',
-        ];
-        if ($this->isAdmin) {
-            $allow[] = 'type';
-        }
-
-        $ipAddress->fill($request->only($allow));
+        $ipAddress->fill($request->only(['name']));
         $ipAddress->save();
 
         return $this->responseIdMeta($request, $ipAddress->id, 200);
