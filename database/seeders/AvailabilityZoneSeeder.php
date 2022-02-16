@@ -107,29 +107,6 @@ class AvailabilityZoneSeeder extends Seeder
             'is_hidden'=> false,
         ]);
 
-        factory(Credential::class)->create([
-            'id' => 'cred-lbnats',
-            'name' => 'LB Nats Server',
-            'resource_id'=> 'az-aaaaaaaa',
-            'host'=> 'tls://ed-01.prod.ukfast.co.uk',
-            'username'=> 'lb_nats_server',
-            'password'=> null,
-            'port'=> 4222,
-            'is_hidden'=> false,
-        ]);
-
-        factory(Credential::class)->create([
-            'id' => 'cred-lbnats-adv',
-            'name' => 'LB Nats Server (Advanced Networking)',
-            'resource_id'=> 'az-aaaaaaaa',
-//            'host'=> 'tls://some.nats.server.advanced',
-            'host'=> 'tls://ed-01.prod.ukfast.co.uk',
-            'username'=> 'lb_nats_server_advanced',
-            'password'=> null,
-            'port'=> 4222,
-            'is_hidden'=> false,
-        ]);
-
         /**
          * Capacity Alerting
          */
