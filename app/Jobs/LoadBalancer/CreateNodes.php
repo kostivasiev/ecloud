@@ -22,7 +22,8 @@ class CreateNodes extends TaskJob
         $loadBalancer = $this->task->resource;
         $loadBalancerNodes = [];
         if (empty($this->task->data['loadbalancer_node_ids'])) {
-            for ($i = 0; $i < $loadBalancer->loadBalancerSpec->node_count; $i++) {
+            $nodesToCreate = $loadBalancer->loadBalancerSpec->node_count - $loadBalancer->loadBalancerNodes()->count();
+            for ($i = 0; $i < $nodesToCreate; $i++) {
                 $node = app()->make(LoadBalancerNode::class);
                 $node->fill([
                     'load_balancer_id' => $loadBalancer->id,
