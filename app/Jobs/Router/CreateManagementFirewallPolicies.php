@@ -36,13 +36,13 @@ class CreateManagementFirewallPolicies extends TaskJob
 
                     // Allow inbound 4222
                     $firewallRule = new FirewallRule([
-                        'name' => 'Allow_Ed_on_Port_4222_inbound_' . $managementRouter->id,
+                        'name' => 'Allow_Ed_on_Port_4222_outbound_' . $managementRouter->id,
                         'sequence' => 10,
                         'firewall_policy_id' => $firewallPolicy->id,
                         'source' => 'ANY',
                         'destination' => 'ANY',
                         'action' => 'ALLOW',
-                        'direction' => 'IN',
+                        'direction' => 'OUT',
                         'enabled' => true
                     ]);
                     $firewallRule->save();

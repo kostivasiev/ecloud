@@ -38,13 +38,13 @@ class CreateManagementNetworkPolicies extends TaskJob
 
                         // Allow inbound 4222
                         $networkRule = new NetworkRule([
-                            'name' => 'Allow_Ed_on_Port_4222_inbound_' . $managementNetwork->id,
+                            'name' => 'Allow_Ed_on_Port_4222_outbound_' . $managementNetwork->id,
                             'sequence' => 10,
                             'network_policy_id' => $networkPolicy->id,
                             'source' => 'ANY',
                             'destination' => 'ANY',
                             'action' => 'ALLOW',
-                            'direction' => 'IN',
+                            'direction' => 'OUT',
                             'enabled' => true
                         ]);
                         $networkRule->save();
