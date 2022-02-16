@@ -54,17 +54,6 @@ class CreateManagementFirewallPolicies extends TaskJob
                     ]);
                     $firewallRulePort->save();
 
-                    // Block all outbound
-                    (new FirewallRule([
-                        'name' => 'Block_all_outbound_' . $managementRouter->id,
-                        'sequence' => 10,
-                        'firewall_policy_id' => $firewallPolicy->id,
-                        'source' => 'ANY',
-                        'destination' => 'ANY',
-                        'action' => 'REJECT',
-                        'direction' => 'OUT',
-                        'enabled' => true
-                    ]))->save();
                     $firewallPolicy->syncSave();
 
                     $this->task->updateData('firewall_policy_id', $firewallPolicy->id);

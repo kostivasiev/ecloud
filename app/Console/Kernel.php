@@ -45,6 +45,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\VPC\ChangeOwnership::class,
         \App\Console\Commands\Credentials\UpdatePleskCredentials::class,
         \App\Console\Commands\VPC\FixBillingEndDates::class,
+        \App\Console\Commands\Router\RemoveBlockAllOutbound::class,
     ];
 
     /**

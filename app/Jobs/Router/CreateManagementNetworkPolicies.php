@@ -56,19 +56,7 @@ class CreateManagementNetworkPolicies extends TaskJob
                         ]);
                         $networkRulePort->save();
 
-                        // Block all outbound
-                        (new NetworkRule([
-                            'name' => 'Block_all_outbound_' . $managementNetwork->id,
-                            'sequence' => 10,
-                            'network_policy_id' => $networkPolicy->id,
-                            'source' => 'ANY',
-                            'destination' => 'ANY',
-                            'action' => 'REJECT',
-                            'direction' => 'OUT',
-                            'enabled' => true
-                        ]))->save();
                         $networkPolicy->syncSave();
-
                         $this->task->updateData('network_policy_id', $networkPolicy->id);
 
                         $this->info('Create Management Network Policy and Rules End', [
