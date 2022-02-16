@@ -24,17 +24,27 @@ class Vip extends Model implements Filterable, Sortable
     use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable, HasFactory;
 
     public $keyPrefix = 'vip';
-    public $incrementing = false;
-    public $timestamps = true;
-    protected $keyType = 'string';
-    protected $connection = 'ecloud';
-    protected $fillable = [
-        'id',
-        'name',
-        'load_balancer_network_id',
-        'ip_address_id',
-        'config_id',
-    ];
+
+    public function __construct(array $attributes = [])
+    {
+        $this->incrementing = false;
+        $this->keyType = 'string';
+        $this->connection = 'ecloud';
+
+        $this->fillable([
+            'id',
+            'name',
+            'load_balancer_network_id',
+            'ip_address_id',
+            'config_id',
+        ]);
+
+        $this->casts = [
+            'config_id' => 'integer',
+        ];
+
+        parent::__construct($attributes);
+    }
 
     public function loadBalancerNetwork(): BelongsTo
     {

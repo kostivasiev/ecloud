@@ -20,6 +20,11 @@ properties:
     description : "ID of the IP address assigned to the resource."
     example: ip-4c63cf58
     readOnly: true
+  config_id:
+    type: integer
+    readOnly: true
+    example: 12345
+    description: Load balancer service VIP identification
   sync :
     type : object
     readOnly : true

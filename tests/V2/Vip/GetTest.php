@@ -14,16 +14,20 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+
+        // Create a VIP and assign a cluster IP to it.
+        $this->vip()->assignClusterIp();
+        $this->vip->setAttribute('config_id', 12345)->saveQuietly();
     }
 
     public function testGetItemCollection()
     {
-        $this->vip();
-
         $this->get('/v2/vips')
             ->seeJson([
                 'id' => $this->vip()->id,
                 'load_balancer_network_id' => $this->loadBalancerNetwork()->id,
+                'ip_address_id' => $this->vip()->ipAddress->id,
+                'config_id' => 12345,
         ])->assertResponseStatus(200);
     }
 
@@ -32,6 +36,8 @@ class GetTest extends TestCase
         $this->get('/v2/vips/' . $this->vip()->id)->seeJson([
             'id' => $this->vip()->id,
             'load_balancer_network_id' => $this->loadBalancerNetwork()->id,
+            'ip_address_id' => $this->vip()->ipAddress->id,
+            'config_id' => 12345,
         ])->assertResponseStatus(200);
     }
 }
