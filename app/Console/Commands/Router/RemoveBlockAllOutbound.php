@@ -32,7 +32,8 @@ class RemoveBlockAllOutbound extends Command
                 $this->info($networkRule->toJson() . PHP_EOL);
             }
             if (!$this->option('test-run')) {
-                $networkRule->syncDelete();
+                $networkRule->delete();
+                $networkRule->networkPolicy->syncSave();
             }
             $networkRuleCount++;
         });
@@ -48,7 +49,8 @@ class RemoveBlockAllOutbound extends Command
                 $this->info($firewallRule->toJson() . PHP_EOL);
             }
             if (!$this->option('test-run')) {
-                $firewallRule->syncDelete();
+                $firewallRule->delete();
+                $firewallRule->firewallPolicy->syncSave();
             }
             $firewallRuleCount++;
         });
