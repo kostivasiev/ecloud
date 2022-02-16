@@ -39,6 +39,7 @@ class IpAddressController extends BaseController
                 'type'
             ])
         );
+
         $ipAddress->save();
         return $this->responseIdMeta($request, $ipAddress->id, 201);
     }
