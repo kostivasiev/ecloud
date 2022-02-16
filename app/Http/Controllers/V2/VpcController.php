@@ -6,8 +6,8 @@ use App\Http\Requests\V2\Vpc\CreateRequest;
 use App\Http\Requests\V2\Vpc\DeployDefaultsRequest;
 use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
+use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
@@ -17,11 +17,9 @@ use App\Resources\V2\LoadBalancerResource;
 use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Resources\V2\VpcResource;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class VpcController extends BaseController
@@ -65,7 +63,7 @@ class VpcController extends BaseController
         $vpc->reseller_id = $this->resellerId;
 
         if ($request->has('support_enabled') && $request->input('support_enabled') === true) {
-            $vpc->support_enabled = true;
+            dispatch(new UpdateSupportEnabledBilling($vpc, true));
         }
 
         $task = $vpc->syncSave();
@@ -96,11 +94,11 @@ class VpcController extends BaseController
 
         if ($request->has('support_enabled')) {
             if ($request->input('support_enabled') == true && !$vpc->support_enabled) {
-                $vpc->support_enabled = true;
+                dispatch(new UpdateSupportEnabledBilling($vpc, true));
             }
 
             if ($request->input('support_enabled') == false && $vpc->support_enabled) {
-                $vpc->support_enabled = false;
+                dispatch(new UpdateSupportEnabledBilling($vpc, false));
             }
         }
 

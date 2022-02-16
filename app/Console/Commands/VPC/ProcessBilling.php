@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\VPC;
 
-use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
+use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\DiscountPlan;
 use App\Models\V2\Product;

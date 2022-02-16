@@ -37,7 +37,7 @@ class CreateRequest extends FormRequest
             'key' => ['required', 'string'],
             'value' => ['required', 'string'],
             'start' => ['required', 'date'],
-            'end' => ['date'],
+            'end' => ['sometimes', 'date', 'nullable'],
             'category' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
         ];

@@ -2,17 +2,13 @@
 namespace Tests\unit\Listeners\V2\Vpc;
 
 use App\Events\V2\Task\Created;
-use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
+use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
-use UKFast\Admin\Account\AdminClient;
-use UKFast\Admin\Account\AdminCustomerClient;
-use UKFast\Admin\Account\Entities\Customer;
-use UKFast\Api\Auth\Consumer;
 
 class UpdateSupportEnabledBillingTest extends TestCase
 {
@@ -32,7 +28,7 @@ class UpdateSupportEnabledBillingTest extends TestCase
             return $task;
         });
 
-        $listener = new \App\Listeners\V2\Vpc\UpdateSupportEnabledBilling();
+        $listener = new \App\Jobs\Vpc\UpdateSupportEnabledBilling();
         $listener->handle(new \App\Events\V2\Task\Updated($task));
 
         $metric = BillingMetric::getActiveByKey($this->vpc(), UpdateSupportEnabledBilling::getKeyName());
@@ -62,7 +58,7 @@ class UpdateSupportEnabledBillingTest extends TestCase
         });
 
 
-        $listener = new \App\Listeners\V2\Vpc\UpdateSupportEnabledBilling();
+        $listener = new \App\Jobs\Vpc\UpdateSupportEnabledBilling();
         $listener->handle(new \App\Events\V2\Task\Updated($task));
 
         $originalMetric->refresh();

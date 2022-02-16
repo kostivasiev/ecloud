@@ -39,7 +39,7 @@ class UpdateRequest extends FormRequest
             'key' => ['sometimes', 'required', 'string'],
             'value' => ['sometimes', 'required', 'string'],
             'start' => ['sometimes', 'required', 'date'],
-            'end' => ['sometimes', 'date'],
+            'end' => ['sometimes', 'date', 'nullable'],
             'category' => ['sometimes', 'string', 'max:255'],
             'price' => ['sometimes', 'numeric', 'min:0'],
         ];
