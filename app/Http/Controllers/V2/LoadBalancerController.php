@@ -82,15 +82,13 @@ class LoadBalancerController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function nodes(Request $request, QueryTransformer $queryTransformer, string $loadBalancerId)
+    public function nodes(Request $request, string $loadBalancerId)
     {
         $collection = LoadBalancer::forUser($request->user())
             ->findOrFail($loadBalancerId)
             ->instances();
-        $queryTransformer->config(Instance::class)
-            ->transform($collection);
 
-        return InstanceResource::collection($collection->paginate(
+        return InstanceResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
