@@ -3,10 +3,7 @@
 namespace Tests\unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\Task;
-use App\Support\Sync;
 use App\Jobs\LoadBalancer\ConfigurePeers;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\LoadBalancerMock;
@@ -38,15 +35,7 @@ class ConfigurePeersTest extends TestCase
 
     public function testSuccessful()
     {
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->loadBalancer());
-            $task->save();
-            return $task;
-        });
+        $task = $this->createSyncUpdateTask($this->loadBalancer());
         Event::fake([JobFailed::class, Created::class]);
 
         dispatch(new ConfigurePeers($task));

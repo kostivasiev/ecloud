@@ -18,7 +18,7 @@ class Update extends Task
             CreateCredentials::class,
             CreateNodes::class,
             AddNetworks::class,
-//            ConfigurePeers::class,
+            ConfigurePeers::class,
         ];
     }
 }
