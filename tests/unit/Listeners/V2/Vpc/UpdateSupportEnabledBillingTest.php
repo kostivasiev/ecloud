@@ -4,9 +4,6 @@ namespace Tests\unit\Listeners\V2\Vpc;
 use App\Events\V2\Task\Created;
 use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
-use App\Models\V2\Task;
-use App\Support\Sync;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -15,21 +12,10 @@ class UpdateSupportEnabledBillingTest extends TestCase
     public function testStartsBillingMetricForSupportEnabled()
     {
         Event::fake(Created::class);
-        $this->vpc()->setAttribute('support_enabled', true)->saveQuietly();
+
         $this->assertNull(BillingMetric::getActiveByKey($this->vpc(), UpdateSupportEnabledBilling::getKeyName()));
 
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'completed' => true,
-                'name' => Sync::TASK_NAME_UPDATE
-            ]);
-            $task->resource()->associate($this->vpc());
-            return $task;
-        });
-
-        $listener = new \App\Jobs\Vpc\UpdateSupportEnabledBilling();
-        $listener->handle(new \App\Events\V2\Task\Updated($task));
+        dispatch(new UpdateSupportEnabledBilling($this->vpc(), true));
 
         $metric = BillingMetric::getActiveByKey($this->vpc(), UpdateSupportEnabledBilling::getKeyName());
         $this->assertNotNull($metric);
@@ -47,19 +33,9 @@ class UpdateSupportEnabledBillingTest extends TestCase
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
 
-        $task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'completed' => true,
-                'name' => Sync::TASK_NAME_DELETE
-            ]);
-            $task->resource()->associate($this->vpc());
-            return $task;
-        });
+        $this->assertNotNull(BillingMetric::getActiveByKey($this->vpc(), UpdateSupportEnabledBilling::getKeyName()));
 
-
-        $listener = new \App\Jobs\Vpc\UpdateSupportEnabledBilling();
-        $listener->handle(new \App\Events\V2\Task\Updated($task));
+        dispatch(new UpdateSupportEnabledBilling($this->vpc(), false));
 
         $originalMetric->refresh();
         $this->assertNotNull($originalMetric->end);
