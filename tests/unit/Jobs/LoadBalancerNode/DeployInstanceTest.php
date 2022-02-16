@@ -85,7 +85,7 @@ class DeployInstanceTest extends TestCase
         $this->assertArrayHasKey('nats_credentials', $imageData);
         $this->assertArrayHasKey('node_id', $imageData);
         $this->assertArrayHasKey('group_id', $imageData);
-        $this->assertArrayHasKey('nats_servers', $imageData);
+        $this->assertArrayHasKey('nats_proxy_ip', $imageData);
         $this->assertArrayHasKey('primary', $imageData);
         $this->assertArrayHasKey('keepalived_password', $imageData);
         $this->assertEquals($this->loadBalancer()->config_id, $imageData['group_id']);

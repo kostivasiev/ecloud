@@ -28,8 +28,8 @@ class DeployInstance extends TaskJob
         }
 
         if (empty($this->task->data['loadbalancer_instance_id'])) {
-            $natsServers = $this->getNatsServers();
-            if ($natsServers === null) {
+            $natsProxyIp = $this->getNatsProxyIp();
+            if ($natsProxyIp === null) {
                 $this->fail(new \Exception('No nats servers found for ' . $availabilityZone->id));
                 return;
             }
@@ -40,7 +40,7 @@ class DeployInstance extends TaskJob
                     'nats_credentials' => decrypt($this->task->data['warden_credentials']),
                     'node_id' => $loadBalancerNode->node_id,
                     'group_id' => $loadBalancerNode->loadBalancer->config_id,
-                    'nats_servers' => $this->getNatsServers(),
+                    'nats_proxy_ip' => $natsProxyIp,
                     'primary' => false,
                     'keepalived_password' => $this->getKeepAliveDPassword()
                 ];
@@ -74,7 +74,7 @@ class DeployInstance extends TaskJob
             ->password;
     }
 
-    public function getNatsServers(): ?string
+    public function getNatsProxyIp(): ?string
     {
         $loadBalancerNode = $this->task->resource;
         $natsServer = 'lb_nats_server';
@@ -82,10 +82,10 @@ class DeployInstance extends TaskJob
             $natsServer.= '_advanced';
         }
         $cred = Credential::where([
-                ['resource_id', '=', $loadBalancerNode->loadBalancer->availabilityZone->id],
-                ['username', '=', $natsServer]
-            ])
+            ['resource_id', '=', $loadBalancerNode->loadBalancer->availabilityZone->id],
+            ['username', '=', $natsServer]
+        ])
             ->first();
-        return $cred ? $cred->host.':'.$cred->port : null;
+        return $cred ? $cred->host : null;
     }
 }
