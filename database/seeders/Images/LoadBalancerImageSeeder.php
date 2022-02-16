@@ -53,6 +53,10 @@ listen stats
     http-request     use-service prometheus-exporter if { path /metrics }
 EOF
 
+cat >> /etc/hosts <<EOF
+{{{nats_proxy_ip}}} ed-01.prod.ukfast.co.uk
+EOF
+
 cat > /etc/warden/nats.creds <<EOF
 {{{nats_credentials}}}
 EOF
@@ -62,7 +66,7 @@ cat > /etc/warden/config.json <<EOF
     "group_id": {{{group_id}}},
     "node_id": {{{node_id}}},
     "credentials": "/etc/warden/nats.creds",
-    "nats_servers": {{{nats_servers}}}
+    "nats_servers": ["tls://ed-01.prod.ukfast.co.uk:4222"]
 }
 EOF
 
