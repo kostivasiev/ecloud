@@ -74,18 +74,14 @@ class DeployInstance extends TaskJob
             ->password;
     }
 
-    public function getNatsProxyIp(): ?string
+    public function getNatsProxyIp(): string
     {
         $loadBalancerNode = $this->task->resource;
-        $natsServer = 'lb_nats_server';
+
         if ($loadBalancerNode->loadBalancer->vpc->advanced_networking) {
-            $natsServer.= '_advanced';
+            return config('load-balancer.nats_proxy_ip.advanced');
         }
-        $cred = Credential::where([
-            ['resource_id', '=', $loadBalancerNode->loadBalancer->availabilityZone->id],
-            ['username', '=', $natsServer]
-        ])
-            ->first();
-        return $cred ? $cred->host : null;
+
+        return config('load-balancer.nats_proxy_ip.standard');
     }
 }
