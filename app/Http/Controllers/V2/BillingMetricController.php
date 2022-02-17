@@ -30,16 +30,6 @@ class BillingMetricController extends BaseController
 
     public function create(CreateRequest $request)
     {
-        if ($request->input('end') == null && !$this->isAdmin) {
-            return response()->json([
-                'errors' => [
-                    'title' => 'Forbidden',
-                    'details' => 'End date can only be set to null by admins.',
-                    'status' => Response::HTTP_FORBIDDEN,
-                ]
-            ], Response::HTTP_FORBIDDEN);
-        }
-
         $model = new BillingMetric($request->only([
             'resource_id',
             'vpc_id',
@@ -58,16 +48,6 @@ class BillingMetricController extends BaseController
 
     public function update(UpdateRequest $request, string $billingMetricId)
     {
-        if ($request->input('end') == null && !$this->isAdmin) {
-            return response()->json([
-                'errors' => [
-                    'title' => 'Forbidden',
-                    'details' => 'End date can only be set to null by admins.',
-                    'status' => Response::HTTP_FORBIDDEN,
-                ]
-            ], Response::HTTP_FORBIDDEN);
-        }
-
         $model = BillingMetric::forUser(Auth::user())->findOrFail($billingMetricId);
         $model->fill($request->only([
             'resource_id',
