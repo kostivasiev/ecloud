@@ -75,6 +75,6 @@ class CreateManagementNetworkPoliciesTest extends TestCase
 
         $networkPolicy = NetworkPolicy::where('network_id', '=', $this->managementNetwork->id)->first();
         $this->assertNotEmpty($networkPolicy);
-        $this->assertEquals(4222, $networkPolicy->networkRules->first()->networkRulePorts->first()->source);
+        $this->assertEquals(4222, $networkPolicy->networkRules->first()->networkRulePorts->first()->destination);
     }
 }
