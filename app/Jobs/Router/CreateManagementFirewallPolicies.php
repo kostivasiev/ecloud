@@ -49,7 +49,7 @@ class CreateManagementFirewallPolicies extends TaskJob
                     $firewallRulePort = new FirewallRulePort([
                         'firewall_rule_id' => $firewallRule->id,
                         'protocol' => 'TCP',
-                        'source' => '4222',
+                        'source' => 'ANY',
                         'destination' => '4222'
                     ]);
                     $firewallRulePort->save();
