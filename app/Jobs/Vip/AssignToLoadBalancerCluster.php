@@ -30,6 +30,12 @@ class AssignToLoadBalancerCluster extends TaskJob
             $vipEntity->externalCidr = $vip->ipAddress->floatingIp->getIPAddress(). '/32';
         }
 
+        $this->debug('Attempting to create VIP', [
+            'load_balancer_config_id' => $loadBalancer->config_id,
+            'internal_cidr' => $vipEntity->internalCidr,
+            'external_cidr' => $vipEntity->externalCidr,
+        ]);
+
         $response = $adminClient->vips()->createEntity($loadBalancer->config_id, $vipEntity);
 
         $vip->setAttribute('config_id', $response->getId())->save();
