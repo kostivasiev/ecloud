@@ -31,6 +31,10 @@ return [
     'floating-ip' => [
         'nat' => [
             'sequence' => 1000
+        ],
+        'rdns' => [
+            'default_rdns' => '%s.svrlist.ukfast.net',
+            'dns_suffix' => '%s.in-addr.arpa'
         ]
     ],
     'firewall_rule' => [

@@ -13,6 +13,7 @@ use UKFast\Responses\UKFastResource;
  * @property string name
  * @property string ip_address
  * @property string resource_id
+ * @property string rdns_hostname
  * @property string created_at
  * @property string updated_at
  */
@@ -31,6 +32,7 @@ class FloatingIpResource extends UKFastResource
             'availability_zone_id' => $this->availability_zone_id,
             'ip_address' => $this->ip_address,
             'resource_id' => $this->resource_id,
+            'rdns_hostname' => $this->rdns_hostname,
             'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,

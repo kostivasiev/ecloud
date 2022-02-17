@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\FloatingIp;
 
+use UKFast\Api\Validation\Rules\Dns\Records\Hostname;
 use UKFast\FormRequests\FormRequest;
 
 /**
@@ -29,6 +30,10 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name' => ['nullable', 'string', 'max:255'],
+            'rdns_hostname' => [
+                'sometimes',
+                new Hostname(app('request')->input('hostname')),
+            ],
         ];
     }
 

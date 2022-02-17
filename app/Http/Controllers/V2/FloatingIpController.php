@@ -61,7 +61,7 @@ class FloatingIpController extends BaseController
 //        }
 
         $floatingIp = new FloatingIp(
-            $request->only(['vpc_id', 'name', 'availability_zone_id'])
+            $request->only(['vpc_id', 'name', 'availability_zone_id', 'rdns_hostname'])
         );
 
         $task = $floatingIp->syncSave();
@@ -71,7 +71,7 @@ class FloatingIpController extends BaseController
     public function update(UpdateRequest $request, string $fipId)
     {
         $floatingIp = FloatingIp::forUser(Auth::user())->findOrFail($fipId);
-        $floatingIp->fill($request->only(['name']));
+        $floatingIp->fill($request->only(['name', 'rdns_hostname']));
 
         $task = $floatingIp->syncSave();
         return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);

@@ -2,15 +2,16 @@
 
 namespace Tests\unit\Console\Commands\FloatingIp;
 
-use App\Console\Commands\Billing\SetFriendlyNames;
-use App\Models\V2\BillingMetric;
-use Database\Seeders\BillingMetricSeeder;
+use App\Events\V2\Task\Created;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class PopulateForIpRangeTest extends TestCase
 {
     public function testSuccess()
     {
+        Event::fake([Created::class]);
+
         $exitCode = $this->artisan('floating-ip:populate-for-ip-range ' . $this->vpc()->id .  ' ' . $this->availabilityZone()->id . ' --ip-range 1.2.3.4/30 --force');
         $this->assertEquals(0, $exitCode);
     }

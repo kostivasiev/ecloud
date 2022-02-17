@@ -157,6 +157,7 @@ $app->register(UKFast\ApiInternalCommunication\NetworkingAdminClientServiceProvi
 $app->register(UKFast\ApiInternalCommunication\BillingAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\LicensesAdminClientServiceProvider::class);
 $app->register(UKFast\ApiInternalCommunication\LoadbalancerAdminClientServiceProvider::class);
+$app->register(UKFast\ApiInternalCommunication\SafeDNSAdminClientServiceProvider::class);
 
 
 $app->register(UKFast\Sieve\SieveServiceProvider::class);
