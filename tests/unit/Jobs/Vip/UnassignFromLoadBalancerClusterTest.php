@@ -60,19 +60,6 @@ class UnassignFromLoadBalancerClusterTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
     }
 
-    public function testNoConfigIdFails()
-    {
-        Event::fake(JobFailed::class);
-
-        $task = $this->createSyncDeleteTask($this->vip());
-
-        dispatch(new UnassignFromLoadBalancerCluster($task));
-
-        Event::assertDispatched(JobFailed::class, function ($event) {
-            return $event->exception->getMessage() == 'Failed to unassign VIP from load balancer cluster, no config_id was set.';
-        });
-    }
-
     public function testUnexpectedErrorFails()
     {
         Event::fake([JobFailed::class, JobProcessed::class]);

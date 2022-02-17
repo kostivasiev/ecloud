@@ -19,7 +19,7 @@ class UnassignFromLoadBalancerCluster extends TaskJob
         $vip = $this->task->resource;
 
         if (empty($vip->config_id)) {
-            $this->fail(new \Exception('Failed to unassign VIP from load balancer cluster, no config_id was set.'));
+            $this->warning('Failed to unassign VIP from load balancer cluster, no config_id was set.');
             return;
         }
 
