@@ -58,7 +58,15 @@ Content-Type: application/json
 client.assert(response.body.data.support_enabled === false, "Support was not enabled");
 %}
 
-### 5. Check billing metric ended after short while
+### 5. Check support_enabled = true
+GET https://{{host}}/{{version}}/billing-metrics?key:eq=vpc.support
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 6. Check billing metric ended after short while
 PATCH https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 X-consumer-custom-id: 0-0
 X-consumer-groups:  ecloud.read, ecloud.write
@@ -74,7 +82,15 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### 6. Check support_enabled = false
+### 7. Check support_enabled billing metric has ended
+GET https://{{host}}/{{version}}/billing-metrics?key:eq=vpc.support
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 8. Check support_enabled = false
 GET https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -86,7 +102,7 @@ Content-Type: application/json
 client.assert(response.body.data.support_enabled === false, "Support was not enabled");
 %}
 
-### 7. Cleanup
+### 9. Cleanup
 DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache
