@@ -71,6 +71,6 @@ class CreateManagementFirewallPoliciesTest extends TestCase
 
         $firewallPolicy = FirewallPolicy::where('router_id', '=', $this->managementRouter->id)->first();
         $this->assertNotEmpty($firewallPolicy);
-        $this->assertEquals(4222, $firewallPolicy->firewallRules->first()->firewallRulePorts->first()->source);
+        $this->assertEquals(4222, $firewallPolicy->firewallRules->first()->firewallRulePorts->first()->destination);
     }
 }

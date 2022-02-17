@@ -51,7 +51,7 @@ class CreateManagementNetworkPolicies extends TaskJob
                         $networkRulePort = new NetworkRulePort([
                             'network_rule_id' => $networkRule->id,
                             'protocol' => 'TCP',
-                            'source' => '4222',
+                            'source' => 'ANY',
                             'destination' => '4222'
                         ]);
                         $networkRulePort->save();
