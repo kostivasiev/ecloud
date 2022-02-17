@@ -123,6 +123,7 @@ $app->routeMiddleware([
     'vpc-can-delete' => \App\Http\Middleware\Vpc\CanDelete::class,
     'load-balancer-is-max-for-customer' => \App\Http\Middleware\Loadbalancer\IsMaxForForCustomer::class,
     'can-be-deleted' => \App\Http\Middleware\CanBeDeleted::class,
+    'loadbalancer-max-vip' => \App\Http\Middleware\Vips\MaxVipLimitReached::class,
 ]);
 
 /*
