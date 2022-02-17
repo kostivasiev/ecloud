@@ -116,7 +116,7 @@ class VpcController extends BaseController
 
     public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
-        $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->volumes();
+        $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->volumes()->forUser($request->user());
         $queryTransformer->config(Volume::class)
             ->transform($collection);
 
