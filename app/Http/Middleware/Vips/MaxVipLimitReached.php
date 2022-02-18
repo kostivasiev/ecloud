@@ -17,7 +17,7 @@ class MaxVipLimitReached
         $limit = config('load-balancer.limits.vips-max');
         $loadBalancerNetwork = LoadBalancerNetwork::find($request->input('load_balancer_network_id'));
         if ($loadBalancerNetwork) {
-            if ($loadBalancerNetwork->loadBalancer->getVipsTotal() >= $limit) {
+            if ($loadBalancerNetwork->loadBalancer->getVipsTotal() > $limit) {
                 return response()->json([
                     'title' => 'Forbidden',
                     'detail' => 'A maximum of ' . $limit . ' vips can be assigned per load balancer.',
