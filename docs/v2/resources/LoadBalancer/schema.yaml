@@ -23,9 +23,8 @@ properties:
     example: 'lbs-2b66bb79'
     readOnly : false
   network_id:
-    description: "Network to assign to the load balancer service"
+    description: "Network assigned to the load balancer service"
     required: true
-    writeOnly: true
     type: string
     example: net-abc123
   sync:

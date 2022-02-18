@@ -42,6 +42,11 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
+            ->seeInDatabase(
+                'load_balancers',
+                $data,
+                'ecloud'
+            )
             ->assertResponseStatus(202);
     }
 }
