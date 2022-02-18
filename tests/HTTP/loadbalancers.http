@@ -1,3 +1,16 @@
+### Create VIP
+POST https://kong.staging.rnd.ukfast/loadbalancers/v2/clusters/5208/vips
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+{
+    "internal_cidr": "192.168.1.6/24"
+}
+
+
+
 ### Get VIPs
 GET https://kong.staging.rnd.ukfast/loadbalancers/v2/vips
 Accept: */*

@@ -1,4 +1,50 @@
-##
+### Create Router (to deploy management networking)
+POST https://{{host}}/{{version}}/routers
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test router",
+  "vpc_id": "{{dev_vpc_id}}",
+  "availability_zone_id" : "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Create Router", function() {
+    client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('router_id', response.body.data.id);
+client.log('Router ID: ' + response.body.data.id);
+%}
+
+### Create a network
+POST https://{{host}}/{{version}}/networks
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "router_id": "{{router_id}}",
+  "subnet": "192.168.1.1/29"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('network_id', response.body.data.id);
+client.log('Network ID: ' + response.body.data.id);
+%}
+
+
+### Create a load balancer
 POST https://{{host}}/{{version}}/load-balancers
 Accept: */*
 Cache-Control: no-cache
@@ -10,21 +56,28 @@ Content-Type: application/json
   "name": "Test",
   "availability_zone_id": "{{dev_availability_zone_id}}",
   "vpc_id": "{{dev_vpc_id}}",
-  "load_balancer_spec_id": "{{dev_load_balancer_spec_id}}"
+  "load_balancer_spec_id": "{{dev_load_balancer_spec_id}}",
+  "network_id": "{{network_id}}"
 }
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 200");
+  client.assert(response.status === 202, "Response status is not 202");
 });
 
 client.global.set('load_balancer_id', response.body.data.id);
 client.log('Load Balancer ID: ' + response.body.data.id);
 %}
 
-###
+### Wait for ages...for the load balancer to deploy
+GET https://{{host}}/{{version}}/load-balancers/{{load_balancer_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
 
-### store
+### Crete a VIP - will need to pull the lb network id from the database load_balancer_network table at the moment as we're transtioning to not surface it
 POST https://{{host}}/{{version}}/vips
 Accept: */*
 Cache-Control: no-cache
@@ -33,8 +86,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "load_balancer_id" : "{{load_balancer_id}}",
-  "network_id": "{{dev_network_id}}"
+  "load_balancer_network_id" : ""
 }
 > {%
 client.test('Create', function () {
@@ -65,7 +117,8 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 200, "Response status is not 200");
+    client.assert(response.body.data.load_balancer_id == client.global.get('load_balancer_id'), "Incorrect load_balancer_id");
+    client.assert(response.status === 200, "Response status is not 200");
 });
 %}
 
@@ -145,3 +198,21 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 202, "Response status is not 202");
 });
 %}
+
+### Clean Up!
+
+###
+DELETE https://{{host}}/{{version}}/networks/{{network_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+DELETE https://{{host}}/{{version}}/routers/{{router_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json

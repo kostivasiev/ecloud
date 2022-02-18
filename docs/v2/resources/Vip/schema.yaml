@@ -11,7 +11,7 @@ properties:
   load_balancer_id:
     type: string
     required: true
-    description : "ID of the load balancer network that the VIP is associated with."
+    description : "ID of the load balancer that the VIP is associated with."
     example: lb-4c63cf58
     readOnly: false
   ip_address_id:

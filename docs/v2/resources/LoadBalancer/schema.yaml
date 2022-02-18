@@ -22,14 +22,11 @@ properties:
     required: true
     example: 'lbs-2b66bb79'
     readOnly : false
-  network_ids:
-    description: "Networks to assign to the load balancer service"
-    required: false
-    writeOnly: true
-    type: array
-    items:
-      type: string
-      example: net-abc123
+  network_id:
+    description: "Network assigned to the load balancer service"
+    required: true
+    type: string
+    example: net-abc123
   sync:
     type: object
     readOnly: true

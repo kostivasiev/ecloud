@@ -330,9 +330,9 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('load-balancers/{loadBalancerId}', 'LoadBalancerController@show');
         $router->patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
         $router->delete('load-balancers/{loadBalancerId}', 'LoadBalancerController@destroy');
-        $router->get('load-balancers/{loadBalancerId}/networks', 'LoadBalancerController@networks');
 
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
+            $router->get('load-balancers/{loadBalancerId}/networks', 'LoadBalancerController@networks');
             $router->get('load-balancers/{loadBalancerId}/nodes', 'LoadBalancerController@nodes');
         });
 
@@ -578,6 +578,7 @@ $router->group($baseRouteParameters, function () use ($router) {
         $router->get('ip-addresses', 'IpAddressController@index');
         $router->get('ip-addresses/{ipAddressId}', 'IpAddressController@show');
         $router->post('ip-addresses', 'IpAddressController@store');
+
         $router->group(['middleware' => 'is-admin'], function () use ($router) {
             $router->get('ip-addresses/{ipAddressId}/nics', 'IpAddressController@nics');
             $router->patch('ip-addresses/{ipAddressId}', 'IpAddressController@update');
@@ -628,7 +629,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Load Balancer Network */
-    $router->group([], function () use ($router) {
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('load-balancer-networks', 'LoadBalancerNetworkController@index');
         $router->get('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@show');
         $router->post('load-balancer-networks', 'LoadBalancerNetworkController@store');
@@ -638,6 +639,5 @@ $router->group($baseRouteParameters, function () use ($router) {
             'middleware' => 'can-be-deleted:' . \App\Models\V2\LoadBalancerNetwork::class   . ',loadBalancerNetworkId',
             'uses' => 'LoadBalancerNetworkController@destroy'
         ]);
-
     });
 });
