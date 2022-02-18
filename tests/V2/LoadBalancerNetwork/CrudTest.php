@@ -15,7 +15,10 @@ class CrudTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->be(
+            (new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))
+                ->setIsAdmin(true)
+        );
     }
 
     public function testIndex()
@@ -32,7 +35,10 @@ class CrudTest extends TestCase
             ->assertResponseStatus(200);
 
         // Assert scope does not return resource for non-owner
-        $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->be(
+            (new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']))
+                ->setIsAdmin(true)
+        );
         $this->get('/v2/load-balancer-networks')
             ->dontSeeJson([
                 'id' => $this->loadBalancerNetwork()->id,
@@ -61,7 +67,10 @@ class CrudTest extends TestCase
             ->assertResponseStatus(200);
 
         // Assert scope does not return resource for non-owner
-        $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->be(
+            (new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']))
+                ->setIsAdmin(true)
+        );
         $this->get('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id)->assertResponseStatus(404);
 
         // Assert scope returns resource for admin

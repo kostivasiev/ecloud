@@ -14,7 +14,10 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->be(
+            (new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))
+                ->setIsAdmin(true)
+        );
     }
 
     public function testVipAssignedFails()
