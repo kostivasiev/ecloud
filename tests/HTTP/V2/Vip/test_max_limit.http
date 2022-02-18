@@ -56,9 +56,7 @@ Content-Type: application/json
   "availability_zone_id": "{{dev_availability_zone_id}}",
   "vpc_id": "{{dev_vpc_id}}",
   "load_balancer_spec_id": "{{dev_load_balancer_spec_id}}",
-  "network_ids": [
-      "{{network_id}}"
-  ]
+  "network_id": "{{network_id}}"
 }
 
 > {%
