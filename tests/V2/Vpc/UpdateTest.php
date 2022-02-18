@@ -4,9 +4,8 @@ namespace Tests\V2\Vpc;
 
 use App\Events\V2\Task\Created;
 use App\Events\V2\Vpc\Saved;
+use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Support\Sync;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminClient;
@@ -32,7 +31,6 @@ class UpdateTest extends TestCase
             $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
             return $mockClient;
         });
-
     }
 
     public function testNoPermsIsDenied()
@@ -141,7 +139,7 @@ class UpdateTest extends TestCase
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
         Event::fake(Created::class);
 
-        $this->vpc()->support_enabled = true;
+        dispatch(new UpdateSupportEnabledBilling($this->vpc(), true));
         $this->vpc()->save();
 
         $this->assertTrue($this->vpc()->support_enabled);

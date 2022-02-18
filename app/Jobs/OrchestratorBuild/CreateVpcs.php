@@ -41,7 +41,7 @@ class CreateVpcs extends Job
             $definition = collect($definition);
 
             $vpc = app()->make(Vpc::class);
-            $vpc->fill($definition->only(['name', 'region_id', 'advanced_networking', 'console_enabled', 'support_enabled'])->toArray());
+            $vpc->fill($definition->only(['name', 'region_id', 'advanced_networking', 'console_enabled'])->toArray());
             $vpc->reseller_id = $orchestratorBuild->orchestratorConfig->reseller_id;
             $vpc->syncSave();
 
