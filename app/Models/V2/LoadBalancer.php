@@ -97,7 +97,7 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
     {
         $total = 0;
         $this->loadBalancerNetworks->each(function ($loadBalancerNetwork) use (&$total) {
-            $total += $loadBalancerNetwork->vips()->count();
+            $total += $loadBalancerNetwork->vips->count();
         });
         return $total;
     }
