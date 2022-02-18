@@ -134,7 +134,21 @@ client.test("Delete the loadbalancer", function() {
 });
 %}
 
-### 8. Delete the router
+### 8. Delete the network
+DELETE https://{{host}}/{{version}}/networks/{{network_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Delete the network", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+### 9. Delete the router
 DELETE https://{{host}}/{{version}}/routers/{{router_id}}
 Accept: */*
 Cache-Control: no-cache
