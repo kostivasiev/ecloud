@@ -38,7 +38,7 @@ patch:
                 load_balancer_spec_id :
                   required : false
                   readOnly : true
-                network_ids :
+                network_id :
                   required : false
                   readOnly : true
   responses:
