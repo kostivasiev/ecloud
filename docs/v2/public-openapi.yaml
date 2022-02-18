@@ -298,10 +298,6 @@ paths:
     $ref: 'resources/LoadBalancer/collection.yaml'
   '/ecloud/v2/load-balancers/{loadBalancerId}':
     $ref: 'resources/LoadBalancer/item.yaml'
-  '/ecloud/v2/load-balancer-networks' :
-    $ref : 'resources/LoadBalancerNetwork/collection.yaml'
-  '/ecloud/v2/load-balancer-networks/{loadBalancerNetworkId}' :
-    $ref : 'resources/LoadBalancerNetwork/item.yaml'
   '/ecloud/v2/load-balancer-specs':
     $ref: 'resources/LoadBalancerSpecification/collection.yaml'
   '/ecloud/v2/load-balancer-specs/{loadBalancerSpecificationId}':

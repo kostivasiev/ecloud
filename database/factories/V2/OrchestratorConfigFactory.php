@@ -16,8 +16,7 @@ $factory->define(OrchestratorConfig::class, function () {
                         "name": "vpc-2",
                         "region_id": "reg-test",
                         "console_enabled": true,
-                        "advanced_networking": true,
-                        "support_enabled": true
+                        "advanced_networking": true
                     }
                 ],
                 "routers": [

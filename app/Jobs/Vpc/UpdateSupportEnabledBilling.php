@@ -1,7 +1,6 @@
 <?php
-namespace App\Listeners\V2\Vpc;
+namespace App\Jobs\Vpc;
 
-use App\Events\V2\Task\Updated;
 use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
@@ -15,32 +14,36 @@ class UpdateSupportEnabledBilling implements Billable
     public static string $category = 'Support';
 
     const RESOURCE = Vpc::class;
+    private $vpc;
+    private $enable;
 
-    public function handle(Updated $event)
+    public function __construct($vpc, $enable)
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
+        $this->vpc = $vpc;
+        $this->enable = $enable;
+    }
 
-        $this->validateBillableResourceEvent($event);
+    public function handle()
+    {
+        Log::info(get_class($this) . ' : Started', ['id' => $this->vpc->id]);
 
-        $vpc = $event->model->resource;
+        $currentActiveMetric = BillingMetric::getActiveByKey($this->vpc, self::getKeyName());
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($vpc, self::getKeyName());
-
-        if ($vpc->support_enabled === false && !empty($currentActiveMetric)) {
+        if ($this->enable === false && !empty($currentActiveMetric)) {
             $currentActiveMetric->setEndDate();
-        } elseif ($vpc->support_enabled === true && empty($currentActiveMetric)) {
+        } elseif ($this->enable === true && empty($currentActiveMetric)) {
             $billingMetric = app()->make(BillingMetric::class);
-            $billingMetric->resource_id = $vpc->id;
-            $billingMetric->vpc_id = $vpc->id;
+            $billingMetric->resource_id = $this->vpc->id;
+            $billingMetric->vpc_id = $this->vpc->id;
             $billingMetric->category = self::$category;
-            $billingMetric->reseller_id = $vpc->reseller_id;
+            $billingMetric->reseller_id = $this->vpc->reseller_id;
             $billingMetric->name = self::getFriendlyName();
             $billingMetric->key = self::getKeyName();
             $billingMetric->value = 1;
             $billingMetric->save();
         }
 
-        Log::info(get_class($this) . ' : Finished', ['id' => $event->model->id]);
+        Log::info(get_class($this) . ' : Finished', ['id' => $this->vpc->id]);
     }
 
     /**

@@ -58,7 +58,7 @@ class LoadBalancerController extends BaseController
             $request->only(['name', 'availability_zone_id', 'vpc_id', 'load_balancer_spec_id'])
         );
 
-        $task = $loadBalancer->syncSave($request->has('network_ids') ? ['network_ids' => $request->input('network_ids')] : null);
+        $task = $loadBalancer->syncSave(['network_ids' => [$request->input('network_id')]]);
         return $this->responseIdMeta($request, $loadBalancer->id, 202, $task->id);
     }
 

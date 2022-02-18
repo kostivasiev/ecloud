@@ -3,57 +3,32 @@
 namespace Tests\V2\LoadBalancer;
 
 use App\Events\V2\Task\Created;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancerSpecification;
 use App\Models\V2\Network;
-use App\Models\V2\Region;
 use App\Models\V2\Router;
-use App\Models\V2\Task;
-use App\Models\V2\Vpc;
-use App\Support\Sync;
-use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
+use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 use UKFast\Admin\Loadbalancers\AdminClient;
 use UKFast\Admin\Loadbalancers\AdminClusterClient;
+use UKFast\Api\Auth\Consumer;
 use UKFast\SDK\SelfResponse;
 
 class CreateTest extends TestCase
 {
-    protected $faker;
-    protected $region;
-    protected $vpc;
-    protected $lbs;
-    protected $availabilityZone;
+    use LoadBalancerMock;
 
     private $lbConfigId = 123456;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->faker = Faker::create();
-
-        $this->region = factory(Region::class)->create();
-        $this->lbs = factory(LoadBalancerSpecification::class)->create();
-
-        $this->vpc = Vpc::withoutEvents(function () {
-            return factory(Vpc::class)->create([
-                'id' => 'vpc-test',
-                'name' => 'Manchester DC',
-                'region_id' => $this->region->id
-            ]);
-        });
-
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
-            'region_id' => $this->region->id
-        ]);
-
         $managementRouter = Model::withoutEvents(function () {
             return factory(Router::class)->create([
                 'id' => 'rtr-mgmt',
-                'vpc_id' => $this->vpc->id,
-                'availability_zone_id' => $this->availabilityZone->id,
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'router_throughput_id' => $this->routerThroughput()->id,
                 'is_management' => true,
             ]);
@@ -84,112 +59,79 @@ class CreateTest extends TestCase
             });
             return $mock;
         });
+
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 
     public function testInvalidVpcIdIsFailed()
     {
-        $data = [
-            'name' => 'My Load Balancer',
-            'load_balancer_spec_id' => $this->lbs->id,
-            'vpc_id' => $this->faker->uuid(),
-            'availability_zone_id' => $this->availabilityZone->id
-        ];
-
         $this->post(
             '/v2/load-balancers',
-            $data,
             [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'name' => 'My Load Balancer',
+                'load_balancer_spec_id' => $this->loadBalancerSpecification()->id,
+                'vpc_id' => Str::uuid(),
+                'availability_zone_id' => $this->availabilityZone()->id
             ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
-            ])
-            ->assertResponseStatus(422);
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The specified vpc id was not found',
+            'status' => 422,
+            'source' => 'vpc_id'
+        ])->assertResponseStatus(422);
     }
 
     public function testInvalidAvailabilityZoneIsFailed()
     {
-        $data = [
-            'name' => 'My Load Balancer',
-            'load_balancer_spec_id' => $this->lbs->id,
-            'vpc_id' => $this->faker->uuid(),
-            'availability_zone_id' => $this->faker->uuid()
-        ];
-
         $this->post(
             '/v2/load-balancers',
-            $data,
             [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'name' => 'My Load Balancer',
+                'load_balancer_spec_id' => $this->loadBalancerSpecification()->id,
+                'vpc_id' => Str::uuid(),
+                'availability_zone_id' => Str::uuid()
             ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
-            ])
-            ->assertResponseStatus(422);
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The specified vpc id was not found',
+            'status' => 422,
+            'source' => 'vpc_id'
+        ])->assertResponseStatus(422);
     }
 
     public function testNotOwnedVpcIdIsFailed()
     {
-        $data = [
-            'name' => 'My Load Balancer',
-            'load_balancer_spec_id' => $this->lbs->id,
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->faker->uuid()
-        ];
-
+        $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->post(
             '/v2/load-balancers',
-            $data,
             [
-                'X-consumer-custom-id' => '2-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'name' => 'My Load Balancer',
+                'load_balancer_spec_id' => $this->loadBalancerSpecification()->id,
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => Str::uuid(),
             ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
-            ])
-            ->assertResponseStatus(422);
+        )->seeJson([
+            'title' => 'Validation Error',
+            'detail' => 'The specified vpc id was not found',
+            'status' => 422,
+            'source' => 'vpc_id'
+        ])->assertResponseStatus(422);
     }
 
     public function testFailedVpcCausesFail()
     {
-        // Force failure
-        Model::withoutEvents(function () {
-            $model = new Task([
-                'id' => 'sync-test',
-                'failure_reason' => 'Unit Test Failure',
-                'completed' => true,
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $model->resource()->associate($this->vpc);
-            $model->save();
-        });
+        $this->createSyncUpdateTask($this->vpc())
+            ->setAttribute('failure_reason', 'Unit Test Failure')
+            ->setAttribute('completed', true)
+            ->saveQuietly();
 
-        $data = [
-            'name' => 'My Load Balancer',
-            'load_balancer_spec_id' => $this->lbs->id,
-            'vpc_id' => $this->vpc->id,
-            'availability_zone_id' => $this->availabilityZone->id
-        ];
         $this->post(
             '/v2/load-balancers',
-            $data,
             [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'name' => 'My Load Balancer',
+                'load_balancer_spec_id' => $this->loadBalancerSpecification()->id,
+                'vpc_id' => $this->vpc()->id,
+                'availability_zone_id' => $this->availabilityZone()->id
             ]
         )->seeJson(
             [
@@ -203,21 +145,16 @@ class CreateTest extends TestCase
     {
         Event::fake(Created::class);
 
-        $data = [
-            'name' => 'My Load Balancer',
-            'vpc_id' => $this->vpc->id,
-            'load_balancer_spec_id' => $this->lbs->id,
-            'availability_zone_id' => $this->availabilityZone->id
-        ];
         $this->post(
             '/v2/load-balancers',
-            $data,
             [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'name' => 'My Load Balancer',
+                'vpc_id' => $this->vpc()->id,
+                'load_balancer_spec_id' => $this->loadBalancerSpecification()->id,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'network_id' => $this->network()->id,
             ]
-        )
-            ->assertResponseStatus(202);
+        )->assertResponseStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';

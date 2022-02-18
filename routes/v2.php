@@ -629,7 +629,7 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Load Balancer Network */
-    $router->group([], function () use ($router) {
+    $router->group(['middleware' => 'is-admin'], function () use ($router) {
         $router->get('load-balancer-networks', 'LoadBalancerNetworkController@index');
         $router->get('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@show');
         $router->post('load-balancer-networks', 'LoadBalancerNetworkController@store');
@@ -639,6 +639,5 @@ $router->group($baseRouteParameters, function () use ($router) {
             'middleware' => 'can-be-deleted:' . \App\Models\V2\LoadBalancerNetwork::class   . ',loadBalancerNetworkId',
             'uses' => 'LoadBalancerNetworkController@destroy'
         ]);
-
     });
 });
