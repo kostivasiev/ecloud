@@ -55,7 +55,7 @@ class VipController extends BaseController
         $lbNetwork = $lb->loadBalancerNetworks->firstOrFail();
         $vip = new Vip([
             'name' => $request->input('name'),
-            'load_balancer_network_id' => $lbNetwork->id
+            'load_balancer_network_id' => $lbNetwork['id']
         ]);
 
         $task = $vip->syncSave([

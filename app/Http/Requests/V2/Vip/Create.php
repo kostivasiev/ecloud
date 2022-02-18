@@ -27,10 +27,10 @@ class Create extends FormRequest
             'load_balancer_id' => [
                 'required',
                 'string',
-                Rule::exists(LoadBalancerNetwork::class, 'id')->whereNull('deleted_at'),
-                new ExistsForUser(LoadBalancerNetwork::class),
-                new IsResourceAvailable(LoadBalancerNetwork::class),
-                new ArePivotResourcesAvailable(LoadBalancerNetwork::class, ['network', 'loadBalancer']),
+                Rule::exists(LoadBalancer::class, 'id')->whereNull('deleted_at'),
+                new ExistsForUser(LoadBalancer::class),
+                new IsResourceAvailable(LoadBalancer::class),
+//                new ArePivotResourcesAvailable(LoadBalancer::class, ['LoadBalancerNetwork', 'network']),
             ],
             'allocate_floating_ip' => [
                 'sometimes',
