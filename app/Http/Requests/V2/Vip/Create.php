@@ -24,7 +24,7 @@ class Create extends FormRequest
                 'string',
                 'max:255'
             ],
-            'load_balancer_network_id' => [
+            'load_balancer_id' => [
                 'required',
                 'string',
                 Rule::exists(LoadBalancerNetwork::class, 'id')->whereNull('deleted_at'),
