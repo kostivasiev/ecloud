@@ -80,8 +80,7 @@ Content-Type: application/json
 
 {
   "load_balancer_id" : "{{load_balancer_id}}",
-  "network_id": "{{network_id}}",
-  "allocate_floating_ip": true
+  "network_id": "{{network_id}}"
 }
 > {%
 client.test('Create', function () {
@@ -100,8 +99,7 @@ Content-Type: application/json
 
 {
   "load_balancer_id" : "{{load_balancer_id}}",
-  "network_id": "{{network_id}}",
-  "allocate_floating_ip": true
+  "network_id": "{{network_id}}"
 }
 > {%
 client.test('Create', function () {
@@ -120,8 +118,7 @@ Content-Type: application/json
 
 {
   "load_balancer_id" : "{{load_balancer_id}}",
-  "network_id": "{{network_id}}",
-  "allocate_floating_ip": true
+  "network_id": "{{network_id}}"
 }
 > {%
 client.test('Create', function () {
