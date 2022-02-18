@@ -409,7 +409,6 @@ class ProcessBilling extends Command
         $payment = new Payment([
             'description' => 'eCloud VPCs from ' . $this->startDate->format('d/m/Y') . ' to ' . $this->endDate->format('d/m/Y'),
             'category' => 'eCloud VPC',
-            //'productId' => '',
             'resellerId' => $resellerId,
             'quantity' => 1,
             'date' => Carbon::now($this->timeZone)->format('c'),
@@ -417,6 +416,7 @@ class ProcessBilling extends Command
             'dateTo' => $this->endDate->format('c'),
             'netpg' => '', // no payment taken, payment required
             'nominalCode' => '41003',
+            'productId' => '5080',
             'source' => 'myukfast',
             'cost' => number_format($total, 2, '.', ''),
             'vat' => 00.00
