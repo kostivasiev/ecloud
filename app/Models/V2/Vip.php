@@ -65,6 +65,11 @@ class Vip extends Model implements Filterable, Sortable
 //        return null;
 //    }
 
+    public function getLoadBalancerIdAttribute()
+    {
+        return $this->loadBalancerNetwork->loadBalancer->id;
+    }
+
     public function scopeForUser($query, Consumer $user)
     {
         if (!$user->isScoped()) {

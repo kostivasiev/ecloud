@@ -2,7 +2,6 @@
 
 namespace App\Resources\V2;
 
-use App\Models\V2\IpAddress;
 use Illuminate\Support\Carbon;
 use UKFast\Responses\UKFastResource;
 
@@ -26,7 +25,7 @@ class VipResource extends UKFastResource
         $data = [
             'id' => $this->id,
             'name' => $this->name,
-            'load_balancer_network_id' => $this->load_balancer_network_id,
+            'load_balancer_id' => $this->load_balancer_id,
             'ip_address_id' => $this->ip_address_id,
 //            'floating_ip_id' => $this->floating_ip_id,
             'config_id' => $this->config_id,
