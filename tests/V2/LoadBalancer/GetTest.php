@@ -54,6 +54,7 @@ class GetTest extends TestCase
 
     public function testGetLoadBalancerNetworksCollection()
     {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->loadBalancerNetwork();
         $this->get('/v2/load-balancers/' . $this->loadBalancer()->id . '/networks')
             ->seeJson([
