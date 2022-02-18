@@ -12,7 +12,7 @@ use UKFast\Responses\UKFastResource;
  * @property string name
  * @property string reseller_id
  * @property string region_id
- * @property bool support_enabled
+ * @property-read bool support_enabled
  * @property bool console_enabled
  * @property bool advanced_networking
  * @property string created_at

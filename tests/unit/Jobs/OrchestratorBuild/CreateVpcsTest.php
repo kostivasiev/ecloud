@@ -3,6 +3,7 @@ namespace Tests\unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\OrchestratorBuild\CreateVpcs;
+use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Vpc;
@@ -95,7 +96,6 @@ class CreateVpcsTest extends TestCase
                     'region_id' => 'reg-test',
                     'console_enabled' => true,
                     'advanced_networking' => true,
-                    'support_enabled' => true
                 ]
             ]
         ]);
@@ -115,7 +115,7 @@ class CreateVpcsTest extends TestCase
         });
 
         $vpc = Vpc::findOrFail($this->orchestratorBuild->state['vpc'][0]);
-
+        dispatch(new UpdateSupportEnabledBilling($vpc, true));
         $this->assertTrue($vpc->support_enabled);
     }
 

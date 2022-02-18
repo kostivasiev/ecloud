@@ -8,13 +8,14 @@ use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Models\V2\VpnService;
 use App\Rules\V2\ExistsForUser;
+use Illuminate\Support\Facades\Auth;
 use UKFast\FormRequests\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
     public function rules()
     {
-        return [
+        $rules = [
             'resource_id' => [
                 'sometimes',
                 'required',
@@ -43,5 +44,12 @@ class UpdateRequest extends FormRequest
             'category' => ['sometimes', 'string', 'max:255'],
             'price' => ['sometimes', 'numeric', 'min:0'],
         ];
+
+
+        if (Auth::user()->isAdmin()) {
+            $rules['end'][] = 'nullable';
+        }
+
+        return $rules;
     }
 }

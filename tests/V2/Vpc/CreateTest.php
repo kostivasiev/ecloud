@@ -3,7 +3,7 @@
 namespace Tests\V2\Vpc;
 
 use App\Events\V2\Task\Created;
-use App\Listeners\V2\Vpc\UpdateSupportEnabledBilling;
+use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
 use App\Support\Sync;
@@ -162,8 +162,7 @@ class CreateTest extends TestCase
 
         app()->bind(Vpc::class, function () {
             return factory(Vpc::class)->create([
-                'id' => 'vpc-test2',
-                'support_enabled' => false,
+                'id' => 'vpc-test2'
             ]);
         });
         $this->post(

@@ -48,12 +48,7 @@ class CreateRequest extends FormRequest
                 new ExistsForUser(Vpc::class),
                 new IsResourceAvailable(Vpc::class),
             ],
-            'network_ids' => [
-                'sometimes',
-                'required',
-                'array'
-            ],
-            'network_ids.*' => [
+            'network_id' => [
                 'required',
                 'string',
                 new ExistsForUser(Network::class),

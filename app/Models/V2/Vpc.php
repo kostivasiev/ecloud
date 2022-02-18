@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\Vpc\Deleting;
 use App\Events\V2\Vpc\Saved;
 use App\Events\V2\Vpc\Saving;
+use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -35,7 +36,6 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
         'reseller_id',
         'region_id',
         'console_enabled',
-        'support_enabled',
         'advanced_networking',
     ];
 
@@ -56,7 +56,6 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
 
     protected $casts = [
         'console_enabled' => 'bool',
-        'support_enabled' => 'bool',
         'advanced_networking' => 'bool',
     ];
 
@@ -125,6 +124,16 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
     }
 
     /**
+     * Get the vpc's support flag.
+     *
+     * @return string
+     */
+    public function getSupportEnabledAttribute()
+    {
+        return (bool) BillingMetric::getActiveByKey($this, UpdateSupportEnabledBilling::getKeyName());
+    }
+
+    /**
      * @param FilterFactory $factory
      * @return array|Filter[]
      */
@@ -186,7 +195,6 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
             'reseller_id' => 'reseller_id',
             'region_id' => 'region_id',
             'console_enabled' => 'console_enabled',
-            'support_enabled' => 'support_enabled',
             'advanced_networking' => 'advanced_networking',
             'created_at' => 'created_at',
             'updated_at' => 'updated_at',
