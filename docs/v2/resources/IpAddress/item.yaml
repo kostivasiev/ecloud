@@ -33,7 +33,7 @@ patch:
                 ip_address :
                   readOnly : true
                 type :
-                  required : false
+                  readOnly : true
                 network_id :
                   type : string
                   required : false
