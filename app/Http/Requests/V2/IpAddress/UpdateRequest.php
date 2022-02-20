@@ -16,7 +16,7 @@ class UpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [
+        return [
             'name' => [
                 'sometimes',
                 'required',
@@ -24,15 +24,5 @@ class UpdateRequest extends FormRequest
                 'max:255'
             ]
         ];
-
-        if (Auth::user()->isAdmin()) {
-            $rules['type'] = [
-                'sometimes',
-                'required',
-                'string',
-                Rule::in([IpAddress::TYPE_NORMAL,IpAddress::TYPE_CLUSTER])
-            ];
-        }
-        return $rules;
     }
 }
