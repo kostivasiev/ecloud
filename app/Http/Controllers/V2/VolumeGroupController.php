@@ -60,7 +60,7 @@ class VolumeGroupController extends BaseController
 
     public function volumes(Request $request, QueryTransformer $queryTransformer, string $volumeGroupId)
     {
-        $collection = VolumeGroup::forUser($request->user())->findOrFail($volumeGroupId)->volumes();
+        $collection = VolumeGroup::forUser($request->user())->findOrFail($volumeGroupId)->volumes()->forUser($request->user());
         $queryTransformer->config(Volume::class)
             ->transform($collection);
 
