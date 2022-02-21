@@ -3,9 +3,6 @@
 namespace App\Http\Requests\V2\Vip;
 
 use App\Models\V2\LoadBalancer;
-use App\Models\V2\LoadBalancerNetwork;
-use App\Models\V2\Network;
-use App\Rules\V2\ArePivotResourcesAvailable;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Validation\Rule;
