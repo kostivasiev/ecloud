@@ -342,10 +342,13 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** VIPS */
-    $router->group([], function() use ($router) {
+    $router->group([], function () use ($router) {
         $router->get('vips', 'VipController@index');
         $router->get('vips/{vipId}', 'VipController@show');
-        $router->post('vips', 'VipController@create');
+        $router->post('vips', [
+            'middleware' => 'loadbalancer-max-vip',
+            'uses' => 'VipController@create'
+        ]);
         $router->patch('vips/{vipId}', 'VipController@update');
         $router->delete('vips/{vipId}', 'VipController@destroy');
     });

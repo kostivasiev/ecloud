@@ -93,6 +93,15 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
         return $this->vpc->reseller_id;
     }
 
+    public function getVipsTotal(): int
+    {
+        $total = 0;
+        $this->loadBalancerNetworks->each(function ($loadBalancerNetwork) use (&$total) {
+            $total += $loadBalancerNetwork->vips->count();
+        });
+        return $total;
+    }
+
     /**
      * Loads networks using the LoadBalancerNetworks pivot
      * @return HasManyThrough
