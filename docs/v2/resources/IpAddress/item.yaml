@@ -15,4 +15,33 @@ get:
                 type: object
   tags:
     - IP Addresses
+patch:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: 'schema.yaml'
+            - type : object
+              properties :
+                name :
+                  required : false
+                ip_address :
+                  readOnly : true
+                type :
+                  readOnly : true
+                network_id :
+                  type : string
+                  required : false
+                  example : 'net-abc123'
+                  readOnly : true
+  responses:
+    200:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - IP Addresses
 
