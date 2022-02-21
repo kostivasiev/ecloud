@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Config;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\Mocks\Resources\VipMock;
 use Tests\TestCase;
+use UKFast\Api\Auth\Consumer;
 
 class MaxVipLimitReachedTest extends TestCase
 {
@@ -23,6 +24,7 @@ class MaxVipLimitReachedTest extends TestCase
     {
         parent::setUp();
         $this->middleware = new MaxVipLimitReached();
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 
     public function testLimitReached()
@@ -64,7 +66,8 @@ class MaxVipLimitReachedTest extends TestCase
 
     protected function getRequest(): Request
     {
-        $payload = json_encode(['load_balancer_network_id' => $this->createNewLoadBalancerNetwork()->id]);
+        $this->createNewLoadBalancerNetwork();
+        $payload = json_encode(['load_balancer_id' => $this->loadBalancer()->id]);
         $headers = ['CONTENT_TYPE' => 'application/json'];
         return Request::create('POST', '/v2/vips', [], [], [], $headers, $payload);
     }
