@@ -3,9 +3,6 @@
 namespace App\Http\Requests\V2\Vip;
 
 use App\Models\V2\LoadBalancer;
-use App\Models\V2\LoadBalancerNetwork;
-use App\Models\V2\Network;
-use App\Rules\V2\ArePivotResourcesAvailable;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Validation\Rule;
@@ -24,13 +21,12 @@ class Create extends FormRequest
                 'string',
                 'max:255'
             ],
-            'load_balancer_network_id' => [
+            'load_balancer_id' => [
                 'required',
                 'string',
-                Rule::exists(LoadBalancerNetwork::class, 'id')->whereNull('deleted_at'),
-                new ExistsForUser(LoadBalancerNetwork::class),
-                new IsResourceAvailable(LoadBalancerNetwork::class),
-                new ArePivotResourcesAvailable(LoadBalancerNetwork::class, ['network', 'loadBalancer']),
+                Rule::exists(LoadBalancer::class, 'id')->whereNull('deleted_at'),
+                new ExistsForUser(LoadBalancer::class),
+                new IsResourceAvailable(LoadBalancer::class),
             ],
             'allocate_floating_ip' => [
                 'sometimes',

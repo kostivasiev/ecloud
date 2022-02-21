@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\Vip\Create;
 use App\Http\Requests\V2\Vip\Update;
+use App\Models\V2\LoadBalancer;
 use App\Models\V2\Vip;
 use App\Resources\V2\VipResource;
 use Illuminate\Http\Request;
@@ -50,10 +51,12 @@ class VipController extends BaseController
      */
     public function create(Create $request)
     {
-        $vip = new Vip($request->only([
-            'name',
-            'load_balancer_network_id'
-        ]));
+        $loadBalancer = LoadBalancer::forUser(Auth::user())->findOrFail($request->input('load_balancer_id'));
+        $loadBalancerNetwork = $loadBalancer->loadBalancerNetworks->firstOrFail();
+        $vip = new Vip([
+            'name' => $request->input('name'),
+            'load_balancer_network_id' => $loadBalancerNetwork->id
+        ]);
 
         $task = $vip->syncSave([
             'allocate_floating_ip' => $request->input('allocate_floating_ip', false)
