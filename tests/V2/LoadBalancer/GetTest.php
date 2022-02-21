@@ -20,6 +20,7 @@ class GetTest extends TestCase
         $this->loadBalancerSpecification();
         $this->loadBalancer();
         $this->loadBalancerNode();
+        $this->loadBalancerNetwork();
 
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
     }
@@ -32,6 +33,7 @@ class GetTest extends TestCase
                 'name' => $this->loadBalancer()->name,
                 'vpc_id' => $this->loadBalancer()->vpc_id,
                 'load_balancer_spec_id' => $this->loadBalancer()->load_balancer_spec_id,
+                'network_id' => $this->network()->id,
             ])
             ->assertResponseStatus(200);
     }
@@ -45,12 +47,14 @@ class GetTest extends TestCase
                 'vpc_id' => $this->loadBalancer()->vpc_id,
                 'load_balancer_spec_id' => $this->loadBalancer()->load_balancer_spec_id,
                 'nodes' => 1,
+                'network_id' => $this->network()->id,
             ])
             ->assertResponseStatus(200);
     }
 
     public function testGetLoadBalancerNetworksCollection()
     {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->loadBalancerNetwork();
         $this->get('/v2/load-balancers/' . $this->loadBalancer()->id . '/networks')
             ->seeJson([
