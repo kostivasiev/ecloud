@@ -2,6 +2,10 @@
 
 namespace App\Traits\V2;
 
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 trait DeletionRules
@@ -9,7 +13,16 @@ trait DeletionRules
     public function canDelete()
     {
         $relationships = $this->getDependentRelationships()->sum(function ($relation) {
-            return $relation->count();
+
+            if ($relation instanceof Collection) {
+                return $relation->count();
+            }
+
+            if ($relation instanceof Model) {
+                return 1;
+            }
+
+            return 0;
         });
         return $relationships === 0;
     }

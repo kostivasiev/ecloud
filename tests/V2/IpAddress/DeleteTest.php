@@ -1,29 +1,47 @@
 <?php
 namespace Tests\V2\IpAddress;
 
-use App\Models\V2\IpAddress;
+use Tests\Mocks\Resources\VipMock;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
+    use VipMock;
+
     public function testSuccessfulDelete()
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $ipAddress = IpAddress::factory()->create();
 
-        $this->delete('/v2/ip-addresses/' . $ipAddress->id)
+        $this->delete('/v2/ip-addresses/' . $this->ip()->id)
             ->assertResponseStatus(204);
     }
 
-    public function testDeleteAssignedToResourceFails()
+    public function testCannotDeleteWhenUsedByNic()
     {
-        $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $ipAddress = IpAddress::factory()->create();
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write'])));
+        $this->ip()->nics()->sync($this->nic());
 
-        $ipAddress->nics()->sync($this->nic());
+        $this->delete('/v2/ip-addresses/' . $this->ip()->id)
+            ->assertResponseStatus(412);
+    }
 
-        $this->delete('/v2/ip-addresses/' . $ipAddress->id)
-            ->assertResponseStatus(403);
+    public function testCannotDeleteWhenUsedByVip()
+    {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write'])));
+        $this->vip()->setAttribute('ip_address_id', $this->ip()->id)->saveQuietly();
+
+        $this->delete('/v2/ip-addresses/' . $this->ip()->id)
+            ->assertResponseStatus(412);
+    }
+
+    public function testCannotDeleteWhenUsedByVipAndNic()
+    {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write'])));
+        $this->ip()->nics()->sync($this->nic());
+        $this->vip()->setAttribute('ip_address_id', $this->ip()->id)->saveQuietly();
+
+        $this->delete('/v2/ip-addresses/' . $this->ip()->id)
+            ->assertResponseStatus(412);
     }
 }
