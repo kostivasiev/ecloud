@@ -31,7 +31,7 @@ class CreateTest extends TestCase
         )->seeInDatabase(
             'vips',
             [
-                'load_balancer_network_id' => $this->loadBalancer()->loadBalancerNetworks->first()['id'],
+                'load_balancer_network_id' => ($this->loadBalancer()->loadBalancerNetworks->first())->id,
             ],
             'ecloud'
         )->assertResponseStatus(202);
@@ -59,7 +59,7 @@ class CreateTest extends TestCase
         )  ->seeInDatabase(
             'vips',
             [
-                'load_balancer_network_id' => $this->loadBalancer()->loadBalancerNetworks->first()['id'],
+                'load_balancer_network_id' => ($this->loadBalancer()->loadBalancerNetworks->first())->id,
             ],
             'ecloud'
         )
