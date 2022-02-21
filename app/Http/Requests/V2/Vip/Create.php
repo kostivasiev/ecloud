@@ -30,7 +30,6 @@ class Create extends FormRequest
                 Rule::exists(LoadBalancer::class, 'id')->whereNull('deleted_at'),
                 new ExistsForUser(LoadBalancer::class),
                 new IsResourceAvailable(LoadBalancer::class),
-//                new ArePivotResourcesAvailable(LoadBalancer::class, ['LoadBalancerNetwork', 'network']),
             ],
             'allocate_floating_ip' => [
                 'sometimes',
