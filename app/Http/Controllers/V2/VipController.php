@@ -51,11 +51,11 @@ class VipController extends BaseController
      */
     public function create(Create $request)
     {
-        $lb = LoadBalancer::forUser(Auth::user())->findOrFail($request->input('load_balancer_id'));
-        $lbNetwork = $lb->loadBalancerNetworks->firstOrFail();
+        $loadBalancer = LoadBalancer::forUser(Auth::user())->findOrFail($request->input('load_balancer_id'));
+        $loadBalancerNetwork = $loadBalancer->loadBalancerNetworks->firstOrFail();
         $vip = new Vip([
             'name' => $request->input('name'),
-            'load_balancer_network_id' => $lbNetwork['id']
+            'load_balancer_network_id' => $loadBalancerNetwork->id
         ]);
 
         $task = $vip->syncSave([
