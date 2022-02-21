@@ -34,9 +34,9 @@ class CreateManagementFirewallPolicies extends TaskJob
                     ]);
                     $firewallPolicy->save();
 
-                    // Allow inbound 4222
+                    // Allow outbound 4222
                     $firewallRule = new FirewallRule([
-                        'name' => 'Allow_Ed_on_Port_4222_outbound_' . $managementRouter->id,
+                        'name' => 'Allow_Ed_Proxy_outbound_' . $managementRouter->id,
                         'sequence' => 10,
                         'firewall_policy_id' => $firewallPolicy->id,
                         'source' => 'ANY',
@@ -51,6 +51,13 @@ class CreateManagementFirewallPolicies extends TaskJob
                         'protocol' => 'TCP',
                         'source' => 'ANY',
                         'destination' => '4222'
+                    ]);
+                    $firewallRulePort->save();
+                    $firewallRulePort = new FirewallRulePort([
+                        'firewall_rule_id' => $firewallRule->id,
+                        'protocol' => 'TCP',
+                        'source' => 'ANY',
+                        'destination' => '3128'
                     ]);
                     $firewallRulePort->save();
 
