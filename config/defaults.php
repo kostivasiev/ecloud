@@ -123,8 +123,12 @@ return [
             'advanced' => env('TAG_ADVANCED_NETWORKING', 'az-advancedNetworking'),
             'management' => [
                 'default' => env('TAG_DEFAULT_NETWORKING', 'az-admin'),
-                'advanced' => env('TAG_DEFAULT_NETWORKING', 'az-adminadv'),
+                'advanced' => env('TAG_ADVANCED_NETWORKING', 'az-adminadv'),
             ]
+        ],
+        'edge-cluster' => [
+            'default' => env('TAG_DEFAULT_EDGECLUSTER', 'az-default'),
+            'advanced' => env('TAG_ADVANCED_EDGECLUSTER', 'az-advancedNetworking'),
         ]
     ]
 ];
