@@ -64,13 +64,7 @@ class Deploy extends TaskJob
 
         if (!$exists) {
             $tier0Tag = ($router->vpc->advanced_networking) ?
-                config('defaults.tag.networking.advanced') :
-                config('defaults.tag.networking.default');
-            if ($router->is_management) {
-                $tier0Tag = ($router->vpc->advanced_networking) ?
-                    config('defaults.tag.networking.management.advanced') :
-                    config('defaults.tag.networking.management.default');
-            }
+                config('defaults.tag.networking.advanced') : config('defaults.tag.networking.default');
 
             // Load default T0 for the AZ
             $tier0SearchResponse = $router->availabilityZone->nsxService()->get(

@@ -184,7 +184,7 @@ class AvailabilityZone extends Model implements Filterable, Sortable, RegionAble
         $searchEdgeClusterResponse = json_decode($this->nsxService()->get(
             'api/v1/search/query?query=resource_type:EdgeCluster' .
             '%20AND%20tags.scope:' . config('defaults.tag.scope') .
-            '%20AND%20tags.tag:' . ($advanced ? config('defaults.tag.edge-cluster.advanced') : config('defaults.tag.edge-cluster.default'))
+            '%20AND%20tags.tag:' . ($advanced ? config('defaults.tag.networking.advanced') : config('defaults.tag.networking.default'))
         )->getBody()->getContents());
 
         if ($searchEdgeClusterResponse->result_count != 1) {
