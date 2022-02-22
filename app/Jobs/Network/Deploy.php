@@ -18,14 +18,17 @@ class Deploy extends TaskJob
             return;
         }
 
-        $subnet = Subnet::fromString($network->subnet);
         //The first address is the network identification and the last one is the broadcast, they cannot be used as regular addresses.
-        $networkAddress = $subnet->getStartAddress();
-        $gatewayAddress = $networkAddress->getNextAddress();
-        $dhcpServerAddress = $gatewayAddress->getNextAddress();
+        $gatewayAddress = $network->getGatewayAddress();
+        $dhcpServerAddress = $network->getDhcpServerAddress();
+        $networkPrefix = $network->getNetworkPrefix();
+
+        $gatewayAddressWithPrefix = $gatewayAddress->toString() . '/' . $networkPrefix;
+        $dhcpServerAddressWithPrefix = $dhcpServerAddress->toString() . '/' . $networkPrefix;
+
         $message = 'Deploying Network: ' . $network->id . ': ';
-        $this->debug($message . 'Gateway Address: ' . $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix());
-        $this->debug($message . 'DHCP Server Address: ' . $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix());
+        $this->debug($message . 'Gateway Address: ' . $gatewayAddressWithPrefix);
+        $this->debug($message . 'DHCP Server Address: ' . $dhcpServerAddressWithPrefix);
         $this->debug($message . 'DHCP ID: ' . $dhcp->id);
 
         $network->router->availabilityZone->nsxService()->patch(
@@ -35,10 +38,10 @@ class Deploy extends TaskJob
                     'resource_type' => 'Segment',
                     'subnets' => [
                         [
-                            'gateway_address' => $gatewayAddress->toString() . '/' . $subnet->getNetworkPrefix(),
+                            'gateway_address' => $gatewayAddressWithPrefix,
                             'dhcp_config' => [
                                 'resource_type' => 'SegmentDhcpV4Config',
-                                'server_address' => $dhcpServerAddress->toString() . '/' . $subnet->getNetworkPrefix(),
+                                'server_address' => $dhcpServerAddressWithPrefix,
                                 'lease_time' => config('defaults.network.subnets.dhcp_config.lease_time'),
                                 'dns_servers' => config('defaults.network.subnets.dhcp_config.dns_servers')
                             ]
