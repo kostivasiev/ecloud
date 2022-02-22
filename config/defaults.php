@@ -121,6 +121,10 @@ return [
         'networking' => [
             'default' => env('TAG_DEFAULT_NETWORKING', 'az-default'),
             'advanced' => env('TAG_ADVANCED_NETWORKING', 'az-advancedNetworking'),
+            'management' => [
+                'default' => env('TAG_DEFAULT_NETWORKING', 'az-admin'),
+                'advanced' => env('TAG_DEFAULT_NETWORKING', 'az-adminadv'),
+            ]
         ]
     ]
 ];

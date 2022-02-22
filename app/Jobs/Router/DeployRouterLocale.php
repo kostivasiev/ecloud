@@ -21,7 +21,7 @@ class DeployRouterLocale extends TaskJob
         $router->availabilityZone->nsxService()->patch('policy/api/v1/infra/tier-1s/' . $router->id . '/locale-services/' . $router->id, [
             'json' => [
                 'edge_cluster_path' => '/infra/sites/default/enforcement-points/default/edge-clusters/' .
-                    $router->availabilityZone->getNsxEdgeClusterId($router->vpc->advanced_networking),
+                    $router->availabilityZone->getNsxEdgeClusterId($router->vpc->advanced_networking, $router->is_management),
                 'tags' => [
                     [
                         'scope' => config('defaults.tag.scope'),
