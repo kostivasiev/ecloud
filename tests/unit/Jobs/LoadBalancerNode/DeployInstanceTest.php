@@ -57,6 +57,8 @@ class DeployInstanceTest extends TestCase
                 'is_hidden' => true,
             ]
         );
+
+        $this->managementNetwork();
     }
 
     public function testDeployInstance()
@@ -88,6 +90,10 @@ class DeployInstanceTest extends TestCase
         $this->assertArrayHasKey('nats_proxy_ip', $imageData);
         $this->assertArrayHasKey('primary', $imageData);
         $this->assertArrayHasKey('keepalived_password', $imageData);
+        $this->assertArrayHasKey('management_gateway', $imageData);
+        $this->assertArrayHasKey('management_subnet', $imageData);
         $this->assertEquals($this->loadBalancer()->config_id, $imageData['group_id']);
+        $this->assertEquals('192.168.8.1', $imageData['management_gateway']);
+        $this->assertEquals(config('network.management_range.standard'), $imageData['management_subnet']);
     }
 }

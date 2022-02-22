@@ -26,19 +26,17 @@ class CreateDefaultNetworkRules extends Job
     {
         $this->model = $networkPolicy;
         $this->data = $data;
-
-        $subnet = Subnet::fromString($this->model->network->subnet);
-        $this->dhcpServerAddress = $subnet->getStartAddress()->getNextAddress()->getNextAddress();
     }
 
     public function handle()
     {
         foreach (config('defaults.network_policy.rules') as $rule) {
             if (!$this->model->networkRules()->where('name', $rule['name'])->where('type', $rule['type'])->exists()) {
+                $dhcpServerAddress = $this->model->network->getDhcpServerAddress()->toString();
                 $networkRule = app()->make(NetworkRule::class);
                 $networkRule->fill($rule);
                 if ($rule['type'] == NetworkRule::TYPE_DHCP && $rule['direction'] == 'IN') {
-                    $networkRule->source = $this->dhcpServerAddress;
+                    $networkRule->source = $dhcpServerAddress;
                 }
 
                 if ($rule['type'] == NetworkRule::TYPE_CATCHALL && isset($this->data['catchall_rule_action'])) {

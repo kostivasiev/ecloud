@@ -152,13 +152,42 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
         }
     }
 
+    public function getSubnet()
+    {
+        return Subnet::fromString($this->subnet);
+    }
+
+    /**
+     * @return \IPLib\Address\AddressInterface
+     */
+    public function getNetworkAddress()
+    {
+        return $this->getSubnet()->getStartAddress();
+    }
+
+    /**
+     * @return \IPLib\Address\AddressInterface
+     */
+    public function getGatewayAddress()
+    {
+        return $this->getNetworkAddress()->getNextAddress();
+    }
+
+    /**
+     * @return \IPLib\Address\AddressInterface
+     */
+    public function getDhcpServerAddress()
+    {
+        return $this->getGatewayAddress()->getNextAddress();
+    }
+
     /**
      * Get subnet prefix, eg 10.0.0.1/24 returns 24
      * @return int
      */
     public function getNetworkPrefix()
     {
-        return Subnet::fromString($this->subnet)->getNetworkPrefix();
+        return $this->getSubnet()->getNetworkPrefix();
     }
 
     /**
