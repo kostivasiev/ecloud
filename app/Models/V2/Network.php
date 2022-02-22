@@ -162,7 +162,7 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
      */
     public function getNetworkAddress()
     {
-        $this->getSubnet()->getStartAddress();
+        return $this->getSubnet()->getStartAddress();
     }
 
     /**
@@ -178,7 +178,7 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
      */
     public function getDhcpServerAddress()
     {
-        $this->getGatewayAddress()->getStartAddress();
+        return $this->getGatewayAddress()->getNextAddress();
     }
 
     /**

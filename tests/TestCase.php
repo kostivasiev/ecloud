@@ -88,6 +88,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
     /** @var Router */
     private $router;
 
+    /** @var Router */
+    private $managementRouter;
+
     /** @var NsxService */
     private $nsxServiceMock;
 
@@ -117,6 +120,9 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
 
     /** @var Network */
     private $network;
+
+    /** @var Network */
+    private $managementNetwork;
 
     /** @var HostSpec */
     private $hostSpec;
@@ -220,6 +226,22 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->router;
+    }
+
+    public function managementRouter()
+    {
+        if (!$this->managementRouter) {
+            Model::withoutEvents(function () {
+                $this->managementRouter = factory(Router::class)->create([
+                    'id' => 'rtr-managementtest',
+                    'vpc_id' => $this->vpc()->id,
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                    'router_throughput_id' => $this->routerThroughput()->id,
+                    'is_management' => true,
+                ]);
+            });
+        }
+        return $this->managementRouter;
     }
 
     public function vpc()
@@ -372,6 +394,21 @@ abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
             });
         }
         return $this->network;
+    }
+
+    public function managementNetwork()
+    {
+        if (!$this->managementNetwork) {
+            Model::withoutEvents(function () {
+                $this->managementNetwork = factory(Network::class)->create([
+                    'id' => 'net-managementtest',
+                    'name' => 'Management Manchester Network',
+                    'subnet' => '192.168.8.0/28',
+                    'router_id' => $this->managementRouter()->id
+                ]);
+            });
+        }
+        return $this->managementNetwork;
     }
 
     public function hostGroup()

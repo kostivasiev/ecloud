@@ -6,6 +6,7 @@ use App\Jobs\TaskJob;
 use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Traits\V2\TaskJobs\AwaitResources;
+use Illuminate\Support\Facades\Log;
 
 class DeployInstance extends TaskJob
 {
@@ -33,6 +34,14 @@ class DeployInstance extends TaskJob
                 $this->fail(new \Exception('No nats servers found for ' . $availabilityZone->id));
                 return;
             }
+
+            $managementGateway = null;
+            try {
+                $managementGateway = $this->getManagementGateway();
+            } catch (\Exception $ex) {
+                $this->fail($ex);
+            }
+
             // Now populate the remaining deploy_data elements
             $deployData = $instance->deploy_data;
             $deployData['image_data'] = [
@@ -42,7 +51,9 @@ class DeployInstance extends TaskJob
                     'group_id' => $loadBalancerNode->loadBalancer->config_id,
                     'nats_proxy_ip' => $natsProxyIp,
                     'primary' => false,
-                    'keepalived_password' => $this->getKeepAliveDPassword()
+                    'keepalived_password' => $this->getKeepAliveDPassword(),
+                    'management_gateway' => $managementGateway,
+                    'management_subnet' => $this->getManagementSubnet(),
                 ];
             $instance->deploy_data = $deployData;
             $instance->syncSave();
@@ -83,5 +94,51 @@ class DeployInstance extends TaskJob
         }
 
         return config('load-balancer.nats_proxy_ip.standard');
+    }
+
+    public function getManagementGateway(): string
+    {
+        $loadBalancerNode = $this->task->resource;
+        $loadBalancer = $loadBalancerNode->loadBalancer;
+
+
+        $managementRouter = $loadBalancer->vpc->routers()
+            ->where('is_management', true)
+            ->whereHas('availabilityZone', function ($query) use ($loadBalancer) {
+                $query->where('id', $loadBalancer->availabilityZone->id);
+            })->first();
+
+        if (!$managementRouter) {
+            Log::error('Failed to load management router', [
+                'vpc_id' => $loadBalancer->vpc->id,
+                'availability_zone_id' => $loadBalancer->availabilityZone->id,
+                'load_balancer_id' => $loadBalancer->id]);
+
+            throw new \Exception('Failed to load management router');
+        }
+
+        $managementNetwork = $managementRouter->networks->first();
+
+        if (!$managementNetwork) {
+            Log::error('Failed to load management network', [
+                'vpc_id' => $loadBalancer->vpc->id,
+                'availability_zone_id' => $loadBalancer->availabilityZone->id,
+                'load_balancer_id' => $loadBalancer->id]);
+
+            throw new \Exception('Failed to load management network');
+        }
+
+        return $managementNetwork->getGatewayAddress()->toString();
+    }
+
+    public function getManagementSubnet(): string
+    {
+        $loadBalancerNode = $this->task->resource;
+
+        if ($loadBalancerNode->loadBalancer->vpc->advanced_networking) {
+            return config('network.management_range.advanced');
+        }
+
+        return config('network.management_range.standard');
     }
 }
