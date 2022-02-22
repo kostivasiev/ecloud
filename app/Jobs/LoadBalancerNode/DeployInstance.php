@@ -40,6 +40,7 @@ class DeployInstance extends TaskJob
                 $managementGateway = $this->getManagementGateway();
             } catch (\Exception $ex) {
                 $this->fail($ex);
+                return;
             }
 
             // Now populate the remaining deploy_data elements
