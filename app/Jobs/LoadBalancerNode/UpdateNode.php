@@ -42,7 +42,7 @@ class UpdateNode extends TaskJob
         ]);
     }
 
-    public function getManagementNic(): Nic
+    public function getManagementNic()
     {
         $loadBalancerNode = $this->task->resource;
 
@@ -50,6 +50,6 @@ class UpdateNode extends TaskJob
             $query->whereIsManagement(true);
         })->with('instance', function ($query) use ($loadBalancerNode) {
             $query->where('instances.id', '=', $loadBalancerNode->instance_id);
-        })->first();
+        })->get()->first();
     }
 }
