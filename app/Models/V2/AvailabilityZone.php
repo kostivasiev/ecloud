@@ -179,12 +179,20 @@ class AvailabilityZone extends Model implements Filterable, Sortable, RegionAble
      * @return string
      * @throws \Exception
      */
-    public function getNsxEdgeClusterId(Bool $advanced = false): string
+    public function getNsxEdgeClusterId(Bool $advanced = false, Bool $management = false): string
     {
+        $tag = $advanced ?
+            config('defaults.tag.edge-cluster.advanced'):
+            config('defaults.tag.edge-cluster.default');
+        if ($management) {
+            $tag = $advanced ?
+                config('defaults.tag.edge-cluster.management.advanced'):
+                config('defaults.tag.edge-cluster.management.default');
+        }
         $searchEdgeClusterResponse = json_decode($this->nsxService()->get(
             'api/v1/search/query?query=resource_type:EdgeCluster' .
             '%20AND%20tags.scope:' . config('defaults.tag.scope') .
-            '%20AND%20tags.tag:' . ($advanced ? config('defaults.tag.edge-cluster.advanced') : config('defaults.tag.edge-cluster.default'))
+            '%20AND%20tags.tag:' . $tag
         )->getBody()->getContents());
 
         if ($searchEdgeClusterResponse->result_count != 1) {

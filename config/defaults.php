@@ -129,6 +129,10 @@ return [
         'edge-cluster' => [
             'default' => env('TAG_DEFAULT_EDGECLUSTER', 'az-default'),
             'advanced' => env('TAG_ADVANCED_EDGECLUSTER', 'az-advancedNetworking'),
+            'management' => [
+                'default' => env('TAG_DEFAULT_EDGECLUSTER', 'az-admin'),
+                'advanced' => env('TAG_ADVANCED_EDGECLUSTER', 'az-adminadv'),
+            ]
         ]
     ]
 ];
