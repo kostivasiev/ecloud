@@ -4,11 +4,10 @@ namespace Tests\unit\Jobs\LoadBalancerNode;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancerNode\UpdateNode;
-use App\Models\V2\Task;
-use App\Support\Sync;
+use App\Models\V2\IpAddress;
+use App\Models\V2\Nic;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 use UKFast\Admin\Loadbalancers\AdminClient;
@@ -19,27 +18,16 @@ class UpdateNodeTest extends TestCase
 {
     use LoadBalancerMock;
 
-    private $lbNodeId = 123456;
-    protected string $ipAddress;
-    protected Task $task;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->ipAddress = '192.168.1.10';
         $this->router()->setAttribute('is_management', true)->saveQuietly();
-        $this->nic()->setAttribute('ip_address', $this->ipAddress)->saveQuietly();
-        $this->loadBalancerNode()->setAttribute('node_id', $this->lbNodeId)->saveQuietly();
-        $this->loadBalancerInstance();
-        $this->task = Task::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $task->resource()->associate($this->loadBalancerNode());
-            $task->save();
-            return $task;
-        });
+        $this->nic()->setAttribute('instance_id', $this->loadBalancerInstance()->id)->saveQuietly();
+        $this->nic()->ipAddresses()->save(IpAddress::factory()->create([
+            'network_id' => $this->network()->id,
+            'type' => IpAddress::TYPE_NORMAL,
+            'ip_address' => '1.1.1.1'
+        ]));
     }
 
     public function testSuccess()
@@ -53,7 +41,7 @@ class UpdateNodeTest extends TestCase
                     ->withAnyArgs()
                     ->andReturnUsing(function () {
                         $mockSelfResponse = \Mockery::mock(SelfResponse::class)->makePartial();
-                        $mockSelfResponse->allows('getId')->andReturns($this->lbNodeId);
+                        $mockSelfResponse->allows('getId')->andReturns($this->loadBalancerNode()->id);
                         return $mockSelfResponse;
                     });
                 return $nodeMock;
@@ -63,14 +51,28 @@ class UpdateNodeTest extends TestCase
 
         Event::fake([JobFailed::class, Created::class]);
 
-        dispatch(new UpdateNode($this->task));
+        dispatch(new UpdateNode($this->createSyncUpdateTask($this->loadBalancerNode())));
 
         Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testGetManagementNic()
     {
-        $job = new UpdateNode($this->task);
-        $this->assertEquals($this->ipAddress, $job->getManagementNic()->ip_address);
+        $job = new UpdateNode($this->createSyncUpdateTask($this->loadBalancerNode()));
+
+        $nic = factory(Nic::class)->create([
+            'id' => 'nic-' . uniqid(),
+            'mac_address' => 'AA:AA:AA:AA:AA:AA',
+            'network_id' => $this->network()->id,
+        ]);
+        $nic->ipAddresses()->save(IpAddress::factory()->create([
+            'network_id' => $this->network()->id,
+            'type' => IpAddress::TYPE_NORMAL,
+            'ip_address' => '2.2.2.2'
+        ]));
+        $nic->setAttribute('instance_id', $this->loadBalancerInstance()->id)->saveQuietly();
+
+        $this->assertEquals($this->nic()->id, $job->getManagementNic()->id);
+        $this->assertEquals('1.1.1.1', $job->getManagementNic()->ip_address);
     }
 }
