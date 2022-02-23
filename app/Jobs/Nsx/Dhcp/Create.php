@@ -3,7 +3,6 @@
 namespace App\Jobs\Nsx\Dhcp;
 
 use App\Jobs\TaskJob;
-use App\Models\V2\Router;
 
 class Create extends TaskJob
 {
