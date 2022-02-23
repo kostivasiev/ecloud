@@ -188,12 +188,20 @@ class FixT0ValuesTest extends TestCase
     public function testUpdateTier0ConfigTestRun()
     {
         $this->mock->allows('option')->with('test-run')->andReturnTrue();
+        $this->mock
+            ->allows('info')
+            ->with('Updating router ' . $this->router()->id . '(' . $this->router()->name . ')')
+            ->andReturnTrue();
         $this->assertTrue($this->mock->updateTier0Config($this->router(), 'path/goes/here'));
     }
 
     public function testUpdateTier0ConfigUpdateException()
     {
         $this->mock->allows('option')->with('test-run')->andReturnFalse();
+        $this->mock
+            ->allows('info')
+            ->with('Updating router ' . $this->router()->id . '(' . $this->router()->name . ')')
+            ->andReturnTrue();
         $this->nsxServiceMock()
             ->allows('patch')
             ->withSomeOfArgs(
@@ -218,6 +226,10 @@ class FixT0ValuesTest extends TestCase
     public function testUpdateTier0Config()
     {
         $this->mock->allows('option')->with('test-run')->andReturnFalse();
+        $this->mock
+            ->allows('info')
+            ->with('Updating router ' . $this->router()->id . '(' . $this->router()->name . ')')
+            ->andReturnTrue();
         $this->nsxServiceMock()
             ->allows('patch')
             ->withSomeOfArgs(
