@@ -19,6 +19,7 @@ use Tests\TestCase;
 class DeployTest extends TestCase
 {
     protected Task $task;
+    protected Task $adminRouterTask;
 
     public function setUp(): void
     {
@@ -31,6 +32,15 @@ class DeployTest extends TestCase
             ]);
             $this->task->resource()->associate($this->router());
             $this->task->save();
+        });
+
+        Model::withoutEvents(function () {
+            $this->adminRouterTask = new Task([
+                'id' => 'adminsync-1',
+                'name' => Sync::TASK_NAME_UPDATE,
+            ]);
+            $this->adminRouterTask->resource()->associate($this->managementRouter());
+            $this->adminRouterTask->save();
         });
     }
 
@@ -148,6 +158,59 @@ class DeployTest extends TestCase
         Event::fake([JobFailed::class]);
 
         dispatch(new Deploy($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testManagementRouterPopulatedAdditionalRouteAdvertisementTypes()
+    {
+        $this->nsxServiceMock()->expects('get')
+            ->withSomeOfArgs('policy/api/v1/search/query?query=resource_type:GatewayQosProfile%20AND%20committed_bandwitdth:' . $this->routerThroughput()->committed_bandwidth)
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'result_count' => 1,
+                    'results' => [
+                        [
+                            'path' => '/some/qos/path'
+                        ]
+                    ]
+                ]));
+            });
+
+        $this->nsxServiceMock()->expects('get')
+            ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->managementRouter()->id])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([]));
+            });
+
+        $this->nsxServiceMock()->expects('patch')
+            ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->managementRouter()->id, [
+                'json' => [
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $this->managementRouter()->vpc_id,
+                        ],
+                    ],
+                    'route_advertisement_types' => [
+                        'TIER1_IPSEC_LOCAL_ENDPOINT',
+                        'TIER1_STATIC_ROUTES',
+                        'TIER1_NAT',
+                        'TIER1_CONNECTED'
+                    ],
+                    'qos_profile' => [
+                        'egress_qos_profile_path' => '/some/qos/path',
+                        'ingress_qos_profile_path' => '/some/qos/path'
+                    ]
+                ],
+            ]])
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([]));
+            });
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new Deploy($this->adminRouterTask));
 
         Event::assertNotDispatched(JobFailed::class);
     }
