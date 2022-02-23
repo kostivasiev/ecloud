@@ -47,6 +47,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\VPC\FixBillingEndDates::class,
         \App\Console\Commands\Router\RemoveBlockAllOutbound::class,
         \App\Console\Commands\Rules\ModifyEdRules::class,
+        \App\Console\Commands\Router\FixT0Values::class,
     ];
 
     /**
