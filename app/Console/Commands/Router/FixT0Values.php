@@ -110,6 +110,7 @@ class FixT0Values extends Command
 
     public function updateTier0Config($router, $correctPath): bool
     {
+        $this->info('Updating router ' . $router->id . '(' . $router->name . ')')
         if (!$this->option('test-run')) {
             try {
                 $response = $router->availabilityZone->nsxService()->patch(
