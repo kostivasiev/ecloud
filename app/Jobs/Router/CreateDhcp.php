@@ -26,8 +26,6 @@ class CreateDhcp extends TaskJob
         $dhcp = app()->make(Dhcp::class);
         $dhcp->vpc()->associate($vpc);
         $dhcp->availabilityZone()->associate($availabilityZone);
-        $dhcp->syncSave([
-            'router_id' => $router->id,
-        ]);
+        $dhcp->syncSave();
     }
 }
