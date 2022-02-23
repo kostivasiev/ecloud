@@ -51,6 +51,10 @@ class Deploy extends TaskJob
             ]
         ];
 
+        if ($router->is_management) {
+            $payload['route_advertisement_types'][] = 'TIER1_CONNECTED';
+        }
+
         $exists = true;
         try {
             $router->availabilityZone->nsxService()->get('policy/api/v1/infra/tier-1s/' . $router->id);
