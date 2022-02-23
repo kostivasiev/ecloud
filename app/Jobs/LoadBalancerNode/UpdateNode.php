@@ -42,7 +42,7 @@ class UpdateNode extends TaskJob
         ]);
     }
 
-    public function getManagementNic()
+    public function getManagementNic(): Nic
     {
         $loadBalancerNode = $this->task->resource;
 

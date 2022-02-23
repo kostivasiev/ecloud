@@ -74,7 +74,6 @@ class UpdateNodeTest extends TestCase
         $nic->setAttribute('instance_id', $this->loadBalancerInstance()->id)->saveQuietly();
 
         $this->assertEquals($this->nic()->id, $job->getManagementNic()->id);
-
         $this->assertEquals('1.1.1.1', $job->getManagementNic()->ip_address);
     }
 }
