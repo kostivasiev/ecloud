@@ -5,7 +5,6 @@ namespace Tests\unit\Jobs\LoadBalancerNode;
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancerNode\UpdateNode;
 use App\Models\V2\IpAddress;
-
 use App\Models\V2\Nic;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
