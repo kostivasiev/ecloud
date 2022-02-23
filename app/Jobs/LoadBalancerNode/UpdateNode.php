@@ -23,10 +23,7 @@ class UpdateNode extends TaskJob
         }
 
         // now we need to get the ip address on the management nic
-        $managementNic = $this->getManagementNic();
-        $ipAddress = $managementNic->ip_address;
-
-        $this->debug("Debug LB Nic: loadBalancerNode->instance_id=".$loadBalancerNode->instance_id.", load_balancer_node_id=".$loadBalancerNode->id.", management_nic_id=".$managementNic->id);
+        $ipAddress = $this->getManagementNic()->ip_address;
 
         $client = app()->make(AdminClient::class)
             ->setResellerId($loadBalancerNode->loadBalancer->getResellerId());
