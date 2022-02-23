@@ -5,7 +5,9 @@ namespace Tests\unit\Jobs\LoadBalancerNode;
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancerNode\UpdateNode;
 use App\Models\V2\IpAddress;
+use App\Models\V2\Network;
 use App\Models\V2\Nic;
+use App\Models\V2\Router;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\LoadBalancerMock;
@@ -63,7 +65,16 @@ class UpdateNodeTest extends TestCase
         $nic = factory(Nic::class)->create([
             'id' => 'nic-' . uniqid(),
             'mac_address' => 'AA:AA:AA:AA:AA:AA',
-            'network_id' => $this->network()->id,
+            'network_id' => factory(Network::class)->create([
+                'id' => 'net-' . uniqid(),
+                'subnet' => '10.0.0.0/24',
+                'router_id' => factory(Router::class)->create([
+                    'id' => 'rtr-' . uniqid(),
+                    'vpc_id' => $this->vpc()->id,
+                    'availability_zone_id' => $this->availabilityZone()->id,
+                    'router_throughput_id' => $this->routerThroughput()->id,
+                ])->id
+            ])->id,
         ]);
         $nic->ipAddresses()->save(IpAddress::factory()->create([
             'network_id' => $this->network()->id,
