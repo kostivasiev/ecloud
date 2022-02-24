@@ -7,13 +7,16 @@ use Illuminate\Console\Command;
 
 class FixT0Values extends Command
 {
-    protected $signature = 'router:fix-t0-settings {--D|debug} {--T|test-run}';
+    protected $signature = 'router:fix-t0-settings {--D|debug} {--T|test-run} {--router=}';
 
     protected $description = 'Fixes the Admin Router T0 values';
 
     public function handle()
     {
-        Router::all()->each(function ($router) {
+        $routers = ($this->option('router')) ?
+            Router::where('id', '=', $this->option('router'))->get():
+            Router::all();
+        $routers->each(function ($router) {
             // 1. Get the tag
             $tier0Tag = $this->getT0Tag($router);
             if (!$tier0Tag) {
