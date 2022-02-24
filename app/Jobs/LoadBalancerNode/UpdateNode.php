@@ -46,10 +46,10 @@ class UpdateNode extends TaskJob
     {
         $loadBalancerNode = $this->task->resource;
 
-        return Nic::whereHas('network.router', function ($query) {
-            $query->whereIsManagement(true);
-        })->with('instance', function ($query) use ($loadBalancerNode) {
-            $query->where('instances.id', '=', $loadBalancerNode->instance_id);
-        })->get()->first();
+        return $loadBalancerNode->instance
+               ->nics()
+               ->whereHas('network.router', function ($query) {
+                   $query->where('is_management', true);
+               })->first();
     }
 }
