@@ -34,8 +34,9 @@ Service Affecting - this bug is affecting the uptime of the customers solution
 Process Affecting - the problem is preventing me or the customer from doing a task 
 /label ~"Process Affecting" 
 
+
 <!--- Set Team label - Delete as appropriate -->
 /label ~PHP ~dotNET ~DevOps
 
 <!--- Set necessary labels - don't remove -->
-/label ~Bug ~Triage 
+/label ~Bug ~Triage ~"risk::low" 
