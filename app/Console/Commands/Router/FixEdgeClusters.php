@@ -131,6 +131,4 @@ class FixEdgeClusters extends Command
         }
         return true;
     }
-
-
 }
