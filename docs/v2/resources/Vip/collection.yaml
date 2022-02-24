@@ -47,6 +47,7 @@ post:
                 allocate_floating_ip:
                   type: boolean
                   required: false
+                  description: Whether to allocate a floating IP to the VIP, defaults to false.
   responses:
     202:
       description: Accepted
