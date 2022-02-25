@@ -1,5 +1,4 @@
-###
-# Create Discount Plan (Scoped Reseller)
+### 1. Create Discount Plan that should be pro-rata'd (note end date is 00:00:00 not 23:59:59)
 POST https://{{host}}/{{version}}/discount-plans
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -29,8 +28,8 @@ client.test('Test Discount Created with scoped reseller', function () {
 %}
 
 ###
-# Approve Discount Plan
-POST https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}/approve
+### 2. Approve Discount Plan
+POST https://{{host}}/{{version}}/discount-plans/{{scoped_id}}/approve
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
 X-consumer-groups: ecloud.read, ecloud.write
@@ -42,8 +41,11 @@ client.test('Check the correct response is received after approval', function ()
 });
 %}
 
+### 3. "Run php artisan vpc:process-billing --current-month --debug --test-run --reseller=7052"
+#
+# observe 97% of Billing period discounted
 
-###
+### 4. Delete the discount plan
 # Delete Discount Plan
 DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}
 Accept: */*
