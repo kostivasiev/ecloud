@@ -19,7 +19,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class Vip extends Model implements Filterable, Sortable
+class Vip extends Model implements Filterable, Sortable, ResellerScopeable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable, HasFactory;
 
@@ -54,6 +54,11 @@ class Vip extends Model implements Filterable, Sortable
     public function ipAddress()
     {
         return $this->belongsTo(IpAddress::class);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->loadBalancerNetwork->loadBalancer->getResellerId();
     }
 
 //    public function getFloatingIpIdAttribute()
