@@ -191,4 +191,64 @@ class ProcessBillingTest extends TestCase
 
         $this->assertEquals($expectedCost, $actualCost);
     }
+
+    public function testProRataDiscountPlanStartsAfterBillingPeriodStart()
+    {
+        $this->setDebugRunExpectation(3, 0);
+
+        $newStartDate = $this->startDate->copy();
+
+//        $percent = ((730 - 48) / 730) * 100;
+//        $expectedCost = (90.00 / 100) * $percent;
+        $expectedCost = 84.082191780822;
+
+        $actualCost = $this->averageMonth()
+            ->addDiscountPlan(100, $newStartDate->addHours(48))
+            ->runBilling()
+            ->getCost();
+
+        $this->assertEquals(number_format($expectedCost, 2), number_format($actualCost, 2));
+    }
+
+    public function testProRataDiscountPlanEndsBeforeBillingPeriodEnd()
+    {
+        $this->setDebugRunExpectation(3, 0);
+
+        $this->averageMonth();
+
+        $newEndDate = $this->endDate->copy();
+
+//        $percent = ((730 - 48) / 730) * 100;
+//        $expectedCost = (90.00 / 100) * $percent;
+        $expectedCost = 84.082191780822;
+
+        $actualCost =
+            $this->addDiscountPlan(100, null, $newEndDate->subHours(48))
+            ->runBilling()
+            ->getCost();
+
+        $this->assertEquals(number_format($expectedCost, 2), number_format($actualCost, 2));
+    }
+
+    public function testProRataDiscountPlanStartsAndEndsDuringBillingPeriodEnd()
+    {
+        $this->setDebugRunExpectation(3, 0);
+
+        $this->averageMonth();
+
+        $newStartDate = $this->startDate->copy()->addHours(48);
+
+        $newEndDate = $this->endDate->copy()->subHours(48);
+
+//        $percent = ((730 - 96) / 730) * 100;
+//        $expectedCost = (90.00 / 100) * $percent;
+        $expectedCost = 78.164383561644;
+
+        $actualCost =
+            $this->addDiscountPlan(100, $newStartDate, $newEndDate)
+                ->runBilling()
+                ->getCost();
+
+        $this->assertEquals(number_format($expectedCost, 2), number_format($actualCost, 2));
+    }
 }
