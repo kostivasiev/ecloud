@@ -4,6 +4,9 @@ namespace App\Console\Commands\Firewall;
 
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRulePort;
+use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
+use App\Models\V2\NetworkRulePort;
 use App\Models\V2\Router;
 use Illuminate\Console\Command;
 
@@ -22,32 +25,90 @@ class SquidUpdate extends Command
             Router::where('is_management', '=', true)->get();
 
         $routers->each(function ($router) {
-            // 1. Get Firewall Policy
-            $firewallPolicy = $this->getManagementFirewallPolicy($router);
-            if (!$firewallPolicy) {
-                $this->error($router->id . ' : Management firewall policy not present.');
-                return;
-            }
-
-            // 2. Get Allow Ed rule
-            $firewallRule = $this->getEdRule($router, $firewallPolicy);
-            if (!$firewallRule) {
-                $this->error(
-                    $router->id . ' : Firewall rule for Ed is not present in policy ' . $firewallPolicy->id
-                );
-                return;
-            }
-
-            // 3. Check if squid port is present, if not create it
-            $firewallRulePort = $this->getSquidPorts($firewallRule);
-            if (!$firewallRulePort) {
-                $this->addSquidPorts($firewallRule);
-                $taskId = $this->updateFirewallRuleAndSyncPolicy($router, $firewallPolicy, $firewallRule);
-                $this->info('Firewall rule ' . $firewallRule->id . ' updated, sync task ' . $taskId . ' created');
-                return;
-            }
-            $this->info($router->id . ' : Squid rule already present.');
+            $this->processFirewalls($router);
+            $this->processNetworks($router);
         });
+    }
+
+    public function processFirewalls(Router $router)
+    {
+        // 1. Get Firewall Policy
+        $firewallPolicy = $this->getManagementFirewallPolicy($router);
+        if (!$firewallPolicy) {
+            $this->error($router->id . ' : Management firewall policy not present.');
+            return;
+        }
+
+        // 2. Get Allow Ed rule
+        $firewallRule = $this->getEdRule($router, $firewallPolicy);
+        if (!$firewallRule) {
+            $this->error(
+                $router->id . ' : Firewall rule for Ed is not present in policy ' . $firewallPolicy->id
+            );
+            return;
+        }
+
+        // 3. Check if squid port is present, if not create it
+        $firewallRulePort = $this->getSquidPorts($firewallRule);
+        if (!$firewallRulePort) {
+            $this->addSquidPorts($firewallRule);
+            $taskId = $this->updateFirewallRuleAndSyncPolicy($router, $firewallPolicy, $firewallRule);
+            $this->info('Firewall rule ' . $firewallRule->id . ' updated, sync task ' . $taskId . ' created');
+            return;
+        }
+        $this->info($router->id . ' : Squid rule already present for firewall.');
+    }
+
+    public function processNetworks(Router $router)
+    {
+        if ($router->vpc->advanced_networking) {
+            $networkPolicy = NetworkPolicy::whereHas('network', function ($query) use ($router) {
+                $query->where('router_id', '=', $router->id);
+            })->first();
+            if (!$networkPolicy) {
+                $this->error('No network policy found for router ' . $router->id);
+                return false;
+            }
+            $networkRule = $networkPolicy->networkRules()->where([
+                ['name', '=', 'Allow_Ed_on_Port_4222_outbound_' . $networkPolicy->network_id]
+            ])->first();
+            if (!$networkRule) {
+                $this->error('No Ed proxy rule found for network ' . $networkPolicy->network_id);
+                return false;
+            }
+            $squidPort = $networkRule->networkRulePorts()->where([
+                ['protocol', '=', 'TCP'],
+                ['destination', '=', '3128']
+            ])->get();
+            if ($squidPort->count() <= 0) {
+                $this->info(
+                    'Creating Squid Port rule for router ' . $router->id .
+                    ' on network ' . $networkPolicy->network_id
+                );
+                if ($this->option('test-run')) {
+                    return true;
+                }
+                $networkRulePort = new NetworkRulePort([
+                    'network_rule_id' => $networkRule->id,
+                    'protocol' => 'TCP',
+                    'source' => 'ANY',
+                    'destination' => '3128'
+                ]);
+                $networkRulePort->save();
+
+                // Update the network rule name
+                $this->info('Updating name for network rule ' . $networkRule->id);
+                $networkRule->name = 'Allow_Ed_Proxy_outbound_' . $networkPolicy->network_id;
+                $networkRule->save();
+
+                $this->info('Syncing policy ' . $networkPolicy->id);
+                $networkPolicy->syncSave();
+                return true;
+            }
+            $this->info($router->id . ' : Squid rule already present for network ' . $networkPolicy->network_id);
+            return true;
+        }
+        $this->info('Router ' . $router->id . ' is not connected to an advanced networking vpc');
     }
 
     public function getManagementFirewallPolicy(Router $router)

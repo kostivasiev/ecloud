@@ -6,6 +6,8 @@ use App\Console\Commands\Firewall\SquidUpdate;
 use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
+use App\Models\V2\NetworkRule;
+use App\Models\V2\NetworkRulePort;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -16,6 +18,8 @@ class SquidUpdateTest extends TestCase
 
     public FirewallRule $firewallRule;
     public FirewallRulePort $firewallRulePort;
+    public NetworkRule $networkRule;
+    public NetworkRulePort $networkRulePort;
 
     public function setUp(): void
     {
@@ -46,6 +50,23 @@ class SquidUpdateTest extends TestCase
             'destination' => '3128'
         ]);
         $this->firewallRulePort->saveQuietly();
+        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
+        $this->networkRule = factory(NetworkRule::class)->create([
+            'name' => 'Allow_Ed_on_Port_4222_outbound_' . $this->network()->id,
+            'sequence' => 10,
+            'network_policy_id' => $this->networkPolicy()->id,
+            'source' => 'ANY',
+            'destination' => 'ANY',
+            'action' => 'ALLOW',
+            'direction' => 'OUT',
+            'enabled' => true
+        ]);
+        $this->networkRulePort = factory(NetworkRulePort::class)->create([
+            'network_rule_id' => $this->networkRule->id,
+            'protocol' => 'TCP',
+            'source' => 'ANY',
+            'destination' => '3128'
+        ]);
     }
 
     public function testGetManagementFirewallPolicyNoPolicies()
@@ -160,22 +181,22 @@ class SquidUpdateTest extends TestCase
         Event::assertDispatched(Created::class);
     }
 
-    public function testHandleGetManagementFirewallPolicyFails()
+    public function testProcessFirewallsGetManagementFirewallPolicyFails()
     {
         $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->allows('error')->with(\Mockery::capture($message));
         $this->mock->allows('getManagementFirewallPolicy')->withAnyArgs()->andReturnFalse();
-        $this->mock->handle();
+        $this->mock->processFirewalls($this->router());
 
         $this->assertEquals($this->router()->id . ' : Management firewall policy not present.', $message);
     }
 
-    public function testHandleGetEdRuleFails()
+    public function testProcessFirewallsGetEdRuleFails()
     {
         $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->allows('error')->with(\Mockery::capture($message));
         $this->mock->allows('getEdRule')->withAnyArgs()->andReturnFalse();
-        $this->mock->handle();
+        $this->mock->processFirewalls($this->router());
 
         $this->assertEquals(
             $this->router()->id . ' : Firewall rule for Ed is not present in policy ' .
@@ -184,17 +205,17 @@ class SquidUpdateTest extends TestCase
         );
     }
 
-    public function testHandleGetSquidPortsPasses()
+    public function testProcessFirewallsGetSquidPortsPasses()
     {
         $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->allows('info')->with(\Mockery::capture($message));
         $this->mock->allows('getSquidPorts')->withAnyArgs()->andReturn($this->firewallRule);
-        $this->mock->handle();
+        $this->mock->processFirewalls($this->router());
 
-        $this->assertEquals($this->router()->id . ' : Squid rule already present.', $message);
+        $this->assertEquals($this->router()->id . ' : Squid rule already present for firewall.', $message);
     }
 
-    public function testHandleGetSquidPortsFails()
+    public function testProcessFirewallsGetSquidPortsFails()
     {
         $task = $this->createSyncUpdateTask($this->firewallPolicy());
         $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
@@ -204,11 +225,71 @@ class SquidUpdateTest extends TestCase
         $this->mock->allows('updateFirewallRuleAndSyncPolicy')
             ->withAnyArgs()
             ->andReturn($task->id);
-        $this->mock->handle();
+        $this->mock->processFirewalls($this->router());
 
         $this->assertEquals(
             'Firewall rule ' . $this->firewallRule->id . ' updated, sync task ' . $task->id . ' created',
             $message
         );
+    }
+
+    public function testProcessNetworksNoAdvancedNetworking()
+    {
+        Model::withoutEvents(function () {
+            $this->vpc()->setAttribute('advanced_networking', false)->saveQuietly();
+        });
+        $this->mock->allows('info')->with(\Mockery::capture($message));
+        $this->mock->processNetworks($this->router());
+
+        $this->assertEquals(
+            'Router ' . $this->router()->id . ' is not connected to an advanced networking vpc',
+            $message
+        );
+    }
+
+    public function testProcessNetworksNoNetworkPolicy()
+    {
+        Model::withoutEvents(function () {
+            $this->networkPolicy()->delete();
+        });
+        $this->mock->allows('error')->with(\Mockery::capture($message));
+        $this->mock->processNetworks($this->router());
+
+        $this->assertEquals('No network policy found for router ' . $this->router()->id, $message);
+    }
+
+    public function testProcessNetworksNoNetworkRule()
+    {
+        $this->networkRule->delete();
+        $this->mock->allows('error')->with(\Mockery::capture($message));
+        $this->mock->processNetworks($this->router());
+
+        $this->assertEquals('No Ed proxy rule found for network ' . $this->network()->id, $message);
+    }
+
+    public function testProcessNetworksRulePresent()
+    {
+        $this->mock->allows('info')->with(\Mockery::capture($message));
+        $this->mock->processNetworks($this->router());
+
+        $this->assertEquals(
+            $this->router()->id . ' : Squid rule already present for network ' . $this->network()->id,
+            $message
+        );
+    }
+
+    public function testProcessNetworksRuleNotPresent()
+    {
+        $this->networkRulePort->delete();
+        $this->mock->allows('info')->with(\Mockery::capture($message));
+        $this->mock->allows('option')->with('test-run')->andReturnFalse();
+
+        Event::fake(Created::class);
+        $this->mock->processNetworks($this->router());
+        Event::assertDispatched(Created::class);
+
+        $this->networkRule->refresh();
+        $this->assertEquals('Syncing policy ' . $this->networkPolicy()->id, $message);
+        $this->assertEquals('Allow_Ed_Proxy_outbound_' . $this->network()->id, $this->networkRule->name);
     }
 }
