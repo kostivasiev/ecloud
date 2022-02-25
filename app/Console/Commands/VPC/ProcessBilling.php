@@ -105,7 +105,6 @@ class ProcessBilling extends Command
                 }
 
                 if ($hoursWithinDiscountPlan != $this->hoursInBillingPeriod) {
-
                     $percentHoursInBillingPeriod = ($hoursWithinDiscountPlan / $this->hoursInBillingPeriod) * 100;
 
                     $proRataCommitmentAmount = ($discountPlan->commitment_amount / 100) * $percentHoursInBillingPeriod;
