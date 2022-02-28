@@ -93,7 +93,8 @@ class ProcessBilling extends Command
                     $hoursWithinDiscountPlan -= $discountPlan->term_start_date->diffInHours($this->startDate);
                 }
 
-                if ($discountPlan->term_end_date < $this->endDate) {
+                // Check if the term end date 23:59:59 is less than the billing end period
+                if ($discountPlan->term_end_date->clone()->setTime(23, 59, 59)->lt($this->endDate)) {
                     $hoursWithinDiscountPlan -= $discountPlan->term_end_date->diffInHours($this->endDate);
                 }
 
