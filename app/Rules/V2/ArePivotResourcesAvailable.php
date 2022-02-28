@@ -12,6 +12,7 @@ class ArePivotResourcesAvailable implements Rule
     protected String $pivot;
 
     protected String $failedResource;
+
     private bool $busy;
 
     public function __construct($pivot, $resources)
