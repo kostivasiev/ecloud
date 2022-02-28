@@ -31,9 +31,9 @@ class IsResourceAvailable implements Rule
     public function message()
     {
         if ($this->inProgress != true) {
-            return 'The specified :attribute resource is currently in a failed state and cannot be used';
+            return sprintf('The specified :attribute resource currently has the status of \'%s\' and cannot be used', Sync::STATUS_FAILED);
         }
 
-        return sprintf('The specified :attribute resource is currently %s and cannot be used', Sync::STATUS_INPROGRESS);
+        return sprintf('The specified :attribute resource currently has the status of \'%s\' and cannot be used', Sync::STATUS_INPROGRESS);
     }
 }
