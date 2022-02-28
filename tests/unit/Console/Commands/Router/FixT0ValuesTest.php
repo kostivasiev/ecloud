@@ -17,20 +17,13 @@ class FixT0ValuesTest extends TestCase
     {
         parent::setUp();
         $this->mock = \Mockery::mock(FixT0Values::class)->makePartial();
-        $this->router();
+        $this->router()->setAttribute('is_management', true)->saveQuietly();
     }
 
     public function testT0Tag()
     {
-        // Standard tag
-        $this->assertEquals('az-default', $this->mock->getT0Tag($this->router()));
-
-        // Advanced tag
-        $this->router()->vpc->setAttribute('advanced_networking', true)->saveQuietly();
-        $this->assertEquals('az-advancedNetworking', $this->mock->getT0Tag($this->router()));
-
         // Advanced Management tag
-        $this->router()->setAttribute('is_management', true)->saveQuietly();
+        $this->router()->vpc->setAttribute('advanced_networking', true)->saveQuietly();
         $this->assertEquals('az-adminadv', $this->mock->getT0Tag($this->router()));
 
         // Standard Management tag
@@ -242,6 +235,7 @@ class FixT0ValuesTest extends TestCase
 
     public function testHandleWhenGetT0TagFails()
     {
+        $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->expects('getT0Tag')->withAnyArgs()->andReturnFalse();
         $this->mock->allows('error')->with(\Mockery::capture($message));
         $this->mock->handle();
@@ -251,6 +245,7 @@ class FixT0ValuesTest extends TestCase
 
     public function testHandleWhenGetTier0TagPathFails()
     {
+        $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->expects('getT0Tag')->withAnyArgs()->andReturn('az-default');
         $this->mock->expects('getTier0TagPath')->withAnyArgs()->andReturnFalse();
         $this->mock->allows('error')->with(\Mockery::capture($message));
@@ -261,6 +256,7 @@ class FixT0ValuesTest extends TestCase
 
     public function testHandleWhenGetTier0ConfigFails()
     {
+        $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->expects('getT0Tag')->withAnyArgs()->andReturn('az-default');
         $this->mock->expects('getTier0TagPath')->withAnyArgs()->andReturn('path/to/t0');
         $this->mock->expects('getTier0Config')->withAnyArgs()->andReturnFalse();
@@ -272,6 +268,7 @@ class FixT0ValuesTest extends TestCase
 
     public function testHandleWhenPathsAreTheSame()
     {
+        $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->expects('getT0Tag')->withAnyArgs()->andReturn('az-default');
         $this->mock->expects('getTier0TagPath')->withAnyArgs()->andReturn('path/to/t0');
         $this->mock->expects('getTier0Config')->withAnyArgs()->andReturn('path/to/t0');
@@ -283,6 +280,7 @@ class FixT0ValuesTest extends TestCase
 
     public function testHandleWhenUpdateTier0ConfigFails()
     {
+        $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->expects('getT0Tag')->withAnyArgs()->andReturn('az-default');
         $this->mock->expects('getTier0TagPath')->withAnyArgs()->andReturn('correct/t0/path');
         $this->mock->expects('getTier0Config')->withAnyArgs()->andReturn('path/to/t0');
@@ -295,6 +293,7 @@ class FixT0ValuesTest extends TestCase
 
     public function testHandleWhenUpdateTier0ConfigSucceeds()
     {
+        $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->expects('getT0Tag')->withAnyArgs()->andReturn('az-default');
         $this->mock->expects('getTier0TagPath')->withAnyArgs()->andReturn('correct/t0/path');
         $this->mock->expects('getTier0Config')->withAnyArgs()->andReturn('path/to/t0');
