@@ -86,15 +86,18 @@ class AdvertiseSegmentsServiceTest extends TestCase
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'id' => $this->router()->id,
+                    'tier0_path' => '/infra/tier-0s/T0',
+                    'route_advertisement_types' => $this->advertisementTypesWithout,
                 ]));
             });
         $this->mock->allows('checkT0Connection')
             ->withAnyArgs()
             ->andReturnFalse();
-        $this->assertFalse($this->mock->getAdvertisedTypes($this->router()));
+        $response = $this->mock->getAdvertisedTypes($this->router());
+        $this->assertEquals(Arr::flatten($this->advertisementTypesWithout), Arr::flatten($response));
     }
 
-    public function testGetAdvertisedTypes()
+    public function testGetAdvertisedTypesPathsMatch()
     {
         $this->nsxServiceMock()
             ->allows('get')
@@ -109,8 +112,7 @@ class AdvertiseSegmentsServiceTest extends TestCase
         $this->mock->allows('checkT0Connection')
             ->withAnyArgs()
             ->andReturnTrue();
-        $response = $this->mock->getAdvertisedTypes($this->router());
-        $this->assertEquals(Arr::flatten($this->advertisementTypesWithout), Arr::flatten($response));
+        $this->assertFalse($this->mock->getAdvertisedTypes($this->router()));
     }
 
     public function testCheckT0ConnectionNoVpc()
@@ -162,33 +164,7 @@ class AdvertiseSegmentsServiceTest extends TestCase
         $this->assertEquals($this->router()->id . ' : No tagged T0 could be found', $message);
     }
 
-    public function testCheckT0ConnectionPathMismatch()
-    {
-        $this->nsxServiceMock()
-            ->allows('get')
-            ->withSomeOfArgs(
-                '/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20'.
-                'tags.scope:ukfast%20AND%20tags.tag:az-admin'
-            )->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'result_count' => 1,
-                    'results' => [
-                        [
-                            'path' => '/infra/tier-0s/T9999',
-                        ]
-                    ]
-                ]));
-            });
-        $response = json_decode(json_encode([
-            'tier0_path' => '/infra/tier-0s/T0',
-        ]));
-        $this->mock->allows('error')->with(\Mockery::capture($message));
-        $this->assertFalse($this->mock->checkT0Connection($this->router(), $response));
-
-        $this->assertEquals($this->router()->id . ' : is not connected to the correct T0 path', $message);
-    }
-
-    public function testCheckT0Connection()
+    public function testCheckT0ConnectionPathMatch()
     {
         $this->nsxServiceMock()
             ->allows('get')
@@ -208,7 +184,35 @@ class AdvertiseSegmentsServiceTest extends TestCase
         $response = json_decode(json_encode([
             'tier0_path' => '/infra/tier-0s/T0',
         ]));
+        $this->mock->allows('info')->with(\Mockery::capture($message));
         $this->assertTrue($this->mock->checkT0Connection($this->router(), $response));
+
+        $this->assertEquals($this->router()->id . ' : is connected to the correct T0 path', $message);
+    }
+
+    public function testCheckT0Connection()
+    {
+        $this->mock->allows('info')->with(\Mockery::capture($message));
+        $this->nsxServiceMock()
+            ->allows('get')
+            ->withSomeOfArgs(
+                '/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20'.
+                'tags.scope:ukfast%20AND%20tags.tag:az-admin'
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'result_count' => 1,
+                    'results' => [
+                        [
+                            'path' => '/infra/tier-0s/T999',
+                        ]
+                    ]
+                ]));
+            });
+        $response = json_decode(json_encode([
+            'tier0_path' => '/infra/tier-0s/T0',
+        ]));
+        $this->assertFalse($this->mock->checkT0Connection($this->router(), $response));
+        $this->assertEquals($this->router()->id . ' : is not connected to the correct T0 path', $message);
     }
 
     public function testUpdateRouteAdvertisementTypesTestRun()

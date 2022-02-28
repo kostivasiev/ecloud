@@ -58,7 +58,7 @@ class AdvertiseSegmentsService extends Command
         }
 
         // now check that the t1 is connected to an admin t0
-        if (!$this->checkT0Connection($router, $response)) {
+        if ($this->checkT0Connection($router, $response)) {
             return false;
         }
 
@@ -91,11 +91,13 @@ class AdvertiseSegmentsService extends Command
             return false;
         }
 
-        if ($response->tier0_path === $tier0SearchResponse->results[0]->path) {
-            return true;
+        if ($response->tier0_path != $tier0SearchResponse->results[0]->path) {
+            $this->info($router->id . ' : is not connected to the correct T0 path');
+            return false;
         }
-        $this->error($router->id . ' : is not connected to the correct T0 path');
-        return false;
+
+        $this->info($router->id . ' : is connected to the correct T0 path');
+        return true;
     }
 
     public function updateRouteAdvertisementTypes(Router $router, array $types): bool
