@@ -16,9 +16,6 @@ class ResetRdnsHostname extends TaskJob implements ShouldQueue
 {
     use InteractsWithQueue, Batchable, RdnsTrait;
 
-    private $rdns;
-    private $safednsClient;
-
     /**
      * @return void
      * @throws GuzzleException
@@ -29,30 +26,29 @@ class ResetRdnsHostname extends TaskJob implements ShouldQueue
         $model = $this->task->resource;
         $this->info(get_class($this) . ' : Started');
 
-        $this->safednsClient = app()->make(AdminClient::class);
-        $floatingIp = FloatingIp::withTrashed()->findOrFail($model->id);
+        $safednsClient = app()->make(AdminClient::class);
 
-        $floatingIp->rdns_hostname = $this->reverseIpDefault($model->ip_address);
-        $floatingIp->save();
+        $model->rdns_hostname = $this->reverseIpDefault($model->ip_address);
+        $model->save();
 
-        $dnsName = $this->reverseIpLookup($floatingIp->ip_address);
+        $dnsName = $this->reverseIpLookup($model->ip_address);
 
-        $this->rdns = $this->safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
+        $rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
 
-        if (count($this->rdns->getItems()) !== 1) {
+        if (count($rdns->getItems()) !== 1) {
             $this->info("Unable to determine RDNS record, can not update.");
             $this->fail(new \Exception('Unable to determine RDNS record, can not update.' . $model->id));
 
             return;
         }
 
-        $this->rdns = $this->rdns->getItems()[0];
+        $rdns = $rdns->getItems()[0];
 
-        if ($this->safednsClient->records()->update($this->createRecord(
-            $this->rdns->id,
-            $this->rdns->name,
-            $this->rdns->zone,
-            $floatingIp->rdns_hostname
+        if ($safednsClient->records()->update($this->createRecord(
+            $rdns->id,
+            $rdns->name,
+            $rdns->zone,
+            $model->rdns_hostname
         ))) {
             $this->info(get_class($this) . ' : Finished');
         } else {
