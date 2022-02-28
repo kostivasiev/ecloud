@@ -14,8 +14,8 @@ class FixT0Values extends Command
     public function handle()
     {
         $routers = ($this->option('router')) ?
-            Router::where('id', '=', $this->option('router'))->get():
-            Router::all();
+            Router::isManagement()->where('id', '=', $this->option('router'))->get():
+            Router::isManagement()->get();
         $routers->each(function ($router) {
             // 1. Get the tag
             $tier0Tag = $this->getT0Tag($router);
@@ -60,15 +60,9 @@ class FixT0Values extends Command
             $this->error($router->id . ' : VPC `' . $router->vpc_id . '` not found');
             return false;
         }
-        $tier0Tag = ($router->vpc->advanced_networking) ?
-            config('defaults.tag.networking.advanced') :
-            config('defaults.tag.networking.default');
-        if ($router->is_management) {
-            $tier0Tag = ($router->vpc->advanced_networking) ?
-                config('defaults.tag.networking.management.advanced') :
-                config('defaults.tag.networking.management.default');
-        }
-        return $tier0Tag;
+        return ($router->vpc->advanced_networking) ?
+            config('defaults.tag.networking.management.advanced') :
+            config('defaults.tag.networking.management.default');
     }
 
     public function getTier0TagPath(Router $router, string $tier0Tag)
