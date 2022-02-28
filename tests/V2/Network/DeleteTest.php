@@ -66,7 +66,7 @@ class DeleteTest extends TestCase
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         Event::fake(Created::class);
-        $this->ip()->nics()->sync($this->nic());
+        $this->nic();
         $this->delete('/v2/networks/' . $this->network()->id)->assertResponseStatus(412);
         $this->network()->refresh();
         $this->assertFalse($this->network()->trashed());
