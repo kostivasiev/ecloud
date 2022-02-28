@@ -12,6 +12,7 @@ class ArePivotResourcesAvailable implements Rule
     protected String $pivot;
 
     protected String $failedResource;
+    private bool $busy;
 
     public function __construct($pivot, $resources)
     {
@@ -26,6 +27,7 @@ class ArePivotResourcesAvailable implements Rule
 
         foreach ($resource->getRelations() as $relation) {
             if ($relation->sync->status != Sync::STATUS_COMPLETE) {
+                $this->busy = $relation->sync->status == Sync::STATUS_INPROGRESS;
                 $this->failedResource = $relation;
                 return false;
             }
@@ -36,6 +38,10 @@ class ArePivotResourcesAvailable implements Rule
 
     public function message()
     {
+        if ($this->busy) {
+            return "The $this->failedResource is currently in a busy state and cannot be used";
+        }
+
         return "The $this->failedResource is currently in a failed state and cannot be used";
     }
 }
