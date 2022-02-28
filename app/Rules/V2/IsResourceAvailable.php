@@ -2,13 +2,14 @@
 
 namespace App\Rules\V2;
 
-use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Contracts\Validation\Rule;
 
 class IsResourceAvailable implements Rule
 {
     protected $resource;
+
+    private bool $busy = false;
 
     public function __construct($resource)
     {
@@ -21,11 +22,26 @@ class IsResourceAvailable implements Rule
         if (!$instance) {
             return false;
         }
-        return $instance->sync->status === Sync::STATUS_COMPLETE;
+
+        switch ($instance->sync->status) {
+            case Sync::STATUS_COMPLETE:
+                return true;
+            case Sync::STATUS_INPROGRESS:
+                $this->busy = true;
+                // no break
+            case Sync::STATUS_FAILED:
+                return false;
+            default:
+                throw new \Exception('Unexpected Resource State');
+        }
     }
 
     public function message()
     {
-        return 'The specified :attribute resource is currently in a failed state and cannot be used';
+        if ($this->busy != true) {
+            return 'The specified :attribute resource is currently in a failed state and cannot be used';
+        }
+
+        return 'The specified :attribute resource is currently in progress and cannot be used';
     }
 }
