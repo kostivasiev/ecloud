@@ -9,9 +9,9 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -25,6 +25,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
  * @method static forUser(string $user)
+ * @method static isManagement()
  */
 class Router extends Model implements Filterable, Sortable, ResellerScopeable, Manageable, AvailabilityZoneable
 {
@@ -128,6 +129,15 @@ class Router extends Model implements Filterable, Sortable, ResellerScopeable, M
         return $query->whereHas('vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
+    }
+
+    /**
+     * @param Builder $query
+     * @return Builder
+     */
+    public function scopeIsManagement(Builder $query)
+    {
+        return $query->where('is_management', true);
     }
 
     /**

@@ -17,12 +17,9 @@ class FixEdgeClusters extends Command
     public function handle()
     {
         $routers = ($this->option('router')) ?
-            Router::where([
-                ['id', '=', $this->option('router')],
-                ['is_management', '=', true],
-            ])->get():
-            Router::where('is_management', '=', true)->get();
-        $routers->where('is_management', '=', true)->each(function ($router) {
+            Router::isManagement()->where('id', '=', $this->option('router'))->get():
+            Router::isManagement()->get();
+        $routers->each(function ($router) {
             // 1. Get the correct Edge Cluster ID
             $edgeClusterId = $this->getEdgeClusterUuid($router);
             if (!$edgeClusterId) {
