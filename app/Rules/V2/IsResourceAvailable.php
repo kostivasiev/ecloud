@@ -42,6 +42,6 @@ class IsResourceAvailable implements Rule
             return 'The specified :attribute resource is currently in a failed state and cannot be used';
         }
 
-        return 'The specified :attribute resource is currently in progress and cannot be used';
+        return 'The specified :attribute resource is currently being processed and cannot be used';
     }
 }
