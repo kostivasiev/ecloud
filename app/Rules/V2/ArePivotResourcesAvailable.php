@@ -39,10 +39,10 @@ class ArePivotResourcesAvailable implements Rule
 
     public function message()
     {
-        if ($this->inProgress != true) {
-            return sprintf('The %s currently has the status of \'%s\' and cannot be used', $this->failedResource, Sync::STATUS_FAILED);
-        }
-
-        return sprintf('The %s currently has the status of \'%s\' and cannot be used', $this->failedResource, Sync::STATUS_INPROGRESS);
+        return sprintf(
+            'The %s currently has the status of \'%s\' and cannot be used',
+            $this->failedResource,
+            $this->inProgress ? Sync::STATUS_INPROGRESS : Sync::STATUS_FAILED
+        );
     }
 }
