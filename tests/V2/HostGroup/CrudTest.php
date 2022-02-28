@@ -111,7 +111,7 @@ class CrudTest extends TestCase
             ->seeJson(
                 [
                     'title' => 'Validation Error',
-                    'detail' => 'The specified vpc id resource is currently in a failed state and cannot be used',
+                    'detail' => 'The specified vpc id resource currently has the status of \'failed\' and cannot be used',
                 ]
             )->assertResponseStatus(422);
     }

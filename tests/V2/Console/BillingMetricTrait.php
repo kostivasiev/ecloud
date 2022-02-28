@@ -518,7 +518,7 @@ trait BillingMetricTrait
         return $this;
     }
 
-    public function addDiscountPlan($commitment = 0.00)
+    public function addDiscountPlan($commitment = 0.00, $startDate = null, $endDate = null)
     {
         factory(DiscountPlan::class)->create([
             'contact_id' => 1,
@@ -526,8 +526,8 @@ trait BillingMetricTrait
             'commitment_before_discount' => $commitment,
             'orderform_id' => '84bfdc19-977e-462b-a14b-0c4b907fff55',
             'status' => 'approved',
-            'term_start_date' => $this->startDate,
-            'term_end_date' => $this->endDate,
+            'term_start_date' => $startDate ?? $this->startDate,
+            'term_end_date' => $endDate ?? $this->endDate,
         ]);
         return $this;
     }

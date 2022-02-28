@@ -24,7 +24,10 @@ class UpdateNodeTest extends TestCase
     {
         parent::setUp();
         $this->router()->setAttribute('is_management', true)->saveQuietly();
-        $this->nic()->setAttribute('instance_id', $this->loadBalancerInstance()->id)->saveQuietly();
+        $this->nic()
+            ->setAttribute('name', 'Management NIC')
+            ->setAttribute('instance_id', $this->loadBalancerInstance()->id)
+            ->saveQuietly();
         $this->nic()->ipAddresses()->save(IpAddress::factory()->create([
             'network_id' => $this->network()->id,
             'type' => IpAddress::TYPE_NORMAL,

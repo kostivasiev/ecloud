@@ -13,6 +13,8 @@ class ArePivotResourcesAvailable implements Rule
 
     protected String $failedResource;
 
+    private bool $inProgress;
+
     public function __construct($pivot, $resources)
     {
         $this->pivot = $pivot;
@@ -26,6 +28,7 @@ class ArePivotResourcesAvailable implements Rule
 
         foreach ($resource->getRelations() as $relation) {
             if ($relation->sync->status != Sync::STATUS_COMPLETE) {
+                $this->inProgress = $relation->sync->status == Sync::STATUS_INPROGRESS;
                 $this->failedResource = $relation;
                 return false;
             }
@@ -36,6 +39,10 @@ class ArePivotResourcesAvailable implements Rule
 
     public function message()
     {
-        return "The $this->failedResource is currently in a failed state and cannot be used";
+        return sprintf(
+            'The %s currently has the status of \'%s\' and cannot be used',
+            $this->failedResource,
+            $this->inProgress ? Sync::STATUS_INPROGRESS : Sync::STATUS_FAILED
+        );
     }
 }

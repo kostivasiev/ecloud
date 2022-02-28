@@ -60,7 +60,7 @@ class AttachVolumeTest extends TestCase
         ])->seeJson(
             [
                 'title' => 'Validation Error',
-                'detail' => 'The specified instance id resource is currently in a failed state and cannot be used',
+                'detail' => 'The specified instance id resource currently has the status of \'failed\' and cannot be used',
             ]
         )->assertResponseStatus(422);
     }
