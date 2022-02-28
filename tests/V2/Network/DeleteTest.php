@@ -62,7 +62,7 @@ class DeleteTest extends TestCase
             ->assertResponseStatus(202);
     }
 
-    public function testDependentResourcesFailsDelete()
+    public function testDependentNicFailsDelete()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         Event::fake(Created::class);
@@ -76,5 +76,13 @@ class DeleteTest extends TestCase
 
         $this->network()->refresh();
         $this->assertNull($this->network()->deleted_at);
+    }
+
+    public function testDependentIpFailsDelete()
+    {
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->ip();
+        $this->delete('/v2/networks/' . $this->network()->id)->assertResponseStatus(412);
+        $this->assertFalse($this->ip()->trashed());
     }
 }
