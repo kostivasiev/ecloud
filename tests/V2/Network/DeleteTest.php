@@ -67,15 +67,9 @@ class DeleteTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         Event::fake(Created::class);
         $this->ip()->nics()->sync($this->nic());
-        $this->delete('/v2/networks/' . $this->network()->id)
-            ->seeJson([
-                'title' => 'Precondition Failed',
-                'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->nic()->id,
-            ])
-            ->assertResponseStatus(412);
-
+        $this->delete('/v2/networks/' . $this->network()->id)->assertResponseStatus(412);
         $this->network()->refresh();
-        $this->assertNull($this->network()->deleted_at);
+        $this->assertFalse($this->network()->trashed());
     }
 
     public function testDependentIpFailsDelete()
@@ -83,6 +77,6 @@ class DeleteTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->ip();
         $this->delete('/v2/networks/' . $this->network()->id)->assertResponseStatus(412);
-        $this->assertFalse($this->ip()->trashed());
+        $this->assertFalse($this->network()->trashed());
     }
 }
