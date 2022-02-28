@@ -9,7 +9,7 @@ class IsResourceAvailable implements Rule
 {
     protected $resource;
 
-    private bool $busy = false;
+    private bool $inProgress = false;
 
     public function __construct($resource)
     {
@@ -23,25 +23,17 @@ class IsResourceAvailable implements Rule
             return false;
         }
 
-        switch ($instance->sync->status) {
-            case Sync::STATUS_COMPLETE:
-                return true;
-            case Sync::STATUS_INPROGRESS:
-                $this->busy = true;
-                // no break
-            case Sync::STATUS_FAILED:
-                return false;
-            default:
-                throw new \Exception('Unexpected Resource State');
-        }
+        $this->inProgress = $instance->sync->status == Sync::STATUS_INPROGRESS;
+
+        return $instance->sync->status === Sync::STATUS_COMPLETE;
     }
 
     public function message()
     {
-        if ($this->busy != true) {
+        if ($this->inProgress != true) {
             return 'The specified :attribute resource is currently in a failed state and cannot be used';
         }
 
-        return 'The specified :attribute resource is currently being processed and cannot be used';
+        return sprintf('The specified :attribute resource is currently %s and cannot be used', Sync::STATUS_INPROGRESS);
     }
 }
