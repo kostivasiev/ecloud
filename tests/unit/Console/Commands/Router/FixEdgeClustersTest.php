@@ -18,7 +18,7 @@ class FixEdgeClustersTest extends TestCase
     {
         parent::setUp();
         $this->mock = \Mockery::mock(FixEdgeClusters::class)->makePartial();
-        $this->router();
+        $this->router()->setAttribute('is_management', true)->saveQuietly();
     }
 
     public function testGetT0TagNoVpc()
@@ -37,15 +37,9 @@ class FixEdgeClustersTest extends TestCase
 
     public function testGetT0Tag()
     {
-        // Standard tag
-        $this->assertEquals('az-default', $this->mock->getT0Tag($this->router()));
-
-        // Advanced tag
-        $this->router()->vpc->setAttribute('advanced_networking', true)->saveQuietly();
-        $this->assertEquals('az-advancedNetworking', $this->mock->getT0Tag($this->router()));
-
         // Advanced Management tag
         $this->router()->setAttribute('is_management', true)->saveQuietly();
+        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
         $this->assertEquals('az-adminadv', $this->mock->getT0Tag($this->router()));
 
         // Standard Management tag

@@ -22,7 +22,7 @@ class FixEdgeClusters extends Command
                 ['is_management', '=', true],
             ])->get():
             Router::where('is_management', '=', true)->get();
-        $routers->each(function ($router) {
+        $routers->where('is_management', '=', true)->each(function ($router) {
             // 1. Get the correct Edge Cluster ID
             $edgeClusterId = $this->getEdgeClusterUuid($router);
             if (!$edgeClusterId) {
@@ -59,15 +59,9 @@ class FixEdgeClusters extends Command
             $this->error($router->id . ' : VPC `' . $router->vpc_id . '` not found');
             return false;
         }
-        $tier0Tag = ($router->vpc->advanced_networking) ?
-            config('defaults.tag.networking.advanced') :
-            config('defaults.tag.networking.default');
-        if ($router->is_management) {
-            $tier0Tag = ($router->vpc->advanced_networking) ?
+        return ($router->vpc->advanced_networking) ?
                 config('defaults.tag.networking.management.advanced') :
                 config('defaults.tag.networking.management.default');
-        }
-        return $tier0Tag;
     }
 
     public function getEdgeClusterUuid(Router $router)
