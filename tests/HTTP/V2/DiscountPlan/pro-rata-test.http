@@ -1,0 +1,61 @@
+### 1. Create Discount Plan that should be pro-rata'd (note end date is 00:00:00 not 23:59:59)
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-Reseller-Id: 1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "orderform_id": "2add21ef-c30d-4086-83d5-8a5214bca003",
+    "name": "test-1",
+    "commitment_amount": 90,
+    "commitment_before_discount": 100,
+    "discount_rate": 10,
+    "term_length": 1,
+    "term_start_date": "2022-01-18 00:00:00",
+    "term_end_date": "2022-02-28 00:00:00",
+    "reseller_id": 7052
+}
+
+> {%
+client.test('Test Discount Created with scoped reseller', function () {
+    client.assert(response.status === 201, '201 Response not received');
+    client.global.set('scoped_id', response.body.data.id);
+    client.log('Discount Plan Id: ' + response.body.data.id);
+});
+%}
+
+###
+### 2. Approve Discount Plan
+POST https://{{host}}/{{version}}/discount-plans/{{scoped_id}}/approve
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Check the correct response is received after approval', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 3. "Run php artisan vpc:process-billing --current-month --debug --test-run --reseller=7052"
+#
+# observe 97% of Billing period discounted
+
+### 4. Delete the discount plan
+# Delete Discount Plan
+DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test Discount Deleted', function () {
+    client.assert(response.status === 204, '204 Response not received');
+});
+%}
