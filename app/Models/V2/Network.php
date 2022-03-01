@@ -30,6 +30,7 @@ class Network extends Model implements Filterable, Sortable, ResellerScopeable, 
 
     public $children = [
         'nics',
+        'ipAddresses',
     ];
 
     public function __construct(array $attributes = [])
