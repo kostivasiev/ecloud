@@ -7,13 +7,16 @@ use Illuminate\Console\Command;
 
 class AdvertiseSegmentsService extends Command
 {
-    protected $signature = 'router:advertise-segments-service {--D|debug} {--T|test-run}';
+    protected $signature = 'router:advertise-segments-service {--D|debug} {--T|test-run} {--router=}';
     protected $description = 'Sets existing Admin T1s to advertise their connected segments and services';
 
     public function handle()
     {
-        Router::isManagement()->each(function (Router $router) {
-            // 1. Is router advertising it's segments/services and connected to T0?
+        $routers = ($this->option('router')) ?
+            Router::isManagement()->where('id', '=', $this->option('router'))->get():
+            Router::isManagement()->get();
+        $routers->each(function (Router $router) {
+            // 1. Is router advertising its segments/services and connected to T0?
             $advertisedTypes = $this->getAdvertisedTypes($router);
             if (!$advertisedTypes) {
                 $this->error($router->id . ' : route_advertisement_types not found');

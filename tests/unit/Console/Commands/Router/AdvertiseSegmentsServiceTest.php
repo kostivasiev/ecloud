@@ -30,6 +30,7 @@ class AdvertiseSegmentsServiceTest extends TestCase
         parent::setUp();
         $this->router()->setAttribute('is_management', true)->saveQuietly();
         $this->mock = \Mockery::mock(AdvertiseSegmentsService::class)->makePartial();
+        $this->mock->allows('option')->with('router')->andReturnFalse();
     }
 
     public function testGetAdvertisedTypesNoAvailabilityZone()
