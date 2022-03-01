@@ -21,14 +21,10 @@ class Delete extends Job
 
     public function handle()
     {
-        $floatingIp = $this->task->resource;
         $this->deleteTaskBatch([
             [
                 new ResetRdnsHostname($this->task),
             ],
         ])->dispatch();
-        $this->task->completed = true;
-        $this->task->save();
-        $floatingIp->delete();
     }
 }

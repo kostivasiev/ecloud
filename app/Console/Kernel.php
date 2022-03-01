@@ -49,6 +49,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Rules\ModifyEdRules::class,
         \App\Console\Commands\Router\FixT0Values::class,
         \App\Console\Commands\Router\AdvertiseSegmentsService::class,
+        \App\Console\Commands\Firewall\SquidUpdate::class,
+        \App\Console\Commands\Router\FixEdgeClusters::class,
     ];
 
     /**
