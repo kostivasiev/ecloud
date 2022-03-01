@@ -42,8 +42,7 @@ RUN mkdir -p /root/.ssh && \
     ssh-keyscan gitlab.devops.ukfast.co.uk > /root/.ssh/known_hosts
 
 WORKDIR /build
-COPY composer.json composer.lock /build/
-COPY database /build/database/
+COPY . /build
 
 ARG APP_ENV=dev
 RUN if [ ${APP_ENV} = "dev" ]; then \
