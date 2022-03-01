@@ -9,12 +9,12 @@
  */
 Route::group([
     'prefix' => 'v1',
-    'namespace' => 'V1',
+    'namespace' => 'App\Http\Controllers\V1',
     'middleware' =>  [
         'auth',
         'paginator-limit:' . env('PAGINATION_LIMIT')
     ]
-] , function () {
+], function () {
     /**
      * Base middleware only
      *

@@ -5,7 +5,7 @@
 
 Route::group([
     'prefix' => 'v2',
-    'namespace' => 'V2',
+    'namespace' => 'App\Http\Controllers\V2',
     'middleware' => [
         'auth',
         'paginator-limit:' . env('PAGINATION_LIMIT')
