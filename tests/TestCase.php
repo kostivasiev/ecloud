@@ -2,6 +2,28 @@
 
 namespace Tests;
 
+use App\Models\V2\Appliance;
+use App\Models\V2\ApplianceVersion;
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Credential;
+use App\Models\V2\Dhcp;
+use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FloatingIp;
+use App\Models\V2\HostGroup;
+use App\Models\V2\HostSpec;
+use App\Models\V2\Image;
+use App\Models\V2\ImageMetadata;
+use App\Models\V2\ImageParameter;
+use App\Models\V2\Instance;
+use App\Models\V2\IpAddress;
+use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
+use App\Models\V2\Nic;
+use App\Models\V2\Region;
+use App\Models\V2\Router;
+use App\Models\V2\RouterThroughput;
+use App\Models\V2\Task;
+use App\Models\V2\Vpc;
 use App\Services\AccountsService;
 use App\Services\V2\ArtisanService;
 use App\Services\V2\ConjurerService;
