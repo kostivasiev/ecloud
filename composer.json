@@ -81,7 +81,7 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "../ecloudLumen/app/helpers.php"
+            "app/helpers.php"
         ]
     },
     "autoload-dev": {
