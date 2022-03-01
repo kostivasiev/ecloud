@@ -1,6 +1,0 @@
-in: query
-name: per_page
-required: false
-schema:
-  type: integer
-description: 'Number of items to display per page'

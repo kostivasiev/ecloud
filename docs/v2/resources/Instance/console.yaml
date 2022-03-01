@@ -1,9 +1,0 @@
-post:
-  description: Retrieve a Console Session
-  parameters:
-    - $ref: '../../resources/Instance/parameters/instanceId.yaml'
-  responses:
-    200:
-      $ref: '../../resources/Instance/responses/consoleResponse.yaml'
-  tags:
-    - Instances

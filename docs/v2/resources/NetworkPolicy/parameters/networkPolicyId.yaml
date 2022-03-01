@@ -1,6 +1,0 @@
-in: path
-name: NetworkPolicyId
-required: true
-schema:
-  type: string
-example: np-abc123xyz

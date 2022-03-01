@@ -1,6 +1,0 @@
-in: path
-name: id
-required: true
-schema:
-  type: string
-example: imgparam-2b66bb79

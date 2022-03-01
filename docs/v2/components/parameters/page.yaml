@@ -1,6 +1,0 @@
-in: query
-name: page
-required: false
-schema:
-  type: integer
-description: 'Page number to jump to'

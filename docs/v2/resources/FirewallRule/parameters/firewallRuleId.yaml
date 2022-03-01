@@ -1,6 +1,0 @@
-in: path
-name: firewallRuleId
-required: true
-schema:
-  type: string
-example: fwr-cd226940

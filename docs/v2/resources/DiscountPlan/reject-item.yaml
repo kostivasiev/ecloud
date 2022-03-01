@@ -1,8 +1,0 @@
-post:
-  parameters:
-    - $ref: '../../resources/DiscountPlan/parameters/discountPlanId.yaml'
-  responses:
-    200:
-      description: Success
-  tags:
-    - Discount Plans

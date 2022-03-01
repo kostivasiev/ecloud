@@ -1,6 +1,0 @@
-in: path
-name: lbsId
-required: true
-schema:
-  type: string
-example: lbs-0c03049b

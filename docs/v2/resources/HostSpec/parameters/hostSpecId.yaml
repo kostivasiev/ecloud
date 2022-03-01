@@ -1,6 +1,0 @@
-in: path
-name: hostSpecId
-required: true
-schema:
-  type: string
-example: hs-2b66bb79

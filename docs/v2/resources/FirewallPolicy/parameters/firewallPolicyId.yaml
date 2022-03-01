@@ -1,6 +1,0 @@
-in: path
-name: firewallPolicyId
-required: true
-schema:
-  type: string
-example: fwp-d4226940

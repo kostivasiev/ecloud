@@ -1,6 +1,0 @@
-in: path
-name: keypairId
-required: true
-schema:
-  type: string
-example: ssh-2b66bb79

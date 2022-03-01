@@ -1,6 +1,0 @@
-in: path
-name: networkId
-required: true
-schema:
-  type: string
-example: net-2b66bb79

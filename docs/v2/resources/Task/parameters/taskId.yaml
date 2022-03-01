@@ -1,6 +1,0 @@
-in: path
-name: taskId
-required: true
-schema:
-  type: string
-example: task-2b66bb79

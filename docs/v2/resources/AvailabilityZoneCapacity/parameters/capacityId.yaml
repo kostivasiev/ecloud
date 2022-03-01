@@ -1,6 +1,0 @@
-in: path
-name: capacityId
-required: true
-schema:
-  type: string
-example: azc-2b66bb79

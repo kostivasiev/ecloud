@@ -1,6 +1,0 @@
-in: path
-name: vpnSessionId
-required: true
-schema:
-  type: string
-example: vpns-2b66bb79

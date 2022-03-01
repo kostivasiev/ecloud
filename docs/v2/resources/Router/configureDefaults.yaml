@@ -1,9 +1,0 @@
-post:
-  description: Configure the default firewall policies for the router
-  parameters:
-    - $ref: '../../resources/Router/parameters/routerId.yaml'
-  responses:
-    202:
-      description: Accepted
-  tags:
-    - Routers

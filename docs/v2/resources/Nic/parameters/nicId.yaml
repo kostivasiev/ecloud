@@ -1,6 +1,0 @@
-in: path
-name: nicId
-required: true
-schema:
-  type: string
-example: nic-2b66bb79

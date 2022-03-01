@@ -1,6 +1,0 @@
-in: path
-name: firewallRulePortId
-required: true
-schema:
-  type: string
-example: fwrp-3f112f25

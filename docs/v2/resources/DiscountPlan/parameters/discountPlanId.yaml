@@ -1,6 +1,0 @@
-in: path
-name: DiscountPlanId
-required: true
-schema:
-  type: string
-example: disc-2b66bb79

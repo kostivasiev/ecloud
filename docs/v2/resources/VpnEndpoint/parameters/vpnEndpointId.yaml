@@ -1,6 +1,0 @@
-in: path
-name: vpnId
-required: true
-schema:
-  type: string
-example: vpne-2b66bb79

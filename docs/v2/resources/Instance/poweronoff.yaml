@@ -1,8 +1,0 @@
-put:
-  parameters:
-    - $ref: '../../resources/Instance/parameters/instanceId.yaml'
-  responses:
-    202:
-      description: Accepted
-  tags:
-    - Instances

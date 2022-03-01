@@ -1,8 +1,0 @@
-allOf:
-  - $ref: "../network.yaml"
-  - type: object
-    properties:
-      is_hidden :
-        type : boolean
-        readOnly : true
-        example : false

@@ -1,6 +1,0 @@
-in: path
-name: instanceId
-required: true
-schema:
-  type: string
-example: i-2b66bb79

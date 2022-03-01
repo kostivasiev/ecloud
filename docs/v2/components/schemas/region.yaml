@@ -1,9 +1,0 @@
-properties:
-  id:
-    type: string
-    example: reg-2b66bb79
-    readOnly: true
-  name:
-    type: string
-    example: 'United Kingdom'
-description: 'Regions'
