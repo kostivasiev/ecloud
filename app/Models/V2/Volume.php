@@ -98,11 +98,15 @@ class Volume extends Model implements Filterable, Sortable, ResellerScopeable, A
             return $query;
         }
 
-        return $query->whereHas('vpc', function ($query) use ($user) {
+        $query->whereHas('vpc', function ($query) use ($user) {
+            $query->where('reseller_id', $user->resellerId());
+        });
+
+        return $query->where(function ($query) {
             $query->whereHas('instances', function ($query) {
                 $query->where('is_hidden', '=', false);
-            })->doesntHave('instances', 'or');
-            $query->where('reseller_id', $user->resellerId());
+            })
+            ->orWhereDoesntHave('instances');
         });
     }
 
