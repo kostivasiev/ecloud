@@ -102,7 +102,7 @@ class Volume extends Model implements Filterable, Sortable, ResellerScopeable, A
             $query->where('reseller_id', $user->resellerId());
         });
 
-        $query->where(function ($query) {
+        return $query->where(function ($query) {
             $query->whereHas('instances', function ($query) {
                 $query->where('is_hidden', '=', false);
             })
