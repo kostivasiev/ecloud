@@ -10,12 +10,13 @@ use App\Events\V2\Nat\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Nat extends Model
 {
-    use CustomKey, SoftDeletes, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, Syncable, Taskable;
 
     public $keyPrefix = 'nat';
     public $incrementing = false;

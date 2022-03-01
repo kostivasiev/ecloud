@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Dhcp\Created;
 use App\Events\V2\Dhcp\Deleted;
 use App\Events\V2\Dhcp\Deleting;
 use App\Events\V2\Dhcp\Saved;
@@ -11,6 +10,7 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -27,7 +27,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Dhcp extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public $keyPrefix = 'dhcp';
     public $incrementing = false;

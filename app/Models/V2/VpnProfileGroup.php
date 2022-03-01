@@ -8,6 +8,7 @@ use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -19,7 +20,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class VpnProfileGroup extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     public $keyPrefix = 'vpnpg';
 

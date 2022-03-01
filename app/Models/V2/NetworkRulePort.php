@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,7 +17,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class NetworkRulePort extends Model implements Filterable, Sortable, Manageable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
     const ICMP_MESSAGE_TYPE_ECHO_REQUEST = 8;
     public string $keyPrefix = 'nrp';

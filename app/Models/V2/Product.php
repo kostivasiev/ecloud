@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -18,6 +19,8 @@ use UKFast\Admin\Account\AdminClient as AccountAdminClient;
  */
 class Product extends V1ModelWrapper implements Filterable, Sortable
 {
+    use HasFactory;
+
     protected $connection = 'reseller';
     protected $table = 'product';
     protected $primaryKey = 'product_id';

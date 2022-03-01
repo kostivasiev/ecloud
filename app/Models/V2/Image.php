@@ -8,6 +8,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -23,7 +24,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Image extends Model implements Filterable, Sortable, ResellerScopeable
 {
-    use CustomKey, SoftDeletes, DeletionRules, DefaultName, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, DeletionRules, DefaultName, Syncable, Taskable;
 
     public string $keyPrefix = 'img';
 

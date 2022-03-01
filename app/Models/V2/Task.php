@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Events\V2\Task\Created;
 use App\Events\V2\Task\Updated;
 use App\Traits\V2\CustomKey;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -16,7 +17,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Task extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use HasFactory, CustomKey, SoftDeletes;
 
     public $keyPrefix = 'task';
     public $incrementing = false;

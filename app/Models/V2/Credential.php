@@ -6,6 +6,7 @@ use App\Events\V2\Credential\Creating;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class Credential extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'cred';
     public $incrementing = false;

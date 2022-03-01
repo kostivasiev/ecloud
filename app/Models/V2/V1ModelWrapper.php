@@ -2,11 +2,14 @@
 
 namespace App\Models\V2;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 
 class V1ModelWrapper extends Model
 {
+    use HasFactory;
+    
     public function getIdAttribute()
     {
         $message = PHP_EOL;

@@ -11,6 +11,7 @@ use App\Services\V2\KingpinService;
 use App\Services\V2\NsxService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DeletionRules;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
@@ -28,7 +29,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class AvailabilityZone extends Model implements Filterable, Sortable, RegionAble
 {
-    use CustomKey, SoftDeletes, DeletionRules;
+    use HasFactory, CustomKey, SoftDeletes, DeletionRules;
 
     public $keyPrefix = 'az';
     public $incrementing = false;

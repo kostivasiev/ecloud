@@ -2,8 +2,12 @@
 
 namespace App\Models\V2;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class ProductPriceCustom extends V1ModelWrapper
 {
+    use HasFactory;
+
     protected $connection = 'reseller';
     protected $table = 'product_price_custom';
     protected $primaryKey = 'product_price_custom_id';

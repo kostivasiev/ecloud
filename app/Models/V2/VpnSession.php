@@ -8,6 +8,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class VpnSession extends Model implements Filterable, Sortable, AvailabilityZoneable, ResellerScopeable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
     const CREDENTIAL_PSK_USERNAME = 'PSK';
 

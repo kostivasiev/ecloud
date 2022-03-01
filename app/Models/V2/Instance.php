@@ -8,6 +8,7 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -17,7 +18,7 @@ use UKFast\Sieve\Sieve;
 
 class Instance extends Model implements Searchable, ResellerScopeable, AvailabilityZoneable, Manageable, VpcAble
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public $keyPrefix = 'i';
     public $incrementing = false;
