@@ -68,14 +68,15 @@ class DeleteTest extends TestCase
         Event::fake(Created::class);
         $this->nic();
         $this->delete('/v2/networks/' . $this->network()->id)->assertResponseStatus(412);
-        $this->assertFalse($this->network()->refresh()->trashed());
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testDependentIpFailsDelete()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        Event::fake(Created::class);
         $this->ip();
         $this->delete('/v2/networks/' . $this->network()->id)->assertResponseStatus(412);
-        $this->assertFalse($this->network()->refresh()->trashed());
+        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 }
