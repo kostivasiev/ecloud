@@ -1,0 +1,18 @@
+description: Success
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: reg-2b66bb79
+        meta:
+          type: object
+          properties:
+            location:
+              type: string
+              example: 'https://api.ukfast.io/ecloud/v2/regions/reg-2b66bb79'

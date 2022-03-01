@@ -1,0 +1,41 @@
+properties:
+  id:
+    type: string
+    example: 'bm-1a2b3c4d'
+    readOnly: true
+  name:
+    type: string
+    example: 'RAM'
+  resource_id:
+    type: string
+    required: true
+    example: 'i-1a2b3c4d'
+  vpc_id:
+    type: string
+    required: true
+    example: 'vpc-1a2b3c4d'
+  key:
+    type: string
+    required: true
+    example: 'ram.capacity'
+  value:
+    type: string
+    required: true
+    example: '16GB'
+  start:
+    type: string
+    required: true
+    example: '2020-07-07T10:30:00+01:00'
+  end:
+    type: string
+    required: false
+    example: '2020-07-07T10:30:00+01:00'
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Billing Metric'

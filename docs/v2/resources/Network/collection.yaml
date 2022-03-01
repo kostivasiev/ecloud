@@ -1,0 +1,49 @@
+get:
+  parameters:
+    - $ref: '../../components/parameters/perPage.yaml'
+    - $ref: '../../components/parameters/page.yaml'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../../components/schemas/network.yaml'
+              meta:
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/networks?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/networks?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/networks?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/networks?page=2'
+  tags:
+    - Networks
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/network.yaml'
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/Network/responses/idResponse.yaml'
+  tags:
+    - Networks

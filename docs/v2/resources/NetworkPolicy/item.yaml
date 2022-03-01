@@ -1,0 +1,53 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/NetworkPolicyId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/NetworkPolicy'
+              meta:
+                type: object
+  tags:
+    - Network Policies
+
+patch:
+  parameters:
+    - $ref: '../../resources/NetworkPolicy/parameters/networkPolicyId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/networkPolicy.yaml'
+            - type: object
+              properties:
+                name:
+                  required: false
+                network_id:
+                  readOnly: true
+                catchall_rule_action:
+                  readOnly: true
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/NetworkPolicy/responses/idResponse.yaml'
+  tags:
+    - Network Policies
+
+delete:
+  parameters:
+    - $ref: '../../resources/NetworkPolicy/parameters/networkPolicyId.yaml'
+  responses:
+    202:
+      description: Accepted
+      $ref : '../../components/responses/taskIdResponse.yaml'
+  tags:
+    - Network Policies

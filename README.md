@@ -1,61 +1,93 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+[![pipeline status](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/badges/master/pipeline.svg)](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/commits/master)
+[![coverage report](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/badges/master/coverage.svg)](https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/commits/master)
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
 
-## About Laravel
+# eCloud API
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Customer facing API for our private cloud infrastructure and resources management
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+v1 endpoints are for managing our legacy cloud, aka Public/Hybrid/Private solutions
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+v2 endpoints for managing our new VPC based resources
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Getting Started
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+These instructions will help you get a copy of the project up and running for development and testing purposes. 
+See deployment for notes on how to deploy the project on a live system.
 
-## Laravel Sponsors
+### Prerequisites
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+- PHP v7.4
+- Composer
 
-### Premium Partners
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
+### Installing
 
-## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+If you’re using the vhost.sh script then you can quickly run the following command
 
-## Code of Conduct
+***Note: this should be run as your user and not as root or via sudo, this is to keep file/folder permissions correct.***
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+./vhost.sh new apio-ecloud apio-ecloud.{your-dns}.rnd.ukfast
+```
 
-## Security Vulnerabilities
+If you are setting up manually, create a new vhost and configure for the PHP version mentioned above.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
 
-## License
+Next, checkout the repository on your local machine and then upload the files to the vhost folder you just created.  
+*Note: you could checkout direct on the server but this tends to cause more issues than it solves so is not recommended*  
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+### Running the tests
+
+Tests are run on each push to gitlab, you can run manually by running the following form the vhost docroot
+
+```
+mv .env-testing .env
+./vendor/bin/phpunit
+
+```
+
+
+### Deployment
+
+Deployment is managed automatically by our CI pipelines
+
+
+UAT:
+
+all changes pushed to a remote branch with an active Merge Request will trigger a UAT build.
+this environment contains all changes on teh branch but connected to our dev database to allow for easier UAT.
+
+- https://uat-ecloud-{mrID}.rndcloud-k3s-1.rnd.ukfast/
+
+
+
+Staging: 
+
+all changes merged to master are auto-deployed to our rndcloud staging environment to allow for internal development
+
+- https://kong.staging.rnd.ukfast/ecloud/
+
+
+Production:
+
+Deployment to production is made on master branch tag, tags must follow semver 
+
+- https://api.ukfast.io/ecloud/ 
+
+
+If for some reason a rollback is required on production, we can auto-roll back to any previous deployment, if the image is still avaialble this is a near instant rollback, otherwise this may take a momment while the image rebuilds
+
+to roll back, please see https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/ecloud/-/environments/2131
+
+
+### Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on the process for submitting pull requests.
+
+### Versioning
+
+We use [SemVer](http://semver.org/) for versioning. For the production ready versions available, see the tags page on this project

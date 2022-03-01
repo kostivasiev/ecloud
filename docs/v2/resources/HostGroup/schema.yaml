@@ -1,0 +1,88 @@
+properties:
+  id:
+    type: string
+    example: hg-2b66bb79
+    readOnly: true
+  name:
+    type: string
+    required: false
+    example: 'Host Group 1'
+    readOnly: false
+  vpc_id :
+    type : string
+    example : vpc-4c63cf58
+    readOnly : false
+  availability_zone_id:
+    type: string
+    required: true
+    example: 'az-2b66bb79'
+    readOnly : false
+  host_spec_id:
+    type: string
+    required: true
+    description : The host spec to use with this host group
+    example: hs-4c63cf58
+    readOnly: false
+  windows_enabled:
+    type: boolean
+    required: false
+    description : Determines whether the host group contains windows-enabled hosts, defaults to false.
+    example: true
+    readOnly: false
+  sync :
+    type : object
+    readOnly : true
+    properties :
+      status :
+        description : "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        example : complete
+      type :
+        description : "The type of the most recent sync performed on the resource. Possible values: update / delete."
+        example : update
+  usage :
+    type : object
+    readOnly : true
+    properties :
+      hosts :
+        type: integer
+        description : "The number of hosts associated with this host group."
+        example : 10
+      ram:
+        type: object
+        properties:
+          capacity:
+            type: integer
+            description: "The total ram capacity in Gb for this host group"
+            example: 2048
+          used:
+            type: integer
+            description: "The total ram used in Gb by hosts in this host group"
+            example: 64
+          available:
+            type: integer
+            description: "The total ram capacity in Gb available to this host group"
+            example: 1984
+      vcpu:
+        type: object
+        properties:
+          capacity:
+            type: integer
+            description: "The total vcpu capacity for this host group"
+            example: 2048
+          used:
+            type: integer
+            description: "The total vcpu in use by hosts in this host group"
+            example: 64
+          available:
+            type: integer
+            description: "The total vcpu capacity available to this host group"
+            example: 1984
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Host Groups'

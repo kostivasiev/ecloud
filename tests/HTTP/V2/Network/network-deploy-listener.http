@@ -1,0 +1,95 @@
+POST https://{{host}}/{{version}}/regions
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test Region"
+}
+
+> {%
+client.global.set('region_id', response.body.data.id);
+client.log('Region UUID: ' + response.body.data.id);
+%}
+
+###
+
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "code": "MAN1",
+  "name": "Test AZ",
+  "datacentre_site_id": 111,
+  "region_id": "{{region_id}}"
+}
+
+> {%
+client.global.set('availability_zone_id', response.body.data.id);
+client.log('Availability Zone UUID: ' + response.body.data.id);
+%}
+
+###
+
+POST https://{{host}}/{{version}}/vpcs
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "region_id": "{{region_id}}"
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC ID: ' + response.body.data.id);
+%}
+
+###
+# vpc-7dd2d8df
+# dhcp-8f7679e5
+
+POST https://{{host}}/{{version}}/routers
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test router",
+  "vpc_id": "{{vpc_id}}",
+  "availability_zone_id" : "{{availability_zone_id}}"
+}
+
+> {%
+client.global.set('router_id', response.body.data.id);
+client.log('Router ID: ' + response.body.data.id);
+%}
+
+###
+
+POST https://{{host}}/{{version}}/networks
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test network",
+  "router_id": "{{router_id}}",
+  "availability_zone_id": "{{availability_zone_id}}"
+}
+
+> {%
+client.global.set('network_id', response.body.data.id);
+client.log('Network ID: ' + response.body.data.id);
+%}
+
+###
+

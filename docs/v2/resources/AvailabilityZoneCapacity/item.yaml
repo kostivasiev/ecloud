@@ -1,0 +1,56 @@
+get:
+  parameters:
+    - $ref: '../../resources/AvailabilityZoneCapacity/parameters/capacityId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                - $ref: '../../components/schemas/availabilityZoneCapacity.yaml'
+              meta:
+                type: object
+  tags:
+    - Availability Zone Capacities
+
+patch:
+  parameters:
+    - $ref: '../../resources/AvailabilityZoneCapacity/parameters/capacityId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/availabilityZoneCapacity.yaml'
+            - type: object
+              properties:
+                availability_zone_id:
+                  required: false
+                type:
+                  required: false
+                alert_warning:
+                  required: false
+                alert_critical:
+                  required: false
+                max:
+                  required: false
+  responses:
+    200:
+      $ref: '../../resources/AvailabilityZoneCapacity/responses/idResponse.yaml'
+  tags:
+    - Availability Zone Capacities
+
+delete:
+  description: Delete Availability Zone Capacity
+  parameters:
+    - $ref: '../../resources/AvailabilityZoneCapacity/parameters/capacityId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Availability Zone Capacities

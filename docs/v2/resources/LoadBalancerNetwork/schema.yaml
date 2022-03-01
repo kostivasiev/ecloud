@@ -1,0 +1,41 @@
+properties:
+  id:
+    type: string
+    example: lbn-2b66bb79
+    readOnly: true
+  name:
+    type: string
+    required: false
+    example: 'Load Balancer Network 1'
+    readOnly: false
+  load_balancer_id:
+    type: string
+    required: true
+    description : ID of the load balancer to assign the network to
+    example: lb-4c63cf58
+    readOnly: false
+  network_id:
+    type: string
+    required: true
+    description : ID of the network to assign to the load balancer
+    example: net-4c63cf58
+    readOnly: false
+  sync :
+    type : object
+    readOnly : true
+    properties :
+      status :
+        description : "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        example : complete
+      type :
+        description : "The type of the most recent sync performed on the resource. Possible values: update / delete."
+        example : update
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Hosts'

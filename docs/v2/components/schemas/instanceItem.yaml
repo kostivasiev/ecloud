@@ -1,0 +1,12 @@
+allOf:
+  - $ref: '../../components/schemas/instance.yaml'
+  - type: object
+    properties:
+      online:
+        type: boolean
+        example: true
+        readOnly: true
+      agent_running:
+        type: boolean
+        example: true
+        readOnly: true

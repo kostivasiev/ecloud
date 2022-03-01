@@ -1,0 +1,6 @@
+in: path
+name: routerThroughputId
+required: true
+schema:
+  type: string
+example: rtp-2b66bb79

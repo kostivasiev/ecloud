@@ -1,0 +1,47 @@
+properties:
+  id:
+    type: string
+    example: fip-2b66bb79
+    readOnly: true
+  name:
+    type: string
+    example: fip-2b66bb79
+    readOnly: false
+  vpc_id:
+    type: string
+    example: vpc-2b66bb79
+    readOnly: false
+  availability_zone_id:
+    type: string
+    example: az-2b66bb79
+    readOnly: false
+    required: true
+  ip_address:
+    description: The external IP address assigned to the floating IP.
+    type: string
+    example: '1.1.1.1'
+    readOnly: true
+  resource_id:
+    description: ID of the resource that the floating IP is assigned to.
+    type: string
+    example: 'ip-abc123'
+    readOnly: true
+  sync:
+    type: object
+    readOnly: true
+    properties:
+      status:
+        description: "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        example: complete
+      type:
+        description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
+        example: update
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Floating IP addresses'

@@ -1,0 +1,42 @@
+properties:
+  id:
+    type: string
+    example: vpc-2b66bb79
+    readOnly: true
+  name:
+    type: string
+    example: 'Manchester Cloud 1'
+  sync:
+    type: object
+    readOnly: true
+    properties:
+      status:
+        description: "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        example: complete
+      type:
+        description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
+        example: update
+  region_id:
+    type: string
+    required: true
+    example: 'reg-a63dd78c'
+  support_enabled:
+    type: boolean
+    example: true
+  console_enabled:
+    type: boolean
+    readOnly: true
+    example: true
+  advanced_networking:
+    type: boolean
+    required: false
+    example: true
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Virtual Private Clouds'

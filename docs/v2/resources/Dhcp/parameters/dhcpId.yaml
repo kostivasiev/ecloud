@@ -1,0 +1,6 @@
+in: path
+name: dhcpId
+required: true
+schema:
+  type: string
+example: dhcp-2b66bb79

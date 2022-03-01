@@ -1,0 +1,34 @@
+properties:
+  id:
+    type: string
+    example: imgparam-abc123xyz
+    readOnly: true
+  image_id:
+    type: string
+    example: img-2b66bb79
+    readOnly: true
+  name:
+    type: string
+    example: 'MySQL root password'
+    readOnly: true
+  key:
+    type: string
+    example: 'mysql_root_password'
+    readOnly: true
+  type:
+    type: string
+    example: 'Password'
+    readOnly: true
+  description:
+    type: string
+    example: 'The root password for the MySQL database'
+    readOnly: true
+  required:
+    type: boolean
+    example: true
+    readOnly: true
+  validation_rule:
+    type: string
+    example: '/\\w+/'
+    readOnly: true
+description: 'Image Parameters'

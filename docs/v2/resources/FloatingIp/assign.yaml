@@ -1,0 +1,19 @@
+post:
+  parameters:
+    - $ref: '../../resources/FloatingIp/parameters/fipId.yaml'
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            resource_id:
+              type: string
+              description: The ID of the resource to assign the floating IP to.
+              example: "nic-abc123"
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/FloatingIp/responses/idResponse.yaml'
+  tags:
+    - Floating IPs

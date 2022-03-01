@@ -1,0 +1,55 @@
+get:
+  parameters:
+    - $ref: '../../resources/Volume/parameters/volumeId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/Volume'
+              meta:
+                type: object
+  tags:
+    - Volumes
+patch:
+  parameters:
+    - $ref: '../../resources/Volume/parameters/volumeId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/volume.yaml'
+            - type: object
+              properties:
+                availability_zone_id:
+                  readOnly: true
+                vpc_id:
+                  required: false
+                  readOnly: true
+                capacity:
+                  required: false
+                type:
+                  readOnly: true
+                is_shared:
+                  readOnly: true
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/Volume/responses/idResponse.yaml'
+  tags:
+    - Volumes
+delete:
+  parameters:
+    - $ref: '../../resources/Volume/parameters/volumeId.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Volumes

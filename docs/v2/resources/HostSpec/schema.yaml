@@ -1,0 +1,39 @@
+properties:
+  id:
+    type: string
+    example: hs-2b66bb79
+    readOnly: true
+  name:
+    type: string
+    required: false
+    readonly: false
+    example: '2 x Hex Core 2Ghz (E5-2620 v1) 64GB'
+  cpu_sockets:
+    description: Number of supported CPU sockets
+    type: integer
+    required: true
+    readonly: false
+    example: 2
+  cpu_type:
+    type: string
+    required: true
+    readonly: false
+    example: 'E5-2620 v1'
+  cpu_cores:
+    type: integer
+    required: true
+    readonly: false
+    example: 6
+  cpu_clock_speed:
+    description: CPU clock speed in MHz
+    type: integer
+    required: true
+    readonly: false
+    example: 2000
+  ram_capacity:
+    description : RAM capacity in GB
+    type : integer
+    required : true
+    readonly : false
+    example : 64
+description: 'Host Spec'

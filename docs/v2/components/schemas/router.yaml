@@ -1,0 +1,42 @@
+properties:
+  id:
+    type: string
+    example: 'rtr-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    required: true
+    example: 'rtr-2b66bb79'
+  vpc_id:
+    type: string
+    required: true
+    example: 'vpc-2b66bb79'
+  router_throughput_id:
+    description: ID of the router throughput profile to assign to the router
+    type: string
+    required: true
+    example: 'rtp-2b66bb79'
+  availability_zone_id:
+    type: string
+    required: true
+    example: 'az-2b66bb79'
+    readOnly : false
+  sync:
+    type: object
+    readOnly: true
+    properties:
+      status:
+        description: "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        example: complete
+      type:
+        description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
+        example: update
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Routers'

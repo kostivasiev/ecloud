@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Application Name
@@ -12,8 +11,8 @@ return [
     | any other location as required by the application or its packages.
     |
     */
+    'name' => env('APP_NAME', 'ecloud'),
 
-    'name' => env('APP_NAME', 'Laravel'),
 
     /*
     |--------------------------------------------------------------------------
@@ -25,7 +24,6 @@ return [
     | services the application utilizes. Set this in your ".env" file.
     |
     */
-
     'env' => env('APP_ENV', 'production'),
 
     /*
@@ -38,7 +36,6 @@ return [
     | application. If disabled, a simple generic error page is shown.
     |
     */
-
     'debug' => (bool) env('APP_DEBUG', false),
 
     /*
@@ -51,7 +48,6 @@ return [
     | your application so that it is used when running Artisan tasks.
     |
     */
-
     'url' => env('APP_URL', 'http://localhost'),
 
     'asset_url' => env('ASSET_URL', null),
@@ -80,7 +76,7 @@ return [
     |
     */
 
-    'locale' => 'en',
+    'locale' => env('APP_LOCALE', 'en'),
 
     /*
     |--------------------------------------------------------------------------
@@ -93,7 +89,7 @@ return [
     |
     */
 
-    'fallback_locale' => 'en',
+    'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
     /*
     |--------------------------------------------------------------------------
@@ -165,6 +161,35 @@ return [
         /*
          * Package Service Providers...
          */
+        Illuminate\Database\Eloquent\LegacyFactoryServiceProvider::class,
+        App\Providers\IntapiServiceProvider::class,
+        UKFast\Responses\ResponseServiceProvider::class,
+        UKFast\Api\Paginator\PaginationServiceProvider::class,
+        UKFast\HealthCheck\HealthCheckServiceProvider::class,
+        \UKFast\Api\Auth\AuthServiceProvider::class,
+        UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class,
+        UKFast\Api\Resource\ResourceServiceProvider::class,
+        UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider::class,
+        UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider::class,
+        UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class,
+        UKFast\ApiInternalCommunication\NetworkingAdminClientServiceProvider::class,
+        UKFast\ApiInternalCommunication\BillingAdminClientServiceProvider::class,
+        UKFast\ApiInternalCommunication\LicensesAdminClientServiceProvider::class,
+        UKFast\ApiInternalCommunication\LoadbalancerAdminClientServiceProvider::class,
+        UKFast\ApiInternalCommunication\SafeDNSAdminClientServiceProvider::class,
+        UKFast\Sieve\SieveServiceProvider::class,
+        UKFast\FormRequests\FormRequestServiceProvider::class,
+        UKFast\Sieve\SieveServiceProvider::class,
+        App\Providers\KingpinServiceProvider::class,
+        App\Providers\ArtisanServiceProvider::class,
+        App\Providers\EncryptionServiceProvider::class,
+        App\Providers\V2\KingpinServiceProvider::class,
+        App\Providers\V2\ConjurerServiceProvider::class,
+        App\Providers\V2\ArtisanServiceProvider::class,
+        App\Providers\NetworkingServiceProvider::class,
+        App\Providers\AccountsServiceProvider::class,
+        App\Providers\BillingServiceProvider::class,
+        App\Providers\V2\NsxServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -174,6 +199,12 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        /*
+         * Custom Application Service Providers for fixing Lumen wip
+         */
+        App\Providers\MailerServiceProvider::class,
+        App\Providers\QueueManagerServiceProvider::class,
 
     ],
 

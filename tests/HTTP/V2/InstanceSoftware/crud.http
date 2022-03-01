@@ -1,0 +1,182 @@
+### Create an instance
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}",
+  "name": "Test",
+  "vcpu_cores": 1,
+  "ram_capacity": 1024,
+  "image_id": "{{dev_image_id}}",
+  "network_id": "{{dev_network_id}}",
+  "volume_capacity": 30
+}
+
+> {%
+client.global.set('instance_id', response.body.data.id);
+client.log('Instance ID: ' + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### Create Software resource
+POST https://{{host}}/{{version}}/software
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "test",
+    "platform": "Linux",
+    "visibility" : "public"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+    client.global.set('software_id', response.body.data.id);
+    client.log('software_id: ' + response.body.data.id);
+});
+%}
+
+
+### Create Script
+POST https://{{host}}/{{version}}/scripts
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "test",
+  "software_id": "{{software_id}}",
+  "sequence" : 1,
+  "script" : "exit 0"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+    client.assert(response.status === 201, "Response status is not 201");
+    client.global.set('script_id', response.body.data.id);
+    client.log('script_id: ' + response.body.data.id);
+});
+%}
+
+
+### Create instance-software resource (instance must be in completed state first)
+POST https://{{host}}/{{version}}/instance-software
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "McAfee",
+  "instance_id": "{{instance_id}}",
+  "software_id" : "{{software_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+    client.assert(response.status === 202, "Response status is not 202");
+    client.global.set('instance_software_id', response.body.data.id);
+    client.log('instance_software_id: ' + response.body.data.id);
+});
+%}
+
+### Get Collection
+GET https://{{host}}/{{version}}/instance-software
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].id === client.global.get('instance_software_id'), "Incorrect id" + client.global.get('instance_software_id'));
+  client.assert(response.body.data[0].name === "McAfee", "Incorrect name");
+  client.assert(response.body.data[0].instance_id === client.global.get('instance_id'), "Incorrect instance_id");
+  client.assert(response.body.data[0].software_id === client.global.get('software_id'), "Incorrect software_id");
+});
+%}
+
+### Get Item
+GET https://{{host}}/{{version}}/instance-software/{{instance_software_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('instance_software_id'), "Incorrect id" + client.global.get('instance_software_id'));
+  client.assert(response.body.data.name === "McAfee", "Incorrect name");
+  client.assert(response.body.data.instance_id === client.global.get('instance_id'), "Incorrect instance_id");
+  client.assert(response.body.data.software_id === client.global.get('software_id'), "Incorrect software_id");
+});
+%}
+
+### Get instances/{id}/software
+GET https://{{host}}/{{version}}/instances/{{instance_id}}/software
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].id === client.global.get('software_id'), "Incorrect id");
+  client.assert(response.body.data[0].name === "test", "Incorrect name");
+  client.assert(response.body.data[0].platform === "Linux", "Incorrect platform");
+});
+%}
+
+### Delete Item
+DELETE https://{{host}}/{{version}}/instance-software/{{instance_software_id}}
+X-consumer-custom-id:  {{dev_reseller_id_admin}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+###
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### Delete script
+DELETE https://{{host}}/{{version}}/scripts/{{script_id}}
+X-consumer-custom-id:  {{dev_reseller_id_admin}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+### Delete software
+DELETE https://{{host}}/{{version}}/software/{{software_id}}
+X-consumer-custom-id:  {{dev_reseller_id_admin}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}

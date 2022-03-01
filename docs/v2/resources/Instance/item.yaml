@@ -1,0 +1,55 @@
+get:
+  parameters:
+    - $ref: '../../resources/Instance/parameters/instanceId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/instanceItem.yaml'
+              meta:
+                type: object
+  tags:
+    - Instances
+patch:
+  parameters:
+    - $ref: '../../resources/Instance/parameters/instanceId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              required: false
+              example: 'My Instance'
+            vcpu_cores:
+              type: integer
+              required: false
+              example: 1
+            ram_capacity:
+              description: RAM capacity MiB
+              type: integer
+              required: false
+              example: 1024
+          description: 'Instances'
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/Instance/responses/idResponse.yaml'
+  tags:
+    - Instances
+delete:
+  parameters:
+    - $ref: '../../resources/Instance/parameters/instanceId.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Instances

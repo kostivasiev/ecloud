@@ -1,0 +1,24 @@
+FROM php:7.4-apache
+RUN pecl install redis-5.1.1 \
+                 xdebug \
+    && docker-php-ext-enable redis \
+                             xdebug
+RUN docker-php-ext-install pdo_mysql \
+                           opcache \
+                           pcntl
+
+RUN a2enmod rewrite
+
+COPY .docker/ca-certificates/ /usr/local/share/ca-certificates/
+RUN update-ca-certificates
+
+COPY .docker/php.ini /usr/local/etc/php/php.ini
+COPY .docker/apache.conf /etc/apache2/sites-available/000-default.conf
+COPY .docker/start.sh /start.sh
+
+RUN chown www-data:www-data -R /var/www/html
+
+STOPSIGNAL SIGTERM
+
+CMD ["app"]
+ENTRYPOINT ["/bin/bash", "/start.sh"]

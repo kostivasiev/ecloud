@@ -1,0 +1,180 @@
+### Prerequisits
+
+### Create an instance so that we have a nic to play with
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}",
+  "name": "Test",
+  "vcpu_cores": 1,
+  "ram_capacity": 1024,
+  "image_id": "{{dev_image_id}}",
+  "requires_floating_ip": true,
+  "network_id": "{{dev_network_id}}",
+  "volume_capacity": 30
+}
+
+> {%
+client.global.set('instance_id', response.body.data.id);
+client.log('Instance ID: ' + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### Wait for instance to deploy before NIC will be available...
+
+GET https://{{host}}/{{version}}/floating-ips
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+
+
+### Create an instance so that we have a nic to play with
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}",
+  "name": "Test",
+  "vcpu_cores": 1,
+  "ram_capacity": 1024,
+  "image_id": "{{dev_image_id}}",
+  "requires_floating_ip": true,
+  "network_id": "{{dev_network_id}}",
+  "volume_capacity": 30
+}
+
+> {%
+client.global.set('instance_id', response.body.data.id);
+client.log('Instance ID: ' + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### Wait for instance to deploy before NIC will be available...
+
+###
+GET https://{{host}}/{{version}}/nics
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.global.set('nic_id', response.body.data[0].id);
+  client.log('NIC ID: ' + response.body.data[0].id);
+});
+%}
+###
+
+
+## Create fip
+POST https://{{host}}/{{version}}/floating-ips
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('fip_id', response.body.data.id);
+client.log('Floating IP ID: ' + response.body.data.id);
+%}
+
+###
+POST https://{{host}}/{{version}}/floating-ips/{{fip_id}}/assign
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "resource_id": "{{nic_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+POST https://{{host}}/{{version}}/floating-ips/{{fip_id}}/unassign
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.resource_id === null, "resource_id was returned in response, resource was NOT unassigned");
+});
+%}
+
+###
+DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

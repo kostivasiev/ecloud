@@ -10,3 +10,9 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+/.idea
+/logs
+composer.phar
+tests/HTTP/V2/http-client.env.json
+/http-client.env.json
+.run/

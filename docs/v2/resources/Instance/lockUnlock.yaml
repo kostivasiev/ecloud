@@ -1,0 +1,9 @@
+put:
+  description: Lock / Unlock an instance to changes
+  parameters:
+    - $ref: '../../resources/Instance/parameters/instanceId.yaml'
+  responses:
+    204:
+      description: success
+  tags:
+    - Instances

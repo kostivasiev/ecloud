@@ -1,0 +1,55 @@
+get:
+  parameters:
+    - $ref: '../../resources/DiscountPlan/parameters/discountPlanId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            allOf:
+              - $ref: '../../components/schemas/admin/discountPlan.yaml'
+              - type: object
+                properties:
+                  region_id:
+                    required: true
+  tags:
+    - Discount Plans
+patch:
+  parameters:
+    - $ref: '../../resources/DiscountPlan/parameters/discountPlanId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/admin/discountPlan.yaml'
+            - type: object
+              properties:
+                code:
+                  required: false
+                name:
+                  required: false
+                datacentre_site_id:
+                  required: false
+                region_id:
+                  required: false
+                is_public:
+                  required: false
+  responses:
+    200:
+      $ref: '../../resources/DiscountPlan/responses/idResponse.yaml'
+  tags:
+    - Discount Plans
+
+delete:
+  parameters:
+    - $ref: '../../resources/DiscountPlan/parameters/discountPlanId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Discount Plans

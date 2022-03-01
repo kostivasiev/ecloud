@@ -8,24 +8,66 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^7.3",
+        "php": "^7.4",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.0",
-        "laravel/tinker": "^2.0"
+        "laravel/tinker": "^2.0",
+        "fzaninotto/faker": "^1.9.1",
+        "cebe/php-openapi": "^1.4",
+        "doctrine/dbal": "^2.9",
+        "illuminate/mail": "^8.0",
+        "illuminate/redis": "^8.0",
+        "laravel/legacy-factories": "^1.1",
+        "mlocati/ip-lib": "^1",
+        "mustache/mustache": "^2.12.0",
+        "phpseclib/mcrypt_compat": "^2.0",
+        "phpseclib/phpseclib": "~3.0",
+        "predis/predis": "^1.1",
+        "ramsey/uuid": "^4.0",
+        "ruflin/elastica": "^6.1",
+        "ukfast/api-auth": "^3.3",
+        "ukfast/api-encryption": "^4.1",
+        "ukfast/api-exceptions": "^3.0",
+        "ukfast/api-helper-datetime": "2.0.*",
+        "ukfast/api-internal-communication": "^1.10",
+        "ukfast/api-paginator": "^2.1",
+        "ukfast/api-resources": "^5.0",
+        "ukfast/api-validation": "~1.0",
+        "ukfast/ditto": "^4.8",
+        "ukfast/form-requests": "^1.1",
+        "ukfast/health-check": "^2.0",
+        "ukfast/laravel-sieve": "^0.4.1",
+        "ukfast/log-provider": "^3.0",
+        "ukfast/responses": "~1.0",
+        "vlucas/phpdotenv": "^5.2"
     },
     "require-dev": {
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*",
+        "ext-sqlite3": "*",
+        "ext-xml": "*",
+        "barryvdh/laravel-ide-helper": "^2.12",
+        "brianium/paratest": "^4.0",
         "facade/ignition": "^2.3.6",
-        "fzaninotto/faker": "^1.9.1",
         "mockery/mockery": "^1.3.1",
         "nunomaduro/collision": "^5.0",
-        "phpunit/phpunit": "^9.3"
+        "phpmd/phpmd": "^2.6",
+        "phpunit/phpunit": "^9.3",
+        "squizlabs/php_codesniffer": "^3.4",
+        "ukfast/rulesets": "^2.1"
     },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "discard-changes": true,
+        "platform": {
+            "php": "7.4.6"
+        }
     },
     "extra": {
         "laravel": {
@@ -37,7 +79,10 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "../ecloudLumen/app/helpers.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {
@@ -56,6 +101,74 @@
         ],
         "post-create-project-cmd": [
             "@php artisan key:generate --ansi"
+        ],
+        "test": [
+            "Composer\\Config::disableProcessTimeout",
+            "phpunit",
+            "phpmd --ignore-violations-on-exit app text vendor/ukfast/rulesets/MessDetector/UKFDefault.xml",
+            "phpcs --runtime-set ignore_warnings_on_exit 1 --standard=vendor/ukfast/rulesets/CodeSniffer/UKFDefault.xml app"
         ]
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/resources.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/exceptions.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/helpers/date-time-helper.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/authentication.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/paginator.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/db/ditto.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/log-provider.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:rnd/api.ukfast/packages/php/rulesets.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/validation.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/health-check.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/api-internal-communication.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/encryption.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/responses.git"
+        },
+        {
+            "type": "vcs",
+            "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/form-requests.git"
+        }
+    ]
 }

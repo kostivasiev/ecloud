@@ -36,7 +36,8 @@ return [
 
         'database' => [
             'driver' => 'database',
-            'table' => 'jobs',
+            'connection' => env('QUEUE_DATABASE_CONNECTION', 'ecloud'),
+            'table' => env('QUEUE_DATABASE_TABLE', 'jobs'),
             'queue' => 'default',
             'retry_after' => 90,
         ],
@@ -61,9 +62,9 @@ return [
 
         'redis' => [
             'driver' => 'redis',
-            'connection' => 'default',
-            'queue' => env('REDIS_QUEUE', 'default'),
-            'retry_after' => 90,
+            'connection' => env('QUEUE_REDIS_CONNECTION', 'default'),
+            'queue' => env('QUEUE_REDIS_QUEUE', env('APP_NAME', 'default')),
+            'retry_after' => env('QUEUE_REDIS_RETRY_AFTER', 1200),
             'block_for' => null,
         ],
 
@@ -81,9 +82,13 @@ return [
     */
 
     'failed' => [
+        'database' => env('QUEUE_FAILED_DATABASE', 'ecloud'),
+        'table' => env('QUEUE_FAILED_TABLE', 'failed_jobs'),
         'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
-        'database' => env('DB_CONNECTION', 'mysql'),
-        'table' => 'failed_jobs',
+    ],
+
+    'batching' => [
+        'database' => env('QUEUE_BATCHING_DATABASE', 'ecloud'),
     ],
 
 ];

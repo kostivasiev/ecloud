@@ -1,0 +1,12 @@
+allOf:
+  - $ref: "schema.yaml"
+  - type: object
+    properties:
+      created_at:
+        type: string
+        example: '2020-07-07T10:30:00+01:00'
+        readOnly: true
+      updated_at:
+        type: string
+        example: '2020-07-07T10:30:00+01:00'
+        readOnly: true

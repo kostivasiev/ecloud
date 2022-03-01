@@ -1,0 +1,67 @@
+properties:
+  id:
+    type: string
+    example: 'vol-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    required: false
+    example: 'vol-2b66bb79'
+  vpc_id:
+    type: string
+    required: true
+    example: 'vpc-2b66bb79'
+  availability_zone_id:
+    type: string
+    required: true
+    example: 'az-2b66bb79'
+    readOnly : false
+  capacity:
+    type: integer
+    required: true
+    description: Volume capacity in GB
+    example: 250
+  iops:
+    type: integer
+    required: false
+    description: IOPS value 300, 600, 1200 or 2500 only
+    example: 300
+  attached:
+    type: boolean
+    readOnly: true
+    description: Is the volume attached to a resource
+    example: true
+  volume_group_id:
+    type: string
+    required: false
+    example: 'volgroup-2b66bb79'
+    readOnly : false
+  is_shared:
+    type: boolean
+    required: false
+    description: Is the volume a shared resource
+    example: true
+  sync:
+    type: object
+    readOnly: true
+    properties:
+      status:
+        description: "The status of the most recent sync performed on the resource. Possible values: in-progress, failed, complete."
+        example: complete
+      type:
+        description: "The type of the most recent sync performed on the resource. Possible values: update / delete."
+        example: update
+  type:
+    type: string
+    readOnly: true
+    description: Is the volume an OS volume
+    example: os
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Routers'

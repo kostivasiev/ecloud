@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: 'schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Software

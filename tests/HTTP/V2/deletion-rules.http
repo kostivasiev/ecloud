@@ -1,0 +1,104 @@
+###
+# Availability Zones
+DELETE https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test delete did not occur', function () {
+    client.assert(response.status === 412, 'Expected response (412) was not received');
+    client.assert(response.body.errors.title === 'Precondition Failed', 'Expected error title not received');
+    client.assert(response.body.errors.detail === 'Active resources exist for this item', 'Expected error not received');
+});
+%}
+
+###
+# Firewall Policy
+DELETE https://{{host}}/{{version}}/firewall-policies/{{dev_firewall_policy_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test delete did not occur', function () {
+    client.assert(response.status === 412, 'Expected response (412) was not received');
+    client.assert(response.body.errors.title === 'Precondition Failed', 'Expected error title not received');
+    client.assert(response.body.errors.detail === 'Active resources exist for this item', 'Expected error not received');
+});
+%}
+
+###
+# Instances
+DELETE https://{{host}}/{{version}}/instances/{{dev_instance_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test delete did not occur', function () {
+    client.assert(response.status === 412, 'Expected response (412) was not received');
+    client.assert(response.body.errors.title === 'Precondition Failed', 'Expected error title not received');
+    client.assert(response.body.errors.detail === 'Active resources exist for this item', 'Expected error not received');
+});
+%}
+
+###
+# Nics
+DELETE https://{{host}}/{{version}}/networks/{{dev_network_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test delete did not occur', function () {
+    client.assert(response.status === 412, 'Expected response (412) was not received');
+    client.assert(response.body.errors.title === 'Precondition Failed', 'Expected error title not received');
+    client.assert(response.body.errors.detail === 'Active resources exist for this item', 'Expected error not received');
+});
+%}
+
+###
+# Regions
+DELETE https://{{host}}/{{version}}/regions/{{dev_region_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test delete did not occur', function () {
+    client.assert(response.status === 412, 'Expected response (412) was not received');
+    client.assert(response.body.errors.title === 'Precondition Failed', 'Expected error title not received');
+    client.assert(response.body.errors.detail === 'Active resources exist for this item', 'Expected error not received');
+});
+%}
+
+###
+# Routers
+DELETE https://{{host}}/{{version}}/routers/{{dev_router_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test delete did not occur', function () {
+    client.assert(response.status === 412, 'Expected response (412) was not received');
+    client.assert(response.body.errors.title === 'Precondition Failed', 'Expected error title not received');
+    client.assert(response.body.errors.detail === 'Active resources exist for this item', 'Expected error not received');
+});
+%}
+
+###
+# VPC
+DELETE https://{{host}}/{{version}}/vpcs/{{dev_vpc_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test delete did not occur', function () {
+    client.assert(response.status === 412, 'Expected response (412) was not received');
+    client.assert(response.body.errors.title === 'Precondition Failed', 'Expected error title not received');
+    client.assert(response.body.errors.detail === 'Active resources exist for this item', 'Expected error not received');
+});
+%}

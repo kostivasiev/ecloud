@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/AvailabilityZoneId'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../public-openapi.yaml#/components/schemas/AvailabilityZone'
+              meta:
+                type: object
+  tags:
+    - Availability Zones

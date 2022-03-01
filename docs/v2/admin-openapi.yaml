@@ -1,0 +1,323 @@
+---
+
+openapi: '3.0.0'
+info:
+  title: 'eCloud Admin API'
+  version: '2.0.0'
+
+servers:
+  - url: https://api.ukfast.io
+
+security:
+  - api_key:
+      - api_key
+
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      description: API key authentication
+      in: header
+      name: Authorization
+
+  schemas:
+    AvailabilityZones:
+      $ref: 'components/schemas/admin/availabilityZone.yaml'
+    Credentials:
+      $ref: 'components/schemas/admin/credential.yaml'
+    Dhcps :
+      $ref : 'components/schemas/dhcp.yaml'
+    DiscountPlan:
+      $ref: 'components/schemas/admin/discountPlan.yaml'
+    HostSpec:
+      $ref: 'resources/HostSpec/schema.yaml'
+    Image:
+      $ref: 'resources/Image/schema.yaml'
+    ImageMetadata:
+      $ref: 'resources/ImageMetadata/schema.yaml'
+    ImageParameter:
+      $ref: 'resources/ImageParameter/schema.yaml'
+    IpAddress :
+      $ref : 'resources/IpAddress/schema.yaml'
+    Instance :
+      $ref : 'resources/Instance/admin-schema.yaml'
+    LoadBalancer:
+      $ref: 'resources/LoadBalancer/schema.yaml'
+    LoadBalancerSpecification:
+      $ref: 'resources/LoadBalancerSpecification/admin-schema.yaml'
+    Meta:
+      $ref: 'components/schemas/meta.yaml'
+    Network:
+      $ref : 'components/schemas/admin/network.yaml'
+    Nics:
+      $ref: 'components/schemas/nic.yaml'
+    Routers:
+      $ref: 'components/schemas/admin/router.yaml'
+    Regions:
+      allOf:
+        - $ref: 'components/schemas/region.yaml'
+        - type: object
+          properties:
+            is_public:
+              required: false
+              type: boolean
+              example: 'true'
+    Software:
+      $ref: 'resources/Software/schema.yaml'
+    Task:
+      $ref: 'components/schemas/admin/task.yaml'
+    Volume:
+      allOf:
+        - $ref: 'components/schemas/volume.yaml'
+        - type: object
+          properties:
+            vmware_uuid:
+              required: false
+              type: string
+              example: '03747ccf-d56b-45a9-b589-177f3cb9936e'
+    VpnProfile:
+      $ref: 'resources/VpnProfile/schema.yaml'
+    VpnProfileGroup:
+      $ref: 'components/schemas/vpnProfileGroupAdmin.yaml'
+#    When adding a new Schema use the following reference, and add to the list above alphabetically
+#    Reference:
+#      $ref: 'resources/Reference/admin-schema.yaml'
+
+  parameters:
+    # Path Parameters
+    # DEPRECATED - don't add these directly in this file any more.
+    DhcpId:
+      $ref: 'resources/Dhcp/parameters/dhcpId.yaml'
+    DiscountPlanId:
+      $ref: 'resources/DiscountPlan/parameters/discountPlanId.yaml'
+    FipId:
+      $ref: 'resources/FloatingIp/parameters/fipId.yaml'
+    FirewallPolicyId:
+      $ref: 'resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+    FirewallRuleId:
+      $ref: 'resources/FirewallRule/parameters/firewallRuleId.yaml'
+    InstanceId:
+      $ref: 'resources/Instance/parameters/instanceId.yaml'
+    NetworkId:
+      $ref: 'resources/Network/parameters/networkId.yaml'
+    RegionId:
+      $ref: 'resources/Region/parameters/regionId.yaml'
+    RouterId:
+      $ref: 'resources/Router/parameters/routerId.yaml'
+    VolumeId:
+      $ref: 'resources/Volume/parameters/volumeId.yaml'
+    VpcId:
+      $ref: 'resources/Vpc/parameters/vpcId.yaml'
+    VpnProfileId:
+      $ref: 'resources/VpnProfile/parameters/vpnProfileId.yaml'
+    VpnProfileGroupId:
+      $ref: 'resources/VpnProfileGroup/parameters/vpnProfileGroupId.yaml'
+    VpnServiceId:
+      $ref: 'resources/VpnService/parameters/vpnServiceId.yaml'
+#    When adding a new parameter use the following reference, and add to the list above alphabetically
+#    ReferenceId:
+#      $ref: 'resources/References/parameters/id.yaml'
+    # Query Parameters
+    PerPage:
+      $ref: 'components/parameters/perPage.yaml'
+    Page:
+      $ref: 'components/parameters/page.yaml'
+
+  responses:
+    # DEPRECATED - don't add these directly in this file any more.
+    DhcpIdResponse:
+      $ref: 'resources/Dhcp/responses/idResponse.yaml'
+    DiscountIdResponse:
+      $ref: 'resources/DiscountPlan/responses/idResponse.yaml'
+    FipIdResponse:
+      $ref: 'resources/FloatingIp/responses/idResponse.yaml'
+    FirewallRuleIdResponse:
+      $ref: 'resources/FirewallRule/responses/idResponse.yaml'
+    FirewallPolicyIdResponse:
+      $ref: 'resources/FirewallPolicy/responses/idResponse.yaml'
+    InstanceIdResponse:
+      $ref: 'resources/Instance/responses/idResponse.yaml'
+    NetworksIdResponse:
+      $ref: 'resources/Network/responses/idResponse.yaml'
+    RegionIdResponse:
+      $ref: 'resources/Region/responses/idResponse.yaml'
+    RouterIdResponse:
+      $ref: 'resources/Router/responses/idResponse.yaml'
+    VirtualPrivateCloudsIdResponse:
+      $ref: 'resources/Vpc/responses/idResponse.yaml'
+    VolumeIdResponse:
+      $ref: 'resources/Volume/responses/idResponse.yaml'
+    VpnProfileIdResponse:
+      $ref: 'resources/VpnProfile/responses/idResponse.yaml'
+    VpnProfileGroupIdResponse:
+      $ref: 'resources/VpnProfileGroup/responses/idResponse.yaml'
+    VpnServiceIdResponse:
+      $ref: 'resources/VpnService/responses/idResponse.yaml'
+#    When adding a new response use the following reference, and add to the list above alphabetically
+#    ReferenceIdResponse:
+#      $ref: 'resources/Reference/responses/idResponse.yaml'
+
+paths:
+  '/ecloud/v2/availability-zone-capacities':
+    $ref: 'resources/AvailabilityZoneCapacity/collection.yaml'
+  '/ecloud/v2/availability-zone-capacities/{AvailabilityZoneId}':
+    $ref: 'resources/AvailabilityZoneCapacity/item.yaml'
+  '/ecloud/v2/availability-zones':
+    $ref: 'resources/AvailabilityZone/admin-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
+    $ref: 'resources/AvailabilityZone/admin-item.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/capacities':
+    $ref: 'resources/AvailabilityZone/capacity-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/credentials':
+    $ref: 'resources/AvailabilityZone/credential-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/dhcps':
+    $ref: 'resources/AvailabilityZone/dhcp-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/images':
+    $ref: 'resources/AvailabilityZone/image-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/instances':
+    $ref: 'resources/AvailabilityZone/instance-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/load-balancers':
+    $ref: 'resources/AvailabilityZone/load-balancers-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/routers':
+    $ref: 'resources/AvailabilityZone/router-collection.yaml'
+  '/ecloud/v2/billing-metrics':
+    $ref: 'resources/BillingMetric/collection.yaml'
+  '/ecloud/v2/billing-metrics/{billingMetricsId}':
+    $ref: 'resources/BillingMetric/item.yaml'
+  '/ecloud/v2/credentials':
+    $ref: 'resources/Credential/collection.yaml'
+  '/ecloud/v2/credentials/{credentialId}':
+    $ref: 'resources/Credential/item.yaml'
+  '/ecloud/v2/dhcps' :
+    $ref : 'resources/Dhcp/admin-collection.yaml'
+  '/ecloud/v2/dhcps/{dhcpId}' :
+    $ref : 'resources/Dhcp/admin-item.yaml'
+  '/ecloud/v2/discount-plans':
+    $ref: 'resources/DiscountPlan/admin-collection.yaml'
+  '/ecloud/v2/discount-plans/{discountPlanId}':
+    $ref: 'resources/DiscountPlan/admin-item.yaml'
+  '/ecloud/v2/host-specs':
+    $ref: 'resources/HostSpec/admin-collection.yaml'
+  '/ecloud/v2/host-specs/{hostSpecId}':
+    $ref: 'resources/HostSpec/admin-item.yaml'
+  '/ecloud/v2/image-metadata':
+    $ref: 'resources/ImageMetadata/admin-collection.yaml'
+  '/ecloud/v2/image-metadata/{imageMetadataId}':
+    $ref: 'resources/ImageMetadata/admin-item.yaml'
+  '/ecloud/v2/image-parameters':
+    $ref: 'resources/ImageParameter/admin-collection.yaml'
+  '/ecloud/v2/image-parameters/{imageParameterId}':
+    $ref: 'resources/ImageParameter/admin-item.yaml'
+  '/ecloud/v2/images':
+    $ref: 'resources/Image/admin-collection.yaml'
+  '/ecloud/v2/images/{imageId}':
+    $ref: 'resources/Image/admin-item.yaml'
+  '/ecloud/v2/images/{id}/metadata':
+    $ref: 'resources/Image/metadata-collection.yaml'
+  '/ecloud/v2/images/{id}/parameters':
+    $ref: 'resources/Image/parameters-collection.yaml'
+  '/ecloud/v2/images/{id}/software':
+    $ref: 'resources/Image/admin-software-collection.yaml'
+  '/ecloud/v2/instances/{instanceId}/software':
+    $ref: 'resources/Instance/admin-software-collection.yaml'
+  '/ecloud/v2/instance-software' :
+    $ref : 'resources/InstanceSoftware/collection.yaml'
+  '/ecloud/v2/instance-software/{instanceSoftwareId}' :
+    $ref : 'resources/InstanceSoftware/item.yaml'
+  '/ecloud/v2/ip-addresses' :
+    $ref : 'resources/IpAddress/admin-collection.yaml'
+  '/ecloud/v2/ip-addresses/{ipAddressId}' :
+    $ref : 'resources/IpAddress/admin-item.yaml'
+  '/ecloud/v2/ip-addresses/{ipAddressId}/nics' :
+    $ref : 'resources/IpAddress/nic-collection.yaml'
+  '/ecloud/v2/load-balancers/{loadBalancerId}/networks' :
+    $ref : 'resources/LoadBalancer/networks-collection.yaml'
+  '/ecloud/v2/load-balancers/{loadBalancerId}/nodes':
+    $ref: 'resources/LoadBalancer/nodes-collection.yaml'
+  '/ecloud/v2/load-balancer-networks' :
+    $ref : 'resources/LoadBalancerNetwork/collection.yaml'
+  '/ecloud/v2/load-balancer-networks/{loadBalancerNetworkId}' :
+    $ref : 'resources/LoadBalancerNetwork/item.yaml'
+  '/ecloud/v2/load-balancer-specs':
+    $ref: 'resources/LoadBalancerSpecification/admin-collection.yaml'
+  '/ecloud/v2/load-balancer-specs/{loadBalancerSpecificationId}':
+    $ref: 'resources/LoadBalancerSpecification/admin-item.yaml'
+  '/ecloud/v2/networks' :
+    $ref : 'resources/Network/admin-collection.yaml'
+  '/ecloud/v2/networks/{networkId}' :
+    $ref : 'resources/Network/admin-item.yaml'
+  '/ecloud/v2/networks/{networkId}/nics' :
+    $ref : 'resources/Network/nic-collection.yaml'
+  '/ecloud/v2/networks/{networkId}/tasks' :
+    $ref : 'resources/Network/tasks-collection.yaml'
+  '/ecloud/v2/nics':
+    $ref: 'resources/Nic/collection.yaml'
+  '/ecloud/v2/nics/{nicId}':
+    $ref: 'resources/Nic/item.yaml'
+  '/ecloud/v2/nics/{nicId}/ip-addresses' :
+    $ref : 'resources/Nic/ip-address-collection.yaml'
+  /ecloud/v2/nics/{nicId}/ip-addresses/{ipAddressId}:
+    $ref : 'resources/Nic/ip-address-item.yaml'
+  '/ecloud/v2/nics/{nicId}/tasks':
+    $ref: 'resources/Nic/tasks-collection.yaml'
+  '/ecloud/v2/orchestrator-configs':
+    $ref: 'resources/OrchestratorConfig/admin-collection.yaml'
+  '/ecloud/v2/orchestrator-configs/{configId}':
+    $ref: 'resources/OrchestratorConfig/admin-item.yaml'
+  '/ecloud/v2/orchestrator-configs/{configId}/data':
+    $ref: 'resources/OrchestratorConfig/data.yaml'
+  '/ecloud/v2/orchestrator-configs/{configId}/deploy':
+    $ref: 'resources/OrchestratorConfig/deploy.yaml'
+  '/ecloud/v2/regions':
+    $ref: 'resources/Region/admin-collection.yaml'
+  '/ecloud/v2/regions/{regionId}':
+    $ref: 'resources/Region/admin-item.yaml'
+  '/ecloud/v2/regions/{regionId}/availability-zones':
+    $ref: 'resources/Region/availabilityZones.yaml'
+  '/ecloud/v2/regions/{regionId}/vpcs':
+    $ref: 'resources/Region/vpc-collection.yaml'
+  '/ecloud/v2/routers':
+    $ref: 'resources/Router/admin-collection.yaml'
+  '/ecloud/v2/routers/{routerId}':
+    $ref: 'resources/Router/admin-item.yaml'
+  '/ecloud/v2/router-throughputs':
+    $ref: 'resources/RouterThroughput/admin-collection.yaml'
+  '/ecloud/v2/router-throughputs/{routerThroughputId}':
+    $ref: 'resources/RouterThroughput/admin-item.yaml'
+  '/ecloud/v2/scripts':
+    $ref : 'resources/Script/admin-collection.yaml'
+  '/ecloud/v2/scripts/{scriptId}':
+    $ref : 'resources/Script/admin-item.yaml'
+  '/ecloud/v2/software' :
+    $ref : 'resources/Software/admin-collection.yaml'
+  '/ecloud/v2/software/{softwareId}' :
+    $ref : 'resources/Software/admin-item.yaml'
+  '/ecloud/v2/software/{softwareId}/images' :
+    $ref : 'resources/Software/admin-images-collection.yaml'
+  '/ecloud/v2/software/{softwareId}/scripts' :
+    $ref : 'resources/Software/admin-scripts-collection.yaml'
+  '/ecloud/v2/tasks':
+    $ref: 'resources/Task/admin-collection.yaml'
+  '/ecloud/v2/tasks/{taskId}':
+    $ref: 'resources/Task/admin-item.yaml'
+  '/ecloud/v2/vips':
+    $ref: 'resources/Vip/collection.yaml'
+  '/ecloud/v2/vips/{vipId}':
+    $ref: 'resources/Vip/item.yaml'
+  '/ecloud/v2/volumes':
+    $ref: 'resources/Volume/admin-collection.yaml'
+  '/ecloud/v2/volumes/{volumeId}':
+    $ref: 'resources/Volume/admin-item.yaml'
+  '/ecloud/v2/vpn-profile-groups':
+    $ref: 'resources/VpnProfileGroup/admin-collection.yaml'
+  '/ecloud/v2/vpn-profile-groups/{vpnProfileGroupId}':
+    $ref: 'resources/VpnProfileGroup/admin-item.yaml'
+  '/ecloud/v2/vpn-profiles':
+    $ref: 'resources/VpnProfile/collection.yaml'
+  '/ecloud/v2/vpn-profiles/{vpnProfileId}':
+    $ref: 'resources/VpnProfile/item.yaml'
+#  When adding a new response use the following reference, and add to the list above alphabetically
+#  '/ecloud/v2/references':
+#    $ref: 'resources/Reference/collection.yaml'
+#  '/ecloud/v2/references/{ReferenceId}':
+#    $ref: 'resources/Reference/item.yaml'

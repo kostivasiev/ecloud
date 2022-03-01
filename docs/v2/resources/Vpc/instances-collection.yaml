@@ -1,0 +1,35 @@
+get:
+  parameters:
+    - $ref: '../../public-openapi.yaml#/components/parameters/VpcId'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../../components/schemas/instance.yaml'
+              meta:
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/instances?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/instances?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/instances?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/vpcs/{vpcId}/instances?page=2'
+  tags:
+    - Virtual Private Clouds

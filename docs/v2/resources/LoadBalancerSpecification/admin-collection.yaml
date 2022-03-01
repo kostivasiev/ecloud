@@ -1,0 +1,49 @@
+get:
+  parameters:
+    - $ref: '../../components/parameters/perPage.yaml'
+    - $ref: '../../components/parameters/page.yaml'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: 'admin-schema.yaml'
+              meta:
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancer-specs?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancer-specs?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancer-specs?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/load-balancer-specs?page=2'
+  tags:
+    - Load Balancer Specification
+post:
+  description: Create an Load Balancer Specification
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: 'admin-schema.yaml'
+  responses:
+    201:
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Load Balancer Specification

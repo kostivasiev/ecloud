@@ -1,0 +1,49 @@
+get:
+  parameters:
+    - $ref: '../../components/parameters/perPage.yaml'
+    - $ref: '../../components/parameters/page.yaml'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '../../components/schemas/volume.yaml'
+              meta:
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/volumes?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/volumes?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/volumes?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/volumes?page=2'
+  tags:
+    - Volumes
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/schemas/volume.yaml'
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/Volume/responses/idResponse.yaml'
+  tags:
+    - Volumes

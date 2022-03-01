@@ -1,0 +1,2149 @@
+---
+
+openapi: '3.0.0'
+info:
+  title: eCloud API
+  version: '1.0.0'
+
+servers:
+  - url: https://api.ukfast.io
+
+security:
+  - api_key:
+      - api_key
+
+tags:
+  - name: Virtual Machines
+  - name: Solutions
+  - name: Sites
+  - name: Hosts
+  - name: Datastores
+  - name: Firewalls
+  - name: Pods
+  - name: Credits
+  - name: Appliances
+  - name: Active Directory
+
+
+paths:
+
+  # Virtual Machines
+  /ecloud/v1/vms:
+    get:
+      description: List available virtual machines
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/vm"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Virtual Machines
+
+    post:
+      description: Deploy a new virtual machine (vm)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                environment:
+                  description: The environment to deploy the vm onto. Must be Public/Hybrid/Burst/Private/GPU
+                  type: string
+                  required: true
+                template:
+                  description: The template to deploy the new vm from. VM's must be launched using either a template or an appliance id.
+                  type: string
+                  required: false
+                template_password:
+                  description: The password required to deploy from the requested template. Required by custom templates
+                  type: string
+                appliance_id:
+                  type: string
+                  description: The ID of the appliance to deploy the new vm from. VM's must be launched using either a template or an appliance id.
+                  required: false
+                parameters:
+                  description: A list of appliance configuration parameters
+                  required: false
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      "key":
+                        required: true
+                        description: The parameter key
+                        type: string
+                      "value":
+                        required: true
+                        description: The parameter value
+                        type: string
+                cpu:
+                  description: The number of virtual CPUs required
+                  type: integer
+                  required: true
+                ram:
+                  description: The total required ram, in gigabytes
+                  type: integer
+                  required: true
+                hdd:
+                  description: The total disk space required, in gigabytes. Either the hdd or hdd_disks parameter must be specified.
+                  type: integer
+                  required: false
+                hdd_disks:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        description: A human-readable name for the disk of the format "Hard disk x", where x represents the disk number. Either the hdd or hdd_disks parameter must be specified.
+                        type: string
+                      capacity:
+                        description: The total disk capacity, in gigabytes
+                        type: integer
+                  required: false
+                name:
+                  description: A human-readable name for the vm
+                  type: string
+                computername:
+                  description: Internal system name, used for local dns lookups, netbios on windows and hostname on linux
+                  type: string
+                tags:
+                  description: A list of tags to associate with the new VM
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                      value:
+                        type: string
+                backup:
+                  description: Public VMs only - Is backup required on this VM
+                  type: boolean
+                support:
+                  description: Public VMs only - Is support required on this VM
+                  type: boolean
+                monitoring:
+                  type: boolean
+                  description: Is monitoring required required on this VM
+                monitoring_contacts:
+                  description: A list of contact IDs that should recieve monitoring alerts for this VM
+                  type: array
+                  items:
+                    type: integer
+                solution_id:
+                  description: The solution ID to deploy the vm into. Required on Hybrid/Private/Burst
+                  type: integer
+                datastore_id:
+                  description: Optional datastore ID to deploy the vm into. Available to Hybrid/Private
+                  type: integer
+                site_id:
+                  description: The site ID to deploy the vm into. Required by multi-site solutions
+                  type: integer
+                network_id:
+                  description: The network ID to deploy the vm into. Required by multi-network solutions
+                  type: integer
+                external_ip_required:
+                  description: Is an external IP requred for this VM. Optional for multi-network solutions, default is false.
+                  type: boolean
+                ssh_keys:
+                  description: An array of SSH public keys to add to the VM (Linux only)
+                  type: array
+                  items:
+                    type: string
+                encrypt:
+                  description: Encrypt the VM
+                  required: false
+                  type: boolean
+                role:
+                  description: A role to assign the Virtual Machine. Available roles are 'Web Server', 'Database Server', 'Mail Server', 'Application Server' and 'Development Server'
+                  required: false
+                  type: string
+                  example: Web Server
+                ad_domain_id:
+                  description: The Active Directory domain to enrol the new VM into.
+                  type: integer
+                bootstrap_script:
+                  description: Optional bootstrap script to execute in-guest on first boot. Expects Bash script for Linux-based virtual machines, and PowerShell script for Windows-based virtual machines
+                  required: false
+                  type: string
+
+      responses:
+        '202':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      credentials:
+                        description: The credentials to login to the newly created VM
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            username:
+                              description: The root/administrator username of the VM
+                              type: string
+                            password:
+                              description: The password for the root/administrator username
+                              type: string
+                  meta:
+                    type: object
+                    required:
+                      - pagination
+                    properties:
+                      location:
+                        type: string
+                        example: "https://api.ukfast.io/ecloud/v1/vms/1"
+      tags:
+        - Virtual Machines
+
+
+  /ecloud/v1/vms/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the virtual machine identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual virtual machine
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/vm"
+                      - $ref: "#/components/schemas/vm-extra"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Virtual Machines
+
+    delete:
+      description: Delete an individual virtual machine
+      responses:
+        '202':
+          description: Success
+      tags:
+        - Virtual Machines
+
+    patch:
+      description: Modify a VM
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: Rename the virtual machine
+                  type: string
+                  required: false
+                cpu:
+                  description: Number of CPU's
+                  type: integer
+                  required: false
+                ram:
+                  description: RAM GB
+                  type: integer
+                  required: false
+                hdd_disks:
+                  description: A list HDD configurations for the VM
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      "uuid":
+                        required: false
+                        description: UUID of the Hard disk (for existing disks).
+                        type: string
+                        example: "85111f50-2ea9-11e9-b210-d663bd873d93"
+                      "capacity":
+                        required: false
+                        description: Storage capacity of the Hard disk in GB
+                        type: integer
+                        example: 20
+                      "state":
+                        required: false
+                        description: Indicates the presence of the Hard disk "present", or "absent" to remove disks.
+                        type: string
+                        example: "present"
+                role:
+                  description: A role to assign to the Virtual Machine. Available roles are 'Web Server', 'Database Server', 'Mail Server', 'Application Server' and 'Development Server'
+                  required: false
+                  type: string
+                  example: Web Server
+      responses:
+        '202':
+          description: Accepted
+        '200':
+          description: Success
+      tags:
+        - Virtual Machines
+
+  /ecloud/v1/vms/{id}/clone:
+    post:
+      description: Clone a virtual machine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: A human-readable name for the cloned vm
+                  type: string
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                  meta:
+                    type: object
+                    required:
+                      - pagination
+                    properties:
+                      location:
+                        type: string
+                        description: "The ID of the newly created cloned VM"
+                        example: "https://api.ukfast.io/ecloud/v1/vms/2"
+      tags:
+        - Virtual Machines
+
+  /ecloud/v1/vms/{id}/clone-to-template:
+    post:
+      description: Create a template with the exact specifications as a specified virtual machine
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              template: object
+              properties:
+                template_name:
+                  description: A human-readable name for the template. Allowed characters alphanumeric, dash, space and underscore.
+                  type: string
+                  required: true
+                template_type:
+                  description: Template type (solution / pod), defaults to solution.
+                  type: string
+                  required: false
+      responses:
+        '202':
+          description: Accepted
+      tags:
+        - Virtual Machines
+
+  /ecloud/v1/vms/{id}/power-on:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the virtual machine identifier
+        schema:
+          type: integer
+
+    put:
+      description: Power on the virtual machine
+      responses:
+        '204':
+          description: Success
+      tags:
+        - Virtual Machines
+
+  /ecloud/v1/vms/{id}/power-off:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the virtual machine identifier
+        schema:
+          type: integer
+
+    put:
+      description: Power off the virtual machine
+      responses:
+        '204':
+          description: Success
+      tags:
+        - Virtual Machines
+
+  /ecloud/v1/vms/{id}/power-reset:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the virtual machine identifier
+        schema:
+          type: integer
+
+    put:
+      description: Power off the virtual machine then power on
+      responses:
+        '204':
+          description: Success
+      tags:
+        - Virtual Machines
+
+  /ecloud/v1/vms/{id}/power-shutdown:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the virtual machine identifier
+        schema:
+          type: integer
+
+    put:
+      description: Shut down the virtual machine
+      responses:
+        '204':
+          description: Success
+      tags:
+        - Virtual Machines
+
+  /ecloud/v1/vms/{id}/power-restart:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the virtual machine identifier
+        schema:
+          type: integer
+
+    put:
+      description: Shut down the virtual machine then power on
+      responses:
+        '204':
+          description: Success
+      tags:
+        - Virtual Machines
+
+  /ecloud/v1/vms/{id}/tags:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the vm identifier
+        schema:
+          type: string
+
+    get:
+      description: List assigned vm tags
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/tag"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Virtual Machines
+
+    post:
+      description: Create new vm tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                key:
+                  type: string
+                  description: The key of the tag
+                value:
+                  type: string
+                  description: The value of the tag
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/tag"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Virtual Machines
+
+  /ecloud/v1/vms/{id}/tags/{key}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the vm identifier
+        schema:
+          type: string
+      - name: key
+        in: path
+        required: true
+        description: the tag identifier
+        schema:
+          type: string
+
+    get:
+      description: Retrieve an individual vm tag
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/tag"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Virtual Machines
+
+    patch:
+      description: Update an individual vm tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  description: The new value of the tag
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                  meta:
+                    type: object
+                    required:
+                      - pagination
+                    properties:
+                      location:
+                        type: string
+                        example: "https://api.ukfast.io/ecloud/v1/vms/2/tags/test"
+      tags:
+        - Virtual Machines
+
+    delete:
+      description: Delete an individual vm tag
+      responses:
+        '202':
+          description: Success
+      tags:
+        - Virtual Machines
+
+
+  # Hybrid/Private Solutions
+  /ecloud/v1/solutions:
+    get:
+      description: List available solutions
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/solution"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual solution
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/solution"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+    patch:
+      description: Update an individual solution
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: A human-readable name for the solution
+                encryption_default:
+                  description: Determine whether newly launched VM's should be encrypted by default (if encryption service is enabled on the solution).
+                  type: boolean
+                  default: true
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                  meta:
+                    type: object
+                    required:
+                      - pagination
+                    properties:
+                      location:
+                        type: string
+                        example: "https://api.ukfast.io/ecloud/v1/solutions/2"
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}/templates:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve the virtual machine templates for a solution
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/template"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}/templates/{name}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The solution identifier
+        schema:
+          type: integer
+      - name: name
+        in: path
+        required: true
+        description: The template name / identifier
+        schema:
+          type: string
+
+
+    get:
+      description: Retrieve an individual virtual machine template for a solution
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/template"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+    delete:
+      description: Delete a virtual machine template from a solution
+      responses:
+        '202':
+          description: Accepted
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}/templates/{name}/move:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The solution identifier
+        schema:
+          type: integer
+      - name: name
+        in: path
+        required: true
+        description: The template name / identifier
+        schema:
+          type: string
+
+    post:
+      description: Move / rename a virtual machine template within a solution
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                destination:
+                  description: The new template resource location (template name)
+                  type: string
+      responses:
+        '202':
+          description: Accepted
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}/vms:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: integer
+
+    get:
+      description: List available solution virtual machines
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/vm"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+
+  /ecloud/v1/solutions/{id}/hosts:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: integer
+
+    get:
+      description: List available solution hosts
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/host"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+
+  /ecloud/v1/solutions/{id}/datastores:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: integer
+
+    get:
+      description: List available solution datastores
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/datastore"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}/sites:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: integer
+
+    get:
+      description: List available solution sites
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/site"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}/networks:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: integer
+
+    get:
+      description: List available solution networks
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/network"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}/firewalls:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: integer
+
+    get:
+      description: List solution firewalls
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/firewall"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}/tags:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: string
+
+    get:
+      description: List assigned solution tags
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/tag"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+    post:
+      description: Create new solution tag
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/tag"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+  /ecloud/v1/solutions/{id}/tags/{key}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the solution identifier
+        schema:
+          type: string
+      - name: key
+        in: path
+        required: true
+        description: the tag identifier
+        schema:
+          type: string
+
+    get:
+      description: Retrieve an individual solution tag
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/tag"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Solutions
+
+    patch:
+      description: Update an individual solution tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  description: The new value of the tag
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                  meta:
+                    type: object
+                    required:
+                      - pagination
+                    properties:
+                      location:
+                        type: string
+                        example: "https://api.ukfast.io/ecloud/v1/solutions/2/tags/test"
+      tags:
+        - Solutions
+
+    delete:
+      description: Delete an individual solution tag
+      responses:
+        '202':
+          description: Success
+      tags:
+        - Solutions
+
+
+  # eCloud Hybrid/Private Sites
+  /ecloud/v1/sites:
+    get:
+      description: List available sites
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/site"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Sites
+
+  /ecloud/v1/sites/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the site identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual site
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/site"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Sites
+
+  #    /ecloud/v1/sites/{id}/vms:
+  #      parameters:
+  #      - name: id
+  #        in: path
+  #        required: true
+  #        description: the solution identifier
+  #        schema:
+  #          type: integer
+  #
+  #      get:
+  #        description: List VMs on a solution site
+  #        responses:
+  #          '200':
+  #            description: Success
+  #            content:
+  #              application/json:
+  #                schema:
+  #                  type: object
+  #                  properties:
+  #                    data:
+  #                      type: array
+  #                      items:
+  #                        $ref: "#/components/schemas/vms"
+  #                    meta:
+  #                      type: object
+  #                      properties:
+  #        tags:
+  #        - Sites
+
+  # Hybrid/Private Hosts
+  /ecloud/v1/hosts:
+    get:
+      description: List available hosts
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/host"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Hosts
+
+  /ecloud/v1/hosts/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the host identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual host
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/host"
+                      - $ref: "#/components/schemas/host-extra"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Hosts
+
+
+  # Hybrid/Private Datastores
+  /ecloud/v1/datastores:
+    get:
+      description: List available datastores
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/datastore"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Datastores
+
+  /ecloud/v1/datastores/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the datastore identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual datastore
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                      - $ref: "#/components/schemas/datastore"
+                      - $ref: "#/components/schemas/datastore-extra"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Datastores
+
+  # eCloud Firewalls
+
+  /ecloud/v1/firewalls:
+    get:
+      description: List available eCloud firewalls
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/firewall"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Firewalls
+
+  /ecloud/v1/firewalls/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the firewall identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual firewall
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/firewall"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Firewalls
+
+  /ecloud/v1/firewalls/{id}/config:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the firewall identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual firewalls config file
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      config:
+                        description: A base64 encoded string of the firewalls config
+                        type: string
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Firewalls
+
+  # Pods
+
+
+  /ecloud/v1/pods:
+    get:
+      description: List available pods
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/pod"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Pods
+
+  /ecloud/v1/pods/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the pod identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual pod
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/pod"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Pods
+
+  /ecloud/v1/pods/{id}/appliances:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the Pod identifier
+        schema:
+          type: string
+
+    get:
+      description: Retrieve a list of VM Appliances available for the Pod
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/appliance"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Pods
+
+  /ecloud/v1/pods/{id}/gpu-profiles:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The Pod identifier
+        schema:
+          type: string
+
+    get:
+      description: Retrieve a list of GPU profiles available for the Pod
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/gpu-profile"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Pods
+
+  /ecloud/v1/pods/{id}/gpu-profiles/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The pod identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual GPU profile
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/gpu-profile"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Pods
+
+  # Appliances
+
+  /ecloud/v1/appliances:
+    get:
+      description: List available Appliances
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/appliance"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Appliances
+
+  /ecloud/v1/appliances/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the Appliance identifier
+        schema:
+          type: string
+
+    get:
+      description: Retrieve an individual Appliance
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/appliance"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Appliances
+
+  /ecloud/v1/appliances/{id}/parameters:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the Appliance identifier
+        schema:
+          type: string
+
+    get:
+      description: Retrieve the parameters required to launch a virtual machine using an Appliance
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/appliance-parameter"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Appliances
+
+  /ecloud/v1/pods/{id}/templates:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: the pod identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve a pod's virtual machine templates
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/template"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Pods
+
+  /ecloud/v1/pods/{id}/templates/{name}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The pod identifier
+        schema:
+          type: integer
+      - name: name
+        in: path
+        required: true
+        description: The template name / identifier
+        schema:
+          type: string
+
+
+    get:
+      description: Retrieve an individual virtual machine template for a Pod
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/template"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Pods
+
+    delete:
+      description: Delete a virtual machine template from a Pod
+      responses:
+        '202':
+          description: Accepted
+      tags:
+        - Pods
+
+  /ecloud/v1/pods/{id}/templates/{name}/move:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The pod identifier
+        schema:
+          type: integer
+      - name: name
+        in: path
+        required: true
+        description: The template name / identifier
+        schema:
+          type: string
+
+    post:
+      description: Move / rename a virtual machine template within a pod
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                destination:
+                  description: The new template resource location (template name)
+                  type: string
+      responses:
+        '202':
+          description: Accepted
+      tags:
+        - Pods
+
+  # Credits
+  /ecloud/v1/credits:
+    get:
+      description: Show eCloud credits available to this account
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/credit"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Credits
+
+  # Active Directory
+  /ecloud/v1/active-directory/domains:
+    get:
+      description: List available Active Directory domains
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ad-domain"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Active Directory
+
+  /ecloud/v1/active-directory/domains/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        description: The AD domain identifier
+        schema:
+          type: integer
+
+    get:
+      description: Retrieve an individual Active Directory domain
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ad-domain"
+                  meta:
+                    type: object
+                    properties:
+      tags:
+        - Active Directory
+
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      description: API key authentication
+      in: header
+      name: Authorization
+
+  schemas:
+
+    vm:
+      properties:
+        id:
+          description: A unique identifier for the virtual machine
+          type: integer
+        name:
+          description: A human-readable name for the virtual machine
+          type: string
+        hostname:
+          description: A Fully Qualified Domain Name (FQDN) for the device
+          type: string
+        computername:
+          description: The local systems dns name
+          type: string
+        cpu:
+          description: The number of virtual CPUs
+          type: integer
+        ram:
+          description: The total available ram, in gigabytes
+          type: integer
+        hdd:
+          description: The total disk space available, in gigabytes
+          type: integer
+        ip_internal:
+          description: The internal IP address assigned to the device
+          type: string
+        ip_external:
+          description: The external IP address assigned to the device
+          type: string
+        template:
+          description: The name of the template used to create the VM
+          type: string
+        platform:
+          description: The operating system platform
+          type: string
+        backup:
+          description: Is backup enabled on the device
+          type: boolean
+        support:
+          description: Is support enabled on the device
+          type: boolean
+        environment:
+          description: The eCloud environment the virtual machine is deployed onto.
+          type: string
+        pod_id:
+          description: The pod ID the virtual machine belongs too
+          type: integer
+        solution_id:
+          description: The solution ID the virtual machine belongs too
+          type: integer
+        encrypted:
+          description: Indicates whether the virtual machine is encrypted
+          type: boolean
+        role:
+          description: A role assigned to the Virtual Machine. Available roles are 'Web Server', 'Database Server', 'Mail Server', 'Application Server' and 'Development Server'
+          type: string
+        ad_domain_id:
+          description: The Active Directory domain the VM is enrolled into
+          type: integer
+    vm-extra:
+      properties:
+        status:
+          description: A status string indicating the state of the virtual machine
+          type: string
+        power_status:
+          description: A status string indicating the power state of the virtual machine
+          type: string
+        tools_status:
+          description: A status string indicating the state of the vmware tools service
+          type: string
+        hdd_disks:
+          properties:
+            uuid:
+              description: UUID of the disk
+              type: string
+            name:
+              description: A human-readable name for the disk
+              type: string
+            type:
+              description: The virtual disk type
+              type: string
+              enum: [ Standard, Cluster ]
+            key:
+              description: Controller device key, while unique keys may be recycled as disks are attached/removed
+              type: integer
+            capacity:
+              description: The total disk capacity, in gigabytes
+              type: integer
+        gpu_profile:
+          description: UUID of the assigned GPU profile
+          type: string
+
+    solution:
+      properties:
+        id:
+          description: A unique identifier for the solution
+          type: integer
+        name:
+          description: A human-readable name for the solution
+          type: string
+        environment:
+          description: The eCloud environemnt, eg. Hybrid/Private
+          type: string
+        pod_id:
+          description: The Pod ID the solution belongs too
+          type: integer
+        encryption_enabled:
+          description: Indicates whether VM encryption is available for the solution
+          type: boolean
+        encryption_default:
+          description: Indicates whether newly launched VM's should be encrypted by default (if encryption service is enabled on the solution)
+          type: boolean
+
+
+    site:
+      properties:
+        id:
+          description: A unique identifier for the site
+          type: integer
+        state:
+          description: The sites' DRS policy
+          type: string
+        solution_id:
+          description: The solution ID the site belongs too
+          type: integer
+        pod_id:
+          description: The Pod ID the site belongs too
+          type: integer
+
+
+    network:
+      properties:
+        id:
+          description: A unique identifier for the network
+          type: integer
+        name:
+          description: A human-readable name for the network
+          type: string
+
+
+    host:
+      properties:
+        id:
+          description: A unique identifier for the host
+          type: integer
+        solution_id:
+          description: The solution ID the host belongs too
+          type: integer
+        pod_id:
+          description: The Pod ID the host belongs too
+          type: integer
+        name:
+          description: A human-readable name for the host
+          type: string
+        cpu:
+          properties:
+            qty:
+              description: Number of processors installed
+              type: integer
+            cores:
+              description: Number of cores available per processor
+              type: integer
+            speed:
+              description: Processor clock speed
+              type: string
+        ram:
+          properties:
+            capacity:
+              description: Total RAM capacity, in gigabytes
+              type: integer
+    host-extra:
+      properties:
+        ram:
+          properties:
+            reserved:
+              description: Total RAM reserved for system use, in gigabytes
+              type: integer
+            allocated:
+              description: Total RAM allocated to virtual machines, in gigabytes
+              type: integer
+            available:
+              description: Total RAM available for allocation, in gigabytes
+              type: integer
+
+
+    datastore:
+      properties:
+        id:
+          description: A unique identifier for the datastore
+          type: integer
+        solution_id:
+          description: The solution ID the datastore belongs too
+          type: integer
+        site_id:
+          description: The site ID the datastore belongs too
+          type: integer
+        name:
+          description: A human-readable name for the datastore
+          type: string
+        status:
+          description: A status string indicating the state of the datastore
+          type: string
+        capacity:
+          description: The capacity of the datastore in gigabytes.
+          type: integer
+    datastore-extra:
+      properties:
+        allocated:
+          description: The amount of space allocated to VMs, in gigabytes.
+          type: integer
+        available:
+          description: The amount of space available to VMs, in gigabytes.
+          type: integer
+
+
+    firewall:
+      properties:
+        id:
+          description: A unique identifier for the device
+          type: integer
+        name:
+          description: A human-readable name for the device
+          type: string
+        hostname:
+          description: A Fully Qualified Domain Name (FQDN) for the device
+          type: string
+        ip:
+          description: Primary IP address assigned to the device
+          type: string
+        role:
+          description: Assigned firewall role, Single/Master/Slave
+          type: string
+
+
+    template:
+      properties:
+        name:
+          description: A unique identifier for the template
+          type: string
+        cpu:
+          description: The number of virtual CPUs
+          type: integer
+        ram:
+          description: The total available ram, in gigabytes
+          type: integer
+        hdd:
+          description: The total disk space available, in gigabytes
+          type: integer
+        hdd_disks:
+          properties:
+            name:
+              description: A human-readable name for the disk
+              type: string
+            capacity:
+              description: The total disk capacity, in gigabytes
+              type: integer
+        platform:
+          description: The operating system platform
+          type: string
+
+    tag:
+      properties:
+        key:
+          description: A unique identifier for the tag
+          type: string
+        value:
+          description: The value of the tag
+          type: string
+        created_at:
+          description: The timestamp of when the tag was created
+          type: string
+
+
+    pod:
+      properties:
+        id:
+          description: A unique identifier for the pod
+          type: integer
+        name:
+          description: A human-readable name for the pod
+          type: string
+        services:
+          properties:
+            public:
+              type: boolean
+              description: eCloud Public is available on this Pod
+            burst:
+              type: boolean
+              description: eCloud Burst is available on this Pod
+            appliances:
+              type: boolean
+              description: eCloud Appliances are available on this Pod
+
+    appliance:
+      properties:
+        id:
+          description: A unique identifier (UUID) for the Appliance
+          type: string
+          example: 0
+        name:
+          description: The name of the Appliance
+          type: string
+          example: Wordpress
+        logo_uri:
+          description: URI of the Appliance logo
+          type: string
+          example: "https://images.ukfast.co.uk/logos/wordpress/300x300_white.jpg"
+        description:
+          description: A description of the Appliance
+          type: string
+          example: WordPress is open source software you can use to create a beautiful website, blog, or app
+        documentation_uri:
+          description: URI of the Appliance documentation
+          type: string
+          example: https://en-gb.wordpress.org
+        publisher:
+          description: The name of the Appliance publisher
+          type: strng
+          example: UKFast
+        created_at:
+          description: The date the appliance was created
+          type: string
+          example: "0000-00-00T00:00:00+00:00"
+
+    appliance-parameter:
+      properties:
+        id:
+          description: A unique identifier for the parameter
+          type: string
+          example: "7c2d39b8-35e1-4d70-9bc4-415b79ffce6a"
+        name:
+          description: The name of the parameter
+          type: string
+          example: MySQL Wordpress user password
+        key:
+          description: The Appliance parameter key / install script placeholder
+          type: string
+          example: mysql_wordpress_user_password
+        type:
+          description: The parameter data type (String / Numeric / Boolean)
+          type: string
+          example: String
+        description:
+          description: A description of the parameter
+          type: string
+          example: "Wordpress user password"
+        required:
+          description: Determines whether the parameter is required or optional for launching the Appliance
+          type: boolean
+          example: true
+        validation_rule:
+          description: A Perl Compatible Regular Expression validation rule for the parameter.
+          type: string
+          example: '/\w+/'
+
+    credit:
+      properties:
+        type:
+          description: The credit type
+          type: string
+          example: ecloud_vm_encryption
+        total:
+          description: Total number of purchased credits of this type
+          type: integer
+        remaining:
+          description: Remaining number of unused credits of this type
+          type: integer
+
+    ad-domain:
+      properties:
+        id:
+          description: A unique identifier for the domain
+          type: integer
+        name:
+          description: A Fully Qualified Domain Name (FQDN) for the domain
+          type: string
+
+    gpu-profile:
+      properties:
+        id:
+          description: A unique identifier for the GPU profile
+          type: string
+          example: "b9787d88-a614-49b0-b135-0e72c87c045b"
+        name:
+          description: The GPU profile name
+          type: string
+        card_type:
+          description: The GPU card type
+          type: string
+          example: "NVIDIA v100"

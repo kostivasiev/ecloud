@@ -1,0 +1,20 @@
+properties:
+  id:
+    type: string
+    example: 'rtp-2b66bb79'
+    readOnly: true
+  availability_zone_id:
+    description: The Availability Zone that this router throughput option is available on
+    type: string
+    required: true
+    example: 'az-2b66bb79'
+  name:
+    type: string
+    required: false
+    example: '10Gb'
+  committed_bandwidth:
+    description: Bandwidth in Mbps
+    type: integer
+    required: true
+    example: 10240
+description: 'Router Throughput'

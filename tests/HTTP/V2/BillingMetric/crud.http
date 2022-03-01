@@ -1,0 +1,137 @@
+POST https://{{host}}/{{version}}/billing-metrics
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "resource_id": "{{dev_instance_id}}",
+    "vpc_id": "{{dev_vpc_id}}",
+    "reseller_id": 1,
+    "key": "ram.capacity",
+    "value": "16GB",
+    "start": "2020-07-07T10:30:00+01:00",
+    "category": "Test Category",
+    "price": 9.99
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('id', response.body.data.id);
+client.log('ID: ' + response.body.data.id);
+%}
+
+###
+GET https://{{host}}/{{version}}/billing-metrics
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/billing-metrics?vpc_id:eq=vpc-aaaaaaaa
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/billing-metrics?reseller_id:eq=1
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/billing-metrics?end:eq=null
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/billing-metrics/{{id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+PATCH https://{{host}}/{{version}}/billing-metrics/{{id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "resource_id": "{{dev_instance_id}}",
+    "vpc_id": "{{dev_vpc_id}}",
+    "reseller_id": 0,
+    "key": "ram.capacity",
+    "value": "16GB",
+    "start": "2020-07-07T10:30:00+01:00",
+    "end": "2020-07-08T10:30:00+01:00",
+    "category": "Updated Category",
+    "price": 11.11
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('nic_id'), "Incorrect resource ID returned");
+});
+%}
+
+###
+DELETE https://{{host}}/{{version}}/billing-metrics/{{id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}

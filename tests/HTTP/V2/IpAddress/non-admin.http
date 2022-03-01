@@ -1,0 +1,256 @@
+### 1. Create Network
+POST https://{{host}}/{{version}}/networks
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "router_id": "{{dev_router_id}}",
+  "subnet": "10.0.17.0/24"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('network_id', response.body.data.id);
+client.log('Network ID: ' + response.body.data.id);
+%}
+
+### 2. Create IP Address
+POST https://{{host}}/{{version}}/ip-addresses
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test",
+    "ip_address": "10.0.17.5",
+    "network_id": "{{network_id}}",
+    "type": "cluster"
+}
+
+> {%
+client.test('Create', function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('ip_address_id', response.body.data.id);
+client.log('IP Address ID: ' + response.body.data.id);
+%}
+
+### 3. Get Ip Address Collection
+GET https://{{host}}/{{version}}/ip-addresses
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 4. Get Ip Address Collection filtered by type
+GET https://{{host}}/{{version}}/ip-addresses?type:eq=cluster
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 5. Get Ip Address Resource
+GET https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+
+### 6. Update Ip Address Resource
+PATCH https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Updated",
+    "ip_address": "172.22.2.4",
+    "network_id": "{{network_id}}",
+    "type": "cluster"
+}
+
+> {%
+client.test('Update Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 7. Verify Ip Address Resource (ip_address and type should not have changed)
+GET https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Update Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 8. Create an Instance
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{dev_vpc_id}}",
+    "name": "Test",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": false,
+    "network_id": "{{network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600
+}
+
+> {%
+client.global.set("instance_id", response.body.data.id);
+client.log("Instance ID: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### 9. Create Nic
+POST https://{{host}}/{{version}}/nics
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "mac_address": "3D:F2:C9:A6:B3:5F",
+  "instance_id": "{{instance_id}}",
+  "network_id": "{{network_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('nic_id', response.body.data.id);
+client.log('NIC ID: ' + response.body.data.id);
+%}
+
+### 10. Assign IP Address to Nic
+POST https://{{host}}/{{version}}/nics/{{nic_id}}/ip-addresses
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "ip_address_id": "{{ip_address_id}}"
+}
+
+> {%
+client.test('Create', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 11. Delete Ip Address Resource (should fail)
+DELETE https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete failed', function () {
+    client.assert(response.status === 401, '401 response not received');
+});
+%}
+
+### 12. Dissassociate the IP
+DELETE https://{{host}}/{{version}}/nics/{{nic_id}}/ip-addresses/{{ip_address_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 13. Delete the Nic
+DELETE https://{{host}}/{{version}}/nics/{{nic_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 14. Delete Ip Address Resource (should pass)
+DELETE https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete succeeded', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 15. Delete the Instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 16. Delete Network
+DELETE https://{{host}}/{{version}}/networks/{{network_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete succeeded', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}

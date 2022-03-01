@@ -37,19 +37,19 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
-            'ignore_exceptions' => false,
+            'channels' => ['daily'],
+            'ignore_exceptions' => false
         ],
 
         'single' => [
             'driver' => 'single',
-            'path' => storage_path('logs/laravel.log'),
+            'path' => storage_path('logs/lumen.log'),
             'level' => 'debug',
         ],
 
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
+            'path' => storage_path('logs/lumen.log'),
             'level' => 'debug',
             'days' => 14,
         ],
@@ -99,6 +99,41 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
-    ],
 
+        'ukfast' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/lumen.log'),
+            'formatter' => \UKFast\Logging\JsonFormatter::class,
+            'ignore_exceptions' => true,
+        ],
+
+        'staging' => [
+            'driver' => 'stack',
+            'channels' => ['elasticsearch', 'single', 'ukfast'],
+            'ignore_exceptions' => true,
+        ],
+
+        'elasticsearch' => [
+            'driver' => 'monolog',
+            'level' => 'debug',
+            'handler' => \Monolog\Handler\ElasticSearchHandler::class,
+            'handler_with' => [
+                'client' => new \Elastica\Client([
+                    'url' => env('ELASTICSEARCH_URL'),
+                    'username' => env('ELASTICSEARCH_USERNAME'),
+                    'password' => env('ELASTICSEARCH_PASSWORD'),
+                    'log' => false,
+                ]),
+                'options' => [
+                    'index' => env('ELASTICSEARCH_INDEX_PREFIX') . Carbon\Carbon::now()->format('-Y-m-d'),
+                    'type' => env('ELASTICSEARCH_TYPE'),
+                ],
+            ],
+            'formatter' => \Monolog\Formatter\ElasticaFormatter::class,
+            'formatter_with' => [
+                'index' => env('ELASTICSEARCH_INDEX_PREFIX') . Carbon\Carbon::now()->format('-Y-m-d'),
+                'type' => env('ELASTICSEARCH_TYPE'),
+            ],
+        ],
+    ],
 ];

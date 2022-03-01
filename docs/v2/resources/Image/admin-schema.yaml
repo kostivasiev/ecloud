@@ -1,0 +1,38 @@
+properties:
+  id:
+    type: string
+    example: img-2b66bb79
+    readOnly: true
+  name:
+    type: string
+    example: 'CentOS 7'
+    readOnly: true
+  logo_uri:
+    type: string
+    example: 'https://example.com/image.png'
+    readOnly: true
+  documentation_uri:
+    type: string
+    example: 'https://example.com/docs'
+    readOnly: true
+  description:
+    type: string
+    example: 'Linux operating system'
+    readOnly: true
+  is_public:
+    type: boolean
+    example: true
+    readOnly: true
+  active:
+    type: boolean
+    example: true
+    readOnly: true
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Images'

@@ -1,0 +1,55 @@
+get:
+  parameters:
+    - $ref: '../../resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            allOf:
+              - $ref: '../../components/schemas/admin/availabilityZone.yaml'
+              - type: object
+                properties:
+                  region_id:
+                    required: true
+  tags:
+    - Availability Zones
+patch:
+  parameters:
+    - $ref: '../../resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/admin/availabilityZone.yaml'
+            - type: object
+              properties:
+                code:
+                  required: false
+                name:
+                  required: false
+                datacentre_site_id:
+                  required: false
+                region_id:
+                  required: false
+                is_public:
+                  required: false
+  responses:
+    200:
+      $ref: '../../resources/AvailabilityZone/responses/idResponse.yaml'
+  tags:
+    - Availability Zones
+
+delete:
+  parameters:
+    - $ref: '../../resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Availability Zones

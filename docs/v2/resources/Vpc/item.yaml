@@ -1,0 +1,52 @@
+get:
+  parameters:
+    - $ref: '../../resources/Vpc/parameters/vpcId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/vpc.yaml'
+              meta:
+                type: object
+  tags:
+    - Virtual Private Clouds
+patch:
+  parameters:
+    - $ref: '../../resources/Vpc/parameters/vpcId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/vpc.yaml'
+            - type: object
+              properties:
+                advanced_networking:
+                  readOnly: true
+                region_id :
+                  type : string
+                  required : true
+                  example : 'reg-a63dd78c'
+                  readOnly : true
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/Vpc/responses/idResponse.yaml'
+  tags:
+    - Virtual Private Clouds
+delete:
+  responses:
+    202:
+      description: Accepted
+      $ref : '../../components/responses/taskIdResponse.yaml'
+  parameters:
+    - $ref: '../../resources/Vpc/parameters/vpcId.yaml'
+  tags:
+    - Virtual Private Clouds

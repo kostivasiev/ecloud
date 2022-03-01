@@ -1,0 +1,6 @@
+in: path
+name: billingMetricId
+required: true
+schema:
+  type: string
+example: bm-2b66bb79

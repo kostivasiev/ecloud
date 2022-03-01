@@ -1,0 +1,5 @@
+### Get Console Session
+POST https://{{host}}/{{version}}/instances/i-15a51298/console-session
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

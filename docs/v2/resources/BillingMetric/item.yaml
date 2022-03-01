@@ -1,0 +1,50 @@
+get:
+  parameters:
+    - $ref: '../../resources/BillingMetric/parameters/billingMetricId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/admin/billingMetric.yaml'
+              meta:
+                type: object
+  tags:
+    - Billing Metric
+
+patch:
+  parameters:
+    - $ref: '../../resources/BillingMetric/parameters/billingMetricId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/admin/billingMetric.yaml'
+            - type: object
+              properties:
+                name:
+                  required: false
+                router_id:
+                  required: false
+  responses:
+    200:
+      $ref: '../../resources/BillingMetric/responses/idResponse.yaml'
+  tags:
+    - Billing Metric
+
+delete:
+  description: Billing Metric
+  parameters:
+    - $ref: '../../resources/BillingMetric/parameters/billingMetricId.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Billing Metric

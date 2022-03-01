@@ -1,31 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="./vendor/phpunit/phpunit/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
+         backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="bootstrap/app.php"
          colors="true"
->
-    <testsuites>
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-    </testsuites>
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         executionOrder="random"
+         resolveDependencies="true"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
     <coverage processUncoveredFiles="true">
         <include>
             <directory suffix=".php">./app</directory>
         </include>
     </coverage>
+    <testsuites>
+        <testsuite name="Application Test Suite">
+            <directory suffix="Test.php">./tests</directory>
+        </testsuite>
+        <testsuite name="v1">
+            <directory suffix="Test.php">./tests/V1</directory>
+        </testsuite>
+        <testsuite name="v2">
+            <directory suffix="Test.php">./tests/V2</directory>
+            <directory suffix="Test.php">./tests/unit</directory>
+        </testsuite>
+    </testsuites>
     <php>
-        <server name="APP_ENV" value="testing"/>
-        <server name="BCRYPT_ROUNDS" value="4"/>
-        <server name="CACHE_DRIVER" value="array"/>
-        <!-- <server name="DB_CONNECTION" value="sqlite"/> -->
-        <!-- <server name="DB_DATABASE" value=":memory:"/> -->
-        <server name="MAIL_MAILER" value="array"/>
-        <server name="QUEUE_CONNECTION" value="sync"/>
-        <server name="SESSION_DRIVER" value="array"/>
-        <server name="TELESCOPE_ENABLED" value="false"/>
+        <ini name="memory_limit" value="1024M"/>
+
+        <server name="APP_NAME" value="ecloud" force="true"/>
+        <server name="APP_ENV" value="testing" force="true"/>
+        <server name="APP_DEBUG" value="true" force="true"/>
+        <server name="APP_TIMEZONE" value="Europe/London" force="true"/>
+
+        <!--        <server name="LOG_CHANNEL" value="stderr" force="true"/>-->
+        <server name="CACHE_DRIVER" value="array" force="true"/>
+        <server name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <server name="PAGINATION_LIMIT" value="100" force="true"/>
+
+        <server name="DB_ECLOUD_CONNECTION" value="ecloud" force="true"/>
+        <server name="DB_ECLOUD_HOST" value="" force="true"/>
+        <server name="DB_ECLOUD_DRIVER" value="sqlite" force="true"/>
+        <server name="DB_ECLOUD_DATABASE" value=":memory:" force="true"/>
+        <!--        <server name="DB_ECLOUD_HOST" value="mysql-ukfast-net" force="true"/>-->
+        <!--        <server name="DB_ECLOUD_PORT" value="3307" force="true"/>-->
+        <!--        <server name="DB_ECLOUD_DATABASE" value="ecloud" force="true"/>-->
+        <!--        <server name="DB_ECLOUD_USERNAME" value="root" force="true"/>-->
+        <!--        <server name="DB_ECLOUD_PASSWORD" value="password" force="true"/>-->
+
+        <server name="DB_RESELLER_CONNECTION" value="reseller" force="true"/>
+        <server name="DB_RESELLER_HOST" value="" force="true"/>
+        <server name="DB_RESELLER_DRIVER" value="sqlite" force="true"/>
+        <server name="DB_RESELLER_DATABASE" value=":memory:" force="true"/>
+        <!--        <server name="DB_RESELLER_HOST" value="mysql-ukfast-net" force="true"/>-->
+        <!--        <server name="DB_RESELLER_PORT" value="3307" force="true"/>-->
+        <!--        <server name="DB_RESELLER_DATABASE" value="reseller" force="true"/>-->
+        <!--        <server name="DB_RESELLER_USERNAME" value="root" force="true"/>-->
+        <!--        <server name="DB_RESELLER_PASSWORD" value="password" force="true"/>-->
     </php>
 </phpunit>

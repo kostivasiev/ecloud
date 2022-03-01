@@ -1,0 +1,26 @@
+properties:
+  id:
+    type: string
+    example: 'vpnpg-2b66bb79'
+    readOnly: true
+  name:
+    type: string
+    required: true
+    example: 'My Profile Group'
+  description:
+    type: string
+    required: true
+    example: 'Description of my profile group'
+  availability_zone_id:
+    readOnly: true
+    type: string
+    example: 'az-2b66bb79'
+  created_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+  updated_at:
+    type: string
+    example: '2020-07-07T10:30:00+01:00'
+    readOnly: true
+description: 'Vpns'

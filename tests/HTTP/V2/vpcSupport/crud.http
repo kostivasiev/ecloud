@@ -1,0 +1,154 @@
+POST https://{{host}}/{{version}}/support
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+X-Reseller-Id: 1
+
+{
+  "vpc_id": "{{dev_vpc_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('support_id', response.body.data.id);
+client.log('Support ID: ' + response.body.data.id);
+%}
+###
+
+GET https://{{host}}/{{version}}/support
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+
+
+GET https://{{host}}/{{version}}/support?vpc_id:eq=vpc-0ff6a6b1
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+###
+
+
+GET https://{{host}}/{{version}}/support/{{support_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('support_id'), "Incorrect resource ID returned");
+  client.assert(response.body.data.vpc_id === "vpc-aaaaaaaa");
+});
+%}
+
+###
+
+GET https://{{host}}/{{version}}/vpcs/vpc-aaaaaaaa
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.support_enabled === true, "Support property is not set to true on VPC");
+});
+%}
+###
+
+PATCH https://{{host}}/{{version}}/support/{{support_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "vpc_id": "vpc-46a607df"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+
+
+GET https://{{host}}/{{version}}/support/{{support_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.vpc_id === "vpc-46a607df");
+});
+%}
+
+####
+
+DELETE https://{{host}}/{{version}}/support/{{support_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 204, "Response status is not 204");
+});
+%}
+
+####
+
+GET https://{{host}}/{{version}}/support/{{support_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 404, "Response status is not 404");
+});
+%}
+###
+
+GET https://{{host}}/{{version}}/vpcs/vpc-aaaaaaaa
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.support_enabled === false, "Support property is not set to false on VPC");
+});
+%}
+###

@@ -1,0 +1,49 @@
+get:
+  parameters:
+    - $ref: '../../resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/firewallPolicy.yaml'
+              meta:
+                type: object
+  tags:
+    - Firewall Policies
+patch:
+  parameters:
+    - $ref: '../../resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../components/schemas/firewallPolicy.yaml'
+            - type: object
+              properties:
+                name:
+                  required: false
+                router_id:
+                  required: false
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/FirewallPolicy/responses/idResponse.yaml'
+  tags:
+    - Firewall Policies
+delete:
+  parameters:
+    - $ref: '../../resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Firewall Policies
+

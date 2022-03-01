@@ -1,0 +1,9 @@
+delete:
+  parameters:
+    - $ref: 'parameters/nicId.yaml'
+    - $ref: '../IpAddress/parameters/id.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Nics

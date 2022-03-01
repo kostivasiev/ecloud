@@ -1,0 +1,28 @@
+properties:
+  id:
+    type: string
+    example: scr-2b66bb79
+    readOnly: true
+  name:
+    type: string
+    required: false
+    example: 'Script 1'
+    readOnly: false
+  software_id:
+    type: string
+    required: true
+    description : The ID of the associated software resource
+    example: soft-4c63cf58
+    readOnly: false
+  sequence:
+    type: string
+    required: true
+    description : Execution order
+    example: 1
+    readOnly: false
+  script:
+    type: string
+    required: true
+    description : The script to be executed
+    readOnly: false
+description: 'Scripts'

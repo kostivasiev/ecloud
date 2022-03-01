@@ -1,0 +1,6 @@
+in: path
+name: networkRulePortId
+required: true
+schema:
+  type: string
+example: nrp-3f112f25

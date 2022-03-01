@@ -1,0 +1,49 @@
+###
+# Run these steps one by one
+###
+# 1. First Create an Availability Zone
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "code": "MAN1",
+  "name": "Manchester Zone 1",
+  "site_id": 111
+}
+
+> {%
+client.global.set('zone_id', response.body.data.id);
+client.log('Zone UUID: ' + response.body.data.id);
+%}
+
+###
+# 2. Then Create a Router
+POST https://{{host}}/{{version}}/routers
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Manchester Router 1"
+}
+
+> {%
+client.global.set('router_id', response.body.data.id);
+client.log('Router UUID: ' + response.body.data.id);
+%}
+
+###
+# 3. Associate Router with Availability Zone
+PUT https://{{host}}/{{version}}/availability-zones/{{zone_id}}/routers/{{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+# 4. Delete Association with Gateway with Router
+DELETE https://{{host}}/{{version}}/availability-zones/{{zone_id}}/routers/{{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

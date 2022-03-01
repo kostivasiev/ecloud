@@ -1,0 +1,17 @@
+get:
+  parameters:
+    - $ref: '../../resources/BillingMetric/parameters/billingMetricId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../components/schemas/billingMetric.yaml'
+              meta:
+                type: object
+  tags:
+    - Billing Metric

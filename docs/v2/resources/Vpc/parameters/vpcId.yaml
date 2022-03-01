@@ -1,0 +1,6 @@
+in: path
+name: vpcId
+required: true
+schema:
+  type: string
+example: vpc-2b66bb79

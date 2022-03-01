@@ -1,0 +1,182 @@
+### Get a Public Availability Zone
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Get a Public Availability Zone', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.global.set('public_az_id', response.body.data.id);
+    client.log('Public Availability Zone ID: ' + response.body.data.id);
+});
+%}
+
+### Create a Private Availability Zone
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test AZ",
+  "code": "MAN1",
+  "datacentre_site_id": 111,
+  "is_public": false,
+  "region_id": "{{dev_region_id}}"
+}
+
+> {%
+client.test('Create a Private Availability Zone', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('private_az_id', response.body.data.id);
+    client.log('Private Availability Zone ID: ' + response.body.data.id);
+});
+%}
+
+### Create a Public Router Throughput
+POST https://{{host}}/{{version}}/router-throughputs
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "10Gb",
+  "availability_zone_id": "{{public_az_id}}",
+  "committed_bandwidth": 10240
+}
+
+> {%
+client.test('Create a Public Router Throughput', function() {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('public_throughput_id', response.body.data.id);
+    client.log('Public Throughput ID: ' + response.body.data.id);
+});
+
+%}
+
+### Create a Private Router Throughput
+POST https://{{host}}/{{version}}/router-throughputs
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "10Gb",
+  "availability_zone_id": "{{private_az_id}}",
+  "committed_bandwidth": 10240
+}
+
+> {%
+client.test('Create a Private Router Throughput', function() {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('private_throughput_id', response.body.data.id);
+    client.log('Private Throughput ID: ' + response.body.data.id);
+});
+%}
+
+### Get Public Throughput as User
+GET https://{{host}}/{{version}}/router-throughputs/{{public_throughput_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Public Throughput as User', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id === client.global.get('public_throughput_id'), 'Expected record not found');
+});
+%}
+
+### Get Public Throughput as Admin
+GET https://{{host}}/{{version}}/router-throughputs/{{public_throughput_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type: application/json
+
+> {%
+client.test('Get Public Throughput as Admin', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id === client.global.get('public_throughput_id'), 'Expected record not found');
+});
+%}
+
+### Get Private Throughput as User
+GET https://{{host}}/{{version}}/router-throughputs/{{private_throughput_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Private Throughput as User', function () {
+    client.assert(response.status === 404, '404 response not received');
+});
+%}
+
+### Get Private Throughput as Admin
+GET https://{{host}}/{{version}}/router-throughputs/{{private_throughput_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Private Throughput as Admin', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id === client.global.get('private_throughput_id'), 'Expected record not found');
+});
+%}
+
+### Delete a Private Router Throughput
+DELETE https://{{host}}/{{version}}/router-throughputs/{{private_throughput_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete a Private Router Throughput', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### Delete a Public Router Throughput
+DELETE https://{{host}}/{{version}}/router-throughputs/{{public_throughput_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete a Public Router Throughput', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### Delete a Private Availability Zone
+DELETE https://{{host}}/{{version}}/availability-zones/{{private_az_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete a Private Availability Zone', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}

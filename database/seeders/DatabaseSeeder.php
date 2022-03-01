@@ -7,12 +7,26 @@ use Illuminate\Database\Seeder;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Run the database seeds.
+     * php artisan db:seed
      *
      * @return void
      */
     public function run()
     {
-        // User::factory(10)->create();
+        // API level resources
+        $this->call(RegionSeeder::class);
+        $this->call(AvailabilityZoneSeeder::class);
+        $this->call(RouterThroughputSeeder::class);
+        $this->call(SoftwareSeeder::class);
+        $this->call(ImageSeeder::class);
+        $this->call(LoadBalancerSeeder::class);
+
+        // Create some dev resources for test reseller 7052
+        $this->call(SshKeyPairSeeder::class);
+        $this->call(VpcSeeder::class);
+        $this->call(RouterSeeder::class);
+        $this->call(NetworkSeeder::class);
     }
 }
+

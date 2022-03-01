@@ -1,0 +1,187 @@
+### Create a Public Availability Zone
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Public Scoping AZ",
+  "code": "MAN1",
+  "datacentre_site_id": 111,
+  "is_public": true,
+  "region_id": "{{dev_region_id}}"
+}
+
+> {%
+client.test('Create a Public Availability Zone', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.global.set('public_az_id', response.body.data.id);
+    client.log('Public Availability Zone ID: ' + response.body.data.id);
+});
+%}
+
+### Create a Private Availability Zone
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Scoping AZ",
+  "code": "MAN1",
+  "datacentre_site_id": 111,
+  "is_public": false,
+  "region_id": "{{dev_region_id}}"
+}
+
+> {%
+client.test('Create a Private Availability Zone', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('private_az_id', response.body.data.id);
+    client.log('Private Availability Zone ID: ' + response.body.data.id);
+});
+%}
+
+### Create a public VPN Profile Group
+POST https://{{host}}/{{version}}/vpn-profile-groups
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Public VPN Profile Group",
+    "description": "Public VPN Profile Group",
+    "availability_zone_id": "{{public_az_id}}",
+    "ike_profile_id": "ike-aaaaaaaa",
+    "ipsec_profile_id": "ipsec-aaaaaaaa"
+}
+
+> {%
+client.test('Create a Public VPN Profile Group', function() {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('public_profile_group_id', response.body.data.id);
+    client.log('Public VPN Profile Group ID: ' + response.body.data.id);
+});
+%}
+
+### Create a private VPN Profile Group
+POST https://{{host}}/{{version}}/vpn-profile-groups
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Private VPN Profile Group",
+    "description": "Private VPN Profile Group",
+    "availability_zone_id": "{{private_az_id}}",
+    "ike_profile_id": "ike-aaaaaaaa",
+    "ipsec_profile_id": "ipsec-aaaaaaaa"
+}
+
+> {%
+client.test('Create a Private VPN Profile Group', function() {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('private_profile_group_id', response.body.data.id);
+    client.log('Private VPN Profile Group ID: ' + response.body.data.id);
+});
+%}
+
+### Get Public VPN Profile Group as User
+GET https://{{host}}/{{version}}/vpn-profile-groups/{{public_profile_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Public VPN Profile Group as User', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id === client.global.get('public_profile_group_id'), 'Expected record not found');
+});
+%}
+
+### Get Private VPN Profile Group as User
+GET https://{{host}}/{{version}}/vpn-profile-groups/{{private_profile_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Private VPN Profile Group as User', function () {
+    client.assert(response.status === 404, '404 response not received');
+});
+%}
+
+### Get Private VPN Profile Group as Admin
+GET https://{{host}}/{{version}}/vpn-profile-groups/{{private_profile_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Private VPN Profile Group as Admin', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id === client.global.get('private_profile_group_id'), 'Expected record not found');
+});
+%}
+
+### Delete a Private VPN Profile Group
+DELETE https://{{host}}/{{version}}/vpn-profile-groups/{{private_profile_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete a Private VPN Profile Group', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### Delete a Public VPN Profile Group
+DELETE https://{{host}}/{{version}}/vpn-profile-groups/{{public_profile_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete a Public VPN Profile Group', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### Delete a Private Availability Zone
+DELETE https://{{host}}/{{version}}/availability-zones/{{private_az_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete a Private Availability Zone', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### Delete a Public Availability Zone
+DELETE https://{{host}}/{{version}}/availability-zones/{{public_az_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete a Public Availability Zone', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
