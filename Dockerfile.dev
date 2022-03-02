@@ -9,6 +9,8 @@ RUN docker-php-ext-install pdo_mysql \
 
 RUN a2enmod rewrite
 
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
+
 COPY .docker/ca-certificates/ /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 
