@@ -7,6 +7,8 @@ use App\Models\V2\ApplianceScriptParameters;
 
 class ApplianceScriptParametersFactory extends Factory
 {
+    protected $connection = 'ecloud';
+
     /**
      * The name of the factory's corresponding model.
      *

@@ -3,6 +3,7 @@
 namespace Tests\unit\Vpc;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Dhcp;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
@@ -31,7 +32,7 @@ class VpcHasResourcesValidationTest extends TestCase
 
     public function testAssignedresourcesFails()
     {
-        factory(Router::class)->create([
+        Router::factory()->create([
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id
         ]);

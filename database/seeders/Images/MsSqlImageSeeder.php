@@ -77,7 +77,7 @@ EOM,
         }
 
         $imageCount = 0;
-        $images = factory(Image::class, 3)
+        $images = Image::factory(3)
             ->make()
             ->each(function ($image) use ($imageData, &$imageCount) {
                 foreach ($imageData[$imageCount] as $key => $value) {
@@ -91,25 +91,25 @@ EOM,
         $images->each(function ($image) {
             // Sync the pivot table
             $image->availabilityZones()->sync(AvailabilityZone::all()->pluck('id')->toArray());
-            factory(ImageMetadata::class)->create([
+            ImageMetadata::factory()->create([
                 'image_id' => $image->id,
                 'key' => 'ukfast.license.identifier',
                 'value' => Str::upper(Str::replace(' ', '-', $image->vm_template)),
             ]);
 
-            factory(ImageMetadata::class)->create([
+            ImageMetadata::factory(3)->create([
                 'image_id' => $image->id,
                 'key' => 'ukfast.license.type',
                 'value' => 'mssql',
             ]);
 
-            factory(ImageMetadata::class)->create([
+            ImageMetadata::factory()->create([
                 'image_id' => $image->id,
                 'key' => 'ukfast.license.id',
                 'value' => '353',
             ]);
 
-            factory(ImageMetadata::class)->create([
+            ImageMetadata::factory()->create([
                 'image_id' => $image->id,
                 'key' => 'ukfast.license.mssql.edition',
                 'value' => Str::replace('windows 2019 ', '', $image->vm_template),

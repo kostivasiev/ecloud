@@ -32,7 +32,7 @@ class WindowsServer2019Seeder extends Seeder
             'visibility' => Image::VISIBILITY_PUBLIC,
         ];
 
-        $image = factory(Image::class)->create($imageData);
+        $image = Image::factory()->create($imageData);
 
         // Sync the pivot table
         $image->availabilityZones()->sync(AvailabilityZone::all()->pluck('id')->toArray());

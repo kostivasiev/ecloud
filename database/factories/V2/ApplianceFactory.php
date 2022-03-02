@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ApplianceFactory extends Factory
 {
+    protected $connection = 'ecloud';
+
     /**
      * The name of the factory's corresponding model.
      *

@@ -248,7 +248,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->vpc) {
             Model::withoutEvents(function () {
-                $this->vpc = factory(Vpc::class)->create([
+                $this->vpc = Vpc::factory()->create([
                     'id' => 'vpc-test',
                     'region_id' => $this->region()->id
                 ]);
@@ -274,7 +274,7 @@ abstract class TestCase extends BaseTestCase
     public function region()
     {
         if (!$this->region) {
-            $this->region = factory(Region::class)->create([
+            $this->region = Region::factory()->create([
                 'id' => 'reg-test',
                 'is_public' => true,
             ]);

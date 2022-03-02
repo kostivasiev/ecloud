@@ -68,30 +68,30 @@ EOM,
             $imageData['id'] = 'img-plesk';
         }
 
-        $image = factory(Image::class)->create($imageData);
+        $image = Image::factory()->create($imageData);
 
         // Sync the pivot table
         $image->availabilityZones()->sync(AvailabilityZone::all()->pluck('id')->toArray());
 
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'image_id' => $image->id,
             'key' => 'ukfast.license.identifier',
             'value' => 'PLESK-12-VPS-WEB-HOST-1M',
         ]);
 
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'image_id' => $image->id,
             'key' => 'ukfast.license.type',
             'value' => 'plesk',
         ]);
 
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'image_id' => $image->id,
             'key' => 'ukfast.fip.required',
             'value' => 'true',
         ]);
 
-        factory(ImageParameter::class)->create([
+        ImageParameter::factory()->create([
             'image_id' => $image->id,
             'name' => 'Plesk Admin Email Address',
             'key' => 'plesk_admin_email_address',
@@ -101,7 +101,7 @@ EOM,
             'validation_rule' => '/\w+/',
         ]);
 
-        factory(ImageParameter::class)->create([
+        ImageParameter::factory()->create([
             'image_id' => $image->id,
             'name' => 'Plesk Admin Password',
             'key' => 'plesk_admin_password',

@@ -36,10 +36,10 @@ class BillingMetricSeeder extends Seeder
             ['key' => 'vpn.session.ipsec', 'value' => '1'],
         ];
         foreach ($items as $item) {
-            factory(BillingMetric::class)->create($item);
+            BillingMetric::factory()->create($item);
         }
 
-        factory(HostSpec::class)->create(['id' => 'hs-123456']);
-        factory(LoadBalancerSpecification::class)->create(['id' => 'lbs-1234567']);
+        HostSpec::factory()->create(['id' => 'hs-123456']);
+        LoadBalancerSpecification::factory()->create(['id' => 'lbs-1234567']);
     }
 }

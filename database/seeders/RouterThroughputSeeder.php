@@ -14,13 +14,13 @@ class RouterThroughputSeeder extends Seeder
      */
     public function run()
     {
-        factory(RouterThroughput::class)->create([
+        RouterThroughput::factory()->create([
             'id' => 'rtp-aaaaaaaa',
             'availability_zone_id' => 'az-aaaaaaaa',
             'committed_bandwidth' => config('router.throughput.default.bandwidth')
         ]);
 
-        factory(RouterThroughput::class)->create([
+        RouterThroughput::factory()->create([
             'availability_zone_id' => 'az-aaaaaaaa',
             'committed_bandwidth' => config('router.throughput.admin_default.bandwidth')
         ]);

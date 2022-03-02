@@ -14,7 +14,7 @@ class SshKeyPairSeeder extends Seeder
      */
     public function run()
     {
-        factory(SshKeyPair::class)->create([
+        SshKeyPair::factory()->create([
             'id' => 'ssh-aaaaaaaa',
             'reseller_id' => 7052
         ]);
