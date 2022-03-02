@@ -149,15 +149,6 @@ abstract class TestCase extends BaseTestCase
     /** @var FloatingIp */
     private $floatingIp;
 
-    /**
-     * Creates the application.
-     * @return Application
-     */
-    public function createApplication()
-    {
-        return require __DIR__ . '/../bootstrap/app.php';
-    }
-
     public function firewallPolicy($id = 'fwp-test')
     {
         if (!$this->firewallPolicy) {
