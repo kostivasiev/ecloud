@@ -6,6 +6,7 @@ use App\Models\V1\Pod\ResourceAbstract;
 use App\Models\V1\Pod\ServiceAbstract;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\Kingpin\V1\KingpinService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use UKFast\Api\Resource\Property\BooleanProperty;
@@ -20,6 +21,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class Pod extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     /**
      * Eloquent configuration
      * ----------------------

@@ -3,6 +3,7 @@
 namespace App\Models\V1;
 
 use App\Scopes\SanServersScope;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\StringProperty;
@@ -14,6 +15,8 @@ use UKFast\Api\Resource\Property\StringProperty;
  */
 class San extends Model
 {
+    use HasFactory;
+
     protected $table = 'servers';
 
     protected $primaryKey = 'servers_id';

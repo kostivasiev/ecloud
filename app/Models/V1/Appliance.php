@@ -6,6 +6,7 @@ use App\Events\V1\ApplianceDeletedEvent;
 use App\Exceptions\V1\ApplianceVersionNotFoundException;
 use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Resource\Property\BooleanProperty;
@@ -21,6 +22,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class Appliance extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     // Table columns have table name prefixes
     use ColumnPrefixHelper;
 
