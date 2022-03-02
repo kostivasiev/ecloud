@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
 use UKFast\Api\Resource\Traits\RequestHelper;
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -32,9 +33,9 @@ class BaseController extends Controller
         $this->perPage = $request->input('per_page', env('PAGINATION_LIMIT'));
 
         // is the client an admin
-        $this->isAdmin = $request->user()->isAdmin();
+        $this->isAdmin = Auth::user()->isAdmin();
 
-        $this->resellerId = $request->user()->resellerId();
+        $this->resellerId = Auth::user()->resellerId();
     }
 
     /**

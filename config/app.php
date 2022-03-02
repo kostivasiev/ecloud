@@ -166,7 +166,7 @@ return [
         UKFast\Responses\ResponseServiceProvider::class,
         UKFast\Api\Paginator\PaginationServiceProvider::class,
         UKFast\HealthCheck\HealthCheckServiceProvider::class,
-        \UKFast\Api\Auth\AuthServiceProvider::class,
+        UKFast\Api\Auth\AuthServiceProvider::class,
         UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class,
         UKFast\Api\Resource\ResourceServiceProvider::class,
         UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider::class,
@@ -195,7 +195,7 @@ return [
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
-        App\Providers\AuthServiceProvider::class,
+//        App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
