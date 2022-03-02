@@ -493,7 +493,7 @@ abstract class TestCase extends BaseTestCase
     public function nsxServiceMock()
     {
         if (!$this->nsxServiceMock) {
-            factory(Credential::class)->create([
+            Credential::factory()->create([
                 'id' => 'cred-nsx',
                 'name' => 'NSX',
                 'resource_id' => $this->availabilityZone()->id,
