@@ -27,21 +27,21 @@ class GetTest extends TestCase
                 'group 14',
             ],
         ];
-        $this->vpnProfile = factory(VpnProfile::class)->create($this->data);
+        $this->vpnProfile = VpnProfile::factory()->create($this->data);
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
     }
 
     public function testGetCollection()
     {
         $this->get('/v2/vpn-profiles')
-            ->seeJson($this->data)
-            ->assertResponseStatus(200);
+            ->assertJsonFragment($this->data)
+            ->assertStatus(200);
     }
 
     public function testGetResource()
     {
         $this->get('/v2/vpn-profiles/' . $this->vpnProfile->id)
-            ->seeJson($this->data)
-            ->assertResponseStatus(200);
+            ->assertJsonFragment($this->data)
+            ->assertStatus(200);
     }
 }
