@@ -82,7 +82,7 @@ class CreateTest extends TestCase
                 'local_networks' => '10.0.0.1/32',
                 'remote_networks' => '172.12.23.11/32',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
         Event::assertDispatched(Created::class);
     }
 
@@ -99,12 +99,12 @@ class CreateTest extends TestCase
                 'local_networks' => '10.0.0.1/32',
                 'remote_networks' => '172.12.23.11/32',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Not found',
                 'detail' => 'No Vpn Session with that ID was found',
             ]
-        )->assertResponseStatus(404);
+        )->assertStatus(404);
     }
 
     public function testCreateResourceWithInvalidIps()
@@ -125,16 +125,16 @@ class CreateTest extends TestCase
                 'remote_networks' => 'INVALID',
                 'local_networks' => 'INVALID',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The remote ip must be a valid IPv4 address',
             'source' => 'remote_ip',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'detail' => 'The remote networks must contain a valid comma separated list of CIDR subnets',
             'source' => 'remote_networks',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'detail' => 'The local networks must contain a valid comma separated list of CIDR subnets',
             'source' => 'local_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testCreateResourceWithMissingLocalNetworks()
@@ -154,10 +154,10 @@ class CreateTest extends TestCase
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '172.12.23.11/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The local networks field is required',
             'source' => 'local_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testCreateResourceWithMissingRemoteNetworks()
@@ -167,7 +167,7 @@ class CreateTest extends TestCase
             'router_id' => $this->router()->id,
         ]);
 
-        $this->post(
+        $response = $this->post(
             '/v2/vpn-sessions',
             [
                 'name' => 'vpn session test',
@@ -177,10 +177,10 @@ class CreateTest extends TestCase
                 'remote_ip' => '211.12.13.1',
                 'local_networks' => '172.12.23.11/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The remote networks field is required',
             'source' => 'remote_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testCreateWithMaxLocalNetworksFails()
@@ -198,10 +198,10 @@ class CreateTest extends TestCase
                 'local_networks' => '10.0.0.1/32,10.0.0.2/32,10.0.0.3/32',
                 'remote_networks' => '172.12.23.11/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'local networks must contain less than 2 comma-seperated items',
             'source' => 'local_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testCreateWithMaxRemoteNetworksFails()
@@ -219,9 +219,9 @@ class CreateTest extends TestCase
                 'local_networks' => '10.0.0.1/32',
                 'remote_networks' => '172.12.23.11/32,72.12.23.12/32,72.12.23.13/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'remote networks must contain less than 2 comma-seperated items',
             'source' => 'remote_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }
