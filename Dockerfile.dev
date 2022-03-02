@@ -16,6 +16,7 @@ RUN update-ca-certificates
 
 COPY .docker/php.ini /usr/local/etc/php/php.ini
 COPY .docker/apache.conf /etc/apache2/sites-available/000-default.conf
+COPY .docker/newrelic.sh /newrelic.sh
 COPY .docker/start.sh /start.sh
 
 RUN chown www-data:www-data -R /var/www/html
