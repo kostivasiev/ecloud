@@ -94,7 +94,7 @@ EOM,
             ImageMetadata::factory()->create([
                 'image_id' => $image->id,
                 'key' => 'ukfast.license.identifier',
-                'value' => Str::upper(Str::replace(' ', '-', $image->vm_template)),
+                'value' => Str::upper(Str::replaceFirst(' ', '-', $image->vm_template)),
             ]);
 
             ImageMetadata::factory(3)->create([
@@ -112,7 +112,7 @@ EOM,
             ImageMetadata::factory()->create([
                 'image_id' => $image->id,
                 'key' => 'ukfast.license.mssql.edition',
-                'value' => Str::replace('windows 2019 ', '', $image->vm_template),
+                'value' => Str::replaceFirst('windows 2019 ', '', $image->vm_template),
             ]);
         });
     }
