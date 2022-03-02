@@ -28,11 +28,8 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/volume-groups', $data)
-            ->seeInDatabase(
-                'volume_groups',
-                $data,
-                'ecloud'
-            )->assertResponseStatus(202);
+            ->assertStatus(202);
+        $this->assertDatabaseHas('volume_groups', $data, 'ecloud');
         Event::assertDispatched(Created::class);
     }
 
@@ -62,12 +59,12 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified vpc id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testNotOwnedVpcIdIdIsFailed()
@@ -83,11 +80,11 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '2-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The specified vpc id was not found',
             'status' => 422,
             'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }
