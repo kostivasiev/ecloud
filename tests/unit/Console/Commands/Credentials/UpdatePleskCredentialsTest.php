@@ -15,7 +15,7 @@ class UpdatePleskCredentialsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->credential = factory(Credential::class)->create([
+        $this->credential = Credential::factory()->create([
             'name' => 'plesk_admin_password',
             'resource_id' => $this->instanceModel()->id,
             'username' => 'plesk_admin_password',

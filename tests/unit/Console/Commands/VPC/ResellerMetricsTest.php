@@ -6,7 +6,6 @@ use App\Console\Commands\VPC\ProcessBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\DiscountPlan;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminClient as AccountAdminClient;
 use UKFast\Admin\Account\AdminCustomerClient;
@@ -22,12 +21,12 @@ class ResellerMetricsTest extends TestCase
         parent::setUp();
 
         $this->vpc()->setAttribute('reseller_id', $this->resellerId)->saveQuietly();
-        factory(DiscountPlan::class)->create([
+        DiscountPlan::factory()->create([
             'reseller_id' => $this->resellerId,
             'status' => 'approved',
             'term_start_date' => Carbon::now()->subtract('month', 1)->toString(),
         ]);
-        factory(BillingMetric::class)->create([
+        BillingMetric::factory()->create([
             'resource_id' => $this->instanceModel()->id,
             'reseller_id' => $this->resellerId,
             'vpc_id' => $this->vpc()->id,

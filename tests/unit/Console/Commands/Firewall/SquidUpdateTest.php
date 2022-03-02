@@ -29,7 +29,7 @@ class SquidUpdateTest extends TestCase
         $this->firewallPolicy()
             ->setAttribute('name', 'Management_Firewall_Policy_for_' . $this->router()->id)
             ->saveQuietly();
-        $this->firewallRule = factory(FirewallRule::class)->create([
+        $this->firewallRule = FirewallRule::factory()->create([
             'id' => 'fwr-test',
             'name' => 'Allow_Ed_on_Port_4222_outbound_' . $this->router()->id,
             'sequence' => 10,
@@ -51,7 +51,7 @@ class SquidUpdateTest extends TestCase
         ]);
         $this->firewallRulePort->saveQuietly();
         $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
-        $this->networkRule = factory(NetworkRule::class)->create([
+        $this->networkRule = NetworkRule::factory()->create([
             'name' => 'Allow_Ed_on_Port_4222_outbound_' . $this->network()->id,
             'sequence' => 10,
             'network_policy_id' => $this->networkPolicy()->id,
@@ -61,7 +61,7 @@ class SquidUpdateTest extends TestCase
             'direction' => 'OUT',
             'enabled' => true
         ]);
-        $this->networkRulePort = factory(NetworkRulePort::class)->create([
+        $this->networkRulePort = NetworkRulePort::factory()->create([
             'network_rule_id' => $this->networkRule->id,
             'protocol' => 'TCP',
             'source' => 'ANY',

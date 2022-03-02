@@ -15,7 +15,7 @@ class CleanupAdvancedNetworkingTest extends TestCase
     {
         parent::setUp();
         $this->vpc()->setAttribute('advanced_networking', false)->saveQuietly();
-        $this->metric = factory(BillingMetric::class)->create([
+        $this->metric = BillingMetric::factory()->create([
             'id' => 'bm-test',
             'resource_id' => $this->vpc()->id,
             'vpc_id' => $this->vpc()->id,

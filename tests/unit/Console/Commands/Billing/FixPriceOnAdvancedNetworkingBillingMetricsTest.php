@@ -17,7 +17,7 @@ class FixPriceOnAdvancedNetworkingBillingMetricsTest extends TestCase
     {
         parent::setUp();
         $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
-        $this->metric = factory(BillingMetric::class)->create([
+        $this->metric = BillingMetric::factory()->create([
             'id' => 'bm-test',
             'resource_id' => $this->vpc()->id,
             'vpc_id' => $this->vpc()->id,
@@ -47,11 +47,11 @@ class FixPriceOnAdvancedNetworkingBillingMetricsTest extends TestCase
             return $mockAccountAdminClient;
         });
 
-        factory(Product::class)->create([
+        Product::factory()->create([
             'product_name' => $this->availabilityZone()->id . ': advanced networking',
             'product_subcategory' => 'Networking',
         ])->each(function ($product) {
-            factory(ProductPrice::class)->create([
+            ProductPrice::factory()->create([
                 'product_price_product_id' => $product->id,
                 'product_price_sale_price' => 0.001388889,
             ]);
