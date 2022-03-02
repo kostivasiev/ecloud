@@ -27,12 +27,12 @@ class RunImageReadinessScriptTest extends TestCase
             'username' => 'root',
             'password' => 'somepassword'
         ]);
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [
@@ -49,7 +49,7 @@ class RunImageReadinessScriptTest extends TestCase
                 ]));
             });
 
-        dispatch(new RunImageReadinessScript($this->instance()));
+        dispatch(new RunImageReadinessScript($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -62,7 +62,7 @@ class RunImageReadinessScriptTest extends TestCase
 
         $this->kingpinServiceMock()->shouldNotReceive('post');
 
-        dispatch(new RunImageReadinessScript($this->instance()));
+        dispatch(new RunImageReadinessScript($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -82,12 +82,12 @@ class RunImageReadinessScriptTest extends TestCase
             'username' => 'root',
             'password' => 'somepassword'
         ]);
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [
@@ -104,7 +104,7 @@ class RunImageReadinessScriptTest extends TestCase
                 ]));
             });
 
-        dispatch(new RunImageReadinessScript($this->instance()));
+        dispatch(new RunImageReadinessScript($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -128,12 +128,12 @@ class RunImageReadinessScriptTest extends TestCase
             'username' => 'root',
             'password' => 'somepassword'
         ]);
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [
@@ -150,7 +150,7 @@ class RunImageReadinessScriptTest extends TestCase
                 ]));
             });
 
-        dispatch(new RunImageReadinessScript($this->instance()));
+        dispatch(new RunImageReadinessScript($this->instanceModel()));
 
         Event::assertDispatched(JobFailed::class);
     }

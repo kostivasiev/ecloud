@@ -35,7 +35,7 @@ class DeleteImageTest extends TestCase
         // Attach availability zone to image
         $this->image()->availabilityZones()->sync([$this->availabilityZone()->id]);
         // Attach instance to image
-        $this->instance()->image_id = $this->image()->id;
+        $this->instanceModel()->image_id = $this->image()->id;
         $this->image()->saveQuietly();
         $this->image()->refresh();
 
@@ -62,7 +62,7 @@ class DeleteImageTest extends TestCase
         // Attach availability zone to image
         $this->image()->availabilityZones()->sync([$this->availabilityZone()->id]);
         // Attach instance to image
-        $this->instance()->image_id = $this->image()->id;
+        $this->instanceModel()->image_id = $this->image()->id;
         $this->image()->saveQuietly();
         $this->image()->refresh();
 

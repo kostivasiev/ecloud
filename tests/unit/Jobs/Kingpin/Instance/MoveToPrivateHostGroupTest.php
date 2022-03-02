@@ -36,7 +36,7 @@ class MoveToPrivateHostGroupTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new MoveToPrivateHostGroup($this->instance(), $this->hostGroup()->id));
+        dispatch(new MoveToPrivateHostGroup($this->instanceModel(), $this->hostGroup()->id));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -44,15 +44,15 @@ class MoveToPrivateHostGroupTest extends TestCase
     public function testAlreadyInHostGroupSkips()
     {
         Event::fake([JobFailed::class]);
-        $this->instance()->host_group_id = $this->hostGroup()->id;
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->host_group_id = $this->hostGroup()->id;
+        $this->instanceModel()->saveQuietly();
 
         Log::shouldReceive('error')->zeroOrMoreTimes();
         Log::shouldReceive('debug')->zeroOrMoreTimes();
         Log::shouldReceive('warning')
             ->withSomeOfArgs(MoveToPrivateHostGroup::class . ': Instance i-test is already in the host group ' . $this->hostGroup()->id . ', nothing to do');
 
-        dispatch(new MoveToPrivateHostGroup($this->instance(), $this->hostGroup()->id));
+        dispatch(new MoveToPrivateHostGroup($this->instanceModel(), $this->hostGroup()->id));
         
         Event::assertNotDispatched(JobFailed::class);
     }

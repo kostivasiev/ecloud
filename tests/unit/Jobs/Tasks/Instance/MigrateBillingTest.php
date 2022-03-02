@@ -33,7 +33,7 @@ class MigrateBillingTest extends TestCase
         // compute metrics created on deploy
         $originalVcpuMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test1',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'category' => 'Compute',
             'key' => 'vcpu.count',
@@ -43,7 +43,7 @@ class MigrateBillingTest extends TestCase
 
         $originalRamMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test2',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'category' => 'Compute',
             'key' => 'ram.capacity',
@@ -53,15 +53,15 @@ class MigrateBillingTest extends TestCase
 
         $originalLicenseMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test3',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'license.windows',
             'value' => 1,
             'start' => Carbon::now(),
         ]);
 
-        $this->instance()->host_group_id = 'hg-aaabbbccc';
-        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly();
+        $this->instanceModel()->host_group_id = 'hg-aaabbbccc';
+        $this->instanceModel()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -69,7 +69,7 @@ class MigrateBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         // Check that the ram billing metric is added
@@ -79,7 +79,7 @@ class MigrateBillingTest extends TestCase
         $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
-        $this->instance()->refresh();
+        $this->instanceModel()->refresh();
 
         $originalVcpuMetric->refresh();
         $originalRamMetric->refresh();
@@ -92,8 +92,8 @@ class MigrateBillingTest extends TestCase
 
     public function testBillingStartsOnAPublicInstance()
     {
-        $this->instance()->host_group_id = '';
-        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly();
+        $this->instanceModel()->host_group_id = '';
+        $this->instanceModel()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -101,7 +101,7 @@ class MigrateBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         // Check that the ram billing metric is added
@@ -111,9 +111,9 @@ class MigrateBillingTest extends TestCase
         $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
-        $this->instance()->refresh();
+        $this->instanceModel()->refresh();
 
-        $metrics = $this->instance()->billingMetrics()->get()->toArray();
+        $metrics = $this->instanceModel()->billingMetrics()->get()->toArray();
         $this->assertEquals('ram.capacity', $metrics[0]['key']);
         $this->assertNull($metrics[0]['end']);
         $this->assertEquals('vcpu.count', $metrics[1]['key']);

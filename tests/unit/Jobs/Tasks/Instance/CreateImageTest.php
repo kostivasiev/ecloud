@@ -28,7 +28,7 @@ class CreateImageTest extends TestCase
                     'image_id' => $this->image()->id,
                 ]
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         Bus::fake();

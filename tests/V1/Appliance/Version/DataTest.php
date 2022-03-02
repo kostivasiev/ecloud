@@ -49,7 +49,7 @@ class DataTest extends TestCase
     {
         $this->applianceVersion = null;
 
-        parent::tearDown();
+        //parent::tearDown();
     }
 
     /**

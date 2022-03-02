@@ -24,7 +24,7 @@ class AttachVolumeTest extends TestCase
 
         // Attach a volume
         $this->post('/v2/volumes/' . $volume->id . '/attach', [
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -47,13 +47,13 @@ class AttachVolumeTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $model->resource()->associate($this->instance());
+            $model->resource()->associate($this->instanceModel());
             $model->save();
         });
 
         // Attach a volume
         $this->post('/v2/volumes/' . $volume->id . '/attach', [
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
@@ -75,10 +75,10 @@ class AttachVolumeTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
 
-        $this->instance()->volumes()->attach($volume);
+        $this->instanceModel()->volumes()->attach($volume);
 
         $this->post('/v2/volumes/' . $volume->id . '/attach', [
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',

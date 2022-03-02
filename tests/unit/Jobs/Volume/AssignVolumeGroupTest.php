@@ -23,7 +23,7 @@ class AssignVolumeGroupTest extends TestCase
     public function skipIfVolumeAlreadyMounted()
     {
         // Assign volume group to instance
-        $this->instance()->setAttribute('volume_group_id', $this->volumeGroup()->id)
+        $this->instanceModel()->setAttribute('volume_group_id', $this->volumeGroup()->id)
             ->saveQuietly();
 
         // Assign volume group to volume
@@ -32,8 +32,8 @@ class AssignVolumeGroupTest extends TestCase
             ->saveQuietly();
 
         // Attach volume to instance
-        $this->instance()->volumes()->attach($this->volume());
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->volumes()->attach($this->volume());
+        $this->instanceModel()->saveQuietly();
 
         Bus::fake([AttachVolume::class, IopsChange::class]);
 
@@ -52,7 +52,7 @@ class AssignVolumeGroupTest extends TestCase
     public function volumeAttachesSuccessfully()
     {
         // Assign volume group to instance
-        $this->instance()->setAttribute('volume_group_id', $this->volumeGroup()->id)
+        $this->instanceModel()->setAttribute('volume_group_id', $this->volumeGroup()->id)
             ->saveQuietly();
 
         // Assign volume group to volume

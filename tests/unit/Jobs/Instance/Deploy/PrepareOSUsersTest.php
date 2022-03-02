@@ -34,7 +34,7 @@ class PrepareOSUsersTest extends TestCase
         ]);
         $this->keypair->save();
 
-        $this->instance()->credentials()->create([
+        $this->instanceModel()->credentials()->create([
             'id' => 'cred-test',
             'username' => 'root',
         ]);
@@ -42,35 +42,35 @@ class PrepareOSUsersTest extends TestCase
 
     public function testsSetsSSHKeysWhenSpecifiedInDeployData()
     {
-        $this->instance()->deploy_data =[
+        $this->instanceModel()->deploy_data =[
             'ssh_key_pair_ids' => [
                 $this->keypair->id
             ]
         ];
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->saveQuietly();
 
         $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/admingroup');
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/admingroup');
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs(function($uri, $args) {
-                return $uri == '/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/user' &&
+                return $uri == '/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/user' &&
                     $args['json']['targetUsername'] == 'graphiterack';
             });
         $this->kingpinServiceMock()->expects('post')
             ->withArgs(function($uri, $args) {
-                return $uri == '/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/user' &&
+                return $uri == '/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/user' &&
                     $args['json']['targetUsername'] == 'ukfastsupport';
             });
         $this->kingpinServiceMock()->expects('post')
             ->withArgs(function($uri, $args) {
-                return $uri == '/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/user' &&
+                return $uri == '/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/user' &&
                     $args['json']['targetPublicKeys'][0] == 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQCuxFiJFGtRIxU7IZA35zya75IJokX21zVrM90rxdWykbZz9cb5obLMXGqPLiHDOKL2frUd9TtTvPI/OQzCu5Sd2x41PdYyLcjXoLAaPqlmUbi3ExzigDKWjVu7RCBYWNBIi63boq3SqUZRdf9oF/R81EGUsF8lMnEIoutDncH8jQ==';
             });
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new PrepareOsUsers($this->instance()));
+        dispatch(new PrepareOsUsers($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -78,52 +78,52 @@ class PrepareOSUsersTest extends TestCase
     public function testDoesntSetSSHKeyWhenNotSpecifiedInDeployData()
     {
         $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/admingroup');
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/admingroup');
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs(function($uri, $args) {
-                return $uri == '/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/user' &&
+                return $uri == '/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/user' &&
                     $args['json']['targetUsername'] == 'graphiterack';
             });
         $this->kingpinServiceMock()->expects('post')
             ->withArgs(function($uri, $args) {
-                return $uri == '/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/user' &&
+                return $uri == '/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/user' &&
                     $args['json']['targetUsername'] == 'ukfastsupport';
             });
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new PrepareOsUsers($this->instance()));
+        dispatch(new PrepareOsUsers($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testDoesntFailWhenSSHKeyDoesntExist()
     {
-        $this->instance()->deploy_data =[
+        $this->instanceModel()->deploy_data =[
             'ssh_key_pair_ids' => [
                 'invalid'
             ]
         ];
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->saveQuietly();
 
         $this->kingpinServiceMock()->expects('post')
-            ->withSomeOfArgs('/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/admingroup');
+            ->withSomeOfArgs('/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/admingroup');
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs(function($uri, $args) {
-                return $uri == '/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/user' &&
+                return $uri == '/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/user' &&
                     $args['json']['targetUsername'] == 'graphiterack';
             });
         $this->kingpinServiceMock()->expects('post')
             ->withArgs(function($uri, $args) {
-                return $uri == '/api/v2/vpc/' . $this->instance()->vpc->id . '/instance/' . $this->instance()->id . '/guest/linux/user' &&
+                return $uri == '/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/user' &&
                     $args['json']['targetUsername'] == 'ukfastsupport';
             });
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new PrepareOsUsers($this->instance()));
+        dispatch(new PrepareOsUsers($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

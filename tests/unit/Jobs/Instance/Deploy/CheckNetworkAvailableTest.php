@@ -56,7 +56,7 @@ class CheckNetworkAvailableTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new CheckNetworkAvailable($this->instance()));
+        dispatch(new CheckNetworkAvailable($this->instanceModel()));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -71,7 +71,7 @@ class CheckNetworkAvailableTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new CheckNetworkAvailable($this->instance()));
+        dispatch(new CheckNetworkAvailable($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -89,7 +89,7 @@ class CheckNetworkAvailableTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new CheckNetworkAvailable($this->instance()));
+        dispatch(new CheckNetworkAvailable($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

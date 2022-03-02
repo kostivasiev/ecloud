@@ -304,7 +304,7 @@ abstract class TestCase extends BaseTestCase
         return $this->availabilityZone;
     }
 
-    public function instance()
+    public function instanceModel()
     {
         if (!$this->instance) {
             Instance::withoutEvents(function () {
@@ -337,7 +337,7 @@ abstract class TestCase extends BaseTestCase
                 $this->nic = factory(Nic::class)->create([
                     'id' => 'nic-test',
                     'mac_address' => 'AA:BB:CC:DD:EE:FF',
-                    'instance_id' => $this->instance()->id,
+                    'instance_id' => $this->instanceModel()->id,
                     'network_id' => $this->network()->id,
                 ]);
             });
@@ -786,7 +786,7 @@ abstract class TestCase extends BaseTestCase
     protected function tearDown(): void
     {
         \Mockery::close();
-        parent::tearDown();
+        //parent::tearDown();
     }
 
 }

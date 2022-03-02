@@ -52,7 +52,7 @@ class DeleteTest extends TestCase
 
     public function testDeleteVpcWithResourcesFails()
     {
-        $this->instance();
+        $this->instanceModel();
         $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',

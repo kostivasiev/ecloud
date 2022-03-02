@@ -15,7 +15,7 @@ class GetVpcInstancesTest extends TestCase
 {
     public function testInstancesCollection()
     {
-        $instance = $this->instance();
+        $instance = $this->instanceModel();
 
         $this->get(
             '/v2/vpcs/'.$this->vpc()->id.'/instances',

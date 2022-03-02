@@ -27,7 +27,7 @@ class MigratePrivateTest extends TestCase
                     'host_group_id' => $this->hostGroup()->id,
                 ]
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
     }
 
@@ -44,8 +44,8 @@ class MigratePrivateTest extends TestCase
 
     public function testJobsBatchedPrivateToPrivateSameSpec()
     {
-        $this->instance()->hostGroup()->associate($this->hostGroup());
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->hostGroup()->associate($this->hostGroup());
+        $this->instanceModel()->saveQuietly();
 
         $hostGroup = Model::withoutEvents(function () {
             return factory(HostGroup::class)->create([
@@ -66,7 +66,7 @@ class MigratePrivateTest extends TestCase
                     'host_group_id' => $hostGroup->id,
                 ]
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             return $task;
         });
 
@@ -81,8 +81,8 @@ class MigratePrivateTest extends TestCase
 
     public function testJobsBatchedPrivateToPrivateDifferentSpec()
     {
-        $this->instance()->hostGroup()->associate($this->hostGroup());
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->hostGroup()->associate($this->hostGroup());
+        $this->instanceModel()->saveQuietly();
 
         $hostSpec = factory(HostSpec::class)->create([
             'id' => 'hs-test2',
@@ -108,7 +108,7 @@ class MigratePrivateTest extends TestCase
                     'host_group_id' => $hostGroup->id,
                 ]
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             return $task;
         });
 

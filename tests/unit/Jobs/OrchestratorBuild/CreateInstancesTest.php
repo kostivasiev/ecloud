@@ -80,7 +80,7 @@ class CreateInstancesTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->orchestratorBuild->updateState('instance', 0, $this->instance()->id);
+        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
 
         dispatch(new CreateInstances($this->orchestratorBuild));
 

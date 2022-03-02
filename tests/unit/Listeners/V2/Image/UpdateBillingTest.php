@@ -20,13 +20,13 @@ class UpdateBillingTest extends TestCase
     {
         parent::setUp();
 
-        $this->image = $this->instance()->image->replicate(['vm_template', 'script_template', 'logo_uri', 'description'])
+        $this->image = $this->instanceModel()->image->replicate(['vm_template', 'script_template', 'logo_uri', 'description'])
             ->fill([
                 'name' => 'Test Image',
             ]);
         $this->image->visibility = Image::VISIBILITY_PRIVATE;
         $this->image->vpc_id = $this->vpc()->id;
-        $this->image->description = "Image taken from instance " . $this->instance()->id . " on " .
+        $this->image->description = "Image taken from instance " . $this->instanceModel()->id . " on " .
             Carbon::now(new \DateTimeZone(config('app.timezone')))->toDayDateTimeString();
         $this->image->save();
         $this->image->availabilityZones()->attach($this->availabilityZone());

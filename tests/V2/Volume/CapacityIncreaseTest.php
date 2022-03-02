@@ -33,7 +33,7 @@ class CapacityIncreaseTest extends TestCase
     {
         Event::fake([Created::class]);
 
-        $this->volume->instances()->attach($this->instance());
+        $this->volume->instances()->attach($this->instanceModel());
 
         $this->patch('v2/volumes/vol-test', [
             'capacity' => 200,

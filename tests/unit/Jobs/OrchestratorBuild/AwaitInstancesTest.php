@@ -35,7 +35,7 @@ class AwaitInstancesTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        $this->orchestratorBuild->updateState('instance', 0, $this->instance()->id);
+        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
 
         // Put the sync in-progress
         Model::withoutEvents(function () {
@@ -44,7 +44,7 @@ class AwaitInstancesTest extends TestCase
                 'completed' => false,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             $task->save();
         });
 
@@ -59,7 +59,7 @@ class AwaitInstancesTest extends TestCase
     {
         Event::fake(JobFailed::class);
 
-        $this->orchestratorBuild->updateState('instance', 0, $this->instance()->id);
+        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
 
         Model::withoutEvents(function () {
             $task = new Task([
@@ -68,7 +68,7 @@ class AwaitInstancesTest extends TestCase
                 'failure_reason' => 'some failure reason',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             $task->save();
         });
 
@@ -81,7 +81,7 @@ class AwaitInstancesTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->orchestratorBuild->updateState('instance', 0, $this->instance()->id);
+        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
 
         Model::withoutEvents(function () {
             $task = new Task([
@@ -89,7 +89,7 @@ class AwaitInstancesTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             $task->save();
         });
 

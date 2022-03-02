@@ -27,7 +27,7 @@ class CreateImageTest extends TestCase
     public function testCreateImageNoVolumes()
     {
         $this->post(
-            '/v2/instances/' . $this->instance()->id . '/create-image',
+            '/v2/instances/' . $this->instanceModel()->id . '/create-image',
             [
                 'name' => 'createImageTest',
             ],
@@ -45,8 +45,8 @@ class CreateImageTest extends TestCase
 
     public function testCreateImageTest()
     {
-        $this->instance()->volumes()->attach($this->volume);
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->volumes()->attach($this->volume);
+        $this->instanceModel()->saveQuietly();
 
         // Bind so that we can use the image id
         app()->bind(Image::class, function () {
@@ -74,7 +74,7 @@ class CreateImageTest extends TestCase
             );
 
         $this->post(
-            '/v2/instances/' . $this->instance()->id . '/create-image',
+            '/v2/instances/' . $this->instanceModel()->id . '/create-image',
             [
                 'name' => 'createImageTest',
             ],

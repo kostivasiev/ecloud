@@ -58,11 +58,11 @@ class AttachVolumeTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new AttachVolume($this->instance(), $volume));
+        dispatch(new AttachVolume($this->instanceModel(), $volume));
 
         Event::assertNotDispatched(JobFailed::class);
 
-        $this->assertEquals(1, $this->instance()->volumes()->count());
+        $this->assertEquals(1, $this->instanceModel()->volumes()->count());
     }
 
     public function testVolumeAlreadyAttachedSkips()
@@ -92,11 +92,11 @@ class AttachVolumeTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new AttachVolume($this->instance(), $volume));
+        dispatch(new AttachVolume($this->instanceModel(), $volume));
 
         Event::assertNotDispatched(JobFailed::class);
 
-        $this->assertEquals(1, $this->instance()->volumes()->count());
+        $this->assertEquals(1, $this->instanceModel()->volumes()->count());
     }
 
     public function testRetrieveInstanceInvalidJsonThrowsException()
@@ -120,7 +120,7 @@ class AttachVolumeTest extends TestCase
 
         $this->expectExceptionMessage('Failed to retrieve instance i-test from Kingpin, invalid JSON');
 
-        dispatch(new AttachVolume($this->instance(), $volume));
+        dispatch(new AttachVolume($this->instanceModel(), $volume));
     }
 
     public function testMaximumVolumeAttachmentReachedFails()
@@ -139,11 +139,11 @@ class AttachVolumeTest extends TestCase
                 'capacity' => 30
             ]);
 
-        $this->instance()->volumes()->attach($volumes[0]);
+        $this->instanceModel()->volumes()->attach($volumes[0]);
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new AttachVolume($this->instance(), $volumes[1]));
+        dispatch(new AttachVolume($this->instanceModel(), $volumes[1]));
 
         Event::assertDispatched(JobFailed::class, function ($event) use ($volumes) {
             return $event->exception->getMessage() == 'Failed to attach volume ' . $volumes[1]->id .'  to instance i-test, volume limit exceeded';

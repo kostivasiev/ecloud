@@ -108,9 +108,9 @@ class IsSameAvailabilityZoneTest extends TestCase
     // Instance attach volume endpoint
     public function testInstanceAttachVolumeSameAvailabilityZoneSucceeds()
     {
-        $this->assertTrue($this->instance() instanceof AvailabilityZoneable);
+        $this->assertTrue($this->instanceModel() instanceof AvailabilityZoneable);
 
-        $rule = new IsSameAvailabilityZone($this->instance()->id);
+        $rule = new IsSameAvailabilityZone($this->instanceModel()->id);
 
         $volume = Volume::factory()->create([
             'id' => 'vol-test',
@@ -128,7 +128,7 @@ class IsSameAvailabilityZoneTest extends TestCase
     // Instance attach volume endpoint
     public function testInstanceAttachVolumeDifferentAvailabilityZoneFails()
     {
-        $rule = new IsSameAvailabilityZone($this->instance()->id);
+        $rule = new IsSameAvailabilityZone($this->instanceModel()->id);
 
         $volume = Volume::factory()->create([
             'id' => 'vol-test',
@@ -154,9 +154,9 @@ class IsSameAvailabilityZoneTest extends TestCase
 
         $rule = new IsSameAvailabilityZone($volume->id);
 
-        $this->assertTrue($this->instance() instanceof AvailabilityZoneable);
+        $this->assertTrue($this->instanceModel() instanceof AvailabilityZoneable);
 
-        $result = $rule->passes('instance_id', $this->instance()->id);
+        $result = $rule->passes('instance_id', $this->instanceModel()->id);
 
         $this->assertTrue($result);
     }
@@ -172,7 +172,7 @@ class IsSameAvailabilityZoneTest extends TestCase
 
         $rule = new IsSameAvailabilityZone($volume->id);
 
-        $result = $rule->passes('instance_id', $this->instance()->id);
+        $result = $rule->passes('instance_id', $this->instanceModel()->id);
 
         $this->assertFalse($result);
     }
@@ -187,7 +187,7 @@ class IsSameAvailabilityZoneTest extends TestCase
 
         $rule = new IsSameAvailabilityZone('invalid-test');
 
-        $result = $rule->passes('instance_id', $this->instance()->id);
+        $result = $rule->passes('instance_id', $this->instanceModel()->id);
 
         $this->assertFalse($result);
     }
@@ -200,7 +200,7 @@ class IsSameAvailabilityZoneTest extends TestCase
             'vpc_id' => $this->vpc()->id
         ]);
 
-        $rule = new IsSameAvailabilityZone($this->instance()->id);
+        $rule = new IsSameAvailabilityZone($this->instanceModel()->id);
 
         $result = $rule->passes('invalid', 'invalid-test');
 

@@ -38,7 +38,7 @@ class UnAssignVolumeGroupTest extends TestCase
     /** @test */
     public function skipIfVolumeGroupIdIsNotEmpty()
     {
-        $this->instance()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
+        $this->instanceModel()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
         $this->volume()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
 
         Model::withoutEvents(function () {
@@ -56,9 +56,9 @@ class UnAssignVolumeGroupTest extends TestCase
     public function volumeDetachesSuccessfully()
     {
         // attach volume to instance and set volume_group_id
-        $this->instance()->setAttribute('volume_group_id', $this->volumeGroup()->id);
-        $this->instance()->volumes()->attach($this->volume());
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->setAttribute('volume_group_id', $this->volumeGroup()->id);
+        $this->instanceModel()->volumes()->attach($this->volume());
+        $this->instanceModel()->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([

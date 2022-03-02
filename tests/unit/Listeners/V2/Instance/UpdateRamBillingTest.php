@@ -32,7 +32,7 @@ class UpdateRamBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             return $task;
         });
 
@@ -81,12 +81,12 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceCreatedStandardTierBilling()
     {
-        $this->instance()->ram_capacity = 1024;
+        $this->instanceModel()->ram_capacity = 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
+        $billingMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'ram.capacity');
 
         $this->assertNotNull($billingMetric);
         $this->assertEquals(1024, $billingMetric->value);
@@ -95,17 +95,17 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceCreatedHighTierBilling()
     {
-        $this->instance()->ram_capacity = (config('billing.ram_tiers.standard') * 1024) + 1024;
+        $this->instanceModel()->ram_capacity = (config('billing.ram_tiers.standard') * 1024) + 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $standardRamMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
+        $standardRamMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'ram.capacity');
         $this->assertNotNull($standardRamMetric);
         $this->assertEquals(config('billing.ram_tiers.standard') * 1024, $standardRamMetric->value);
         $this->assertEquals(0.00000816, $standardRamMetric->price);
 
-        $highRamMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity.high');
+        $highRamMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'ram.capacity.high');
         $this->assertNotNull($highRamMetric);
         $this->assertEquals(1024, $highRamMetric->value);
         $this->assertEquals(0.00000816, $highRamMetric->price);
@@ -115,14 +115,14 @@ class UpdateRamBillingTest extends TestCase
     {
         $originalRamMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test2',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'ram.capacity',
             'value' => 1024,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
 
-        $this->instance()->ram_capacity = 2048;
+        $this->instanceModel()->ram_capacity = 2048;
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -130,7 +130,7 @@ class UpdateRamBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         // Check that the ram billing metric is added
@@ -141,7 +141,7 @@ class UpdateRamBillingTest extends TestCase
         $originalRamMetric->refresh();
         $this->assertNotNull($originalRamMetric->end);
 
-        $ramMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
+        $ramMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'ram.capacity');
         $this->assertNotNull($ramMetric);
         $this->assertEquals(2048, $ramMetric->value);
     }
@@ -150,14 +150,14 @@ class UpdateRamBillingTest extends TestCase
     {
         $originalRamMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test2',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'ram.capacity',
             'value' => 1024,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
 
-        $this->instance()->ram_capacity = (config('billing.ram_tiers.standard') * 1024) + 1024;
+        $this->instanceModel()->ram_capacity = (config('billing.ram_tiers.standard') * 1024) + 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
@@ -167,12 +167,12 @@ class UpdateRamBillingTest extends TestCase
         $this->assertNotNull($originalRamMetric->end);
 
         // Check new metrics
-        $standardRamMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
+        $standardRamMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'ram.capacity');
         $this->assertNotNull($standardRamMetric);
         $this->assertEquals(config('billing.ram_tiers.standard') * 1024, $standardRamMetric->value);
         $this->assertEquals(0.00000816, $standardRamMetric->price);
 
-        $highRamMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity.high');
+        $highRamMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'ram.capacity.high');
         $this->assertNotNull($highRamMetric);
         $this->assertEquals(1024, $highRamMetric->value);
         $this->assertEquals(0.00000816, $highRamMetric->price);
@@ -182,7 +182,7 @@ class UpdateRamBillingTest extends TestCase
     {
         $originalStandardMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-' . uniqid(),
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'ram.capacity',
             'value' => config('billing.ram_tiers.standard') * 1024,
@@ -191,14 +191,14 @@ class UpdateRamBillingTest extends TestCase
 
         $originalHighMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-' . uniqid(),
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'ram.capacity',
             'value' => 1024,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
 
-        $this->instance()->ram_capacity = 1024;
+        $this->instanceModel()->ram_capacity = 1024;
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
@@ -211,25 +211,25 @@ class UpdateRamBillingTest extends TestCase
         $this->assertNotNull($originalHighMetric->end);
 
         // Check new metrics
-        $newMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
+        $newMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'ram.capacity');
         $this->assertNotNull($newMetric);
         $this->assertEquals(1024, $newMetric->value);
         $this->assertEquals(0.00000816, $newMetric->price);
 
-        $highMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity.high');
+        $highMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'ram.capacity.high');
         $this->assertNull($highMetric);
     }
 
     public function testLoadBalancerInstancesIgnored()
     {
-        $this->instance()->ram_capacity = 1024;
+        $this->instanceModel()->ram_capacity = 1024;
 
-        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+        $this->instanceModel()->loadBalancer()->associate($this->loadBalancer())->save();
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateRamBilling();
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'ram.capacity');
+        $billingMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'ram.capacity');
 
         $this->assertNull($billingMetric);
     }

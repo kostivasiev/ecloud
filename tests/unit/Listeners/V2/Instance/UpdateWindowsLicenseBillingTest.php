@@ -24,19 +24,19 @@ class UpdateWindowsLicenseBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
     }
 
     public function testInstertWindowsLicenseBilling()
     {
-        $this->instance()->vcpu_cores = 1;
-        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly();
+        $this->instanceModel()->vcpu_cores = 1;
+        $this->instanceModel()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
+        $vcpuMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'license.windows');
         $this->assertNotNull($vcpuMetric);
         $this->assertEquals(1, $vcpuMetric->value);
     }
@@ -45,20 +45,20 @@ class UpdateWindowsLicenseBillingTest extends TestCase
     {
         $originalVcpuMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test1',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'license.windows',
             'value' => 1,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
 
-        $this->instance()->vcpu_cores = 5;
-        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly();
+        $this->instanceModel()->vcpu_cores = 5;
+        $this->instanceModel()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
+        $vcpuMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'license.windows');
         $this->assertNotNull($vcpuMetric);
         $this->assertEquals(5, $vcpuMetric->value);
 
@@ -69,15 +69,15 @@ class UpdateWindowsLicenseBillingTest extends TestCase
 
     public function testLoadBalancerInstancesIgnored()
     {
-        $this->instance()->vcpu_cores = 1;
-        $this->instance()->image->setAttribute('platform', 'Windows')->saveQuietly(); // LB nodes are not Windows, but just for testing...
+        $this->instanceModel()->vcpu_cores = 1;
+        $this->instanceModel()->image->setAttribute('platform', 'Windows')->saveQuietly(); // LB nodes are not Windows, but just for testing...
 
-        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+        $this->instanceModel()->loadBalancer()->associate($this->loadBalancer())->save();
 
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateWindowsLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'license.windows');
+        $vcpuMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'license.windows');
         $this->assertNull($vcpuMetric);
     }
 }

@@ -15,20 +15,20 @@ class PowerOffTest extends TestCase
     public function testPowerOffJob()
     {
         $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id])
             ->andReturnUsing(function () {
                 return new Response(200);
             });
 
         $this->kingpinServiceMock()->expects('delete')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/power'])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id . '/power'])
             ->andReturnUsing(function () {
                 return new Response(200);
             });
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new PowerOff($this->instance()));
+        dispatch(new PowerOff($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -38,26 +38,26 @@ class PowerOffTest extends TestCase
         $this->expectException(RequestException::class);
 
         $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id])
             ->andThrow(
                 new RequestException('Not Found', new Request('GET', 'test'), new Response(404))
             );
 
-        $job = new PowerOff($this->instance());
+        $job = new PowerOff($this->instanceModel());
         $job->handle();
     }
 
     public function testIgnoreInstanceNotFound()
     {
         $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id])
             ->andThrow(
                 new RequestException('Not Found', new Request('GET', 'test'), new Response(404))
             );
 
         Event::fake([JobFailed::class]);
 
-        $job = new PowerOff($this->instance(), true);
+        $job = new PowerOff($this->instanceModel(), true);
 
         $job->handle();
 

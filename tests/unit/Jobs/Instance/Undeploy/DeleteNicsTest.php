@@ -47,7 +47,7 @@ class DeleteNicsTest extends TestCase
 
         Event::fake([Created::class, JobFailed::class, JobProcessed::class]);
 
-        dispatch(new DeleteNics($this->instance()));
+        dispatch(new DeleteNics($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
 

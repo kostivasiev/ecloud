@@ -27,7 +27,7 @@ class CrudTest extends TestCase
         $this->instanceSoftware = InstanceSoftware::factory()->make([
             'name' => 'McAfee'
         ]);
-        $this->instanceSoftware->instance()->associate($this->instance());
+        $this->instanceSoftware->instance()->associate($this->instanceModel());
         $this->instanceSoftware->software()->associate($this->software);
         $this->instanceSoftware->save();
     }
@@ -39,7 +39,7 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => $this->instanceSoftware->id,
                 'name' => 'McAfee',
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'software_id' => $this->software->id,
             ])
             ->assertResponseStatus(200);
@@ -50,7 +50,7 @@ class CrudTest extends TestCase
             ->dontSeeJson([
                 'id' => $this->instanceSoftware->id,
                 'name' => 'McAfee',
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'software_id' => $this->software->id,
             ])
             ->assertResponseStatus(200);
@@ -61,7 +61,7 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => $this->instanceSoftware->id,
                 'name' => 'McAfee',
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'software_id' => $this->software->id,
             ])
             ->assertResponseStatus(200);
@@ -74,7 +74,7 @@ class CrudTest extends TestCase
             ->seeJson([
                 'id' => $this->instanceSoftware->id,
                 'name' => 'McAfee',
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'software_id' => $this->software->id,
             ])
             ->assertResponseStatus(200);
@@ -94,7 +94,7 @@ class CrudTest extends TestCase
 
         $data = [
             'name' => 'test',
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
             'software_id' => $this->software->id,
         ];
 

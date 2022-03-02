@@ -28,16 +28,16 @@ class UpdateBackupBillingTest extends TestCase
                 'availability_zone_id' => $this->availabilityZone()->id,
             ]);
 
-            $this->volume->instances()->attach($this->instance());
+            $this->volume->instances()->attach($this->instanceModel());
         });
     }
 
     public function testEnableBackupUpdatesBillingMetrics()
     {
-        $this->assertNull(BillingMetric::getActiveByKey($this->instance(), 'backup.quota'));
+        $this->assertNull(BillingMetric::getActiveByKey($this->instanceModel(), 'backup.quota'));
 
         // Update the instance compute values
-        $this->instance()->backup_enabled = true;
+        $this->instanceModel()->backup_enabled = true;
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -45,14 +45,14 @@ class UpdateBackupBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         // Check that the vcpu billing metric is added
         $updateBackupBillingListener = new \App\Listeners\V2\Instance\UpdateBackupBilling();
         $updateBackupBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
+        $backupMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'backup.quota');
 
         $this->assertNotNull($backupMetric);
 
@@ -62,16 +62,16 @@ class UpdateBackupBillingTest extends TestCase
     public function testDisableBackupUpdatesBillingMetrics()
     {
         $billingMetric = factory(BillingMetric::class)->create([
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'backup.quota',
             'value' => $this->volume->capacity
         ]);
 
-        $this->assertNotNull(BillingMetric::getActiveByKey($this->instance(), 'backup.quota'));
+        $this->assertNotNull(BillingMetric::getActiveByKey($this->instanceModel(), 'backup.quota'));
 
         // Update the instance compute values
-        $this->instance()->backup_enabled = false;
+        $this->instanceModel()->backup_enabled = false;
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -79,7 +79,7 @@ class UpdateBackupBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         // Check that the vcpu billing metric is added
@@ -89,15 +89,15 @@ class UpdateBackupBillingTest extends TestCase
         $billingMetric->refresh();
         $this->assertNotNull($billingMetric->end);
 
-        $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
+        $backupMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'backup.quota');
         $this->assertNull($backupMetric);
     }
 
     public function testResizingVolumeUpdatesBackupBillingMetric()
     {
         Model::withoutEvents(function () {
-            $this->instance()->backup_enabled = true;
-            $this->instance()->save();
+            $this->instanceModel()->backup_enabled = true;
+            $this->instanceModel()->save();
 
             $this->volume->capacity = 15;
             $this->volume->save();
@@ -114,7 +114,7 @@ class UpdateBackupBillingTest extends TestCase
         $updateBackupBillingListener = new \App\Listeners\V2\Instance\UpdateBackupBilling();
         $updateBackupBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
+        $backupMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'backup.quota');
 
         $this->assertNotNull($backupMetric);
 
@@ -159,12 +159,12 @@ class UpdateBackupBillingTest extends TestCase
 
     public function testLoadBalancerInstancesIgnored()
     {
-        $this->instance()->setAttribute('backup_enabled', true)->save();
+        $this->instanceModel()->setAttribute('backup_enabled', true)->save();
 
         $this->volume->capacity = 15;
         $this->volume->save();
 
-        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+        $this->instanceModel()->loadBalancer()->associate($this->loadBalancer())->save();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -179,7 +179,7 @@ class UpdateBackupBillingTest extends TestCase
         $updateBackupBillingListener = new \App\Listeners\V2\Instance\UpdateBackupBilling();
         $updateBackupBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $backupMetric = BillingMetric::getActiveByKey($this->instance(), 'backup.quota');
+        $backupMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'backup.quota');
 
         $this->assertNull($backupMetric);
     }

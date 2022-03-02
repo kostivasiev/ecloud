@@ -16,20 +16,20 @@ class UndeployTest extends TestCase
     public function testUndeployJob()
     {
         $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id])
             ->andReturnUsing(function () {
                 return new Response(200);
             });
 
         $this->kingpinServiceMock()->expects('delete')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id])
             ->andReturnUsing(function () {
                 return new Response(200);
             });
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Undeploy($this->instance()));
+        dispatch(new Undeploy($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -37,14 +37,14 @@ class UndeployTest extends TestCase
     public function testUndeployJobInstanceDoesNotExist()
     {
         $this->kingpinServiceMock()->expects('get')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id])
             ->andThrow(
                 new RequestException('Not Found', new Request('GET', 'test'), new Response(404))
             );
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new Undeploy($this->instance()));
+        dispatch(new Undeploy($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

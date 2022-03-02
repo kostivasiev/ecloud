@@ -30,7 +30,7 @@ class CreateTest extends TestCase
             [
                 'name' => 'test-nic',
                 'mac_address' => $macAddress,
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
             ]
         )
@@ -39,7 +39,7 @@ class CreateTest extends TestCase
                 [
                     'name' => 'test-nic',
                     'mac_address' => $macAddress,
-                    'instance_id' => $this->instance()->id,
+                    'instance_id' => $this->instanceModel()->id,
                     'network_id'  => $this->network()->id,
                 ],
                 'ecloud'
@@ -101,7 +101,7 @@ class CreateTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $model->resource()->associate($this->instance());
+            $model->resource()->associate($this->instanceModel());
             $model->save();
             $model = new Task([
                 'id' => 'sync-test-2',
@@ -115,7 +115,7 @@ class CreateTest extends TestCase
 
         $this->post('/v2/nics', [
                 'mac_address' => $this->faker->macAddress,
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.0.0.6'
             ])->seeJson([

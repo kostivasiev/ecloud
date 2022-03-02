@@ -38,7 +38,7 @@ class CreateNatsTest extends TestCase
 
     public function testOtherResourceAssignedCompletesWithoutNats()
     {
-        $this->floatingIp()->resource()->associate($this->instance());
+        $this->floatingIp()->resource()->associate($this->instanceModel());
         $this->floatingIp()->save();
 
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);

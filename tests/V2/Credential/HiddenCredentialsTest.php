@@ -48,7 +48,7 @@ class HiddenCredentialsTest extends TestCase
         $this->post(
             '/v2/credentials',
             [
-                'resource_id' => $this->instance()->id,
+                'resource_id' => $this->instanceModel()->id,
                 'host' => 'https://127.0.0.1',
                 'username' => 'someuser',
                 'password' => 'somepassword',
@@ -62,7 +62,7 @@ class HiddenCredentialsTest extends TestCase
         )->seeInDatabase(
             'credentials',
             [
-                'resource_id' => $this->instance()->id,
+                'resource_id' => $this->instanceModel()->id,
                 'host' => 'https://127.0.0.1',
                 'username' => 'someuser',
                 'port' => 8080,
@@ -87,10 +87,10 @@ class HiddenCredentialsTest extends TestCase
 
     public function testUserCannotSeeHiddenFlag()
     {
-        $this->instance()->deployed = true;
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->deployed = true;
+        $this->instanceModel()->saveQuietly();
         $this->get(
-            '/v2/instances/' . $this->instance()->id . '/credentials',
+            '/v2/instances/' . $this->instanceModel()->id . '/credentials',
             [
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.read',

@@ -19,12 +19,12 @@ class VolumeDetachTest extends TestCase
             'vpc_id' => $this->vpc()->id
         ]);
 
-        $this->instance()->volumes()->attach($volume);
+        $this->instanceModel()->volumes()->attach($volume);
 
         Event::fake([Created::class]);
 
         $this->post(
-            '/v2/instances/' . $this->instance()->id . '/volume-detach',
+            '/v2/instances/' . $this->instanceModel()->id . '/volume-detach',
             [
                 'volume_id' => $volume->id,
             ],
@@ -47,7 +47,7 @@ class VolumeDetachTest extends TestCase
         Event::fake([Created::class]);
 
         $this->post(
-            '/v2/instances/' . $this->instance()->id . '/volume-detach',
+            '/v2/instances/' . $this->instanceModel()->id . '/volume-detach',
             [
                 'volume_id' => $volume->id,
             ],

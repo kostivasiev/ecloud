@@ -56,17 +56,17 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
         $mockAdminLicensesClient->allows('licenses')->andReturnUsing(function () {
             $licenseMock = \Mockery::mock(\UKFast\Admin\Licenses\AdminLicensesClient::class)->makePartial();
             $licenseMock->allows()->getAll([
-                'owner_id:eq' => $this->instance()->id,
+                'owner_id:eq' => $this->instanceModel()->id,
                 'license_type:eq' => 'mssql',
             ])->andReturnUsing(function () {
                 return [
                     new \UKFast\SDK\Licenses\Entities\License([
                         'id' => 'lic-abc123xyz',
-                        'ownerId' => $this->instance()->id,
+                        'ownerId' => $this->instanceModel()->id,
                         'ownerType' => 'ecloud',
                         'keyId' => 'WINDOWS-2019-DATACENTER-MSSQL2019-STANDARD',
                         'licenseType' => 'mssql',
-                        'resellerId' => $this->instance()->getResellerId(),
+                        'resellerId' => $this->instanceModel()->getResellerId(),
                     ]),
                 ];
             });
@@ -92,7 +92,7 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
     public function testInitialBillingMetricMinimum4Cores()
     {
         $vcpuCores = 2;
-        $this->instance()->setAttribute('vcpu_cores', $vcpuCores)->saveQuietly();
+        $this->instanceModel()->setAttribute('vcpu_cores', $vcpuCores)->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -100,13 +100,13 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         $event = new Updated($this->task);
         $this->billingJobMock->handle($event);
 
-        $metric = $this->instance()->billingMetrics->first();
+        $metric = $this->instanceModel()->billingMetrics->first();
         $this->assertEquals(2, $metric->value); // packs
         $this->assertEquals('license.mssql.standard', $metric->key);
         $this->assertNull($metric->end);
@@ -115,7 +115,7 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
     public function testInitialBillingMetricWith5Cores()
     {
         $vcpuCores = 5; // should result in 3 packs
-        $this->instance()->setAttribute('vcpu_cores', $vcpuCores)->saveQuietly();
+        $this->instanceModel()->setAttribute('vcpu_cores', $vcpuCores)->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -123,13 +123,13 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         $event = new Updated($this->task);
         $this->billingJobMock->handle($event);
 
-        $metric = $this->instance()->billingMetrics->first();
+        $metric = $this->instanceModel()->billingMetrics->first();
         $this->assertEquals(3, $metric->value); // packs
         $this->assertEquals('license.mssql.standard', $metric->key);
         $this->assertNull($metric->end);
@@ -139,7 +139,7 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
     {
         $originalMetric = factory(BillingMetric::class)->create([
             "id" => "bm-orig",
-            "resource_id" => $this->instance()->id,
+            "resource_id" => $this->instanceModel()->id,
             "vpc_id" => $this->vpc()->id,
             "reseller_id" => "1",
             "key" => "license.mssql.standard",
@@ -154,7 +154,7 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
         ]);
 
         $vcpuCores = 5; // should result in 3 packs
-        $this->instance()->setAttribute('vcpu_cores', $vcpuCores)->saveQuietly();
+        $this->instanceModel()->setAttribute('vcpu_cores', $vcpuCores)->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
@@ -162,14 +162,14 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         $event = new Updated($this->task);
         $this->billingJobMock->handle($event);
 
         $originalMetric->refresh();
-        $newMetric = $this->instance()->billingMetrics()->whereNull('end')->first();
+        $newMetric = $this->instanceModel()->billingMetrics()->whereNull('end')->first();
         $this->assertEquals($originalMetric->resource_id, $newMetric->resource_id);
         $this->assertNotNull($originalMetric->end);
         $this->assertNull($newMetric->end);

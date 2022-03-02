@@ -20,7 +20,7 @@ class RegisterLicensesTest extends TestCase
     public function testRegisterPleskLicense()
     {
         (new PleskImageSeeder())->run();
-        $this->instance()->setAttribute('image_id', 'img-plesk')->save();
+        $this->instanceModel()->setAttribute('image_id', 'img-plesk')->save();
 
         $mockAdminPleskClient = \Mockery::mock(AdminPleskClient::class)->makePartial();
 
@@ -37,7 +37,7 @@ class RegisterLicensesTest extends TestCase
 
         $mockAdminPleskClient
             ->allows('requestLicense')
-            ->withArgs([$this->instance()->id, 'ecloud', 'PLESK-12-VPS-WEB-HOST-1M'])
+            ->withArgs([$this->instanceModel()->id, 'ecloud', 'PLESK-12-VPS-WEB-HOST-1M'])
             ->andReturnUsing(function () {
                 $mockSelfResponse = \Mockery::mock(SelfResponse::class)->makePartial();
                 $mockSelfResponse->allows('getId')->andReturns(10);
@@ -53,11 +53,11 @@ class RegisterLicensesTest extends TestCase
             return $mockAdminLicensesClient;
         });
 
-        dispatch(new RegisterLicenses($this->instance()));
+        dispatch(new RegisterLicenses($this->instanceModel()));
 
-        $this->instance()->refresh();
+        $this->instanceModel()->refresh();
 
-        $this->assertEquals('plesk license key', $this->instance()->deploy_data['image_data']['plesk_key']);
+        $this->assertEquals('plesk license key', $this->instanceModel()->deploy_data['image_data']['plesk_key']);
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -90,18 +90,18 @@ class RegisterLicensesTest extends TestCase
             return $mockAdminLicensesClient;
         });
 
-        dispatch(new RegisterLicenses($this->instance()));
+        dispatch(new RegisterLicenses($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
 
     public function testNoLicenseRequiredSkips()
     {
-        dispatch(new RegisterLicenses($this->instance()));
+        dispatch(new RegisterLicenses($this->instanceModel()));
 
-        $this->instance()->refresh();
+        $this->instanceModel()->refresh();
 
-        $this->assertFalse(isset($this->instance()->deploy_data['image_data']['plesk_key']));
+        $this->assertFalse(isset($this->instanceModel()->deploy_data['image_data']['plesk_key']));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -110,7 +110,7 @@ class RegisterLicensesTest extends TestCase
     {
         (new CpanelImageSeeder())->run();
 
-        $this->instance()
+        $this->instanceModel()
             ->setAttribute('image_id', 'img-cpanel')
             ->setAttribute('deploy_data', [
                 'floating_ip_id' => $this->floatingIp()->id
@@ -119,7 +119,7 @@ class RegisterLicensesTest extends TestCase
 
         $mockAdminLicensesClient = \Mockery::mock(AdminClient::class);
         $mockAdminLicensesClient->allows('cpanel->requestLicense')
-            ->withArgs([$this->instance()->id, 'ecloud', '1.1.1.1', 21163])
+            ->withArgs([$this->instanceModel()->id, 'ecloud', '1.1.1.1', 21163])
             ->andReturnUsing(function () {
                 return \Mockery::mock(SelfResponse::class)->makePartial();
             });
@@ -129,7 +129,7 @@ class RegisterLicensesTest extends TestCase
             return $mockAdminLicensesClient;
         });
 
-        dispatch(new RegisterLicenses($this->instance()));
+        dispatch(new RegisterLicenses($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

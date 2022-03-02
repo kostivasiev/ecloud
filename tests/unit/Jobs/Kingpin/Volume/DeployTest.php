@@ -63,7 +63,7 @@ class DeployTest extends TestCase
                 'vmware_uuid' => 'bbff7e7b-c22e-4827-8d2c-a918087deefd',
             ]);
 
-            $this->instance()->volumes()->attach($volume);
+            $this->instanceModel()->volumes()->attach($volume);
             return $volume;
         });
 

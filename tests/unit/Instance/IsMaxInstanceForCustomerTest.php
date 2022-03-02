@@ -26,7 +26,7 @@ class IsMaxInstanceForCustomerTest extends TestCase
     public function testValidationFails()
     {
         // Use the instance
-        $this->instance();
+        $this->instanceModel();
         $this->assertFalse($this->validationRule->isWithinLimit());
     }
 

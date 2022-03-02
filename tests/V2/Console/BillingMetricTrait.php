@@ -169,7 +169,7 @@ trait BillingMetricTrait
         });
 
         factory(BillingMetric::class)->create([
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'reseller_id' => 1,
             'key' => $code,
@@ -184,7 +184,7 @@ trait BillingMetricTrait
     public function endBillingMetric(string $code, int $quantity = 1)
     {
         $billingMetric = BillingMetric::where([
-            ['resource_id', '=', $this->instance()->id],
+            ['resource_id', '=', $this->instanceModel()->id],
             ['vpc_id', '=', $this->vpc()->id],
             ['key', '=', $code],
         ])

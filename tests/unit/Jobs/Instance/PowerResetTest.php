@@ -14,14 +14,14 @@ class PowerResetTest extends TestCase
     public function testPowerResetJob()
     {
         $this->kingpinServiceMock()->expects('put')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/power/reset'])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id . '/power/reset'])
             ->andReturnUsing(function () {
                 return new Response(200);
             });
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new PowerReset($this->instance()));
+        dispatch(new PowerReset($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

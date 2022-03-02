@@ -28,7 +28,7 @@ class ResellerMetricsTest extends TestCase
             'term_start_date' => Carbon::now()->subtract('month', 1)->toString(),
         ]);
         factory(BillingMetric::class)->create([
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'reseller_id' => $this->resellerId,
             'vpc_id' => $this->vpc()->id,
             'start' => Carbon::now()->subtract('month', 1)->toString(),

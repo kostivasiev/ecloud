@@ -26,7 +26,7 @@ class DeleteTest extends TestCase
                 'id' => 'task-1',
                 'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         Bus::fake();

@@ -11,7 +11,7 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->instance();
+        $this->instanceModel();
 
         $this->kingpinServiceMock()->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode([
@@ -31,9 +31,9 @@ class GetTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->instance()->id,
-                'name' => $this->instance()->name,
-                'vpc_id' => $this->instance()->vpc_id,
+                'id' => $this->instanceModel()->id,
+                'name' => $this->instanceModel()->name,
+                'vpc_id' => $this->instanceModel()->vpc_id,
                 'platform' => 'Linux',
             ])
             ->assertResponseStatus(200);
@@ -63,16 +63,16 @@ class GetTest extends TestCase
     public function testGetResource()
     {
         $this->get(
-            '/v2/instances/' . $this->instance()->id,
+            '/v2/instances/' . $this->instanceModel()->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
             ->seeJson([
-                'id' => $this->instance()->id,
-                'name' => $this->instance()->name,
-                'vpc_id' => $this->instance()->vpc_id,
+                'id' => $this->instanceModel()->id,
+                'name' => $this->instanceModel()->name,
+                'vpc_id' => $this->instanceModel()->vpc_id,
                 'image_id' => $this->image()->id,
             ])
             ->assertResponseStatus(200);
@@ -90,7 +90,7 @@ class GetTest extends TestCase
         $this->floatingIp()->resource()->associate($this->nic())->save();
 
         $this->get(
-            '/v2/instances/' . $this->instance()->id . '/floating-ips',
+            '/v2/instances/' . $this->instanceModel()->id . '/floating-ips',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',

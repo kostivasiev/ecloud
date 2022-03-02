@@ -29,7 +29,7 @@ class UpdateTest extends TestCase
                 'name' => 'test',
                 'data' => []
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         Bus::fake();

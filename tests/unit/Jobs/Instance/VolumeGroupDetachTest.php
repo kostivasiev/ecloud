@@ -29,16 +29,16 @@ class VolumeGroupDetachTest extends TestCase
             ->once();
 
         // add volume group to instance and attach the volume
-        $this->instance()->volume_group_id = $this->volumeGroup()->id;
-        $this->instance()->volumes()->attach($this->volume());
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->volume_group_id = $this->volumeGroup()->id;
+        $this->instanceModel()->volumes()->attach($this->volume());
+        $this->instanceModel()->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'task-1',
                 'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         $this->assertEmpty((new VolumeGroupDetach($this->task))->handle());
@@ -50,15 +50,15 @@ class VolumeGroupDetachTest extends TestCase
         $this->volume()->is_shared = true;
         $this->volume()->port = 0;
         $this->volume()->saveQuietly();
-        $this->instance()->volumes()->attach($this->volume());
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->volumes()->attach($this->volume());
+        $this->instanceModel()->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'task-1',
                 'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         Bus::fake([DetachVolume::class]);

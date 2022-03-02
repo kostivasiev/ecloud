@@ -23,7 +23,7 @@ class UpdateTest extends TestCase
     {
         Event::fake();
         $this->patch(
-            '/v2/instances/' . $this->instance()->id,
+            '/v2/instances/' . $this->instanceModel()->id,
             [
                 'name' => 'Changed',
                 'backup_enabled' => true,
@@ -35,16 +35,16 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance()->id,
+                'id' => $this->instanceModel()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
         )
             ->assertResponseStatus(202);
 
-        $this->instance()->refresh();
-        $this->assertEquals('Changed', $this->instance()->name);
-        $this->assertTrue($this->instance()->backup_enabled);
+        $this->instanceModel()->refresh();
+        $this->assertEquals('Changed', $this->instanceModel()->name);
+        $this->assertTrue($this->instanceModel()->backup_enabled);
     }
 
     public function testAdminCanModifyLockedInstance()
@@ -52,14 +52,14 @@ class UpdateTest extends TestCase
         Event::fake();
 
         // Lock the instance
-        $this->instance()->locked = true;
-        $this->instance()->save();
+        $this->instanceModel()->locked = true;
+        $this->instanceModel()->save();
 
         $data = [
             'name' => 'Changed',
         ];
         $this->patch(
-            '/v2/instances/' . $this->instance()->id,
+            '/v2/instances/' . $this->instanceModel()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -68,7 +68,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance()->id,
+                'id' => $this->instanceModel()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
@@ -80,10 +80,10 @@ class UpdateTest extends TestCase
     {
         Event::fake();
 
-        $this->instance()->locked = true;
-        $this->instance()->save();
+        $this->instanceModel()->locked = true;
+        $this->instanceModel()->save();
         $this->patch(
-            '/v2/instances/' . $this->instance()->id,
+            '/v2/instances/' . $this->instanceModel()->id,
             [
                 'name' => 'Testing Locked Instance',
             ],
@@ -106,10 +106,10 @@ class UpdateTest extends TestCase
         Event::fake();
 
         // Lock the instance
-        $this->instance()->locked = true;
-        $this->instance()->save();
+        $this->instanceModel()->locked = true;
+        $this->instanceModel()->save();
         $this->patch(
-            '/v2/instances/' . $this->instance()->id,
+            '/v2/instances/' . $this->instanceModel()->id,
             [
                 'name' => 'Testing Locked Instance',
             ],
@@ -126,14 +126,14 @@ class UpdateTest extends TestCase
             ->assertResponseStatus(403);
 
         // Unlock the instance
-        $this->instance()->locked = false;
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->locked = false;
+        $this->instanceModel()->saveQuietly();
 
         $data = [
             'name' => 'Changed',
         ];
         $this->patch(
-            '/v2/instances/' . $this->instance()->id,
+            '/v2/instances/' . $this->instanceModel()->id,
             $data,
             [
                 'X-consumer-custom-id' => '1-1',
@@ -142,7 +142,7 @@ class UpdateTest extends TestCase
         )->seeInDatabase(
             'instances',
             [
-                'id' => $this->instance()->id,
+                'id' => $this->instanceModel()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
@@ -163,7 +163,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/instances/' . $this->instance()->id,
+            '/v2/instances/' . $this->instanceModel()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
@@ -191,7 +191,7 @@ class UpdateTest extends TestCase
         ];
 
         $this->patch(
-            '/v2/instances/' . $this->instance()->id,
+            '/v2/instances/' . $this->instanceModel()->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',

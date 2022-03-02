@@ -56,7 +56,7 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             return $task;
         });
 
@@ -80,8 +80,8 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
 
-        $this->instance()->ram_capacity = 2048;
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->ram_capacity = 2048;
+        $this->instanceModel()->saveQuietly();
 
         $task = Model::withoutEvents(function () {
             $task = new Task([
@@ -89,7 +89,7 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             return $task;
         });
 
@@ -204,11 +204,11 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             return $task;
         });
 
-        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+        $this->instanceModel()->loadBalancer()->associate($this->loadBalancer())->save();
 
         $listener = new \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling();
         $listener->handle(new \App\Events\V2\Task\Updated($task));

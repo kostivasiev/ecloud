@@ -27,15 +27,15 @@ class DetachSharedVolumesTest extends TestCase
             ->setAttribute('port', 0)
             ->saveQuietly();
 
-        $this->instance()->volumes()->attach($this->volume());
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->volumes()->attach($this->volume());
+        $this->instanceModel()->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'task-1',
                 'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         Bus::fake([DetachVolume::class]);

@@ -21,7 +21,7 @@ class DetachedIsNotSharedTest extends TestCase
     public function nonSharedVolumePasses()
     {
         $job = new DetachedIsNotShared($this->volume()->id);
-        $this->assertTrue($job->passes('instance_id', $this->instance()->id));
+        $this->assertTrue($job->passes('instance_id', $this->instanceModel()->id));
     }
 
     /** @test */
@@ -30,6 +30,6 @@ class DetachedIsNotSharedTest extends TestCase
         $this->volume()->is_shared = true;
         $this->volume()->saveQuietly();
         $job = new DetachedIsNotShared($this->volume()->id);
-        $this->assertFalse($job->passes('instance_id', $this->instance()->id));
+        $this->assertFalse($job->passes('instance_id', $this->instanceModel()->id));
     }
 }

@@ -26,7 +26,7 @@ class MigratePublicTest extends TestCase
                 'id' => 'sync-1',
                 'name' => 'test',
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         Bus::fake();
@@ -38,6 +38,6 @@ class MigratePublicTest extends TestCase
         });
 
         // Check that host_group has been disassociated
-        $this->assertNull($this->instance()->host_group_id);
+        $this->assertNull($this->instanceModel()->host_group_id);
     }
 }
