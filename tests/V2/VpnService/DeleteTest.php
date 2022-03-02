@@ -19,7 +19,7 @@ class DeleteTest extends TestCase
         parent::setUp();
         $this->consumer = new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']);
         $this->consumer->setIsAdmin(true);
-        $this->vpn = factory(VpnService::class)->create([
+        $this->vpn = VpnService::factory()->create([
             'name' => 'Unit Test VPN',
             'router_id' => $this->router()->id,
         ]);
@@ -30,23 +30,23 @@ class DeleteTest extends TestCase
         $this->be($this->consumer);
         Event::fake(Created::class);
         $this->delete('/v2/vpn-services/' . $this->vpn->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
         Event::assertDispatched(Created::class);
     }
 
     public function testDeleteFailsIfChildPresent()
     {
         $this->be($this->consumer);
-        $vpnEndpoint = factory(VpnEndpoint::class)->create([
+        $vpnEndpoint = VpnEndpoint::factory()->create([
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpn->id,
         ]);
         $this->delete('/v2/vpn-services/' . $this->vpn->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Precondition Failed',
                     'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $vpnEndpoint->id,
                 ]
-            )->assertResponseStatus(412);
+            )->assertStatus(412);
     }
 }

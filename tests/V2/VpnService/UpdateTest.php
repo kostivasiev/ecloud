@@ -15,7 +15,7 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
 
-        $this->vpnService = factory(VpnService::class)->create([
+        $this->vpnService = VpnService::factory()->create([
             'name' => 'Unit Test VPN',
             'router_id' => $this->router()->id,
         ]);
@@ -35,7 +35,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
         $vpnItem = VpnService::findOrFail($this->vpnService->id);
         $this->assertEquals($data['router_id'], $vpnItem->router_id);
