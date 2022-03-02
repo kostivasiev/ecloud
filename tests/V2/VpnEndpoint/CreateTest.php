@@ -19,14 +19,14 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->floatingIp = FloatingIp::withoutEvents(function () {
-            return factory(FloatingIp::class)->create([
+            return FloatingIp::factory()->create([
                 'id' => 'fip-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'ip_address' => '203.0.113.1',
                 'availability_zone_id' => $this->availabilityZone()->id,
             ]);
         });
-        $this->vpnService = factory(VpnService::class)->create([
+        $this->vpnService = VpnService::factory()->create([
             'router_id' => $this->router()->id,
         ]);
     }
@@ -40,15 +40,15 @@ class CreateTest extends TestCase
             'floating_ip_id' => $this->floatingIp->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
     }
 
     public function testCreateResourceFipInUse()
     {
-        $vpnService = factory(VpnService::class)->create([
+        $vpnService = VpnService::factory()->create([
             'router_id' => $this->router()->id,
         ]);
-        $vpnEndpoint = factory(VpnEndpoint::class)->create([
+        $vpnEndpoint = VpnEndpoint::factory()->create([
             'name' => 'Original Endpoint',
             'vpn_service_id' => $this->vpnService->id,
         ]);
@@ -60,12 +60,12 @@ class CreateTest extends TestCase
             'floating_ip_id' => $this->floatingIp->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'The floating ip id is already assigned to a resource',
                 ]
             )
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 }

@@ -15,7 +15,7 @@ trait VpnEndpointMock
     {
         if (!$this->vpnEndpoint) {
             Model::withoutEvents(function () use ($id) {
-                $this->vpnEndpoint = factory(VpnEndpoint::class)->create([
+                $this->vpnEndpoint = VpnEndpoint::factory()->create([
                     'id' => $id,
                     'name' => $id,
                     'vpn_service_id' => $this->vpnService()->id,

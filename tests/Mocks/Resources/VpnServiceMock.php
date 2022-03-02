@@ -13,7 +13,7 @@ trait VpnServiceMock
     {
         if (!$this->vpnService) {
             Model::withoutEvents(function () use ($id) {
-                $this->vpnService = factory(VpnService::class)->create([
+                $this->vpnService = VpnService::factory()->create([
                     'id' => $id,
                     'name' => $id,
                     'router_id' => $this->router()->id,
