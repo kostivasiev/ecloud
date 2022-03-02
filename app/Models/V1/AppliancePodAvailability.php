@@ -4,10 +4,13 @@ namespace App\Models\V1;
 
 use App\Events\V1\AppliancePodAvailabilityDeletedEvent;
 use App\Traits\V1\ColumnPrefixHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AppliancePodAvailability extends Model
 {
+    use HasFactory;
+
     use ColumnPrefixHelper;
 
     protected $connection = 'ecloud';

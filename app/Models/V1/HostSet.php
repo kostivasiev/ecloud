@@ -3,6 +3,7 @@
 namespace App\Models\V1;
 
 use App\Traits\V1\UUIDHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Resource\Property\DateTimeProperty;
@@ -17,6 +18,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class HostSet extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     // Table uses UUID's
     use UUIDHelper;
 

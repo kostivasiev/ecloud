@@ -4,6 +4,7 @@ namespace App\Models\V1;
 
 use App\Services\Artisan\V1\ArtisanService;
 use App\Traits\V1\UUIDHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
@@ -20,9 +21,7 @@ use UKFast\DB\Ditto\Sortable;
 class VolumeSet extends Model implements Filterable, Sortable
 {
     // Table uses UUID's
-    use UUIDHelper;
-
-    use SoftDeletes;
+    use UUIDHelper, SoftDeletes, HasFactory;
 
     protected $table = 'ucs_storage_volume_set';
 

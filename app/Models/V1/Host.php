@@ -4,6 +4,7 @@ namespace App\Models\V1;
 
 use App\Models\V1\Pod\Location;
 use GuzzleHttp\Client;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Devices\AdminClient;
@@ -19,6 +20,8 @@ use UKFast\SDK\Page;
 
 class Host extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     const RESERVED_SYSTEM_RAM = 2;
 
 

@@ -3,6 +3,7 @@
 namespace App\Models\V1;
 
 use App\Traits\V1\UUIDHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
@@ -16,7 +17,7 @@ use UKFast\DB\Ditto\Sortable;
 class IopsTier extends Model implements Filterable, Sortable
 {
     // Table uses UUID's
-    use UUIDHelper;
+    use UUIDHelper, HasFactory;
 
     protected $table = 'ucs_storage_iops_tiers';
 

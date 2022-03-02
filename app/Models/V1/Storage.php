@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -11,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Storage extends Model
 {
+    use HasFactory;
+
     protected $table = 'ucs_storage';
 
     protected $primaryKey = 'id';

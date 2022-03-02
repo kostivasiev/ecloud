@@ -4,6 +4,7 @@ namespace App\Models\V1;
 
 use App\Encryption\AesEncryption;
 use App\Encryption\RemoteKeyStore;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use UKFast\Api\Resource\Property\BooleanProperty;
@@ -24,6 +25,8 @@ use UKFast\Api\Resource\Property\StringProperty;
  */
 class ServerDetail extends Model
 {
+    use HasFactory;
+
     /**
      * The table associated with the model.
      * @var string

@@ -7,6 +7,7 @@ use App\Rules\V1\IsValidUuid;
 use App\Rules\V1\IsValidValidationRule;
 use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Resource\Property\BooleanProperty;
@@ -23,6 +24,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class ApplianceParameter extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     // Table columns have table name prefixes
     use ColumnPrefixHelper;
 

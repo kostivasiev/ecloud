@@ -9,6 +9,7 @@ use App\Exceptions\V1\ArtisanException;
 use App\Exceptions\V1\KingpinException;
 use App\Http\Controllers\V1\VolumeSetController;
 use App\Services\Artisan\V1\ArtisanService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -23,6 +24,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class Datastore extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     /**
      * Eloquent configuration
      * ----------------------
