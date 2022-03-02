@@ -20,20 +20,20 @@ class GetStaffPriceTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $region = factory(Region::class)->create();
+        $region = Region::factory()->create();
 
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id
         ])->each(function ($availabilityZone) {
-            factory(Product::class)->create([
+            Product::factory()->create([
                 'product_name' => $availabilityZone->id . ': ' . $this->faker->word,
                 'product_cost_price' => 0.1111 // Staff price
             ])->each(function ($product) {
-                factory(ProductPrice::class)->create([
+                ProductPrice::factory()->create([
                     'product_price_product_id' => $product->id,
                     'product_price_sale_price' => 0.9999 // Normal price
                 ])->each(function ($productPrice) {
-                    factory(ProductPriceCustom::class)->create([
+                    ProductPriceCustom::factory()->create([
                         'product_price_custom_product_id' => $productPrice->product_price_product_id,
                         'product_price_custom_reseller_id' => 1,
                         'product_price_custom_sale_price' => 0.2222 // Custom price (reseller 1)

@@ -17,12 +17,12 @@ class CreateTest extends TestCase
                 'ike_profile_id' => 'ike-aaaaaaaa',
                 'ipsec_profile_id' => 'ipsec-aaaaaaaa'
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
             ]
-        )->assertResponseStatus(401);
+        )->assertStatus(401);
     }
 
     public function testCreateResourceAsAdmin()
@@ -40,6 +40,6 @@ class CreateTest extends TestCase
                 'ike_profile_id' => 'ike-aaaaaaaa',
                 'ipsec_profile_id' => 'ipsec-aaaaaaaa'
             ]
-        )->assertResponseStatus(201);
+        )->assertStatus(201);
     }
 }

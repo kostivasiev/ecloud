@@ -119,10 +119,10 @@ class FixBillingEndDatesTest extends TestCase
             ['id' => 'bm-37b7183c','resource_id' => 'i-90a128ac','vpc_id' => 'vpc-27f207ed','reseller_id' => '30345','name' => 'Backup Capacity','key' => 'backup.quota','value' => '20','start' => '2021-09-02 13:03:01','end' => '2021-10-31 23:59:59','category' => 'Storage','price' => '0.000000000000','created_at' => '2021-09-02 13:03:01','updated_at' => '2021-11-11 08:58:42','deleted_at' => null],
         ];
         foreach ($billing_metrics as $metric) {
-            factory(BillingMetric::class)->create($metric);
+            BillingMetric::factory()->create($metric);
             $instance = Instance::find($metric['resource_id']);
             if (!$instance) {
-                factory(Instance::class)->create(['id' => $metric['resource_id']]);
+                Instance::factory()->create(['id' => $metric['resource_id']]);
             }
         }
     }
