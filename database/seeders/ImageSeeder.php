@@ -19,7 +19,7 @@ class ImageSeeder extends Seeder
      */
     public function run()
     {
-        $image = factory(Image::class)->create([
+        $image = Image::factory()->create([
             'id' => 'img-aaaaaaaa',
             'name' => 'Dev Image (Centos 7)',
             'vpc_id' => null,

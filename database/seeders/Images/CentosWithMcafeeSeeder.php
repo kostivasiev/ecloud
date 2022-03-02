@@ -32,7 +32,8 @@ class CentosWithMcafeeSeeder extends Seeder
             'visibility' => Image::VISIBILITY_PUBLIC,
         ];
 
-        $image = factory(Image::class)->create($imageData);
+        /** @var Image $image */
+        $image = Image::factory()->create($imageData);
 
         // Sync the pivot table
         $image->availabilityZones()->sync(AvailabilityZone::all()->pluck('id')->toArray());

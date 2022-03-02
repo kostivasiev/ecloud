@@ -150,15 +150,6 @@ abstract class TestCase extends BaseTestCase
     /** @var FloatingIp */
     private $floatingIp;
 
-    /**
-     * Creates the application.
-     * @return Application
-     */
-    public function createApplication()
-    {
-        return require __DIR__ . '/../bootstrap/app.php';
-    }
-
     public function firewallPolicy($id = 'fwp-test')
     {
         if (!$this->firewallPolicy) {
@@ -250,7 +241,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->vpc) {
             Model::withoutEvents(function () {
-                $this->vpc = factory(Vpc::class)->create([
+                $this->vpc = Vpc::factory()->create([
                     'id' => 'vpc-test',
                     'region_id' => $this->region()->id
                 ]);
@@ -276,7 +267,7 @@ abstract class TestCase extends BaseTestCase
     public function region()
     {
         if (!$this->region) {
-            $this->region = factory(Region::class)->create([
+            $this->region = Region::factory()->create([
                 'id' => 'reg-test',
                 'is_public' => true,
             ]);
@@ -287,12 +278,12 @@ abstract class TestCase extends BaseTestCase
     public function availabilityZone()
     {
         if (!$this->availabilityZone) {
-            $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            $this->availabilityZone = AvailabilityZone::factory()->create([
                 'id' => 'az-test',
                 'region_id' => $this->region()->id,
             ]);
 
-            factory(Credential::class)->create([
+            Credential::factory()->create([
                 'id' => 'cred-lbnats',
                 'name' => 'LB Nats Server',
                 'resource_id'=> $this->availabilityZone->id,
@@ -486,7 +477,7 @@ abstract class TestCase extends BaseTestCase
     public function kingpinServiceMock()
     {
         if (!$this->kingpinServiceMock) {
-            factory(Credential::class)->create([
+            Credential::factory()->create([
                 'id' => 'cred-kingpin',
                 'name' => 'kingpinapi',
                 'resource_id' => $this->availabilityZone()->id,

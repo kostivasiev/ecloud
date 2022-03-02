@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 
 class RegionFactory extends Factory
 {
+    protected $connection = 'ecloud';
+
     /**
      * The name of the factory's corresponding model.
      *

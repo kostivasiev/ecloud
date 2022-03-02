@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'reseller'),
+    'default' => env('DB_RESELLER_CONNECTION', 'reseller'),
 
     /*
     |--------------------------------------------------------------------------

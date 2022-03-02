@@ -130,30 +130,30 @@ EOM,
             $imageData['id'] = 'img-cpanel';
         }
 
-        $image = factory(Image::class)->create($imageData);
+        $image = Image::factory()->create($imageData);
 
         // Sync the pivot table
         $image->availabilityZones()->sync(AvailabilityZone::all()->pluck('id')->toArray());
 
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'image_id' => $image->id,
             'key' => 'ukfast.license.identifier',
             'value' => 21163,
         ]);
 
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'image_id' => $image->id,
             'key' => 'ukfast.license.type',
             'value' => 'cpanel',
         ]);
 
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'image_id' => $image->id,
             'key' => 'ukfast.fip.required',
             'value' => 'true',
         ]);
 
-        factory(ImageParameter::class)->create([
+        ImageParameter::factory()->create([
             'image_id' => $image->id,
             'name' => 'Hostname',
             'key' => 'cpanel_hostname',

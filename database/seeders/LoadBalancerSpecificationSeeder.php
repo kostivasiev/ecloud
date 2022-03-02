@@ -14,7 +14,7 @@ class LoadBalancerSpecificationSeeder extends Seeder
      */
     public function run()
     {
-        factory(LoadBalancerSpecification::class)->create([
+        LoadBalancerSpecification::factory()->create([
                 'name' => 'small',
                 'node_count' => 1,
                 'cpu' => 1,
@@ -24,7 +24,7 @@ class LoadBalancerSpecificationSeeder extends Seeder
                 'image_id' => 'img-loadbalancer',
         ]);
 
-        factory(LoadBalancerSpecification::class)->create([
+        LoadBalancerSpecification::factory()->create([
                 'id' => 'lbs-aaaaaaaa', // dev_load_balancer_spec_id
                 'name' => 'medium',
                 'node_count' => 2,
@@ -35,7 +35,7 @@ class LoadBalancerSpecificationSeeder extends Seeder
                 'image_id' => 'img-loadbalancer',
         ]);
 
-        factory(LoadBalancerSpecification::class)->create([
+        LoadBalancerSpecification::factory()->create([
                 'name' => 'large',
                 'node_count' => 2,
                 'cpu' => 4,

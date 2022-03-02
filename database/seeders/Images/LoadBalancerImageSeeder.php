@@ -16,7 +16,7 @@ class LoadBalancerImageSeeder extends Seeder
      */
     public function run()
     {
-        $image = factory(Image::class)->create([
+        $image = Image::factory()->create([
             'id' => 'img-loadbalancer',
             'name' => 'Ubuntu 20.04 LBv2',
             'vpc_id' => null,
