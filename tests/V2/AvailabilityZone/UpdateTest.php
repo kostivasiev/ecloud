@@ -19,16 +19,16 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $region = Region::factory()->create();
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id
         ]);
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
     }
 
     public function testValidDataIsSuccessful()
     {
-        $this->patch(
+        $patch = $this->patch(
             '/v2/availability-zones/' . $this->availabilityZone->id,
             [
                 'code' => 'MAN2',
@@ -40,25 +40,25 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeInDatabase(
-                'availability_zones',
-                [
-                    'id' => $this->availabilityZone->id,
-                    'code' => 'MAN2',
-                    'name' => 'Manchester Zone 2',
-                    'datacentre_site_id' => 2,
-                    'region_id' => $this->region->id,
-                ],
-                'ecloud'
-            )
-            ->assertResponseStatus(200);
+        )->assertStatus(200);
+
+        $this->assertDatabaseHas(
+            'availability_zones',
+            [
+                'id' => $this->availabilityZone->id,
+                'code' => 'MAN2',
+                'name' => 'Manchester Zone 2',
+                'datacentre_site_id' => 2,
+                'region_id' => $this->region->id,
+            ],
+            'ecloud'
+        );
 
         // Check for single occurence of id in the meta location
         $availabilityZoneId
-            = (json_decode($this->response->getContent()))->data->id;
+            = (json_decode($patch->getContent()))->data->id;
         $metaLocation
-            = (json_decode($this->response->getContent()))->meta->location;
+            = (json_decode($patch->getContent()))->meta->location;
         $this->assertTrue((substr_count($metaLocation, $availabilityZoneId)
             == 1));
     }

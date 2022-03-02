@@ -4,7 +4,6 @@ namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\Dhcp;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetDhcpsTest extends TestCase
@@ -16,7 +15,7 @@ class GetDhcpsTest extends TestCase
         parent::setUp();
 
         Model::withoutEvents(function () {
-            $this->dhcp = factory(Dhcp::class)->create([
+            $this->dhcp = Dhcp::factory()->create([
                 'id' => 'dhcp-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id
@@ -33,10 +32,10 @@ class GetDhcpsTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id'       => $this->dhcp->id,
                 'vpc_id'   => $this->dhcp->vpc_id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

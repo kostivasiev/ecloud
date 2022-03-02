@@ -17,7 +17,7 @@ class GetClustersTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->loadBalancer = factory(LoadBalancer::class)->create([
+        $this->loadBalancer = LoadBalancer::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id
         ]);
@@ -32,13 +32,13 @@ class GetClustersTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id'     => $this->loadBalancer->id,
                 'name'   => $this->loadBalancer->name,
                 'vpc_id' => $this->loadBalancer->vpc_id,
                 'load_balancer_spec_id' => $this->loadBalancer->load_balancer_spec_id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testNsxClusterDoesntExist()

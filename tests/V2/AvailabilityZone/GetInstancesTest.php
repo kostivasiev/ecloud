@@ -27,12 +27,12 @@ class GetInstancesTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->instanceModel()->id,
                 'name' => $this->instanceModel()->name,
                 'vpc_id' => $this->instanceModel()->vpc_id,
                 'platform' => 'Linux',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

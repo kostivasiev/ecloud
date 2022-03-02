@@ -24,16 +24,16 @@ class GetPricesTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->product = factory(Product::class)->create([
+        $this->product = Product::factory()->create([
             'product_name' => $this->availabilityZone()->id . ': vcpu'
         ]);
 
-        factory(ProductPrice::class)->create([
+        ProductPrice::factory()->create([
             'product_price_product_id' => $this->product->id,
             'product_price_sale_price' => 0.999
         ]);
 
-        factory(ProductPriceCustom::class)->create([
+        ProductPriceCustom::factory()->create([
             'product_price_custom_product_id' => $this->product->id,
             'product_price_custom_reseller_id' => 1,
             'product_price_custom_sale_price' => 0.111
@@ -49,12 +49,12 @@ class GetPricesTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'availability_zone_id'   => $this->product->availability_zone_id,
                 'name' => $this->product->name,
                 'category'  => strtolower($this->product->product_subcategory),
                 'price'  => 0.999,
-            ])->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 
     public function testGetCustomPrices()
@@ -66,11 +66,11 @@ class GetPricesTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'availability_zone_id'   => $this->product->availability_zone_id,
                 'name' => $this->product->name,
                 'category'  => strtolower($this->product->product_subcategory),
                 'price'  => 0.111,
-            ])->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 }

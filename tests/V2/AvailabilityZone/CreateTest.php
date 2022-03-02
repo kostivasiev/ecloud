@@ -34,12 +34,12 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ])
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 
     public function testNullCodeIsFailed()
@@ -57,13 +57,13 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The code field is required',
                 'status' => 422,
                 'source' => 'code'
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testNullNameIsFailed()
@@ -81,13 +81,13 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The name field is required',
                 'status' => 422,
                 'source' => 'name'
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testNullSiteIdIsFailed()
@@ -105,13 +105,13 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The datacentre site id field is required',
                 'status' => 422,
                 'source' => 'datacentre_site_id'
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testNullRegionIdIsFailed()
@@ -130,13 +130,13 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The region id field is required',
                 'status' => 422,
                 'source' => 'region_id'
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testValidDataSucceeds()
@@ -148,7 +148,7 @@ class CreateTest extends TestCase
             'is_public' => false,
             'region_id' => $this->region()->id
         ];
-        $this->post(
+        $post = $this->post(
             '/v2/availability-zones',
             $data,
             [
@@ -156,11 +156,11 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
 
-        $availabilityZoneId = (json_decode($this->response->getContent()))->data->id;
-        $metaLocation = (json_decode($this->response->getContent()))->meta->location;
-        $this->seeJson([
+        $availabilityZoneId = (json_decode($post->getContent()))->data->id;
+        $metaLocation = (json_decode($post->getContent()))->meta->location;
+        $post->assertJsonFragment([
             'id' => $availabilityZoneId,
         ]);
 

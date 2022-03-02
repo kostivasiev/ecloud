@@ -20,11 +20,11 @@ class DeletionRulesTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->region = Region::factory()->create();
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
-        $this->router = factory(Router::class)->create([
+        $this->router = Router::factory()->create([
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id,
@@ -40,9 +40,9 @@ class DeletionRulesTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->router->id,
-        ])->assertResponseStatus(412);
+        ])->assertStatus(412);
         $availabilityZone = AvailabilityZone::withTrashed()->findOrFail($this->availabilityZone->id);
         $this->assertNull($availabilityZone->deleted_at);
     }

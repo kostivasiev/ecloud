@@ -25,30 +25,30 @@ class DeleteTest extends TestCase
         $this->be($this->consumer);
         $this->delete(
             '/v2/availability-zones/' . $this->availabilityZone()->id
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Unauthorized',
             'detail' => 'Unauthorized',
             'status' => 401,
-        ])->assertResponseStatus(401);
+        ])->assertStatus(401);
     }
 
     public function testFailInvalidId()
     {
         $this->be($this->consumer);
         $this->delete('/v2/availability-zones/' . $this->faker->uuid)
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Not found',
                 'detail' => 'No Availability Zone with that ID was found',
                 'status' => 404,
             ])
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testSuccessfulDelete()
     {
         $this->be($this->consumer);
         $this->delete('/v2/availability-zones/' . $this->availabilityZone()->id)
-            ->assertResponseStatus(204);
+            ->assertStatus(204);
         $this->availabilityZone()->refresh();
         $this->assertNotNull($this->availabilityZone()->deleted_at);
     }
@@ -58,12 +58,12 @@ class DeleteTest extends TestCase
         $this->router();
         $this->be($this->consumer);
         $this->delete('/v2/availability-zones/' . $this->availabilityZone()->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Precondition Failed',
                     'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->router()->id,
                 ]
-            )->assertResponseStatus(412);
+            )->assertStatus(412);
     }
 
 }

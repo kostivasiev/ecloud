@@ -16,14 +16,14 @@ class GetTest extends TestCase
     {
         parent::setUp();
         // Hidden Region
-        $hiddenRegion = factory(Region::class)->create([
+        $hiddenRegion = Region::factory()->create([
             'id' => 'reg-hidden',
             'name' => 'Hidden Region',
             'is_public' => false,
         ]);
 
         // Availability Zone hidden by region
-        $this->regionHiddenAz = factory(AvailabilityZone::class)->create([
+        $this->regionHiddenAz = AvailabilityZone::factory()->create([
             'id' => 'az-hidden',
             'name' => 'Region Hidden AZ',
             'region_id' => $hiddenRegion->id,
@@ -33,72 +33,72 @@ class GetTest extends TestCase
     public function testGetCollectionAsAdmin()
     {
         // Availability Zone only visible to admins
-        factory(AvailabilityZone::class)->create([
+        AvailabilityZone::factory()->create([
             'is_public' => false,
         ]);
 
         $this->availabilityZone()->is_public = true;
         $this->availabilityZone()->save();
 
-        $this->get('/v2/availability-zones', [
+        $get = $this->get('/v2/availability-zones', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->regionHiddenAz->id,
             'name' => $this->regionHiddenAz->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
 
-        $this->assertCount(3, $this->response->original);
+        $this->assertCount(3, $get->getOriginalContent());
     }
 
     public function testGetCollectionAsNonAdmin()
     {
         // Availability Zone only visible to admins
-        factory(AvailabilityZone::class)->create([
+        AvailabilityZone::factory()->create([
             'is_public' => false,
         ]);
 
         $this->availabilityZone()->is_public = true;
         $this->availabilityZone()->save();
 
-        $this->get('/v2/availability-zones', [
+        $get = $this->get('/v2/availability-zones', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->regionHiddenAz->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
 
-        $this->assertCount(1, $this->response->original);
+        $this->assertCount(1, $get->getOriginalContent());
     }
 
     public function testGetCollectionAsInternalReseller()
     {
         // Availability Zone only visible to admins
-        factory(AvailabilityZone::class)->create([
+        AvailabilityZone::factory()->create([
             'is_public' => false,
         ]);
 
         $this->availabilityZone()->is_public = true;
         $this->availabilityZone()->save();
 
-        $this->get('/v2/availability-zones', [
+        $get = $this->get('/v2/availability-zones', [
             'X-consumer-custom-id' => '7052-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->regionHiddenAz->id,
             'name' => $this->regionHiddenAz->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
 
-        $this->assertCount(3, $this->response->original);
+        $this->assertCount(3, $get->getOriginalContent());
     }
 
     public function testGetPublicAvailabilityZoneAsAdmin()
@@ -109,12 +109,12 @@ class GetTest extends TestCase
         $this->get('/v2/availability-zones/' . $this->availabilityZone()->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->regionHiddenAz->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetPublicAvailabilityZoneAsInternalReseller()
@@ -125,12 +125,12 @@ class GetTest extends TestCase
         $this->get('/v2/availability-zones/' . $this->availabilityZone()->id, [
             'X-consumer-custom-id' => '7052-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->regionHiddenAz->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetPublicAvailabilityZoneAsNonAdmin()
@@ -141,12 +141,12 @@ class GetTest extends TestCase
         $this->get('/v2/availability-zones/' . $this->availabilityZone()->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->regionHiddenAz->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetPrivateAvailabilityZoneAsAdmin()
@@ -157,12 +157,12 @@ class GetTest extends TestCase
         $this->get('/v2/availability-zones/' . $this->availabilityZone()->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZone()->id,
             'name' => $this->availabilityZone()->name,
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->regionHiddenAz->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetPrivateAvailabilityZoneAsNonAdmin()
@@ -173,7 +173,7 @@ class GetTest extends TestCase
         $this->get('/v2/availability-zones/' . $this->availabilityZone()->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testGetCollectionNonAdminPropertiesHidden()
@@ -184,17 +184,17 @@ class GetTest extends TestCase
         $this->get('/v2/availability-zones', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZone()->id,
             'code' => $this->availabilityZone()->code,
             'name' => $this->availabilityZone()->name,
             'datacentre_site_id' => $this->availabilityZone()->datacentre_site_id,
             'region_id' => $this->availabilityZone()->region_id
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->regionHiddenAz->id,
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'is_public' => true
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetItemDetailNonAdminPropertiesHidden()
@@ -205,37 +205,37 @@ class GetTest extends TestCase
         $this->get('/v2/availability-zones/' . $this->availabilityZone()->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZone()->id,
             'code' => $this->availabilityZone()->code,
             'name' => $this->availabilityZone()->name,
             'datacentre_site_id' => $this->availabilityZone()->datacentre_site_id,
             'region_id' => $this->availabilityZone()->region_id
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'is_public' => true
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->regionHiddenAz->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetCapacities()
     {
-        $availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
+        $availabilityZoneCapacity = AvailabilityZoneCapacity::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id
         ]);
 
         $this->get('/v2/availability-zones/' . $this->availabilityZone()->id . '/capacities', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $availabilityZoneCapacity->id,
             'availability_zone_id' => $this->availabilityZone()->id,
             'type' => $availabilityZoneCapacity->type,
             'alert_warning' => $availabilityZoneCapacity->alert_warning,
             'alert_critical' => $availabilityZoneCapacity->alert_critical,
             'max' => $availabilityZoneCapacity->max
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->regionHiddenAz->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }
