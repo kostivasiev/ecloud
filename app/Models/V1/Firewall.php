@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use UKFast\Api\Resource\Property\IdProperty;
 use UKFast\Api\Resource\Property\IntProperty;
@@ -14,6 +15,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class Firewall extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     /**
      * The table associated with the model.
      *

@@ -3,6 +3,7 @@
 namespace App\Models\V1;
 
 use App\Traits\V1\UUIDHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\DB\Ditto\Factories\FilterFactory;
@@ -13,8 +14,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class PublicSupport extends Model implements Filterable, Sortable
 {
-    use SoftDeletes;
-    use UUIDHelper;
+    use SoftDeletes, UUIDHelper, HasFactory;
 
     /**
      * Eloquent configuration

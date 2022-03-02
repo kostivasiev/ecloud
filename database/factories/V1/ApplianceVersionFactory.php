@@ -1,13 +1,20 @@
 <?php
+namespace Database\Factories\V1;
 
-/**
- * Factory for Appliance Versions
- */
+use App\Models\V1\ApplianceVersion;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-use Ramsey\Uuid\Uuid;
+class ApplianceVersionFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = ApplianceVersion::class;
 
-$factory->define(App\Models\V1\ApplianceVersion::class, function (Faker\Generator $faker) {
-    $script_template = <<<'EOM'
+    protected string $script_template = <<<'EOM'
 mysql -e "UPDATE mysql.user SET password=PASSWORD('{{{ mysql_root_password }}}') WHERE User='root';"
 mysql -e "CREATE DATABASE wordpress;"
 mysql -e "CREATE USER wordpressuser@localhost IDENTIFIED BY '{{{ mysql_wordpress_user_password }}}';"
@@ -47,15 +54,21 @@ sed -i "/'LOGGED_IN_SALT'/c\define('LOGGED_IN_SALT',   '$LOGGED_IN_SALT');" /var
 sed -i "/'NONCE_SALT'/c\define('NONCE_SALT',       '$NONCE_SALT');" /var/www/html/wp-config.php
 EOM;
 
-    $data = [
-        'appliance_version_uuid' => Uuid::uuid4()->toString(),
-        //'appliance_version_appliance_id' => '',
-        //'appliance_version_version' => '',
-        'appliance_version_script_template' => $script_template,
-        'appliance_version_vm_template' => 'centos7-wordpress-v1.0.0',
-        'appliance_version_server_license_id' => 258,
-        'appliance_version_active' => 'Yes'
-    ];
-
-    return $data;
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'appliance_version_uuid' => Str::uuid(),
+            //'appliance_version_appliance_id' => '',
+            //'appliance_version_version' => '',
+            'appliance_version_script_template' => $this->script_template,
+            'appliance_version_vm_template' => 'centos7-wordpress-v1.0.0',
+            'appliance_version_server_license_id' => 258,
+            'appliance_version_active' => 'Yes'
+        ];
+    }
+}

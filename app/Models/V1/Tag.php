@@ -2,6 +2,7 @@
 
 namespace App\Models\V1;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use UKFast\Api\Resource\Property\DateTimeProperty;
 use UKFast\Api\Resource\Property\IdProperty;
@@ -15,6 +16,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class Tag extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     const KEY_FORMAT_DESC = 'alphanumeric characters and hyphens';
     const KEY_FORMAT_REGEX = '^[a-z0-9]+(?:-[a-z0-9]+)*$';
 

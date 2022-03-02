@@ -1,10 +1,31 @@
 <?php
+namespace Database\Factories\V1;
 
-$factory->define(\App\Models\V1\VolumeSet::class, function (Faker\Generator $faker) {
-    return [
-        'uuid' => $faker->uuid(),
-        'name' => $faker->name(),
-        'ucs_reseller_id' => 1,
-        'max_iops' => 500
-    ];
-});
+use App\Models\V1\VolumeSet;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+
+class VolumeSetFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = VolumeSet::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'uuid' => Str::uuid(),
+            'name' => $this->faker->name(),
+            'ucs_reseller_id' => 1,
+            'max_iops' => 500
+        ];
+    }
+}

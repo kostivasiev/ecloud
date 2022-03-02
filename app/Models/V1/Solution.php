@@ -4,6 +4,7 @@ namespace App\Models\V1;
 
 use App\Exceptions\V1\KingpinException;
 use App\Solution\EncryptionBillingType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -20,6 +21,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class Solution extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     const NAME_FORMAT_DESC = 'Alphanumeric, spaces, hyphens and underscores';
     const NAME_FORMAT_REGEX = '^[A-Za-z0-9\-\_\ \.]+$';
 

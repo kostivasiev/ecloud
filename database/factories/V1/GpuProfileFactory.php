@@ -1,17 +1,18 @@
 <?php
 namespace Database\Factories\V1;
 
-use App\Models\V1\Storage;
+use App\Models\V1\GpuProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
-class StorageFactory extends Factory
+class GpuProfileFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = Storage::class;
+    protected $model = GpuProfile::class;
 
     /**
      * Define the model's default state.
@@ -21,9 +22,10 @@ class StorageFactory extends Factory
     public function definition()
     {
         return [
-            'ucs_datacentre_id' => 1,
-            'server_id' => 1,
-            'qos_enabled' => 'No',
+            'uuid' => Str::uuid(),
+            'name' => $this->faker->word(),
+            'profile_name' => 'grid_v100d-32q',
+            'card_type' => 'v100'
         ];
     }
 }
