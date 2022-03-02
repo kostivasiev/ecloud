@@ -154,7 +154,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->firewallPolicy) {
             Model::withoutEvents(function () use ($id) {
-                $this->firewallPolicy = factory(FirewallPolicy::class)->create([
+                $this->firewallPolicy = FirewallPolicy::factory()->create([
                     'id' => $id,
                     'router_id' => $this->router()->id,
                 ]);
@@ -183,7 +183,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->networkPolicy) {
             Model::withoutEvents(function () use ($id) {
-                $this->networkPolicy = factory(NetworkPolicy::class)->create([
+                $this->networkPolicy = NetworkPolicy::factory()->create([
                     'id' => $id,
                     'network_id' => $this->network()->id,
                 ]);
@@ -196,7 +196,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->routerThroughput) {
             Model::withoutEvents(function () {
-                $this->routerThroughput = factory(RouterThroughput::class)->create([
+                $this->routerThroughput = RouterThroughput::factory()->create([
                     'id' => 'rtp-test',
                     'committed_bandwidth' => '1024',
                     'availability_zone_id' => $this->availabilityZone()->id
@@ -210,7 +210,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->router) {
             Model::withoutEvents(function () {
-                $this->router = factory(Router::class)->create([
+                $this->router = Router::factory()->create([
                     'id' => 'rtr-test',
                     'vpc_id' => $this->vpc()->id,
                     'availability_zone_id' => $this->availabilityZone()->id,
@@ -225,7 +225,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->managementRouter) {
             Model::withoutEvents(function () {
-                $this->managementRouter = factory(Router::class)->create([
+                $this->managementRouter = Router::factory()->create([
                     'id' => 'rtr-managementtest',
                     'vpc_id' => $this->vpc()->id,
                     'availability_zone_id' => $this->availabilityZone()->id,
@@ -254,7 +254,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->dhcp) {
             Model::withoutEvents(function () {
-                $this->dhcp = factory(Dhcp::class)->create([
+                $this->dhcp = Dhcp::factory()->create([
                     'id' => 'dhcp-test',
                     'vpc_id' => $this->vpc()->id,
                     'availability_zone_id' => $this->availabilityZone()->id,
@@ -301,7 +301,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->instance) {
             Instance::withoutEvents(function () {
-                $this->instance = factory(Instance::class)->create([
+                $this->instance = Instance::factory()->create([
                     'id' => 'i-test',
                     'vpc_id' => $this->vpc()->id,
                     'name' => 'Test Instance ' . uniqid(),
@@ -327,7 +327,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->nic) {
             Nic::withoutEvents(function () {
-                $this->nic = factory(Nic::class)->create([
+                $this->nic = Nic::factory()->create([
                     'id' => 'nic-test',
                     'mac_address' => 'AA:BB:CC:DD:EE:FF',
                     'instance_id' => $this->instanceModel()->id,
@@ -344,7 +344,7 @@ abstract class TestCase extends BaseTestCase
     public function image()
     {
         if (!$this->image) {
-            $this->image = factory(Image::class)->create([
+            $this->image = Image::factory()->create([
                 'id' => 'img-test',
                 'vpc_id' => $this->vpc()->id,
             ]);
@@ -355,7 +355,7 @@ abstract class TestCase extends BaseTestCase
     public function imageParameter()
     {
         if (!$this->imageParameter) {
-            $this->imageParameter = factory(ImageParameter::class)->make([
+            $this->imageParameter = ImageParameter::factory()->make([
                 'id' => 'iparam-test'
             ]);
             $this->image()->imageParameters()->save($this->imageParameter);
@@ -366,7 +366,7 @@ abstract class TestCase extends BaseTestCase
     public function imageMetadata()
     {
         if (!$this->imageMetadata) {
-            $this->imageMetadata = factory(ImageMetadata::class)->make([
+            $this->imageMetadata = ImageMetadata::factory()->make([
                 'id' => 'imgmeta-test'
             ]);
             $this->image()->imageMetadata()->save($this->imageMetadata);
@@ -378,7 +378,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->network) {
             Model::withoutEvents(function () {
-                $this->network = factory(Network::class)->create([
+                $this->network = Network::factory()->create([
                     'id' => 'net-test',
                     'name' => 'Manchester Network',
                     'subnet' => '10.0.0.0/24',
@@ -393,7 +393,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->managementNetwork) {
             Model::withoutEvents(function () {
-                $this->managementNetwork = factory(Network::class)->create([
+                $this->managementNetwork = Network::factory()->create([
                     'id' => 'net-managementtest',
                     'name' => 'Management Manchester Network',
                     'subnet' => '192.168.8.0/28',
@@ -408,7 +408,7 @@ abstract class TestCase extends BaseTestCase
     {
         if (!$this->hostGroup) {
             $this->hostGroup = Model::withoutEvents(function () {
-                return factory(HostGroup::class)->create([
+                return HostGroup::factory()->create([
                     'id' => 'hg-test',
                     'name' => 'hg-test',
                     'vpc_id' => $this->vpc()->id,
@@ -424,7 +424,7 @@ abstract class TestCase extends BaseTestCase
     public function floatingIp()
     {
         if (!$this->floatingIp) {
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -510,7 +510,7 @@ abstract class TestCase extends BaseTestCase
     public function hostSpec()
     {
         if (!$this->hostSpec) {
-            $this->hostSpec = factory(HostSpec::class)->create([
+            $this->hostSpec = HostSpec::factory()->create([
                 'id' => 'hs-test',
             ]);
         }
@@ -520,14 +520,14 @@ abstract class TestCase extends BaseTestCase
     public function artisanServiceMock()
     {
         if (!$this->artisanServiceMock) {
-            factory(Credential::class)->create([
+            Credential::factory()->create([
                 'id' => 'cred-3par',
                 'name' => '3PAR',
                 'username' => config('artisan.user'),
                 'resource_id' => $this->availabilityZone()->id,
             ]);
 
-            factory(Credential::class)->create([
+            Credential::factory()->create([
                 'id' => 'cred-artisan',
                 'name' => 'Artisan API',
                 'username' => config('artisan.san_user'),
@@ -545,14 +545,14 @@ abstract class TestCase extends BaseTestCase
     public function conjurerServiceMock()
     {
         if (!$this->conjurerServiceMock) {
-            factory(Credential::class)->create([
+            Credential::factory()->create([
                 'id' => 'cred-ucs',
                 'name' => 'UCS API',
                 'username' => config('conjurer.ucs_user'),
                 'resource_id' => $this->availabilityZone()->id,
             ]);
 
-            factory(Credential::class)->create([
+            Credential::factory()->create([
                 'id' => 'cred-conjurer',
                 'name' => 'Conjurer API',
                 'username' => config('conjurer.user'),
