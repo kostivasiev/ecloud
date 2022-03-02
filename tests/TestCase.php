@@ -24,6 +24,7 @@ use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
+use App\Providers\EncryptionServiceProvider;
 use App\Services\AccountsService;
 use App\Services\V2\ArtisanService;
 use App\Services\V2\ConjurerService;
@@ -285,12 +286,12 @@ abstract class TestCase extends BaseTestCase
     public function availabilityZone()
     {
         if (!$this->availabilityZone) {
-            $this->availabilityZone = factory(AvailabilityZone::class)->create([
+            $this->availabilityZone = AvailabilityZone::factory()->create([
                 'id' => 'az-test',
                 'region_id' => $this->region()->id,
             ]);
 
-            factory(Credential::class)->create([
+            Credential::factory()->create([
                 'id' => 'cred-lbnats',
                 'name' => 'LB Nats Server',
                 'resource_id'=> $this->availabilityZone->id,
@@ -612,7 +613,7 @@ abstract class TestCase extends BaseTestCase
     public function kingpinServiceMock()
     {
         if (!$this->kingpinServiceMock) {
-            factory(Credential::class)->create([
+            Credential::factory()->create([
                 'id' => 'cred-kingpin',
                 'name' => 'kingpinapi',
                 'resource_id' => $this->availabilityZone()->id,
