@@ -27,24 +27,24 @@ class GetTest extends TestCase
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->floatingIp = FloatingIp::withoutEvents(function () {
-            return factory(FloatingIp::class)->create([
+            return FloatingIp::factory()->create([
                 'id' => 'fip-abc123xyz',
             ]);
         });
-        $this->vpnService = factory(VpnService::class)->create([
+        $this->vpnService = VpnService::factory()->create([
             'router_id' => $this->router()->id,
         ]);
 
-        $this->vpnEndpoint = factory(VpnEndpoint::class)->create();
+        $this->vpnEndpoint = VpnEndpoint::factory()->create();
         $this->floatingIp->resource()->associate($this->vpnEndpoint);
         $this->floatingIp->save();
 
-        $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+        $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz',
         ]);
-        $this->vpnSession = factory(VpnSession::class)->create(
+        $this->vpnSession = VpnSession::factory()->create(
             [
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => $this->vpnService->id,
@@ -67,7 +67,7 @@ class GetTest extends TestCase
             'type' => VpnSessionNetwork::TYPE_REMOTE,
             'ip_address' => '127.1.1.1/32',
         ]);
-        $this->credential = factory(Credential::class)->create([
+        $this->credential = Credential::factory()->create([
             'resource_id' => $this->vpnSession->id,
             'username' => VpnSession::CREDENTIAL_PSK_USERNAME
         ]);
@@ -76,12 +76,12 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get('/v2/vpn-sessions')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'id' => $this->vpnSession->id,
                     'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 
     public function testGetResource()
@@ -95,23 +95,23 @@ class GetTest extends TestCase
             });
 
         $this->get('/v2/vpn-sessions/' . $this->vpnSession->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'id' => $this->vpnSession->id,
                     'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 
     public function testGetPreSharedKeySucceedsWhenExists()
     {
         $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/pre-shared-key')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'psk' => 'somepassword',
                 ]
             )
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetPreSharedKey404WhenNotExist()
@@ -119,6 +119,6 @@ class GetTest extends TestCase
         $this->credential->delete();
 
         $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/pre-shared-key')
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 }

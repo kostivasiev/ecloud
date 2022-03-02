@@ -27,23 +27,23 @@ class DeleteTest extends TestCase
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->floatingIp = FloatingIp::withoutEvents(function () {
-            return factory(FloatingIp::class)->create([
+            return FloatingIp::factory()->create([
                 'id' => 'fip-abc123xyz',
             ]);
         });
-        $this->vpnService = factory(VpnService::class)->create([
+        $this->vpnService = VpnService::factory()->create([
             'router_id' => $this->router()->id,
         ]);
 
-        $this->vpnEndpoint = factory(VpnEndpoint::class)->create();
+        $this->vpnEndpoint = VpnEndpoint::factory()->create();
         $this->floatingIp->resource()->associate($this->vpnEndpoint);
         $this->floatingIp->save();
 
-        $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+        $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz'
         ]);
-        $this->vpnSession = factory(VpnSession::class)->create(
+        $this->vpnSession = VpnSession::factory()->create(
             [
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => $this->vpnService->id,
@@ -73,7 +73,7 @@ class DeleteTest extends TestCase
         Event::fake(Created::class);
 
         $this->delete('/v2/vpn-sessions/' . $this->vpnSession->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         Event::assertDispatched(Created::class);
     }

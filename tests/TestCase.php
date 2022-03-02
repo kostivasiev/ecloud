@@ -34,6 +34,7 @@ use App\Support\Sync;
 use GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Foundation\Application;
@@ -43,7 +44,8 @@ abstract class TestCase extends BaseTestCase
 {
     use CreatesApplication,
         ResellerDatabaseMigrations,
-        Mocks\Host\Mocks;
+        Mocks\Host\Mocks,
+        InteractsWithDatabase;
 
     /**
      * @deprecated use $this->be();

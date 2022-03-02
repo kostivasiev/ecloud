@@ -27,24 +27,24 @@ class UpdateTest extends TestCase
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->floatingIp = FloatingIp::withoutEvents(function () {
-            return factory(FloatingIp::class)->create([
+            return FloatingIp::factory()->create([
                 'id' => 'fip-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
             ]);
         });
-        $this->vpnService = factory(VpnService::class)->create([
+        $this->vpnService = VpnService::factory()->create([
             'router_id' => $this->router()->id,
         ]);
 
-        $this->vpnEndpoint = factory(VpnEndpoint::class)->create();
+        $this->vpnEndpoint = VpnEndpoint::factory()->create();
         $this->floatingIp->resource()->associate($this->vpnEndpoint);
         $this->floatingIp->save();
 
-        $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+        $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz',
         ]);
-        $this->vpnSession = factory(VpnSession::class)->create(
+        $this->vpnSession = VpnSession::factory()->create(
             [
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'vpn_service_id' => $this->vpnService->id,
@@ -79,11 +79,12 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/vpn-sessions/' . $this->vpnSession->id,
             $data
-        )->seeInDatabase(
+        )->assertStatus(202);
+        $this->assertDatabaseHas(
             'vpn_sessions',
             $data,
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(Created::class);
     }
@@ -95,9 +96,9 @@ class UpdateTest extends TestCase
             [
                 'remote_ip' => 'INVALID_IP',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The remote ip must be a valid IPv4 address',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testUpdateResourceInvalidRemoteAndLocalNetworks()
@@ -108,11 +109,11 @@ class UpdateTest extends TestCase
                 'remote_networks' => 'INVALID_IP',
                 'local_networks' => 'INVALID_IP',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The remote networks must contain a valid comma separated list of CIDR subnets',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'detail' => 'The local networks must contain a valid comma separated list of CIDR subnets',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testUpdateWithMaxLocalNetworksFails()
@@ -124,10 +125,10 @@ class UpdateTest extends TestCase
             [
                 'local_networks' => '10.0.0.1/32,10.0.0.2/32,10.0.0.3/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'local networks must contain less than 2 comma-seperated items',
             'source' => 'local_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testUpdateWithMaxRemoteNetworksFails()
@@ -139,9 +140,9 @@ class UpdateTest extends TestCase
             [
                 'remote_networks' => '172.12.23.11/32,72.12.23.12/32,72.12.23.13/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'remote networks must contain less than 2 comma-seperated items',
             'source' => 'remote_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }
