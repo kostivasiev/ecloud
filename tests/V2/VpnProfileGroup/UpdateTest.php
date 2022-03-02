@@ -13,7 +13,7 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+        $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'name' => 'Profile Group Name',
             'description' => 'VPN Profile Group Description',
             'availability_zone_id' => $this->availabilityZone()->id,
@@ -33,12 +33,12 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/vpn-profile-groups/' . $this->vpnProfileGroup->id,
             $this->data,
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
             ]
-        )->assertResponseStatus(401);
+        )->assertStatus(401);
     }
 
     public function testUpdateResourceAsAdmin()
@@ -50,11 +50,12 @@ class UpdateTest extends TestCase
         $this->patch(
             '/v2/vpn-profile-groups/' . $this->vpnProfileGroup->id,
             $this->data,
-        )->seeInDatabase(
+        )->assertStatus(200);
+        $this->assertDatabaseHas(
             'vpn_profile_groups',
             array_merge(['id' => $this->vpnProfileGroup->id], $this->data),
             'ecloud'
-        )->assertResponseStatus(200);
+        );
     }
 
 }
