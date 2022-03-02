@@ -14,7 +14,7 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
+        $this->orchestratorConfig = OrchestratorConfig::factory()->create();
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
     }
 
@@ -68,7 +68,7 @@ class GetTest extends TestCase
 
     public function testGetBuildsAdminSucceeds()
     {
-        $this->orchestratorBuild = factory(OrchestratorBuild::class)->make();
+        $this->orchestratorBuild = OrchestratorBuild::factory()->make();
         $this->orchestratorBuild->orchestratorConfig()->associate($this->orchestratorConfig);
         $this->orchestratorBuild->save();
 

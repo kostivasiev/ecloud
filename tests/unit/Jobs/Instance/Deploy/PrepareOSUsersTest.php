@@ -2,23 +2,11 @@
 
 namespace Tests\unit\Jobs\Instance\Deploy;
 
-use App\Events\V2\Task\Created;
-use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
-use App\Jobs\Network\Deploy;
-use App\Jobs\Network\DeployDiscoveryProfile;
-use App\Models\V2\Instance;
-use App\Models\V2\Router;
 use App\Models\V2\SshKeyPair;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Queue;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class PrepareOSUsersTest extends TestCase

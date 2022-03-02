@@ -11,7 +11,6 @@ use Tests\TestCase;
 
 class MigratePublicTest extends TestCase
 {
-
     private $task;
 
     public function setUp(): void

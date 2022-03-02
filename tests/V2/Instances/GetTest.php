@@ -41,7 +41,7 @@ class GetTest extends TestCase
 
     public function testCantSeeHiddenResource()
     {
-        $hidden = factory(Instance::class)->create([
+        $hidden = Instance::factory()->create([
             'is_hidden' => true,
             'vpc_id' => $this->vpc()->id,
         ]);

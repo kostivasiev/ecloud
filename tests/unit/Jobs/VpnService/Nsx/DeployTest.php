@@ -1,5 +1,5 @@
 <?php
-namespace Jobs\VpnService\Nsx;
+namespace Tests\unit\Jobs\VpnService\Nsx;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\VpnService\Nsx\Deploy;

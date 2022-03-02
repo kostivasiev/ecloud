@@ -74,7 +74,7 @@ class UpdateBillingTest extends TestCase
     {
         $this->hostGroup();
 
-        $billingMetric = factory(BillingMetric::class)->create([
+        $billingMetric = BillingMetric::factory()->create([
             'resource_id' => $this->vpnSession()->id,
             'key' => 'vpn.session.ipsec',
             'value' => 1,

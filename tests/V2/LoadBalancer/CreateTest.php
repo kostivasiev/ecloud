@@ -25,7 +25,7 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $managementRouter = Model::withoutEvents(function () {
-            return factory(Router::class)->create([
+            return Router::factory()->create([
                 'id' => 'rtr-mgmt',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -35,7 +35,7 @@ class CreateTest extends TestCase
         });
 
         Model::withoutEvents(function () use ($managementRouter) {
-            return factory(Network::class)->create([
+            return Network::factory()->create([
                 'id' => 'net-mgmt',
                 'name' => 'Manchester Network',
                 'subnet' => '10.0.0.0/24',

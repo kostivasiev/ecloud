@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
+use App\Models\V2\Host;
 
 class DeleteTest extends TestCase
 {
@@ -87,7 +88,7 @@ class DeleteTest extends TestCase
 
         // First add another host to make sure we have enough resource
         $host = Model::withoutEvents(function () {
-            return factory(\App\Models\V2\Host::class)->create([
+            return Host::factory()->create([
                 'id' => 'additional-host',
                 'name' => 'additional-host',
                 'host_group_id' => $this->hostGroup()->id,

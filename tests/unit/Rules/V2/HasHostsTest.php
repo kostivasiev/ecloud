@@ -20,7 +20,7 @@ class HasHostsTest extends TestCase
     public function testWithoutHostsFails()
     {
         $hostGroup = HostGroup::withoutEvents(function () {
-            return factory(HostGroup::class)->create([
+            return HostGroup::factory()->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
                 'vpc_id' => $this->vpc()->id,
@@ -40,7 +40,7 @@ class HasHostsTest extends TestCase
     public function testWithHostsPasses()
     {
         $hostGroup = HostGroup::withoutEvents(function () {
-            return factory(HostGroup::class)->create([
+            return HostGroup::factory()->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
                 'vpc_id' => $this->vpc()->id,
@@ -51,7 +51,7 @@ class HasHostsTest extends TestCase
         });
 
         Host::withoutEvents(function () use ($hostGroup) {
-            return factory(\App\Models\V2\Host::class)->create([
+            return Host::factory()->create([
                 'id' => 'h-test',
                 'name' => 'h-test',
                 'host_group_id' => $hostGroup->id,

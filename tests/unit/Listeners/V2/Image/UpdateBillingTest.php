@@ -62,7 +62,7 @@ class UpdateBillingTest extends TestCase
     public function testUpdateBilling()
     {
         // metrics created on deploy
-        $originalImageMetric = factory(BillingMetric::class)->create([
+        $originalImageMetric = BillingMetric::factory()->create([
             'id' => 'bm-test1',
             'resource_id' => $this->image->id,
             'vpc_id' => $this->vpc()->id,
@@ -99,7 +99,7 @@ class UpdateBillingTest extends TestCase
     public function testEndBillingOnDelete()
     {
         // metrics created on deploy
-        $originalImageMetric = factory(BillingMetric::class)->create([
+        $originalImageMetric = BillingMetric::factory()->create([
             'id' => 'bm-test1',
             'resource_id' => $this->image->id,
             'vpc_id' => $this->vpc()->id,

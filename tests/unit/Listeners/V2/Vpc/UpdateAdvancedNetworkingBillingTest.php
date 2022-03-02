@@ -71,7 +71,7 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
     public function testResizeInstanceUpdatesAdvancedNetworkingBillingMetric()
     {
         $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
-        $originalMetric = factory(BillingMetric::class)->create([
+        $originalMetric = BillingMetric::factory()->create([
             'id' => 'bm-test',
             'resource_id' => $this->vpc()->id,
             'vpc_id' => $this->vpc()->id,
@@ -108,13 +108,13 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
     {
         $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
         $instance = Instance::withoutEvents(function () {
-            factory(Instance::class)->create([
+            Instance::factory()->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'ram_capacity' => 1024,
             ]);
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -122,7 +122,7 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
             ]);
         });
 
-        $originalMetric = factory(BillingMetric::class)->create([
+        $originalMetric = BillingMetric::factory()->create([
             'id' => 'bm-test',
             'resource_id' => $this->vpc()->id,
             'vpc_id' => $this->vpc()->id,
@@ -157,14 +157,14 @@ class UpdateAdvancedNetworkingBillingTest extends TestCase
     {
         $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
         $instance = Instance::withoutEvents(function () {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'ram_capacity' => 1024,
             ]);
         });
 
-        $originalMetric = factory(BillingMetric::class)->create([
+        $originalMetric = BillingMetric::factory()->create([
             'id' => 'bm-test',
             'resource_id' => $this->vpc()->id,
             'vpc_id' => $this->vpc()->id,

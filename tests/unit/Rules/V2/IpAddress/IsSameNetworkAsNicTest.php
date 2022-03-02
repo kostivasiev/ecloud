@@ -11,7 +11,7 @@ use Tests\TestCase;
 class IsSameNetworkAsNicTest extends TestCase
 {
     public function testIpNotSameNetworkAsNicFails() {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'id' => 'net-test-2',
             'router_id' => $this->router()->id
         ]);

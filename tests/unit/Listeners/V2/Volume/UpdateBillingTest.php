@@ -106,7 +106,7 @@ class UpdateBillingTest extends TestCase
                 'availability_zone_id' => $this->availabilityZone()->id
             ]);
 
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'image_id' => $this->image()->id,
@@ -135,7 +135,7 @@ class UpdateBillingTest extends TestCase
                 'iops' => 600
             ]);
 
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'image_id' => $this->image()->id,
@@ -157,7 +157,7 @@ class UpdateBillingTest extends TestCase
 
     public function testAttachedVolumeNewIopsExistingMetric()
     {
-        $originalBilling = factory(BillingMetric::class)->create([
+        $originalBilling = BillingMetric::factory()->create([
             'id' => 'bm-test',
             'resource_id' => 'vol-abc123xyz',
             'vpc_id' => 'vpc-test',
@@ -179,7 +179,7 @@ class UpdateBillingTest extends TestCase
                 'iops' => 600
             ]);
 
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
                 'image_id' => $this->image()->id,

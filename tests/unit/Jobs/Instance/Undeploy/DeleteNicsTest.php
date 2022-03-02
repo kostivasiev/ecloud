@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteNicsTest extends TestCase
@@ -26,7 +25,7 @@ class DeleteNicsTest extends TestCase
     public function testJobSucceedsWithNoNics()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
         });

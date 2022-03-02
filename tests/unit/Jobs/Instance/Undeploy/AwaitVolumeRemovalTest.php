@@ -2,10 +2,8 @@
 
 namespace Tests\unit\Jobs\Instance\Undeploy;
 
-use App\Jobs\Instance\Undeploy\AwaitNicRemoval;
 use App\Jobs\Instance\Undeploy\AwaitVolumeRemoval;
 use App\Models\V2\Instance;
-use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Support\Sync;
@@ -13,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AwaitVolumeRemovalTest extends TestCase
@@ -29,7 +26,7 @@ class AwaitVolumeRemovalTest extends TestCase
     public function testJobSucceedsWithNoVolumes()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
         });
@@ -47,7 +44,7 @@ class AwaitVolumeRemovalTest extends TestCase
     public function testJobFailedWhenVolumeSyncFailed()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
             $this->volume = $this->instance->volumes()->create([
@@ -77,7 +74,7 @@ class AwaitVolumeRemovalTest extends TestCase
     public function testJobReleasedWhenNicSyncInProgress()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
             $this->volume = $this->instance->volumes()->create([

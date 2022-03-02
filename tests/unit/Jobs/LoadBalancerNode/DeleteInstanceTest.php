@@ -4,12 +4,9 @@ namespace Tests\unit\Jobs\LoadBalancerNode;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancerNode\DeleteInstance;
-use App\Models\V2\Task;
 use App\Support\Sync;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 use function dispatch;

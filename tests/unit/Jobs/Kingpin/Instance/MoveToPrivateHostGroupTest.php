@@ -3,7 +3,6 @@
 namespace Tests\unit\Jobs\Kingpin\Instance;
 
 use App\Jobs\Kingpin\Instance\MoveToPrivateHostGroup;
-use App\Jobs\Kingpin\Instance\MoveToPublicHostGroup;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;

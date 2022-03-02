@@ -21,7 +21,7 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->loadBalancer = factory(LoadBalancer::class)->create([
+        $this->loadBalancer = LoadBalancer::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id
         ]);

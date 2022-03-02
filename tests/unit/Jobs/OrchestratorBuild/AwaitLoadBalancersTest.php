@@ -24,8 +24,8 @@ class AwaitLoadBalancersTest extends TestCase
         parent::setUp();
         $this->availabilityZone();
 
-        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
-        $this->orchestratorBuild = factory(OrchestratorBuild::class)->make();
+        $this->orchestratorConfig = OrchestratorConfig::factory()->create();
+        $this->orchestratorBuild = OrchestratorBuild::factory()->make();
         $this->orchestratorBuild->orchestratorConfig()->associate($this->orchestratorConfig);
         $this->orchestratorBuild->save();
     }

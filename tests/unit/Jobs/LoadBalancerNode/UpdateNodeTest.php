@@ -65,13 +65,13 @@ class UpdateNodeTest extends TestCase
     {
         $job = new UpdateNode($this->createSyncUpdateTask($this->loadBalancerNode()));
 
-        $nic = factory(Nic::class)->create([
+        $nic = Nic::factory()->create([
             'id' => 'nic-' . uniqid(),
             'mac_address' => 'AA:AA:AA:AA:AA:AA',
-            'network_id' => factory(Network::class)->create([
+            'network_id' => Network::factory()->create([
                 'id' => 'net-' . uniqid(),
                 'subnet' => '10.0.0.0/24',
-                'router_id' => factory(Router::class)->create([
+                'router_id' => Router::factory()->create([
                     'id' => 'rtr-' . uniqid(),
                     'vpc_id' => $this->vpc()->id,
                     'availability_zone_id' => $this->availabilityZone()->id,

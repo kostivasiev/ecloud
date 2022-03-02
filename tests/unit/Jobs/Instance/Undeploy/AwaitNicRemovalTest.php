@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AwaitNicRemovalTest extends TestCase
@@ -27,7 +26,7 @@ class AwaitNicRemovalTest extends TestCase
     public function testJobSucceedsWithNoNics()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
         });
@@ -45,7 +44,7 @@ class AwaitNicRemovalTest extends TestCase
     public function testJobFailedWhenNicSyncFailed()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
             $this->nic = $this->instance->nics()->create([
@@ -74,7 +73,7 @@ class AwaitNicRemovalTest extends TestCase
     public function testJobReleasedWhenNicSyncInProgress()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
             $this->nic = $this->instance->nics()->create([

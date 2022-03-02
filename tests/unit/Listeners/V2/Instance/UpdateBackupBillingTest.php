@@ -61,7 +61,7 @@ class UpdateBackupBillingTest extends TestCase
 
     public function testDisableBackupUpdatesBillingMetrics()
     {
-        $billingMetric = factory(BillingMetric::class)->create([
+        $billingMetric = BillingMetric::factory()->create([
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'backup.quota',
@@ -123,7 +123,7 @@ class UpdateBackupBillingTest extends TestCase
 
     public function testResizingVolumeEndsExistingBillingMetric()
     {
-        $metric = factory(BillingMetric::class)->create([
+        $metric = BillingMetric::factory()->create([
             'resource_id' => $this->volume->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'disk.capacity.300',

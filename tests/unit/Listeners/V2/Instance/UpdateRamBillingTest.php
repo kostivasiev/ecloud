@@ -113,7 +113,7 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceResizedStandardTierBilling()
     {
-        $originalRamMetric = factory(BillingMetric::class)->create([
+        $originalRamMetric = BillingMetric::factory()->create([
             'id' => 'bm-test2',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -148,7 +148,7 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceResizedToHighTierBilling()
     {
-        $originalRamMetric = factory(BillingMetric::class)->create([
+        $originalRamMetric = BillingMetric::factory()->create([
             'id' => 'bm-test2',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -180,7 +180,7 @@ class UpdateRamBillingTest extends TestCase
 
     public function testInstanceResizedToStandardTierBillingFromHigh()
     {
-        $originalStandardMetric = factory(BillingMetric::class)->create([
+        $originalStandardMetric = BillingMetric::factory()->create([
             'id' => 'bm-' . uniqid(),
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -189,7 +189,7 @@ class UpdateRamBillingTest extends TestCase
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
 
-        $originalHighMetric = factory(BillingMetric::class)->create([
+        $originalHighMetric = BillingMetric::factory()->create([
             'id' => 'bm-' . uniqid(),
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,

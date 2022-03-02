@@ -43,7 +43,7 @@ class UpdateWindowsLicenseBillingTest extends TestCase
 
     public function testUpdateWindowsLicenseChangeBilling()
     {
-        $originalVcpuMetric = factory(BillingMetric::class)->create([
+        $originalVcpuMetric = BillingMetric::factory()->create([
             'id' => 'bm-test1',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,

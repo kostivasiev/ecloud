@@ -20,7 +20,7 @@ class EndComputeBillingTest extends TestCase
 
     public function testEndComputeBillingJob()
     {
-        $originalVcpuMetric = factory(BillingMetric::class)->create([
+        $originalVcpuMetric = BillingMetric::factory()->create([
             'id' => 'bm-test1',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -28,7 +28,7 @@ class EndComputeBillingTest extends TestCase
             'value' => 1,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
-        $originalRamMetric = factory(BillingMetric::class)->create([
+        $originalRamMetric = BillingMetric::factory()->create([
             'id' => 'bm-test2',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -57,7 +57,7 @@ class EndComputeBillingTest extends TestCase
     public function testEndComputeOnlyUpdatesActiveResources()
     {
         $endDate = '2020-12-31T22:22:22+0:00';
-        $originalVcpuMetric = factory(BillingMetric::class)->create([
+        $originalVcpuMetric = BillingMetric::factory()->create([
             'id' => 'bm-test1',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -65,7 +65,7 @@ class EndComputeBillingTest extends TestCase
             'value' => 1,
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
-        $originalRamMetric = factory(BillingMetric::class)->create([
+        $originalRamMetric = BillingMetric::factory()->create([
             'id' => 'bm-test2',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -74,7 +74,7 @@ class EndComputeBillingTest extends TestCase
             'start' => '2020-07-07T10:30:00+01:00',
         ]);
 
-        $endedVcpuMetric = factory(BillingMetric::class)->create([
+        $endedVcpuMetric = BillingMetric::factory()->create([
             'id' => 'bm-test-end1',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -83,7 +83,7 @@ class EndComputeBillingTest extends TestCase
             'start' => '2020-07-07T10:30:00+01:00',
             'end' => $endDate,
         ]);
-        $endedRamMetric = factory(BillingMetric::class)->create([
+        $endedRamMetric = BillingMetric::factory()->create([
             'id' => 'bm-test-end2',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,

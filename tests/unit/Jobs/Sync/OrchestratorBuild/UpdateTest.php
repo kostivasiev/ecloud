@@ -13,7 +13,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-
     private $task;
 
     public function setUp(): void
@@ -25,11 +24,11 @@ class UpdateTest extends TestCase
     {
         Model::withoutEvents(function() {
 
-            $orchestratorConfig = factory(OrchestratorConfig::class)->create([
+            $orchestratorConfig = OrchestratorConfig::factory()->create([
                 'id' => 'oconf-test'
             ]);
 
-            $orchestratorBuild = factory(OrchestratorBuild::class)->make();
+            $orchestratorBuild = OrchestratorBuild::factory()->make();
             $orchestratorBuild->id = 'obuild-test';
             $orchestratorBuild->orchestratorConfig()->associate($orchestratorConfig);
             $orchestratorBuild->save();

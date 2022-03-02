@@ -24,7 +24,7 @@ class HasAvailableInstancesTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         Instance::withoutEvents(function () {
-            factory(Instance::class)->create([
+            Instance::factory()->create([
                 'id' => 'i-test',
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),

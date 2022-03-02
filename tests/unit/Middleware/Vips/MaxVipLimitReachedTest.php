@@ -83,7 +83,7 @@ class MaxVipLimitReachedTest extends TestCase
     {
         $network = Model::withoutEvents(function () {
             $id = $this->getId('net');
-            return factory(Network::class)->create([
+            return Network::factory()->create([
                 'id' => $id,
                 'name' => $id,
                 'subnet' => long2ip(rand(0, 4294967295)) . '/24',

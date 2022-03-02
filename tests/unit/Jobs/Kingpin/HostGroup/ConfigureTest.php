@@ -20,7 +20,7 @@ class ConfigureTest extends TestCase
     {
         parent::setUp();
 
-        $this->hostGroup = factory(HostGroup::class)->create([
+        $this->hostGroup = HostGroup::factory()->create([
             'id' => 'hg-test',
             'name' => 'hg-test',
             'vpc_id' => $this->vpc()->id,

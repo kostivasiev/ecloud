@@ -38,7 +38,7 @@ class ResourceTest extends TestCase
                 'id' => 'vpc-test1',
                 'region_id' => $this->region->id,
             ]);
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test1',
                 'availability_zone_id' => $this->availability_zone->id,
                 'vpc_id' => $this->vpc->id,

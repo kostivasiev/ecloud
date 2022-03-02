@@ -25,7 +25,7 @@ class DeleteVolumesTest extends TestCase
     public function testJobSucceedsWithNoVolumes()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
         });
@@ -43,7 +43,7 @@ class DeleteVolumesTest extends TestCase
     public function testDeletesOSVolume()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
             $this->volume = Volume::factory()->create([
@@ -68,7 +68,7 @@ class DeleteVolumesTest extends TestCase
     public function testDetachesDataVolume()
     {
         Model::withoutEvents(function() {
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test1',
             ]);
             $this->volume = Volume::factory()->create([

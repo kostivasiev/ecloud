@@ -59,7 +59,7 @@ class UpdateLicenseBillingTest extends TestCase
         });
 
         // add iimage metadata for ukfast.license.type = 'plesk'
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'key' => 'ukfast.license.type',
             'value' => 'plesk',
             'image_id' => $this->image()->id

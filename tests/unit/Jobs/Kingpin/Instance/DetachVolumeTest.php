@@ -2,12 +2,10 @@
 
 namespace Tests\unit\Jobs\Kingpin\Instance;
 
-use App\Jobs\Kingpin\Instance\AttachVolume;
 use App\Jobs\Kingpin\Instance\DetachVolume;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 

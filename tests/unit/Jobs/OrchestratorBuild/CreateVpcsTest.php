@@ -22,9 +22,9 @@ class CreateVpcsTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
+        $this->orchestratorConfig = OrchestratorConfig::factory()->create();
 
-        $this->orchestratorBuild = factory(OrchestratorBuild::class)->make();
+        $this->orchestratorBuild = OrchestratorBuild::factory()->make();
         $this->orchestratorBuild->orchestratorConfig()->associate($this->orchestratorConfig);
         $this->orchestratorBuild->save();
     }

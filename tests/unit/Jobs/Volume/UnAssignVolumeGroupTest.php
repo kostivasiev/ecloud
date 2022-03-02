@@ -8,7 +8,6 @@ use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Log;
 use Tests\Mocks\Resources\VolumeGroupMock;
 use Tests\Mocks\Resources\VolumeMock;
 use Tests\TestCase;

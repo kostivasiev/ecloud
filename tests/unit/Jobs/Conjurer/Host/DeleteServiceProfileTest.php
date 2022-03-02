@@ -28,14 +28,14 @@ class DeleteServiceProfileTest extends TestCase
         parent::setUp();
 
         $this->host = Host::withoutEvents(function () {
-            $hostGroup = factory(HostGroup::class)->create([
+            $hostGroup = HostGroup::factory()->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'host_spec_id' => $this->hostSpec()->id,
             ]);
-            return factory(Host::class)->create([
+            return Host::factory()->create([
                 'id' => 'h-test',
                 'name' => 'h-test',
                 'host_group_id' => $hostGroup->id,

@@ -21,7 +21,7 @@ trait LoadBalancerMock
     {
         if (!isset($this->loadBalancerSpecification)) {
             Model::withoutEvents(function () use ($id) {
-                $this->loadBalancerSpecification = factory(LoadBalancerSpecification::class)->create([
+                $this->loadBalancerSpecification = LoadBalancerSpecification::factory()->create([
                     'id' => $id,
                     'name' => 'medium',
                 ]);
@@ -34,7 +34,7 @@ trait LoadBalancerMock
     {
         if (!isset($this->loadBalancer)) {
             Model::withoutEvents(function () use ($id) {
-                $this->loadBalancer = factory(LoadBalancer::class)->create([
+                $this->loadBalancer = LoadBalancer::factory()->create([
                     'id' => $id,
                     'name' => $id,
                     'availability_zone_id' => $this->availabilityZone()->id,
@@ -50,7 +50,7 @@ trait LoadBalancerMock
     {
         if (!isset($this->loadBalancerInstance)) {
             Model::withoutEvents(function () use ($id) {
-                $this->loadBalancerInstance = factory(Instance::class)->create([
+                $this->loadBalancerInstance = Instance::factory()->create([
                     'id' => $id,
                     'vpc_id' => $this->vpc()->id,
                     'name' => 'Load Balancer ' . uniqid(),
@@ -76,7 +76,7 @@ trait LoadBalancerMock
     {
         if (!isset($this->loadBalancerNode)) {
             Model::withoutEvents(function () use ($id) {
-                $this->loadBalancerNode = factory(LoadBalancerNode::class)->create([
+                $this->loadBalancerNode = LoadBalancerNode::factory()->create([
                     'id' => $id,
                     'instance_id' => $this->loadBalancerInstance()->id,
                     'load_balancer_id' => $this->loadBalancer()->id,

@@ -14,7 +14,7 @@ class DeployTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
+        $this->orchestratorConfig = OrchestratorConfig::factory()->create();
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
     }
 

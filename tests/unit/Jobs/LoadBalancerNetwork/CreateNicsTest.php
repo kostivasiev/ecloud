@@ -114,7 +114,7 @@ class CreateNicsTest extends TestCase
     public function testInstanceHasNicOnSameNetworkSkips()
     {
         Nic::withoutEvents(function () {
-            $nic = factory(Nic::class)->create([
+            $nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'mac_address' => 'AA:BB:CC:DD:EE:FF',
             ]);
@@ -142,7 +142,7 @@ class CreateNicsTest extends TestCase
         Event::fake([JobFailed::class, Created::class]);
 
         $network = Model::withoutEvents(function () {
-            return factory(Network::class)->create([
+            return Network::factory()->create([
                 'id' => 'net-abc',
                 'subnet' => '10.0.0.0/24',
                 'router_id' => $this->router()->id
@@ -150,7 +150,7 @@ class CreateNicsTest extends TestCase
         });
 
         Nic::withoutEvents(function () use ($network) {
-            $nic = factory(Nic::class)->create([
+            $nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'mac_address' => 'AA:BB:CC:DD:EE:FF',
             ]);

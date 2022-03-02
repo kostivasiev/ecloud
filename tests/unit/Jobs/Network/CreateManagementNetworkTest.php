@@ -22,7 +22,7 @@ class CreateManagementNetworkTest extends TestCase
         parent::setUp();
 
         Model::withoutEvents(function () {
-            $this->managementRouter = factory(Router::class)->create([
+            $this->managementRouter = Router::factory()->create([
                 'id' => 'rtr-mgttest',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

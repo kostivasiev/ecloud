@@ -29,19 +29,19 @@ class UniqueSubnetPerRouterTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
-        $this->router = factory(Router::class)->create([
+        $this->router = Router::factory()->create([
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id,
         ]);
-        $this->router2 = factory(Router::class)->create([
+        $this->router2 = Router::factory()->create([
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id,
         ]);
-        $this->network = factory(Network::class)->create([
+        $this->network = Network::factory()->create([
             'router_id' => $this->router->id,
             'subnet' => '10.0.0.1/30',
         ]);
-        $this->network2 = factory(Network::class)->create([
+        $this->network2 = Network::factory()->create([
             'router_id' => $this->router->id,
             'subnet' => '10.0.0.2/30',
         ]);

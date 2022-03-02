@@ -7,7 +7,6 @@ use App\Models\V2\HostGroup;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class RemoveFromNsGroupsTest extends TestCase
@@ -20,7 +19,7 @@ class RemoveFromNsGroupsTest extends TestCase
     {
         parent::setUp();
 
-        $hostGroup = factory(HostGroup::class)->create([
+        $hostGroup = HostGroup::factory()->create([
             'id' => 'hg-test',
             'name' => 'hg-test',
             'vpc_id' => $this->vpc()->id,
@@ -28,7 +27,7 @@ class RemoveFromNsGroupsTest extends TestCase
             'host_spec_id' => $this->hostSpec()->id,
         ]);
 
-        $this->host = factory(Host::class)->create([
+        $this->host = Host::factory()->create([
             'id' => 'h-test',
             'name' => 'h-test',
             'host_group_id' => $hostGroup->id,

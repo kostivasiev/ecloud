@@ -2,9 +2,7 @@
 namespace Tests\unit\Jobs\Vpc;
 
 use App\Jobs\Vpc\RemoveVPCFolder;
-use App\Models\V2\Region;
 use App\Models\V2\Task;
-use App\Models\V2\Vpc;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;

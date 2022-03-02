@@ -18,7 +18,7 @@ class UpdateTest extends TestCase
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        $this->networkRule = factory(NetworkRule::class)->make([
+        $this->networkRule = NetworkRule::factory()->make([
             'id' => 'nr-test-1',
             'name' => 'nr-test-1',
         ]);

@@ -61,7 +61,7 @@ class ScheduledDeployTest extends TestCase
 
     public function testWithConfigs()
     {
-        $orchestratorConfig = factory(OrchestratorConfig::class)->create([
+        $orchestratorConfig = OrchestratorConfig::factory()->create([
             'deploy_on' => $this->now,
         ]);
         Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations Start');
@@ -72,7 +72,7 @@ class ScheduledDeployTest extends TestCase
 
     public function testWithConfigNotDue()
     {
-        factory(OrchestratorConfig::class)->create([
+        OrchestratorConfig::factory()->create([
             'deploy_on' => Carbon::createFromTimeString('2031-07-02 13:40:00')
         ]);
         Log::shouldReceive('info')->withSomeOfArgs('Processing Orchestrations Start');

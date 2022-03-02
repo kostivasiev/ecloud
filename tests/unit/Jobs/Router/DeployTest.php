@@ -3,17 +3,14 @@
 namespace Tests\unit\Jobs\Router;
 
 use App\Jobs\Router\Deploy;
-use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Support\Sync;
-use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeployTest extends TestCase

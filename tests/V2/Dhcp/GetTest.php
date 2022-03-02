@@ -19,7 +19,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
         Model::withoutEvents(function() {
-            $this->dhcp = factory(Dhcp::class)->create([
+            $this->dhcp = Dhcp::factory()->create([
                 'id' => 'dhcp-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

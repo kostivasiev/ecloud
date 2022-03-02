@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class CreateImageTest extends TestCase
 {
-
     private $task;
 
     public function setUp(): void

@@ -38,7 +38,7 @@ class DeleteTest extends TestCase
             'region_id' => $this->region->id
         ]);
 
-        $this->loadBalancer = factory(LoadBalancer::class)->create([
+        $this->loadBalancer = LoadBalancer::factory()->create([
             'availability_zone_id' => $this->availabilityZone->id,
             'vpc_id' => $this->vpc->id
         ]);

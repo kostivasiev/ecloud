@@ -8,7 +8,6 @@ use App\Models\V2\Instance;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use phpseclib3\Exception\InsufficientSetupException;
 use Tests\TestCase;
 
 class CreateFloatingIpTest extends TestCase
@@ -30,7 +29,7 @@ class CreateFloatingIpTest extends TestCase
         Event::fake([JobFailed::class]);
 
         $instance = Instance::withoutEvents(function() {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-test',
                 'vpc_id' => $this->vpc()->id,
                 'deploy_data' => [
@@ -50,7 +49,7 @@ class CreateFloatingIpTest extends TestCase
 
         // Bind and return test ID on creation
         app()->bind(FloatingIp::class, function () {
-            return factory(FloatingIp::class)->make([
+            return FloatingIp::factory()->make([
                 'id' => 'fip-test',
             ]);
         });

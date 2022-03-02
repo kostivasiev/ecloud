@@ -22,7 +22,7 @@ class CreateInstancesTest extends TestCase
     {
         parent::setUp();
         (new SoftwareSeeder())->run();
-        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create([
+        $this->orchestratorConfig = OrchestratorConfig::factory()->create([
             'data' => json_encode([
                 'instances' => [
                     [
@@ -53,7 +53,7 @@ class CreateInstancesTest extends TestCase
             ])
         ]);
 
-        $this->orchestratorBuild = factory(OrchestratorBuild::class)->make();
+        $this->orchestratorBuild = OrchestratorBuild::factory()->make();
         $this->orchestratorBuild->orchestratorConfig()->associate($this->orchestratorConfig);
         $this->orchestratorBuild->save();
 

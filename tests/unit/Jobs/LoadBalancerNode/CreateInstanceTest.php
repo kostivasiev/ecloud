@@ -3,7 +3,6 @@
 namespace Tests\unit\Jobs\LoadBalancerNode;
 
 use App\Jobs\LoadBalancerNode\CreateInstance;
-use App\Jobs\LoadBalancerNode\RegisterNode;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Tests\Mocks\Resources\LoadBalancerMock;
