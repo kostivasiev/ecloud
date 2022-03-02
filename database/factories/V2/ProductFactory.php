@@ -1,16 +1,33 @@
 <?php
+namespace Database\Factories\V2;
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+use App\Models\V2\Product;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
+class ProductFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Product::class;
 
-$factory->define(\App\Models\V2\Product::class, function () {
-    return [
-        'product_name' => 'az-aaaaaaaa: vcpu-1',
-        'product_category' => 'eCloud',
-        'product_subcategory' => 'Compute',
-        'product_supplier' => 'UKFast',
-        'product_active' => 'Yes',
-        'product_duration_type' => 'Hour',
-        'product_cost_price' => 0.00
-    ];
-});
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'product_name' => 'az-aaaaaaaa: vcpu-1',
+            'product_category' => 'eCloud',
+            'product_subcategory' => 'Compute',
+            'product_supplier' => 'UKFast',
+            'product_active' => 'Yes',
+            'product_duration_type' => 'Hour',
+            'product_cost_price' => 0.00
+        ];
+    }
+}

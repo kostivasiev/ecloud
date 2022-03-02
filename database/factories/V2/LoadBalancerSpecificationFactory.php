@@ -1,11 +1,25 @@
 <?php
-
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories\V2;
 
 use App\Models\V2\LoadBalancerSpecification;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(LoadBalancerSpecification::class, function () {
+class LoadBalancerSpecificationFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = LoadBalancerSpecification::class;
 
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
         return [
             'name' => 'medium',
             'description' => 'HA load balancer, suitable for large sites with notable amounts of daily traffic.',
@@ -16,4 +30,5 @@ $factory->define(LoadBalancerSpecification::class, function () {
             'iops' => 300,
             'image_id' => 'img-test',
         ];
-});
+    }
+}

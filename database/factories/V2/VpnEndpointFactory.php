@@ -1,11 +1,27 @@
 <?php
-
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories\V2;
 
 use App\Models\V2\VpnEndpoint;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(VpnEndpoint::class, function () {
-    return [
-        'name' => 'Endpoint Name',
-    ];
-});
+class VpnEndpointFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = VpnEndpoint::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => 'Endpoint Name',
+        ];
+    }
+}

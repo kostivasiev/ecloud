@@ -1,12 +1,29 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories\V2;
 
 use App\Models\V2\ImageMetadata;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(ImageMetadata::class, function () {
-    return [
-        'key' => 'test.key',
-        'value' => 'test.value',
-    ];
-});
+class ImageMetadataFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = ImageMetadata::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition(): array
+    {
+        return [
+            'key' => 'test.key',
+            'value' => 'test.value',
+        ];
+    }
+}

@@ -1,11 +1,27 @@
 <?php
-
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories\V2;
 
 use App\Models\V2\VpnSession;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(VpnSession::class, function () {
-    return [
-        'remote_ip' => '218.16.12.11',
-    ];
-});
+class VpnSessionFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = VpnSession::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'remote_ip' => '218.16.12.11',
+        ];
+    }
+}
