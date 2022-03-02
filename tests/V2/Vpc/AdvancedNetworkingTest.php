@@ -24,11 +24,11 @@ class AdvancedNetworkingTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->get(
             '/v2/vpcs'
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'advanced_networking' => true,
             ]
-        )->assertResponseStatus(200);
+        )->assertStatus(200);
     }
 
     /**
@@ -39,11 +39,11 @@ class AdvancedNetworkingTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->get(
             '/v2/vpcs/' . $this->vpc()->id
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'advanced_networking' => true,
             ]
-        )->assertResponseStatus(200);
+        )->assertStatus(200);
     }
 
     /**
@@ -54,11 +54,11 @@ class AdvancedNetworkingTest extends TestCase
         Event::fake(Created::class);
 
         app()->bind(Vpc::class, function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-test2',
             ]);
         });
-        $this->post(
+        $response = $this->post(
             '/v2/vpcs',
             [
                 'name' => 'CreateTest Name',
@@ -71,9 +71,9 @@ class AdvancedNetworkingTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
                 'X-reseller-id' => 1,
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
-        $vpc = Vpc::findOrFail(json_decode($this->response->getContent())->data->id);
+        $vpc = Vpc::findOrFail(json_decode($response->getContent())->data->id);
         $this->assertTrue(is_bool($vpc->advanced_networking));
         $this->assertTrue($vpc->advanced_networking);
     }

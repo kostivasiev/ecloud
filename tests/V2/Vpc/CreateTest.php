@@ -26,12 +26,12 @@ class CreateTest extends TestCase
             $data,
             []
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ])
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 
     public function testNullRegionIsFailed()
@@ -48,13 +48,13 @@ class CreateTest extends TestCase
                 'X-Reseller-Id' => 1,
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The region id field is required',
                 'status' => 422,
                 'source' => 'region_id'
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testNotScopedFails()
@@ -72,12 +72,12 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Bad Request',
                 'detail' => 'Missing Reseller scope',
                 'status' => 400,
             ])
-            ->assertResponseStatus(400);
+            ->assertStatus(400);
     }
 
     public function testNoAdminFailsWhenConsoleIsSet()
@@ -95,20 +95,20 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Forbidden',
                 'details' => 'Console access cannot be modified',
                 'status' => 403
             ]
-        )->assertResponseStatus(403);
+        )->assertStatus(403);
     }
 
     public function testExceedMaxVpcLimit()
     {
         config(['defaults.vpc.max_count' => 10]);
         $counter = 1;
-        factory(Vpc::class, (int) config('defaults.vpc.max_count'))
+        Vpc::factory((int) config('defaults.vpc.max_count'))
             ->make([
                 'reseller_id' => 1,
                 'region_id' => $this->region()->id,
@@ -133,12 +133,12 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The maximum number of ' . config('defaults.vpc.max_count') . ' VPCs has been reached',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testSupportEnabled()
@@ -161,7 +161,7 @@ class CreateTest extends TestCase
         Event::fake(Created::class);
 
         app()->bind(Vpc::class, function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-test2'
             ]);
         });
@@ -173,7 +173,7 @@ class CreateTest extends TestCase
                 'region_id' => $this->region()->id,
                 'support_enabled' => true,
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
         $vpc = Vpc::findOrFail('vpc-test2');
 

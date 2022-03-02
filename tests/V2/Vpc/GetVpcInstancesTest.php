@@ -24,12 +24,12 @@ class GetVpcInstancesTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id'       => $instance->id,
                 'name'     => $instance->name,
                 'vpc_id'   => $instance->vpc_id,
                 'platform' => $instance->platform,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

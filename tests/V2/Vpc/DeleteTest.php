@@ -15,11 +15,12 @@ class DeleteTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $this->delete('/v2/vpcs/' . $this->vpc()->id)->seeJson([
-            'title' => 'Unauthorized',
-            'detail' => 'Unauthorized',
-            'status' => 401,
-        ])->assertResponseStatus(401);
+        $this->delete('/v2/vpcs/' . $this->vpc()->id)
+            ->assertJsonFragment([
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
+                'status' => 401,
+            ])->assertStatus(401);
     }
 
     public function testFailInvalidId()
@@ -27,11 +28,11 @@ class DeleteTest extends TestCase
         $this->delete('/v2/vpcs/x', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Not found',
             'detail' => 'No Vpc with that ID was found',
             'status' => 404,
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testNonMatchingResellerIdFails()
@@ -43,11 +44,11 @@ class DeleteTest extends TestCase
         $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Not found',
             'detail' => 'No Vpc with that ID was found',
             'status' => 404,
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testDeleteVpcWithResourcesFails()
@@ -56,11 +57,11 @@ class DeleteTest extends TestCase
         $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Precondition Failed',
             'detail' => 'The specified resource has dependant relationships and cannot be deleted',
             'status' => 412,
-        ])->assertResponseStatus(412);
+        ])->assertStatus(412);
     }
 
     public function testDeleteVpcWithManagementResourceDoesNotFail()
@@ -70,7 +71,7 @@ class DeleteTest extends TestCase
         $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
     }
 
     public function testSuccessfulDelete()
@@ -80,7 +81,7 @@ class DeleteTest extends TestCase
         $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
     }
 
     public function testDeletionFailsIfVpcHasHostGroup()
@@ -89,12 +90,12 @@ class DeleteTest extends TestCase
         $this->delete('/v2/vpcs/' . $this->vpc()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Precondition Failed',
                 'detail' => 'The specified resource has dependant relationships and cannot be deleted',
                 'status' => 412,
             ]
-        )->assertResponseStatus(412);
+        )->assertStatus(412);
     }
 }
