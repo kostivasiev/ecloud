@@ -35,7 +35,7 @@ class VolumeAttachTest extends TestCase
                     'volume_id' => $volume->id,
                 ]
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         Bus::fake();

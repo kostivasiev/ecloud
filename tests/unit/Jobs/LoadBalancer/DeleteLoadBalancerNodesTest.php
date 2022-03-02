@@ -21,7 +21,7 @@ class DeleteLoadBalancerNodesTest extends TestCase
         $this->loadBalancerNode()
             ->setAttribute('node_id', 123456)
             ->saveQuietly();
-        $this->loadBalancerNode()->instance()->associate($this->instance());
+        $this->loadBalancerNode()->instance()->associate($this->instanceModel());
 
         $task = Model::withoutEvents(function () {
             $task = new Task([

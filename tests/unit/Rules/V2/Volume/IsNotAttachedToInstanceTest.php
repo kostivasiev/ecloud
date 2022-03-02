@@ -40,7 +40,7 @@ class IsNotAttachedToInstanceTest extends TestCase
             'vpc_id' => $this->vpc()->id,
         ]);
 
-        $volume->instances()->attach($this->instance());
+        $volume->instances()->attach($this->instanceModel());
 
         $rule = new IsNotAttachedToInstance($volume->id);
 

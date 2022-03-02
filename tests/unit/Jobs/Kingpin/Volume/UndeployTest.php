@@ -61,7 +61,7 @@ class UndeployTest extends TestCase
                 'vmware_uuid' => 'uuid-test-uuid-test-uuid-test',
             ]);
 
-            $this->instance()->volumes()->attach($this->volume);
+            $this->instanceModel()->volumes()->attach($this->volume);
         });
 
         $this->expectException(\Exception::class);

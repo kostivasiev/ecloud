@@ -27,7 +27,7 @@ class IsMaxInstanceForVpcTest extends TestCase
     public function testValidationFails()
     {
         // Use the instance
-        $instance = $this->instance();
+        $instance = $this->instanceModel();
         $this->assertFalse($this->validationRule->passes('vpc_id', $instance->vpc->id));
     }
 

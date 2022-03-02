@@ -22,7 +22,7 @@ class HiddenInstanceVolumesTest extends TestCase
     public function testVolumeAttachedToNormalInstanceVisible()
     {
         $this->be($this->consumer);
-        $this->volume()->instances()->attach($this->instance());
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes')
             ->seeJson([
                 'id' => $this->volume()->id,
@@ -32,8 +32,8 @@ class HiddenInstanceVolumesTest extends TestCase
     public function testVolumeAttachedToHiddenInstanceHidden()
     {
         $this->be($this->consumer);
-        $this->instance()->setAttribute('is_hidden', true)->saveQuietly();
-        $this->volume()->instances()->attach($this->instance());
+        $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes')
             ->dontSeeJson([
                 'id' => $this->volume()->id,
@@ -43,7 +43,7 @@ class HiddenInstanceVolumesTest extends TestCase
     public function testVpcVolumesEndpointShowsVisibleVolumes()
     {
         $this->be($this->consumer);
-        $this->volume()->instances()->attach($this->instance());
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/vpcs/' . $this->vpc()->id . '/volumes')
             ->seeJson([
                 'id' => $this->volume()->id,
@@ -53,8 +53,8 @@ class HiddenInstanceVolumesTest extends TestCase
     public function testVpcVolumesEndpointHidesHiddenVolumes()
     {
         $this->be($this->consumer);
-        $this->instance()->setAttribute('is_hidden', true)->saveQuietly();
-        $this->volume()->instances()->attach($this->instance());
+        $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/vpcs/' . $this->vpc()->id . '/volumes')
             ->dontSeeJson([
                 'id' => $this->volume()->id,
@@ -64,8 +64,8 @@ class HiddenInstanceVolumesTest extends TestCase
     public function testInstanceVolumesEndpointShowsVisibleVolumes()
     {
         $this->be($this->consumer);
-        $this->volume()->instances()->attach($this->instance());
-        $this->get('/v2/instances/' . $this->instance()->id . '/volumes')
+        $this->volume()->instances()->attach($this->instanceModel());
+        $this->get('/v2/instances/' . $this->instanceModel()->id . '/volumes')
             ->seeJson([
                 'id' => $this->volume()->id,
             ])->assertResponseOK();
@@ -75,27 +75,27 @@ class HiddenInstanceVolumesTest extends TestCase
     public function testInstanceVolumesEndpointHidesHiddenVolumes()
     {
         $this->be($this->consumer);
-        $this->instance()->setAttribute('is_hidden', true)->saveQuietly();
-        $this->volume()->instances()->attach($this->instance());
-        $this->get('/v2/instances/' . $this->instance()->id . '/volumes')
+        $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->volume()->instances()->attach($this->instanceModel());
+        $this->get('/v2/instances/' . $this->instanceModel()->id . '/volumes')
             ->assertResponseStatus(404);
     }
 
     public function testVolumeVisibleInstance()
     {
         $this->be($this->consumer);
-        $this->volume()->instances()->attach($this->instance());
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes/' . $this->volume()->id . '/instances')
             ->seeJson([
-                'id' => $this->instance()->id,
+                'id' => $this->instanceModel()->id,
             ])->assertResponseOk();
     }
 
     public function testVolumeInstancesHidden()
     {
         $this->be($this->consumer);
-        $this->instance()->setAttribute('is_hidden', true)->saveQuietly();
-        $this->volume()->instances()->attach($this->instance());
+        $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes/' . $this->volume()->id . '/instances')
             ->assertResponseStatus(404);
     }
@@ -104,7 +104,7 @@ class HiddenInstanceVolumesTest extends TestCase
     {
         $this->be($this->consumer);
         $task = $this->createSyncUpdateTask($this->volume());
-        $this->volume()->instances()->attach($this->instance());
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes/' . $this->volume()->id . '/tasks')
             ->seeJson([
                 'id' => $task->id,
@@ -115,8 +115,8 @@ class HiddenInstanceVolumesTest extends TestCase
     {
         $this->be($this->consumer);
         $task = $this->createSyncUpdateTask($this->volume());
-        $this->instance()->setAttribute('is_hidden', true)->saveQuietly();
-        $this->volume()->instances()->attach($this->instance());
+        $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes/' . $this->volume()->id . '/tasks')
             ->assertResponseStatus(404);
     }
@@ -124,7 +124,7 @@ class HiddenInstanceVolumesTest extends TestCase
     public function testVolumeVisibleVolumeGroups()
     {
         $this->be($this->consumer);
-        $this->volume()->instances()->attach($this->instance());
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->volume()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
         $this->get('/v2/volume-groups/' . $this->volumeGroup()->id . '/volumes')
             ->seeJson([
@@ -135,8 +135,8 @@ class HiddenInstanceVolumesTest extends TestCase
     public function testVolumeHiddenVolumeGroups()
     {
         $this->be($this->consumer);
-        $this->instance()->setAttribute('is_hidden', true)->saveQuietly();
-        $this->volume()->instances()->attach($this->instance());
+        $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->volume()->instances()->attach($this->instanceModel());
         $this->volume()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
         $this->get('/v2/volume-groups/' . $this->volumeGroup()->id . '/volumes')
             ->dontSeeJson([

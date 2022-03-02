@@ -30,7 +30,7 @@ class DetachVolumeTest extends TestCase
             'capacity' => 30
         ]);
 
-        $this->instance()->volumes()->attach($volume);
+        $this->instanceModel()->volumes()->attach($volume);
 
         $this->kingpinServiceMock()->expects('get')
             ->withArgs([
@@ -56,11 +56,11 @@ class DetachVolumeTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DetachVolume($this->instance(), $volume));
+        dispatch(new DetachVolume($this->instanceModel(), $volume));
 
         Event::assertNotDispatched(JobFailed::class);
 
-        $this->assertEquals(0, $this->instance()->volumes()->count());
+        $this->assertEquals(0, $this->instanceModel()->volumes()->count());
     }
 
     public function testVolumeAlreadyDetachedSkips()
@@ -73,7 +73,7 @@ class DetachVolumeTest extends TestCase
             'capacity' => 30
         ]);
 
-        $this->instance()->volumes()->attach($volume);
+        $this->instanceModel()->volumes()->attach($volume);
 
         $this->kingpinServiceMock()->expects('get')
             ->withArgs([
@@ -87,11 +87,11 @@ class DetachVolumeTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new DetachVolume($this->instance(), $volume));
+        dispatch(new DetachVolume($this->instanceModel(), $volume));
 
         Event::assertNotDispatched(JobFailed::class);
 
-        $this->assertEquals(0, $this->instance()->volumes()->count());
+        $this->assertEquals(0, $this->instanceModel()->volumes()->count());
     }
 
     public function testRetrieveInstanceInvalidJsonThrowsException()
@@ -104,7 +104,7 @@ class DetachVolumeTest extends TestCase
             'capacity' => 30
         ]);
 
-        $this->instance()->volumes()->attach($volume);
+        $this->instanceModel()->volumes()->attach($volume);
 
         $this->kingpinServiceMock()->expects('get')
             ->withArgs([
@@ -116,6 +116,6 @@ class DetachVolumeTest extends TestCase
 
         $this->expectExceptionMessage('Failed to retrieve instance i-test from Kingpin, invalid JSON');
 
-        dispatch(new DetachVolume($this->instance(), $volume));
+        dispatch(new DetachVolume($this->instanceModel(), $volume));
     }
 }

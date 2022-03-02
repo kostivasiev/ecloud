@@ -33,7 +33,7 @@ class RunApplianceBootstrapTest extends TestCase
             '{{{ plesk_admin_email_address }}} {{{ plesk_admin_password }}}'
         )->save();
 
-        $this->instance()->setAttribute('deploy_data', [
+        $this->instanceModel()->setAttribute('deploy_data', [
             'image_data' => [
                 'plesk_admin_email_address' => 'elmer.fudd@example.com'
             ]
@@ -45,7 +45,7 @@ class RunApplianceBootstrapTest extends TestCase
             'username' => 'root',
             'password' => 'somepassword'
         ]);
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
 
         $credential = app()->make(Credential::class);
         $credential->fill([
@@ -55,12 +55,12 @@ class RunApplianceBootstrapTest extends TestCase
             'is_hidden' => true
         ]);
 
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [
@@ -74,7 +74,7 @@ class RunApplianceBootstrapTest extends TestCase
                 return new Response(200);
             });
 
-        dispatch(new RunApplianceBootstrap($this->instance()));
+        dispatch(new RunApplianceBootstrap($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -83,14 +83,14 @@ class RunApplianceBootstrapTest extends TestCase
     {
         (new CpanelImageSeeder())->run();
 
-        $this->instance()
+        $this->instanceModel()
             ->setAttribute('image_id', 'img-cpanel')
             ->setAttribute('deploy_data', [
                 'floating_ip_id' => $this->floatingIp()->id,
             ])
             ->save();
 
-        $this->instance()->image->setAttribute(
+        $this->instanceModel()->image->setAttribute(
             'script_template',
             'ARG_HOSTNAME="{{cpanel_hostname}}"'
         )->save();
@@ -101,12 +101,12 @@ class RunApplianceBootstrapTest extends TestCase
             'username' => 'root',
             'password' => 'somepassword'
         ]);
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [
@@ -120,7 +120,7 @@ class RunApplianceBootstrapTest extends TestCase
                 return new Response(200);
             });
 
-        dispatch(new RunApplianceBootstrap($this->instance()));
+        dispatch(new RunApplianceBootstrap($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -129,7 +129,7 @@ class RunApplianceBootstrapTest extends TestCase
     {
         (new CpanelImageSeeder())->run();
 
-        $this->instance()
+        $this->instanceModel()
             ->setAttribute('image_id', 'img-cpanel')
             ->setAttribute('deploy_data', [
                 'floating_ip_id' => $this->floatingIp()->id,
@@ -139,7 +139,7 @@ class RunApplianceBootstrapTest extends TestCase
             ])
             ->save();
 
-        $this->instance()->image->setAttribute(
+        $this->instanceModel()->image->setAttribute(
             'script_template',
             'ARG_HOSTNAME="{{cpanel_hostname}}"'
         )->save();
@@ -150,12 +150,12 @@ class RunApplianceBootstrapTest extends TestCase
             'username' => 'root',
             'password' => 'somepassword'
         ]);
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [
@@ -169,7 +169,7 @@ class RunApplianceBootstrapTest extends TestCase
                 return new Response(200);
             });
 
-        dispatch(new RunApplianceBootstrap($this->instance()));
+        dispatch(new RunApplianceBootstrap($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -182,7 +182,7 @@ class RunApplianceBootstrapTest extends TestCase
             ->setAttribute('script_template', '{{{ plesk_admin_email_address }}}')
             ->save();
 
-        $this->instance()->setAttribute('image_id', 'img-plesk')->save();
+        $this->instanceModel()->setAttribute('image_id', 'img-plesk')->save();
 
         $credential = app()->make(Credential::class);
         $credential->fill([
@@ -190,7 +190,7 @@ class RunApplianceBootstrapTest extends TestCase
             'username' => 'root',
             'password' => 'somepassword'
         ]);
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
 
         $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
         $mockAccountAdminClient->allows('setResellerId')
@@ -223,8 +223,8 @@ class RunApplianceBootstrapTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('post')
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [
@@ -238,7 +238,7 @@ class RunApplianceBootstrapTest extends TestCase
                 return new Response(200);
             });
 
-        dispatch(new RunApplianceBootstrap($this->instance()));
+        dispatch(new RunApplianceBootstrap($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -253,9 +253,9 @@ class RunApplianceBootstrapTest extends TestCase
             'username' => 'root',
             'password' => 'somepassword'
         ]);
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
 
-        $this->instance()
+        $this->instanceModel()
             ->setAttribute('deploy_data', [
                 'image_data' => [
                     'plesk_admin_email_address' => 'elmer.fudd@example.com'
@@ -270,7 +270,7 @@ class RunApplianceBootstrapTest extends TestCase
                 return new Response(200);
             });
 
-        $job = new RunApplianceBootstrap($this->instance());
+        $job = new RunApplianceBootstrap($this->instanceModel());
         $job->handle();
 
         $this->assertTrue(isset($job->imageData['plesk_admin_password']));
@@ -283,7 +283,7 @@ class RunApplianceBootstrapTest extends TestCase
     {
         (new PleskImageSeeder())->run();
 
-        $this->instance()->credentials()->save(
+        $this->instanceModel()->credentials()->save(
             app()->make(Credential::class)
             ->fill([
                 'name' => 'root',
@@ -292,7 +292,7 @@ class RunApplianceBootstrapTest extends TestCase
             ])
         );
 
-        $this->instance()
+        $this->instanceModel()
             ->setAttribute('deploy_data', [
                 'image_data' => [
                     'plesk_admin_email_address' => 'elmer.fudd@example.com'
@@ -307,7 +307,7 @@ class RunApplianceBootstrapTest extends TestCase
                 return new Response(200);
             });
 
-        $job = new RunApplianceBootstrap($this->instance());
+        $job = new RunApplianceBootstrap($this->instanceModel());
         $job->handle();
 
         $this->assertTrue(isset($job->imageData['plesk_admin_password']));

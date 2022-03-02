@@ -33,7 +33,7 @@ class UpdateVcpuBillingTest extends TestCase
         // compute metrics created on deploy
         $originalVcpuMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test1',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'vcpu.count',
             'value' => 1,
@@ -41,7 +41,7 @@ class UpdateVcpuBillingTest extends TestCase
         ]);
 
         // Update the instance compute values
-        $this->instance()->vcpu_cores = 2;
+        $this->instanceModel()->vcpu_cores = 2;
 
         Model::withoutEvents(function () {
             $this->sync = new Task([
@@ -49,14 +49,14 @@ class UpdateVcpuBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->sync->resource()->associate($this->instance());
+            $this->sync->resource()->associate($this->instanceModel());
         });
 
         // Check that the vcpu billing metric is added
         $updateVcpuBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
         $updateVcpuBillingListener->handle(new \App\Events\V2\Task\Updated($this->sync));
 
-        $vcpuMetric = BillingMetric::getActiveByKey($this->instance(), 'vcpu.count');
+        $vcpuMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'vcpu.count');
         $this->assertNotNull($vcpuMetric);
         $this->assertEquals(2, $vcpuMetric->value);
 
@@ -68,9 +68,9 @@ class UpdateVcpuBillingTest extends TestCase
 
     public function testLoadBalancerInstancesIgnored()
     {
-        $this->instance();
+        $this->instanceModel();
 
-        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+        $this->instanceModel()->loadBalancer()->associate($this->loadBalancer())->save();
 
         $task = Model::withoutEvents(function() {
             $task = new Task([
@@ -78,14 +78,14 @@ class UpdateVcpuBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $task->resource()->associate($this->instance());
+            $task->resource()->associate($this->instanceModel());
             return $task;
         });
 
         $updateRamBillingListener = new \App\Listeners\V2\Instance\UpdateVcpuBilling();
         $updateRamBillingListener->handle(new \App\Events\V2\Task\Updated($task));
 
-        $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'vcpu.count');
+        $billingMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'vcpu.count');
 
         $this->assertNull($billingMetric);
     }

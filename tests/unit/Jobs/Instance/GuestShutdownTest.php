@@ -14,14 +14,14 @@ class GuestShutdownTest extends TestCase
     public function testGuestShutdownJob()
     {
         $this->kingpinServiceMock()->expects('put')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/power/guest/shutdown'])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id . '/power/guest/shutdown'])
             ->andReturnUsing(function () {
                 return new Response(200);
             });
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new GuestShutdown($this->instance()));
+        dispatch(new GuestShutdown($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

@@ -22,7 +22,7 @@ class EndComputeBillingTest extends TestCase
     {
         $originalVcpuMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test1',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'vcpu.count',
             'value' => 1,
@@ -30,7 +30,7 @@ class EndComputeBillingTest extends TestCase
         ]);
         $originalRamMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test2',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'ram.capacity',
             'value' => 1024,
@@ -45,7 +45,7 @@ class EndComputeBillingTest extends TestCase
                 ]))
             );
         Event::fake([JobFailed::class]);
-        dispatch(new EndComputeBilling($this->instance()));
+        dispatch(new EndComputeBilling($this->instanceModel()));
         Event::assertNotDispatched(JobFailed::class);
 
         $originalVcpuMetric->refresh();
@@ -59,7 +59,7 @@ class EndComputeBillingTest extends TestCase
         $endDate = '2020-12-31T22:22:22+0:00';
         $originalVcpuMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test1',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'vcpu.count',
             'value' => 1,
@@ -67,7 +67,7 @@ class EndComputeBillingTest extends TestCase
         ]);
         $originalRamMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test2',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'ram.capacity',
             'value' => 1024,
@@ -76,7 +76,7 @@ class EndComputeBillingTest extends TestCase
 
         $endedVcpuMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test-end1',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'vcpu.count',
             'value' => 1,
@@ -85,7 +85,7 @@ class EndComputeBillingTest extends TestCase
         ]);
         $endedRamMetric = factory(BillingMetric::class)->create([
             'id' => 'bm-test-end2',
-            'resource_id' => $this->instance()->id,
+            'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'key' => 'ram.capacity',
             'value' => 1024,
@@ -100,7 +100,7 @@ class EndComputeBillingTest extends TestCase
                 ]))
             );
         Event::fake([JobFailed::class]);
-        dispatch(new EndComputeBilling($this->instance()));
+        dispatch(new EndComputeBilling($this->instanceModel()));
         Event::assertNotDispatched(JobFailed::class);
 
         $originalVcpuMetric->refresh();

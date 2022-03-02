@@ -26,7 +26,7 @@ class IopsModificationTest extends TestCase
     {
         Event::fake([Created::class]);
 
-        $this->instance()->volumes()->attach($this->volume);
+        $this->instanceModel()->volumes()->attach($this->volume);
 
         $this->patch('/v2/volumes/' . $this->volume->id, [
             'iops' => 600,
@@ -45,7 +45,7 @@ class IopsModificationTest extends TestCase
 
     public function testSetInvalidIopsValue()
     {
-        $this->instance()->volumes()->attach($this->volume);
+        $this->instanceModel()->volumes()->attach($this->volume);
 
         $this->patch('/v2/volumes/' . $this->volume->id, [
             'iops' => 200,

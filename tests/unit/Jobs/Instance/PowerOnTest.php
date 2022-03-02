@@ -14,14 +14,14 @@ class PowerOnTest extends TestCase
     public function testPowerOnJob()
     {
         $this->kingpinServiceMock()->expects('post')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/power'])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id . '/power'])
             ->andReturnUsing(function () {
                 return new Response(200);
             });
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new PowerOn($this->instance()));
+        dispatch(new PowerOn($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

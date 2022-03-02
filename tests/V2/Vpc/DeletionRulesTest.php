@@ -10,7 +10,7 @@ class DeletionRulesTest extends TestCase
 {
     public function testFailedDeletion()
     {
-        $this->instance();
+        $this->instanceModel();
         $this->delete(
             '/v2/vpcs/' . $this->vpc()->id,
             [],

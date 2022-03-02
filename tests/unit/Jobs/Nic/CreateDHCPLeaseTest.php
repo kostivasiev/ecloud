@@ -75,7 +75,7 @@ class CreateDHCPLeaseTest extends TestCase
 
         $nic = factory(Nic::class)->create([
             'mac_address' => 'AA:BB:CC:DD:EE:FF',
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
             'network_id' => $this->network()->id,
         ]);
 
@@ -129,7 +129,7 @@ class CreateDHCPLeaseTest extends TestCase
 
         $nic = factory(Nic::class)->create([
             'mac_address' => 'AA:AA:CC:DD:EE:FF',
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
             'network_id' => $network->id,
         ]);
 
@@ -177,7 +177,7 @@ class CreateDHCPLeaseTest extends TestCase
 
         $nic = factory(Nic::class)->create([
             'mac_address' => 'AA:AA:CC:DD:EE:FF',
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
             'network_id' => $network->id,
         ]);
 

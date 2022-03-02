@@ -26,7 +26,7 @@ class GetNicsTest extends TestCase
         $this->nic();
 
         $this->get(
-            '/v2/instances/' . $this->instance()->id . '/nics',
+            '/v2/instances/' . $this->instanceModel()->id . '/nics',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups'    => 'ecloud.read',

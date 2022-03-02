@@ -31,7 +31,7 @@ class UpdateBillingTest extends TestCase
                 'availability_zone_id' => $this->availabilityZone()->id,
             ]);
 
-            $this->volume->instances()->attach($this->instance());
+            $this->volume->instances()->attach($this->instanceModel());
         });
     }
 
@@ -206,7 +206,7 @@ class UpdateBillingTest extends TestCase
 
     public function testLoadBalancerInstanceVolumesIgnored()
     {
-        $this->instance()->loadBalancer()->associate($this->loadBalancer())->save();
+        $this->instanceModel()->loadBalancer()->associate($this->loadBalancer())->save();
 
         $dispatchResourceSyncedEventListener = new \App\Listeners\V2\Volume\UpdateBilling();
         $dispatchResourceSyncedEventListener->handle(new \App\Events\V2\Task\Updated($this->volume));

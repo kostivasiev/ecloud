@@ -42,7 +42,7 @@ class CapacityChangeTest extends TestCase
             ]);
         });
 
-        $this->instance()->volumes()->attach($volume);
+        $this->instanceModel()->volumes()->attach($volume);
 
         $this->kingpinServiceMock()->expects('get')
             ->withArgs([
@@ -86,7 +86,7 @@ class CapacityChangeTest extends TestCase
             ]);
         });
 
-        $this->instance()->volumes()->attach($volume);
+        $this->instanceModel()->volumes()->attach($volume);
 
         $this->kingpinServiceMock()->expects('get')
             ->withArgs([

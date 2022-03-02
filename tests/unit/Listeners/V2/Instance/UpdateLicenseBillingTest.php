@@ -24,7 +24,7 @@ class UpdateLicenseBillingTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
@@ -68,7 +68,7 @@ class UpdateLicenseBillingTest extends TestCase
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'license.plesk');
+        $billingMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'license.plesk');
 
         $this->assertNotNull($billingMetric);
         $this->assertEquals(1, $billingMetric->value);
@@ -80,6 +80,6 @@ class UpdateLicenseBillingTest extends TestCase
         $updateLicenseBillingListener = new \App\Listeners\V2\Instance\UpdateLicenseBilling();
         $updateLicenseBillingListener->handle(new \App\Events\V2\Task\Updated($this->task));
 
-        $this->assertNull(BillingMetric::getActiveByKey($this->instance(), 'license.plesk'));
+        $this->assertNull(BillingMetric::getActiveByKey($this->instanceModel(), 'license.plesk'));
     }
 }

@@ -28,7 +28,7 @@ class UpdateBillingTest extends TestCase
         $this->instanceSoftware = InstanceSoftware::factory()->make([
             'name' => $this->software->name
         ]);
-        $this->instanceSoftware->instance()->associate($this->instance());
+        $this->instanceSoftware->instance()->associate($this->instanceModel());
         $this->instanceSoftware->software()->associate($this->software);
         $this->instanceSoftware->save();
 
@@ -81,10 +81,10 @@ class UpdateBillingTest extends TestCase
         $updateBillingListener = new \App\Listeners\V2\InstanceSoftware\UpdateBilling;
         $updateBillingListener->handle(new \App\Events\V2\Task\Updated($task));
 
-        $billingMetric = BillingMetric::getActiveByKey($this->instance(), 'software.test-software');
+        $billingMetric = BillingMetric::getActiveByKey($this->instanceModel(), 'software.test-software');
 
         $this->assertNotNull($billingMetric);
-        $this->assertEquals($this->instance()->id, $billingMetric->resource_id);
+        $this->assertEquals($this->instanceModel()->id, $billingMetric->resource_id);
         $this->assertEquals($this->vpc()->id, $billingMetric->vpc_id);
         $this->assertEquals($this->vpc()->reseller_id, $billingMetric->reseller_id);
         $this->assertEquals('Software: Test Software', $billingMetric->name);

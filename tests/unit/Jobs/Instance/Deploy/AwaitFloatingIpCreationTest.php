@@ -16,7 +16,7 @@ class AwaitFloatingIpCreationTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new AwaitFloatingIpCreation($this->instance()));
+        dispatch(new AwaitFloatingIpCreation($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {

@@ -54,7 +54,7 @@ class RevokeLicensesTest extends TestCase
             return $mockAdminLicensesClient;
         });
 
-        dispatch(new RevokeLicenses($this->instance()));
+        dispatch(new RevokeLicenses($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -70,7 +70,7 @@ class RevokeLicensesTest extends TestCase
             return $mockAdminLicensesClient;
         });
 
-        dispatch(new RevokeLicenses($this->instance()));
+        dispatch(new RevokeLicenses($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

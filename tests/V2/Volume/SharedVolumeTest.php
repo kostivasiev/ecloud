@@ -176,7 +176,7 @@ class SharedVolumeTest extends TestCase
             'vpc_id' => $this->vpc()->id,
         ]);
 
-        $volume->instances()->attach($this->instance());
+        $volume->instances()->attach($this->instanceModel());
 
         $this->patch('/v2/volumes/' . $volume->id, [
             'volume_group_id' => $this->volumeGroup()->id

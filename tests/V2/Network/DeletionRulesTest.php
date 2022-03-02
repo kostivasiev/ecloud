@@ -21,7 +21,7 @@ class DeletionRulesTest extends TestCase
             $this->nics = factory(Nic::class)->create([
                 'id' => 'nic-test',
                 'mac_address' => $this->faker->macAddress,
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
                 'ip_address' => $this->faker->ipv4,
             ]);

@@ -19,7 +19,7 @@ class UnassignFloatingIpTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new UnassignFloatingIP($this->instance()));
+        dispatch(new UnassignFloatingIP($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -34,7 +34,7 @@ class UnassignFloatingIpTest extends TestCase
         $this->floatingIp()->resource()->associate($this->nic());
         $this->floatingIp()->save();
 
-        $job = \Mockery::mock(UnassignFloatingIP::class, [$this->instance()])->makePartial();
+        $job = \Mockery::mock(UnassignFloatingIP::class, [$this->instanceModel()])->makePartial();
         $job->shouldReceive('awaitTask')->andReturn(true);
         $job->handle();
 
@@ -65,7 +65,7 @@ class UnassignFloatingIpTest extends TestCase
             return $task;
         });
 
-        dispatch(new UnassignFloatingIP($this->instance()));
+        dispatch(new UnassignFloatingIP($this->instanceModel()));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -89,7 +89,7 @@ class UnassignFloatingIpTest extends TestCase
             return $task;
         });
 
-        $job = new UnassignFloatingIP($this->instance());
+        $job = new UnassignFloatingIP($this->instanceModel());
         $job->awaitTask($task);
 
         $this->assertTrue($job->awaitTask($task));

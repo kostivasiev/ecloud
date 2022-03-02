@@ -16,14 +16,14 @@ class GuestRestartTest extends TestCase
     public function testGuestRestartJob()
     {
         $this->kingpinServiceMock()->expects('put')
-            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instance()->id . '/power/guest/restart'])
+            ->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id . '/power/guest/restart'])
             ->andReturnUsing(function () {
                 return new Response(200);
             });
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new GuestRestart($this->instance()));
+        dispatch(new GuestRestart($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

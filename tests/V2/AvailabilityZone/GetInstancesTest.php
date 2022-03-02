@@ -12,7 +12,7 @@ class GetInstancesTest extends TestCase
     {
         parent::setUp();
 
-        $this->instance();
+        $this->instanceModel();
         $this->kingpinServiceMock()->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode(['powerState' => 'poweredOn']))
         );
@@ -28,9 +28,9 @@ class GetInstancesTest extends TestCase
             ]
         )
             ->seeJson([
-                'id' => $this->instance()->id,
-                'name' => $this->instance()->name,
-                'vpc_id' => $this->instance()->vpc_id,
+                'id' => $this->instanceModel()->id,
+                'name' => $this->instanceModel()->name,
+                'vpc_id' => $this->instanceModel()->vpc_id,
                 'platform' => 'Linux',
             ])
             ->assertResponseStatus(200);

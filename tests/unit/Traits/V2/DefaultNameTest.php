@@ -14,21 +14,21 @@ class DefaultNameTest extends TestCase
 
     public function testSetsNameToIDWithNoneSet()
     {
-        $this->instance()->name = '';
+        $this->instanceModel()->name = '';
 
         $mock = $this->getMockForTrait(DefaultName::class);
-        $mock->setDefaultName($this->instance());
+        $mock->setDefaultName($this->instanceModel());
 
-        $this->assertEquals($this->instance()->id, $this->instance()->name);
+        $this->assertEquals($this->instanceModel()->id, $this->instanceModel()->name);
     }
 
     public function testAvailabilityZoneNotOverridden()
     {
-        $this->instance()->name = 'oldname';
+        $this->instanceModel()->name = 'oldname';
 
         $mock = $this->getMockForTrait(DefaultName::class);
-        $mock->setDefaultName($this->instance());
+        $mock->setDefaultName($this->instanceModel());
 
-        $this->assertEquals('oldname', $this->instance()->name);
+        $this->assertEquals('oldname', $this->instanceModel()->name);
     }
 }

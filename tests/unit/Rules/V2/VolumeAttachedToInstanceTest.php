@@ -18,9 +18,9 @@ class VolumeAttachedToInstanceTest extends TestCase
             'vpc_id' => $this->vpc()->id
         ]);
 
-        $this->instance()->volumes()->attach($volume);
+        $this->instanceModel()->volumes()->attach($volume);
 
-        $rule = new VolumeAttachedToInstance($this->instance()->id);
+        $rule = new VolumeAttachedToInstance($this->instanceModel()->id);
 
         $result = $rule->passes('volume_id', $volume->id);
 
@@ -36,7 +36,7 @@ class VolumeAttachedToInstanceTest extends TestCase
             'vpc_id' => $this->vpc()->id
         ]);
 
-        $rule = new VolumeAttachedToInstance($this->instance()->id);
+        $rule = new VolumeAttachedToInstance($this->instanceModel()->id);
 
         $result = $rule->passes('volume_id', $volume->id);
 

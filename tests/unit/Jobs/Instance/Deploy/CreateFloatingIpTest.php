@@ -17,7 +17,7 @@ class CreateFloatingIpTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new CreateFloatingIp($this->instance()));
+        dispatch(new CreateFloatingIp($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -55,14 +55,14 @@ class CreateFloatingIpTest extends TestCase
             ]);
         });
 
-        $deploy_data = $this->instance()->deploy_data;
+        $deploy_data = $this->instanceModel()->deploy_data;
         $deploy_data['requires_floating_ip'] = true;
-        $this->instance()->deploy_data = $deploy_data;
-        $this->instance()->save();
+        $this->instanceModel()->deploy_data = $deploy_data;
+        $this->instanceModel()->save();
 
         Event::fake([JobFailed::class, Created::class]);
 
-        dispatch(new CreateFloatingIp($this->instance()));
+        dispatch(new CreateFloatingIp($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -70,8 +70,8 @@ class CreateFloatingIpTest extends TestCase
             return $event->model->name == 'sync_update';
         });
 
-        $this->instance()->refresh();
+        $this->instanceModel()->refresh();
 
-        $this->assertEquals('fip-test', $this->instance()->deploy_data['floating_ip_id']);
+        $this->assertEquals('fip-test', $this->instanceModel()->deploy_data['floating_ip_id']);
     }
 }

@@ -17,10 +17,10 @@ class InstanceTest extends TestCase
     {
         Event::fake();
 
-        $this->instance()->delete();
+        $this->instanceModel()->delete();
 
         Event::assertDispatched(\App\Events\V2\Instance\Deleted::class, function ($event)  {
-            return $event->model->id === $this->instance()->id;
+            return $event->model->id === $this->instanceModel()->id;
         });
     }
 }

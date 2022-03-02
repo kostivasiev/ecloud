@@ -19,17 +19,17 @@ class IsInstanceInVolumeGroupTest extends TestCase
     /** @test */
     public function failWhenInstanceHasVolumeGroup()
     {
-        $this->instance()->volume_group_id = $this->volumeGroup()->id;
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->volume_group_id = $this->volumeGroup()->id;
+        $this->instanceModel()->saveQuietly();
 
-        $rule = new IsInstanceInVolumeGroup($this->instance()->id);
+        $rule = new IsInstanceInVolumeGroup($this->instanceModel()->id);
         $this->assertFalse($rule->passes('volume_group_id', $this->volumeGroup()->id));
     }
 
     /** @test */
     public function passWhenInstanceHasNoVolumeGroup()
     {
-        $rule = new IsInstanceInVolumeGroup($this->instance()->id);
+        $rule = new IsInstanceInVolumeGroup($this->instanceModel()->id);
         $this->assertTrue($rule->passes('volume_group_id', $this->volumeGroup()->id));
     }
 }

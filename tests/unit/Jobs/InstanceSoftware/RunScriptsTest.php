@@ -31,7 +31,7 @@ class RunScriptsTest extends TestCase
 
         $instanceSoftware = app()->make(InstanceSoftware::class);
         $instanceSoftware->name = $this->software->name;
-        $instanceSoftware->instance()->associate($this->instance());
+        $instanceSoftware->instance()->associate($this->instanceModel());
         $instanceSoftware->software()->associate($this->software);
         $instanceSoftware->save();
 
@@ -51,7 +51,7 @@ class RunScriptsTest extends TestCase
             'username' => 'root',
             'password' => 'somepassword'
         ]);
-        $this->instance()->credentials()->save($credential);
+        $this->instanceModel()->credentials()->save($credential);
     }
 
     public function testPasses()
@@ -61,8 +61,8 @@ class RunScriptsTest extends TestCase
         $this->kingpinServiceMock()->expects('post')
             ->twice()
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [
@@ -94,8 +94,8 @@ class RunScriptsTest extends TestCase
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [
@@ -127,8 +127,8 @@ class RunScriptsTest extends TestCase
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
-                '/api/v2/vpc/' . $this->instance()->vpc->id .
-                '/instance/' . $this->instance()->id .
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id .
+                '/instance/' . $this->instanceModel()->id .
                 '/guest/linux/script',
                 [
                     'json' => [

@@ -35,16 +35,16 @@ class VolumeGroupAttachTest extends TestCase
         $this->volume()->saveQuietly();
 
         // add volume group to instance and attach the volume
-        $this->instance()->volume_group_id = $this->volumeGroup()->id;
-        $this->instance()->volumes()->attach($this->volume());
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->volume_group_id = $this->volumeGroup()->id;
+        $this->instanceModel()->volumes()->attach($this->volume());
+        $this->instanceModel()->saveQuietly();
 
         Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'task-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         $this->assertEmpty((new VolumeGroupAttach($this->task))->handle());
@@ -60,8 +60,8 @@ class VolumeGroupAttachTest extends TestCase
         $this->volume()->saveQuietly();
 
         // add volume group to instance
-        $this->instance()->volume_group_id = $this->volumeGroup()->id;
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->volume_group_id = $this->volumeGroup()->id;
+        $this->instanceModel()->saveQuietly();
 
         Bus::fake([AttachVolume::class, IopsChange::class]);
 
@@ -70,7 +70,7 @@ class VolumeGroupAttachTest extends TestCase
                 'id' => 'task-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->task->resource()->associate($this->instance());
+            $this->task->resource()->associate($this->instanceModel());
         });
 
         $volumeGroupAttach = \Mockery::mock(VolumeGroupAttach::class, [$this->task])

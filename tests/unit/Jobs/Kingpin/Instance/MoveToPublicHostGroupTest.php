@@ -20,8 +20,8 @@ class MoveToPublicHostGroupTest extends TestCase
 
     public function testMove()
     {
-        $this->instance()->host_group_id = $this->hostGroup()->id;
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->host_group_id = $this->hostGroup()->id;
+        $this->instanceModel()->saveQuietly();
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
@@ -38,7 +38,7 @@ class MoveToPublicHostGroupTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new MoveToPublicHostGroup($this->instance()));
+        dispatch(new MoveToPublicHostGroup($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -52,7 +52,7 @@ class MoveToPublicHostGroupTest extends TestCase
         Log::shouldReceive('warning')
             ->withSomeOfArgs(MoveToPublicHostGroup::class . ': Instance i-test is already in the Public host group, nothing to do');
 
-        dispatch(new MoveToPublicHostGroup($this->instance()));
+        dispatch(new MoveToPublicHostGroup($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
     }

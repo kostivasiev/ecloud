@@ -25,7 +25,7 @@ class ConsoleTest extends TestCase
                 return new Response(502);
             });
         $this->post(
-            '/v2/instances/'.$this->instance()->id.'/console-session',
+            '/v2/instances/'.$this->instanceModel()->id.'/console-session',
             [],
             [
                 'X-consumer-custom-id' => '1-1',
@@ -54,7 +54,7 @@ class ConsoleTest extends TestCase
                 ]));
             });
         $this->post(
-            '/v2/instances/'.$this->instance()->id.'/console-session',
+            '/v2/instances/'.$this->instanceModel()->id.'/console-session',
             [],
             [
                 'X-consumer-custom-id' => '1-1',
@@ -91,7 +91,7 @@ class ConsoleTest extends TestCase
                 ]));
             });
         $this->post(
-            '/v2/instances/'.$this->instance()->id.'/console-session',
+            '/v2/instances/'.$this->instanceModel()->id.'/console-session',
             [],
             [
                 'X-consumer-custom-id' => '1-1',
@@ -145,7 +145,7 @@ class ConsoleTest extends TestCase
 
         // run test
         $this->post(
-            '/v2/instances/'.$this->instance()->id.'/console-session',
+            '/v2/instances/'.$this->instanceModel()->id.'/console-session',
             [],
             [
                 'X-consumer-custom-id' => '1-1',
@@ -153,7 +153,7 @@ class ConsoleTest extends TestCase
             ]
         )->seeJson(
             [
-                'url' => 'https://127.0.0.1/console/?title='.$this->instance()->id.'&session='.$uuid
+                'url' => 'https://127.0.0.1/console/?title='.$this->instanceModel()->id.'&session='.$uuid
             ]
         )->assertResponseStatus(200);
     }
@@ -166,7 +166,7 @@ class ConsoleTest extends TestCase
             $this->vpc()->save();
         });
         $this->post(
-            '/v2/instances/'.$this->instance()->id.'/console-session',
+            '/v2/instances/'.$this->instanceModel()->id.'/console-session',
             []
         )->seeJson(
             [
@@ -221,11 +221,11 @@ class ConsoleTest extends TestCase
             $this->vpc()->save();
         });
         $this->post(
-            '/v2/instances/'.$this->instance()->id.'/console-session',
+            '/v2/instances/'.$this->instanceModel()->id.'/console-session',
             []
         )->seeJson(
             [
-                'url' => 'https://127.0.0.1/console/?title='.$this->instance()->id.'&session='.$uuid
+                'url' => 'https://127.0.0.1/console/?title='.$this->instanceModel()->id.'&session='.$uuid
             ]
         )->assertResponseStatus(200);
     }
@@ -237,20 +237,20 @@ class ConsoleTest extends TestCase
         $this->kingpinServiceMock()
             ->shouldReceive('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_CONSOLE_SCREENSHOT, $this->instance()->vpc_id, $this->instance()->id)
+                sprintf(KingpinService::GET_CONSOLE_SCREENSHOT, $this->instanceModel()->vpc_id, $this->instanceModel()->id)
             )
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode($this->loadData('Kingpin/GetConsoleScreenshot.json')));
             });
 
-        $response = $this->get('/v2/instances/' . $this->instance()->id . '/console-screenshot');
+        $response = $this->get('/v2/instances/' . $this->instanceModel()->id . '/console-screenshot');
 
         $response->assertResponseStatus(200);
 
         $this->assertEquals($this->loadData('Kingpin/GetConsoleScreenshot.json'), $response->response->getContent());
 
         $this->assertEquals(
-            'attachment; filename=' . $this->instance()->vpc_id . '-' . $this->instance()->id . '-' . date('d-m-Y') . '-screenshot',
+            'attachment; filename=' . $this->instanceModel()->vpc_id . '-' . $this->instanceModel()->id . '-' . date('d-m-Y') . '-screenshot',
             $response->response->headers->all()['content-disposition'][0]
         );
     }

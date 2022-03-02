@@ -29,7 +29,7 @@ class AwaitNatSyncTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new AwaitNatSync($this->floatingIp(), $this->instance()));
+        dispatch(new AwaitNatSync($this->floatingIp(), $this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {

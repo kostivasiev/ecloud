@@ -28,7 +28,7 @@ class InstallSoftwareTest extends TestCase
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->task->resource()->associate($this->instance())->save();
+            $this->task->resource()->associate($this->instanceModel())->save();
         });
     }
 
@@ -50,7 +50,7 @@ class InstallSoftwareTest extends TestCase
 
         Event::fake([Created::class, JobFailed::class, JobProcessed::class]);
 
-        $this->instance()->setAttribute('image_id', 'img-centos-mcafee')->save();
+        $this->instanceModel()->setAttribute('image_id', 'img-centos-mcafee')->save();
 
         dispatch(new InstallSoftware($this->task));
 
@@ -70,7 +70,7 @@ class InstallSoftwareTest extends TestCase
     {
         Event::fake([Created::class, JobFailed::class, JobProcessed::class]);
 
-        $this->instance()->setAttribute('deploy_data', [
+        $this->instanceModel()->setAttribute('deploy_data', [
             'software_ids' => [
                 'soft-aaaaaaaa'
             ]
@@ -98,9 +98,9 @@ class InstallSoftwareTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        $this->instance()->setAttribute('image_id', 'img-centos-mcafee')->save();
+        $this->instanceModel()->setAttribute('image_id', 'img-centos-mcafee')->save();
 
-        $this->instance()->setAttribute('deploy_data', [
+        $this->instanceModel()->setAttribute('deploy_data', [
             'software_ids' => [
                 'soft-aaaaaaaa'
             ]

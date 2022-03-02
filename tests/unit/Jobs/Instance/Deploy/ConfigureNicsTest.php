@@ -31,10 +31,10 @@ class ConfigureNicsTest extends TestCase
                 ]));
             });
 
-        dispatch(new ConfigureNics($this->instance()));
+        dispatch(new ConfigureNics($this->instanceModel()));
 
         Event::assertNotDispatched(JobFailed::class);
 
-        $this->assertEquals(1, $this->instance()->nics()->count());
+        $this->assertEquals(1, $this->instanceModel()->nics()->count());
     }
 }

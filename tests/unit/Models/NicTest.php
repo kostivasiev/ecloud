@@ -19,7 +19,7 @@ class NicTest extends TestCase
         $nic = factory(Nic::class)->create([
             'id' => 'nic-test',
             'mac_address' => 'AA:BB:CC:DD:EE:FF',
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
             'network_id' => $this->network()->id,
             'ip_address' => '1.1.1.1',
         ]);

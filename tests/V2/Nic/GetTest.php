@@ -22,7 +22,7 @@ class GetTest extends TestCase
         $this->get('/v2/nics')
             ->seeJson([
             'mac_address' => $this->nic()->mac_address,
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
             'network_id' => $this->network()->id,
         ])->assertResponseStatus(200);
     }
@@ -32,7 +32,7 @@ class GetTest extends TestCase
         $this->get('/v2/nics/' . $this->nic()->id)
             ->seeJson([
             'mac_address' => $this->nic()->mac_address,
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
             'network_id' => $this->network()->id,
         ])->assertResponseStatus(200);
     }
