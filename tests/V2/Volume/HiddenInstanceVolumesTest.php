@@ -24,9 +24,9 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->be($this->consumer);
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->volume()->id,
-            ])->assertResponseOK();
+            ])->assertStatus(200);
     }
 
     public function testVolumeAttachedToHiddenInstanceHidden()
@@ -35,9 +35,9 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes')
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'id' => $this->volume()->id,
-            ])->assertResponseOK();
+            ])->assertStatus(200);
     }
 
     public function testVpcVolumesEndpointShowsVisibleVolumes()
@@ -45,9 +45,9 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->be($this->consumer);
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/vpcs/' . $this->vpc()->id . '/volumes')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->volume()->id,
-            ])->assertResponseOK();
+            ])->assertStatus(200);
     }
 
     public function testVpcVolumesEndpointHidesHiddenVolumes()
@@ -56,9 +56,9 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/vpcs/' . $this->vpc()->id . '/volumes')
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'id' => $this->volume()->id,
-            ])->assertResponseOK();
+            ])->assertStatus(200);
     }
 
     public function testInstanceVolumesEndpointShowsVisibleVolumes()
@@ -66,9 +66,9 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->be($this->consumer);
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/instances/' . $this->instanceModel()->id . '/volumes')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->volume()->id,
-            ])->assertResponseOK();
+            ])->assertStatus(200);
     }
 
     // hidden instances are not visible through this endpoint
@@ -78,7 +78,7 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/instances/' . $this->instanceModel()->id . '/volumes')
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testVolumeVisibleInstance()
@@ -86,9 +86,9 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->be($this->consumer);
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes/' . $this->volume()->id . '/instances')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->instanceModel()->id,
-            ])->assertResponseOk();
+            ])->assertStatus(200);
     }
 
     public function testVolumeInstancesHidden()
@@ -97,7 +97,7 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes/' . $this->volume()->id . '/instances')
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testVolumeVisibleTasks()
@@ -106,9 +106,9 @@ class HiddenInstanceVolumesTest extends TestCase
         $task = $this->createSyncUpdateTask($this->volume());
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes/' . $this->volume()->id . '/tasks')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $task->id,
-            ])->assertResponseOk();
+            ])->assertStatus(200);
     }
 
     public function testVolumeHiddenTasks()
@@ -118,7 +118,7 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->instanceModel()->setAttribute('is_hidden', true)->saveQuietly();
         $this->volume()->instances()->attach($this->instanceModel());
         $this->get('/v2/volumes/' . $this->volume()->id . '/tasks')
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testVolumeVisibleVolumeGroups()
@@ -126,10 +126,10 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->be($this->consumer);
         $this->volume()->instances()->attach($this->instanceModel());
         $this->volume()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
-        $this->get('/v2/volume-groups/' . $this->volumeGroup()->id . '/volumes')
-            ->seeJson([
+        $response = $this->get('/v2/volume-groups/' . $this->volumeGroup()->id . '/volumes')
+            ->assertJsonFragment([
                 'id' => $this->volume()->id,
-            ])->assertResponseOk();
+            ])->assertStatus(200);
     }
 
     public function testVolumeHiddenVolumeGroups()
@@ -139,8 +139,8 @@ class HiddenInstanceVolumesTest extends TestCase
         $this->volume()->instances()->attach($this->instanceModel());
         $this->volume()->setAttribute('volume_group_id', $this->volumeGroup()->id)->saveQuietly();
         $this->get('/v2/volume-groups/' . $this->volumeGroup()->id . '/volumes')
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'id' => $this->volume()->id,
-            ])->assertResponseOk();
+            ])->assertStatus(200);
     }
 }

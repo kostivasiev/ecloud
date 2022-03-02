@@ -18,7 +18,7 @@ class CapacityIncreaseTest extends TestCase
     {
         parent::setUp();
 
-        $this->volume = Model::withoutEvents(function() {
+        $this->volume = Model::withoutEvents(function () {
             return Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
@@ -40,7 +40,7 @@ class CapacityIncreaseTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
     }
 
     public function testValidationRule()

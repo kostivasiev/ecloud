@@ -29,7 +29,7 @@ class AttachRequest extends FormRequest
                 'string',
                 'exists:ecloud.instances,id,deleted_at,NULL',
                 new ExistsForUser(Instance::class),
-                new VolumeNotAttached($this->route()[2]['volumeId']),
+                new VolumeNotAttached(app('request')->route('volumeId')),
                 new IsMaxVolumeLimitReached(),
                 new IsResourceAvailable(Instance::class),
                 new IsSameAvailabilityZone(app('request')->route('volumeId')),

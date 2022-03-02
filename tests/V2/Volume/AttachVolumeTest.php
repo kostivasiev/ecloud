@@ -28,7 +28,7 @@ class AttachVolumeTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
     }
 
     public function testAttachVolumeInstanceHasFailed()
@@ -57,12 +57,12 @@ class AttachVolumeTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified instance id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testAttachingAttachedVolumeFails()
@@ -82,7 +82,7 @@ class AttachVolumeTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'errors' => [
                 [
                     'title' => 'Validation Error',
@@ -91,6 +91,6 @@ class AttachVolumeTest extends TestCase
                     'source' => 'instance_id',
                 ]
             ],
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }

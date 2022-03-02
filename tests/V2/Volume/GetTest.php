@@ -27,15 +27,15 @@ class GetTest extends TestCase
         $this->get('/v2/volumes', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => 'vol-test',
             'name' => 'Volume',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => '100',
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'vmware_uuid' => 'uuid-test-uuid-test-uuid-test'
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetItemDetail()
@@ -43,15 +43,15 @@ class GetTest extends TestCase
         $this->get('/v2/volumes/vol-test', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => 'vol-test',
             'name' => 'Volume',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => '100',
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'vmware_uuid' => 'uuid-test-uuid-test-uuid-test'
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetItemDetailAdmin()
@@ -59,13 +59,13 @@ class GetTest extends TestCase
         $this->get('/v2/volumes/vol-test', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => 'vol-test',
             'name' => 'Volume',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => '100',
             'vmware_uuid' => 'uuid-test-uuid-test-uuid-test',
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }
