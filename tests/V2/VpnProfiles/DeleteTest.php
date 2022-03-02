@@ -27,17 +27,17 @@ class DeleteTest extends TestCase
                 'group 14',
             ],
         ];
-        $this->vpnProfile = factory(VpnProfile::class)->create($this->data);
+        $this->vpnProfile = VpnProfile::factory()->create($this->data);
     }
 
     public function testDeleteResourceNonAdmin()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->delete('/v2/vpn-profiles/' . $this->vpnProfile->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
-            ])->assertResponseStatus(401);
+            ])->assertStatus(401);
     }
 
     public function testDeleteResource()
@@ -47,6 +47,6 @@ class DeleteTest extends TestCase
         $this->be($consumer);
 
         $this->delete('/v2/vpn-profiles/' . $this->vpnProfile->id)
-            ->assertResponseStatus(204);
+            ->assertStatus(204);
     }
 }

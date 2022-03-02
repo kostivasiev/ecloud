@@ -27,7 +27,7 @@ class UpdateTest extends TestCase
                 'group 14',
             ],
         ];
-        $this->vpnProfile = factory(VpnProfile::class)->create($this->data);
+        $this->vpnProfile = VpnProfile::factory()->create($this->data);
     }
 
     public function testUpdateResourceNonAdmin()
@@ -39,10 +39,10 @@ class UpdateTest extends TestCase
                 'name' => 'Vpn Test Profile (Updated)',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
-            ])->assertResponseStatus(401);
+            ])->assertStatus(401);
     }
 
     public function testUpdateResource()
@@ -72,7 +72,7 @@ class UpdateTest extends TestCase
         $transformed['diffie_hellman'] = implode(',', $data['diffie_hellman']);
 
         $this->patch('/v2/vpn-profiles/' . $this->vpnProfile->id, $data)
-            ->seeInDatabase('vpn_profiles', $transformed, 'ecloud')
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
+        $this->assertDatabaseHas('vpn_profiles', $transformed, 'ecloud');
     }
 }
