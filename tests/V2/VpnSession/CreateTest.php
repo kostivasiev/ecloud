@@ -24,23 +24,23 @@ class CreateTest extends TestCase
         parent::setUp();
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->vpnService = factory(VpnService::class)->create([
+        $this->vpnService = VpnService::factory()->create([
             'router_id' => $this->router()->id,
         ]);
 
-        $this->vpnEndpoint = factory(VpnEndpoint::class)->create([
+        $this->vpnEndpoint = VpnEndpoint::factory()->create([
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpnService->id,
         ]);
         $this->floatingIp()->resource()->associate($this->vpnEndpoint);
         $this->floatingIp()->save();
 
-        $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+        $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz',
         ]);
-        $this->vpnSession = factory(VpnSession::class)->create(
+        $this->vpnSession = VpnSession::factory()->create(
             [
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'remote_ip' => '211.12.13.1',
@@ -66,7 +66,7 @@ class CreateTest extends TestCase
     public function testCreateResource()
     {
         Event::fake([Created::class]);
-        $vpnService = factory(VpnService::class)->create([
+        $vpnService = VpnService::factory()->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
         ]);
@@ -109,7 +109,7 @@ class CreateTest extends TestCase
 
     public function testCreateResourceWithInvalidIps()
     {
-        $service = factory(VpnService::class)->create([
+        $service = VpnService::factory()->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
         ]);
@@ -139,7 +139,7 @@ class CreateTest extends TestCase
 
     public function testCreateResourceWithMissingLocalNetworks()
     {
-        $service = factory(VpnService::class)->create([
+        $service = VpnService::factory()->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
         ]);
@@ -162,7 +162,7 @@ class CreateTest extends TestCase
 
     public function testCreateResourceWithMissingRemoteNetworks()
     {
-        $service = factory(VpnService::class)->create([
+        $service = VpnService::factory()->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
         ]);
