@@ -3,7 +3,7 @@
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Laravel\Lumen\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
@@ -48,6 +48,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Router\RemoveBlockAllOutbound::class,
         \App\Console\Commands\Rules\ModifyEdRules::class,
         \App\Console\Commands\Router\FixT0Values::class,
+        \App\Console\Commands\Router\AdvertiseSegmentsService::class,
         \App\Console\Commands\Firewall\SquidUpdate::class,
         \App\Console\Commands\Router\FixEdgeClusters::class,
     ];
@@ -55,8 +56,10 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
+     * @param Schedule $schedule
+     * @return                  void
+     * @codeCoverageIgnore
+     * @SuppressWarnings(PHPMD)
      */
     protected function schedule(Schedule $schedule)
     {
@@ -64,7 +67,7 @@ class Kernel extends ConsoleKernel
             $schedule->command('vpc:process-billing --debug')
                 ->monthlyOn(1, '01:00')
                 ->emailOutputTo(config('alerts.billing.to'));
-
+                
             $schedule->command('orchestrator:deploy')
                 ->everyMinute();
 
@@ -80,16 +83,4 @@ class Kernel extends ConsoleKernel
         $schedule->command('task:timeout-stuck --hours=12')
             ->hourly();
     }
-//
-//    /**
-//     * Register the commands for the application.
-//     *
-//     * @return void
-//     */
-//    protected function commands()
-//    {
-//        $this->load(__DIR__.'/Commands');
-//
-//        require base_path('routes/console.php');
-//    }
 }
