@@ -32,10 +32,12 @@ class BaseController extends Controller
         // Pagination limit. Try to set from Request, or default to .env PAGINATION_LIMIT
         $this->perPage = $request->input('per_page', env('PAGINATION_LIMIT'));
 
-        // is the client an admin
-        $this->isAdmin = Auth::user()->isAdmin();
+        if (Auth::user()) {
+            // is the client an admin
+            $this->isAdmin = Auth::user()->isAdmin();
 
-        $this->resellerId = Auth::user()->resellerId();
+            $this->resellerId = Auth::user()->resellerId();
+        }
     }
 
     /**

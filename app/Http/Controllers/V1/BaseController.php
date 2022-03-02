@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use Auth;
 use Illuminate\Http\Request;
 use UKFast\Api\Resource\Traits\RequestHelper;
 use UKFast\Api\Resource\Traits\ResponseHelper;
@@ -33,10 +34,12 @@ class BaseController extends Controller
         // Pagination limit. Try to set from Request, or default to .env PAGINATION_LIMIT
         $this->perPage = $request->input('per_page', env('PAGINATION_LIMIT'));
 
-        // is the client an admin
-        $this->isAdmin = $request->user()->isAdmin();
+        if (Auth::user()) {
+            // is the client an admin
+            $this->isAdmin = Auth::user()->isAdmin();
 
-        $this->resellerId = $request->user()->resellerId();
+            $this->resellerId = Auth::user()->resellerId();
+        }
     }
 
     /**
