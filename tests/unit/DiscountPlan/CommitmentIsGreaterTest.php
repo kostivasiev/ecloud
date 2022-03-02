@@ -13,7 +13,7 @@ class CommitmentIsGreaterTest extends TestCase
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        $discountPlan = factory(DiscountPlan::class)->create([
+        $discountPlan = DiscountPlan::factory()->create([
             'contact_id' => 1,
             'name' => 'test-commitment',
             'commitment_amount' => '2000',

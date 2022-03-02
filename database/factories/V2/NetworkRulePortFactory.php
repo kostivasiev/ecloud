@@ -4,7 +4,7 @@ namespace Database\Factories\V2;
 use App\Models\V2\NetworkRulePort;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class NetworkAclRulePortFactory extends Factory
+class NetworkRulePortFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
