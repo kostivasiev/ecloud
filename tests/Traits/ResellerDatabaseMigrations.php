@@ -2,7 +2,7 @@
 
 namespace Tests\Traits;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 trait ResellerDatabaseMigrations
 {
