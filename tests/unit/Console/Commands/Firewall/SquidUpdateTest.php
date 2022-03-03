@@ -78,7 +78,7 @@ class SquidUpdateTest extends TestCase
 
         $this->assertFalse($this->mock->getManagementFirewallPolicy($this->router()));
 
-        $this->assertEquals($this->router()->id . ' : has no firewall policies.', $message);
+        $this->assertEquals('Error: ' . $this->router()->id . ' : has no firewall policies.', $message);
     }
 
     public function testGetManagementFirewallPolicyNoManagementPolicy()
@@ -87,7 +87,7 @@ class SquidUpdateTest extends TestCase
         $this->mock->allows('error')->with(\Mockery::capture($message));
 
         $this->assertFalse($this->mock->getManagementFirewallPolicy($this->router()));
-        $this->assertEquals('No management firewall policy found for router ' . $this->router()->id, $message);
+        $this->assertEquals('Error: No management firewall policy found for router ' . $this->router()->id, $message);
     }
 
     public function testGetManagementFirewallPolicy()
@@ -107,7 +107,7 @@ class SquidUpdateTest extends TestCase
         $this->assertFalse($this->mock->getEdRule($this->router(), $this->firewallPolicy()));
 
         $this->assertEquals(
-            $this->router()->id . ' : Firewall Policy ' . $this->firewallPolicy()->id . ' has no rules.',
+            'Error: ' . $this->router()->id . ' : Firewall Policy ' . $this->firewallPolicy()->id . ' has no rules.',
             $message
         );
     }
@@ -120,7 +120,7 @@ class SquidUpdateTest extends TestCase
         $this->assertFalse($this->mock->getEdRule($this->router(), $this->firewallPolicy()));
 
         $this->assertEquals(
-            'No outbound Ed rule found for policy ' . $this->firewallPolicy()->id,
+            'Error: No outbound Ed rule found for policy ' . $this->firewallPolicy()->id,
             $message
         );
     }
@@ -188,18 +188,19 @@ class SquidUpdateTest extends TestCase
         $this->mock->allows('getManagementFirewallPolicy')->withAnyArgs()->andReturnFalse();
         $this->mock->processFirewalls($this->router());
 
-        $this->assertEquals($this->router()->id . ' : Management firewall policy not present.', $message);
+        $this->assertEquals('Error: ' . $this->router()->id . ' : Management firewall policy not present.', $message);
     }
 
     public function testProcessFirewallsGetEdRuleFails()
     {
+        $this->mock->allows('info')->withAnyArgs();
         $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->allows('error')->with(\Mockery::capture($message));
         $this->mock->allows('getEdRule')->withAnyArgs()->andReturnFalse();
         $this->mock->processFirewalls($this->router());
 
         $this->assertEquals(
-            $this->router()->id . ' : Firewall rule for Ed is not present in policy ' .
+            'Error: ' . $this->router()->id . ' : Firewall rule for Ed is not present in policy ' .
             $this->firewallPolicy()->id,
             $message
         );
@@ -255,16 +256,17 @@ class SquidUpdateTest extends TestCase
         $this->mock->allows('error')->with(\Mockery::capture($message));
         $this->mock->processNetworks($this->router());
 
-        $this->assertEquals('No network policy found for router ' . $this->router()->id, $message);
+        $this->assertEquals('Error: No network policy found for router ' . $this->router()->id, $message);
     }
 
     public function testProcessNetworksNoNetworkRule()
     {
+        $this->mock->allows('info')->withAnyArgs();
         $this->networkRule->delete();
         $this->mock->allows('error')->with(\Mockery::capture($message));
         $this->mock->processNetworks($this->router());
 
-        $this->assertEquals('No Ed proxy rule found for network ' . $this->network()->id, $message);
+        $this->assertEquals('Error: No Ed proxy rule found for network ' . $this->network()->id, $message);
     }
 
     public function testProcessNetworksRulePresent()
