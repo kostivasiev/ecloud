@@ -14,7 +14,7 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->discountPlan = factory(DiscountPlan::class)->create([
+        $this->discountPlan = DiscountPlan::factory()->create([
             'contact_id' => 1,
         ]);
     }
@@ -29,7 +29,7 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->assertResponseStatus(204);
+        )->assertStatus(204);
 
         $discountPlan = DiscountPlan::withTrashed()->findOrFail($this->discountPlan->id);
         $this->assertNotNull($discountPlan->deleted_at);
