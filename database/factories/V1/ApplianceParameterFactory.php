@@ -5,7 +5,7 @@ use App\Models\V1\ApplianceParameter;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class ApplianceParametersFactory extends Factory
+class ApplianceParameterFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.

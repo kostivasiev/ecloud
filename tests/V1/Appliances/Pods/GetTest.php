@@ -18,8 +18,8 @@ class GetTest extends ApplianceTestCase
     public function testPodAppliances()
     {
         $this->json('GET', '/v1/pods/1/appliances', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson(
+            ->assertStatus(200)
+            ->seeJsonFragment(
                 [
                     'id' => $this->appliances[0]->uuid,
                     'name' => $this->appliances[0]->name,
@@ -34,8 +34,8 @@ class GetTest extends ApplianceTestCase
     public function testPodAppliancesPodDisabled()
     {
         $this->json('GET', '/v1/pods/2/appliances', [], $this->validReadHeaders) //$this->validWriteHeaders
-        ->seeStatusCode(200)
-            ->seeJson(
+        ->assertStatus(200)
+            ->seeJsonFragment(
                 [
                     'total' => 0,
                 ]
