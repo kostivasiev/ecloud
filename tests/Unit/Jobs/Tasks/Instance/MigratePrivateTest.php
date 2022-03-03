@@ -83,7 +83,7 @@ class MigratePrivateTest extends TestCase
         $this->instanceModel()->hostGroup()->associate($this->hostGroup());
         $this->instanceModel()->saveQuietly();
 
-        $hostSpec = factory(HostSpec::class)->create([
+        $hostSpec = HostSpec::factory()->create([
             'id' => 'hs-test2',
             'name' => 'test-host-spec',
         ]);
