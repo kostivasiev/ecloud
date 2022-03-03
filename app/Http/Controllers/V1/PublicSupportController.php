@@ -51,7 +51,7 @@ class PublicSupportController extends BaseController
     /**
      * Store new support resource
      * @param Request $request
-     * @return Response
+     * @return PublicSupportResource
      * @throws Exceptions\UnauthorisedException
      */
     public function store(Request $request)
@@ -64,9 +64,6 @@ class PublicSupportController extends BaseController
         $item->reseller_id = $request->user()->resellerId();
         $item->save();
 
-        return response()->self(
-            'support.item',
-            $item->getKey()
-        )->setStatusCode(201);
+        return new PublicSupportResource($item);
     }
 }
