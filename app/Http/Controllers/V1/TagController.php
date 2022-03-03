@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V1;
 
 use App\Exceptions\V1\TagNotFoundException;
 use App\Models\V1\Tag;
+use App\Resources\V1\VirtualMachineTagsResource;
 use App\Solution\CanModifyResource;
 use Illuminate\Http\Request;
 use UKFast\Api\Exceptions\BadRequestException;
@@ -51,16 +52,25 @@ class TagController extends BaseController
             throw new TagNotFoundException('Tag with key \'' . $tagKey . '\' not found');
         }
 
-        return $this->respondItem(
-            $request,
-            $tag
+        return response()->json(
+            [
+                'data' => [
+                    'key' => $tag->metadata_key,
+                    'value' => $tag->metadata_value,
+                    'created_at' => $tag->metadata_created,
+                ],
+                'meta' => [
+                    'location' => \Illuminate\Support\Facades\Request::url() . '/' . $tag->metadata_key,
+                ],
+            ],
+            200
         );
     }
 
     /**
      * @param Request $request
      * @param $solutionId
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      * @throws BadRequestException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
@@ -101,14 +111,18 @@ class TagController extends BaseController
             // todo log and error
         }
 
-        return $this->respondSave(
-            $request,
-            $tag,
-            201,
-            null,
-            [],
-            [],
-            $request->path() . '/' . $tag->metadata_key
+        return response()->json(
+            [
+                'data' => [
+                    'key' => $tag->metadata_key,
+                    'value' => $tag->metadata_value,
+                    'created_at' => $tag->metadata_created,
+                ],
+                'meta' => [
+                    'location' => \Illuminate\Support\Facades\Request::url() . '/' . $tag->metadata_key,
+                ],
+            ],
+            201
         );
     }
 
@@ -116,7 +130,7 @@ class TagController extends BaseController
      * @param Request $request
      * @param $solutionId
      * @param $tagKey
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      * @throws TagNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
@@ -147,10 +161,7 @@ class TagController extends BaseController
             // todo log and error
         }
 
-        return $this->respondSave(
-            $request,
-            $tag
-        );
+        return $this->responseIdMeta($request, $tag, 200);
     }
 
     /**
@@ -180,7 +191,7 @@ class TagController extends BaseController
             // todo log and error
         }
 
-        return $this->respondEmpty();
+        return response('', 204);
     }
 
     public function indexVMTags(Request $request, $vmId)
@@ -194,10 +205,7 @@ class TagController extends BaseController
             ->config(Tag::class)
             ->transform($collection);
 
-        return $this->respondCollection(
-            $request,
-            $collection->paginate($this->perPage)
-        );
+        return VirtualMachineTagsResource::collection($collection->paginate);
     }
 
     public function showVMTag(Request $request, $vmId, $tagKey)
@@ -213,10 +221,7 @@ class TagController extends BaseController
             throw new TagNotFoundException('Tag with key \'' . $tagKey . '\' not found');
         }
 
-        return $this->respondItem(
-            $request,
-            $tag
-        );
+        return new VirtualMachineTagsResource($tag);
     }
 
     public function createVMTag(Request $request, $vmId)
@@ -290,10 +295,7 @@ class TagController extends BaseController
             // todo log and error
         }
 
-        return $this->respondSave(
-            $request,
-            $tag
-        );
+        return $this->responseIdMeta($request, $tag, 200);
     }
 
     public function destroyVMTag(Request $request, $vmId, $tagKey)
@@ -316,6 +318,6 @@ class TagController extends BaseController
             // todo log and error
         }
 
-        return $this->respondEmpty();
+        return response('', 204);
     }
 }

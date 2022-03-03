@@ -16,30 +16,26 @@ class GetTest extends TestCase
     public function testValidCollection()
     {
         $total = rand(1, 2);
-        factory(Solution::class, $total)->create();
+        Solution::factory($total)->create();
 
         $this->get('/v1/solutions', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        ])->assertJsonFragment([
             'total' => $total,
-        ]);
+        ])->assertStatus(200);
     }
 
     public function testValidItem()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123,
         ]);
 
         $this->get('/v1/solutions/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testInvalidItem()
@@ -47,9 +43,7 @@ class GetTest extends TestCase
         $this->get('/v1/solutions/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testInvalidSolutionVmCollection()
@@ -57,40 +51,36 @@ class GetTest extends TestCase
         $this->get('/v1/solutions/12345/vms', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testValidTagCollection()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123,
         ]);
 
         $total = rand(1, 2);
-        factory(Tag::class, $total)->create([
+        Tag::factory($total)->create([
             'metadata_resource' => 'ucs_reseller',
             'metadata_resource_id' => 123,
         ]);
 
-        $this->get('/v1/solutions/123/tags', [
+        $response =$this->get('/v1/solutions/123/tags', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        ])->assertJsonFragment([
             'total' => $total,
-        ]);
+        ])->assertStatus(200);
     }
 
     public function testValidTagItem()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123,
         ]);
 
-        factory(Tag::class, 1)->create([
+        Tag::factory()->create([
             'metadata_key' => 'test',
             'metadata_resource' => 'ucs_reseller',
             'metadata_resource_id' => 123,
@@ -99,10 +89,8 @@ class GetTest extends TestCase
         $this->get('/v1/solutions/123/tags/test', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        ])->assertJsonFragment([
             'key' => 'test',
-        ]);
+        ])->assertStatus(200);
     }
 }

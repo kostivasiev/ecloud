@@ -31,8 +31,6 @@ class ConsoleSessionTest extends TestCase
         $this->get('/v1/vms/999/console-session', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 }

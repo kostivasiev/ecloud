@@ -3,6 +3,7 @@
 namespace Tests\V1;
 
 use App\Providers\EncryptionServiceProvider;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Support\Facades\Event;
 use Tests\CreatesApplication;
 use Tests\Traits\ResellerDatabaseMigrations;
@@ -10,7 +11,7 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    use ResellerDatabaseMigrations, CreatesApplication;
+    use ResellerDatabaseMigrations, CreatesApplication, InteractsWithDatabase;
 
     public $validReadHeaders = [
         'X-consumer-custom-id' => '1-1',
