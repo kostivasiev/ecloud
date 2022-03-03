@@ -52,7 +52,7 @@ class ApplianceTestCase extends TestCase
                     'appliance_version_version' => ($i + 1),
                 ];
 
-                $applianceVersion = factory(ApplianceVersion::class)->make($applianceFactoryConfig);
+                $applianceVersion = ApplianceVersion::factory()->make($applianceFactoryConfig);
 
                 if ($this->verbose) {
                     echo 'Creating appliance version \'' . ($i + 1) . '\' for appliance \'' . $appliance->getKey() . '\'';

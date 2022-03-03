@@ -126,8 +126,8 @@ class PostTest extends ApplianceTestCase
                 ]
             ]
         ], $this->validWriteHeaders)
-            ->seeStatusCode(400)
-            ->seeJson([
+            ->assertStatus(400)
+            ->seeJsonFragment([
                 'title' => 'Bad Request',
                 'detail' => "Required parameter 'MySQL Wordpress user password' with key 'THIS_REQUIRED_KEY_IS_MISSING_FROM_THE_SCRIPT' was not found in script template",
                 'status' => 400
@@ -147,6 +147,6 @@ class PostTest extends ApplianceTestCase
             'vm_template' => $applianceVersion->vm_template,
             'active' => true
         ], $this->validReadHeaders)
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 }

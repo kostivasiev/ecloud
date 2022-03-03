@@ -16,10 +16,10 @@ class PostTest extends ApplianceTestCase
     public function testCreateAppliance()
     {
         // Generate test appliance record
-        $appliance = factory(Appliance::class, 1)->make()->first();
+        $appliance = Appliance::factory()->make();
 
         // Assert record does not exist
-        $this->missingFromDatabase(
+        $this->assertDatabaseMissing(
             'appliance',
             [
                 'appliance_uuid' => $appliance->appliance_uuid
@@ -28,7 +28,7 @@ class PostTest extends ApplianceTestCase
         );
 
         // Create the appliance record
-        $res = $this->json('POST', '/v1/appliances', [
+        $response = $this->json('POST', '/v1/appliances', [
             'name' => $appliance->name,
             'logo_uri' => $appliance->logo_uri,
             'description' => $appliance->description,
@@ -41,7 +41,7 @@ class PostTest extends ApplianceTestCase
         ]);
 
         // Get the ID of the created record
-        $data = json_decode($res->response->getContent());
+        $data = json_decode($response->getContent());
 
         $uuid = $data->data->id;
 
@@ -55,7 +55,7 @@ class PostTest extends ApplianceTestCase
                 'appliance_description' => $appliance->description,
                 'appliance_documentation_uri' => $appliance->documentation_uri,
                 'appliance_publisher' => $appliance->publisher,
-                'appliance_active' => ($appliance->active == 'Yes'),
+                'appliance_active' => 'Yes',
             ],
             env('DB_ECLOUD_CONNECTION')
         );

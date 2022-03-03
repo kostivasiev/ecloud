@@ -3,7 +3,6 @@
 namespace Tests\V1\Appliances\ApplianceParameters;
 
 use App\Models\V1\ApplianceParameter;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\ApplianceTestCase;
 
 class PatchTest extends ApplianceTestCase
@@ -20,7 +19,7 @@ class PatchTest extends ApplianceTestCase
     public function testUpdateApplianceParameter()
     {
         // Generate a test parameter
-        $newParameter = factory(ApplianceParameter::class, 1)->make()->first();
+        $newParameter = ApplianceParameter::factory()->make()->first();
 
         // Get an existing parameter
         $param = ApplianceParameter::query()->first();
@@ -44,11 +43,10 @@ class PatchTest extends ApplianceTestCase
             'description' => $newParameter->description,
             'required' => 0,
             'validation_rule' => '/\w+/'
-        ], $this->validWriteHeaders);
+        ], $this->validWriteHeaders)
+            ->assertStatus(204);
 
-        $this->assertResponseStatus(204);
-
-        $this->seeInDatabase(
+        $this->assertDatabaseHas(
             'appliance_script_parameters',
             [
                 'appliance_script_parameters_uuid' => $param->uuid,
@@ -69,7 +67,7 @@ class PatchTest extends ApplianceTestCase
     public function testUpdateApplianceParameterNotAdmin()
     {
         // Generate a test parameter
-        $newParameter = factory(ApplianceParameter::class, 1)->make()->first();
+        $newParameter = ApplianceParameter::factory()->make()->first();
 
         // Get an existing parameter
         $param = ApplianceParameter::query()->first();

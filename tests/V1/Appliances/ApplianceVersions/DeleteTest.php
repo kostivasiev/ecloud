@@ -2,6 +2,9 @@
 
 namespace Tests\V1\Appliances\ApplianceVersions;
 
+use App\Models\V1\Appliance;
+use App\Models\V1\AppliancePodAvailability;
+use App\Models\V1\ApplianceVersion;
 use Tests\V1\ApplianceTestCase;
 
 

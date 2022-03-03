@@ -23,11 +23,10 @@ class GetTest extends ApplianceTestCase
      */
     public function testValidCollection()
     {
-        $this->get('/v1/appliances', $this->validReadHeaders);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        $this->get('/v1/appliances', $this->validReadHeaders)
+            ->assertJsonFragment([
             'total' => count($this->appliances),
-        ]);
+        ])->assertStatus(200);
     }
 
     /**
@@ -37,9 +36,7 @@ class GetTest extends ApplianceTestCase
     {
         $uuid = $this->appliances->first()->uuid;
 
-        $this->get('/v1/appliances/' . $uuid, $this->validReadHeaders);
-
-        $this->assertResponseStatus(200);
+        $this->get('/v1/appliances/' . $uuid, $this->validReadHeaders)->assertStatus(200);
     }
 
     /**
@@ -48,9 +45,7 @@ class GetTest extends ApplianceTestCase
      */
     public function testInvalidItem()
     {
-        $this->get('/v1/appliances/' . Uuid::uuid4()->toString(), $this->validReadHeaders);
-
-        $this->assertResponseStatus(404);
+        $this->get('/v1/appliances/' . Uuid::uuid4()->toString(), $this->validReadHeaders)->assertStatus(404);
     }
 
     /**
@@ -58,9 +53,7 @@ class GetTest extends ApplianceTestCase
      */
     public function testInvalidUuid()
     {
-        $this->get('/v1/appliances/abc', $this->validReadHeaders);
-
-        $this->assertResponseStatus(422);
+        $this->get('/v1/appliances/abc', $this->validReadHeaders)->assertStatus(422);
     }
 
     /**
@@ -72,8 +65,8 @@ class GetTest extends ApplianceTestCase
         $parameters = $appliance->getLatestVersion()->parameters;
 
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/parameters', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $parameters[0]->uuid,
                 'version_id' => $parameters[0]->appliance_version_uuid,
                 'name' => $parameters[0]->name,
@@ -95,8 +88,8 @@ class GetTest extends ApplianceTestCase
         $version = $appliance->versions[0];
 
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/versions', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $version->uuid,
                 'appliance_id' => $version->appliance_uuid,
                 'version' => (int)$version->version,
@@ -116,8 +109,8 @@ class GetTest extends ApplianceTestCase
         $version = $appliance->getLatestVersion();
 
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/version', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $version->uuid,
                 'appliance_id' => $version->appliance_uuid,
                 'version' => (int)$version->version,
@@ -142,8 +135,8 @@ class GetTest extends ApplianceTestCase
         $appliancePodAvailability->save();
 
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/pods', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $pod[0]->getKey()
             ]);
     }
@@ -166,7 +159,7 @@ class GetTest extends ApplianceTestCase
             '/v1/appliances/' . $appliance->uuid . '/data',
             [],
             DataTest::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+        )->assertStatus(Response::HTTP_OK)->assertJsonFragment([
             'data' => [
                 [
                     'key' => $applianceVersionData->key,
