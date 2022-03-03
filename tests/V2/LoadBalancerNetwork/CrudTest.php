@@ -27,12 +27,12 @@ class CrudTest extends TestCase
 
         // Assert scope returns resource for [load balancer] owner
         $this->get('/v2/load-balancer-networks')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->loadBalancerNetwork()->id,
                 'load_balancer_id' => $this->loadBalancer()->id,
                 'network_id' => $this->network()->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         // Assert scope does not return resource for non-owner
         $this->be(
@@ -40,42 +40,42 @@ class CrudTest extends TestCase
                 ->setIsAdmin(true)
         );
         $this->get('/v2/load-balancer-networks')
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'id' => $this->loadBalancerNetwork()->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         // Assert scope returns resource for admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->get('/v2/load-balancer-networks')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->loadBalancerNetwork()->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShow()
     {
         // Assert scope returns resource for [load balancer] owner
         $this->get('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->loadBalancerNetwork()->id,
                 'name' => $this->loadBalancerNetwork()->id,
                 'load_balancer_id' => $this->loadBalancer()->id,
                 'network_id' => $this->network()->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         // Assert scope does not return resource for non-owner
         $this->be(
             (new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']))
                 ->setIsAdmin(true)
         );
-        $this->get('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id)->assertResponseStatus(404);
+        $this->get('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id)->assertStatus(404);
 
         // Assert scope returns resource for admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->get('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id)->assertResponseStatus(200);
+        $this->get('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id)->assertStatus(200);
     }
 
     public function testStore()
@@ -88,7 +88,7 @@ class CrudTest extends TestCase
             'network_id' => $this->network()->id,
         ];
 
-        $this->post('/v2/load-balancer-networks', $data)->assertResponseStatus(202);
+        $this->post('/v2/load-balancer-networks', $data)->assertStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -107,7 +107,7 @@ class CrudTest extends TestCase
             'network_id' => $this->network()->id,
         ];
 
-        $this->post('/v2/load-balancer-networks', $data)->assertResponseStatus(422);
+        $this->post('/v2/load-balancer-networks', $data)->assertStatus(422);
     }
 
     public function testUpdate()
@@ -118,7 +118,7 @@ class CrudTest extends TestCase
             'name' => 'Test - UPDATED',
         ];
 
-        $this->patch('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id, $data)->assertResponseStatus(202);
+        $this->patch('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id, $data)->assertStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -129,7 +129,7 @@ class CrudTest extends TestCase
     {
         Event::fake(Created::class);
 
-        $this->delete('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id)->assertResponseStatus(202);
+        $this->delete('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id)->assertStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_delete';
