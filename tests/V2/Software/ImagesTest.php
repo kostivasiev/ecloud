@@ -20,9 +20,9 @@ class ImagesTest extends TestCase
         $this->image()->software()->sync(['soft-aaaaaaaa']);
 
         $this->get('/v2/software/soft-aaaaaaaa/images')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'img-test',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }
