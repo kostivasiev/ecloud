@@ -603,13 +603,14 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $mockEncryptionServiceProvider = \Mockery::mock(EncryptionServiceProvider::class)
+        $mockEncrypter = \Mockery::mock(\Illuminate\Encryption\Encrypter::class)
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
-        app()->bind('encrypter', function () use ($mockEncryptionServiceProvider) {
-            $mockEncryptionServiceProvider->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-            $mockEncryptionServiceProvider->shouldReceive('decrypt')->andReturn('somepassword');
-            return $mockEncryptionServiceProvider;
+
+        app()->bind('encrypter', function () use ($mockEncrypter) {
+            $mockEncrypter->allows('encrypt')->andReturns('EnCrYpTeD-pAsSwOrD');
+            $mockEncrypter->allows('decrypt')->andReturns('somepassword');
+            return $mockEncrypter;
         });
 
         // Using these mocks means we have to use DatabaseMigration by default, but the ability to catch 3rd party
