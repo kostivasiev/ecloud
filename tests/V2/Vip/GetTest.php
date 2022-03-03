@@ -23,21 +23,22 @@ class GetTest extends TestCase
     public function testGetItemCollection()
     {
         $this->get('/v2/vips')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->vip()->id,
                 'load_balancer_id' => $this->loadBalancer()->id,
                 'ip_address_id' => $this->vip()->ipAddress->id,
                 'config_id' => 12345,
-        ])->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 
     public function testGetItemDetail()
     {
-        $this->get('/v2/vips/' . $this->vip()->id)->seeJson([
-            'id' => $this->vip()->id,
-            'load_balancer_id' => $this->loadBalancer()->id,
-            'ip_address_id' => $this->vip()->ipAddress->id,
-            'config_id' => 12345,
-        ])->assertResponseStatus(200);
+        $this->get('/v2/vips/' . $this->vip()->id)
+            ->assertJsonFragment([
+                'id' => $this->vip()->id,
+                'load_balancer_id' => $this->loadBalancer()->id,
+                'ip_address_id' => $this->vip()->ipAddress->id,
+                'config_id' => 12345,
+            ])->assertStatus(200);
     }
 }
