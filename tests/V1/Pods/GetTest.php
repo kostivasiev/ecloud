@@ -22,16 +22,14 @@ class GetTest extends TestCase
     public function testValidCollection()
     {
         $total = rand(1, 2);
-        factory(Pod::class, $total)->create();
+        Pod::factory($total)->create();
 
         $this->get('/v1/pods', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        ])->assertJsonFragment([
             'total' => $total,
-        ]);
+        ])->assertStatus(200);
     }
 
     /**
@@ -40,16 +38,14 @@ class GetTest extends TestCase
      */
     public function testValidItem()
     {
-        factory(Pod::class, 1)->create([
+        Pod::factory()->create([
             'ucs_datacentre_id' => 123,
         ]);
 
         $this->get('/v1/pods/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     /**
@@ -61,9 +57,7 @@ class GetTest extends TestCase
         $this->get('/v1/pods/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     /**
@@ -72,7 +66,7 @@ class GetTest extends TestCase
      */
     public function testHiddenApiDisabled()
     {
-        factory(Pod::class, 1)->create([
+        Pod::factory()->create([
             'ucs_datacentre_id' => 123,
             'ucs_datacentre_api_enabled' => 'No',
         ]);
@@ -80,9 +74,7 @@ class GetTest extends TestCase
         $this->get('/v1/pods/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     /**
@@ -91,7 +83,7 @@ class GetTest extends TestCase
      */
     public function testHiddenClientPod()
     {
-        factory(Pod::class, 1)->create([
+        Pod::factory()->create([
             'ucs_datacentre_id' => 123,
             'ucs_datacentre_reseller_id' => 999,
         ]);
@@ -99,9 +91,7 @@ class GetTest extends TestCase
         $this->get('/v1/pods/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     /**
@@ -109,21 +99,19 @@ class GetTest extends TestCase
      */
     public function testVclVceServerIdAdmin()
     {
-        $pod = factory(Pod::class, 1)->create([
+        $pod = Pod::factory()->create([
             'ucs_datacentre_id' => 123,
             'ucs_datacentre_vcl_server_id' => 12345,
             'ucs_datacentre_vce_server_id' => 54321,
         ])->first();
 
-        $this->json('GET', '/v1/pods/123', [], [
+        $this->getJson('/v1/pods/123', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
-        ])
-            ->seeStatusCode(200)
-            ->seeJson([
-                'vce_server_id' => $pod->ucs_datacentre_vce_server_id,
-                'vcl_server_id' => $pod->ucs_datacentre_vcl_server_id
-            ]);
+        ])->assertJsonFragment([
+            'vce_server_id' => (int) $pod->ucs_datacentre_vce_server_id,
+            'vcl_server_id' => (int) $pod->ucs_datacentre_vcl_server_id
+        ])->assertStatus(200);
     }
 
     /**
@@ -131,31 +119,31 @@ class GetTest extends TestCase
      */
     public function testVclVceServerIdNotAdmin()
     {
-        $pod = factory(Pod::class, 1)->create([
+        $pod = Pod::factory()->create([
             'ucs_datacentre_id' => 123,
             'ucs_datacentre_vcl_server_id' => 12345,
             'ucs_datacentre_vce_server_id' => 54321,
         ])->first();
 
-        $this->json('GET', '/v1/pods/123', [], [
+        $this->get('/v1/pods/123', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
         ])
-            ->seeStatusCode(200)
-            ->dontSeeJson([
-                'vce_server_id' => $pod->ucs_datacentre_vce_server_id,
-                'vcl_server_id' => $pod->ucs_datacentre_vcl_server_id
+            ->assertStatus(200)
+            ->assertJsonMissing([
+                'vce_server_id' => (int) $pod->ucs_datacentre_vce_server_id,
+                'vcl_server_id' => (int) $pod->ucs_datacentre_vcl_server_id
             ]);
     }
 
     public function testFilteringCollectionByService()
     {
-        factory(Pod::class, 1)->create([
+        Pod::factory()->create([
             'ucs_datacentre_id' => 123,
             'ucs_datacentre_public_enabled' => true,
         ]);
 
-        factory(Pod::class, 1)->create([
+        Pod::factory()->create([
             'ucs_datacentre_id' => 321,
             'ucs_datacentre_public_enabled' => false,
         ]);
@@ -163,11 +151,9 @@ class GetTest extends TestCase
         $this->get('/v1/pods?services.public:eq=true', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        ])->assertJsonFragment([
             'total' => 1,
-        ]);
+        ])->assertStatus(200);
     }
 
     /**
@@ -175,17 +161,16 @@ class GetTest extends TestCase
      */
     public function testVmwareApiUrlAdmin()
     {
-        $pod = factory(Pod::class, 1)->create([
+        $pod = Pod::factory()->create([
             'ucs_datacentre_id' => 123,
             'ucs_datacentre_vmware_api_url' => 'http://example.com'
         ])->first();
 
-        $this->json('GET', '/v1/pods/123', [], [
+        $this->get('/v1/pods/123', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
-        ])
-            ->seeStatusCode(200)
-            ->seeJson([
+        ])->assertStatus(200)
+            ->assertJsonFragment([
                 'mgmt_api_url' => $pod->ucs_datacentre_vmware_api_url
             ]);
     }
@@ -195,17 +180,17 @@ class GetTest extends TestCase
      */
     public function testVmwareApiUrlNotAdmin()
     {
-        $pod = factory(Pod::class, 1)->create([
+        $pod = Pod::factory()->create([
             'ucs_datacentre_id' => 123,
             'ucs_datacentre_vmware_api_url' => 'http://example.com'
         ])->first();
 
-        $this->json('GET', '/v1/pods/123', [], [
+        $this->get('/v1/pods/123', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
         ])
-            ->seeStatusCode(200)
-            ->dontSeeJson([
+            ->assertStatus(200)
+            ->assertJsonMissing([
                 'mgmt_api_url' => $pod->ucs_datacentre_vmware_api_url
             ]);
     }
