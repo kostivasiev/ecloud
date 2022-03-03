@@ -33,7 +33,7 @@ class DeleteTest extends TestCase
         $this->availabilityZone = factory(AvailabilityZone::class)->create([
             'region_id' => $this->region->id,
         ]);
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'name' => 'NSX',
             'resource_id' => $this->availabilityZone->id,
         ]);

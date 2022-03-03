@@ -21,7 +21,7 @@ class NatTest extends TestCase
         $this->faker = Faker::create();
 
         Model::withoutEvents(function () {
-            $this->floating_ip = factory(FloatingIp::class)->create([
+            $this->floating_ip = FloatingIp::factory()->create([
                 'id' => 'fip-test2',
                 'ip_address' => $this->faker->ipv4,
             ]);

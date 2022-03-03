@@ -19,11 +19,11 @@ class UpdateBillingTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        factory(Product::class)->create([
+        Product::factory()->create([
             'product_name' => $this->availabilityZone()->id . ': site to site vpn',
             'product_subcategory' => 'Networking',
         ])->each(function ($product) {
-            factory(ProductPrice::class)->create([
+            ProductPrice::factory()->create([
                 'product_price_product_id' => $product->id,
                 'product_price_sale_price' => 0.05
             ]);

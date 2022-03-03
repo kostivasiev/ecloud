@@ -54,7 +54,7 @@ class MigrateTest extends TestCase
             ]);
         });
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-' . uniqid(),
             'platform' => 'Windows'
         ])->instances()->save($instance);

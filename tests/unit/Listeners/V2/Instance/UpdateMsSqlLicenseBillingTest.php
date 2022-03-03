@@ -24,10 +24,10 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
         parent::setUp();
         $this->billingJobMock = Mockery::mock(UpdateMsSqlLicenseBilling::class)->makePartial();
 
-        factory(Product::class)->create([
+        Product::factory()->create([
             'product_name' => $this->availabilityZone()->id . ': mssql standard license',
         ])->each(function ($product) {
-            factory(ProductPrice::class)->create([
+            ProductPrice::factory()->create([
                 'product_price_product_id' => $product->id,
                 'product_price_sale_price' => 1
             ]);

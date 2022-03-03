@@ -45,7 +45,7 @@ class IsSameAvailabilityZoneTest extends TestCase
     {
         $rule = new IsSameAvailabilityZone($this->network()->id);
 
-        $floatingIp = factory(floatingip::class)->create([
+        $floatingIp = FloatingIp::factory()->create([
             'id' => 'fip-test',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone2->id,

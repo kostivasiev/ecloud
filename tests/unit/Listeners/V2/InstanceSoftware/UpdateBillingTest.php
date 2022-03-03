@@ -33,7 +33,7 @@ class UpdateBillingTest extends TestCase
         $this->instanceSoftware->save();
 
         // Create billing product for az-test: software:test software
-        $this->product = factory(Product::class)->create([
+        $this->product = Product::factory()->create([
             'product_sales_product_id' => 0,
             'product_name' => $this->availabilityZone()->id.': software:test software',
             'product_category' => 'eCloud',
@@ -43,7 +43,7 @@ class UpdateBillingTest extends TestCase
             'product_duration_type' => 'Hour',
             'product_duration_length' => 1,
         ]);
-        factory(ProductPrice::class)->create([
+        ProductPrice::factory()->create([
             'product_price_product_id' => $this->product->id,
             'product_price_sale_price' => 0.0000115314,
         ]);

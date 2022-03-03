@@ -152,11 +152,11 @@ trait BillingMetricTrait
 
     public function createBillingMetricAndCost($code, $price, $quantity)
     {
-        factory(Product::class)->create([
+        Product::factory()->create([
             'product_name' => $this->availabilityZone()->id . ': ' . $code,
             'product_cost_price' => $price,
         ])->each(function ($product) use ($price) {
-            factory(ProductPrice::class)->create([
+            ProductPrice::factory()->create([
                 'product_price_product_id' => $product->id,
                 'product_price_sale_price' => $price,
             ])->each(function ($productPrice) use ($price) {

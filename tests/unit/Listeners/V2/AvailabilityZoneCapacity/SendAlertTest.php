@@ -2,15 +2,9 @@
 
 namespace Tests\unit\Listeners\V2\AvailabilityZoneCapacity;
 
-use App\Jobs\FloatingIp\AllocateIp;
 use App\Mail\AvailabilityZoneCapacityAlert;
 use App\Models\V2\AvailabilityZoneCapacity;
-use App\Models\V2\FloatingIp;
-use Faker\Factory as Faker;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class SendAlertTest extends TestCase
@@ -23,7 +17,7 @@ class SendAlertTest extends TestCase
     {
         parent::setUp();
 
-        $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
+        $this->availabilityZoneCapacity = AvailabilityZoneCapacity::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'current' => null
         ]);

@@ -47,12 +47,12 @@ class UpdateLicenseBillingTest extends TestCase
     public function testInsertPleskLicenseBilling()
     {
         // Add a plesk billing product
-        factory(Product::class)->create([
+        Product::factory()->create([
             'product_name' => $this->availabilityZone()->id . ': plesk-license',
             'product_category' => 'eCloud',
             'product_subcategory' => 'License',
         ])->each(function ($product) {
-            factory(ProductPrice::class)->create([
+            ProductPrice::factory()->create([
                 'product_price_product_id' => $product->id,
                 'product_price_sale_price' => 0.00000816
             ]);

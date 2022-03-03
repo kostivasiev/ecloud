@@ -32,7 +32,7 @@ class HiddenCredentialsTest extends TestCase
             $this->instance = new Instance(['id' => 'abc-abc132']);
         });
 
-        $this->credentials = factory(Credential::class)->create([
+        $this->credentials = Credential::factory()->create([
             'resource_id' => 'abc-abc132',
             'host' => 'https://127.0.0.1',
             'username' => 'someuser',

@@ -23,7 +23,7 @@ class UpdateTest extends TestCase
             'region_id' => $this->region->id
         ]);
 
-        $this->routerThroughput = factory(RouterThroughput::class)->create([
+        $this->routerThroughput = RouterThroughput::factory()->create([
             'availability_zone_id' => $availabilityZone->id,
         ]);
     }

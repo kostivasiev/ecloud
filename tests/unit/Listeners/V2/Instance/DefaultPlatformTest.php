@@ -2,16 +2,12 @@
 namespace Tests\unit\Listeners\V2\Instance;
 
 use App\Listeners\V2\Instance\DefaultPlatform;
-use App\Models\V2\Appliance;
-use App\Models\V2\ApplianceVersion;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use Faker\Factory as Faker;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
-use UKFast\Admin\Devices\AdminClient;
 
 class DefaultPlatformTest extends TestCase
 {
@@ -31,7 +27,7 @@ class DefaultPlatformTest extends TestCase
         $this->faker = Faker::create();
 
         Model::withoutEvents(function() {
-            $this->image = factory(Image::class)->create([
+            $this->image = Image::factory()->create([
                 'id' => 'img-test',
             ]);
             $this->instance = Instance::factory()->create([
@@ -40,7 +36,7 @@ class DefaultPlatformTest extends TestCase
             $this->instance->image()->associate($this->image);
         });
 
-        $this->network = factory(Network::class)->create();
+        $this->network = Network::factory()->create();
     }
 
     public function testSettingPlatform()

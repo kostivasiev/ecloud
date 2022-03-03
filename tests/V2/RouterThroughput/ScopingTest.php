@@ -13,7 +13,7 @@ class ScopingTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->routerThroughput = factory(RouterThroughput::class)->create([
+        $this->routerThroughput = RouterThroughput::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->getKey()
         ]);
     }
