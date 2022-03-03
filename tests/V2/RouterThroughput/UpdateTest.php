@@ -5,7 +5,6 @@ namespace Tests\V2\RouterThroughput;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\RouterThroughput;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
@@ -18,19 +17,19 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->region = Region::factory()->create();
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
 
-        $this->routerThroughput = factory(RouterThroughput::class)->create([
+        $this->routerThroughput = RouterThroughput::factory()->create([
             'availability_zone_id' => $availabilityZone->id,
         ]);
     }
 
     public function testValidDataSucceeds()
     {
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
 
@@ -42,14 +41,16 @@ class UpdateTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])
-            ->seeInDatabase('router_throughputs', [
+            ->assertStatus(200);
+        $this->assertDatabaseHas(
+            'router_throughputs',
+            [
                 'id' => $this->routerThroughput->id,
                 'name' => 'NEW NAME',
                 'availability_zone_id' => $availabilityZone->id,
                 "committed_bandwidth" => 999,
             ],
-                'ecloud'
-            )
-            ->assertResponseStatus(200);
+            'ecloud'
+        );
     }
 }
