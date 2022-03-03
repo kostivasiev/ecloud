@@ -15,13 +15,13 @@ class DeleteTest extends TestCase
      */
     public function testDeleteHostNoSanMapped()
     {
-        $pod = factory(Pod::class, 1)->create()->first();
+        $pod = Pod::factory(1)->create()->first();
 
-        $solution = factory(Solution::class, 1)->create([
+        $solution = Solution::factory(1)->create([
             'ucs_reseller_datacentre_id' => $pod->getKey()
         ])->first();
 
-        $host = factory(Host::class, 1)->create([
+        $host = Host::factory(1)->create([
             'ucs_node_ucs_reseller_id' => $solution->getKey(),
             'ucs_node_internal_name' => 'Test Host 1'
         ])->first();
@@ -29,9 +29,10 @@ class DeleteTest extends TestCase
         $this->json('POST', '/v1/hosts/' . $host->getKey() . '/delete', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeStatusCode(404)->seeJson([
-            'title' => 'SAN not found',
-            'detail' => "No SANS are found on the solution's pod"
-        ]);
+        ])->assertStatus(404)
+            ->assertJsonFragment([
+                'title' => 'SAN not found',
+                'detail' => "No SANS are found on the solution's pod"
+            ]);
     }
 }

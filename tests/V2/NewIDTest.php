@@ -41,7 +41,7 @@ class NewIDTest extends TestCase
 
     public function testFormatOfAvailabilityZoneID()
     {
-        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
+        putenv('APP_ENV=local');
         $response = $this->post('/v2/availability-zones', [
             'code' => 'MAN1',
             'name' => 'Manchester Zone 1',
@@ -61,7 +61,7 @@ class NewIDTest extends TestCase
     public function testFormatOfRoutersId()
     {
         Event::fake(Created::class);
-        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
+        putenv('APP_ENV=local');
         $post = $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc()->id,
@@ -82,7 +82,7 @@ class NewIDTest extends TestCase
     {
         Event::fake(Created::class);
 
-        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('local');
+        putenv('APP_ENV=local');
 
         $post = $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
@@ -104,7 +104,7 @@ class NewIDTest extends TestCase
     public function testProductionEnvironmentId()
     {
         Event::fake(Created::class);
-        App::shouldReceive('environment')->zeroOrMoreTimes()->andReturn('production');
+        putenv('APP_ENV=production');
         $post = $this->post('/v2/routers', [
             'name' => 'Manchester Router 1',
             'vpc_id' => $this->vpc()->id,

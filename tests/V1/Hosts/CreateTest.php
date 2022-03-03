@@ -7,7 +7,6 @@ use App\Models\V1\Pod;
 use App\Models\V1\San;
 use App\Models\V1\Solution;
 use App\Models\V1\Storage;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class CreateTest extends TestCase
@@ -18,16 +17,16 @@ class CreateTest extends TestCase
      */
     public function tesCountSolutionMappedSans()
     {
-        $pod = factory(Pod::class, 1)->create()->first();
+        $pod = Pod::factory(1)->create()->first();
 
-        $solution = factory(Solution::class, 1)->create([
+        $solution = Solution::factory(1)->create([
             'ucs_reseller_datacentre_id' => $pod->getKey()
         ])->first();
 
         $this->assertEquals(0, $solution->pod->sans->count());
 
         // Add a SAN mapped to the solution
-        factory(Storage::class, 1)->create([
+        Storage::factory(1)->create([
             'ucs_datacentre_id' => $pod->ucs_datacentre_id
         ]);
 
@@ -40,23 +39,24 @@ class CreateTest extends TestCase
      */
     public function testCreateHostNoSan()
     {
-        $pod = factory(Pod::class, 1)->create()->first();
+        $pod = Pod::factory(1)->create()->first();
 
-        $solution = factory(Solution::class, 1)->create([
+        $solution = Solution::factory(1)->create([
             'ucs_reseller_datacentre_id' => $pod->getKey()
         ])->first();
 
-        $host = factory(Host::class, 1)->create([
+        $host = Host::factory(1)->create([
             'ucs_node_ucs_reseller_id' => $solution->getKey()
         ])->first();
 
         $this->json('POST', '/v1/hosts/' . $host->getKey() . '/create', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeStatusCode(404)->seeJson([
-            'title' => 'SAN not found',
-            'detail' => "No SANS are found on the solution's pod"
-        ]);
+        ])->assertStatus(404)
+            ->assertJsonFragment([
+                'title' => 'SAN not found',
+                'detail' => "No SANS are found on the solution's pod"
+            ]);
     }
 
     /**
@@ -65,19 +65,19 @@ class CreateTest extends TestCase
      */
     public function testCreateHostLinkedSan()
     {
-        $pod = factory(Pod::class, 1)->create()->first();
+        $pod = Pod::factory(1)->create()->first();
 
-        $solution = factory(Solution::class, 1)->create([
+        $solution = Solution::factory(1)->create([
             'ucs_reseller_datacentre_id' => $pod->getKey()
         ])->first();
 
-        $host = factory(Host::class, 1)->create([
+        $host = Host::factory(1)->create([
             'ucs_node_ucs_reseller_id' => $solution->getKey()
         ])->first();
 
-        $san = factory(San::class, 1)->create([])->first();
+        $san = San::factory(1)->create([])->first();
 
-        factory(Storage::class, 1)->create([
+        Storage::factory(1)->create([
             'ucs_datacentre_id' => $pod->getKey(),
             'server_id' => $san->getKey()
         ]);
@@ -88,6 +88,6 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ]);
 
-        $this->assertNotEquals(404, $response->response->getStatusCode());
+        $this->assertNotEquals(404, $response->getStatusCode());
     }
 }

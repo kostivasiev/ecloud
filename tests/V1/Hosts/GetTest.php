@@ -19,17 +19,15 @@ class GetTest extends TestCase
      */
     public function testValidCollection()
     {
-        factory(Solution::class, 1)->create();
+        Solution::factory(1)->create();
 
         $count = 2;
-        factory(Host::class, $count)->create();
+        Host::factory($count)->create();
 
         $this->get('/v1/hosts', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        ])->assertStatus(200)->assertJsonFragment([
             'total' => $count,
             'count' => $count,
         ]);
@@ -86,8 +84,6 @@ class GetTest extends TestCase
         $this->get('/v1/hosts/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 }
