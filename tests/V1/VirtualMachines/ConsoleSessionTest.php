@@ -17,8 +17,8 @@ class ConsoleSessionTest extends TestCase
 
         });
 
-        $pod = Pod::factory()->create()->first();
-        $vm = VirtualMachine::factory()->create()->first();
+        $pod = factory(Pod::class)->create()->first();
+        $vm = factory(VirtualMachine::class)->create()->first();
         $vm->pod = $pod;
 
         $consoleResource = \App\Models\V1\Pod\Resource\Console::create([

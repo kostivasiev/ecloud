@@ -17,7 +17,7 @@ class PostTest extends ApplianceTestCase
     public function testAddApplianceToPod()
     {
         // Assert record does not exist
-        $this->missingFromDatabase(
+        $this->assertDatabaseMissing(
             'appliance_pod_availability',
             [
                 'appliance_pod_availability_appliance_id' => $this->appliances[1]->id
@@ -27,7 +27,8 @@ class PostTest extends ApplianceTestCase
 
         $this->assertTrue($this->addToPodMock(2));
 
-        $this->seeInDatabase('appliance_pod_availability',
+        $this->assertDatabaseHas(
+            'appliance_pod_availability',
             [
                 'appliance_pod_availability_appliance_id' => (int)$this->appliances[1]->id
             ],

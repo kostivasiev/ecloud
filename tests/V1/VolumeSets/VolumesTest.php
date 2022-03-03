@@ -15,20 +15,20 @@ class VolumesTest extends TestCase
 {
     public function testValidVolumeSet()
     {
-        (Solution::factory()->create());
-        (Pod::factory(1)->create([
+        (factory(Solution::class, 1)->create());
+        (factory(Pod::class, 1)->create([
             'ucs_datacentre_id' => 1
         ]));
 
-        (Storage::factory()->create([
+        (factory(Storage::class, 1)->create([
             'server_id' => 1,
             'ucs_datacentre_id' => 1,
         ]));
-        (San::factory()->create([
+        (factory(San::class, 1)->create([
             'servers_id' => 1
         ]));
 
-        $volumeSet = (VolumeSet::factory()->create())->first();
+        $volumeSet = (factory(VolumeSet::class, 1)->create())->first();
 
         app()->bind(ArtisanService::class, function () {
             return app()->instance(ArtisanService::class, Mockery::mock(ArtisanService::class, function ($mock) {
@@ -41,43 +41,45 @@ class VolumesTest extends TestCase
             }));
         });
 
-        $this->getJson(
+        $this->json(
+            'GET',
             '/v1/volumesets/' . $volumeSet->uuid . '/volumes',
+            [],
             $this->validWriteHeaders
-        )->assertJsonFragment([
+        )->seeJson([
             'data' => [
                 'volumes' => [
                     'myMockVolume',
                 ]
             ],
             'meta' => [],
-        ])->assertStatus(200);
+        ])->seeStatusCode(200);
     }
 
     public function testSameVolumeSetFoundOnManySans()
     {
-        (Solution::factory()->create());
-        (Pod::factory()->create([
+        (factory(Solution::class, 1)->create());
+        (factory(Pod::class, 1)->create([
             'ucs_datacentre_id' => 1
         ]));
 
-        (Storage::factory()->create([
+        (factory(Storage::class, 1)->create([
             'server_id' => 1,
             'ucs_datacentre_id' => 1,
         ]));
-        (San::factory()->create([
+        (factory(San::class, 1)->create([
             'servers_id' => 1
         ]));
 
-        (Storage::factory()->create([
+        (factory(Storage::class, 1)->create([
             'server_id' => 2,
             'ucs_datacentre_id' => 1,
         ]));
-        (San::factory()->create([
+        (factory(San::class, 1)->create([
             'servers_id' => 2
         ]));
 
-        $volumeSet = (VolumeSet::factory()->create())->first();
+        $volumeSet = (factory(VolumeSet::class, 1)->create())->first();
 
         app()->bind(ArtisanService::class, function () {
             return app()->instance(ArtisanService::class, Mockery::mock(ArtisanService::class, function ($mock) {
@@ -89,9 +91,11 @@ class VolumesTest extends TestCase
                 ]);
             }));
         });
-        $this->getJson(
+        $this->json(
+            'GET',
             '/v1/volumesets/' . $volumeSet->uuid . '/volumes',
+            [],
             $this->validWriteHeaders
-        )->assertStatus(500);
+        )->seeStatusCode(500);
     }
 }

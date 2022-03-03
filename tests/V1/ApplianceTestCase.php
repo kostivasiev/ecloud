@@ -52,7 +52,7 @@ class ApplianceTestCase extends TestCase
                     'appliance_version_version' => ($i + 1),
                 ];
 
-                $applianceVersion = ApplianceVersion::factory()->make($applianceFactoryConfig);
+                $applianceVersion = factory(ApplianceVersion::class)->make($applianceFactoryConfig);
 
                 if ($this->verbose) {
                     echo 'Creating appliance version \'' . ($i + 1) . '\' for appliance \'' . $appliance->getKey() . '\'';
@@ -96,6 +96,7 @@ class ApplianceTestCase extends TestCase
             if ($this->verbose) {
                 echo PHP_EOL;
             }
+
         });
     }
 
@@ -105,7 +106,7 @@ class ApplianceTestCase extends TestCase
     public function setUpAppliancePodTestData()
     {
         // Create a pod with one-click enabled
-        Pod::factory(1)->create([
+        factory(Pod::class, 1)->create([
             'ucs_datacentre_id' => 1,
             'ucs_datacentre_oneclick_enabled' => 'Yes'
         ]);
@@ -116,9 +117,9 @@ class ApplianceTestCase extends TestCase
         $availability->save();
 
         // Create a Pod with one-click disabled
-        Pod::factory(1)->create([
+        factory(Pod::class, 1)->create([
             'ucs_datacentre_id' => 2,
-            'ucs_datacentre_oneclick_enabled' => 'No',
+            'ucs_datacentre_oneclick_enabled' => 'No'
         ]);
         // Add an appliance to the pod
         $availability = new AppliancePodAvailability();

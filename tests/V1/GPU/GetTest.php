@@ -4,7 +4,6 @@ namespace Tests\V1\GPU;
 
 use App\Models\V1\GpuProfile;
 use App\Models\V1\VirtualMachine;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 use Tests\V1\TestCase;
 
@@ -16,14 +15,14 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->gpu_profile = factory(GpuProfile::class, 1)->create()->first();
+        $this->gpu_profile = GpuProfile::factory()->create()->first();
     }
 
     public function testValidCollection()
     {
         $this->json('GET', '/v1/gpu-profiles', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
                 'profile_name' => $this->gpu_profile->profile_name,
@@ -34,11 +33,11 @@ class GetTest extends TestCase
     public function testValidCollectionReadOnly()
     {
         $this->json('GET', '/v1/gpu-profiles', [], $this->validReadHeaders)
-            ->seeStatusCode(200)
-            ->dontSeeJson([
+            ->assertStatus(200)
+            ->assertJsonMissing([
                 'profile_name' => $this->gpu_profile->profile_name,
             ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
                 'card_type' => $this->gpu_profile->card_type,
@@ -48,8 +47,8 @@ class GetTest extends TestCase
     public function testValidItem()
     {
         $this->json('GET', '/v1/gpu-profiles/' . $this->gpu_profile->getKey(), [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
                 'profile_name' => $this->gpu_profile->profile_name,
@@ -60,11 +59,11 @@ class GetTest extends TestCase
     public function testValidItemReadOnly()
     {
         $this->json('GET', '/v1/gpu-profiles/' . $this->gpu_profile->getKey(), [], $this->validReadHeaders)
-            ->seeStatusCode(200)
-            ->dontSeeJson([
+            ->assertStatus(200)
+            ->assertJsonMissing([
                 'profile_name' => $this->gpu_profile->profile_name,
             ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
                 'card_type' => $this->gpu_profile->card_type,
@@ -76,7 +75,7 @@ class GetTest extends TestCase
         config(['gpu.cards_available' => 5]);
         $this->assertEquals(5, GpuProfile::gpuResourcePoolAvailability());
 
-        $vms = factory(VirtualMachine::class, 1)->create()->first();
+        $vms = VirtualMachine::factory()->create()->first();
         $vms->servers_ecloud_gpu_profile_uuid = $this->gpu_profile->getKey();
         $vms->save();
 

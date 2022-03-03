@@ -2,12 +2,11 @@
 
 namespace Tests\V1;
 
-use App\Providers\EncryptionServiceProvider;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Event;
 use Tests\CreatesApplication;
 use Tests\Traits\ResellerDatabaseMigrations;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -32,8 +31,8 @@ abstract class TestCase extends BaseTestCase
             ->makePartial();
 
         app()->bind('encrypter', function () use ($mockEncrypter) {
-            $mockEncrypter->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
-            $mockEncrypter->shouldReceive('decrypt')->andReturn('somepassword');
+            $mockEncrypter->allows('encrypt')->andReturns('EnCrYpTeD-pAsSwOrD');
+            $mockEncrypter->allows('decrypt')->andReturns('somepassword');
             return $mockEncrypter;
         });
 

@@ -20,11 +20,10 @@ class PatchTest extends ApplianceTestCase
     public function testUpdateApplianceParameter()
     {
         // Generate a test parameter
-        $newParameter = ApplianceParameter::factory(1)->make()->first();
+        $newParameter = factory(ApplianceParameter::class, 1)->make()->first();
 
         // Get an existing parameter
         $param = ApplianceParameter::query()->first();
-
 
         $this->assertDatabaseMissing(
             'appliance_script_parameters',
@@ -34,7 +33,6 @@ class PatchTest extends ApplianceTestCase
                 'appliance_script_parameters_type' => $newParameter->type,
                 'appliance_script_parameters_description' => $newParameter->description,
                 'appliance_script_parameters_required' => ($newParameter->required == 'Yes'),
-
             ],
             env('DB_ECLOUD_CONNECTION')
         );
@@ -44,12 +42,13 @@ class PatchTest extends ApplianceTestCase
             'key' => $newParameter->key,
             'type' => $newParameter->type,
             'description' => $newParameter->description,
-            'required' => false,
+            'required' => 0,
             'validation_rule' => '/\w+/'
-        ], $this->validWriteHeaders)
-            ->assertStatus(204);
+        ], $this->validWriteHeaders);
 
-        $this->assertDatabaseHas(
+        $this->assertResponseStatus(204);
+
+        $this->seeInDatabase(
             'appliance_script_parameters',
             [
                 'appliance_script_parameters_uuid' => $param->uuid,
@@ -70,7 +69,7 @@ class PatchTest extends ApplianceTestCase
     public function testUpdateApplianceParameterNotAdmin()
     {
         // Generate a test parameter
-        $newParameter = ApplianceParameter::factory(1)->make()->first();
+        $newParameter = factory(ApplianceParameter::class, 1)->make()->first();
 
         // Get an existing parameter
         $param = ApplianceParameter::query()->first();

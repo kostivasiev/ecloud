@@ -25,7 +25,7 @@ class DeleteTest extends ApplianceTestCase
      */
     public function testDeleteApplianceFromPod()
     {
-        factory(Pod::class, 1)->create([
+        Pod::factory(1)->create([
             'ucs_datacentre_id' => 123,
         ]);
         $appliance = $this->appliances[0];
@@ -36,9 +36,8 @@ class DeleteTest extends ApplianceTestCase
 
         $this->assertEquals($podQry->count(), 1);
 
-        $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid, [], $this->validWriteHeaders);
-
-        $this->assertStatus(204);
+        $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid, [], $this->validWriteHeaders)
+            ->assertStatus(204);
 
         $podQry = AppliancePodAvailability::query();
         $podQry->where('appliance_pod_availability_appliance_id', '=', $appliance->id);
@@ -50,12 +49,11 @@ class DeleteTest extends ApplianceTestCase
     public function testDeleteApplianceFromPodUnauthorised()
     {
         $appliance = $this->appliances[0];
-        factory(Pod::class, 1)->create([
+        Pod::factory(1)->create([
             'ucs_datacentre_id' => 123,
         ]);
 
-        $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid, [], $this->validReadHeaders);
-
-        $this->assertStatus(401);
+        $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid, [], $this->validReadHeaders)
+            ->assertStatus(401);
     }
 }

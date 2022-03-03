@@ -4,9 +4,10 @@ namespace Tests\V1\Appliance\Version;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\ApplianceVersion;
-use Illuminate\Http\Response;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
+use Symfony\Component\HttpFoundation\Response;
+
 use Tests\V1\TestCase;
 
 class DataTest extends TestCase
@@ -37,9 +38,9 @@ class DataTest extends TestCase
     {
         parent::setUp();
 
-        $this->applianceVersion = factory(ApplianceVersion::class)->create([
+        $this->applianceVersion = ApplianceVersion::factory()->create([
             'appliance_uuid' => function () {
-                return factory(Appliance::class)->create()->appliance_uuid;
+                return Appliance::factory()->create()->appliance_uuid;
             },
             'appliance_version_version' => 1,
         ]);
@@ -71,7 +72,9 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri(),
             self::TEST_DATA,
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_CREATED)->seeInDatabase(
+        )->assertStatus(Response::HTTP_CREATED);
+
+        $this->assertDatabaseHas(
             'appliance_version_data',
             self::TEST_DATA + [
                 'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
@@ -88,7 +91,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri(),
             self::TEST_DATA,
             self::HEADERS_PUBLIC
-        )->seeStatusCode(Response::HTTP_UNAUTHORIZED);
+        )->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     public function testDeleteIsAdminOnly()
@@ -98,7 +101,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri() . '/test-key',
             [],
             self::HEADERS_PUBLIC
-        )->seeStatusCode(Response::HTTP_UNAUTHORIZED);
+        )->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     public function testPatchIsAdminOnly()
@@ -108,7 +111,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri() . '/test-key',
             [],
             self::HEADERS_PUBLIC
-        )->seeStatusCode(Response::HTTP_UNAUTHORIZED);
+        )->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     public function testGetIsAdminOnly()
@@ -118,7 +121,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri(),
             [],
             self::HEADERS_PUBLIC
-        )->seeStatusCode(Response::HTTP_UNAUTHORIZED);
+        )->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     public function valueDataProvider()
@@ -127,7 +130,7 @@ class DataTest extends TestCase
             'valid_value_returns_OK' => [
                 'data' => self::TEST_DATA,
                 'responseCode' => Response::HTTP_CREATED,
-                'databaseCheckMethod' => 'seeInDatabase',
+                'databaseCheckMethod' => 'assertDatabaseHas',
             ],
             'invalid_value_returns_BAD_REQUEST' => [
                 'data' => [
@@ -135,7 +138,7 @@ class DataTest extends TestCase
                     'value' => '',
                 ],
                 'responseCode' => Response::HTTP_BAD_REQUEST,
-                'databaseCheckMethod' => 'notSeeInDatabase',
+                'databaseCheckMethod' => 'assertDatabaseMissing',
             ],
         ];
     }
@@ -153,7 +156,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri(),
             $data,
             self::HEADERS_ADMIN
-        )->seeStatusCode($responseCode);
+        )->assertStatus($responseCode);
 
         $this->$databaseCheckMethod(
             'appliance_version_data',
@@ -190,7 +193,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri($useValidUuid),
             self::TEST_DATA,
             self::HEADERS_ADMIN
-        )->seeStatusCode($responseCode);
+        )->assertStatus($responseCode);
     }
 
     public function applianceStateDataProvider()
@@ -232,7 +235,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri(),
             self::TEST_DATA,
             self::HEADERS_ADMIN
-        )->seeStatusCode($responseCode);
+        )->assertStatus($responseCode);
     }
 
     public function applianceVersionStateDataProvider()
@@ -264,7 +267,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri(),
             self::TEST_DATA,
             self::HEADERS_ADMIN
-        )->seeStatusCode($responseCode);
+        )->assertStatus($responseCode);
     }
 
     public function testDuplicateKey()
@@ -275,7 +278,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri(),
             self::TEST_DATA,
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_CONFLICT);
+        )->assertStatus(Response::HTTP_CONFLICT);
     }
 
     public function testDeleteExistingKey()
@@ -286,16 +289,15 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri() . '/test-key',
             [],
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_NO_CONTENT);
+        )->assertStatus(Response::HTTP_NO_CONTENT);
 
-        $this->notSeeInDatabase(
+        $this->assertDatabaseMissing(
             'appliance_version_data',
             self::TEST_DATA + [
                 'appliance_version_uuid' => $this->applianceVersion->appliance_version_uuid,
                 'deleted_at' => null,
             ],
-            'ecloud'
-        );
+            'ecloud');
     }
 
     public function testDeleteNonExistentKey()
@@ -305,7 +307,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri() . '/test-key',
             [],
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_NOT_FOUND);
+        )->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
     public function testGetExistingKey()
@@ -316,7 +318,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
             [],
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+        )->assertStatus(Response::HTTP_OK)->assertJsonFragment([
             'data' => [
                 'value' => self::TEST_DATA['value'],
             ]
@@ -330,7 +332,7 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri() . '/' . self::TEST_DATA['key'],
             [],
             self::HEADERS_ADMIN
-        )->seeStatusCode(404);
+        )->assertStatus(404);
     }
 
     public function testGetAll()
@@ -341,7 +343,9 @@ class DataTest extends TestCase
             $this->getApplianceVersionDataUri(),
             [],
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+        )
+            ->assertStatus(Response::HTTP_OK)
+            ->assertJsonFragment([
             'data' => [
                 self::TEST_DATA,
             ]
@@ -358,11 +362,13 @@ class DataTest extends TestCase
                 'value' => 'new_value',
             ],
             self::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+        )->assertStatus(Response::HTTP_OK)->assertJsonFragment([
             'data' => [
                 'key' => self::TEST_DATA['key'],
             ]
-        ])->seeInDatabase(
+        ]);
+
+        $this->assertDatabaseHas(
             'appliance_version_data',
             [
                 'key' => self::TEST_DATA['key'],

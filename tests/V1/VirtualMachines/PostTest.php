@@ -23,41 +23,94 @@ class PostTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertStatus(403);
+        ]);
+
+        $this->assertResponseStatus(403);
     }
+
+//    /**
+//     * @runTestsInSeparateProcesses
+//     */
+//    public function testHybridDeploy()
+//    {
+//        factory(Solution::class, 1)->create([
+//            'ucs_reseller_id' => 12345,
+//        ]);
+//
+//
+//        //lets get mockery...
+//
+//        $mockDatastore = (object) [
+//            'uuid' => 'Datastore-datastore-01',
+//            'name' => 'MCS_PX_VV_12345_DATA_01',
+//            'type' => 'VMFS',
+//            'capacity' => 1024,
+//            'freeSpace' => 1024,
+//            'uncommitted' => 0,
+//            'provisioned' => 0,
+//            'available' => 1024,
+//            'used' => 0,
+//        ];
+//
+//
+//        \Mockery::mock('overload:KingpinService')
+//            ->shouldReceive('getDatastores')->andReturn([
+//                $mockDatastore
+//            ]);
+//
+//        \Mockery::mock('overload:KingpinService')
+//            ->shouldReceive('getDatastore')->andReturn($mockDatastore);
+//
+//
+//
+//        // test the api
+//        $this->json('POST', '/v1/vms/', [
+//            'environment' => 'Hybrid',
+//            'template' => 'CentOS 7 64-bit',
+//            'solution_id' => '12345',
+//            'cpu' => 1,
+//            'ram' => 2,
+//            'hdd' => 20,
+//        ], [
+//            'X-consumer-custom-id' => '1-1',
+//            'X-consumer-groups' => 'ecloud.write',
+//        ]);
+//
+//        $this->assertResponseStatus(201);
+//    }
 
     public function testPublicCloneDisabled()
     {
-        VirtualMachine::factory()->create([
+        factory(VirtualMachine::class, 1)->create([
             'servers_id' => 123,
             'servers_ecloud_type' => 'Public',
         ]);
 
-        $this->postJson(
-            '/v1/vms/123/clone',
-            [],
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertStatus(403);
+        $this->json('POST', '/v1/vms/123/clone', [
+
+        ], [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(403);
     }
 
     public function testBurstCloneDisabled()
     {
-        VirtualMachine::factory()->create([
+        factory(VirtualMachine::class, 1)->create([
             'servers_id' => 123,
             'servers_ecloud_type' => 'Burst',
         ]);
 
-        $this->postJson(
-            '/v1/vms/123/clone',
-            [],
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertStatus(403);
+        $this->json('POST', '/v1/vms/123/clone', [
+
+        ], [
+            'X-consumer-custom-id' => '1-1',
+            'X-consumer-groups' => 'ecloud.write',
+        ]);
+
+        $this->assertResponseStatus(403);
     }
 
 
@@ -79,7 +132,7 @@ class PostTest extends TestCase
 
     public function testInvalidSSHPublicKey()
     {
-        Solution::factory()->create();
+        factory(Solution::class, 1)->create();
         $solution = Solution::query()->first();
         $data = [
             'environment' => 'Hybrid',
@@ -93,9 +146,9 @@ class PostTest extends TestCase
             ]
         ];
 
-        $this->postJson('/v1/vms', $data, $this->validWriteHeaders)
-            ->assertStatus(422)
-            ->assertJsonFragment(
+        $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)
+            ->seeStatusCode(422)
+            ->seeJson(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'ssh_keys.0 is not a valid SSH Public key',

@@ -31,11 +31,11 @@ class CanModifyResourceTest extends TestCase
      * @test
      * @dataProvider validStatuses
      */
-    public function testAllowsModifyWhenSolutionCompleted($status)
+    public function allows_modify_when_solution_completed($status)
     {
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
 
-        $solution = (Solution::factory(1)->create())->first();
+        $solution = (factory(Solution::class, 1)->create())->first();
 
         $solution->ucs_reseller_status = Status::COMPLETED;
 
@@ -48,11 +48,11 @@ class CanModifyResourceTest extends TestCase
      * @test
      * @dataProvider invalidStatuses
      */
-    public function testThrowsExceptionWhenInInvalidState($status)
+    public function throws_exception_when_in_invalid_state($status)
     {
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(false));
 
-        $solution = (Solution::factory(1)->create())->first();
+        $solution = (factory(Solution::class, 1)->create())->first();
         $solution->ucs_reseller_status = $status;
 
         $check = new CanModifyResource($solution);

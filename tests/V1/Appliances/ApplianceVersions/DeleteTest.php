@@ -2,9 +2,6 @@
 
 namespace Tests\V1\Appliances\ApplianceVersions;
 
-use App\Models\V1\Appliance;
-use App\Models\V1\AppliancePodAvailability;
-use App\Models\V1\ApplianceVersion;
 use Tests\V1\ApplianceTestCase;
 
 
@@ -31,9 +28,8 @@ class DeleteTest extends ApplianceTestCase
 
         $this->assertNull($applianceVersion->deleted_at);
 
-        $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid, [], $this->validWriteHeaders);
-
-        $this->assertStatus(204);
+        $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid, [], $this->validWriteHeaders)
+            ->assertStatus(204);
 
         $applianceVersion->refresh();
 
@@ -49,9 +45,8 @@ class DeleteTest extends ApplianceTestCase
     {
         $applianceVersion = $this->appliances[0]->getLatestVersion();
 
-        $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid, [], $this->validReadHeaders);
-
-        $this->assertStatus(401);
+        $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid, [], $this->validReadHeaders)
+            ->assertStatus(401);
     }
 
     /**
@@ -61,7 +56,7 @@ class DeleteTest extends ApplianceTestCase
     public function testDeleteLastActiveApplianceVersion()
     {
         // Create an appliance with a single active version and add it to a Pod
-        $appliance = factory(Appliance::class, 1)->create()->each(function ($appliance) {
+        $appliance = Appliance::factory(1)->create()->each(function ($appliance) {
             $appliance->save();
             $appliance->refresh();
 
@@ -71,7 +66,7 @@ class DeleteTest extends ApplianceTestCase
                 'appliance_version_version' => 1,
             ];
 
-            $applianceVersion = factory(ApplianceVersion::class)->make($applianceFactoryConfig);
+            $applianceVersion = ApplianceVersion::factory()->make($applianceFactoryConfig);
             $applianceVersion->save();
             $applianceVersion->refresh();
 
@@ -85,13 +80,11 @@ class DeleteTest extends ApplianceTestCase
         $versions = $appliance->versions->where('appliance_version_active', '=', 'Yes');
         $this->assertEquals(1, $versions->count());
 
-        $res = $this->json(
+        $this->json(
             'DELETE',
             '/v1/appliance-versions/' . $versions->first()->appliance_version_uuid,
             [],
             $this->validWriteHeaders
-        );
-
-        $this->assertStatus(400);
+        )->assertStatus(400);
     }
 }
