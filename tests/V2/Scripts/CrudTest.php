@@ -20,68 +20,68 @@ class CrudTest extends TestCase
     {
         // 'public' visibility of related software displays to non admin
         $this->get('/v2/scripts')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'scr-test-1',
                 'name' => 'Script 1',
                 'software_id' => 'soft-aaaaaaaa',
                 'sequence' => 1,
                 'script' => 'exit 0',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         $software = Software::first();
         $software->setAttribute('visibility', Software::VISIBILITY_PRIVATE)->save();
 
         // 'private' visibility of related software does not display to non admin
         $this->get('/v2/scripts')
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'id' => 'scr-test-1'
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         // 'private' visibility of related software displays to admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->get('/v2/scripts')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'scr-test-1',
                 'name' => 'Script 1',
                 'software_id' => 'soft-aaaaaaaa',
                 'sequence' => 1,
                 'script' => 'exit 0',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShow()
     {
         // 'public' visibility of related software displays to non admin
         $this->get('/v2/scripts/scr-test-1')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'scr-test-1',
                 'name' => 'Script 1',
                 'software_id' => 'soft-aaaaaaaa',
                 'sequence' => 1,
                 'script' => 'exit 0',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         $software = Software::first();
         $software->setAttribute('visibility', Software::VISIBILITY_PRIVATE)->save();
 
         // 'private' visibility of related software does not display to non admin
-        $this->get('/v2/scripts/scr-test-1')->assertResponseStatus(404);
+        $this->get('/v2/scripts/scr-test-1')->assertStatus(404);
 
         // 'private' visibility of related software displays to admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->get('/v2/scripts/scr-test-1')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'scr-test-1',
                 'name' => 'Script 1',
                 'software_id' => 'soft-aaaaaaaa',
                 'sequence' => 1,
                 'script' => 'exit 0',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testStore()
@@ -93,17 +93,17 @@ class CrudTest extends TestCase
         ];
 
         // Not admin fails
-        $this->post('/v2/scripts', $data)->assertResponseStatus(401);
+        $this->post('/v2/scripts', $data)->assertStatus(401);
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
         // Sequence number already used fails
-        $this->post('/v2/scripts', array_merge($data, ['sequence' => 1]))->assertResponseStatus(422);
+        $this->post('/v2/scripts', array_merge($data, ['sequence' => 1]))->assertStatus(422);
 
         $data = array_merge($data, ['sequence' => 4]);
         $this->post('/v2/scripts', $data)
-            ->seeInDatabase('scripts', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
+        $this->assertDatabaseHas('scripts', $data, 'ecloud');
     }
 
     public function testUpdate()
@@ -115,28 +115,29 @@ class CrudTest extends TestCase
         ];
 
         // Not admin fails
-        $this->patch('/v2/scripts/scr-test-1', $data)->assertResponseStatus(401);
+        $this->patch('/v2/scripts/scr-test-1', $data)->assertStatus(401);
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->patch('/v2/scripts/scr-test-1', $data)
-            ->seeInDatabase('scripts', $data, 'ecloud')
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
+        $this->assertDatabaseHas('scripts', $data, 'ecloud');
     }
 
     public function testDestroy()
     {
         // Not admin fails
-        $this->delete('/v2/scripts/scr-test-1')->assertResponseStatus(401);
+        $this->delete('/v2/scripts/scr-test-1')->assertStatus(401);
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->delete('/v2/scripts/scr-test-1')
-            ->notSeeInDatabase(
-                'scripts',
-                [
-                    'id' => 'scr-test-1',
-                    'deleted_at' => null,
-                ],
-                'ecloud'
-            )->assertResponseStatus(204);
+            ->assertStatus(204);
+        $this->assertDatabaseMissing(
+            'scripts',
+            [
+                'id' => 'scr-test-1',
+                'deleted_at' => null,
+            ],
+            'ecloud'
+        );
     }
 }

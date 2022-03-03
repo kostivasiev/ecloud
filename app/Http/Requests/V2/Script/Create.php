@@ -38,9 +38,9 @@ class Create extends FormRequest
                 'sometimes',
                 'required',
                 'integer',
-                Rule::unique(Script::class)->withoutTrashed()->where(function ($query) {
+                Rule::unique(Script::class)->where(function ($query) {
                     return $query->where('software_id', app('request')->input('software_id'));
-                }),
+                })->whereNull('deleted_at'),
             ],
             'script' => [
                 'required',
