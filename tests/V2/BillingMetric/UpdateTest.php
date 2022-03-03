@@ -31,15 +31,15 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->region = Region::factory()->create();
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
-        $this->router = factory(Router::class)->create([
+        $this->router = Router::factory()->create([
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
-        $this->billingMetric = factory(BillingMetric::class)->create([
+        $this->billingMetric = BillingMetric::factory()->create([
             'resource_id' => $this->router->id,
             'vpc_id' => $this->vpc()->id,
             'reseller_id' => 1,
@@ -58,15 +58,16 @@ class UpdateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])
-            ->seeInDatabase('billing_metrics', [
+        ])->assertStatus(200);
+        $resource = BillingMetric::find($this->billingMetric->id);
+        $this->assertEquals('changed', $resource->key);
+        $this->assertDatabaseHas(
+            'billing_metrics',
+            [
                 'id' => $this->billingMetric->id,
                 'key' => 'changed',
             ],
-                'ecloud'
-            )
-            ->assertResponseStatus(200);
-        $resource = BillingMetric::find($this->billingMetric->id);
-        $this->assertEquals($resource->key, 'changed');
+            'ecloud'
+        );
     }
 }

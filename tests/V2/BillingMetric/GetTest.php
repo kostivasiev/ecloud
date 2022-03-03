@@ -31,15 +31,15 @@ class GetTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->region = Region::factory()->create();
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
-        $this->router = factory(Router::class)->create([
+        $this->router = Router::factory()->create([
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id,
         ]);
-        $this->billingMetric = factory(BillingMetric::class)->create([
+        $this->billingMetric = BillingMetric::factory()->create([
             'resource_id' => $this->router->id,
             'vpc_id' => $this->vpc()->id,
             'reseller_id' => 1,
@@ -57,18 +57,18 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->billingMetric->id,
                 'resource_id' => $this->billingMetric->resource_id,
                 'vpc_id' => $this->billingMetric->vpc_id,
-                'reseller_id' => (string)$this->billingMetric->reseller_id,
+                'reseller_id' => (string) $this->billingMetric->reseller_id,
                 'key' => $this->billingMetric->key,
                 'value' => $this->billingMetric->value,
                 'start' => $this->billingMetric->start,
                 'category' => $this->billingMetric->category,
                 'price' => $this->billingMetric->price,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetItemDetail()
@@ -77,17 +77,17 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->billingMetric->id,
                 'resource_id' => $this->billingMetric->resource_id,
                 'vpc_id' => $this->billingMetric->vpc_id,
-                'reseller_id' => (string)$this->billingMetric->reseller_id,
+                'reseller_id' => (string) $this->billingMetric->reseller_id,
                 'key' => $this->billingMetric->key,
                 'value' => $this->billingMetric->value,
                 'start' => $this->billingMetric->start,
                 'category' => $this->billingMetric->category,
                 'price' => $this->billingMetric->price,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }
