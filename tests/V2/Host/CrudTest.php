@@ -23,12 +23,12 @@ class CrudTest extends TestCase
         $this->host();
 
         $this->get('/v2/hosts')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'h-test',
                 'name' => 'h-test',
                 'host_group_id' => 'hg-test',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShow()
@@ -36,12 +36,12 @@ class CrudTest extends TestCase
         $this->host();
 
         $this->get('/v2/hosts/h-test')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'h-test',
                 'name' => 'h-test',
                 'host_group_id' => 'hg-test',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testStore()
@@ -53,8 +53,8 @@ class CrudTest extends TestCase
             'host_group_id' => $this->hostGroup()->id,
         ];
         $this->post('/v2/hosts', $data)
-            ->seeInDatabase('hosts', $data, 'ecloud')
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
+        $this->assertDatabaseHas('hosts', $data, 'ecloud');
     }
 
     public function testStoreWithFailedHostGroup()
@@ -76,12 +76,12 @@ class CrudTest extends TestCase
             'host_group_id' => $this->hostGroup()->id,
         ];
         $this->post('/v2/hosts', $data)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'The specified host group id resource currently has the status of \'failed\' and cannot be used',
                 ]
-            )->assertResponseStatus(422);
+            )->assertStatus(422);
     }
 
     public function testUpdate()
@@ -91,14 +91,15 @@ class CrudTest extends TestCase
 
         $this->patch('/v2/hosts/h-test', [
             'name' => 'new name',
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+        $this->assertDatabaseHas(
             'hosts',
             [
                 'id' => 'h-test',
                 'name' => 'new name',
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
     }
 
     public function testDestroy()
@@ -107,12 +108,13 @@ class CrudTest extends TestCase
         $this->host();
 
         $this->delete('/v2/hosts/h-test')
-            ->seeInDatabase(
-                'hosts',
-                [
-                    'id' => 'h-test',
-                ],
-                'ecloud'
-            )->assertResponseStatus(202);
+            ->assertStatus(202);
+        $this->assertDatabaseHas(
+            'hosts',
+            [
+                'id' => 'h-test',
+            ],
+            'ecloud'
+        );
     }
 }

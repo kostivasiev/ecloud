@@ -19,23 +19,23 @@ class GetTest extends TestCase
     public function testIndex()
     {
         $this->get('/v2/floating-ips')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
                 'ip_address' => '1.1.1.1'
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShow()
     {
         $this->get('/v2/floating-ips/' . $this->floatingIp()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
                 'ip_address' => '1.1.1.1'
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testSyncStatusAssignFloatingIpTaskInProgress()
@@ -49,7 +49,7 @@ class GetTest extends TestCase
         $task->save();
 
         $this->get('/v2/floating-ips/' . $this->floatingIp()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
                 'ip_address' => '1.1.1.1',
@@ -58,7 +58,7 @@ class GetTest extends TestCase
                     'type' =>  'floating_ip_assign'
                 ]
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testSyncStatusAssignFloatingIpTaskCompleted()
@@ -72,7 +72,7 @@ class GetTest extends TestCase
         $task->save();
 
         $this->get('/v2/floating-ips/' . $this->floatingIp()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
                 'ip_address' => '1.1.1.1',
@@ -80,7 +80,6 @@ class GetTest extends TestCase
                     'status' => 'complete',
                     'type' =>  'floating_ip_assign'
                 ]
-            ])
-            ->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 }

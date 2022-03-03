@@ -27,7 +27,7 @@ class AssignTest extends TestCase
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/assign', [
             'resource_id' => $ipAddress->id
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'floating_ip_assign';
@@ -45,6 +45,6 @@ class AssignTest extends TestCase
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/assign', [
             'resource_id' => $ipAddress->id
-        ])->assertResponseStatus(409);
+        ])->assertStatus(409);
     }
 }

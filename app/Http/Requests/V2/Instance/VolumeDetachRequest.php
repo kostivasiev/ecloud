@@ -18,13 +18,14 @@ class VolumeDetachRequest extends FormRequest
      */
     public function rules()
     {
+        $instanceId = app('request')->route('instanceId');
         return [
             'volume_id' => [
                 'required',
                 'string',
                 'exists:ecloud.volumes,id,deleted_at,NULL',
                 new ExistsForUser(Volume::class),
-                new VolumeAttachedToInstance($this->route()[2]['instanceId']),
+                new VolumeAttachedToInstance($instanceId),
                 new VolumeNotOSVolume(),
                 new DetachedIsNotShared,
             ]

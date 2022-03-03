@@ -8,6 +8,7 @@ use App\Rules\V2\Instance\IsNotSharedVolume;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\VolumeNotAttachedToInstance;
 use UKFast\FormRequests\FormRequest;
+use Request;
 
 class VolumeAttachRequest extends FormRequest
 {
@@ -18,7 +19,7 @@ class VolumeAttachRequest extends FormRequest
      */
     public function rules()
     {
-        $instanceId = $this->route()[2]['instanceId'];
+        $instanceId = app('request')->route('instanceId');
         return [
             'volume_id' => [
                 'required',
@@ -26,7 +27,7 @@ class VolumeAttachRequest extends FormRequest
                 'exists:ecloud.volumes,id,deleted_at,NULL',
                 new ExistsForUser(Volume::class),
                 new VolumeNotAttachedToInstance($instanceId),
-                new IsSameAvailabilityZone(app('request')->route('instanceId')),
+                new IsSameAvailabilityZone($instanceId),
                 new IsNotSharedVolume,
             ]
         ];

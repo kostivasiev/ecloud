@@ -27,11 +27,11 @@ class VolumeCapacityAttributeTests extends TestCase
     {
         parent::setUp();
 
-        $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $region = Region::factory()->create();
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id,
         ]);
-        $this->vpc = factory(Vpc::class)->create([
+        $this->vpc = Vpc::factory()->create([
             'name' => 'Manchester VPC',
         ]);
         $this->instance = Instance::factory()->create([
@@ -39,7 +39,7 @@ class VolumeCapacityAttributeTests extends TestCase
             'availability_zone_id' => $availabilityZone->id,
         ]);
 
-        $this->volumes = factory(Volume::class, 2)->create([
+        $this->volumes = Volume::factory(2)->create([
             'vpc_id' => $this->vpc->id,
             'capacity' => 10,
         ]);
@@ -48,7 +48,7 @@ class VolumeCapacityAttributeTests extends TestCase
     /**
      * Test volume capacity is as expected in collection when a single volume is connected to an instance
      */
-    public function testGetInstanceCollection_SingleVolume_ExpectedVolumeCapacityInCollection()
+    public function testGetInstanceCollectionSingleVolumeExpectedVolumeCapacityInCollection()
     {
         $this->volumes->first()->instances()->attach($this->instance);
         $this->get(
@@ -57,17 +57,15 @@ class VolumeCapacityAttributeTests extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'volume_capacity' => 10,
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'volume_capacity' => 10,
+        ])->assertStatus(200);
     }
 
     /**
      * Test volume capacity attribute is as expected in collection when multiple volumes are connected to an instance
      */
-    public function testGetInstanceCollection_MultipleVolumes_ExpectedVolumeCapacityInCollection()
+    public function testGetInstanceCollectionMultipleVolumesExpectedVolumeCapacityInCollection()
     {
         $this->volumes->get(0)->instances()->attach($this->instance);
         $this->volumes->get(1)->instances()->attach($this->instance);
@@ -77,17 +75,15 @@ class VolumeCapacityAttributeTests extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'volume_capacity' => 20,
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'volume_capacity' => 20,
+        ])->assertStatus(200);
     }
 
     /**
      * Test volume capacity attribute is as expected in item when a single volume is connected to an instance
      */
-    public function testGetInstance_SingleVolume_ExpectedVolumeCapacityInItem()
+    public function testGetInstanceSingleVolumeExpectedVolumeCapacityInItem()
     {
         $this->volumes->first()->instances()->attach($this->instance);
         $this->get(
@@ -96,10 +92,8 @@ class VolumeCapacityAttributeTests extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'volume_capacity' => 10,
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'volume_capacity' => 10,
+        ])->assertStatus(200);
     }
 }

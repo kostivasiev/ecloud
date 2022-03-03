@@ -55,30 +55,32 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/images', $data)
-            ->seeJsonStructure([
+            ->assertJsonStructure([
                 'data' => [
                     'id',
                     'task_id'
                 ]
-            ])->seeInDatabase(
-                'images',
-                [
-                    'name' => 'Test Image',
-                    'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
-                    'documentation_uri' => 'https://docs.centos.org/en-US/docs/',
-                    'description' => 'CentOS (Community enterprise Operating System)',
-                    'script_template' => '',
-                    'vm_template' => 'CentOS7 x86_64',
-                    'platform' => 'Linux',
-                    'active' => true,
-                    'public' => true,
-                ],
-                'ecloud')
-            ->assertResponseStatus(202);
+            ])->assertStatus(202);
+
+        $this->assertDatabaseHas(
+            'images',
+            [
+                'name' => 'Test Image',
+                'logo_uri' => addslashes('https://images.ukfast.co.uk/logos/centos/300x300_white.png'),
+                'documentation_uri' => addslashes('https://docs.centos.org/en-US/docs/'),
+                'description' => 'CentOS (Community enterprise Operating System)',
+                'script_template' => null,
+                'vm_template' => 'CentOS7 x86_64',
+                'platform' => 'Linux',
+                'active' => 1,
+                'public' => 1,
+            ],
+            'ecloud'
+        );
     }
 
     public function testStoreNotAdminFails()
     {
-        $this->post('/v2/images', [])->assertResponseStatus(401);
+        $this->post('/v2/images', [])->assertStatus(401);
     }
 }

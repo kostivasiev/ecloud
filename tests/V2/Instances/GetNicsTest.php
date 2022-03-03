@@ -32,12 +32,12 @@ class GetNicsTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id'          => $this->nic()->id,
                 'mac_address' => $this->nic()->mac_address,
                 'instance_id' => $this->nic()->instance_id,
                 'network_id'  => $this->nic()->network_id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

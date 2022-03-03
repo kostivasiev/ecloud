@@ -26,7 +26,7 @@ class UnassignTest extends TestCase
         $this->floatingIp()->resource()->associate($this->nic())->save();
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/unassign')
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'floating_ip_unassign';
@@ -35,14 +35,14 @@ class UnassignTest extends TestCase
 
     public function testVpnEndpointFloatingIpCanNotBeUnassigned()
     {
-        $vpnEndpoint = factory(VpnEndpoint::class)->create();
+        $vpnEndpoint = VpnEndpoint::factory()->create();
 
         $this->floatingIp()->resource()->associate($vpnEndpoint)->save();
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/unassign', [
             'resource_id' => $this->nic()->id
         ])
-            ->assertResponseStatus(403);
+            ->assertStatus(403);
     }
 
     public function testVipFloatingIpCanNotBeUnassigned()
@@ -53,7 +53,6 @@ class UnassignTest extends TestCase
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/unassign', [
             'resource_id' => $this->nic()->id
-        ])
-            ->assertResponseStatus(403);
+        ])->assertStatus(403);
     }
 }

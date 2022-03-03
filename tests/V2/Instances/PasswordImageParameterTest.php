@@ -42,9 +42,9 @@ class PasswordImageParameterTest extends TestCase
             ]
         ];
 
-        $this->post('/v2/instances', $data)->assertResponseStatus(202);
+        $post = $this->post('/v2/instances', $data)->assertStatus(202);
 
-        $instance = Instance::find((json_decode($this->response->getContent()))->data->id);
+        $instance = Instance::find((json_decode($post->getContent()))->data->id);
 
         // Check removed from plain text deploy data
         $this->assertFalse(in_array('plesk_admin_password', array_keys($instance->deploy_data['image_data'])));

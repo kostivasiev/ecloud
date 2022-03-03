@@ -35,12 +35,12 @@ class CreateImageTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'Cannot create an image of an Instance with no attached volumes',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testCreateImageTest()
@@ -82,6 +82,6 @@ class CreateImageTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
     }
 }

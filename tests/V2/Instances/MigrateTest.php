@@ -26,8 +26,7 @@ class MigrateTest extends TestCase
             [
                 'host_group_id' => $this->hostGroup()->id
             ],
-        )
-            ->assertResponseStatus(202);
+        )->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -37,7 +36,7 @@ class MigrateTest extends TestCase
         Event::fake(Created::class);
 
         $this->post('/v2/instances/' . $this->instanceModel()->id . '/migrate')
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -46,7 +45,7 @@ class MigrateTest extends TestCase
     {
         Event::fake();
 
-        $instance = Instance::withoutEvents(function() {
+        $instance = Instance::withoutEvents(function () {
             return Instance::factory()->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
@@ -68,7 +67,6 @@ class MigrateTest extends TestCase
             [
                 'host_group_id' => $this->hostGroup()->id
             ],
-        )
-            ->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 }

@@ -42,7 +42,7 @@ class ImageParameterTest extends TestCase
         ];
         foreach ($paramRules as $rule) {
             Model::withoutEvents(function () use ($rule) {
-                factory(ImageParameter::class)->create($rule);
+                ImageParameter::factory()->create($rule);
             });
         }
 
@@ -75,7 +75,7 @@ class ImageParameterTest extends TestCase
     public function testRules()
     {
         $rules = $this->createRequest->rules();
-        $this->assertTrue(array_key_exists('image_data.moodle_admin_password', $rules));
+        $this->assertArrayHasKey('image_data.moodle_admin_password', $rules);
         $this->assertEquals('required', $rules['image_data.moodle_admin_password'][0]);
         $this->assertEquals('regex:/^.{8,}$/', $rules['image_data.moodle_admin_password'][1]);
         $this->assertEquals('string', $rules['image_data.moodle_admin_password'][2]);
