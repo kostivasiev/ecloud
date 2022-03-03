@@ -25,6 +25,9 @@ class SquidUpdate extends Command
             Router::where('is_management', '=', true)->get();
 
         $routers->each(function ($router) {
+            $this->info('---');
+            $this->info('Processing router ' . $router->id . ' (' . $router->name . ')');
+            $this->info('---');
             $this->processFirewalls($router);
             $this->processNetworks($router);
         });
@@ -35,15 +38,16 @@ class SquidUpdate extends Command
         // 1. Get Firewall Policy
         $firewallPolicy = $this->getManagementFirewallPolicy($router);
         if (!$firewallPolicy) {
-            $this->error($router->id . ' : Management firewall policy not present.');
+            $this->error('Error: ' . $router->id . ' : Management firewall policy not present.');
             return;
         }
+        $this->info('Processing fwp ' . $firewallPolicy->id . ' (' . $firewallPolicy->name . ')');
 
         // 2. Get Allow Ed rule
         $firewallRule = $this->getEdRule($router, $firewallPolicy);
         if (!$firewallRule) {
             $this->error(
-                $router->id . ' : Firewall rule for Ed is not present in policy ' . $firewallPolicy->id
+                'Error: ' . $router->id . ' : Firewall rule for Ed is not present in policy ' . $firewallPolicy->id
             );
             return;
         }
@@ -66,14 +70,17 @@ class SquidUpdate extends Command
                 $query->where('router_id', '=', $router->id);
             })->first();
             if (!$networkPolicy) {
-                $this->error('No network policy found for router ' . $router->id);
+                $this->error('Error: No network policy found for router ' . $router->id);
                 return false;
             }
+
+            $this->info('Processing networkPolicy ' . $networkPolicy->id . ' (' . $networkPolicy->name . ')');
+
             $networkRule = $networkPolicy->networkRules()->where([
-                ['name', '=', 'Allow_Ed_on_Port_4222_outbound_' . $networkPolicy->network_id]
+                ['name', 'like', 'Allow_Ed_%_outbound_' . $networkPolicy->network_id]
             ])->first();
             if (!$networkRule) {
-                $this->error('No Ed proxy rule found for network ' . $networkPolicy->network_id);
+                $this->error('Error: No Ed proxy rule found for network ' . $networkPolicy->network_id);
                 return false;
             }
             $squidPort = $networkRule->networkRulePorts()->where([
@@ -114,14 +121,14 @@ class SquidUpdate extends Command
     public function getManagementFirewallPolicy(Router $router)
     {
         if ($router->firewallPolicies()->count() === 0) {
-            $this->error($router->id . ' : has no firewall policies.');
+            $this->error('Error: ' . $router->id . ' : has no firewall policies.');
             return false;
         }
         $policies = $router->firewallPolicies()
             ->where('name', '=', 'Management_Firewall_Policy_for_' . $router->id)
             ->get();
         if ($policies->count() <= 0) {
-            $this->error('No management firewall policy found for router ' . $router->id);
+            $this->error('Error: No management firewall policy found for router ' . $router->id);
             return false;
         }
         return $policies->first();
@@ -130,14 +137,14 @@ class SquidUpdate extends Command
     public function getEdRule(Router $router, FirewallPolicy $firewallPolicy)
     {
         if ($firewallPolicy->firewallRules()->count() === 0) {
-            $this->error($router->id . ' : Firewall Policy ' . $firewallPolicy->id . ' has no rules.');
+            $this->error('Error: ' . $router->id . ' : Firewall Policy ' . $firewallPolicy->id . ' has no rules.');
             return false;
         }
         $rules = $firewallPolicy->firewallRules()
-            ->where('name', '=', 'Allow_Ed_on_Port_4222_outbound_' . $router->id)
+            ->where('name', 'like', 'Allow_Ed_%_outbound_' . $router->id)
             ->get();
         if ($rules->count() <= 0) {
-            $this->error('No outbound Ed rule found for policy ' . $firewallPolicy->id);
+            $this->error('Error: No outbound Ed rule found for policy ' . $firewallPolicy->id);
             return false;
         }
         return $rules->first();
