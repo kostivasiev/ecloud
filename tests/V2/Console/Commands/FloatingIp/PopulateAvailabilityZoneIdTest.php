@@ -17,9 +17,8 @@ class PopulateAvailabilityZoneIdTest extends TestCase
 
         $this->assertNull($this->floatingIp()->availability_zone_id);
 
-        $exitCode = $this->artisan('floating-ip:populate-availability-zone-id');
-
-        $this->assertEquals(Command::SUCCESS ,$exitCode);
+        $this->artisan('floating-ip:populate-availability-zone-id')
+            ->assertExitCode(Command::SUCCESS);
 
         $this->floatingIp()->refresh();
         $this->assertEquals($this->availabilityZone()->id, $this->floatingIp()->availability_zone_id);

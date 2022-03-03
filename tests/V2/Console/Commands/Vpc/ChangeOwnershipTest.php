@@ -18,9 +18,9 @@ class ChangeOwnershipTest extends TestCase
     {
         $currentResellerId = 1374;
         $newResellerId = 1337;
-        $vpc = factory(Vpc::class)->create(['reseller_id' => $currentResellerId]);
+        $vpc = Vpc::factory()->create(['reseller_id' => $currentResellerId]);
 
-        factory(BillingMetric::class, 10)->create([
+        BillingMetric::factory(10)->create([
             'vpc_id' => $vpc->id,
             'start' => Carbon::now()->endOfDay()->subMonth(),
             'end' => null,
@@ -30,10 +30,8 @@ class ChangeOwnershipTest extends TestCase
         //check old metrics finished, new metrics started and vpc ownership changed
         $this->assertEquals(BillingMetric::where('vpc_id', $vpc->id)->count(), 10);
 
-        $this->assertEquals(
-            $this->artisan(sprintf('vpc:change-ownership --vpc=%s --reseller=%s', $vpc->id, $newResellerId)),
-            Command::SUCCESS
-        );
+        $this->artisan(sprintf('vpc:change-ownership --vpc=%s --reseller=%s', $vpc->id, $newResellerId))
+            ->assertExitCode(Command::SUCCESS);
 
         $this->assertEquals(BillingMetric::where('vpc_id', $vpc->id)->count(), 20);
         $this->assertEquals(BillingMetric::where('vpc_id', $vpc->id)->whereNull('end')->count(), 10);
@@ -44,9 +42,9 @@ class ChangeOwnershipTest extends TestCase
     {
         $currentResellerId = 1374;
         $newResellerId = 1337;
-        $vpc = factory(Vpc::class)->create(['reseller_id' => $currentResellerId]);
+        $vpc = Vpc::factory()->create(['reseller_id' => $currentResellerId]);
 
-        factory(BillingMetric::class, 10)->create([
+        BillingMetric::factory(10)->create([
             'vpc_id' => $vpc->id,
             'start' => Carbon::now()->endOfDay()->subMonth(),
             'end' => null,
@@ -56,10 +54,8 @@ class ChangeOwnershipTest extends TestCase
         //check old metrics finished, new metrics started and vpc ownership changed
         $this->assertEquals(BillingMetric::where('vpc_id', $vpc->id)->count(), 10);
 
-        $this->assertEquals(
-            $this->artisan(sprintf('vpc:change-ownership --vpc=%s --reseller=%s --date=%s', $vpc->id, $newResellerId, 'INVALID_DATE')),
-            Command::FAILURE
-        );
+        $this->artisan(sprintf('vpc:change-ownership --vpc=%s --reseller=%s --date=%s', $vpc->id, $newResellerId, 'INVALID_DATE'))
+            ->assertExitCode(Command::FAILURE);
 
         //check old metrics finished, new metrics started and vpc ownership changed
         $this->assertEquals(BillingMetric::where('vpc_id', $vpc->id)->count(), 10);
