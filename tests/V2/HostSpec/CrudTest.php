@@ -2,7 +2,6 @@
 
 namespace Tests\V2\HostSpec;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -53,7 +52,7 @@ class CrudTest extends TestCase
     public function testIndex()
     {
         $this->get('/v2/host-specs')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
                 'cpu_sockets' => 2,
@@ -62,13 +61,13 @@ class CrudTest extends TestCase
                 'cpu_clock_speed' => 4000,
                 'ram_capacity' => 64,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShow()
     {
         $this->get('/v2/host-specs/' . $this->hostSpec()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
                 'cpu_sockets' => 2,
@@ -77,12 +76,12 @@ class CrudTest extends TestCase
                 'cpu_clock_speed' => 4000,
                 'ram_capacity' => 64,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testStoreNotAdmin()
     {
-        $this->post('/v2/host-specs', ['name' => 'test-host-spec'])->assertResponseStatus(401);
+        $this->post('/v2/host-specs', ['name' => 'test-host-spec'])->assertStatus(401);
     }
 
     public function testStoreAsAdmin()
@@ -99,8 +98,9 @@ class CrudTest extends TestCase
             'ram_capacity' => 64
         ];
         $this->post('/v2/host-specs', $data)
-            ->seeInDatabase('host_specs', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
+
+        $this->assertDatabaseHas('host_specs', $data, 'ecloud');
     }
 
     public function testAssignToAvailabilityZone()
@@ -121,12 +121,12 @@ class CrudTest extends TestCase
                 ]
             ]
         ];
-        $this->post('/v2/host-specs', $data)
-            ->assertResponseStatus(201);
+        $response = $this->post('/v2/host-specs', $data)
+            ->assertStatus(201);
 
-        $hostSpecId = json_decode($this->response->getContent())->data->id;
+        $hostSpecId = json_decode($response->getContent())->data->id;
 
-        $this->seeInDatabase('availability_zone_host_spec', [
+        $this->assertDatabaseHas('availability_zone_host_spec', [
             'host_spec_id' => $hostSpecId,
             'availability_zone_id' => $this->availabilityZone()->id
         ], 'ecloud');
@@ -134,7 +134,7 @@ class CrudTest extends TestCase
 
     public function testUpdateNotAdmin()
     {
-        $this->patch('/v2/host-specs/' . $this->hostSpec()->id, ['name' => 'test-host-spec'])->assertResponseStatus(401);
+        $this->patch('/v2/host-specs/' . $this->hostSpec()->id, ['name' => 'test-host-spec'])->assertStatus(401);
     }
 
     public function testUpdateAsAdmin()
@@ -151,8 +151,8 @@ class CrudTest extends TestCase
             'ram_capacity' => 1
         ];
         $this->patch('/v2/host-specs/' . $this->hostSpec()->id, $data)
-            ->seeInDatabase('host_specs', $data, 'ecloud')
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
+        $this->assertDatabaseHas('host_specs', $data, 'ecloud');
     }
 
     public function testDestroy()
@@ -160,21 +160,21 @@ class CrudTest extends TestCase
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
         $this->delete('/v2/host-specs/hs-test')
-            ->seeInDatabase(
-                'host_specs',
-                [
-                    'id' => 'hs-test',
-                ],
-                'ecloud'
-            )->assertDatabaseMissing(
-                'host_specs',
-                [
-                    'id' => 'hs-test',
-                    'deleted_at' => null,
-                ],
-                'ecloud'
-            )
-            ->assertResponseStatus(204);
-    }
+            ->assertStatus(204);
 
+        $this->assertDatabaseHas(
+            'host_specs',
+            [
+                'id' => 'hs-test',
+            ],
+            'ecloud'
+        )->assertDatabaseMissing(
+            'host_specs',
+            [
+                'id' => 'hs-test',
+                'deleted_at' => null,
+            ],
+            'ecloud'
+        );
+    }
 }
