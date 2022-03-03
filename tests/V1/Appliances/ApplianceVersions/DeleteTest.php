@@ -33,7 +33,7 @@ class DeleteTest extends ApplianceTestCase
 
         $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid, [], $this->validWriteHeaders);
 
-        $this->assertResponseStatus(204);
+        $this->assertStatus(204);
 
         $applianceVersion->refresh();
 
@@ -51,7 +51,7 @@ class DeleteTest extends ApplianceTestCase
 
         $this->json('DELETE', '/v1/appliance-versions/' . $applianceVersion->uuid, [], $this->validReadHeaders);
 
-        $this->assertResponseStatus(401);
+        $this->assertStatus(401);
     }
 
     /**
@@ -92,6 +92,6 @@ class DeleteTest extends ApplianceTestCase
             $this->validWriteHeaders
         );
 
-        $this->assertResponseStatus(400);
+        $this->assertStatus(400);
     }
 }

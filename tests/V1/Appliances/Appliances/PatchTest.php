@@ -34,7 +34,7 @@ class PatchTest extends ApplianceTestCase
         $uuid = $this->appliances->first()->uuid;
 
         foreach ($stringProperty as $property => $newValue) {
-            $this->missingFromDatabase(
+            $this->assertDatabaseMissing(
                 'appliance',
                 [
                     'appliance_uuid' => $uuid,
@@ -48,13 +48,11 @@ class PatchTest extends ApplianceTestCase
             ], [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
-            ]);
-
-            $this->seeJson([
+            ])->assertJsonFragment([
                 'id' => $uuid
-            ]);
+            ])->assertStatus(200);
 
-            $this->assertResponseStatus(200) && $this->seeInDatabase('appliance', [
+            $this->assertDatabaseHas('appliance', [
                 'appliance_uuid' => $uuid,
                 $property => $newValue,
             ]);
@@ -76,8 +74,6 @@ class PatchTest extends ApplianceTestCase
         ], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(401);
+        ])->assertStatus(401);
     }
 }

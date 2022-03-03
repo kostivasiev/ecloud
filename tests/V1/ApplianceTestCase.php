@@ -34,7 +34,7 @@ class ApplianceTestCase extends TestCase
         $total = 2;
 
         // Create some appliances
-        $this->appliances = factory(Appliance::class, $total)->create()->each(function ($appliance) {
+        $this->appliances = Appliance::factory($total)->create()->each(function ($appliance) {
             // Save the $appliance
             $appliance->save();
             $appliance->refresh();
@@ -52,7 +52,7 @@ class ApplianceTestCase extends TestCase
                     'appliance_version_version' => ($i + 1),
                 ];
 
-                $applianceVersion = factory(ApplianceVersion::class)->make($applianceFactoryConfig);
+                $applianceVersion = ApplianceVersion::factory()->make($applianceFactoryConfig);
 
                 if ($this->verbose) {
                     echo 'Creating appliance version \'' . ($i + 1) . '\' for appliance \'' . $appliance->getKey() . '\'';
@@ -88,7 +88,7 @@ class ApplianceTestCase extends TestCase
                     }
 
                     $applianceVersion->parameters()->save(
-                        factory(ApplianceParameter::class)->make($applianceParameterConfig)
+                        ApplianceParameter::factory()->make($applianceParameterConfig)
                     );
                 }
             }
@@ -96,7 +96,6 @@ class ApplianceTestCase extends TestCase
             if ($this->verbose) {
                 echo PHP_EOL;
             }
-
         });
     }
 
@@ -106,7 +105,7 @@ class ApplianceTestCase extends TestCase
     public function setUpAppliancePodTestData()
     {
         // Create a pod with one-click enabled
-        factory(Pod::class, 1)->create([
+        Pod::factory(1)->create([
             'ucs_datacentre_id' => 1,
             'ucs_datacentre_oneclick_enabled' => 'Yes'
         ]);
@@ -117,9 +116,9 @@ class ApplianceTestCase extends TestCase
         $availability->save();
 
         // Create a Pod with one-click disabled
-        factory(Pod::class, 1)->create([
+        Pod::factory(1)->create([
             'ucs_datacentre_id' => 2,
-            'ucs_datacentre_oneclick_enabled' => 'No'
+            'ucs_datacentre_oneclick_enabled' => 'No',
         ]);
         // Add an appliance to the pod
         $availability = new AppliancePodAvailability();

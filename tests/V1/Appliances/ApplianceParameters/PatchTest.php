@@ -20,13 +20,13 @@ class PatchTest extends ApplianceTestCase
     public function testUpdateApplianceParameter()
     {
         // Generate a test parameter
-        $newParameter = factory(ApplianceParameter::class, 1)->make()->first();
+        $newParameter = ApplianceParameter::factory(1)->make()->first();
 
         // Get an existing parameter
         $param = ApplianceParameter::query()->first();
 
 
-        $this->missingFromDatabase(
+        $this->assertDatabaseMissing(
             'appliance_script_parameters',
             [
                 'appliance_script_parameters_name' => $newParameter->name,
@@ -46,11 +46,11 @@ class PatchTest extends ApplianceTestCase
             'description' => $newParameter->description,
             'required' => false,
             'validation_rule' => '/\w+/'
-        ], $this->validWriteHeaders);
+        ], $this->validWriteHeaders)
+            ->assertStatus(204);
 
-        $this->assertResponseStatus(204);
-
-        $this->seeInDatabase('appliance_script_parameters',
+        $this->assertDatabaseHas(
+            'appliance_script_parameters',
             [
                 'appliance_script_parameters_uuid' => $param->uuid,
                 'appliance_script_parameters_name' => $newParameter->name,
@@ -62,7 +62,6 @@ class PatchTest extends ApplianceTestCase
             ],
             env('DB_ECLOUD_CONNECTION')
         );
-
     }
 
     /**
@@ -71,15 +70,14 @@ class PatchTest extends ApplianceTestCase
     public function testUpdateApplianceParameterNotAdmin()
     {
         // Generate a test parameter
-        $newParameter = factory(ApplianceParameter::class, 1)->make()->first();
+        $newParameter = ApplianceParameter::factory(1)->make()->first();
 
         // Get an existing parameter
         $param = ApplianceParameter::query()->first();
 
         $this->json('PATCH', '/v1/appliance-parameters/' . $param->uuid, [
             'name' => $newParameter->name
-        ], $this->validReadHeaders);
-
-        $this->assertResponseStatus(401);
+        ], $this->validReadHeaders)
+            ->assertStatus(401);
     }
 }

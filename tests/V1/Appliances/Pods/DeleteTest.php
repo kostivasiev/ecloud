@@ -38,7 +38,7 @@ class DeleteTest extends ApplianceTestCase
 
         $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid, [], $this->validWriteHeaders);
 
-        $this->assertResponseStatus(204);
+        $this->assertStatus(204);
 
         $podQry = AppliancePodAvailability::query();
         $podQry->where('appliance_pod_availability_appliance_id', '=', $appliance->id);
@@ -56,6 +56,6 @@ class DeleteTest extends ApplianceTestCase
 
         $this->json('DELETE', '/v1/pods/123/appliances/' . $appliance->uuid, [], $this->validReadHeaders);
 
-        $this->assertResponseStatus(401);
+        $this->assertStatus(401);
     }
 }
