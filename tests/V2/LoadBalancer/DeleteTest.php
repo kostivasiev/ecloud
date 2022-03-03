@@ -24,7 +24,7 @@ class DeleteTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
 
         $this->vpc = Vpc::withoutEvents(function () {
             return Vpc::factory()->create([
@@ -54,12 +54,12 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Not found',
                 'detail' => 'No Load Balancer with that ID was found',
                 'status' => 404,
             ])
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testSuccessfulDelete()
@@ -89,7 +89,7 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         $resource = LoadBalancer::withTrashed()->findOrFail($this->loadBalancer->id);
         $this->assertNotNull($resource->deleted_at);

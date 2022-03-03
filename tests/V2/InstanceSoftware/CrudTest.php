@@ -36,56 +36,56 @@ class CrudTest extends TestCase
     {
         // Assert scope returns resource for [instance] owner
         $this->get('/v2/instance-software')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->instanceSoftware->id,
                 'name' => 'McAfee',
                 'instance_id' => $this->instanceModel()->id,
                 'software_id' => $this->software->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         // Assert scope does not return resource for non-owner
         $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->get('/v2/instance-software')
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'id' => $this->instanceSoftware->id,
                 'name' => 'McAfee',
                 'instance_id' => $this->instanceModel()->id,
                 'software_id' => $this->software->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         // Assert scope returns resource for admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->get('/v2/instance-software')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->instanceSoftware->id,
                 'name' => 'McAfee',
                 'instance_id' => $this->instanceModel()->id,
                 'software_id' => $this->software->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShow()
     {
         // Assert scope returns resource for [instance] owner
         $this->get('/v2/instance-software/' . $this->instanceSoftware->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->instanceSoftware->id,
                 'name' => 'McAfee',
                 'instance_id' => $this->instanceModel()->id,
                 'software_id' => $this->software->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         // Assert scope does not return resource for non-owner
         $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->get('/v2/instance-software/' . $this->instanceSoftware->id)->assertResponseStatus(404);
+        $this->get('/v2/instance-software/' . $this->instanceSoftware->id)->assertStatus(404);
 
         // Assert scope returns resource for admin
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->get('/v2/instance-software/' . $this->instanceSoftware->id)->assertResponseStatus(200);
+        $this->get('/v2/instance-software/' . $this->instanceSoftware->id)->assertStatus(200);
     }
 
     public function testStore()
@@ -99,11 +99,11 @@ class CrudTest extends TestCase
         ];
 
         // Assert not admin fails
-        $this->post('/v2/instance-software', $data)->assertResponseStatus(401);
+        $this->post('/v2/instance-software', $data)->assertStatus(401);
 
         // Assert admin creates resource
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->post('/v2/instance-software', $data)->assertResponseStatus(202);
+        $this->post('/v2/instance-software', $data)->assertStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -119,11 +119,11 @@ class CrudTest extends TestCase
         ];
 
         // Assert not admin fails
-        $this->patch('/v2/instance-software/' . $this->instanceSoftware->id, $data)->assertResponseStatus(401);
+        $this->patch('/v2/instance-software/' . $this->instanceSoftware->id, $data)->assertStatus(401);
 
         // Assert not admin passes
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->patch('/v2/instance-software/' . $this->instanceSoftware->id, $data)->assertResponseStatus(202);
+        $this->patch('/v2/instance-software/' . $this->instanceSoftware->id, $data)->assertStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -135,11 +135,11 @@ class CrudTest extends TestCase
         Event::fake(Created::class);
 
         // Not admin fails
-        $this->delete('/v2/instance-software/' . $this->instanceSoftware->id)->assertResponseStatus(401);
+        $this->delete('/v2/instance-software/' . $this->instanceSoftware->id)->assertStatus(401);
 
         // Assert admin passes
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
-        $this->delete('/v2/instance-software/' . $this->instanceSoftware->id)->assertResponseStatus(202);
+        $this->delete('/v2/instance-software/' . $this->instanceSoftware->id)->assertStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_delete';

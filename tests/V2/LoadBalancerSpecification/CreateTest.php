@@ -12,7 +12,7 @@ class CreateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->image = factory(Image::class)->create();
+        $this->image = Image::factory()->create();
     }
 
     public function testValidDataSucceeds()
@@ -33,7 +33,8 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )  ->seeInDatabase(
+        )->assertStatus(201);
+        $this->assertDatabaseHas(
             'load_balancer_specifications',
             [
                 'name' => 'small-test',
@@ -46,8 +47,7 @@ class CreateTest extends TestCase
                 'image_id' => $this->image->id
             ],
             'ecloud'
-        )
-            ->assertResponseStatus(201);
+        );
     }
 
     public function testNonAdminIsDenied()
@@ -69,11 +69,11 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ])
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 }

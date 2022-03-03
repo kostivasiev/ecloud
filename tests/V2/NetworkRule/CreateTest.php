@@ -32,16 +32,17 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/network-rules',
             $data
-        )->seeJsonStructure([
+        )->assertJsonStructure([
            'data' => [
                'id',
                'task_id'
            ]
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+        $this->assertDatabaseHas(
             'network_rules',
             $data,
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -74,11 +75,11 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/network-rules',
             $data
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified network policy id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 }

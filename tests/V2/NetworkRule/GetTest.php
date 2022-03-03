@@ -31,27 +31,27 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get('/v2/network-rules')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'nr-test',
                 'network_policy_id' => $this->networkPolicy()->id,
                 'sequence' => 1,
                 'source' => '10.0.1.0/32',
                 'destination' => '10.0.2.0/32',
                 'direction' => 'IN_OUT',
-            ])->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 
     public function testGetResource()
     {
         $this->get('/v2/network-rules/nr-test')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'nr-test',
                 'network_policy_id' => 'np-test',
                 'sequence' => 1,
                 'source' => '10.0.1.0/32',
                 'destination' => '10.0.2.0/32',
                 'direction' => 'IN_OUT',
-            ])->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 
     public function testGetHiddenNotAdminFails()
@@ -61,7 +61,7 @@ class GetTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         $this->get('/v2/network-rules/' . $this->networkRule->id)
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testGetHiddenAdminPasses()
@@ -70,6 +70,6 @@ class GetTest extends TestCase
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        $this->get('/v2/network-rules/' . $this->networkRule->id)->assertResponseStatus(200);
+        $this->get('/v2/network-rules/' . $this->networkRule->id)->assertStatus(200);
     }
 }

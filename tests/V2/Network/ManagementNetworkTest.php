@@ -2,7 +2,6 @@
 
 namespace Tests\V2\Network;
 
-use App\Models\V2\Network;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -20,7 +19,7 @@ class ManagementNetworkTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         $this->get('/v2/networks/' . $this->network()->id)
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testGetManagedNetworkAdminPasses()
@@ -28,9 +27,9 @@ class ManagementNetworkTest extends TestCase
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
         $this->get('/v2/networks/' . $this->network()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'is_hidden' => true
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

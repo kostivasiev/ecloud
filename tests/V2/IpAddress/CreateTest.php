@@ -22,11 +22,12 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/ip-addresses', $data)
-            ->seeInDatabase(
-                'ip_addresses',
-                $data,
-                'ecloud'
-            )->assertResponseStatus(201);
+            ->assertStatus(201);
+        $this->assertDatabaseHas(
+            'ip_addresses',
+            $data,
+            'ecloud'
+        );
     }
 
     public function testSuccessNotAdmin()
@@ -41,11 +42,12 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/ip-addresses', $data)
-            ->seeInDatabase(
-                'ip_addresses',
-                $data,
-                'ecloud'
-            )->assertResponseStatus(201);
+            ->assertStatus(201);
+        $this->assertDatabaseHas(
+            'ip_addresses',
+            $data,
+            'ecloud'
+        );
     }
 
     public function testIpAddressNotInSubnetFails()
@@ -57,6 +59,6 @@ class CreateTest extends TestCase
             'type' => 'normal',
         ];
 
-        $this->post('/v2/ip-addresses', $data)->assertResponseStatus(422);
+        $this->post('/v2/ip-addresses', $data)->assertStatus(422);
     }
 }

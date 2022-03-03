@@ -9,7 +9,6 @@ use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use App\Rules\V2\IsNotOverlappingSubnet;
 use Illuminate\Http\Request;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class OverlappingSubnetTest extends TestCase
