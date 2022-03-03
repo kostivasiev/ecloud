@@ -70,7 +70,7 @@ class Pod extends Model implements Filterable, Sortable
             $factory->create('reseller_id', Filter::$numericDefaults),
             $factory->boolean()->create('active', 'Yes', 'No'),
 
-            $factory->boolean()->create('services_public', 'Yes', 'No', 'ucs_datacentre_public_enabled'),
+            $factory->boolean()->create('services_public', 1, 0, 'ucs_datacentre_public_enabled'),
             $factory->boolean()->create('services_burst', 'Yes', 'No', 'ucs_datacentre_burst_enabled'),
             $factory->boolean()->create('services_gpu', 'Yes', 'No', 'ucs_datacentre_gpu_enabled'),
             $factory->boolean()->create('services_appliances', 'Yes', 'No', 'ucs_datacentre_oneclick_enabled'),
