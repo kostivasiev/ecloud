@@ -28,8 +28,8 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/orchestrator-configs', $data)
-            ->seeInDatabase('orchestrator_configs', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
+        $this->assertDatabaseHas('orchestrator_configs', $data, 'ecloud');
     }
 
     public function testStoreDeployDateInPastFails()
@@ -40,12 +40,12 @@ class CreateTest extends TestCase
             'deploy_on' => Carbon::yesterday()->format('Y-m-d H:i:s')
         ];
         $this->post('/v2/orchestrator-configs', $data)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'The deploy on must be a date after now',
                 ]
-            )->assertResponseStatus(422);
+            )->assertStatus(422);
     }
 
     public function testStoreDeployDateInFuturePasses()
@@ -56,8 +56,8 @@ class CreateTest extends TestCase
             'deploy_on' => Carbon::tomorrow()->format('Y-m-d H:i:s')
         ];
         $this->post('/v2/orchestrator-configs', $data)
-            ->seeInDatabase('orchestrator_configs', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
+        $this->assertDatabaseHas('orchestrator_configs', $data, 'ecloud');
     }
 
     public function testStoreDeployDateNoResellerFails()
@@ -67,18 +67,18 @@ class CreateTest extends TestCase
             'deploy_on' => Carbon::tomorrow()->format('Y-m-d H:i:s')
         ];
         $this->post('/v2/orchestrator-configs', $data)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'The reseller id is required when specifying deploy on property',
                 ]
-            )->assertResponseStatus(422);
+            )->assertStatus(422);
     }
 
     public function testStoreNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->post('/v2/orchestrator-configs', [])->assertResponseStatus(401);
+        $this->post('/v2/orchestrator-configs', [])->assertStatus(401);
     }
 
     public function testStoreDataAdminIsSuccess()
@@ -88,7 +88,7 @@ class CreateTest extends TestCase
         ];
 
         $this->json('POST', '/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/data', $data)
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
 
         $this->orchestratorConfig->refresh();
 
@@ -98,7 +98,7 @@ class CreateTest extends TestCase
     public function testStoreDataInvalidJsonFails()
     {
         $this->json('POST', '/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/data', [])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testDeploy()
@@ -106,7 +106,7 @@ class CreateTest extends TestCase
         Event::fake([\App\Events\V2\Task\Created::class]);
 
         $this->json('POST', '/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/deploy', [])
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == Sync::TASK_NAME_UPDATE;

@@ -19,11 +19,11 @@ class DeleteTest extends TestCase
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        $this->delete('/v2/orchestrator-configs/' . $this->orchestratorConfig->id)->assertResponseStatus(204);
+        $this->delete('/v2/orchestrator-configs/' . $this->orchestratorConfig->id)->assertStatus(204);
     }
 
     public function testNotAdminDeleteFails()
     {
-        $this->delete('/v2/orchestrator-configs/' . $this->orchestratorConfig->id)->assertResponseStatus(401);
+        $this->delete('/v2/orchestrator-configs/' . $this->orchestratorConfig->id)->assertStatus(401);
     }
 }
