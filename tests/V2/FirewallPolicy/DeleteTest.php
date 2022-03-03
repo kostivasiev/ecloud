@@ -3,7 +3,6 @@
 namespace Tests\V2\FirewallPolicy;
 
 use GuzzleHttp\Psr7\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
@@ -50,7 +49,7 @@ class DeleteTest extends TestCase
         $this->delete('/v2/firewall-policies/' . $this->firewallPolicy()->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
         $this->firewallPolicy()->refresh();
         $this->assertNotNull($this->firewallPolicy()->deleted_at);
     }

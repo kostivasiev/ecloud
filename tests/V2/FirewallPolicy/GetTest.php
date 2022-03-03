@@ -4,7 +4,6 @@ namespace Tests\V2\FirewallPolicy;
 
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -30,7 +29,7 @@ class GetTest extends TestCase
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
             });
 
-        $this->firewallRule = factory(FirewallRule::class)->create([
+        $this->firewallRule = FirewallRule::factory()->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
     }
@@ -43,14 +42,12 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'id' => $this->firewallPolicy()->id,
-                'name' => $this->firewallPolicy()->name,
-                'sequence' => $this->firewallPolicy()->sequence,
-                'router_id' => $this->router()->id,
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'id' => $this->firewallPolicy()->id,
+            'name' => $this->firewallPolicy()->name,
+            'sequence' => $this->firewallPolicy()->sequence,
+            'router_id' => $this->router()->id,
+        ])->assertStatus(200);
     }
 
     public function testGetResource()
@@ -61,14 +58,12 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'id' => $this->firewallPolicy()->id,
-                'name' => $this->firewallPolicy()->name,
-                'sequence' => $this->firewallPolicy()->sequence,
-                'router_id' => $this->router()->id,
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'id' => $this->firewallPolicy()->id,
+            'name' => $this->firewallPolicy()->name,
+            'sequence' => $this->firewallPolicy()->sequence,
+            'router_id' => $this->router()->id,
+        ])->assertStatus(200);
     }
 
     public function testGetFirewallPolicyFirewallRules()
@@ -79,12 +74,10 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'id' => $this->firewallRule->id,
-                'firewall_policy_id' => $this->firewallPolicy()->id
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'id' => $this->firewallRule->id,
+            'firewall_policy_id' => $this->firewallPolicy()->id
+        ])->assertStatus(200);
     }
 
     public function testGetHiddenNotAdminFails()
@@ -94,7 +87,7 @@ class GetTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         $this->get('/v2/firewall-policies/' . $this->firewallPolicy()->id)
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testGetHiddenAdminPasses()
@@ -103,6 +96,6 @@ class GetTest extends TestCase
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        $this->get('/v2/firewall-policies/' . $this->firewallPolicy()->id)->assertResponseStatus(200);
+        $this->get('/v2/firewall-policies/' . $this->firewallPolicy()->id)->assertStatus(200);
     }
 }

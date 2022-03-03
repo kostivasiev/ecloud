@@ -2,12 +2,9 @@
 
 namespace Tests\V2\FirewallPolicy;
 
-use App\Events\V2\FirewallPolicy\Saved;
 use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallPolicy;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
@@ -25,7 +22,7 @@ class UpdateTest extends TestCase
             'name' => 'Demo Firewall Policy 1',
             'router_id' => $this->router()->id,
         ];
-        $this->policy = factory(FirewallPolicy::class)->create($this->oldData)->first();
+        $this->policy = FirewallPolicy::factory()->create($this->oldData)->first();
         Event::fake([Created::class]);
     }
 
@@ -34,17 +31,16 @@ class UpdateTest extends TestCase
         $data = [
             'name' => 'Updated Firewall Policy 1',
         ];
-        $this->patch(
+        $patch = $this->patch(
             '/v2/firewall-policies/' . $this->policy->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(202);
+        )->assertStatus(202);
 
-        $firewallPolicy = FirewallPolicy::findOrFail((json_decode($this->response->getContent()))->data->id);
+        $firewallPolicy = FirewallPolicy::findOrFail((json_decode($patch->getContent()))->data->id);
         $this->assertEquals($data['name'], $firewallPolicy->name);
         $this->assertNotEquals($this->oldData['name'], $firewallPolicy->name);
 
