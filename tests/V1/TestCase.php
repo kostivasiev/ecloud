@@ -2,6 +2,7 @@
 
 namespace Tests\V1;
 
+use App\Providers\EncryptionServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Tests\CreatesApplication;
 use Tests\Traits\ResellerDatabaseMigrations;
@@ -24,6 +25,16 @@ abstract class TestCase extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $mockEncrypter = \Mockery::mock(\Illuminate\Encryption\Encrypter::class)
+            ->shouldAllowMockingProtectedMethods()
+            ->makePartial();
+
+        app()->bind('encrypter', function () use ($mockEncrypter) {
+            $mockEncrypter->shouldReceive('encrypt')->andReturn('EnCrYpTeD-pAsSwOrD');
+            $mockEncrypter->shouldReceive('decrypt')->andReturn('somepassword');
+            return $mockEncrypter;
+        });
 
         Event::fake([
             \App\Events\V1\DatastoreCreatedEvent::class,
