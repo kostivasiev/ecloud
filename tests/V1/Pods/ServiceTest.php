@@ -14,7 +14,7 @@ class ServiceTest extends TestCase
      */
     public function testValidServiceEnabled()
     {
-        $pod = factory(Pod::class)->create([
+        $pod = Pod::factory()->create([
             'ucs_datacentre_public_enabled' => 'Yes',
         ]);
 
@@ -27,7 +27,7 @@ class ServiceTest extends TestCase
      */
     public function testValidServiceDisabled()
     {
-        $pod = factory(Pod::class)->create([
+        $pod = Pod::factory()->create([
             'ucs_datacentre_public_enabled' => 'No',
         ]);
 
@@ -40,7 +40,7 @@ class ServiceTest extends TestCase
      */
     public function testUnknownServiceFails()
     {
-        $pod = factory(Pod::class)->create();
+        $pod = Pod::factory()->create();
 
         $this->assertFalse($pod->hasEnabledService('unknown'));
     }

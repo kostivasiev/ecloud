@@ -31,6 +31,7 @@ class PodController extends BaseController
 
         $pods = $collectionQuery->paginate($this->perPage);
 
+
         return $this->respondCollection(
             $request,
             $pods
