@@ -151,7 +151,7 @@ class GetTest extends ApplianceTestCase
     public function testApplianceData()
     {
         $appliance = factory(Appliance::class)->create();
-        $applianceVersion = factory(ApplianceVersion::class)->create([
+        $applianceVersion = ApplianceVersion::factory()->create([
             'appliance_uuid' => $appliance->appliance_uuid,
             'appliance_version_version' => 1,
         ]);
