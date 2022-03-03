@@ -19,7 +19,7 @@ class ManagementRouterTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         $this->get('/v2/routers/' . $this->router()->id)
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testGetManagedRouterAdminPasses()
@@ -27,10 +27,10 @@ class ManagementRouterTest extends TestCase
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
         $this->get('/v2/routers/' . $this->router()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'is_management' => true,
                 'is_hidden' => true
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

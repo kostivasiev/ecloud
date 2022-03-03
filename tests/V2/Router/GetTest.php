@@ -14,14 +14,14 @@ class GetTest extends TestCase
         $this->availabilityZone();
 
         // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('patch')
-            ->andReturn(
+        $this->nsxServiceMock()->allows('patch')
+            ->andReturns(
                 new Response(200, [], ''),
             );
 
         // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('get')
-            ->andReturn(
+        $this->nsxServiceMock()->allows('get')
+            ->andReturns(
                 new Response(200, [], json_encode(['publish_status' => 'REALIZED']))
             );
     }
@@ -37,12 +37,12 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->router()->id,
                 'name' => $this->router()->name,
                 'vpc_id' => $this->router()->vpc_id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetItemDetail()
@@ -54,12 +54,12 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->router()->id,
                 'name' => $this->router()->name,
                 'vpc_id' => $this->router()->vpc_id
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testRouterFirewallPolicies()
@@ -73,12 +73,12 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->firewallPolicy()->id,
                 'name' => $this->firewallPolicy()->name,
                 'router_id' => $this->router()->id,
                 'sequence' => $this->firewallPolicy()->sequence,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }
