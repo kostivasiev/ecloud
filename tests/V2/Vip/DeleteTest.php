@@ -21,12 +21,12 @@ class DeleteTest extends TestCase
     public function testFailInvalidId()
     {
         $this->delete('/v2/vips/NOT_FOUND')
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Not found',
                 'detail' => 'No Vip with that ID was found',
                 'status' => 404,
             ])
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testSuccessfulDelete()
@@ -40,7 +40,7 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_delete';

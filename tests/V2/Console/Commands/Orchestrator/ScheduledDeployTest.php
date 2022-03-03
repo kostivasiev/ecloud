@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class ScheduledDeployTest extends TestCase
 {
-
     protected $command;
     protected string $now;
     protected OrchestratorConfig $orchestratorConfig;

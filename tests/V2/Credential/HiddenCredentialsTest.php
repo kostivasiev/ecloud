@@ -23,12 +23,11 @@ class HiddenCredentialsTest extends TestCase
     protected Vpc $vpc;
     protected Image $image;
 
-
     public function setUp(): void
     {
         parent::setUp();
 
-        Instance::withoutEvents(function() {
+        Instance::withoutEvents(function () {
             $this->instance = new Instance(['id' => 'abc-abc132']);
         });
 
@@ -44,7 +43,6 @@ class HiddenCredentialsTest extends TestCase
 
     public function testAdminCanSetHiddenFlag()
     {
-        $instance = null;
         $this->post(
             '/v2/credentials',
             [
@@ -59,7 +57,9 @@ class HiddenCredentialsTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeInDatabase(
+        )->assertStatus(201);
+
+        $this->assertDatabaseHas(
             'credentials',
             [
                 'resource_id' => $this->instanceModel()->id,
@@ -69,7 +69,7 @@ class HiddenCredentialsTest extends TestCase
                 'is_hidden' => 1,
             ],
             'ecloud'
-        )->assertResponseStatus(201);
+        );
     }
 
     public function testAdminCanSeeHiddenCredentials()
@@ -80,9 +80,9 @@ class HiddenCredentialsTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'is_hidden' => true,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testUserCannotSeeHiddenFlag()
@@ -95,8 +95,8 @@ class HiddenCredentialsTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )->dontSeeJson([
+        )->assertJsonMissing([
             'is_hidden' => true,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }

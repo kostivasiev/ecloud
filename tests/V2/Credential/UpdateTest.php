@@ -10,7 +10,7 @@ class UpdateTest extends TestCase
 {
     public function testValidDataSucceeds()
     {
-        $credential = factory(Credential::class)->create();
+        $credential = Credential::factory()->create();
 
         $this->patch('/v2/credentials/' . $credential->id, [
             'resource_id' => 'abc-abc123',
@@ -21,7 +21,9 @@ class UpdateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeInDatabase(
+        ])->assertStatus(200);
+
+        $this->assertDatabaseHas(
             'credentials',
             [
                 'id' => $credential->id,
@@ -31,7 +33,7 @@ class UpdateTest extends TestCase
                 'port' => 8080
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        );
 
         $resource = Credential::find($credential->id);
 
