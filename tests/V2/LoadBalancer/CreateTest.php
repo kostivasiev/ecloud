@@ -73,12 +73,12 @@ class CreateTest extends TestCase
                 'vpc_id' => Str::uuid(),
                 'availability_zone_id' => $this->availabilityZone()->id
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The specified vpc id was not found',
             'status' => 422,
             'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testInvalidAvailabilityZoneIsFailed()
@@ -91,12 +91,12 @@ class CreateTest extends TestCase
                 'vpc_id' => Str::uuid(),
                 'availability_zone_id' => Str::uuid()
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The specified vpc id was not found',
             'status' => 422,
             'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testNotOwnedVpcIdIsFailed()
@@ -110,12 +110,12 @@ class CreateTest extends TestCase
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => Str::uuid(),
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The specified vpc id was not found',
             'status' => 422,
             'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testFailedVpcCausesFail()
@@ -133,12 +133,12 @@ class CreateTest extends TestCase
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified vpc id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testValidDataSucceeds()
@@ -154,7 +154,7 @@ class CreateTest extends TestCase
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'network_id' => $this->network()->id,
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';

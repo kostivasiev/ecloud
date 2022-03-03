@@ -28,20 +28,20 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get('/v2/load-balancers')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->loadBalancer()->id,
                 'name' => $this->loadBalancer()->name,
                 'vpc_id' => $this->loadBalancer()->vpc_id,
                 'load_balancer_spec_id' => $this->loadBalancer()->load_balancer_spec_id,
                 'network_id' => $this->network()->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetItemDetail()
     {
         $this->get('/v2/load-balancers/' . $this->loadBalancer()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->loadBalancer()->id,
                 'name' => $this->loadBalancer()->name,
                 'vpc_id' => $this->loadBalancer()->vpc_id,
@@ -49,7 +49,7 @@ class GetTest extends TestCase
                 'nodes' => 1,
                 'network_id' => $this->network()->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetLoadBalancerNetworksCollection()
@@ -57,12 +57,12 @@ class GetTest extends TestCase
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->loadBalancerNetwork();
         $this->get('/v2/load-balancers/' . $this->loadBalancer()->id . '/networks')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->loadBalancerNetwork()->id,
                 'name' => $this->loadBalancerNetwork()->name,
                 'load_balancer_id' => $this->loadBalancer()->id,
                 'network_id' => $this->network()->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }
