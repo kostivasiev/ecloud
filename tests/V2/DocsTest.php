@@ -11,7 +11,7 @@ class DocsTest extends TestCase
         $this->get('/v2/docs.yaml', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testDocsAdmin()
@@ -19,6 +19,6 @@ class DocsTest extends TestCase
         $this->get('/v2/admin-docs.yaml', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }
