@@ -18,17 +18,16 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         Event::fake([Created::class]);
-        $this->patch('/v2/nics/' . $this->nic()->id, [
-                'name' => 'renamed',
-            ]
-        )
-            ->seeInDatabase('nics', [
+        $this->patch('/v2/nics/' . $this->nic()->id, ['name' => 'renamed'])
+            ->assertStatus(202);
+        $this->assertDatabaseHas(
+            'nics',
+            [
                 'id' => $this->nic()->id,
                 'name' => 'renamed'
             ],
-                'ecloud'
-            )
-            ->assertResponseStatus(202);
+            'ecloud'
+        );
         Event::assertDispatched(Created::class);
     }
 }

@@ -20,34 +20,33 @@ class GetTest extends TestCase
     {
         $this->nic();
         $this->get('/v2/nics')
-            ->seeJson([
-            'mac_address' => $this->nic()->mac_address,
-            'instance_id' => $this->instanceModel()->id,
-            'network_id' => $this->network()->id,
-        ])->assertResponseStatus(200);
+            ->assertJsonFragment([
+                'mac_address' => $this->nic()->mac_address,
+                'instance_id' => $this->instanceModel()->id,
+                'network_id' => $this->network()->id,
+            ])->assertStatus(200);
     }
 
     public function testGetResource()
     {
         $this->get('/v2/nics/' . $this->nic()->id)
-            ->seeJson([
-            'mac_address' => $this->nic()->mac_address,
-            'instance_id' => $this->instanceModel()->id,
-            'network_id' => $this->network()->id,
-        ])->assertResponseStatus(200);
+            ->assertJsonFragment([
+                'mac_address' => $this->nic()->mac_address,
+                'instance_id' => $this->instanceModel()->id,
+                'network_id' => $this->network()->id,
+            ])->assertStatus(200);
     }
 
     public function testGetIpAddressCollection()
     {
         $ipAddress = IpAddress::factory()->create();
-
         $this->nic()->ipAddresses()->sync($ipAddress);
 
         $this->get('/v2/nics/' . $this->nic()->id . '/ip-addresses')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'id' => $ipAddress->id,
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 }
