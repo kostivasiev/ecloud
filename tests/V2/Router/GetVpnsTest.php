@@ -24,15 +24,15 @@ class GetVpnsTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->region = Region::factory()->create();
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id,
         ]);
         $this->router = Router::factory()->create([
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
-        $this->vpnService = factory(VpnService::class)->create([
+        $this->vpnService = VpnService::factory()->create([
             'router_id' => $this->router->id,
         ]);
     }
@@ -46,11 +46,11 @@ class GetVpnsTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id'                   => $this->vpnService->id,
                 'router_id'            => $this->vpnService->router_id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
 }
