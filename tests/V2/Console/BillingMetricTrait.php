@@ -14,7 +14,6 @@ use ReflectionProperty;
 
 trait BillingMetricTrait
 {
-
     protected $command;
     protected \DateTimeZone $timeZone;
     protected Carbon $startDate;
@@ -152,15 +151,15 @@ trait BillingMetricTrait
 
     public function createBillingMetricAndCost($code, $price, $quantity)
     {
-        factory(Product::class)->create([
+        Product::factory()->create([
             'product_name' => $this->availabilityZone()->id . ': ' . $code,
             'product_cost_price' => $price,
         ])->each(function ($product) use ($price) {
-            factory(ProductPrice::class)->create([
+            ProductPrice::factory()->create([
                 'product_price_product_id' => $product->id,
                 'product_price_sale_price' => $price,
             ])->each(function ($productPrice) use ($price) {
-                factory(ProductPriceCustom::class)->create([
+                ProductPriceCustom::factory()->create([
                     'product_price_custom_product_id' => $productPrice->product_price_product_id,
                     'product_price_custom_reseller_id' => 1,
                     'product_price_custom_sale_price' => $price,
@@ -168,7 +167,7 @@ trait BillingMetricTrait
             });
         });
 
-        factory(BillingMetric::class)->create([
+        BillingMetric::factory()->create([
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
             'reseller_id' => 1,
@@ -520,7 +519,7 @@ trait BillingMetricTrait
 
     public function addDiscountPlan($commitment = 0.00, $startDate = null, $endDate = null)
     {
-        factory(DiscountPlan::class)->create([
+        DiscountPlan::factory()->create([
             'contact_id' => 1,
             'commitment_amount' => $commitment - (($commitment / 100) * 10),
             'commitment_before_discount' => $commitment,
