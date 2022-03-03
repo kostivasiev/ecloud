@@ -23,16 +23,12 @@ class UpdateTest extends TestCase
     {
         Event::fake(Created::class);
 
-        $this->patch('/v2/vips/' . $this->vip()->id,
+        $this->patch(
+            '/v2/vips/' . $this->vip()->id,
             [
                 'name' => 'foo',
             ]
-        )->seeInDatabase(
-            'vips',
-            [
-                'name' => 'foo',
-            ],
-            'ecloud'
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
+        $this->assertDatabaseHas('vips', ['name' => 'foo',], 'ecloud');
     }
 }
