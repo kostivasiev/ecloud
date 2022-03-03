@@ -18,12 +18,12 @@ class GetTest extends TestCase
             '/v2/networks',
             []
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ])
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 
     public function testGetCollection()
@@ -35,12 +35,12 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->network()->id,
                 'name' => $this->network()->name,
                 'subnet' => '10.0.0.0/24'
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetItemDetail()
@@ -52,12 +52,12 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->network()->id,
                 'name' => $this->network()->name,
                 'subnet' => '10.0.0.0/24'
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
 }

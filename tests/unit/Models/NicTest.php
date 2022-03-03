@@ -2,7 +2,6 @@
 
 namespace Tests\unit\Models;
 
-
 use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
 use Tests\TestCase;
@@ -16,7 +15,7 @@ class NicTest extends TestCase
 
     public function testIpaddressAttributeReturnsModelAttribute()
     {
-        $nic = factory(Nic::class)->create([
+        $nic = Nic::factory()->create([
             'id' => 'nic-test',
             'mac_address' => 'AA:BB:CC:DD:EE:FF',
             'instance_id' => $this->instanceModel()->id,
@@ -33,7 +32,7 @@ class NicTest extends TestCase
 
         $this->nic()->ipAddresses()->sync($ipAddress);
 
-        $this->notSeeInDatabase('nics', [
+        $this->assertDatabaseMissing('nics', [
             'id' => $this->nic()->id,
             'ip_address' => '1.1.1.1'
         ],

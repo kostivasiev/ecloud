@@ -2,7 +2,6 @@
 
 namespace Tests\unit\Rules\V2\IpAddress;
 
-
 use App\Rules\V2\IpAddress\IsInSubnet;
 use Tests\TestCase;
 

@@ -20,13 +20,13 @@ class UniqueSubnetPerRouterTest extends TestCase
     protected Router $router2;
     protected Vpc $vpc;
 
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create([
+        $this->region = Region::factory()->create([
             'name' => 'testregion',
         ]);
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id,
         ]);
         $this->router = Router::factory()->create([
@@ -60,10 +60,10 @@ class UniqueSubnetPerRouterTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The subnet must not overlap an existing CIDR range',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testSuccessfulCreation()
@@ -79,12 +79,12 @@ class UniqueSubnetPerRouterTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
     }
 
     public function testPatchIsSuccessful()
     {
-        $this->post(
+        $response = $this->post(
             '/v2/networks',
             [
                 'name' => 'Manchester Network',
@@ -95,9 +95,9 @@ class UniqueSubnetPerRouterTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
-        $networkId = (json_decode($this->response->getContent()))->data->id;
+        $networkId = (json_decode($response->getContent()))->data->id;
 
         // update the record using the same data. Before the fix the same subnet for the same
         // record would result in an overlapping subnet error.
@@ -112,7 +112,7 @@ class UniqueSubnetPerRouterTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
     }
 
 }

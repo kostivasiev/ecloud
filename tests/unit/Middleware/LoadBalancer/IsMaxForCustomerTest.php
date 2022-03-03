@@ -25,7 +25,7 @@ class IsMaxForCustomerTest extends TestCase
         Config::set('load-balancer.customer_max_per_az', 1);
         $this->loadBalancer();
 
-        factory(Instance::class, 2)->create([
+        Instance::factory(2)->create([
             'vpc_id' => $this->vpc()->id,
             'name' => 'Test Instance ' . uniqid(),
             'image_id' => $this->image()->id,

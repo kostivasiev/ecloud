@@ -23,14 +23,15 @@ class UpdateTest extends TestCase
                 'ip_address' => '10.0.0.6',
                 'type' => 'cluster',
             ]
-        )->seeInDatabase(
+        )->assertStatus(200);
+        $this->assertDatabaseHas(
             'ip_addresses',
             [
                 'id' => $this->ip()->id,
                 'name' => 'UPDATED',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        );
     }
 
     public function testCantChangeIpAddress()
@@ -44,7 +45,8 @@ class UpdateTest extends TestCase
                 'ip_address' => '10.0.0.6',
                 'type' => 'cluster',
             ]
-        )->seeInDatabase(
+        )->assertStatus(200);
+        $this->assertDatabaseHas(
             'ip_addresses',
             [
                 'name' => 'UPDATED',
@@ -52,6 +54,6 @@ class UpdateTest extends TestCase
                 'type' => 'normal',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        );
     }
 }

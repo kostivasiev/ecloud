@@ -17,7 +17,7 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
     }
 
     public function testNotAdminIsDenied()
@@ -33,13 +33,11 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeJson([
-                'title' => 'Unauthorized',
-                'detail' => 'Unauthorized',
-                'status' => 401,
-            ])
-            ->assertResponseStatus(401);
+        )->assertJsonFragment([
+            'title' => 'Unauthorized',
+            'detail' => 'Unauthorized',
+            'status' => 401,
+        ])->assertStatus(401);
     }
 
     public function testNullNameIsDenied()
@@ -54,14 +52,12 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The name field, when specified, cannot be null',
-                'status' => 422,
-                'source' => 'name'
-            ])
-            ->assertResponseStatus(422);
+        )->assertJsonFragment([
+            'title' => 'Validation Error',
+            'detail' => 'The name field, when specified, cannot be null',
+            'status' => 422,
+            'source' => 'name'
+        ])->assertStatus(422);
     }
 
     public function testValidDataIsSuccessful()
@@ -76,13 +72,8 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeInDatabase(
-                'regions',
-                $data,
-                'ecloud'
-            )
-            ->assertResponseStatus(200);
+        )->assertStatus(200);
+        $this->assertDatabaseHas('regions', $data, 'ecloud');
 
         $region = Region::findOrFail($this->region->id);
         $this->assertEquals($data['name'], $region->name);

@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\V2\NetworkRule;
 
 use App\Models\V2\NetworkPolicy;
@@ -40,14 +41,15 @@ class UpdateTest extends TestCase
             [
                 'action' => 'REJECT',
             ]
-        )->seeInDatabase(
+        )->assertStatus(202);
+        $this->assertDatabaseHas(
             'network_rules',
             [
                 'id' => 'nr-test',
                 'action' => 'REJECT',
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -71,6 +73,6 @@ class UpdateTest extends TestCase
             return $dhcpNetworkRule;
         });
 
-        $this->patch('/v2/network-rules/' . $dhcpNetworkRule->id)->assertResponseStatus(403);
+        $this->patch('/v2/network-rules/' . $dhcpNetworkRule->id)->assertStatus(403);
     }
 }

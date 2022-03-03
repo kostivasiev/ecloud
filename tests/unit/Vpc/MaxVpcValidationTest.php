@@ -9,7 +9,6 @@ use UKFast\Api\Auth\Consumer;
 
 class MaxVpcValidationTest extends TestCase
 {
-
     protected $rule;
 
     public function setUp(): void
@@ -28,18 +27,19 @@ class MaxVpcValidationTest extends TestCase
     {
         config(['defaults.vpc.max_count' => 10]);
         $counter = 1;
-        factory(Vpc::class, config('defaults.vpc.max_count'))
-            ->make([
-                'reseller_id' => 1,
-                'region_id' => $this->region()->id,
-                'console_enabled' => true,
-            ])
+
+        Vpc::factory(config('defaults.vpc.max_count'))->make([
+            'reseller_id' => 1,
+            'region_id' => $this->region()->id,
+            'console_enabled' => true,
+        ])
             ->each(function ($vpc) use (&$counter) {
                 $vpc->id = 'vpc-test' . $counter;
                 $vpc->name = 'TestVPC-' . $counter;
                 $vpc->saveQuietly();
                 $counter++;
             });
+
         $this->assertFalse($this->rule->isWithinLimit());
     }
 }

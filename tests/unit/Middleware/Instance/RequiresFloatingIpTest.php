@@ -4,9 +4,7 @@ namespace Tests\unit\Middleware\Instance;
 
 use App\Http\Middleware\Instance\RequiresFloatingIp;
 use App\Models\V2\ImageMetadata;
-use App\Models\V2\Instance;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;

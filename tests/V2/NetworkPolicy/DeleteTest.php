@@ -23,7 +23,7 @@ class DeleteTest extends TestCase
         $this->delete(
             '/v2/network-policies/' . $this->networkPolicy()->id,
             []
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }

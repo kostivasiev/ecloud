@@ -6,7 +6,6 @@ use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use Tests\TestCase;
 
-
 class OrchestratorBuildTest extends TestCase
 {
     protected OrchestratorConfig $orchestratorConfig;

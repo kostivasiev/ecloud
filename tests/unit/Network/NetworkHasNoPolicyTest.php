@@ -5,7 +5,6 @@ use App\Models\V2\NetworkPolicy;
 use App\Rules\V2\NetworkHasNoPolicy;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 

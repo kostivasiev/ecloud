@@ -41,12 +41,11 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeInDatabase(
-                'load_balancers',
-                $data,
-                'ecloud'
-            )
-            ->assertResponseStatus(202);
+        )->assertStatus(202);
+        $this->assertDatabaseHas(
+            'load_balancers',
+            $data,
+            'ecloud'
+        );
     }
 }

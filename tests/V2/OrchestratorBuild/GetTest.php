@@ -10,7 +10,6 @@ use UKFast\Api\Auth\Consumer;
 class GetTest extends TestCase
 {
     protected OrchestratorConfig $orchestratorConfig;
-
     protected OrchestratorBuild $orchestratorBuild;
 
     public function setUp(): void
@@ -29,34 +28,34 @@ class GetTest extends TestCase
     public function testIndexAdminSucceeds()
     {
         $this->get('/v2/orchestrator-builds')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->orchestratorBuild->id,
                 'orchestrator_config_id' => $this->orchestratorConfig->id,
                 'state' => null
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testIndexNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->get('/v2/orchestrator-builds')->assertResponseStatus(401);
+        $this->get('/v2/orchestrator-builds')->assertStatus(401);
     }
 
     public function testShowAdminSucceeds()
     {
         $this->get('/v2/orchestrator-builds/' . $this->orchestratorBuild->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->orchestratorBuild->id,
                 'orchestrator_config_id' => $this->orchestratorConfig->id,
                 'state' => null
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShowNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->get('/v2/orchestrator-builds/' . $this->orchestratorConfig->id)->assertResponseStatus(401);
+        $this->get('/v2/orchestrator-builds/' . $this->orchestratorConfig->id)->assertStatus(401);
     }
 }

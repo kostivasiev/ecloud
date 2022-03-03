@@ -10,7 +10,6 @@ use App\Models\V2\Region;
 use App\Models\V2\Vpc;
 use App\Support\Resource;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class ResourceTest extends TestCase
@@ -27,14 +26,14 @@ class ResourceTest extends TestCase
         parent::setUp();
 
         Model::withoutEvents(function() {
-            $this->region = factory(Region::class)->create([
+            $this->region = Region::factory()->create([
                 'id' => 'reg-test1',
             ]);
-            $this->availability_zone = factory(AvailabilityZone::class)->create([
+            $this->availability_zone = AvailabilityZone::factory()->create([
                 'id' => 'az-test1',
                 'region_id' => $this->region->id,
             ]);
-            $this->vpc = factory(Vpc::class)->create([
+            $this->vpc = Vpc::factory()->create([
                 'id' => 'vpc-test1',
                 'region_id' => $this->region->id,
             ]);
@@ -46,7 +45,7 @@ class ResourceTest extends TestCase
             $this->floating_ip = FloatingIp::factory()->create([
                 'id' => 'fip-test1',
             ]);
-            $this->nic = factory(Nic::class)->create([
+            $this->nic = Nic::factory()->create([
                 'id' => 'nic-test1',
             ]);
         });

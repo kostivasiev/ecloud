@@ -26,7 +26,6 @@ class VolumeCapacityAttributeTests extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-
         $region = Region::factory()->create();
         $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id,

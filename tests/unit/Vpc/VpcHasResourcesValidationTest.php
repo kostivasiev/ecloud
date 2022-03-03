@@ -2,21 +2,13 @@
 
 namespace Tests\unit\Vpc;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Dhcp;
-use App\Models\V2\Region;
 use App\Models\V2\Router;
-use App\Models\V2\Vpc;
 use App\Rules\V2\VpcHasResources;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class VpcHasResourcesValidationTest extends TestCase
 {
-    /** @var Vpc */
-    private $vpc;
     private $validator;
-    private $availability_zone;
 
     public function setUp(): void
     {
