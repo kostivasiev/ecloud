@@ -37,7 +37,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Application;
 use Tests\Traits\ResellerDatabaseMigrations;
 
 abstract class TestCase extends BaseTestCase

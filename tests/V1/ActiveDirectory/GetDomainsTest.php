@@ -18,16 +18,16 @@ class GetDomainsTest extends TestCase
      */
     public function testValidCollection()
     {
-        $total = 2;
-        factory(ActiveDirectoryDomain::class, $total)->create();
+        ActiveDirectoryDomain::factory(2)->create();
 
         $this->get('/v1/active-directory/domains', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
         ]);
 
-        $this->assertResponseStatus(200) && $this->seeJson([
-            'total' => $total,
+
+        $this->assertStatus(200) && $this->seeJson([
+            'total' => 2,
         ]);
     }
 

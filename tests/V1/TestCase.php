@@ -4,8 +4,9 @@ namespace Tests\V1;
 
 use Illuminate\Support\Facades\Event;
 use Tests\Traits\ResellerDatabaseMigrations;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
-abstract class TestCase extends \Laravel\Lumen\Testing\TestCase
+abstract class TestCase extends BaseTestCase
 {
     use ResellerDatabaseMigrations;
 
