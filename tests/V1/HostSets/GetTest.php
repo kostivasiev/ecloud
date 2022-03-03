@@ -19,14 +19,14 @@ class GetTest extends TestCase
     public function testValidCollection()
     {
         $count = 2;
-        factory(HostSet::class, $count)->create();
+        HostSet::factory($count)->create();
 
-        $this->get('/v1/hostsets', $this->validWriteHeaders);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
-            'total' => $count,
-            'count' => $count,
-        ]);
+        $this->get('/v1/hostsets', $this->validWriteHeaders)
+            ->assertStatus(200)
+            ->assertJsonFragment([
+                'total' => $count,
+                'count' => $count,
+            ]);
     }
 
     /**
@@ -35,11 +35,11 @@ class GetTest extends TestCase
      */
     public function testValidItem()
     {
-        $item = (factory(HostSet::class, 1)->create())->first();
+        $item = (HostSet::factory(1)->create())->first();
 
         $this->json('GET', '/v1/hostsets/' . $item->uuid, [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $item->uuid,
                 'name' => $item->name,
                 'solution_id' => $item->ucs_reseller_id
@@ -52,9 +52,8 @@ class GetTest extends TestCase
      */
     public function testInvalidItem()
     {
-        $this->get('/v1/hostsets/abc', $this->validWriteHeaders);
-
-        $this->assertResponseStatus(404);
+        $this->get('/v1/hostsets/abc', $this->validWriteHeaders)
+            ->assertStatus(404);
     }
 
     /**
@@ -66,8 +65,6 @@ class GetTest extends TestCase
         $this->get('/v1/hostsets/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(401);
+        ])->assertStatus(401);
     }
 }
