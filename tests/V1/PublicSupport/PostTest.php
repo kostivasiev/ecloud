@@ -12,16 +12,13 @@ class PostTest extends TestCase
         parent::setUp();
     }
 
-
     public function testAdminCanCreateItem()
     {
         $this->post('/v1/support', [], [
             'X-consumer-custom-id' => '0-1',
             'X-consumer-groups' => 'ecloud.write',
             'X-reseller-id' => 1,
-        ]);
-
-        $this->assertResponseStatus(201);
+        ])->assertStatus(201);
     }
 
     public function testClientCantCreateItem()
@@ -30,8 +27,6 @@ class PostTest extends TestCase
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
             'X-reseller-id' => 1,
-        ]);
-
-        $this->assertResponseStatus(401);
+        ])->assertStatus(401);
     }
 }
