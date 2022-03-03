@@ -41,8 +41,7 @@ use Tests\Traits\ResellerDatabaseMigrations;
 
 abstract class TestCase extends BaseTestCase
 {
-    use CreatesApplication,
-        ResellerDatabaseMigrations,
+    use ResellerDatabaseMigrations,
         Mocks\Host\Mocks,
         InteractsWithDatabase;
 

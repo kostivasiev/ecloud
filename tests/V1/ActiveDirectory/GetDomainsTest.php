@@ -23,12 +23,9 @@ class GetDomainsTest extends TestCase
         $this->get('/v1/active-directory/domains', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-
-        $this->assertStatus(200) && $this->seeJson([
+        ])->assertJsonFragment([
             'total' => 2,
-        ]);
+        ])->assertStatus(200);
     }
 
 
