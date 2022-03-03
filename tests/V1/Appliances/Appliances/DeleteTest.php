@@ -30,9 +30,8 @@ class DeleteTest extends ApplianceTestCase
 
         $this->assertNull($applianceVersion->deleted_at);
 
-        $this->json('DELETE', '/v1/appliances/' . $appliance->uuid, [], $this->validWriteHeaders);
-
-        $this->assertResponseStatus(204);
+        $this->json('DELETE', '/v1/appliances/' . $appliance->uuid, [], $this->validWriteHeaders)
+            ->assertStatus(204);
 
         // Check things were marked as deleted
         $appliance->refresh();
@@ -53,8 +52,7 @@ class DeleteTest extends ApplianceTestCase
     {
         $appliance = $this->appliances[0];
 
-        $this->json('DELETE', '/v1/appliances/' . $appliance->uuid, [], $this->validReadHeaders);
-
-        $this->assertResponseStatus(401);
+        $this->json('DELETE', '/v1/appliances/' . $appliance->uuid, [], $this->validReadHeaders)
+            ->assertStatus(401);
     }
 }

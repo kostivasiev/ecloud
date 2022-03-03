@@ -20,7 +20,7 @@ class GetTest extends ApplianceTestCase
     {
         $this->get('/v1/appliance-versions', $this->validWriteHeaders);
 
-        $this->assertResponseStatus(200) && $this->seeJson([
+        $this->assertStatus(200) && $this->assertJsonFragment([
             'total' => 9,
         ]);
     }
@@ -34,7 +34,7 @@ class GetTest extends ApplianceTestCase
 
         $this->get('/v1/appliance-versions/' . $uuid, $this->validWriteHeaders);
 
-        $this->assertResponseStatus(200);
+        $this->assertStatus(200);
     }
 
     /**
@@ -45,7 +45,7 @@ class GetTest extends ApplianceTestCase
     {
         $this->get('/v1/appliance-versions/' . Uuid::uuid4()->toString(), $this->validWriteHeaders);
 
-        $this->assertResponseStatus(404);
+        $this->assertStatus(404);
     }
 
 
@@ -59,8 +59,8 @@ class GetTest extends ApplianceTestCase
 
         $this->json('GET', '/v1/appliance-versions/' . $latestVersion->uuid . '/parameters', [],
             $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $parameters[0]->uuid,
                 'version_id' => $parameters[0]->appliance_version_uuid,
                 'name' => $parameters[0]->name,

@@ -20,7 +20,7 @@ class DeleteTest extends ApplianceTestCase
 
         $this->json('DELETE', '/v1/appliance-parameters/' . $parameter->uuid, [], $this->validWriteHeaders);
 
-        $this->assertResponseStatus(204);
+        $this->assertStatus(204);
 
         $parameter->refresh();
 
@@ -34,6 +34,6 @@ class DeleteTest extends ApplianceTestCase
 
         $this->json('DELETE', '/v1/appliance-parameters/' . $parameter->uuid, [], $this->validReadHeaders);
 
-        $this->assertResponseStatus(401);
+        $this->assertStatus(401);
     }
 }

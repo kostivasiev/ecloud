@@ -17,7 +17,7 @@ class PostTest extends ApplianceTestCase
         $applianceVersion = $this->appliances[0]->getLatestVersion();
 
         // Assert record does not exist
-        $this->missingFromDatabase(
+        $this->assertDatabaseMissing(
             'appliance_script_parameters',
             [
                 'appliance_script_parametsrs_key' => 'test'
@@ -34,7 +34,7 @@ class PostTest extends ApplianceTestCase
             'description' => 'This is a test parameter',
             'required' => false
 
-        ], $this->validWriteHeaders)->seeStatusCode(201);
+        ], $this->validWriteHeaders)->assertStatus(201);
     }
 
     public function testCreateApplianceVersionUnauthorised()
@@ -42,7 +42,7 @@ class PostTest extends ApplianceTestCase
         $applianceVersion = $this->appliances[0]->getLatestVersion();
 
         // Assert record does not exist
-        $this->missingFromDatabase(
+        $this->assertDatabaseMissing(
             'appliance_script_parameters',
             [
                 'appliance_script_parametsrs_key' => 'test'
@@ -59,6 +59,6 @@ class PostTest extends ApplianceTestCase
             'description' => 'This is a test parameter',
             'required' => false
 
-        ], $this->validReadHeaders)->seeStatusCode(401);
+        ], $this->validReadHeaders)->assertStatus(401);
     }
 }
