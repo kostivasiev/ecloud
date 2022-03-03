@@ -21,12 +21,11 @@ class GetTest extends TestCase
         $count = 2;
         factory(VolumeSet::class, $count)->create();
 
-        $this->get('/v1/volumesets', $this->validWriteHeaders);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        $this->get('/v1/volumesets', $this->validWriteHeaders)
+            ->assertJsonFragment([
             'total' => $count,
             'count' => $count,
-        ]);
+        ])->assertStatus(200);
     }
 
     /**
@@ -38,8 +37,8 @@ class GetTest extends TestCase
         $item = (factory(VolumeSet::class, 1)->create())->first();
 
         $this->json('GET', '/v1/volumesets/' . $item->uuid, [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $item->uuid,
                 'name' => $item->name,
                 'solution_id' => $item->ucs_reseller_id,
@@ -53,9 +52,8 @@ class GetTest extends TestCase
      */
     public function testInvalidItem()
     {
-        $this->get('/v1/volumesets/abc', $this->validWriteHeaders);
-
-        $this->assertResponseStatus(404);
+        $this->get('/v1/volumesets/abc', $this->validWriteHeaders)
+            ->assertStatus(404);
     }
 
     /**
@@ -67,8 +65,6 @@ class GetTest extends TestCase
         $this->get('/v1/volumesets/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(401);
+        ])->assertStatus(401);
     }
 }
