@@ -3,15 +3,11 @@
 namespace Tests\V2\Network;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
-use App\Models\V2\Vpc;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
@@ -25,7 +21,7 @@ class CreateTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
         $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id,
         ]);
@@ -48,7 +44,8 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )  ->seeInDatabase(
+        )->assertStatus(202);
+        $this->assertDatabaseHas(
             'networks',
             [
                 'name' => 'Manchester Network',
@@ -56,8 +53,7 @@ class CreateTest extends TestCase
                 'subnet' => '10.0.0.0/24'
             ],
             'ecloud'
-        )
-            ->assertResponseStatus(202);
+        );
     }
 
     public function testFailedRouterCausesFail()
@@ -85,11 +81,11 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified router id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 }
