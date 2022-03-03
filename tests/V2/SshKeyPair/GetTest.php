@@ -2,9 +2,7 @@
 
 namespace Tests\V2\SshKeyPair;
 
-use App\Models\V2\Region;
 use App\Models\V2\SshKeyPair;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase
@@ -24,11 +22,12 @@ class GetTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $this->get('/v2/ssh-key-pairs')->seeJson([
-            'title' => 'Unauthorized',
-            'detail' => 'Unauthorized',
-            'status' => 401,
-        ])->assertResponseStatus(401);
+        $this->get('/v2/ssh-key-pairs')
+            ->assertJsonFragment([
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
+                'status' => 401,
+            ])->assertStatus(401);
     }
 
     public function testGetCollectionAdmin()
@@ -36,10 +35,10 @@ class GetTest extends TestCase
         $this->get('/v2/ssh-key-pairs', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->keypair->id,
             'name' => $this->keypair->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetCollectionResellerScopeCanSeeSshKeyPair()
@@ -47,9 +46,9 @@ class GetTest extends TestCase
         $this->get('/v2/ssh-key-pairs', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->keypair->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetCollectionResellerScopeCanNotSeeSshKeyPair()
@@ -57,9 +56,9 @@ class GetTest extends TestCase
         $this->get('/v2/ssh-key-pairs', [
             'X-consumer-custom-id' => '2-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->keypair->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
 
@@ -75,11 +74,11 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
             'X-Reseller-Id' => 1
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $keypair2->id,
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->keypair->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testNonMatchingResellerIdFails()
@@ -90,11 +89,11 @@ class GetTest extends TestCase
         $this->get('/v2/ssh-key-pairs/' . $this->keypair->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Not found',
             'detail' => 'No Ssh Key Pair with that ID was found',
             'status' => 404,
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testGetItemDetail()
@@ -102,9 +101,9 @@ class GetTest extends TestCase
         $this->get('/v2/ssh-key-pairs/' . $this->keypair->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->keypair->id,
             'name' => $this->keypair->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }
