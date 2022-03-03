@@ -3,9 +3,9 @@ namespace Tests\V2\NetworkPolicy;
 
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Task;
-use Illuminate\Support\Facades\Event;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -48,17 +48,18 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/network-policies',
             $data
-        )->seeJson([
+        )->assertJsonFragment([
             'id' => 'np-test',
             'task_id' => 'test-task',
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+        $this->assertDatabaseHas(
             'network_policies',
             [
                 'name' => 'Test Policy',
                 'network_id' => $this->network()->id,
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
     }
 
     public function testCreateResourceFailedNetwork()
@@ -82,12 +83,12 @@ class CreateTest extends TestCase
         $this->post(
             '/v2/network-policies',
             $data
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified network id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testCreateResourceNetworkAlreadyAssigned()
@@ -96,7 +97,7 @@ class CreateTest extends TestCase
             'name' => 'Test Policy',
             'network_id' => $this->network()->id,
         ];
-        factory(NetworkPolicy::class)->create(array_merge(['id' => 'np-test'], $data));
+        NetworkPolicy::factory()->create(array_merge(['id' => 'np-test'], $data));
         $this->post(
             '/v2/network-policies',
             $data,
@@ -104,9 +105,9 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'This network id already has an assigned Policy'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }
