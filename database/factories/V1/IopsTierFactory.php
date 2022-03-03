@@ -5,7 +5,7 @@ use App\Models\V1\IopsTier;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-class IopsFactory extends Factory
+class IopsTierFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.

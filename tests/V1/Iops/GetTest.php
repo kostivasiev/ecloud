@@ -19,14 +19,13 @@ class GetTest extends TestCase
     public function testValidCollection()
     {
         $count = 2;
-        factory(IopsTier::class, $count)->create();
+        IopsTier::factory($count)->create();
 
         $this->get('/v1/iops', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        ])->assertStatus(200)
+        ->assertJsonFragment([
             'total' => $count,
             'count' => $count,
         ]);
@@ -38,11 +37,11 @@ class GetTest extends TestCase
      */
     public function testValidItem()
     {
-        $item = (factory(IopsTier::class, 1)->create())->first();
+        $item = (IopsTier::factory(1)->create())->first();
 
         $this->json('GET', '/v1/iops/' . $item->uuid, [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $item->uuid,
                 'name' => $item->name,
                 'limit' => $item->max_iops,
@@ -58,8 +57,6 @@ class GetTest extends TestCase
         $this->get('/v1/iops/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 }
