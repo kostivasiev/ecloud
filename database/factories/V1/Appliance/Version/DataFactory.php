@@ -4,7 +4,7 @@ namespace Database\Factories\V1\Appliance\Version;
 use App\Models\V1\Appliance\Version\Data as DataModel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class Data extends Factory
+class DataFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.

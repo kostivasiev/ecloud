@@ -54,10 +54,14 @@ class PatchTest extends ApplianceTestCase
                 'id' => $uuid
             ]);
 
-            $this->assertResponseStatus(200) && $this->seeInDatabase('appliance', [
-                'appliance_uuid' => $uuid,
-                $property => $newValue,
-            ]);
+            $this->assertDatabaseHas(
+                'appliance',
+                [
+                    'appliance_uuid' => $uuid,
+                    'appliance_' . $property => $newValue,
+                ],
+                env('DB_ECLOUD_CONNECTION')
+            );
         }
     }
 

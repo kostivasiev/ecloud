@@ -2,7 +2,6 @@
 
 namespace Tests\V1;
 
-use App\Providers\EncryptionServiceProvider;
 use Illuminate\Support\Facades\Event;
 use Tests\CreatesApplication;
 use Tests\Traits\ResellerDatabaseMigrations;

@@ -32,12 +32,12 @@ class PatchTest extends ApplianceTestCase
 
         $stringProperty = [
             'version' => 9,
-            'script_template' => $scriptTemplate,
+            'script_template' => $scriptTemplate . ' ',
             'vm_template' => 'sometemplate'
         ];
 
         foreach ($stringProperty as $property => $newValue) {
-            $this->missingFromDatabase(
+            $this->assertDatabaseMissing(
                 'appliance_version',
                 [
                     'appliance_version_uuid' => $applianceVersion->uuid,
@@ -48,15 +48,13 @@ class PatchTest extends ApplianceTestCase
 
             $this->json('PATCH', '/v1/appliance-versions/' . $applianceVersion->uuid, [
                 $property => $newValue,
-            ], $this->validWriteHeaders);
+            ], $this->validWriteHeaders)
+                ->assertStatus(200)
+                ->assertJsonFragment([
+                    'id' => $applianceVersion->uuid
+                ]);
 
-            $this->assertResponseStatus(200);
-
-            $this->seeJson([
-                'id' => $applianceVersion->uuid
-            ]);
-
-            $this->seeInDatabase(
+            $this->assertDatabaseHas(
                 'appliance_version',
                 [
                     'appliance_version_uuid' => $applianceVersion->uuid,
@@ -81,8 +79,7 @@ class PatchTest extends ApplianceTestCase
 
         $this->json('PATCH', '/v1/appliance-versions/' . $applianceVersion->uuid, [
             'name' => $testString,
-        ], $this->validReadHeaders);
-
-        $this->assertResponseStatus(401);
+        ], $this->validReadHeaders)
+            ->assertStatus(401);
     }
 }

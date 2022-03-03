@@ -27,7 +27,8 @@ class GetTest extends ApplianceTestCase
                     'description' => $this->appliances[0]->description,
                     'documentation_uri' => $this->appliances[0]->documentation_uri,
                     'publisher' => $this->appliances[0]->publisher,
-                ]);
+                ]
+            );
     }
 
     public function testPodAppliancesPodDisabled()
@@ -37,7 +38,8 @@ class GetTest extends ApplianceTestCase
             ->seeJson(
                 [
                     'total' => 0,
-                ]);
+                ]
+            );
     }
 
 
