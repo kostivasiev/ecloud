@@ -71,7 +71,7 @@ class DeleteTest extends ApplianceTestCase
                 'appliance_version_version' => 1,
             ];
 
-            $applianceVersion = factory(ApplianceVersion::class)->make($applianceFactoryConfig);
+            $applianceVersion = ApplianceVersion::factory()->make($applianceFactoryConfig);
             $applianceVersion->save();
             $applianceVersion->refresh();
 

@@ -2,7 +2,6 @@
 
 namespace Tests\V1\Appliances\ApplianceParameters;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\ApplianceTestCase;
 
 class DeleteTest extends ApplianceTestCase

@@ -34,7 +34,7 @@ class ApplianceTestCase extends TestCase
         $total = 2;
 
         // Create some appliances
-        $this->appliances = factory(Appliance::class, $total)->create()->each(function ($appliance) {
+        $this->appliances = Appliance::factory($total)->create()->each(function ($appliance) {
             // Save the $appliance
             $appliance->save();
             $appliance->refresh();
@@ -88,7 +88,7 @@ class ApplianceTestCase extends TestCase
                     }
 
                     $applianceVersion->parameters()->save(
-                        factory(ApplianceParameter::class)->make($applianceParameterConfig)
+                        ApplianceParameter::factory()->make($applianceParameterConfig)
                     );
                 }
             }

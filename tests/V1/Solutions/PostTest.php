@@ -18,11 +18,11 @@ class PostTest extends TestCase
         $testKey = 'foo';
         $testValue = 'bar';
 
-        factory(Solution::class, 1)->create([
+        Solution::factory(1)->create([
             'ucs_reseller_id' => 123,
         ]);
 
-        $this->missingFromDatabase('metadata', [
+        $this->assertDatabaseMissing('metadata', [
             'metadata_resource' => 'ucs_reseller',
             'metadata_resource_id' => 123,
             'metadata_key' => $testKey,
