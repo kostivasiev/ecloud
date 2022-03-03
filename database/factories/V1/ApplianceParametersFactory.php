@@ -24,9 +24,9 @@ class ApplianceParametersFactory extends Factory
         return [
             'appliance_script_parameters_uuid' => Str::uuid(),
             'appliance_script_parameters_name' => $this->faker->sentence(2),
-            'appliance_script_parameters_key' => str_replace(' ', '_', $this->faker->words(2)),
+            'appliance_script_parameters_key' => implode('_', $this->faker->words(2)),
             'appliance_script_parameters_type' => 'String',
-            'appliance_script_parameters_description' => $this->faker->sentence(8),
+            'appliance_script_parameters_description' => $this->faker->sentence(7),
             'appliance_script_parameters_required' => 'Yes',
         ];
     }

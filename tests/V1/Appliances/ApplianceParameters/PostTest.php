@@ -45,7 +45,7 @@ class PostTest extends ApplianceTestCase
         $this->missingFromDatabase(
             'appliance_script_parameters',
             [
-                'appliance_script_parametsrs_key' => 'test'
+                'appliance_script_parameters_key' => 'test'
             ],
             env('DB_ECLOUD_CONNECTION')
         );

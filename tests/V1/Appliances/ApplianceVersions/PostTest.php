@@ -16,10 +16,10 @@ class PostTest extends ApplianceTestCase
     public function testCreateApplianceVersion()
     {
         // Generate test appliance record
-        $applianceVersion = factory(ApplianceVersion::class, 1)->make()->first();
+        $applianceVersion = ApplianceVersion::factory(1)->make()->first();
 
         // Assert record does not exist
-        $this->missingFromDatabase(
+        $this->assertDatabaseMissing(
             'appliance_version',
             [
                 'appliance_version_version' => 4
@@ -62,15 +62,19 @@ class PostTest extends ApplianceTestCase
         ], $this->validWriteHeaders);
 
         // Get the ID of the created record
-        $data = json_decode($res->response->getContent());
+        $data = json_decode($res->getContent());
 
         $uuid = $data->data->id;
 
         // Check that the appliance was created
-        $this->assertResponseStatus(201) && $this->seeInDatabase('appliance_version',
+        $res->assertStatus(201);
+
+        $this->assertDatabaseHas(
+            'appliance_version',
             [
                 'appliance_version_uuid' => $uuid
-            ]
+            ],
+            env('DB_ECLOUD_CONNECTION')
         );
     }
 
@@ -78,10 +82,10 @@ class PostTest extends ApplianceTestCase
     public function testCreateApplianceVersionRequiredParamMissingFromScript()
     {
         // Generate test appliance record
-        $applianceVersion = factory(ApplianceVersion::class, 1)->make()->first();
+        $applianceVersion = ApplianceVersion::factory(1)->make()->first();
 
         // Assert record does not exist
-        $this->missingFromDatabase(
+        $this->assertDatabaseMissing(
             'appliance_version',
             [
                 'appliance_version_version' => 4
@@ -133,7 +137,7 @@ class PostTest extends ApplianceTestCase
     public function testCreateApplianceVersionUnauthorised()
     {
         // Generate test appliance record
-        $applianceVersion = factory(ApplianceVersion::class, 1)->make()->first();
+        $applianceVersion = ApplianceVersion::factory(1)->make()->first();
 
         // Create the appliance record
         $this->json('POST', '/v1/appliance-versions', [
