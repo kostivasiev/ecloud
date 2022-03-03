@@ -23,10 +23,10 @@ class UniqueSubnetPerRouterTest extends TestCase
     function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create([
+        $this->region = Region::factory()->create([
             'name' => 'testregion',
         ]);
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id,
         ]);
         $this->router = Router::factory()->create([

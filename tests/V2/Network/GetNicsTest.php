@@ -21,7 +21,7 @@ class GetNicsTest extends TestCase
     {
         $nic = null;
         Nic::withoutEvents(function() use (&$nic) {
-            $nic = factory(Nic::class)->create([
+            $nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'mac_address' => $this->faker->macAddress,
                 'instance_id' => $this->instanceModel()->id,

@@ -19,7 +19,7 @@ class CreateTest extends TestCase
         parent::setUp();
 
         $region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id
         ]);
     }

@@ -3,7 +3,6 @@
 namespace Tests\unit\Network;
 
 use App\Rules\V2\IsPrivateSubnet;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class IsPrivateSubnetTest extends TestCase

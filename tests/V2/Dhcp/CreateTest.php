@@ -30,7 +30,7 @@ class CreateTest extends TestCase
         parent::setUp();
 
         $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
         $this->router = Router::factory()->create([
@@ -95,7 +95,7 @@ class CreateTest extends TestCase
     public function testInvalidAzIsFailed()
     {
         $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id
         ]);
 

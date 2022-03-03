@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Tests\unit\Rules\V2\IpAddress;
 
 use App\Models\V2\IpAddress;

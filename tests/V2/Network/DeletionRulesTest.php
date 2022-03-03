@@ -18,7 +18,7 @@ class DeletionRulesTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
         Nic::withoutEvents(function() {
-            $this->nics = factory(Nic::class)->create([
+            $this->nics = Nic::factory()->create([
                 'id' => 'nic-test',
                 'mac_address' => $this->faker->macAddress,
                 'instance_id' => $this->instanceModel()->id,

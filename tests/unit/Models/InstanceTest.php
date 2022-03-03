@@ -3,7 +3,6 @@
 namespace Tests\unit\Models;
 
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class InstanceTest extends TestCase

@@ -20,7 +20,7 @@ class CanCreatePortForNetworkRuleTest extends TestCase
 
     public function testNoTypePasses()
     {
-        $rule = factory(NetworkRule::class)->create([
+        $rule = NetworkRule::factory()->create([
             'id' => 'nr-test',
             'network_policy_id' => $this->networkPolicy()->id,
         ]);
@@ -31,7 +31,7 @@ class CanCreatePortForNetworkRuleTest extends TestCase
 
     public function testDhcpTypeFails()
     {
-        $rule = factory(NetworkRule::class)->create([
+        $rule = NetworkRule::factory()->create([
             'id' => 'nr-test',
             'network_policy_id' => $this->networkPolicy()->id,
             'type' => NetworkRule::TYPE_DHCP,
@@ -43,7 +43,7 @@ class CanCreatePortForNetworkRuleTest extends TestCase
 
     public function testCatchallTypeFails()
     {
-        $rule = factory(NetworkRule::class)->create([
+        $rule = NetworkRule::factory()->create([
             'id' => 'nr-test',
             'network_policy_id' => $this->networkPolicy()->id,
             'type' => NetworkRule::TYPE_CATCHALL,

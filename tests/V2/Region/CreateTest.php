@@ -18,7 +18,7 @@ class CreateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->region = factory(Region::class)->create([
+        $this->region = Region::factory()->create([
             'name' => 'Manchester',
         ]);
     }

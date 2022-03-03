@@ -68,7 +68,7 @@ class DeleteTest extends TestCase
     public function testNotAdminDeletePrivateNotOwnerFails()
     {
         Event::fake();
-        $vpc = factory(Vpc::class)->create([
+        $vpc = Vpc::factory()->create([
             'id' => 'vpc-' . uniqid(),
             'reseller_id' => 2
         ]);

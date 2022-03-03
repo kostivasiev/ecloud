@@ -25,7 +25,7 @@ class NatTest extends TestCase
                 'id' => 'fip-test2',
                 'ip_address' => $this->faker->ipv4,
             ]);
-            $this->nat = factory(Nat::class)->create([
+            $this->nat = Nat::factory()->create([
                 'id' => 'nat-1234562',
                 'destination_id' => $this->floating_ip->id,
                 'destinationable_type' => FloatingIp::class,

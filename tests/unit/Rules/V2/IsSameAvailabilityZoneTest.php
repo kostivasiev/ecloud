@@ -21,7 +21,7 @@ class IsSameAvailabilityZoneTest extends TestCase
     {
         parent::setUp();
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->availabilityZone2 = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone2 = AvailabilityZone::factory()->create([
             'id' => 'az-test-2',
             'region_id' => $this->region()->id,
         ]);
@@ -89,7 +89,7 @@ class IsSameAvailabilityZoneTest extends TestCase
                 'router_id' => $router->id
             ]);
 
-            return factory(Nic::class)->create([
+            return Nic::factory()->create([
                 'id' => 'nic-test',
                 'mac_address' => 'AA:BB:CC:DD:EE:FF',
                 'network_id' => $network->id,

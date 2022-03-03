@@ -22,10 +22,10 @@ class DefaultAvailabilityZoneTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->region = factory(Region::class)->create([
+        $this->region = Region::factory()->create([
             'name' => $this->faker->country(),
         ]);
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id,
         ]);
     }

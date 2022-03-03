@@ -358,7 +358,7 @@ class CreateTest extends TestCase
     public function testNetworkFromAnotherVpcCausesFail()
     {
         $secondVpc = Model::withoutEvents(function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-second',
                 'region_id' => $this->region()->id
             ]);

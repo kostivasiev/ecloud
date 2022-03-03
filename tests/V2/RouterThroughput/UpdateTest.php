@@ -19,7 +19,7 @@ class UpdateTest extends TestCase
         parent::setUp();
 
         $this->region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
 
@@ -30,7 +30,7 @@ class UpdateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
 

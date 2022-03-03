@@ -25,7 +25,7 @@ class CredentialsTest extends TestCase
         parent::setUp();
 
         $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id,
         ]);
         $this->instance = Instance::withoutEvents(function () use ($availabilityZone) {

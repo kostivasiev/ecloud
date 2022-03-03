@@ -4,7 +4,6 @@ namespace Tests\unit\Traits\V2;
 
 use App\Models\V2\Task;
 use App\Support\Sync;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 

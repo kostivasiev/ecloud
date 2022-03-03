@@ -25,7 +25,7 @@ class DeletionRulesTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
         $this->region = factory(Region::class)->create();
-        $this->availability_zone = factory(AvailabilityZone::class)->create([
+        $this->availability_zone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
     }

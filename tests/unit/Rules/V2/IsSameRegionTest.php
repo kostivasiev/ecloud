@@ -21,7 +21,7 @@ class IsSameRegionTest extends TestCase
 
     public function testAzAndVpcNotInSameRegion()
     {
-        $region = factory(Region::class)->create([
+        $region = Region::factory()->create([
             'id' => 'reg-alternate',
             'is_public' => true,
         ]);

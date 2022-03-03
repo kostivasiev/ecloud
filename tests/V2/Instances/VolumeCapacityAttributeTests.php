@@ -28,10 +28,10 @@ class VolumeCapacityAttributeTests extends TestCase
         parent::setUp();
 
         $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id,
         ]);
-        $this->vpc = factory(Vpc::class)->create([
+        $this->vpc = Vpc::factory()->create([
             'name' => 'Manchester VPC',
         ]);
         $this->instance = Instance::factory()->create([

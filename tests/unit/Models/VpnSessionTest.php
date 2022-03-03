@@ -2,9 +2,7 @@
 
 namespace Tests\unit\Models;
 
-use App\Models\V2\Task;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Tests\Mocks\Resources\VpnSessionMock;
 use Tests\TestCase;
 

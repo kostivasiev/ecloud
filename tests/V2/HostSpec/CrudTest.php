@@ -166,7 +166,7 @@ class CrudTest extends TestCase
                     'id' => 'hs-test',
                 ],
                 'ecloud'
-            )->notSeeInDatabase(
+            )->assertDatabaseMissing(
                 'host_specs',
                 [
                     'id' => 'hs-test',

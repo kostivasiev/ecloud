@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class ValidBillingDateTest extends TestCase
 {
-
     protected DateIsTodayOrFirstOfMonth $validationRule;
 
     public function setUp(): void
