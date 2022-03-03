@@ -24,30 +24,28 @@ class CrudTest extends TestCase
     {
         $this->hostGroup();
         $this->get('/v2/host-groups')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
                 'vpc_id' => 'vpc-test',
                 'availability_zone_id' => 'az-test',
                 'host_spec_id' => 'hs-test',
                 'windows_enabled' => true,
-            ])
-            ->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 
     public function testShow()
     {
         $this->hostGroup();
         $this->get('/v2/host-groups/hg-test')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
                 'vpc_id' => 'vpc-test',
                 'availability_zone_id' => 'az-test',
                 'host_spec_id' => 'hs-test',
                 'windows_enabled' => true,
-            ])
-            ->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 
     public function testStore()
@@ -62,8 +60,9 @@ class CrudTest extends TestCase
             'windows_enabled' => true,
         ];
         $this->post('/v2/host-groups', $data)
-            ->seeInDatabase('host_groups', $data, 'ecloud')
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
+
+        $this->assertDatabaseHas('host_groups', $data, 'ecloud');
     }
 
     public function testInvalidAzIsFailed()
@@ -78,12 +77,13 @@ class CrudTest extends TestCase
             'windows_enabled' => true,
         ];
 
-        $this->post('/v2/host-groups', $data)->seeJson([
-            'title' => 'Not Found',
-            'detail' => 'The specified availability zone is not available to that VPC',
-            'status' => 404,
-            'source' => 'availability_zone_id'
-        ])->assertResponseStatus(404);
+        $this->post('/v2/host-groups', $data)
+            ->assertJsonFragment([
+                'title' => 'Not Found',
+                'detail' => 'The specified availability zone is not available to that VPC',
+                'status' => 404,
+                'source' => 'availability_zone_id'
+            ])->assertStatus(404);
     }
 
     public function testVpcFailedCausesFailure()
@@ -108,34 +108,34 @@ class CrudTest extends TestCase
             'windows_enabled' => true,
         ];
         $this->post('/v2/host-groups', $data)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'The specified vpc id resource currently has the status of \'failed\' and cannot be used',
                 ]
-            )->assertResponseStatus(422);
+            )->assertStatus(422);
     }
 
     public function testStoreValidationWithEmptyHostSpecId()
     {
         $this->post('/v2/host-groups', [
             'host_spec_id' => '',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The host spec id field is required',
             'status' => 422,
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testStoreValidationWithNonExistentHostSpecId()
     {
         $this->post('/v2/host-groups', [
             'host_spec_id' => 'hs-none-existent',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The selected host spec id is invalid',
             'status' => 422,
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testStoreWithNoWindowsEnabledFlag()
@@ -149,10 +149,11 @@ class CrudTest extends TestCase
             'host_spec_id' => $this->hostSpec()->id,
         ];
         $this->post('/v2/host-groups', $data)
-            ->seeInDatabase('host_groups', [
-                'windows_enabled' => false
-            ], 'ecloud')
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
+
+        $this->assertDatabaseHas('host_groups', [
+            'windows_enabled' => false
+        ], 'ecloud');
     }
 
     public function testStoreWitFalseWindowsEnabledFlag()
@@ -167,10 +168,11 @@ class CrudTest extends TestCase
             'windows_enabled' => false
         ];
         $this->post('/v2/host-groups', $data)
-            ->seeInDatabase('host_groups', [
-                'windows_enabled' => false
-            ], 'ecloud')
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
+
+        $this->assertDatabaseHas('host_groups', [
+            'windows_enabled' => false
+        ], 'ecloud');
     }
 
     public function testUpdate()
@@ -180,14 +182,15 @@ class CrudTest extends TestCase
 
         $this->patch('/v2/host-groups/hg-test', [
             'name' => 'new name',
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+        $this->assertDatabaseHas(
             'host_groups',
             [
                 'id' => 'hg-test',
                 'name' => 'new name',
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
     }
 
     public function testUpdateCantChangeHostSpecId()
@@ -197,14 +200,16 @@ class CrudTest extends TestCase
 
         $this->patch('/v2/host-groups/hg-test', [
             'host_spec_id' => 'hs-new',
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'host_groups',
             [
                 'id' => 'hg-test',
                 'host_spec_id' => 'hs-test',
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
     }
 
     public function testDestroy()
@@ -213,20 +218,22 @@ class CrudTest extends TestCase
         $this->hostGroup();
 
         $this->delete('/v2/host-groups/hg-test')
-            ->seeInDatabase(
-                'host_groups',
-                [
-                    'id' => 'hg-test',
-                ],
-                'ecloud'
-            )->assertResponseStatus(202);
+            ->assertStatus(202);
+
+        $this->assertDatabaseHas(
+            'host_groups',
+            [
+                'id' => 'hg-test',
+            ],
+            'ecloud'
+        );
     }
 
     public function testDestroyCantDeleteHostGroupWhenItHasHost()
     {
         // bind data so we can use Conjurer mocks with expected host ID
         app()->bind(Host::class, function () {
-            return factory(Host::class)->make([
+            return Host::factory()->make([
                 'id' => 'h-test',
                 'name' => 'h-test',
                 'host_group_id' => $this->hostGroup()->id,
@@ -236,10 +243,10 @@ class CrudTest extends TestCase
         $this->hostGroup();
         $this->host()->hostGroup()->associate($this->hostGroup());
         $this->delete('/v2/host-groups/hg-test')
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'Can not delete Host group with active hosts',
                 'status' => 422,
-            ])->assertResponseStatus(422);
+            ])->assertStatus(422);
     }
 }

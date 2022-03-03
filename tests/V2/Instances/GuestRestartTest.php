@@ -11,7 +11,9 @@ class GuestRestartTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->kingpinServiceMock()->allows('put')->withArgs(['/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id . '/power/guest/restart'])->andReturns(
+        $this->kingpinServiceMock()->allows('put')->withArgs([
+            '/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id . '/power/guest/restart'
+        ])->andReturns(
             new Response(200)
         );
     }
@@ -32,7 +34,6 @@ class GuestRestartTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(202);
+        )->assertStatus(202);
     }
 }

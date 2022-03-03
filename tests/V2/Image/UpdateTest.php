@@ -34,7 +34,9 @@ class UpdateTest extends TestCase
                 'public' => false,
                 'visibility' => Image::VISIBILITY_PRIVATE,
             ]
-        )->seeInDatabase(
+        )->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'images',
             [
                 'name' => 'NEW NAME',
@@ -49,14 +51,14 @@ class UpdateTest extends TestCase
                 'visibility' => Image::VISIBILITY_PRIVATE,
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testUpdatePublicResourceNotAdminFails()
     {
-        $this->patch('/v2/images/' . $this->image()->id, [])->assertResponseStatus(403);
+        $this->patch('/v2/images/' . $this->image()->id, [])->assertStatus(403);
     }
 
     public function testUpdatePrivateResourceAdminNotOwnerSucceeds()
@@ -85,7 +87,9 @@ class UpdateTest extends TestCase
                 'public' => false,
                 'visibility' => Image::VISIBILITY_PUBLIC,
             ]
-        )->seeInDatabase(
+        )->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'images',
             [
                 'name' => 'NEW NAME',
@@ -100,7 +104,7 @@ class UpdateTest extends TestCase
                 'visibility' => Image::VISIBILITY_PUBLIC,
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -123,7 +127,9 @@ class UpdateTest extends TestCase
                 'documentation_uri' => 'NEW DOCS URI',
                 'description' => 'NEW DESCRIPTION',
             ]
-        )->seeInDatabase(
+        )->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'images',
             [
                 'name' => 'NEW NAME',
@@ -132,7 +138,7 @@ class UpdateTest extends TestCase
                 'description' => 'NEW DESCRIPTION',
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -162,7 +168,9 @@ class UpdateTest extends TestCase
                 'public' => false,
                 'visibility' => Image::VISIBILITY_PUBLIC
             ]
-        )->notSeeInDatabase(
+        )->assertStatus(202);
+
+        $this->assertDatabaseMissing(
             'images',
             [
                 'platform' => 'Windows',
@@ -173,10 +181,9 @@ class UpdateTest extends TestCase
                 'visibility' => Image::VISIBILITY_PUBLIC
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
-
     }
 
     public function testUpdatePrivateResourceNotAdminNotOwnerFails()
@@ -189,6 +196,6 @@ class UpdateTest extends TestCase
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
-        $this->patch('/v2/images/img-private-test', [])->assertResponseStatus(404);
+        $this->patch('/v2/images/img-private-test', [])->assertStatus(404);
     }
 }

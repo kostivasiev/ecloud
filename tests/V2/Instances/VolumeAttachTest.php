@@ -30,8 +30,7 @@ class VolumeAttachTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(202);
+        )->assertStatus(202);
     }
 
     public function testAlreadyAttachedFails()
@@ -55,7 +54,6 @@ class VolumeAttachTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 }

@@ -24,7 +24,7 @@ class CredentialsTest extends TestCase
     {
         parent::setUp();
 
-        $region = factory(Region::class)->create();
+        $region = Region::factory()->create();
         $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id,
         ]);
@@ -57,12 +57,12 @@ class CredentialsTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson(
+            ->assertJsonFragment(
                 collect($this->credential)
                     ->except(['created_at', 'updated_at'])
                     ->toArray()
             )
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetCredentialsWhenNotDeployed()
@@ -75,12 +75,12 @@ class CredentialsTest extends TestCase
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Not Found',
                 'detail' => 'Credentials will be available when instance deployment is complete'
             ]
-        )->assertResponseStatus(404);
+        )->assertStatus(404);
     }
 
     public function testGetCredentialsWhenNotDeployedAsAdmin()
@@ -94,11 +94,11 @@ class CredentialsTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson(
+            ->assertJsonFragment(
                 collect($this->credential)
                     ->except(['created_at', 'updated_at'])
                     ->toArray()
             )
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

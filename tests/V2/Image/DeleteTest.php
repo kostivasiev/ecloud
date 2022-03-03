@@ -21,14 +21,14 @@ class DeleteTest extends TestCase
 
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        $this->delete('/v2/images/' . $this->image()->id,)->assertResponseStatus(202);
+        $this->delete('/v2/images/' . $this->image()->id)->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testNotAdminDeletePublicFails()
     {
-        $this->delete('/v2/images/' . $this->image()->id)->assertResponseStatus(403);
+        $this->delete('/v2/images/' . $this->image()->id)->assertStatus(403);
     }
 
     public function testAdminDeletePrivateSucceeds()
@@ -43,7 +43,7 @@ class DeleteTest extends TestCase
 
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        $this->delete('/v2/images/img-private-test')->assertResponseStatus(202);
+        $this->delete('/v2/images/img-private-test')->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -60,7 +60,7 @@ class DeleteTest extends TestCase
 
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        $this->delete('/v2/images/img-private-test')->assertResponseStatus(202);
+        $this->delete('/v2/images/img-private-test')->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -79,6 +79,6 @@ class DeleteTest extends TestCase
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
-        $this->delete('/v2/images/img-private-test')->assertResponseStatus(404);
+        $this->delete('/v2/images/img-private-test')->assertStatus(404);
     }
 }

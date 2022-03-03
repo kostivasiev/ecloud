@@ -20,7 +20,7 @@ class CrudTest extends TestCase
     {
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->get('/v2/host-specs')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
                 'ucs_specification_name' => 'test-host-spec',
@@ -30,14 +30,14 @@ class CrudTest extends TestCase
                 'cpu_clock_speed' => 4000,
                 'ram_capacity' => 64,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShowAsAdmin()
     {
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->get('/v2/host-specs/' . $this->hostSpec()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'hs-test',
                 'name' => 'test-host-spec',
                 'ucs_specification_name' => 'test-host-spec',
@@ -47,7 +47,7 @@ class CrudTest extends TestCase
                 'cpu_clock_speed' => 4000,
                 'ram_capacity' => 64,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testIndex()

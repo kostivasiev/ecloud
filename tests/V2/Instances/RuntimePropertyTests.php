@@ -23,7 +23,7 @@ class RuntimePropertyTests extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
         $this->availability_zone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
@@ -35,7 +35,6 @@ class RuntimePropertyTests extends TestCase
         $mockKingpinService = Mockery::mock(new KingpinService(new Client()))->makePartial();
         $mockKingpinService->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode([
-                'powerState' => 'poweredOn',
                 'powerState' => 'poweredOn',
                 'toolsRunningStatus' => 'guestToolsRunning'
             ]))
@@ -56,12 +55,10 @@ class RuntimePropertyTests extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->dontSeeJson([
-                'agent_running' => true,
-                'online' => true,
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonMissing([
+            'agent_running' => true,
+            'online' => true,
+        ])->assertStatus(200);
     }
 
     /**
@@ -83,12 +80,10 @@ class RuntimePropertyTests extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'online' => null,
-                'agent_running' => null,
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'online' => null,
+            'agent_running' => null,
+        ])->assertStatus(200);
     }
 
     /**
@@ -102,11 +97,9 @@ class RuntimePropertyTests extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'agent_running' => true,
-                'online' => true,
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'agent_running' => true,
+            'online' => true,
+        ])->assertStatus(200);
     }
 }

@@ -15,19 +15,22 @@ class UpdateTest extends TestCase
             [
                 'key' => 'KEY.UPDATED',
                 'value' => 'VALUE.UPDATED',
-            ])->seeInDatabase(
+            ]
+        )->assertStatus(200);
+
+        $this->assertDatabaseHas(
             'image_metadata',
             [
                 'key' => 'KEY.UPDATED',
                 'value' => 'VALUE.UPDATED',
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        );
     }
 
     public function testUpdateNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->patch('/v2/image-metadata/' . $this->imageMetadata()->id, [])->assertResponseStatus(401);
+        $this->patch('/v2/image-metadata/' . $this->imageMetadata()->id, [])->assertStatus(401);
     }
 }

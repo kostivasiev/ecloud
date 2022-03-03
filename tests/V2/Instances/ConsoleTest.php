@@ -31,13 +31,13 @@ class ConsoleTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Bad Gateway',
                 'details' => 'Console access to this instance is not available',
                 'status' => 502,
             ]
-        )->assertResponseStatus(502);
+        )->assertStatus(502);
     }
 
     public function testCredentialFailure()
@@ -60,13 +60,13 @@ class ConsoleTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Upstream API Failure',
                 'details' => 'Console access is not available due to an upstream api failure',
                 'status' => 503,
             ]
-        )->assertResponseStatus(503);
+        )->assertStatus(503);
     }
 
     public function testCreateSessionFailure()
@@ -97,13 +97,13 @@ class ConsoleTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Upstream API Failure',
                 'details' => 'Console session is not available due to an upstream api failure',
                 'status' => 503,
             ]
-        )->assertResponseStatus(503);
+        )->assertStatus(503);
     }
 
     public function testValidClientResult()
@@ -151,11 +151,11 @@ class ConsoleTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'url' => 'https://127.0.0.1/console/?title='.$this->instanceModel()->id.'&session='.$uuid
             ]
-        )->assertResponseStatus(200);
+        )->assertStatus(200);
     }
 
     public function testRestrictedConsoleNonAdmin()
@@ -168,12 +168,12 @@ class ConsoleTest extends TestCase
         $this->post(
             '/v2/instances/'.$this->instanceModel()->id.'/console-session',
             []
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Forbidden',
                 'details' => 'Console access has been disabled for this resource',
             ]
-        )->assertResponseStatus(403);
+        )->assertStatus(403);
     }
 
     public function testRestrictedConsoleAdmin()
@@ -223,11 +223,11 @@ class ConsoleTest extends TestCase
         $this->post(
             '/v2/instances/'.$this->instanceModel()->id.'/console-session',
             []
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'url' => 'https://127.0.0.1/console/?title='.$this->instanceModel()->id.'&session='.$uuid
             ]
-        )->assertResponseStatus(200);
+        )->assertStatus(200);
     }
 
     public function testScreenshot()
@@ -245,13 +245,13 @@ class ConsoleTest extends TestCase
 
         $response = $this->get('/v2/instances/' . $this->instanceModel()->id . '/console-screenshot');
 
-        $response->assertResponseStatus(200);
+        $response->assertStatus(200);
 
-        $this->assertEquals($this->loadData('Kingpin/GetConsoleScreenshot.json'), $response->response->getContent());
+        $this->assertEquals($this->loadData('Kingpin/GetConsoleScreenshot.json'), $response->getContent());
 
         $this->assertEquals(
             'attachment; filename=' . $this->instanceModel()->vpc_id . '-' . $this->instanceModel()->id . '-' . date('d-m-Y') . '-screenshot',
-            $response->response->headers->all()['content-disposition'][0]
+            $response->headers->all()['content-disposition'][0]
         );
     }
 }

@@ -26,12 +26,11 @@ class SoftwareTest extends TestCase
         $instanceSoftware->save();
 
         $this->get(
-            '/v2/instances/' . $this->instanceModel()->id . '/software')
-            ->seeJson([
-                'id' => 'soft-aaaaaaaa',
-                'name' => 'Test Software',
-                'platform' => 'Linux',
-            ])
-            ->assertResponseStatus(200);
+            '/v2/instances/' . $this->instanceModel()->id . '/software'
+        )->assertJsonFragment([
+            'id' => 'soft-aaaaaaaa',
+            'name' => 'Test Software',
+            'platform' => 'Linux',
+        ])->assertStatus(200);
     }
 }

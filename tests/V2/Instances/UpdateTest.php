@@ -32,15 +32,16 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeInDatabase(
+        )->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'instances',
             [
                 'id' => $this->instanceModel()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
-        )
-            ->assertResponseStatus(202);
+        );
 
         $this->instanceModel()->refresh();
         $this->assertEquals('Changed', $this->instanceModel()->name);
@@ -65,15 +66,16 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeInDatabase(
+        )->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'instances',
             [
                 'id' => $this->instanceModel()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
-        )
-            ->assertResponseStatus(202);
+        );
     }
 
     public function testScopedAdminCanNotModifyLockedInstance()
@@ -92,13 +94,11 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
                 'X-Reseller-Id' => '1',
             ]
-        )
-            ->seeJson([
-                'title' => 'Forbidden',
-                'detail' => 'The specified Instance is locked',
-                'status' => 403,
-            ])
-            ->assertResponseStatus(403);
+        )->assertJsonFragment([
+            'title' => 'Forbidden',
+            'detail' => 'The specified Instance is locked',
+            'status' => 403,
+        ])->assertStatus(403);
     }
 
     public function testLockedInstanceIsNotEditable()
@@ -117,13 +117,11 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeJson([
-                'title' => 'Forbidden',
-                'detail' => 'The specified Instance is locked',
-                'status' => 403,
-            ])
-            ->assertResponseStatus(403);
+        )->assertJsonFragment([
+            'title' => 'Forbidden',
+            'detail' => 'The specified Instance is locked',
+            'status' => 403,
+        ])->assertStatus(403);
 
         // Unlock the instance
         $this->instanceModel()->locked = false;
@@ -139,20 +137,21 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeInDatabase(
+        )->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'instances',
             [
                 'id' => $this->instanceModel()->id,
                 'name' => 'Changed'
             ],
             'ecloud'
-        )
-            ->assertResponseStatus(202);
+        );
     }
 
     public function testApplianceSpecRamMax()
     {
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'key' => 'ukfast.spec.ram.max',
             'value' => 2048,
             'image_id' => $this->image()->id,
@@ -169,18 +168,17 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'Specified ram capacity is above the maximum of 2048',
-                'status' => 422,
-                'source' => 'ram_capacity'
-            ])->assertResponseStatus(422);
+        )->assertJsonFragment([
+            'title' => 'Validation Error',
+            'detail' => 'Specified ram capacity is above the maximum of 2048',
+            'status' => 422,
+            'source' => 'ram_capacity'
+        ])->assertStatus(422);
     }
 
     public function testApplianceSpecVcpuMax()
     {
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'key' => 'ukfast.spec.cpu_cores.max',
             'value' => 5,
             'image_id' => $this->image()->id,
@@ -197,12 +195,11 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'Specified vcpu cores is above the maximum of 5',
-                'status' => 422,
-                'source' => 'vcpu_cores'
-            ])->assertResponseStatus(422);
+        )->assertJsonFragment([
+            'title' => 'Validation Error',
+            'detail' => 'Specified vcpu cores is above the maximum of 5',
+            'status' => 422,
+            'source' => 'vcpu_cores'
+        ])->assertStatus(422);
     }
 }
