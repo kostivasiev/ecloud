@@ -11,7 +11,8 @@ class ConsoleSessionTest extends TestCase
 {
     public function testValidRequest()
     {
-        return $this->markTestSkipped('WIP');
+        //TODO: check
+        $this->markTestSkipped('WIP');
 
         app()->bind('App\Services\Kingpin\V1\KingpinService', function ($k) {
 

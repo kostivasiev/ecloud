@@ -6,7 +6,6 @@ use App\Models\V1\Solution;
 use App\Models\V1\VirtualMachine;
 use App\Rules\V1\IsValidSSHPublicKey;
 use Illuminate\Support\Facades\Validator;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class PostTest extends TestCase
@@ -23,9 +22,7 @@ class PostTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
-
-        $this->assertResponseStatus(403);
+        ])->assertStatus(403);
     }
 
 //    /**
@@ -76,12 +73,12 @@ class PostTest extends TestCase
 //            'X-consumer-groups' => 'ecloud.write',
 //        ]);
 //
-//        $this->assertResponseStatus(201);
+//        $this->assertStatus(201);
 //    }
 
     public function testPublicCloneDisabled()
     {
-        factory(VirtualMachine::class, 1)->create([
+        VirtualMachine::factory(1)->create([
             'servers_id' => 123,
             'servers_ecloud_type' => 'Public',
         ]);
@@ -91,14 +88,12 @@ class PostTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
-
-        $this->assertResponseStatus(403);
+        ])->assertStatus(403);
     }
 
     public function testBurstCloneDisabled()
     {
-        factory(VirtualMachine::class, 1)->create([
+        VirtualMachine::factory(1)->create([
             'servers_id' => 123,
             'servers_ecloud_type' => 'Burst',
         ]);
@@ -108,9 +103,7 @@ class PostTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
-
-        $this->assertResponseStatus(403);
+        ])->assertStatus(403);
     }
 
 
@@ -132,7 +125,7 @@ class PostTest extends TestCase
 
     public function testInvalidSSHPublicKey()
     {
-        factory(Solution::class, 1)->create();
+        Solution::factory(1)->create();
         $solution = Solution::query()->first();
         $data = [
             'environment' => 'Hybrid',
@@ -147,8 +140,8 @@ class PostTest extends TestCase
         ];
 
         $this->json('POST', '/v1/vms', $data, $this->validWriteHeaders)
-            ->seeStatusCode(422)
-            ->seeJson(
+            ->assertStatus(422)
+            ->assertJsonFragment(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'ssh_keys.0 is not a valid SSH Public key',
