@@ -17,6 +17,10 @@ class FixT0Values extends Command
             Router::isManagement()->where('id', '=', $this->option('router'))->get():
             Router::isManagement()->get();
         $routers->each(function ($router) {
+            $this->info('---');
+            $this->info('Processing router ' . $router->id . ' (' . $router->name . ')');
+            $this->info('---');
+
             // 1. Get the tag
             $tier0Tag = $this->getT0Tag($router);
             if (!$tier0Tag) {
@@ -40,6 +44,7 @@ class FixT0Values extends Command
 
             // 4. If the values are different, patch the tier0_path using the value from the tag
             if ($tagPath !== $tier0Path) {
+                $this->info("Current T0 path $tier0Path not equal expected $tagPath");
                 $result = $this->updateTier0Config($router, $tagPath);
                 if (!$result) {
                     $this->error($router->id . ' : tier0_path failed modification.');
@@ -113,9 +118,9 @@ class FixT0Values extends Command
                 $response = $router->availabilityZone->nsxService()->patch(
                     'policy/api/v1/infra/tier-1s/' . $router->id,
                     [
-                        'json' => json_encode([
+                        'json' => [
                             'tier0_path' => $correctPath
-                        ]),
+                        ],
                     ]
                 );
             } catch (\Exception $e) {
