@@ -4,6 +4,7 @@ namespace Tests\V1\Datastores;
 
 use App\Models\V1\Datastore;
 use App\Models\V1\Pod;
+use App\Models\V1\Solution;
 use Tests\V1\TestCase;
 
 class GetTest extends TestCase
@@ -20,14 +21,19 @@ class GetTest extends TestCase
     public function testValidCollection()
     {
         $count = 2;
-        factory(Datastore::class, $count)->create();
-
-        $this->get('/v1/datastores', [
-            'X-consumer-custom-id' => '1-1',
-            'X-consumer-groups' => 'ecloud.read',
+        Datastore::factory($count)->create();
+        Solution::factory()->create([
+            'ucs_reseller_id' => 1,
         ]);
 
-        $this->assertResponseStatus(200) && $this->seeJson([
+        $this->get(
+            '/v1/datastores',
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )->assertStatus(200)
+        ->assertJsonFragment([
             'total' => $count,
             'count' => $count,
         ]);
@@ -65,9 +71,7 @@ class GetTest extends TestCase
         $this->get('/v1/datastores/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     /**
@@ -77,13 +81,13 @@ class GetTest extends TestCase
      */
     public function testCanLoadPublicDefault()
     {
-        $pod = factory(Pod::class, 1)->create([
+        $pod = Pod::factory(1)->create([
             'ucs_datacentre_id' => 123,
         ])->first();
 
         // Backup
         $clusterName = 'MCS_P' . $pod->getKey() . '_VV_VMPUBLICSTORE_SSD_BACKUP';
-        factory(Datastore::class, 1)->create([
+        Datastore::factory(1)->create([
             'reseller_lun_name' => $clusterName,
         ]);
 
@@ -94,7 +98,7 @@ class GetTest extends TestCase
 
         // Non-Backup
         $clusterName = 'MCS_P' . $pod->getKey() . '_VV_VMPUBLICSTORE_SSD_NONBACKUP';
-        factory(Datastore::class, 1)->create([
+        Datastore::factory(1)->create([
             'reseller_lun_name' => $clusterName,
         ]);
 
@@ -111,12 +115,12 @@ class GetTest extends TestCase
      */
     public function testCanLoadPublicPod1NonBackup()
     {
-        $pod = factory(Pod::class, 1)->create([
+        $pod = Pod::factory(1)->create([
             'ucs_datacentre_id' => 14,
         ])->first();
 
         $clusterName = 'MCS_VV_P1_VMPUBLICSTORE_SSD_NONBACKUP';
-        factory(Datastore::class, 1)->create([
+        Datastore::factory(1)->create([
             'reseller_lun_name' => $clusterName,
         ]);
 
