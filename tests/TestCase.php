@@ -43,7 +43,8 @@ abstract class TestCase extends BaseTestCase
 {
     use ResellerDatabaseMigrations,
         Mocks\Host\Mocks,
-        InteractsWithDatabase;
+        InteractsWithDatabase,
+        CreatesApplication;
 
     /**
      * @deprecated use $this->be();
