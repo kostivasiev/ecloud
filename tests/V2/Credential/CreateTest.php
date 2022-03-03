@@ -21,23 +21,23 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeInDatabase(
-                'credentials',
-                [
-                    'resource_id' => 'abc-abc132',
-                    'host' => 'https://127.0.0.1',
-                    'username' => 'someuser',
-                    'port' => 8080
-                ],
-                'ecloud'
-            )
-            // Assert that we're not storing the plain text password in the db
-            ->missingFromDatabase(
-                'credentials',
-                ['password' => 'somepassword'],
-                'ecloud'
-            )
-            ->assertResponseStatus(201);
+        )->assertStatus(201);
+
+        $this->assertDatabaseMissing(
+            'credentials',
+            ['password' => 'somepassword'],
+            'ecloud'
+        );
+
+        $this->assertDatabaseHas(
+            'credentials',
+            [
+                'resource_id' => 'abc-abc132',
+                'host' => 'https://127.0.0.1',
+                'username' => 'someuser',
+                'port' => 8080
+            ],
+            'ecloud'
+        );
     }
 }

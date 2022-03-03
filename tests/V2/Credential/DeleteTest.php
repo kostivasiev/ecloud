@@ -14,7 +14,7 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
 
-        $this->credential = factory(Credential::class)->create();
+        $this->credential = Credential::factory()->create();
     }
 
     public function testSuccessfulDelete()
@@ -26,8 +26,7 @@ class DeleteTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->assertResponseStatus(204);
+        )->assertStatus(204);
         $resource = Credential::withTrashed()->findOrFail($this->credential->id);
         $this->assertNotNull($resource->deleted_at);
     }
