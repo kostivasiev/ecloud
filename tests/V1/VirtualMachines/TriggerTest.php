@@ -4,7 +4,6 @@ namespace Tests\V1\VirtualMachines;
 
 use App\Models\V1\Trigger;
 use App\Models\V1\VirtualMachine;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class TriggerTest extends TestCase
@@ -14,7 +13,7 @@ class TriggerTest extends TestCase
         $serverId = 123;
         $resellerId = 321;
 
-        $server = factory(VirtualMachine::class, 1)->create([
+        $server = VirtualMachine::factory(1)->create([
             'servers_id' => $serverId,
             'servers_reseller_id' => $resellerId,
         ])->first();
@@ -27,7 +26,7 @@ class TriggerTest extends TestCase
         ];
 
         foreach ($descriptionFormats as $description) {
-            factory(Trigger::class, 1)->create([
+            Trigger::factory(1)->create([
                 'trigger_reference_id' => $serverId,
                 'trigger_reseller_id' => $resellerId,
                 'trigger_description' => $description,
