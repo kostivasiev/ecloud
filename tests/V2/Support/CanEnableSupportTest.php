@@ -23,7 +23,7 @@ class CanEnableSupportTest extends TestCase
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
             $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
 
-            $mockCustomer->shouldReceive('getById')
+            $mockCustomer->allows('getById')
                 ->andThrow(
                     new ClientException(
                         'Not Found',
@@ -31,19 +31,19 @@ class CanEnableSupportTest extends TestCase
                         new Response(404)
                     )
                 );
-            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
+            $mockClient->allows('customers')->andReturns($mockCustomer);
             return $mockClient;
         });
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->patch('/v2/vpcs/'.$this->vpc()->id, [
             'support_enabled' => true
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Not Found',
                 'detail' => 'The customer account is not available',
                 'status' => 403,
             ]
-        )->assertResponseStatus(403);
+        )->assertStatus(403);
 
         Event::assertNotDispatched(Created::class);
     }
@@ -56,26 +56,26 @@ class CanEnableSupportTest extends TestCase
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
             $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
 
-            $mockCustomer->shouldReceive('getById')
-                ->andReturn(
+            $mockCustomer->allows('getById')
+                ->andReturns(
                     new Customer([
                         'paymentMethod' => 'Credit Card',
                     ])
                 );
-            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
+            $mockClient->allows('customers')->andReturns($mockCustomer);
             return $mockClient;
         });
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->patch('/v2/vpcs/'.$this->vpc()->id, [
             'support_enabled' => true
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Payment Required',
                 'detail' => 'Payment is required before support can be enabled',
                 'status' => 402,
             ]
-        )->assertResponseStatus(402);
+        )->assertStatus(402);
 
         Event::assertNotDispatched(Created::class);
     }
@@ -88,20 +88,20 @@ class CanEnableSupportTest extends TestCase
             $mockClient = \Mockery::mock(AdminClient::class)->makePartial();
             $mockCustomer = \Mockery::mock(AdminCustomerClient::class)->makePartial();
 
-            $mockCustomer->shouldReceive('getById')
-                ->andReturn(
+            $mockCustomer->allows('getById')
+                ->andReturns(
                     new Customer([
                         'paymentMethod' => 'Invoice',
                     ])
                 );
-            $mockClient->shouldReceive('customers')->andReturn($mockCustomer);
+            $mockClient->allows('customers')->andReturns($mockCustomer);
             return $mockClient;
         });
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->patch('/v2/vpcs/'.$this->vpc()->id, [
             'support_enabled' => true
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == Sync::TASK_NAME_UPDATE;
