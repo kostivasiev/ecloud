@@ -19,7 +19,7 @@ class GetTest extends ApplianceTestCase
     {
         $this->json('GET', '/v1/pods/1/appliances', [], $this->validWriteHeaders)
             ->assertStatus(200)
-            ->seeJsonFragment(
+            ->assertJsonFragment(
                 [
                     'id' => $this->appliances[0]->uuid,
                     'name' => $this->appliances[0]->name,
@@ -35,7 +35,7 @@ class GetTest extends ApplianceTestCase
     {
         $this->json('GET', '/v1/pods/2/appliances', [], $this->validReadHeaders) //$this->validWriteHeaders
         ->assertStatus(200)
-            ->seeJsonFragment(
+            ->assertJsonFragment(
                 [
                     'total' => 0,
                 ]
