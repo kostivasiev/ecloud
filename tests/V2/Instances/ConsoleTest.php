@@ -71,7 +71,7 @@ class ConsoleTest extends TestCase
 
     public function testCreateSessionFailure()
     {
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'name' => 'Envoy',
             'resource_id' => $this->availabilityZone()->id,
             'host' => 'https://127.0.0.1',
@@ -109,7 +109,7 @@ class ConsoleTest extends TestCase
     public function testValidClientResult()
     {
         // Create Credential
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'name' => 'Envoy',
             'resource_id' => $this->availabilityZone()->id,
             'host' => 'https://127.0.0.1',
@@ -179,7 +179,7 @@ class ConsoleTest extends TestCase
     public function testRestrictedConsoleAdmin()
     {
         // Create Credential
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'name' => 'Envoy',
             'resource_id' => $this->availabilityZone()->id,
             'host' => 'https://127.0.0.1',

@@ -61,7 +61,7 @@ class UpdateTest extends TestCase
 
     public function testUpdatePrivateResourceAdminNotOwnerSucceeds()
     {
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
@@ -109,7 +109,7 @@ class UpdateTest extends TestCase
     {
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
@@ -141,7 +141,7 @@ class UpdateTest extends TestCase
     {
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
@@ -183,7 +183,7 @@ class UpdateTest extends TestCase
     {
         $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE

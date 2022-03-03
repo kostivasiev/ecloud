@@ -5,8 +5,6 @@ namespace Tests\unit\Listeners\V2\Router;
 use App\Listeners\V2\Router\DefaultRouterThroughput;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DefaultRouterThroughputTest extends TestCase
@@ -20,7 +18,7 @@ class DefaultRouterThroughputTest extends TestCase
 
     public function testDefaultRouterThroughput()
     {
-        $routerThroughput = factory(RouterThroughput::class)->create([
+        $routerThroughput = RouterThroughput::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'committed_bandwidth' => config('router.throughput.default.bandwidth')
         ]);

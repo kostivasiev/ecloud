@@ -17,7 +17,7 @@ class UpdateTest extends TestCase
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-test-2',
         ]);
 

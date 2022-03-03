@@ -61,7 +61,7 @@ class GetTest extends TestCase
     {
         $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'public' => false,
@@ -78,7 +78,7 @@ class GetTest extends TestCase
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE,
@@ -95,7 +95,7 @@ class GetTest extends TestCase
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'public' => false,
@@ -153,7 +153,7 @@ class GetTest extends TestCase
     {
         $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'public' => false,
@@ -166,7 +166,7 @@ class GetTest extends TestCase
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE,
@@ -183,7 +183,7 @@ class GetTest extends TestCase
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE,

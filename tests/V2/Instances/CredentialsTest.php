@@ -43,7 +43,7 @@ class CredentialsTest extends TestCase
             ]);
         });
 
-        $this->credential = factory(Credential::class)->create([
+        $this->credential = Credential::factory()->create([
             'resource_id' => $this->instance->id
         ]);
     }

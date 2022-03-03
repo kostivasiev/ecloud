@@ -10,7 +10,6 @@ use App\Support\Sync;
 use Faker\Factory as Faker;
 use Faker\Generator;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateBillingTest extends TestCase
@@ -27,7 +26,7 @@ class UpdateBillingTest extends TestCase
         $this->faker = Faker::create();
 
         Model::withoutEvents(function () {
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id
@@ -43,10 +42,10 @@ class UpdateBillingTest extends TestCase
             $this->task->resource()->associate($this->floatingIp);
         });
 
-        factory(Product::class)->create([
+        Product::factory()->create([
             'product_name' => $this->availabilityZone()->id . ': floating ip',
         ])->each(function ($product) {
-            factory(ProductPrice::class)->create([
+            ProductPrice::factory()->create([
                 'product_price_product_id' => $product->id,
                 'product_price_sale_price' => 0.006849315
             ]);
