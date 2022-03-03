@@ -29,11 +29,13 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->seeInDatabase(
+        )->assertStatus(201);
+
+        $this->assertDatabaseHas(
             'discount_plans',
             $data,
             'ecloud'
-        )->assertResponseStatus(201);
+        );
     }
 
     public function testCreateItemAutoCalcEndDate()
@@ -48,7 +50,7 @@ class CreateTest extends TestCase
             'term_length' => '24',
             'term_start_date' => date('Y-m-d 00:00:00', strtotime('now')),
         ];
-        $this->post(
+        $post = $this->post(
             '/v2/discount-plans',
             $data,
             [
@@ -56,13 +58,15 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->seeInDatabase(
+        )->assertStatus(201);
+
+        $this->assertDatabaseHas(
             'discount_plans',
             $data,
             'ecloud'
-        )->assertResponseStatus(201);
+        );
 
-        $planId = (json_decode($this->response->getContent()))->data->id;
+        $planId = (json_decode($post->getContent()))->data->id;
         $planEndDate = date(
             'Y-m-d',
             strtotime('+'.$data['term_length'].' months', strtotime($data['term_start_date']))
@@ -92,9 +96,9 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The term_end_date must be greater than the term_start_date',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }

@@ -21,7 +21,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->discountPlan = factory(DiscountPlan::class)->create([
+        $this->discountPlan = DiscountPlan::factory()->create([
             'contact_id' => 1,
             'orderform_id' => '84bfdc19-977e-462b-a14b-0c4b907fff55',
         ]);
@@ -35,14 +35,14 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'name' => $this->discountPlan->name,
             'orderform_id' => $this->discountPlan->orderform_id,
             'commitment_amount' => $this->discountPlan->commitment_amount,
             'commitment_before_discount' => $this->discountPlan->commitment_before_discount,
             'discount_rate' => $this->discountPlan->discount_rate,
             'term_length' => $this->discountPlan->term_length,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetResource()
@@ -53,13 +53,13 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'name' => $this->discountPlan->name,
             'orderform_id' => $this->discountPlan->orderform_id,
             'commitment_amount' => $this->discountPlan->commitment_amount,
             'commitment_before_discount' => $this->discountPlan->commitment_before_discount,
             'discount_rate' => $this->discountPlan->discount_rate,
             'term_length' => $this->discountPlan->term_length,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }
