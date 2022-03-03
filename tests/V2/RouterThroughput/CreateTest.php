@@ -4,21 +4,17 @@ namespace Tests\V2\RouterThroughput;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
-use App\Models\V2\Router;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    private Router $router;
-
     private AvailabilityZone $availabilityZone;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $region = factory(Region::class)->create();
+        $region = Region::factory()->create();
         $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id
         ]);
@@ -36,7 +32,7 @@ class CreateTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
         ])
-            ->seeInDatabase('router_throughputs', $data, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
+        $this->assertDatabaseHas('router_throughputs', $data, 'ecloud');
     }
 }

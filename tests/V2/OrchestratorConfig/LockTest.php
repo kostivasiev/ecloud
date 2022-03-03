@@ -25,19 +25,19 @@ class LockTest extends TestCase
     {
         $this->be($this->user);
         $this->put('/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/lock')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Unauthorized',
                     'detail' => 'Unauthorized',
                 ]
-            )->assertResponseStatus(401);
+            )->assertStatus(401);
     }
 
     public function testLockConfigurationAsAdmin()
     {
         $this->be($this->adminUser);
         $this->put('/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/lock')
-            ->assertResponseStatus(204);
+            ->assertStatus(204);
         $this->orchestratorConfig->refresh();
         $this->assertTrue($this->orchestratorConfig->locked);
     }
@@ -46,12 +46,12 @@ class LockTest extends TestCase
     {
         $this->be($this->user);
         $this->put('/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/unlock')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Unauthorized',
                     'detail' => 'Unauthorized',
                 ]
-            )->assertResponseStatus(401);
+            )->assertStatus(401);
     }
 
     public function testUnlockConfigurationAsAdmin()
@@ -62,7 +62,7 @@ class LockTest extends TestCase
         $this->orchestratorConfig->saveQuietly();
 
         $this->put('/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/unlock')
-            ->assertResponseStatus(204);
+            ->assertStatus(204);
         $this->orchestratorConfig->refresh();
         $this->assertFalse($this->orchestratorConfig->locked);
     }
@@ -74,17 +74,16 @@ class LockTest extends TestCase
         $this->orchestratorConfig->locked = true;
         $this->orchestratorConfig->saveQuietly();
 
-        $this->json(
-            'POST',
+        $this->postJson(
             '/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/data',
             [
                 'foo' => 'bar'
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Forbidden',
                 'detail' => 'The specified Orchestrator Config is locked',
             ]
-        )->assertResponseStatus(403);
+        )->assertStatus(403);
     }
 }

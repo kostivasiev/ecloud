@@ -2,7 +2,6 @@
 
 namespace Tests\V2\Router;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetNetworksTest extends TestCase
@@ -17,11 +16,11 @@ class GetNetworksTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id'        => $this->network()->id,
                 'name'      => $this->network()->name,
                 'router_id' => $this->network()->router_id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

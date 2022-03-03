@@ -30,7 +30,7 @@ class UpdateTest extends TestCase
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
             });
 
-        $this->firewall_rule = factory(FirewallRule::class)->create([
+        $this->firewall_rule = FirewallRule::factory()->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
     }
@@ -46,7 +46,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testEmptyDestinationFails()
@@ -60,7 +60,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testInvalidPortFails()
@@ -79,6 +79,6 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 }

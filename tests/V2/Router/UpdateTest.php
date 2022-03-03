@@ -23,7 +23,7 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
         $this->assertEquals('expected', Router::findOrFail($this->router()->id)->name);
     }
 }

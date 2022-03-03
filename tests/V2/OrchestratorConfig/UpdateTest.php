@@ -25,14 +25,15 @@ class UpdateTest extends TestCase
                 'reseller_id' => 2,
                 'employee_id' => 2,
             ]
-        )->seeInDatabase(
+        )->assertStatus(200);
+        $this->assertDatabaseHas(
             'orchestrator_configs',
             [
                 'reseller_id' => 2,
                 'employee_id' => 2,
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        );
     }
 
     public function testStoreDeployDateInPastFails()
@@ -43,12 +44,12 @@ class UpdateTest extends TestCase
             'deploy_on' => Carbon::yesterday()->format('Y-m-d H:i:s')
         ];
         $this->patch('/v2/orchestrator-configs/' . $this->orchestratorConfig->id, $data)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'The deploy on must be a date after now',
                 ]
-            )->assertResponseStatus(422);
+            )->assertStatus(422);
     }
 
     public function testStoreDeployDateInFuturePasses()
@@ -59,8 +60,8 @@ class UpdateTest extends TestCase
             'deploy_on' => Carbon::tomorrow()->format('Y-m-d H:i:s')
         ];
         $this->patch('/v2/orchestrator-configs/' . $this->orchestratorConfig->id, $data)
-            ->seeInDatabase('orchestrator_configs', $data, 'ecloud')
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
+        $this->assertDatabaseHas('orchestrator_configs', $data, 'ecloud');
     }
 
     public function testStoreDeployDateNoResellerIdFails()
@@ -73,17 +74,17 @@ class UpdateTest extends TestCase
             'deploy_on' => Carbon::tomorrow()->format('Y-m-d H:i:s')
         ];
         $this->patch('/v2/orchestrator-configs/' . $this->orchestratorConfig->id, $data)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'The reseller id is required when specifying deploy on property',
                 ]
-            )->assertResponseStatus(422);
+            )->assertStatus(422);
     }
 
     public function testUpdateNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->patch('/v2/orchestrator-configs/' . $this->image()->id, [])->assertResponseStatus(401);
+        $this->patch('/v2/orchestrator-configs/' . $this->image()->id, [])->assertStatus(401);
     }
 }

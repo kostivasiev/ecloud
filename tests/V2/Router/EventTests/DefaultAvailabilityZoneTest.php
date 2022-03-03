@@ -33,7 +33,7 @@ class DefaultAvailabilityZoneTest extends TestCase
     public function testCreateRouterWithAvailabilityZone()
     {
         Bus::fake();
-        $this->post(
+        $response = $this->post(
             '/v2/routers',
             [
                 'name' => 'Manchester Network',
@@ -45,8 +45,8 @@ class DefaultAvailabilityZoneTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(202);
-        $id = json_decode($this->response->getContent())->data->id;
+            ->assertStatus(202);
+        $id = json_decode($response->getContent())->data->id;
         $router = Router::findOrFail($id);
         // verify that the availability_zone_id equals the one in the data array
         $this->assertEquals($router->availability_zone_id, $this->availabilityZone->id);

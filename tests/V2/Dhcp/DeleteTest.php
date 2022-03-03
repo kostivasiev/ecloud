@@ -29,7 +29,7 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
         $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id,
         ]);
@@ -38,7 +38,7 @@ class DeleteTest extends TestCase
             'resource_id' => $this->availabilityZone->id,
         ]);
 
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->dhcp = Dhcp::factory()->create([
                 'id' => 'dhcp-test',
                 'vpc_id' => $this->vpc()->id,
@@ -59,11 +59,11 @@ class DeleteTest extends TestCase
     public function testNoPermsIsDenied()
     {
         $this->delete('/v2/dhcps/' . $this->dhcp->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
-            ])->assertResponseStatus(401);
+            ])->assertStatus(401);
     }
 
     public function testFailInvalidId()
@@ -71,11 +71,11 @@ class DeleteTest extends TestCase
         $this->delete('/v2/dhcps/x', [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Not found',
             'detail' => 'No Dhcp with that ID was found',
             'status' => 404,
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testSuccessfulDelete()
@@ -85,7 +85,7 @@ class DeleteTest extends TestCase
         $this->delete('/v2/dhcps/' . $this->dhcp->id, [], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
         $this->assertNotNull(Dhcp::withTrashed()->findOrFail($this->dhcp->id)->deleted_at);
 
         Event::assertDispatched(Deleted::class, function ($job) {

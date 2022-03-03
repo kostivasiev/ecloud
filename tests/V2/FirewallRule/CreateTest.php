@@ -39,7 +39,9 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeInDatabase('firewall_rules', [
+        ])->assertStatus(202);
+
+        $this->assertDatabaseHas('firewall_rules', [
             'name' => 'Demo firewall rule 1',
             'sequence' => 10,
             'firewall_policy_id' => $this->firewallPolicy()->id,
@@ -48,7 +50,7 @@ class CreateTest extends TestCase
             'action' => 'ALLOW',
             'direction' => 'IN',
             'enabled' => true
-        ], 'ecloud')->assertResponseStatus(202);
+        ], 'ecloud');
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -81,12 +83,12 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified firewall policy id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -105,7 +107,9 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeInDatabase('firewall_rules', [
+        ])->assertStatus(202);
+
+        $this->assertDatabaseHas('firewall_rules', [
             'name' => 'Demo firewall rule 1',
             'sequence' => 10,
             'firewall_policy_id' => $this->firewallPolicy()->id,
@@ -114,7 +118,7 @@ class CreateTest extends TestCase
             'action' => 'ALLOW',
             'direction' => 'IN',
             'enabled' => true
-        ], 'ecloud')->assertResponseStatus(202);
+        ], 'ecloud');
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -135,7 +139,9 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeInDatabase('firewall_rules', [
+        ])->assertStatus(202);
+
+        $this->assertDatabaseHas('firewall_rules', [
             'name' => 'Demo firewall rule 1',
             'sequence' => 10,
             'firewall_policy_id' => $this->firewallPolicy()->id,
@@ -144,7 +150,7 @@ class CreateTest extends TestCase
             'action' => 'ALLOW',
             'direction' => 'IN',
             'enabled' => true
-        ], 'ecloud')->assertResponseStatus(202);
+        ], 'ecloud');
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -165,7 +171,7 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -184,7 +190,7 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -210,7 +216,7 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -237,7 +243,7 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
