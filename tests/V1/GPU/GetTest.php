@@ -4,7 +4,6 @@ namespace Tests\V1\GPU;
 
 use App\Models\V1\GpuProfile;
 use App\Models\V1\VirtualMachine;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 use Tests\V1\TestCase;
 
@@ -16,13 +15,13 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->gpu_profile = factory(GpuProfile::class, 1)->create()->first();
+        $this->gpu_profile = GpuProfile::factory()->create()->first();
     }
 
     public function testValidCollection()
     {
         $this->json('GET', '/v1/gpu-profiles', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
+            ->assertStatus(200)
             ->seeJson([
                 'id' => $this->gpu_profile->getKey(),
                 'name' => $this->gpu_profile->name,
@@ -34,7 +33,7 @@ class GetTest extends TestCase
     public function testValidCollectionReadOnly()
     {
         $this->json('GET', '/v1/gpu-profiles', [], $this->validReadHeaders)
-            ->seeStatusCode(200)
+            ->assertStatus(200)
             ->dontSeeJson([
                 'profile_name' => $this->gpu_profile->profile_name,
             ])
