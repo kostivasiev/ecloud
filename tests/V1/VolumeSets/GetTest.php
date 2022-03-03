@@ -19,7 +19,7 @@ class GetTest extends TestCase
     public function testValidCollection()
     {
         $count = 2;
-        factory(VolumeSet::class, $count)->create();
+        VolumeSet::factory($count)->create();
 
         $this->get('/v1/volumesets', $this->validWriteHeaders)
             ->assertJsonFragment([
@@ -34,15 +34,15 @@ class GetTest extends TestCase
      */
     public function testValidItem()
     {
-        $item = (factory(VolumeSet::class, 1)->create())->first();
+        $item = (VolumeSet::factory()->create())->first();
 
         $this->json('GET', '/v1/volumesets/' . $item->uuid, [], $this->validWriteHeaders)
             ->assertStatus(200)
             ->assertJsonFragment([
                 'id' => $item->uuid,
                 'name' => $item->name,
-                'solution_id' => $item->ucs_reseller_id,
-                'max_iops' => $item->max_iops,
+                'solution_id' => (int) $item->ucs_reseller_id,
+                'max_iops' => (int) $item->max_iops,
             ]);
     }
 
