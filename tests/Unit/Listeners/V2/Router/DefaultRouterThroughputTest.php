@@ -25,7 +25,7 @@ class DefaultRouterThroughputTest extends TestCase
 
         $defaultThroughputListener = \Mockery::mock(DefaultRouterThroughput::class)->makePartial();
 
-        $this->router = factory(Router::class)->make([
+        $this->router = Router::factory()->make([
             'availability_zone_id' => $this->availabilityZone()->id,
             'router_throughput_id' => null
         ]);
