@@ -96,7 +96,7 @@ class AdvertiseSegmentsServiceTest extends TestCase
             ->withAnyArgs()
             ->andReturnFalse();
         $response = $this->mock->getAdvertisedTypes($this->router());
-        $this->assertEquals(Arr::flatten($this->advertisementTypesWithout), Arr::flatten($response));
+        $this->assertFalse($response);
     }
 
     public function testGetAdvertisedTypesPathsMatch()
