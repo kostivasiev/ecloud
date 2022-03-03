@@ -4,7 +4,6 @@ namespace Tests\V2\LoadBalancerSpecification;
 
 use App\Models\V2\Image;
 use App\Models\V2\LoadBalancerSpecification;
-use Database\Factories\V2\LoadBalancerSpecificationFactory;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
@@ -16,7 +15,7 @@ class DeleteTest extends TestCase
     {
         parent::setUp();
 
-        $this->image = factory(Image::class)->create();
+        $this->image = Image::factory()->create();
         $this->loadBalancerSpecification = LoadBalancerSpecification::factory()->create([
             "image_id" => $this->image->id
         ]);
@@ -29,12 +28,12 @@ class DeleteTest extends TestCase
             [],
             []
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ])
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 
     public function testFailInvalidId()
@@ -47,12 +46,12 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Not found',
                 'detail' => 'No Load Balancer Specification with that ID was found',
                 'status' => 404,
             ])
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testSuccessfulDelete()
@@ -65,6 +64,6 @@ class DeleteTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->assertResponseStatus(204);
+            ->assertStatus(204);
     }
 }
