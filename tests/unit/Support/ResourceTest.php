@@ -43,7 +43,7 @@ class ResourceTest extends TestCase
                 'availability_zone_id' => $this->availability_zone->id,
                 'vpc_id' => $this->vpc->id,
             ]);
-            $this->floating_ip = factory(FloatingIp::class)->create([
+            $this->floating_ip = FloatingIp::factory()->create([
                 'id' => 'fip-test1',
             ]);
             $this->nic = factory(Nic::class)->create([

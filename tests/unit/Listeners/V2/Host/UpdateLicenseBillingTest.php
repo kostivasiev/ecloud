@@ -23,7 +23,7 @@ class UpdateLicenseBillingTest extends TestCase
         parent::setUp();
 
         // Setup Host product
-        $this->product = factory(Product::class)->create([
+        $this->product = Product::factory()->create([
             'product_sales_product_id' => 0,
             'product_name' => $this->availabilityZone()->id.': host windows-os-license',
             'product_category' => 'eCloud',
@@ -33,7 +33,7 @@ class UpdateLicenseBillingTest extends TestCase
             'product_duration_type' => 'Hour',
             'product_duration_length' => 1,
         ]);
-        factory(ProductPrice::class)->create([
+        ProductPrice::factory()->create([
             'product_price_product_id' => $this->product->id,
             'product_price_sale_price' => 0.0164384,
         ]);

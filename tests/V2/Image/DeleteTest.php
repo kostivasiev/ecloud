@@ -35,7 +35,7 @@ class DeleteTest extends TestCase
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
@@ -50,7 +50,7 @@ class DeleteTest extends TestCase
 
     public function testNotAdminDeletePrivateIsOwnerSucceeds()
     {
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
@@ -73,7 +73,7 @@ class DeleteTest extends TestCase
             'reseller_id' => 2
         ]);
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $vpc->id,
             'visibility' => Image::VISIBILITY_PRIVATE

@@ -2,13 +2,6 @@
 
 namespace Tests\V2\RouterThroughput;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\BillingMetric;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\RouterThroughput;
-use App\Models\V2\Vpc;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -28,7 +21,7 @@ class DeleteTest extends TestCase
         $this->be($this->consumer);
 
         $this->delete('/v2/router-throughputs/' . $this->routerThroughput()->id)
-            ->assertResponseStatus(204);
+            ->assertStatus(204);
 
         $this->routerThroughput()->refresh();
         $this->assertNotNull($this->routerThroughput()->deleted_at);
@@ -40,11 +33,11 @@ class DeleteTest extends TestCase
         $this->router();
 
         $this->delete('/v2/router-throughputs/' . $this->routerThroughput()->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Precondition Failed',
                     'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->router()->id,
                 ]
-            )->assertResponseStatus(412);
+            )->assertStatus(412);
     }
 }

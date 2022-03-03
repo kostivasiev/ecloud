@@ -18,7 +18,7 @@ class CreateTest extends TestCase
     {
         parent::setUp();
 
-        $this->routerThroughput = factory(RouterThroughput::class)->create([
+        $this->routerThroughput = RouterThroughput::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
     }

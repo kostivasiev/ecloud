@@ -37,7 +37,7 @@ class DeletePreSharedKeyTest extends TestCase
     public function testSuccessful()
     {
         Credential::withoutEvents(function () {
-            $credential = factory(Credential::class)->create([
+            $credential = Credential::factory()->create([
                 'id' => 'cred-test',
                 'name' => 'Pre-shared Key for VPN Session ' . $this->vpnSession()->id,
                 'host' => null,

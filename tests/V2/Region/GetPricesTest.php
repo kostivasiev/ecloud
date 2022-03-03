@@ -35,7 +35,7 @@ class GetPricesTest extends TestCase
             factory(Product::class, 5)->create([
                 'product_name' => $availabilityZone->id . ': ' . $this->faker->word,
             ])->each(function ($product) {
-                factory(ProductPrice::class)->create([
+                ProductPrice::factory()->create([
                     'product_price_product_id' => $product->id
                 ]);
             });
