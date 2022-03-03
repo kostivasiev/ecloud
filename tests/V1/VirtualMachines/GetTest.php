@@ -15,30 +15,27 @@ class GetTest extends TestCase
     public function testValidCollection()
     {
         $total = rand(1, 2);
-        factory(VirtualMachine::class, $total)->create();
+        VirtualMachine::factory($total)->create();
 
         $this->get('/v1/vms', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        ])->assertStatus(200)
+            ->assertJsonFragment([
             'total' => $total,
         ]);
     }
 
     public function testValidItem()
     {
-        factory(VirtualMachine::class, 1)->create([
+        VirtualMachine::factory(1)->create([
             'servers_id' => 123,
         ]);
 
         $this->get('/v1/vms/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     /**
@@ -49,9 +46,7 @@ class GetTest extends TestCase
         $this->get('/v1/vms/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     /**
@@ -62,9 +57,7 @@ class GetTest extends TestCase
         $this->get('/v1/vms/999', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
 
