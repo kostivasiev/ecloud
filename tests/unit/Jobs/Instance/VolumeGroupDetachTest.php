@@ -6,7 +6,6 @@ use App\Jobs\Instance\VolumeGroupDetach;
 use App\Jobs\Kingpin\Instance\DetachVolume;
 use App\Models\V2\Task;
 use App\Support\Sync;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;

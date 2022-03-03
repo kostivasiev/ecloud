@@ -2,7 +2,6 @@
 
 namespace Tests\unit\Jobs\Nsx\NetworkPolicy;
 
-use App\Events\V2\NetworkRule\Deleted;
 use App\Jobs\Nsx\NetworkPolicy\Undeploy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
@@ -12,7 +11,6 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UndeployTest extends TestCase
@@ -25,7 +23,7 @@ class UndeployTest extends TestCase
         parent::setUp();
 
         Model::withoutEvents(function () {
-            $this->networkRule = factory(NetworkRule::class)->make([
+            $this->networkRule = NetworkRule::factory()->make([
                 'id' => 'nr-test-1',
                 'name' => 'nr-test-1',
             ]);

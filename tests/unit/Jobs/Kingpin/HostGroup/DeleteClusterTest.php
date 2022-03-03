@@ -1,7 +1,6 @@
 <?php
 namespace Tests\unit\Jobs\Kingpin\HostGroup;
 
-use App\Jobs\Kingpin\HostGroup\CreateCluster;
 use App\Jobs\Kingpin\HostGroup\DeleteCluster;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
@@ -14,8 +13,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteClusterTest extends TestCase
@@ -28,7 +25,7 @@ class DeleteClusterTest extends TestCase
         parent::setUp();
 
         Model::withoutEvents(function () {
-            $this->hostGroup = factory(HostGroup::class)->create([
+            $this->hostGroup = HostGroup::factory()->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
                 'vpc_id' => $this->vpc()->id,

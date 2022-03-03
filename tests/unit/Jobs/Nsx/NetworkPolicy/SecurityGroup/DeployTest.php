@@ -6,7 +6,6 @@ use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Deploy;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeployTest extends TestCase

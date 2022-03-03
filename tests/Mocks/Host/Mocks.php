@@ -6,6 +6,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\V2\Host;
 
 trait Mocks
 {
@@ -16,7 +17,7 @@ trait Mocks
     {
         if (!$this->host) {
             $this->host = Model::withoutEvents(function() {
-               return factory(\App\Models\V2\Host::class)->create([
+               return Host::factory()->create([
                    'id' => 'h-test',
                    'name' => 'h-test',
                    'host_group_id' => $this->hostGroup()->id,

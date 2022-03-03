@@ -15,7 +15,7 @@ trait VpnSessionMock
     {
         if (!$this->vpnSession) {
             Model::withoutEvents(function () use ($id) {
-                $this->vpnSession = factory(VpnSession::class)->create([
+                $this->vpnSession = VpnSession::factory()->create([
                     'id' => $id,
                     'name' => $id,
                     'vpn_profile_group_id' => $this->vpnProfileGroup()->id,

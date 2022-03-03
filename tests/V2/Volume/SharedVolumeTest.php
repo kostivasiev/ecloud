@@ -37,12 +37,12 @@ class SharedVolumeTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => '1',
             'volume_group_id' => $this->volumeGroup()->id
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'Maximum port count reached for the specified volume group',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testUpdateSharedVolumeVolumeGroupDoesNotHaveAvailablePortsFails()
@@ -62,12 +62,12 @@ class SharedVolumeTest extends TestCase
 
         $this->patch('/v2/volumes/' . $volume->id, [
             'volume_group_id' => $this->volumeGroup()->id
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'Maximum port count reached for the specified volume group',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     /**
@@ -81,12 +81,12 @@ class SharedVolumeTest extends TestCase
 
         $this->patch('/v2/volumes/' . $volume->id, [
             'volume_group_id' => $this->volumeGroup()->id
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'Operating System volumes can not be used as shared volumes',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testAddToVolumeGroupIsNotOsDiskSucceeds()
@@ -98,7 +98,7 @@ class SharedVolumeTest extends TestCase
 
         $this->patch('/v2/volumes/' . $volume->id, [
             'volume_group_id' => $this->volumeGroup()->id
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
     }
 
 
@@ -121,13 +121,13 @@ class SharedVolumeTest extends TestCase
             [
                 'volume_group_id' => $this->volumeGroup()->id,
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The volume is already a member of a volume group',
             'status' => 422,
             'source' => 'volume_group_id'
         ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testVolumeIsNotAlreadyAssignedToVolumeGroupSucceeds()
@@ -145,7 +145,7 @@ class SharedVolumeTest extends TestCase
             [
                 'volume_group_id' => $this->volumeGroup()->id,
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
     }
 
     /**
@@ -159,12 +159,12 @@ class SharedVolumeTest extends TestCase
 
         $this->patch('/v2/volumes/' . $volume->id, [
             'volume_group_id' => $this->volumeGroup()->id
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'Only shared volumes can be added to a volume group',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     /**
@@ -180,11 +180,11 @@ class SharedVolumeTest extends TestCase
 
         $this->patch('/v2/volumes/' . $volume->id, [
             'volume_group_id' => $this->volumeGroup()->id
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The volume is attached to one or more instances',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 }

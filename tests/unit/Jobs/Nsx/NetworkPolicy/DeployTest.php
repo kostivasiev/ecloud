@@ -112,7 +112,7 @@ class DeployTest extends TestCase
 
 
         Model::withoutEvents(function () {
-            $networkRule = factory(NetworkRule::class)->make([
+            $networkRule = NetworkRule::factory()->make([
                 'id' => 'nr-test-1',
                 'name' => 'nr-test-1',
             ]);

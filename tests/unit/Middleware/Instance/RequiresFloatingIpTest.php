@@ -23,7 +23,7 @@ class RequiresFloatingIpTest extends TestCase
 
     public function testRequiresFloatingIpFails()
     {
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'key' => 'ukfast.fip.required',
             'value' => 'true',
             'image_id' => $this->image()->id

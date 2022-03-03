@@ -9,7 +9,7 @@ use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use App\Models\V2\Host;
 use Tests\TestCase;
 
 class UpdateLicenseBillingTest extends TestCase
@@ -58,7 +58,7 @@ class UpdateLicenseBillingTest extends TestCase
     public function testCreatingHostInWindowsEnabledHostGroupAddsBilling()
     {
         $host = Model::withoutEvents(function() {
-            return factory(\App\Models\V2\Host::class)->create([
+            return Host::factory()->create([
                 'id' => 'h-test-2',
                 'name' => 'h-test-2',
                 'host_group_id' => $this->hostGroup()->id,
@@ -93,7 +93,7 @@ class UpdateLicenseBillingTest extends TestCase
     public function testCreatingHostInWindowsEnabledHostGroupAddsBillingMinCores()
     {
         $host = Model::withoutEvents(function() {
-            return factory(\App\Models\V2\Host::class)->create([
+            return Host::factory()->create([
                 'id' => 'h-test-2',
                 'name' => 'h-test-2',
                 'host_group_id' => $this->hostGroup()->id,
@@ -131,7 +131,7 @@ class UpdateLicenseBillingTest extends TestCase
     public function testCreatingHostInWindowsNotEnabledHostGroupDoesNotAddBilling()
     {
         $hostGroup = Model::withoutEvents(function() {
-            return factory(HostGroup::class)->create([
+            return HostGroup::factory()->create([
                 'id' => 'hg-test-2',
                 'name' => 'hg-test-2',
                 'vpc_id' => $this->vpc()->id,
@@ -142,7 +142,7 @@ class UpdateLicenseBillingTest extends TestCase
         });
 
         $host = Model::withoutEvents(function() use ($hostGroup) {
-            return factory(\App\Models\V2\Host::class)->create([
+            return Host::factory()->create([
                 'id' => 'h-test-2',
                 'name' => 'h-test-2',
                 'host_group_id' => $hostGroup->id,

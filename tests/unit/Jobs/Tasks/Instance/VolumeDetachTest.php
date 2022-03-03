@@ -12,7 +12,6 @@ use Tests\TestCase;
 
 class VolumeDetachTest extends TestCase
 {
-
     private $task;
 
     public function setUp(): void

@@ -1,5 +1,5 @@
 <?php
-namespace Jobs\VpnSession\Nsx;
+namespace Tests\unit\Jobs\VpnSession\Nsx;
 
 use App\Jobs\Nsx\VpnSession\CreateVpnSession;
 use App\Models\V2\Credential;

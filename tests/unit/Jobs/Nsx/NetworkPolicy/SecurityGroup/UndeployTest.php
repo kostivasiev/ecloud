@@ -2,7 +2,6 @@
 
 namespace Tests\unit\Jobs\Nsx\NetworkPolicy\SecurityGroup;
 
-use App\Events\V2\NetworkRule\Deleted;
 use App\Jobs\Nsx\NetworkPolicy\SecurityGroup\Undeploy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
@@ -24,7 +23,7 @@ class UndeployTest extends TestCase
         parent::setUp();
 
         Model::withoutEvents(function () {
-            $this->networkRule = factory(NetworkRule::class)->make([
+            $this->networkRule = NetworkRule::factory()->make([
                 'id' => 'nr-test-1',
                 'name' => 'nr-test-1',
             ]);

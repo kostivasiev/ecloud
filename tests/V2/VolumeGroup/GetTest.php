@@ -33,38 +33,38 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get('/v2/volume-groups')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'id' => $this->volumeGroup()->id,
                 ]
-            )->seeJsonDoesntContains(
+            )->assertJsonMissing(
                 [
                     'reseller_id' => $this->volumeGroup()->getResellerId(),
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 
     public function testGetResource()
     {
         $this->get('/v2/volume-groups/'.$this->volumeGroup()->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'id' => $this->volumeGroup()->id,
                 ]
-            )->seeJsonDoesntContains(
+            )->assertJsonMissing(
                 [
                     'reseller_id' => $this->volumeGroup()->getResellerId(),
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 
     public function testGetVolumeCollection()
     {
         $this->get('/v2/volume-groups/'.$this->volumeGroup()->id.'/volumes')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'id' => $this->volume->id,
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 }

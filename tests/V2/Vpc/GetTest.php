@@ -18,9 +18,9 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
         $this->vpc = Vpc::withoutEvents(function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-test',
                 'region_id' => $this->region->id,
                 'reseller_id' => 1
@@ -30,11 +30,12 @@ class GetTest extends TestCase
 
     public function testNoPermsIsDenied()
     {
-        $this->get('/v2/vpcs')->seeJson([
-            'title' => 'Unauthorized',
-            'detail' => 'Unauthorized',
-            'status' => 401,
-        ])->assertResponseStatus(401);
+        $this->get('/v2/vpcs')
+            ->assertJsonFragment([
+                'title' => 'Unauthorized',
+                'detail' => 'Unauthorized',
+                'status' => 401,
+            ])->assertStatus(401);
     }
 
     public function testGetCollectionAdmin()
@@ -42,10 +43,10 @@ class GetTest extends TestCase
         $this->get('/v2/vpcs', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->vpc->id,
             'name' => $this->vpc->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetCollectionResellerScopeCanSeeVpc()
@@ -53,9 +54,9 @@ class GetTest extends TestCase
         $this->get('/v2/vpcs', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->vpc->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetCollectionResellerScopeCanNotSeeVpc()
@@ -63,23 +64,23 @@ class GetTest extends TestCase
         $this->get('/v2/vpcs', [
             'X-consumer-custom-id' => '2-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->vpc->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
 
     public function testGetCollectionAdminResellerScope()
     {
         $vpc1 = Vpc::withoutEvents(function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-test1',
                 'region_id' => $this->region->id,
                 'reseller_id' => 1
             ]);
         });
         $vpc2 = Vpc::withoutEvents(function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-test2',
                 'region_id' => $this->region->id,
                 'reseller_id' => 2
@@ -89,11 +90,11 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
             'X-Reseller-Id' => 1
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $vpc2->id,
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $vpc1->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testNonMatchingResellerIdFails()
@@ -104,11 +105,11 @@ class GetTest extends TestCase
         $this->get('/v2/vpcs/' . $this->vpc->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Not found',
             'detail' => 'No Vpc with that ID was found',
             'status' => 404,
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testGetItemDetail()
@@ -116,9 +117,9 @@ class GetTest extends TestCase
         $this->get('/v2/vpcs/' . $this->vpc->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->vpc->id,
             'name' => $this->vpc->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }

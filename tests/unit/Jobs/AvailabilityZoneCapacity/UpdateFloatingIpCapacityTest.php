@@ -38,20 +38,20 @@ class UpdateFloatingIpCapacityTest extends TestCase
     public function testCapacityExpectedWithFloatingIPs()
     {
         Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test1',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.5',
             ]);
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test2',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.6',
             ]);
 
-            $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
+            $this->availabilityZoneCapacity = AvailabilityZoneCapacity::factory()->create([
                 'id' => 'azc-test',
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'current' => null
@@ -113,26 +113,26 @@ class UpdateFloatingIpCapacityTest extends TestCase
     public function testIPRangeWithInvalidCidrIgnored()
     {
         Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test1',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.5',
             ]);
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test2',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.113.6',
             ]);
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test3',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'ip_address' => '203.0.110.6',
             ]);
 
-            $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
+            $this->availabilityZoneCapacity = AvailabilityZoneCapacity::factory()->create([
                 'id' => 'azc-test',
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'current' => null
@@ -219,7 +219,7 @@ class UpdateFloatingIpCapacityTest extends TestCase
     public function testAvailabilityZoneWithNoAvailabilityZoneCapacitySkipped()
     {
         $az = Model::withoutEvents(function() {
-            return factory(AvailabilityZone::class)->create([
+            return AvailabilityZone::factory()->create([
                 'id' => 'az-noazcapacity',
             ]);
         });

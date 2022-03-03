@@ -364,7 +364,7 @@ class CreateTest extends TestCase
             ]);
         });
         $secondRouter = Model::withoutEvents(function () use ($secondVpc) {
-            return factory(Router::class)->create([
+            return Router::factory()->create([
                 'id' => 'rtr-second',
                 'vpc_id' => $secondVpc->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -372,7 +372,7 @@ class CreateTest extends TestCase
             ]);
         });
         $secondNetwork = Model::withoutEvents(function () use ($secondRouter) {
-            return factory(Network::class)->create([
+            return Network::factory()->create([
                 'id' => 'net-second',
                 'name' => 'Manchester Network',
                 'subnet' => '10.0.0.0/24',

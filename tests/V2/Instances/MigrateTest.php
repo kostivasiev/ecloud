@@ -47,7 +47,7 @@ class MigrateTest extends TestCase
         Event::fake();
 
         $instance = Instance::withoutEvents(function() {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),

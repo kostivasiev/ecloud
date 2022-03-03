@@ -2,20 +2,15 @@
 
 namespace Tests\unit\Jobs\Nsx\Dhcp;
 
-use App\Jobs\Nsx\Dhcp\Create;
-use App\Jobs\Nsx\Dhcp\Undeploy;
 use App\Jobs\Nsx\Dhcp\UndeployCheck;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Task;
-use App\Models\V2\Volume;
 use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UndeployCheckTest extends TestCase
@@ -28,7 +23,7 @@ class UndeployCheckTest extends TestCase
         parent::setUp();
 
         Model::withoutEvents(function () {
-            $this->dhcp = factory(Dhcp::class)->create([
+            $this->dhcp = Dhcp::factory()->create([
                 'id' => 'dhcp-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

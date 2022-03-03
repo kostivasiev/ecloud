@@ -77,12 +77,12 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
             return $mockAdminLicensesClient;
         });
 
-        $this->image()->imageMetadata()->save(factory(ImageMetadata::class)->create([
+        $this->image()->imageMetadata()->save(ImageMetadata::factory()->create([
             'key' => 'ukfast.license.type',
             'value' => 'mssql',
             'image_id' => $this->image()->id,
         ]));
-        $this->image()->imageMetadata()->save(factory(ImageMetadata::class)->create([
+        $this->image()->imageMetadata()->save(ImageMetadata::factory()->create([
             'key' => 'ukfast.license.mssql.edition',
             'value' => 'datacenter-mssql2019-standard',
             'image_id' => $this->image()->id,
@@ -137,7 +137,7 @@ class UpdateMsSqlLicenseBillingTest extends TestCase
 
     public function testUpdateCoresEndsMetricStartsNewMetric()
     {
-        $originalMetric = factory(BillingMetric::class)->create([
+        $originalMetric = BillingMetric::factory()->create([
             "id" => "bm-orig",
             "resource_id" => $this->instanceModel()->id,
             "vpc_id" => $this->vpc()->id,

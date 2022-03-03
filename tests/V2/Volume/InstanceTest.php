@@ -21,8 +21,8 @@ class InstanceTest extends TestCase
         $this->get('/v2/volumes/' . $volume->id . '/instances', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->instanceModel()->id,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }

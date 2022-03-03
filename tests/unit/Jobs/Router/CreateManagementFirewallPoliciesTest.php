@@ -21,13 +21,13 @@ class CreateManagementFirewallPoliciesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->managementRouter = factory(Router::class)->create([
+        $this->managementRouter = Router::factory()->create([
             'id' => 'rtr-mgmt',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
             'router_throughput_id' => $this->routerThroughput()->id,
         ]);
-        $this->managementNetwork = factory(Network::class)->create([
+        $this->managementNetwork = Network::factory()->create([
             'id' => 'net-mgmt',
             'name' => 'Manchester Network',
             'subnet' => '10.0.0.0/24',

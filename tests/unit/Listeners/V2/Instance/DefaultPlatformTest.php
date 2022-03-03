@@ -34,7 +34,7 @@ class DefaultPlatformTest extends TestCase
             $this->image = factory(Image::class)->create([
                 'id' => 'img-test',
             ]);
-            $this->instance = factory(Instance::class)->create([
+            $this->instance = Instance::factory()->create([
                 'id' => 'i-test',
             ]);
             $this->instance->image()->associate($this->image);

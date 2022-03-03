@@ -55,7 +55,7 @@ class NetworkHasNoPolicyTest extends TestCase
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         Model::withoutEvents(function () {
-            factory(NetworkPolicy::class)->create([
+            NetworkPolicy::factory()->create([
                 'id' => 'np-test',
                 'network_id' => $this->network()->id,
             ]);

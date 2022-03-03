@@ -1,22 +1,16 @@
 <?php
 namespace Tests\unit\Jobs\Vpc;
 
-use App\Events\V2\Task\Created;
-use App\Jobs\Conjurer\Host\PowerOff;
 use App\Jobs\Vpc\RemoveLanPolicies;
-use App\Models\V2\Host;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class RemoveLanPoliciesTest extends TestCase

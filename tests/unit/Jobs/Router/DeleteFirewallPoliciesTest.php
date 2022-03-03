@@ -3,15 +3,11 @@
 namespace Tests\unit\Jobs\Router;
 
 use App\Jobs\Router\DeleteFirewallPolicies;
-use App\Jobs\Router\DeployRouterDefaultRule;
-use App\Jobs\Router\DeployRouterLocale;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Router;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteFirewallPoliciesTest extends TestCase

@@ -1,7 +1,6 @@
 <?php
 namespace Tests\unit\Jobs\Kingpin\Host;
 
-use App\Jobs\Kingpin\Host\DeleteInVmware;
 use App\Jobs\Kingpin\Host\MaintenanceMode;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
@@ -11,8 +10,6 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class MaintenanceModeTest extends TestCase
@@ -24,7 +21,7 @@ class MaintenanceModeTest extends TestCase
     {
         parent::setUp();
 
-        $hostGroup = factory(HostGroup::class)->create([
+        $hostGroup = HostGroup::factory()->create([
             'id' => 'hg-test',
             'name' => 'hg-test',
             'vpc_id' => $this->vpc()->id,
@@ -32,7 +29,7 @@ class MaintenanceModeTest extends TestCase
             'host_spec_id' => $this->hostSpec()->id,
         ]);
 
-        $this->host = factory(Host::class)->create([
+        $this->host = Host::factory()->create([
             'id' => 'h-test',
             'name' => 'h-test',
             'host_group_id' => $hostGroup->id,

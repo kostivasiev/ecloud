@@ -64,13 +64,13 @@ class RegisterLicensesTest extends TestCase
 
     public function testRegisterMsSqlLicense()
     {
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'key' => 'ukfast.license.identifier',
             'value' => 'WINDOWS-2019-DATACENTER-MSSQL2019-STANDARD',
             'image_id' => $this->image()->id
         ]);
 
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'key' => 'ukfast.license.type',
             'value' => 'mssql',
             'image_id' => $this->image()->id

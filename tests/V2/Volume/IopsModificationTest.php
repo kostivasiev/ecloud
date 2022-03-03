@@ -33,14 +33,11 @@ class IopsModificationTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeInDatabase(
-            'volumes',
-            [
-                'id' => $this->volume->id,
-                'iops' => 600,
-            ],
-            'ecloud'
-        )->assertResponseStatus(202);
+        ])->assertStatus(202);
+        $this->assertDatabaseHas('volumes', [
+            'id' => $this->volume->id,
+            'iops' => 600,
+        ],'ecloud');
     }
 
     public function testSetInvalidIopsValue()
@@ -52,10 +49,10 @@ class IopsModificationTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The specified iops field is not a valid IOPS value (300, 600, 1200, 2500)',
             'source' => 'iops',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }

@@ -15,7 +15,7 @@ class IsValidTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
+        $this->orchestratorConfig = OrchestratorConfig::factory()->create();
     }
 
     public function testIsNotValidOrchestratorConfigFails()

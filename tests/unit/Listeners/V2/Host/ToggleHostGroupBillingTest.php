@@ -7,10 +7,9 @@ use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\Task;
 use App\Support\Sync;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use App\Models\V2\Host;
 
 class ToggleHostGroupBillingTest extends TestCase
 {
@@ -59,7 +58,7 @@ class ToggleHostGroupBillingTest extends TestCase
     {
         $this->hostGroup();
 
-        $hostGroupBillingMetric = factory(BillingMetric::class)->create([
+        $hostGroupBillingMetric = BillingMetric::factory()->create([
             'resource_id' => $this->hostGroup()->id,
             'key' => 'hostgroup',
             'value' => 1,
@@ -123,7 +122,7 @@ class ToggleHostGroupBillingTest extends TestCase
 
         // Create a 2nd host
         $newHost = Model::withoutEvents(function() {
-            return factory(\App\Models\V2\Host::class)->create([
+            return Host::factory()->create([
                 'id' => 'h-test-2',
                 'name' => 'h-test-2',
                 'host_group_id' => $this->hostGroup()->id,

@@ -29,7 +29,7 @@ class CredentialsTest extends TestCase
             'region_id' => $region->id,
         ]);
         $this->instance = Instance::withoutEvents(function () use ($availabilityZone) {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $availabilityZone->id,

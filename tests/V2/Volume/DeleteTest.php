@@ -36,13 +36,13 @@ class DeleteTest extends TestCase
     public function itDoesNotDeleteAVolumeGroupMember()
     {
         $this->delete('/v2/volumes/'.$this->volume->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Forbidden',
                     'detail' => 'Volumes that are members of a volume group cannot be deleted',
                     'status' => 403,
                 ]
-            )->assertResponseStatus(403);
+            )->assertStatus(403);
     }
 
     /** @test */
@@ -54,7 +54,7 @@ class DeleteTest extends TestCase
         $this->volume->saveQuietly();
 
         $this->delete('/v2/volumes/'.$this->volume->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         Event::assertDispatched(Created::class);
     }

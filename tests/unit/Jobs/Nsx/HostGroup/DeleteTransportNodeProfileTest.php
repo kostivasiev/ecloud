@@ -21,7 +21,7 @@ class DeleteTransportNodeProfileTest extends TestCase
         parent::setUp();
 
         Model::withoutEvents(function () {
-            $this->hostGroup = factory(HostGroup::class)->create([
+            $this->hostGroup = HostGroup::factory()->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
                 'vpc_id' => $this->vpc()->id,

@@ -34,7 +34,7 @@ class VolumeCapacityAttributeTests extends TestCase
         $this->vpc = factory(Vpc::class)->create([
             'name' => 'Manchester VPC',
         ]);
-        $this->instance = factory(Instance::class)->create([
+        $this->instance = Instance::factory()->create([
             'vpc_id' => $this->vpc->id,
             'availability_zone_id' => $availabilityZone->id,
         ]);

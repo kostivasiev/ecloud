@@ -40,11 +40,11 @@ class AwaitNatSyncTest extends TestCase
     public function testJobFailedWhenSourceNatSyncFailed()
     {
         Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
             ]);
-            $this->nic = factory(Nic::class)->create([
+            $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.3.4.5',
@@ -84,11 +84,11 @@ class AwaitNatSyncTest extends TestCase
     public function testJobFailedWhenDestinationNatSyncFailed()
     {
         Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
             ]);
-            $this->nic = factory(Nic::class)->create([
+            $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.3.4.5',
@@ -128,11 +128,11 @@ class AwaitNatSyncTest extends TestCase
     public function testJobReleasedWhenSourceNatExistsAndSyncInProgress()
     {
         Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
             ]);
-            $this->nic = factory(Nic::class)->create([
+            $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.3.4.5',
@@ -174,11 +174,11 @@ class AwaitNatSyncTest extends TestCase
     public function testJobReleasedWhenDestinationNatExistsAndSyncInProgress()
     {
         Model::withoutEvents(function() {
-            $this->floatingIp = factory(FloatingIp::class)->create([
+            $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
             ]);
-            $this->nic = factory(Nic::class)->create([
+            $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.3.4.5',

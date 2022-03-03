@@ -4,11 +4,9 @@ namespace Tests\unit\Jobs\Nsx\NetworkPolicy;
 
 use App\Jobs\Nsx\NetworkPolicy\UndeployCheck;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UndeployCheckTest extends TestCase

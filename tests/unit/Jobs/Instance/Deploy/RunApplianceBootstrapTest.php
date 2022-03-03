@@ -18,7 +18,7 @@ class RunApplianceBootstrapTest extends TestCase
 {
     public function testLoadsAndRendersEncryptedPasswords()
     {
-        factory(ImageParameter::class)->create([
+        ImageParameter::factory()->create([
             'image_id' => $this->image()->id,
             'name' => 'Plesk Admin Password',
             'key' => 'plesk_admin_password',

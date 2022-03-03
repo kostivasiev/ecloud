@@ -73,7 +73,7 @@ class CreateDHCPLeaseTest extends TestCase
                 return new Response(200);
             });
 
-        $nic = factory(Nic::class)->create([
+        $nic = Nic::factory()->create([
             'mac_address' => 'AA:BB:CC:DD:EE:FF',
             'instance_id' => $this->instanceModel()->id,
             'network_id' => $this->network()->id,
@@ -121,13 +121,13 @@ class CreateDHCPLeaseTest extends TestCase
             });
 
         // Create a NIC on a different network
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'id' => 'net-2',
             'subnet' => '10.0.0.0/24',
             'router_id' => $this->router()->id
         ]);
 
-        $nic = factory(Nic::class)->create([
+        $nic = Nic::factory()->create([
             'mac_address' => 'AA:AA:CC:DD:EE:FF',
             'instance_id' => $this->instanceModel()->id,
             'network_id' => $network->id,
@@ -151,7 +151,7 @@ class CreateDHCPLeaseTest extends TestCase
 
     public function testNoIpAddressAvailableFails()
     {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'id' => 'net-2',
             'subnet' => '172.17.2.0/29',
             'router_id' => $this->router()->id
@@ -175,7 +175,7 @@ class CreateDHCPLeaseTest extends TestCase
                 ]));
             });
 
-        $nic = factory(Nic::class)->create([
+        $nic = Nic::factory()->create([
             'mac_address' => 'AA:AA:CC:DD:EE:FF',
             'instance_id' => $this->instanceModel()->id,
             'network_id' => $network->id,

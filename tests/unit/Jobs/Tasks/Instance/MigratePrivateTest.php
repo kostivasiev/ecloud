@@ -13,7 +13,6 @@ use Tests\TestCase;
 
 class MigratePrivateTest extends TestCase
 {
-
     private $task;
 
     public function setUp(): void
@@ -48,7 +47,7 @@ class MigratePrivateTest extends TestCase
         $this->instanceModel()->saveQuietly();
 
         $hostGroup = Model::withoutEvents(function () {
-            return factory(HostGroup::class)->create([
+            return HostGroup::factory()->create([
                 'id' => 'hg-2',
                 'name' => 'hg-test',
                 'vpc_id' => $this->vpc()->id,
@@ -90,7 +89,7 @@ class MigratePrivateTest extends TestCase
         ]);
 
         $hostGroup = Model::withoutEvents(function () use($hostSpec) {
-            return factory(HostGroup::class)->create([
+            return HostGroup::factory()->create([
                 'id' => 'hg-2',
                 'name' => 'hg-test',
                 'vpc_id' => $this->vpc()->id,

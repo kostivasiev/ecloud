@@ -39,7 +39,7 @@ class AssociateIpTest extends TestCase
 
     public function testIpNotSameNetworkAsNicFails()
     {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'id' => 'net-test-2',
             'name' => 'Manchester Network',
             'subnet' => '10.0.0.0/24',

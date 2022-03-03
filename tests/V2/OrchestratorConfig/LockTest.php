@@ -15,7 +15,7 @@ class LockTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create();
+        $this->orchestratorConfig = OrchestratorConfig::factory()->create();
         $this->user = (new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->adminUser = (new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))
             ->setIsAdmin(true);

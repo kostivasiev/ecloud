@@ -27,7 +27,7 @@ class CreateDefaultNetworkRulesTest extends TestCase
 
         $this->assertEquals($this->networkPolicy()->networkRules()->count(), 3);
 
-        $this->seeInDatabase('network_rules', [
+        $this->assertDatabaseHas('network_rules', [
             'name' => 'dhcp_ingress',
             'sequence' => 10000,
             'network_policy_id' => $this->networkPolicy()->id,
@@ -39,7 +39,7 @@ class CreateDefaultNetworkRulesTest extends TestCase
             'type' => NetworkRule::TYPE_DHCP
         ], 'ecloud');
 
-        $this->seeInDatabase('network_rules', [
+        $this->assertDatabaseHas('network_rules', [
             'name' => 'dhcp_egress',
             'sequence' => 10001,
             'network_policy_id' => $this->networkPolicy()->id,
@@ -51,7 +51,7 @@ class CreateDefaultNetworkRulesTest extends TestCase
             'type' => NetworkRule::TYPE_DHCP
         ], 'ecloud');
 
-        $this->seeInDatabase('network_rules', [
+        $this->assertDatabaseHas('network_rules', [
             'name' => NetworkRule::TYPE_CATCHALL,
             'sequence' => 20000,
             'network_policy_id' => $this->networkPolicy()->id,
@@ -74,7 +74,7 @@ class CreateDefaultNetworkRulesTest extends TestCase
 
         dispatch(new CreateDefaultNetworkRules($this->networkPolicy(), ['catchall_rule_action' => 'ALLOW']));
 
-        $this->seeInDatabase('network_rules', [
+        $this->assertDatabaseHas('network_rules', [
             'action' => 'ALLOW',
             'type' => NetworkRule::TYPE_CATCHALL
         ], 'ecloud');

@@ -29,7 +29,7 @@ class DeleteTest extends TestCase
     {
         Event::fake(Created::class);
         $this->delete('/v2/volume-groups/' . $this->volumeGroup->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
         Event::assertDispatched(Created::class);
     }
 }

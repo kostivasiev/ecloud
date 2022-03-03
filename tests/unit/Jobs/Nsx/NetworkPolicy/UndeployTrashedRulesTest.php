@@ -2,16 +2,11 @@
 
 namespace Tests\unit\Jobs\Nsx\NetworkPolicy;
 
-use App\Jobs\Nsx\NetworkPolicy\Deploy;
 use App\Jobs\Nsx\NetworkPolicy\UndeployTrashedRules;
 use App\Models\V2\NetworkPolicy;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UndeployTrashedRulesTest extends TestCase
@@ -25,7 +20,7 @@ class UndeployTrashedRulesTest extends TestCase
 
     public function testPolicyRemovesRuleIfExistsAndTrashed()
     {
-        $this->networkPolicy = factory(NetworkPolicy::class)->create([
+        $this->networkPolicy = NetworkPolicy::factory()->create([
             'id' => 'np-test',
             'network_id' => $this->network()->id,
         ]);
@@ -69,7 +64,7 @@ class UndeployTrashedRulesTest extends TestCase
 
     public function testPolicySkipRuleRemovalIfExistsAndNotTrashed()
     {
-        $this->networkPolicy = factory(NetworkPolicy::class)->create([
+        $this->networkPolicy = NetworkPolicy::factory()->create([
             'id' => 'np-test',
             'network_id' => $this->network()->id,
         ]);
@@ -106,7 +101,7 @@ class UndeployTrashedRulesTest extends TestCase
 
     public function testPolicySkipRuleRemovalIfNotExists()
     {
-        $this->networkPolicy = factory(NetworkPolicy::class)->create([
+        $this->networkPolicy = NetworkPolicy::factory()->create([
             'id' => 'np-test',
             'network_id' => $this->network()->id,
         ]);

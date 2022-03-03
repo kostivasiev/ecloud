@@ -23,7 +23,7 @@ class CheckNetworkAvailableTest extends TestCase
     public function testNetworkDoesNotExists()
     {
         $instance = Instance::withoutEvents(function () {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-fail',
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),

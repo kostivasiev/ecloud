@@ -75,14 +75,14 @@ class IsSameAvailabilityZoneTest extends TestCase
         $rule = new IsSameAvailabilityZone($this->floatingIp()->id);
 
         $nic = Nic::withoutEvents(function() {
-            $router = factory(Router::class)->create([
+            $router = Router::factory()->create([
                 'id' => 'rtr-test-2',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone2->id,
                 'router_throughput_id' => $this->routerThroughput()->id,
             ]);
 
-            $network = factory(Network::class)->create([
+            $network = Network::factory()->create([
                 'id' => 'net-test-2',
                 'name' => 'Manchester Network',
                 'subnet' => '10.0.0.0/24',

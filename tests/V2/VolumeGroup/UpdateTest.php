@@ -32,7 +32,7 @@ class UpdateTest extends TestCase
             [
                 'name' => 'expected',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
         $this->assertEquals('expected', VolumeGroup::findOrFail($this->volumeGroup->id)->name);
         Event::assertDispatched(Created::class);
     }

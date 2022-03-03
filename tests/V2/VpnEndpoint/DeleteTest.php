@@ -21,7 +21,7 @@ class DeleteTest extends TestCase
     {
         Event::fake(Created::class);
         $this->delete('/v2/vpn-endpoints/' . $this->vpnEndpoint()->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
         Event::assertDispatched(Created::class);
     }
 
@@ -29,12 +29,12 @@ class DeleteTest extends TestCase
     {
         $this->be(new Consumer(999, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->delete('/v2/vpn-endpoints/' . $this->vpnEndpoint()->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Not found',
                     'detail' => 'No Vpn Endpoint with that ID was found',
                 ]
-            )->assertResponseStatus(404);
+            )->assertStatus(404);
     }
 
     public function testDeleteResourceWhenVpnSessionExists()
@@ -42,11 +42,11 @@ class DeleteTest extends TestCase
         $this->vpnSession();
         Event::fake(Created::class);
         $this->delete('/v2/vpn-endpoints/' . $this->vpnEndpoint()->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Forbidden',
                     'detail' => 'Vpn Endpoints that have associated Vpn Sessions cannot be deleted',
                 ]
-            )->assertResponseStatus(403);
+            )->assertStatus(403);
     }
 }

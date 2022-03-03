@@ -3,7 +3,6 @@
 namespace Tests\unit\Jobs\Router;
 
 use App\Jobs\Router\DeployRouterLocale;
-use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;

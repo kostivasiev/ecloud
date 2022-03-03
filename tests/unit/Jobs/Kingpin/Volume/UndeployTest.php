@@ -2,20 +2,11 @@
 
 namespace Tests\unit\Jobs\Kingpin\Volume;
 
-use App\Events\V2\Nic\Saved;
-use App\Events\V2\Nic\Saving;
-use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Kingpin\Volume\Undeploy;
-use App\Models\V2\Nic;
 use App\Models\V2\Volume;
-use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\QueryException;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Queue;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UndeployTest extends TestCase

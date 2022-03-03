@@ -4,7 +4,6 @@ namespace Tests\unit\Jobs\Network;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\Network\AwaitNetworkPolicyRemoval;
-use App\Jobs\Network\DeleteNetworkPolicy;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;

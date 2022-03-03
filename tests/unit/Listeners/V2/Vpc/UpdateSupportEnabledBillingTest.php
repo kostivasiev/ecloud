@@ -24,7 +24,7 @@ class UpdateSupportEnabledBillingTest extends TestCase
 
     public function testEndsBillingMetricForSupportEnabled()
     {
-        $originalMetric = factory(BillingMetric::class)->create([
+        $originalMetric = BillingMetric::factory()->create([
             'id' => 'bm-test',
             'resource_id' => $this->vpc()->id,
             'vpc_id' => $this->vpc()->id,

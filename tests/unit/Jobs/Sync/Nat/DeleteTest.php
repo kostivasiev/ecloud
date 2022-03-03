@@ -9,7 +9,6 @@ use App\Support\Sync;
 use Illuminate\Bus\PendingBatch;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Bus;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase

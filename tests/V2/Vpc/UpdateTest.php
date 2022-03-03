@@ -37,11 +37,11 @@ class UpdateTest extends TestCase
     {
         $this->patch('/v2/vpcs/' . $this->vpc()->id, [
             'name' => 'Manchester DC',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Unauthorized',
             'detail' => 'Unauthorized',
             'status' => 401,
-        ])->assertResponseStatus(401);
+        ])->assertStatus(401);
     }
 
     public function testNullNameIsDenied()
@@ -51,12 +51,12 @@ class UpdateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The name field is required',
             'status' => 422,
             'source' => 'name'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testNonMatchingResellerIdFails()
@@ -69,11 +69,11 @@ class UpdateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Not found',
             'detail' => 'No Vpc with that ID was found',
             'status' => 404,
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testNoAdminFailsWhenConsoleIsSet()
@@ -86,13 +86,13 @@ class UpdateTest extends TestCase
         $this->patch('/v2/vpcs/' . $this->vpc()->id, $data, [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Forbidden',
                 'details' => 'Console access cannot be modified',
                 'status' => 403
             ]
-        )->assertResponseStatus(403);
+        )->assertStatus(403);
     }
 
     public function testValidDataIsSuccessful()
@@ -123,7 +123,7 @@ class UpdateTest extends TestCase
             [
                 'support_enabled' => true,
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
         $this->vpc()->refresh();
 
@@ -149,7 +149,7 @@ class UpdateTest extends TestCase
             [
                 'support_enabled' => false,
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
         $this->vpc()->refresh();
 

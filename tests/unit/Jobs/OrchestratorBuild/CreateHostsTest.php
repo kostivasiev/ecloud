@@ -30,20 +30,16 @@ class CreateHostsTest extends TestCase
                 ],
             ]
         ];
-        $this->orchestratorConfig = factory(OrchestratorConfig::class)->create(
-            [
-                'reseller_id' => 7052,
-                'employee_id' => 1,
-                'data' => json_encode($this->orchestratorData),
-                'locked' => false,
-            ]
-        );
-        $this->orchestratorBuild = factory(OrchestratorBuild::class)->create(
-            [
-                'orchestrator_config_id' => $this->orchestratorConfig->id,
-                'state' => [],
-            ]
-        );
+        $this->orchestratorConfig = OrchestratorConfig::factory()->create([
+            'reseller_id' => 7052,
+            'employee_id' => 1,
+            'data' => json_encode($this->orchestratorData),
+            'locked' => false,
+        ]);
+        $this->orchestratorBuild = OrchestratorBuild::factory()->create([
+            'orchestrator_config_id' => $this->orchestratorConfig->id,
+            'state' => [],
+        ]);
         $this->availabilityZone();
     }
 

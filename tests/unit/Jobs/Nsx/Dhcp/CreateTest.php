@@ -5,7 +5,6 @@ namespace Tests\unit\Jobs\Nsx\Dhcp;
 use App\Jobs\Nsx\Dhcp\Create;
 use App\Models\V2\Dhcp;
 use App\Models\V2\Task;
-use App\Models\V2\Volume;
 use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
@@ -23,7 +22,7 @@ class CreateTest extends TestCase
         parent::setUp();
 
         Model::withoutEvents(function () {
-            $this->dhcp = factory(Dhcp::class)->create([
+            $this->dhcp = Dhcp::factory()->create([
                 'id' => 'dhcp-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,

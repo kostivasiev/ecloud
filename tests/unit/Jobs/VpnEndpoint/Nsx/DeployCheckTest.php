@@ -1,6 +1,6 @@
 <?php
 
-namespace Jobs\VpnEndpoint\Nsx;
+namespace Tests\unit\Jobs\VpnEndpoint\Nsx;
 
 use App\Jobs\VpnEndpoint\Nsx\DeployCheck;
 use App\Models\V2\Task;

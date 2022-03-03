@@ -1,7 +1,6 @@
 <?php
 namespace Tests\unit\Jobs\Tasks\Instance;
 
-use App\Jobs\Instance\EndPublicBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
 use App\Services\V2\KingpinService;
@@ -31,7 +30,7 @@ class MigrateBillingTest extends TestCase
     public function testBillingEndsOnPublicInstance()
     {
         // compute metrics created on deploy
-        $originalVcpuMetric = factory(BillingMetric::class)->create([
+        $originalVcpuMetric = BillingMetric::factory()->create([
             'id' => 'bm-test1',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -41,7 +40,7 @@ class MigrateBillingTest extends TestCase
             'start' => Carbon::now(),
         ]);
 
-        $originalRamMetric = factory(BillingMetric::class)->create([
+        $originalRamMetric = BillingMetric::factory()->create([
             'id' => 'bm-test2',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,
@@ -51,7 +50,7 @@ class MigrateBillingTest extends TestCase
             'start' => Carbon::now(),
         ]);
 
-        $originalLicenseMetric = factory(BillingMetric::class)->create([
+        $originalLicenseMetric = BillingMetric::factory()->create([
             'id' => 'bm-test3',
             'resource_id' => $this->instanceModel()->id,
             'vpc_id' => $this->vpc()->id,

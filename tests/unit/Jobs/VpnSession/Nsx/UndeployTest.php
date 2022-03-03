@@ -1,6 +1,6 @@
 <?php
 
-namespace Jobs\VpnSession\Nsx;
+namespace Tests\unit\Jobs\VpnSession\Nsx;
 
 use App\Jobs\VpnSession\Nsx\Undeploy;
 use App\Models\V2\Task;

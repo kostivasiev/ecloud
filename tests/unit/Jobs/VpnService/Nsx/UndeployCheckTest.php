@@ -1,10 +1,9 @@
 <?php
 
-namespace Jobs\VpnService\Nsx;
+namespace Tests\unit\Jobs\VpnService\Nsx;
 
 use App\Jobs\VpnService\Nsx\UndeployCheck;
 use App\Models\V2\Task;
-use App\Models\V2\VpnService;
 use App\Support\Sync;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;

@@ -27,7 +27,7 @@ class AwaitFloatingIpCreationTest extends TestCase
     public function testNoFloatingIpIdInDeploymentDataWhenRequiresFloatingIpTrueFails()
     {
         $instance = Instance::withoutEvents(function() {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-test',
                 'vpc_id' => $this->vpc()->id,
                 'deploy_data' => [
@@ -53,7 +53,7 @@ class AwaitFloatingIpCreationTest extends TestCase
         $this->floatingIp()->tasks()->save($task);
 
         $instance = Instance::withoutEvents(function() {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-test',
                 'vpc_id' => $this->vpc()->id,
                 'deploy_data' => [
@@ -80,7 +80,7 @@ class AwaitFloatingIpCreationTest extends TestCase
         $this->floatingIp()->tasks()->save($task);
 
         $instance = Instance::withoutEvents(function() {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-test',
                 'vpc_id' => $this->vpc()->id,
                 'deploy_data' => [
@@ -110,7 +110,7 @@ class AwaitFloatingIpCreationTest extends TestCase
         $this->floatingIp()->tasks()->save($task);
 
         $instance = Instance::withoutEvents(function() {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => 'i-test',
                 'vpc_id' => $this->vpc()->id,
                 'deploy_data' => [

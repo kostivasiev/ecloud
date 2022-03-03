@@ -2,10 +2,7 @@
 
 namespace Tests\unit\Jobs\Network;
 
-use App\Jobs\Network\Undeploy;
-use App\Jobs\Network\UndeployDiscoveryProfiles;
 use App\Jobs\Network\UndeployQoSProfiles;
-use App\Jobs\Network\UndeploySecurityProfiles;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
@@ -14,7 +11,6 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UndeployQoSProfilesTest extends TestCase

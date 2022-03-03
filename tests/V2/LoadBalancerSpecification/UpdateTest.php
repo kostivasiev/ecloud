@@ -16,7 +16,7 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         $this->image = factory(Image::class)->create();
-        $this->loadBalancerSpecification = factory(LoadBalancerSpecification::class)->create([
+        $this->loadBalancerSpecification = LoadBalancerSpecification::factory()->create([
             "image_id" => $this->image->id
         ]);
     }

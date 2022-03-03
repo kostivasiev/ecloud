@@ -2,9 +2,7 @@
 
 namespace Tests\unit\Jobs\Nsx\FirewallPolicy;
 
-use App\Events\V2\FirewallRule\Deleted;
 use App\Jobs\Nsx\FirewallPolicy\Undeploy;
-use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Task;
@@ -13,7 +11,6 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UndeployTest extends TestCase

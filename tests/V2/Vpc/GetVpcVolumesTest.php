@@ -26,12 +26,12 @@ class GetVpcVolumesTest extends TestCase
         $this->get('/v2/vpcs/' . $this->vpc()->id . '/volumes', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => 'vol-test',
             'name' => 'Volume',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
             'capacity' => '100',
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }
