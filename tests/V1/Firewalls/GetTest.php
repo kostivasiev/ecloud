@@ -13,7 +13,7 @@ class GetTest extends TestCase
 //        $this->artisan('db:seed');
 
         // test firewall
-//        factory(Firewall::class, 1)->create();
+//        Firewall::factory()->create();
     }
 
     /**
@@ -22,14 +22,12 @@ class GetTest extends TestCase
      */
     public function testValidCollection()
     {
-        factory(Firewall::class, 1)->create();
+        Firewall::factory()->create();
 
         $this->get('/v1/firewalls', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     /**
@@ -38,16 +36,14 @@ class GetTest extends TestCase
      */
     public function testValidItem()
     {
-        factory(Firewall::class, 1)->create([
+        Firewall::factory()->create([
             'servers_id' => 123,
         ]);
 
         $this->get('/v1/firewalls/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     /**
@@ -59,9 +55,7 @@ class GetTest extends TestCase
         $this->get('/v1/firewalls/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     /**
@@ -70,7 +64,7 @@ class GetTest extends TestCase
      */
     public function testInactiveItem()
     {
-        factory(Firewall::class, 1)->create([
+        Firewall::factory()->create([
             'servers_id' => 123,
             'servers_active' => 'n',
         ]);
@@ -78,9 +72,7 @@ class GetTest extends TestCase
         $this->get('/v1/firewalls/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     /**
@@ -89,7 +81,7 @@ class GetTest extends TestCase
      */
     public function testInvalidOwnerItem()
     {
-        factory(Firewall::class, 1)->create([
+        Firewall::factory()->create([
             'servers_id' => 123,
             'servers_reseller_id' => 2,
         ]);
@@ -97,8 +89,6 @@ class GetTest extends TestCase
         $this->get('/v1/firewalls/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 }
