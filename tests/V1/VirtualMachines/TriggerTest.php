@@ -14,7 +14,7 @@ class TriggerTest extends TestCase
         $serverId = 123;
         $resellerId = 321;
 
-        $server = factory(VirtualMachine::class, 1)->create([
+        $server = VirtualMachine::factory()->create([
             'servers_id' => $serverId,
             'servers_reseller_id' => $resellerId,
         ])->first();
@@ -27,7 +27,7 @@ class TriggerTest extends TestCase
         ];
 
         foreach ($descriptionFormats as $description) {
-            factory(Trigger::class, 1)->create([
+            Trigger::factory()->create([
                 'trigger_reference_id' => $serverId,
                 'trigger_reseller_id' => $resellerId,
                 'trigger_description' => $description,
