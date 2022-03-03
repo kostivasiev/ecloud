@@ -3,6 +3,7 @@
 namespace Tests\V1\Appliances\Appliances;
 
 use App\Models\V1\Appliance;
+use App\Models\V1\Appliance\Version\Data;
 use App\Models\V1\AppliancePodAvailability;
 use App\Models\V1\ApplianceVersion;
 use App\Models\V1\Pod;
@@ -127,7 +128,7 @@ class GetTest extends ApplianceTestCase
     {
         $appliance = $this->appliances[0];
 
-        $pod = factory(Pod::class, 1)->create();
+        $pod = Pod::factory()->create();
 
         $appliancePodAvailability = new AppliancePodAvailability();
         $appliancePodAvailability->appliance_id = $appliance->appliance_id;
@@ -137,18 +138,18 @@ class GetTest extends ApplianceTestCase
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/pods', [], $this->validWriteHeaders)
             ->assertStatus(200)
             ->assertJsonFragment([
-                'id' => $pod[0]->getKey()
+                'id' => $pod->getKey()
             ]);
     }
 
     public function testApplianceData()
     {
-        $appliance = factory(Appliance::class)->create();
+        $appliance = Appliance::factory()->create();
         $applianceVersion = ApplianceVersion::factory()->create([
             'appliance_uuid' => $appliance->appliance_uuid,
             'appliance_version_version' => 1,
         ]);
-        $applianceVersionData = factory(Appliance\Version\Data::class)->create([
+        $applianceVersionData = Data::factory()->create([
             'appliance_version_uuid' => $applianceVersion->appliance_version_uuid,
             'key' => 'key_value',
             'value' => 'value_value',

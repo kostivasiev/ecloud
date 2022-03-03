@@ -106,7 +106,7 @@ class ApplianceTestCase extends TestCase
     public function setUpAppliancePodTestData()
     {
         // Create a pod with one-click enabled
-        factory(Pod::class, 1)->create([
+        Pod::factory()->create([
             'ucs_datacentre_id' => 1,
             'ucs_datacentre_oneclick_enabled' => 'Yes'
         ]);
@@ -117,7 +117,7 @@ class ApplianceTestCase extends TestCase
         $availability->save();
 
         // Create a Pod with one-click disabled
-        factory(Pod::class, 1)->create([
+        Pod::factory()->create([
             'ucs_datacentre_id' => 2,
             'ucs_datacentre_oneclick_enabled' => 'No'
         ]);

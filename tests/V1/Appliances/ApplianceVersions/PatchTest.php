@@ -58,7 +58,7 @@ class PatchTest extends ApplianceTestCase
                 'appliance_version',
                 [
                     'appliance_version_uuid' => $applianceVersion->uuid,
-                    'appliance_version_' . $property => $newValue,
+                    'appliance_version_' . $property => rtrim($newValue),
                 ],
                 env('DB_ECLOUD_CONNECTION')
             );
