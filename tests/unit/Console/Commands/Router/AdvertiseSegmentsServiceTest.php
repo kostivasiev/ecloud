@@ -115,7 +115,7 @@ class AdvertiseSegmentsServiceTest extends TestCase
         $this->mock->allows('checkT0Connection')
             ->withAnyArgs()
             ->andReturnTrue();
-        $this->assertFalse($this->mock->getAdvertisedTypes($this->router()));
+        $this->assertEquals($this->advertisementTypesWithout, $this->mock->getAdvertisedTypes($this->router()));
     }
 
     public function testCheckT0ConnectionNoVpc()
