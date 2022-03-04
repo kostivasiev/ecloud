@@ -2,6 +2,7 @@
 
 namespace App\Tasks\Sync\LoadBalancer;
 
+use App\Jobs\LoadBalancer\DeleteAntiAffinity;
 use App\Jobs\LoadBalancer\DeleteCluster;
 use App\Jobs\LoadBalancer\DeleteCredentials;
 use App\Jobs\LoadBalancer\DeleteLoadBalancerNodes;
@@ -16,6 +17,7 @@ class Delete extends Task
         return [
             DeleteVips::class,
             DeleteNetworks::class,
+            DeleteAntiAffinity::class,
             DeleteLoadBalancerNodes::class,
             DeleteCluster::class,
             DeleteCredentials::class,

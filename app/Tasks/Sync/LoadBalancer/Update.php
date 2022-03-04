@@ -7,6 +7,7 @@ use App\Jobs\LoadBalancer\ConfigurePeers;
 use App\Jobs\LoadBalancer\CreateCluster;
 use App\Jobs\LoadBalancer\CreateCredentials;
 use App\Jobs\LoadBalancer\CreateNodes;
+use App\Jobs\LoadBalancer\ConfigureAntiAffinity;
 use App\Tasks\Task;
 
 class Update extends Task
@@ -19,6 +20,7 @@ class Update extends Task
             CreateNodes::class,
             AddNetworks::class,
             ConfigurePeers::class,
+            ConfigureAntiAffinity::class,
         ];
     }
 }
