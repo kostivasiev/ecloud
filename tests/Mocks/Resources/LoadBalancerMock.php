@@ -15,6 +15,7 @@ trait LoadBalancerMock
     protected $loadBalancer;
     protected $loadBalancerInstance;
     protected $loadBalancerNode;
+    protected $loadBalancerHANodes;
     protected $loadBalancerNetwork;
 
     public function loadBalancerSpecification($id = 'lbs-test'): LoadBalancerSpecification
@@ -49,42 +50,67 @@ trait LoadBalancerMock
     public function loadBalancerInstance($id = 'i-lbtest'): Instance
     {
         if (!isset($this->loadBalancerInstance)) {
-            Model::withoutEvents(function () use ($id) {
-                $this->loadBalancerInstance = factory(Instance::class)->create([
-                    'id' => $id,
-                    'vpc_id' => $this->vpc()->id,
-                    'name' => 'Load Balancer ' . uniqid(),
-                    'image_id' => $this->image()->id,
-                    'vcpu_cores' => 1,
-                    'ram_capacity' => 1024,
-                    'availability_zone_id' => $this->availabilityZone()->id,
-                    'deploy_data' => [
-                        'network_id' => $this->network()->id,
-                        'volume_capacity' => 20,
-                        'volume_iops' => 300,
-                        'requires_floating_ip' => false,
-                    ],
-                    'load_balancer_id' => $this->loadBalancer()->id,
-                    'is_hidden' => true,
-                ]);
-            });
+            $this->loadBalancerInstance = $this->newLoadBalancerInstance($id);
         }
         return $this->loadBalancerInstance;
+    }
+
+    public function newLoadBalancerInstance($id = 'i-lbtest'): Instance
+    {
+        return Model::withoutEvents(function () use ($id) {
+            return factory(Instance::class)->create([
+                'id' => $id,
+                'vpc_id' => $this->vpc()->id,
+                'name' => 'Load Balancer ' . uniqid(),
+                'image_id' => $this->image()->id,
+                'vcpu_cores' => 1,
+                'ram_capacity' => 1024,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'deploy_data' => [
+                    'network_id' => $this->network()->id,
+                    'volume_capacity' => 20,
+                    'volume_iops' => 300,
+                    'requires_floating_ip' => false,
+                ],
+                'load_balancer_id' => $this->loadBalancer()->id,
+                'is_hidden' => true,
+            ]);
+        });
     }
 
     public function loadBalancerNode($id = 'ln-test'): LoadBalancerNode
     {
         if (!isset($this->loadBalancerNode)) {
-            Model::withoutEvents(function () use ($id) {
-                $this->loadBalancerNode = factory(LoadBalancerNode::class)->create([
-                    'id' => $id,
-                    'instance_id' => $this->loadBalancerInstance()->id,
+            $this->loadBalancerNode = factory(LoadBalancerNode::class)->create([
+                'id' => $id,
+                'instance_id' => $this->loadBalancerInstance()->id,
+                'load_balancer_id' => $this->loadBalancer()->id,
+                'node_id' => null,
+            ]);
+        }
+        return $this->loadBalancerNode;
+    }
+
+    public function loadBalancerHANodes()
+    {
+        if (!isset($this->loadBalancerHANodes)) {
+            Model::withoutEvents(function () {
+                $this->loadBalancerHANodes = [];
+                $this->loadBalancerHANodes[] = factory(LoadBalancerNode::class)->create([
+                    'id' => 'lbn-test1',
+                    'instance_id' => $this->newLoadBalancerInstance('i-test1'),
+                    'load_balancer_id' => $this->loadBalancer()->id,
+                    'node_id' => null,
+                ]);
+                $this->loadBalancerHANodes[] = factory(LoadBalancerNode::class)->create([
+                    'id' => 'lbn-test2',
+                    'instance_id' => $this->newLoadBalancerInstance('i-test2'),
                     'load_balancer_id' => $this->loadBalancer()->id,
                     'node_id' => null,
                 ]);
             });
         }
-        return $this->loadBalancerNode;
+        return $this->loadBalancerHANodes;
     }
 
     public function loadBalancerNetwork($id = 'lbn-test'): LoadBalancerNetwork
