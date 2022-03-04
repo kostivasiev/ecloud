@@ -1,7 +1,7 @@
 ################################################################################################
 ## Base PHP image stage - used by composer vendor builder (composer-builder) and final stages ##
 ################################################################################################
-FROM php:7.4-apache AS apio
+FROM php:8.1-apache AS apio
 RUN pecl install redis-5.1.1 \
     && docker-php-ext-enable redis
 RUN docker-php-ext-install pdo_mysql \
