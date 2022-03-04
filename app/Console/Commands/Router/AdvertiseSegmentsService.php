@@ -16,6 +16,10 @@ class AdvertiseSegmentsService extends Command
             Router::isManagement()->where('id', '=', $this->option('router'))->get():
             Router::isManagement()->get();
         $routers->each(function (Router $router) {
+            $this->info('---');
+            $this->info('Processing router ' . $router->id . ' (' . $router->name . ')');
+            $this->info('---');
+
             // 1. Is router advertising its segments/services and connected to T0?
             $advertisedTypes = $this->getAdvertisedTypes($router);
             if (!$advertisedTypes) {
@@ -61,7 +65,7 @@ class AdvertiseSegmentsService extends Command
         }
 
         // now check that the t1 is connected to an admin t0
-        if ($this->checkT0Connection($router, $response)) {
+        if (!$this->checkT0Connection($router, $response)) {
             return false;
         }
 

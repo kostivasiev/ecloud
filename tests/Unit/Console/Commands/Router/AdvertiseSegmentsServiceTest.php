@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Console\Commands\Router;
+namespace Tests\unit\Console\Commands\Router;
 
 use App\Console\Commands\Router\AdvertiseSegmentsService;
 use GuzzleHttp\Exception\ClientException;
@@ -81,6 +81,7 @@ class AdvertiseSegmentsServiceTest extends TestCase
 
     public function testGetAdvertisedTypesNoTier0()
     {
+        $this->mock->allows('info')->withAnyArgs();
         $this->nsxServiceMock()
             ->allows('get')
             ->withSomeOfArgs('policy/api/v1/infra/tier-1s/' . $this->router()->id)
@@ -95,11 +96,12 @@ class AdvertiseSegmentsServiceTest extends TestCase
             ->withAnyArgs()
             ->andReturnFalse();
         $response = $this->mock->getAdvertisedTypes($this->router());
-        $this->assertEquals(Arr::flatten($this->advertisementTypesWithout), Arr::flatten($response));
+        $this->assertFalse($response);
     }
 
     public function testGetAdvertisedTypesPathsMatch()
     {
+        $this->mock->allows('info')->withAnyArgs();
         $this->nsxServiceMock()
             ->allows('get')
             ->withSomeOfArgs('policy/api/v1/infra/tier-1s/' . $this->router()->id)
@@ -113,7 +115,7 @@ class AdvertiseSegmentsServiceTest extends TestCase
         $this->mock->allows('checkT0Connection')
             ->withAnyArgs()
             ->andReturnTrue();
-        $this->assertFalse($this->mock->getAdvertisedTypes($this->router()));
+        $this->assertEquals($this->advertisementTypesWithout, $this->mock->getAdvertisedTypes($this->router()));
     }
 
     public function testCheckT0ConnectionNoVpc()
@@ -264,6 +266,7 @@ class AdvertiseSegmentsServiceTest extends TestCase
 
     public function testHandleNoAdvertisedTypes()
     {
+        $this->mock->allows('info')->withAnyArgs();
         $this->mock->allows('getAdvertisedTypes')->withAnyArgs()->andReturnFalse();
         $this->mock->allows('error')->with(\Mockery::capture($message));
         $this->mock->handle();
@@ -282,6 +285,7 @@ class AdvertiseSegmentsServiceTest extends TestCase
 
     public function testHandleUpdateRouteAdvertisementTypesFailure()
     {
+        $this->mock->allows('info')->withAnyArgs();
         $this->mock->allows('getAdvertisedTypes')->andReturn($this->advertisementTypesWithout);
         $this->mock->allows('updateRouteAdvertisementTypes')->andReturnFalse();
         $this->mock->allows('error')->with(\Mockery::capture($message));

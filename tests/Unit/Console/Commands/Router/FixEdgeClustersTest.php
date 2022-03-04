@@ -241,6 +241,7 @@ class FixEdgeClustersTest extends TestCase
 
     public function testHandleGetEdgeClusterUuidFails()
     {
+        $this->mock->allows('info')->withAnyArgs();
         $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->allows('getEdgeClusterUuid')->withAnyArgs()->andReturnFalse();
         $this->mock->allows('error')->with(\Mockery::capture($message));
@@ -256,6 +257,7 @@ class FixEdgeClustersTest extends TestCase
     public function testHandleGetExistingEdgeClusterUuidFails()
     {
         $uuid = Str::uuid();
+        $this->mock->allows('info')->withAnyArgs();
         $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->allows('getEdgeClusterUuid')->withAnyArgs()->andReturn($uuid);
         $this->mock->allows('getExistingEdgeClusterUuid')->withAnyArgs()->andReturnFalse();
@@ -288,6 +290,7 @@ class FixEdgeClustersTest extends TestCase
     public function testHandleUpdateEdgeClusterIdFails()
     {
         $uuid = Str::uuid();
+        $this->mock->allows('info')->withAnyArgs();
         $this->mock->allows('option')->with('router')->andReturn($this->router()->id);
         $this->mock->allows('getEdgeClusterUuid')->withAnyArgs()->andReturn($uuid);
         $this->mock->allows('getExistingEdgeClusterUuid')->withAnyArgs()->andReturn(Str::uuid());
