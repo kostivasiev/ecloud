@@ -654,7 +654,7 @@ abstract class TestCase extends BaseTestCase
     protected function tearDown(): void
     {
         \Mockery::close();
-        //parent::tearDown();
+        parent::tearDown();
     }
 
     public function asAdmin()
