@@ -2,12 +2,14 @@
 
 namespace Tests\V2\Network;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
@@ -33,18 +35,16 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $this->post(
-            '/v2/networks',
-            [
-                'name' => 'Manchester Network',
-                'router_id' => $this->router->id,
-                'subnet' => '10.0.0.0/24'
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertStatus(202);
+        Event::fake([Created::class]);
+        $this->asAdmin()
+            ->post(
+                '/v2/networks',
+                [
+                    'name' => 'Manchester Network',
+                    'router_id' => $this->router->id,
+                    'subnet' => '10.0.0.0/24'
+                ]
+            )->assertStatus(202);
         $this->assertDatabaseHas(
             'networks',
             [

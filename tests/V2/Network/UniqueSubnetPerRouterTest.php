@@ -52,45 +52,24 @@ class UniqueSubnetPerRouterTest extends TestCase
 
     public function testOverlapDetectionWorks()
     {
-        $this->post(
-            '/v2/networks',
-            [
-                'name' => 'Manchester Network',
-                'router_id' => $this->router->id,
-                'subnet' => '10.0.0.1/22'
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertJsonFragment([
-            'title' => 'Validation Error',
-            'detail' => 'The subnet must not overlap an existing CIDR range',
-        ])->assertStatus(422);
+        $this->asAdmin()
+            ->post(
+                '/v2/networks',
+                [
+                    'name' => 'Manchester Network',
+                    'router_id' => $this->router->id,
+                    'subnet' => '10.0.0.1/22'
+                ]
+            )->assertJsonFragment([
+                'title' => 'Validation Error',
+                'detail' => 'The subnet must not overlap an existing CIDR range',
+            ])->assertStatus(422);
     }
 
     public function testSuccessfulCreation()
     {
         Event::fake([TaskCreated::class]);
-        $this->post(
-            '/v2/networks',
-            [
-                'name' => 'Manchester Network',
-                'router_id' => $this->router2->id,
-                'subnet' => '10.0.0.1/22'
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertStatus(202);
-        Event::assertDispatched(TaskCreated::class);
-    }
-
-    public function testPatchIsSuccessful()
-    {
-        Event::fake([TaskCreated::class, SyncCreated::class]);
-        $response = $this->asAdmin()
+        $this->asAdmin()
             ->post(
                 '/v2/networks',
                 [
@@ -99,20 +78,23 @@ class UniqueSubnetPerRouterTest extends TestCase
                     'subnet' => '10.0.0.1/22'
                 ]
             )->assertStatus(202);
+        Event::assertDispatched(TaskCreated::class);
+    }
 
-        $networkId = (json_decode($response->getContent()))->data->id;
+    public function testPatchIsSuccessful()
+    {
+        Event::fake([TaskCreated::class, SyncCreated::class]);
 
         // update the record using the same data. Before the fix the same subnet for the same
         // record would result in an overlapping subnet error.
         $this->asAdmin()
             ->patch(
-                '/v2/networks/' . $networkId,
+                '/v2/networks/' . $this->network()->id,
                 [
                     'name' => 'Updated Network',
-                    'router_id' => $this->router2->id,
-                    'subnet' => '10.0.0.1/22'
+                    'router_id' => $this->network()->router_id,
+                    'subnet' => $this->network()->subnet,
                 ]
             )->assertStatus(202);
     }
-
 }
