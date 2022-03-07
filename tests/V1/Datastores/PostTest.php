@@ -31,17 +31,13 @@ class PostTest extends TestCase
         $data = [
             'solution_id' => Solution::first()->ucs_reseller_id,
             'name' => 'MY DATASTORE',
-            'type' => 'Hybrid',
-            'capacity' => 1
+            'type' => 'Private',
+            'capacity' => 1,
+            'sub_type' => 1,
+            'status' => 'Queued',
+            'allocated' => 1234,
+            'available' => 1,
         ];
-        $this->post(
-            '/v1/datastores',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->getContent();
 
         $this->post(
             '/v1/datastores',
@@ -50,9 +46,9 @@ class PostTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertStatus(200)
+        )->assertStatus(202)
             ->assertJsonFragment([
-                'total' => 122,
+                'id' => 1,
             ]);
     }
 }

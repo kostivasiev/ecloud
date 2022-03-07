@@ -90,10 +90,10 @@ class CreateInitialTables extends Migration
             $table->string('reseller_lun_status');
             $table->string('reseller_lun_type');
             $table->integer('reseller_lun_size_gb');
-            $table->string('reseller_lun_name');
-            $table->string('reseller_lun_wwn');
+            $table->string('reseller_lun_name')->default('');
+            $table->string('reseller_lun_wwn')->default('');
             $table->string('reseller_lun_lun_type');
-            $table->string('reseller_lun_lun_sub_type');
+            $table->string('reseller_lun_lun_sub_type')->default('');
         });
 
 
