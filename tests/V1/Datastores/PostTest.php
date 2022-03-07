@@ -34,14 +34,14 @@ class PostTest extends TestCase
             'type' => 'Hybrid',
             'capacity' => 1
         ];
-        dd($this->post(
+        $this->post(
             '/v1/datastores',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->getContent());
+        )->getContent();
 
         $this->post(
             '/v1/datastores',
