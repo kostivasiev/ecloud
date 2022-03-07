@@ -18,7 +18,7 @@ trait RdnsTrait
     {
         return sprintf(
             config('defaults.floating-ip.rdns.default_rdns'),
-            implode('.', explode('.', $ip)),
+            $ip,
         );
     }
 
