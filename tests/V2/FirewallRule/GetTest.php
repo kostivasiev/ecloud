@@ -58,7 +58,7 @@ class GetTest extends TestCase
             'enabled' => $this->firewallRule->enabled,
             'id' => $this->firewallRule->id,
             'name' => $this->firewallRule->name,
-            'sequence' => (string)$this->firewallRule->sequence,
+            'sequence' => $this->firewallRule->sequence,
         ])->assertStatus(200);
     }
 
@@ -73,7 +73,7 @@ class GetTest extends TestCase
         )->assertJsonFragment([
                 'id' => $this->firewallRule->id,
                 'name' => $this->firewallRule->name,
-                'sequence' => (string)$this->firewallRule->sequence,
+                'sequence' => $this->firewallRule->sequence,
         ])->assertStatus(200);
     }
 

@@ -32,7 +32,7 @@ class GetTest extends TestCase
             'name' => 'Volume',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
-            'capacity' => '100',
+            'capacity' => 100,
         ])->assertJsonMissing([
             'vmware_uuid' => 'uuid-test-uuid-test-uuid-test'
         ])->assertStatus(200);
@@ -48,7 +48,7 @@ class GetTest extends TestCase
             'name' => 'Volume',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
-            'capacity' => '100',
+            'capacity' => 100,
         ])->assertJsonMissing([
             'vmware_uuid' => 'uuid-test-uuid-test-uuid-test'
         ])->assertStatus(200);
@@ -64,7 +64,7 @@ class GetTest extends TestCase
             'name' => 'Volume',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
-            'capacity' => '100',
+            'capacity' => 100,
             'vmware_uuid' => 'uuid-test-uuid-test-uuid-test',
         ])->assertStatus(200);
     }

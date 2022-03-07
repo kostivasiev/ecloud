@@ -33,7 +33,7 @@ return [
             'sequence' => 1000
         ],
         'rdns' => [
-            'default_rdns' => '%s.svrlist.ukfast.net',
+            'default_rdns' => '%s.srvlist.ukfast.net',
             'dns_suffix' => '%s.in-addr.arpa'
         ]
     ],

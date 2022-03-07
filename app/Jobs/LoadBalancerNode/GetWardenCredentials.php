@@ -14,7 +14,7 @@ class GetWardenCredentials extends TaskJob
         $client = app()->make(AdminClient::class)
             ->setResellerId($loadBalancer->getResellerId());
         $response = $client->clusters()->get(
-            vsprintf(
+            sprintf(
                 'v2/clusters/%d/warden-credentials',
                 $loadBalancer->config_id
             )

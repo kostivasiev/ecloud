@@ -31,7 +31,7 @@ class GetVpcVolumesTest extends TestCase
             'name' => 'Volume',
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone()->id,
-            'capacity' => '100',
+            'capacity' => 100,
         ])->assertStatus(200);
     }
 }

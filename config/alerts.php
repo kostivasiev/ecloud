@@ -17,7 +17,7 @@ return [
         ]
     ],
     'billing' => [
-        'to' => 'gavin.taylor@ukfast.co.uk'
+        'to' => 'ecloud-billing@ans.co.uk'
     ],
     'health' => [
         'to' => [

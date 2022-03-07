@@ -38,6 +38,7 @@ use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Event;
 use Tests\Traits\ResellerDatabaseMigrations;
+use UKFast\Api\Auth\Consumer;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -276,7 +277,7 @@ abstract class TestCase extends BaseTestCase
         return $this->region;
     }
 
-    public function availabilityZone()
+    public function availabilityZone(): AvailabilityZone
     {
         if (!$this->availabilityZone) {
             $this->availabilityZone = AvailabilityZone::factory()->create([
@@ -653,7 +654,21 @@ abstract class TestCase extends BaseTestCase
     protected function tearDown(): void
     {
         \Mockery::close();
-        //parent::tearDown();
+        parent::tearDown();
+    }
+
+    public function asAdmin()
+    {
+        $consumer = new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']);
+        $consumer->setIsAdmin(true);
+        $this->be($consumer);
+        return $this;
+    }
+
+    public function asUser()
+    {
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        return $this;
     }
 
 }
