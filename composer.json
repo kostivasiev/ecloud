@@ -28,11 +28,9 @@
         "ruflin/elastica": "^6.1",
         "ukfast/api-auth": "^3.3",
         "ukfast/api-encryption": "^4.1",
-        "ukfast/api-exceptions": "^3.2",
-        "ukfast/api-helper-datetime": "^2.3",
+        "ukfast/api-exceptions": "^4.0",
         "ukfast/api-internal-communication": "^1.10",
         "ukfast/api-paginator": "^2.1",
-        "ukfast/api-resources": "^5.2",
         "ukfast/api-validation": "^1.4",
         "ukfast/ditto": "^4.1",
         "ukfast/form-requests": "^2.1",
@@ -40,7 +38,8 @@
         "ukfast/laravel-sieve": "^0.5",
         "ukfast/log-provider": "^3.0",
         "ukfast/responses": "~1.0",
-        "vlucas/phpdotenv": "^5.2"
+        "vlucas/phpdotenv": "^5.2",
+        "ukfast/laravel-responses": "^1.0"
     },
     "require-dev": {
         "ext-json": "*",
@@ -168,6 +167,14 @@
         {
             "type": "vcs",
             "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/form-requests.git"
+        },
+        {
+          "type": "vcs",
+          "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/laravel-responses.git"
+        },
+        {
+          "type": "vcs",
+          "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/paginator.git"
         }
     ]
 }

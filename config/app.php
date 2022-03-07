@@ -163,12 +163,11 @@ return [
          */
         Illuminate\Database\Eloquent\LegacyFactoryServiceProvider::class,
         App\Providers\IntapiServiceProvider::class,
-        UKFast\Responses\ResponseServiceProvider::class,
+        UKFast\Responses\LaravelResponseServiceProvider::class,
         UKFast\Api\Paginator\PaginationServiceProvider::class,
         UKFast\HealthCheck\HealthCheckServiceProvider::class,
         UKFast\Api\Auth\AuthServiceProvider::class,
         UKFast\Api\Exceptions\Providers\UKFastExceptionServiceProvider::class,
-        UKFast\Api\Resource\ResourceServiceProvider::class,
         UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider::class,
         UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider::class,
         UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class,
