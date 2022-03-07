@@ -14,8 +14,8 @@ use Illuminate\Http\Request;
 use Log;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Exceptions\ForbiddenException;
-use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\Api\Resource\Traits\ResponseHelper;
+use App\Services\V1\Resource\Traits\RequestHelper;
+use App\Services\V1\Resource\Traits\ResponseHelper;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class ApplianceController extends BaseController
@@ -79,9 +79,9 @@ class ApplianceController extends BaseController
      * @return \Illuminate\Http\Response
      * @throws DatabaseException
      * @throws ForbiddenException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResourceException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResponseException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidRouteException
      */
     public function create(Request $request)
     {

@@ -8,8 +8,8 @@ use App\Resources\V1\VirtualMachineTagsResource;
 use App\Solution\CanModifyResource;
 use Illuminate\Http\Request;
 use UKFast\Api\Exceptions\BadRequestException;
-use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\Api\Resource\Traits\ResponseHelper;
+use App\Services\V1\Resource\Traits\RequestHelper;
+use App\Services\V1\Resource\Traits\ResponseHelper;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class TagController extends BaseController
@@ -74,9 +74,9 @@ class TagController extends BaseController
      * @throws BadRequestException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResourceException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResponseException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidRouteException
      */
     public function createSolutionTag(Request $request, $solutionId)
     {
@@ -134,9 +134,9 @@ class TagController extends BaseController
      * @throws TagNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResourceException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResponseException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidRouteException
      */
     public function updateSolutionTag(Request $request, $solutionId, $tagKey)
     {

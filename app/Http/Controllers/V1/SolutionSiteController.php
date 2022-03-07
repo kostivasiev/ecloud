@@ -5,8 +5,8 @@ namespace App\Http\Controllers\V1;
 use App\Exceptions\V1\SiteNotFoundException;
 use App\Models\V1\SolutionSite;
 use Illuminate\Http\Request;
-use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\Api\Resource\Traits\ResponseHelper;
+use App\Services\V1\Resource\Traits\RequestHelper;
+use App\Services\V1\Resource\Traits\ResponseHelper;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class SolutionSiteController extends BaseController

@@ -10,8 +10,8 @@ use UKFast\Api\Exceptions\BadRequestException;
 use UKFast\Api\Exceptions\DatabaseException;
 use UKFast\Api\Exceptions\ForbiddenException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
-use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\Api\Resource\Traits\ResponseHelper;
+use App\Services\V1\Resource\Traits\RequestHelper;
+use App\Services\V1\Resource\Traits\ResponseHelper;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class ApplianceParametersController extends BaseController
@@ -83,9 +83,9 @@ class ApplianceParametersController extends BaseController
      * @throws BadRequestException
      * @throws DatabaseException
      * @throws \App\Exceptions\V1\ApplianceVersionNotFoundException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResourceException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResponseException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidRouteException
      * @throws UnprocessableEntityException
      */
     public function create(Request $request)

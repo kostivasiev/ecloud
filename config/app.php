@@ -189,6 +189,7 @@ return [
         App\Providers\AccountsServiceProvider::class,
         App\Providers\BillingServiceProvider::class,
         App\Providers\V2\NsxServiceProvider::class,
+        App\Providers\V1\ResourceServiceProvider::class,
 
         /*
          * Application Service Providers...

@@ -7,11 +7,11 @@ use App\Encryption\RemoteKeyStore;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
-use UKFast\Api\Resource\Property\BooleanProperty;
-use UKFast\Api\Resource\Property\EncryptionProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\IntProperty;
-use UKFast\Api\Resource\Property\StringProperty;
+use App\Services\V1\Resource\Property\BooleanProperty;
+use App\Services\V1\Resource\Property\EncryptionProperty;
+use App\Services\V1\Resource\Property\IdProperty;
+use App\Services\V1\Resource\Property\IntProperty;
+use App\Services\V1\Resource\Property\StringProperty;
 
 /**
  * Creates Illuminate\Database\Eloquent\Model
