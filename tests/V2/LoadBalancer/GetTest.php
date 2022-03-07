@@ -10,7 +10,6 @@ use UKFast\Api\Auth\Consumer;
 class GetTest extends TestCase
 {
     use LoadBalancerMock;
-    protected $loadBalancer;
     protected $loadBalancerSpec;
 
     public function setUp(): void
