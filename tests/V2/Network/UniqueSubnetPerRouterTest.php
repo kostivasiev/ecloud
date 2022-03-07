@@ -2,11 +2,14 @@
 
 namespace Tests\V2\Network;
 
+use App\Events\V2\Task\Created as TaskCreated;
+use App\Events\V2\Sync\Created as SyncCreated;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Network;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Illuminate\Support\Facades\Event;
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -68,6 +71,7 @@ class UniqueSubnetPerRouterTest extends TestCase
 
     public function testSuccessfulCreation()
     {
+        Event::fake([TaskCreated::class]);
         $this->post(
             '/v2/networks',
             [
@@ -80,39 +84,35 @@ class UniqueSubnetPerRouterTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertStatus(202);
+        Event::assertDispatched(TaskCreated::class);
     }
 
     public function testPatchIsSuccessful()
     {
-        $response = $this->post(
-            '/v2/networks',
-            [
-                'name' => 'Manchester Network',
-                'router_id' => $this->router2->id,
-                'subnet' => '10.0.0.1/22'
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertStatus(202);
+        Event::fake([TaskCreated::class, SyncCreated::class]);
+        $response = $this->asAdmin()
+            ->post(
+                '/v2/networks',
+                [
+                    'name' => 'Manchester Network',
+                    'router_id' => $this->router2->id,
+                    'subnet' => '10.0.0.1/22'
+                ]
+            )->assertStatus(202);
 
         $networkId = (json_decode($response->getContent()))->data->id;
 
         // update the record using the same data. Before the fix the same subnet for the same
         // record would result in an overlapping subnet error.
-        $this->patch(
-            '/v2/networks/'.$networkId,
-            [
-                'name' => 'Updated Network',
-                'router_id' => $this->router2->id,
-                'subnet' => '10.0.0.1/22'
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertStatus(202);
+        $this->asAdmin()
+            ->patch(
+                '/v2/networks/' . $networkId,
+                [
+                    'name' => 'Updated Network',
+                    'router_id' => $this->router2->id,
+                    'subnet' => '10.0.0.1/22'
+                ]
+            )->assertStatus(202);
     }
 
 }
