@@ -87,7 +87,7 @@ client.test('Get Resource', function () {
 });
 %}
 
-### 7. Verify Appliance Resource
+### 7. Delete Appliance Resource
 DELETE https://{{host}}/v1/appliances/{{appliance_id}}
 Accept: */*
 Cache-Control: no-cache

@@ -112,8 +112,22 @@ client.test('Get Resource', function () {
 });
 %}
 
-### 7. Verify Appliance Version Resource
+### 7. Delete Appliance Version Resource
 DELETE https://{{host}}/v1/appliance-versions/{{appliance_version_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete resource', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 8. Delete Appliance Resource
+DELETE https://{{host}}/v1/appliances/{{appliance_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
