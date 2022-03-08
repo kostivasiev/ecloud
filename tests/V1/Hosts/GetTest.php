@@ -3,6 +3,7 @@
 namespace Tests\V1\Hosts;
 
 use App\Models\V1\Host;
+use App\Models\V1\HostSpecification;
 use App\Models\V1\Solution;
 use Tests\V1\TestCase;
 
@@ -19,10 +20,17 @@ class GetTest extends TestCase
      */
     public function testValidCollection()
     {
-        Solution::factory(1)->create();
+        $solution = Solution::factory()->create();
+        $specification = HostSpecification::factory()->create([
+            'ucs_specification_active' => 'Yes',
+        ]);
 
         $count = 2;
-        Host::factory($count)->create();
+        Host::factory($count)->create([
+            'ucs_node_ucs_reseller_id' => $solution->getKey(),
+            'ucs_node_status' => 'Active',
+            'ucs_node_specification_id' => $specification->getKey(),
+        ]);
 
         $this->get('/v1/hosts', [
             'X-consumer-custom-id' => '1-1',
