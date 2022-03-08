@@ -1,0 +1,127 @@
+###  1. Create Appliance
+POST https://{{host}}/v1/appliances
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name":  "Test Appliance",
+    "logo_uri": "https://laravel.com/img/logotype.min.svg",
+    "description": "Test Appliance Description",
+    "documentation_uri": "https://laravel.com/docs/9.x/database-testing",
+    "publisher": "Laravel",
+    "active": true,
+    "public": true
+}
+
+> {%
+client.test('Create Appliance', function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('appliance_id', response.body.data.id);
+%}
+
+### 2. Create Appliance Version
+POST https://{{host}}/v1/appliance-versions
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "appliance_id": "{{appliance_id}}",
+    "script_template": "template goes here",
+    "vm_template": "ubuntu20",
+    "description": "This is a test appliance version",
+    "os_license_id": 1,
+    "active": true,
+    "version": 2
+}
+
+> {%
+client.test('Create Appliance Version', function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('appliance_version_id', response.body.data.id);
+%}
+
+### 3. Get Appliance Version Collection
+GET https://{{host}}/v1/appliance-versions
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 4. Get Appliance Version Resource
+GET https://{{host}}/v1/appliance-versions/{{appliance_version_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 5. Update Appliance Version
+PATCH https://{{host}}/v1/appliance-versions/{{appliance_version_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "description": "This is an updated test appliance version"
+}
+
+> {%
+client.test('Update Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 6. Verify Appliance Version Resource
+GET https://{{host}}/v1/appliance-versions/{{appliance_version_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(
+            response.body.data.description === 'This is an updated test appliance version',
+            'Description does not match'
+    );
+});
+%}
+
+### 7. Verify Appliance Version Resource
+DELETE https://{{host}}/v1/appliance-versions/{{appliance_version_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete resource', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
