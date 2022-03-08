@@ -25,7 +25,7 @@ class HostFactory extends Factory
             'ucs_node_ucs_reseller_id' => 1,
             'ucs_node_datacentre_id' => 1,
             'ucs_node_specification_id' => 1,
-            'ucs_node_status' => 'Complete',
+            'ucs_node_status' => 'Completed',
             'ucs_node_location_id' => 1,
         ];
     }

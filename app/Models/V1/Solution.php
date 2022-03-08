@@ -538,9 +538,9 @@ class Solution extends Model implements Filterable, Sortable
                     $this->ucs_reseller_type
                 ]
             );
-
             //Load the solution datastores from VMWare
             $datastores = $kingpin->getDatastores($this->getKey());
+
         } catch (KingpinException $exception) {
             throw new \Exception('Failed to load solution datastores.');
         }
