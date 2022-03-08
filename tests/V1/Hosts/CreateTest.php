@@ -19,6 +19,7 @@ class CreateTest extends TestCase
                 'ucs_specification_id' => 1,
                 'ucs_specification_active' => 'Yes',
                 'ucs_specification_friendly_name' => '2 x Oct Core 2.7Ghz (E5-2680 v1) 128GB',
+                'ucs_specification_name' => '',
                 'ucs_specification_cpu_qty' => 2,
                 'ucs_specification_cpu_cores' => 8,
                 'ucs_specification_cpu_speed' => '2.7Ghz',
