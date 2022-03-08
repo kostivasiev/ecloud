@@ -41,4 +41,22 @@ abstract class TestCase extends BaseTestCase
             \App\Events\V1\DatastoreCreatedEvent::class,
         ]);
     }
+
+    public function addReseller()
+    {
+        \DB::table('ucs_reseller')
+            ->insert([
+                'ucs_reseller_id' => '1',
+                'ucs_reseller_reseller_id' => '1',
+                'ucs_reseller_active' => 'Yes',
+                'ucs_reseller_solution_name' => 'Single Site Solution',
+                'ucs_reseller_status' => 'Completed',
+                'ucs_reseller_start_date' => '0000-00-00 00:00:00',
+                'ucs_reseller_datacentre_id' => '5',
+                'ucs_reseller_encryption_enabled' => 'No',
+                'ucs_reseller_encryption_default' => 'Yes',
+                'ucs_reseller_encryption_billing_type' => 'PAYG'
+            ]);
+        return $this;
+    }
 }
