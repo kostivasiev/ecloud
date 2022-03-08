@@ -52,7 +52,7 @@ class DeleteTest extends TestCase
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
         $resource = Pod\Resource\Console::Create([
-            'token' => 123,
+            'token' => '',
             'url' => 123,
             'console_url' => 123,
         ]);
