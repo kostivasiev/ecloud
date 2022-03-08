@@ -2,15 +2,12 @@
 
 namespace Tests\V2\FirewallPolicy;
 
-use App\Events\V2\FirewallPolicy\Saved;
 use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Task;
 use App\Support\Sync;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
@@ -30,16 +27,16 @@ class CreateTest extends TestCase
             'sequence' => 10,
             'router_id' => $this->router()->id,
         ];
-        $this->post(
+        $post = $this->post(
             '/v2/firewall-policies',
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
-        $policyId = (json_decode($this->response->getContent()))->data->id;
+        $policyId = (json_decode($post->getContent()))->data->id;
         $firewallPolicy = FirewallPolicy::findOrFail($policyId);
         $this->assertEquals($firewallPolicy->name, $data['name']);
         $this->assertEquals($firewallPolicy->sequence, $data['sequence']);
@@ -75,12 +72,12 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified router id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }

@@ -1,11 +1,26 @@
 <?php
-
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories\V2;
 
 use App\Models\V2\OrchestratorConfig;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(OrchestratorConfig::class, function () {
-    $data = <<<EOM
+class OrchestratorConfigFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = OrchestratorConfig::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        $data = <<<EOM
             {
                 "vpcs": [
                     {
@@ -74,11 +89,10 @@ $factory->define(OrchestratorConfig::class, function () {
             }
 EOM;
 
-    return [
-        'reseller_id' => 1,
-        'employee_id' => 1,
-        'data' => $data
-    ];
-});
-
-
+        return [
+            'reseller_id' => 1,
+            'employee_id' => 1,
+            'data' => $data
+        ];
+    }
+}

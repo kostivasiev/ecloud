@@ -14,7 +14,7 @@ class RouterSeeder extends Seeder
      */
     public function run()
     {
-        factory(Router::class)->create([
+        Router::factory()->create([
             'id' => 'rtr-aaaaaaaa',
             'vpc_id' => 'vpc-aaaaaaaa',
             'availability_zone_id' => 'az-aaaaaaaa',

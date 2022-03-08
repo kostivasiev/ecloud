@@ -29,17 +29,17 @@ class AssociateIpTest extends TestCase
             [
                 'ip_address_id' => $ipAddress->id,
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The ip address id must be of type ' . IpAddress::TYPE_CLUSTER,
             'status' => 422,
             'source' => 'ip_address_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testIpNotSameNetworkAsNicFails()
     {
-        $network = factory(Network::class)->create([
+        $network = Network::factory()->create([
             'id' => 'net-test-2',
             'name' => 'Manchester Network',
             'subnet' => '10.0.0.0/24',
@@ -56,12 +56,12 @@ class AssociateIpTest extends TestCase
             [
                 'ip_address_id' => $ipAddress->id,
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The ip address id must be on the same network as the NIC',
             'status' => 422,
             'source' => 'ip_address_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testValidDataSucceeds()
@@ -78,7 +78,7 @@ class AssociateIpTest extends TestCase
             [
                 'ip_address_id' => $ipAddress->id,
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'associate_ip';

@@ -13,7 +13,7 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->discountPlan = factory(DiscountPlan::class)->create([
+        $this->discountPlan = DiscountPlan::factory()->create([
             'contact_id' => 1,
             'name' => 'test-commitment',
             'commitment_amount' => '2000',
@@ -44,7 +44,7 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->assertResponseStatus(200);
+        )->assertStatus(200);
 
         $endDate = date(
             'Y-m-d',
@@ -82,9 +82,9 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The term_end_date must be greater than the term_start_date',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }

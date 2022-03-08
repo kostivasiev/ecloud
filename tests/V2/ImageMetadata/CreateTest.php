@@ -25,15 +25,17 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/image-metadata', $data)
-           ->seeInDatabase(
-                'image_metadata',
-                $data,
-                'ecloud')
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
+
+        $this->assertDatabaseHas(
+            'image_metadata',
+            $data,
+            'ecloud'
+        );
     }
 
     public function testStoreNotAdminFails()
     {
-        $this->post('/v2/image-metadata', [])->assertResponseStatus(401);
+        $this->post('/v2/image-metadata', [])->assertStatus(401);
     }
 }

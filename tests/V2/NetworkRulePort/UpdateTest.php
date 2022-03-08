@@ -3,7 +3,6 @@
 namespace Tests\V2\NetworkRulePort;
 
 use App\Models\V2\NetworkRule;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -18,7 +17,7 @@ class UpdateTest extends TestCase
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        $this->networkRule = factory(NetworkRule::class)->make([
+        $this->networkRule = NetworkRule::factory()->make([
             'id' => 'nr-test-1',
             'name' => 'nr-test-1',
         ]);
@@ -43,7 +42,9 @@ class UpdateTest extends TestCase
         $this->patch('v2/network-rule-ports/nrp-test', [
             'source' => '3306',
             'destination' => '444',
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'network_rule_ports',
             [
                 'id' => 'nrp-test',
@@ -51,7 +52,7 @@ class UpdateTest extends TestCase
                 'destination' => '444',
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -64,6 +65,6 @@ class UpdateTest extends TestCase
         $this->patch('v2/network-rule-ports/nrp-test', [
             'source' => '3306',
             'destination' => '444',
-        ])->assertResponseStatus(403);
+        ])->assertStatus(403);
     }
 }

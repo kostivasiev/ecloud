@@ -4,7 +4,6 @@ namespace Tests\V2\LoadBalancerSpecification;
 
 use App\Models\V2\Image;
 use App\Models\V2\LoadBalancerSpecification;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
@@ -15,8 +14,8 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->image = factory(Image::class)->create();
-        $this->loadBalancerSpecification = factory(LoadBalancerSpecification::class)->create([
+        $this->image = Image::factory()->create();
+        $this->loadBalancerSpecification = LoadBalancerSpecification::factory()->create([
             "image_id" => $this->image->id
         ]);
     }
@@ -34,16 +33,18 @@ class UpdateTest extends TestCase
             "image_id" => $this->image->id
         ];
 
-        $this->patch('/v2/load-balancer-specs/' . $this->loadBalancerSpecification->id,
+        $this->patch(
+            '/v2/load-balancer-specs/' . $this->loadBalancerSpecification->id,
             $data,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read,ecloud.write',
             ]
-        )->seeInDatabase(
+        )->assertStatus(200);
+        $this->assertDatabaseHas(
             'load_balancer_specifications',
             $data,
             'ecloud'
-        )->assertResponseStatus(200);
+        );
     }
 }

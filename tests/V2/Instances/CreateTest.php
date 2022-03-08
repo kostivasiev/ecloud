@@ -44,32 +44,32 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'Specified vcpu cores is above the maximum of ' . config('instance.cpu_cores.max'),
                 'status' => 422,
                 'source' => 'ram_capacity'
             ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'Specified ram capacity is below the minimum of ' . config('instance.ram_capacity.min'),
                 'status' => 422,
                 'source' => 'ram_capacity'
             ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'Specified volume capacity is below the minimum of ' . config('volume.capacity.linux.min'),
                 'status' => 422,
                 'source' => 'volume_capacity'
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
 
         //dd($this->response->getContent());
     }
 
     public function testImageMetadataSpecRamMin()
     {
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'key' => 'ukfast.spec.ram.min',
             'value' => 2048,
             'image_id' => $this->image()->id
@@ -93,17 +93,17 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'Specified ram capacity is below the minimum of 2048',
                 'status' => 422,
                 'source' => 'ram_capacity'
-            ])->assertResponseStatus(422);
+            ])->assertStatus(422);
     }
 
     public function testImageMetadataSpecVolumeMin()
     {
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'key' => 'ukfast.spec.volume.min',
             'value' => 50,
             'image_id' => $this->image()->id
@@ -127,17 +127,17 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'Specified volume capacity is below the minimum of 50',
                 'status' => 422,
                 'source' => 'volume_capacity'
-            ])->assertResponseStatus(422);
+            ])->assertStatus(422);
     }
 
     public function testImageMetadataSpecVcpuMin()
     {
-        factory(ImageMetadata::class)->create([
+        ImageMetadata::factory()->create([
             'key' => 'ukfast.spec.cpu_cores.min',
             'value' => 2,
             'image_id' => $this->image()->id
@@ -161,12 +161,12 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'Specified vcpu cores is below the minimum of 2',
                 'status' => 422,
                 'source' => 'vcpu_cores'
-            ])->assertResponseStatus(422);
+            ])->assertStatus(422);
     }
 
     public function testMaxInstancePerVpcLimitReached()
@@ -191,12 +191,12 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The maximum number of 0 Instances per Vpc has been reached',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testMaxInstancePerCustomerLimitReached()
@@ -221,12 +221,12 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The maximum number of 0 Instances per Customer have been reached',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testVpcOrNetworkFailCausesFail()
@@ -270,23 +270,23 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified vpc id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified network id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testHostgroupWithNoHostsCausesFail()
     {
         $hostGroup = HostGroup::withoutEvents(function () {
-            return factory(HostGroup::class)->create([
+            return HostGroup::factory()->create([
                 'id' => 'hg-test',
                 'name' => 'hg-test',
                 'vpc_id' => $this->vpc()->id,
@@ -314,13 +314,13 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'There are no hosts assigned to the specified host group id',
                 'source' => 'host_group_id',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testAlreadyAssignedFloatingIpCausesFail()
@@ -346,25 +346,25 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The Floating IP is already assigned to a resource',
                 'source' => 'floating_ip_id',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testNetworkFromAnotherVpcCausesFail()
     {
         $secondVpc = Model::withoutEvents(function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-second',
                 'region_id' => $this->region()->id
             ]);
         });
         $secondRouter = Model::withoutEvents(function () use ($secondVpc) {
-            return factory(Router::class)->create([
+            return Router::factory()->create([
                 'id' => 'rtr-second',
                 'vpc_id' => $secondVpc->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -372,7 +372,7 @@ class CreateTest extends TestCase
             ]);
         });
         $secondNetwork = Model::withoutEvents(function () use ($secondRouter) {
-            return factory(Network::class)->create([
+            return Network::factory()->create([
                 'id' => 'net-second',
                 'name' => 'Manchester Network',
                 'subnet' => '10.0.0.0/24',
@@ -397,12 +397,12 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'Resources must be in the same Vpc'
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testOptionalSoftwareWrongPlatformFails()
@@ -426,12 +426,12 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/instances', $data)
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'Software platform does not match image platform',
                 'status' => 422,
                 'source' => 'software_ids.0'
-            ])->assertResponseStatus(422);
+            ])->assertStatus(422);
     }
 
     public function testOptionalSoftwareCorrectPlatformPasses()
@@ -454,6 +454,6 @@ class CreateTest extends TestCase
             ]
         ];
 
-        $this->post('/v2/instances', $data)->assertResponseStatus(202);
+        $this->post('/v2/instances', $data)->assertStatus(202);
     }
 }

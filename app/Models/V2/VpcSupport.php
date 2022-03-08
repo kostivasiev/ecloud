@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -14,7 +15,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class VpcSupport extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use HasFactory, CustomKey, SoftDeletes;
 
     protected $table = 'vpc_support';
     public $keyPrefix = 'sup';

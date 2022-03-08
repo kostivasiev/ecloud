@@ -5,7 +5,6 @@ namespace Tests\V2\Network;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeletionRulesTest extends TestCase
@@ -17,11 +16,11 @@ class DeletionRulesTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        Nic::withoutEvents(function() {
-            $this->nics = factory(Nic::class)->create([
+        Nic::withoutEvents(function () {
+            $this->nics = Nic::factory()->create([
                 'id' => 'nic-test',
                 'mac_address' => $this->faker->macAddress,
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
                 'ip_address' => $this->faker->ipv4,
             ]);
@@ -37,9 +36,9 @@ class DeletionRulesTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->nics->id,
-        ])->assertResponseStatus(412);
+        ])->assertStatus(412);
         $network = Network::withTrashed()->findOrFail($this->network()->id);
         $this->assertNull($network->deleted_at);
     }

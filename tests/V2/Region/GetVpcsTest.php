@@ -2,19 +2,12 @@
 
 namespace Tests\V2\Region;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetVpcsTest extends TestCase
 {
     protected \Faker\Generator $faker;
-    protected $regions;
-    protected $vpc;
 
     public function setUp(): void
     {
@@ -33,11 +26,11 @@ class GetVpcsTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id'        => $this->vpc()->id,
                 'name'      => $this->vpc()->name,
                 'region_id' => $this->vpc()->region_id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

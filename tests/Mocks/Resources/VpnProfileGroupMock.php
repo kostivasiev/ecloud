@@ -13,7 +13,7 @@ trait VpnProfileGroupMock
     {
         if (!$this->vpnProfileGroup) {
             Model::withoutEvents(function () use ($id) {
-                $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+                $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
                     'id' => $id,
                     'availability_zone_id' => $this->availabilityZone()->id
                 ]);

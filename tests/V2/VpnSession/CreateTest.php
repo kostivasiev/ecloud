@@ -24,23 +24,23 @@ class CreateTest extends TestCase
         parent::setUp();
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->vpnService = factory(VpnService::class)->create([
+        $this->vpnService = VpnService::factory()->create([
             'router_id' => $this->router()->id,
         ]);
 
-        $this->vpnEndpoint = factory(VpnEndpoint::class)->create([
+        $this->vpnEndpoint = VpnEndpoint::factory()->create([
             'name' => 'Create Test',
             'vpn_service_id' => $this->vpnService->id,
         ]);
         $this->floatingIp()->resource()->associate($this->vpnEndpoint);
         $this->floatingIp()->save();
 
-        $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+        $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'ike_profile_id' => 'ike-abc123xyz',
             'ipsec_profile_id' => 'ipsec-abc123xyz',
         ]);
-        $this->vpnSession = factory(VpnSession::class)->create(
+        $this->vpnSession = VpnSession::factory()->create(
             [
                 'vpn_profile_group_id' => $this->vpnProfileGroup->id,
                 'remote_ip' => '211.12.13.1',
@@ -66,7 +66,7 @@ class CreateTest extends TestCase
     public function testCreateResource()
     {
         Event::fake([Created::class]);
-        $vpnService = factory(VpnService::class)->create([
+        $vpnService = VpnService::factory()->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
         ]);
@@ -82,7 +82,7 @@ class CreateTest extends TestCase
                 'local_networks' => '10.0.0.1/32',
                 'remote_networks' => '172.12.23.11/32',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
         Event::assertDispatched(Created::class);
     }
 
@@ -99,17 +99,17 @@ class CreateTest extends TestCase
                 'local_networks' => '10.0.0.1/32',
                 'remote_networks' => '172.12.23.11/32',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Not found',
                 'detail' => 'No Vpn Session with that ID was found',
             ]
-        )->assertResponseStatus(404);
+        )->assertStatus(404);
     }
 
     public function testCreateResourceWithInvalidIps()
     {
-        $service = factory(VpnService::class)->create([
+        $service = VpnService::factory()->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
         ]);
@@ -125,21 +125,21 @@ class CreateTest extends TestCase
                 'remote_networks' => 'INVALID',
                 'local_networks' => 'INVALID',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The remote ip must be a valid IPv4 address',
             'source' => 'remote_ip',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'detail' => 'The remote networks must contain a valid comma separated list of CIDR subnets',
             'source' => 'remote_networks',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'detail' => 'The local networks must contain a valid comma separated list of CIDR subnets',
             'source' => 'local_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testCreateResourceWithMissingLocalNetworks()
     {
-        $service = factory(VpnService::class)->create([
+        $service = VpnService::factory()->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
         ]);
@@ -154,20 +154,20 @@ class CreateTest extends TestCase
                 'remote_ip' => '211.12.13.1',
                 'remote_networks' => '172.12.23.11/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The local networks field is required',
             'source' => 'local_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testCreateResourceWithMissingRemoteNetworks()
     {
-        $service = factory(VpnService::class)->create([
+        $service = VpnService::factory()->create([
             'name' => 'test-service',
             'router_id' => $this->router()->id,
         ]);
 
-        $this->post(
+        $response = $this->post(
             '/v2/vpn-sessions',
             [
                 'name' => 'vpn session test',
@@ -177,10 +177,10 @@ class CreateTest extends TestCase
                 'remote_ip' => '211.12.13.1',
                 'local_networks' => '172.12.23.11/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'The remote networks field is required',
             'source' => 'remote_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testCreateWithMaxLocalNetworksFails()
@@ -198,10 +198,10 @@ class CreateTest extends TestCase
                 'local_networks' => '10.0.0.1/32,10.0.0.2/32,10.0.0.3/32',
                 'remote_networks' => '172.12.23.11/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'local networks must contain less than 2 comma-seperated items',
             'source' => 'local_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testCreateWithMaxRemoteNetworksFails()
@@ -219,9 +219,9 @@ class CreateTest extends TestCase
                 'local_networks' => '10.0.0.1/32',
                 'remote_networks' => '172.12.23.11/32,72.12.23.12/32,72.12.23.13/32',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'detail' => 'remote networks must contain less than 2 comma-seperated items',
             'source' => 'remote_networks',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }

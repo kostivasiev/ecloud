@@ -17,7 +17,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Software extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, DefaultName, HasFactory;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName, HasFactory;
 
     public $keyPrefix = 'soft';
 

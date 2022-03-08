@@ -11,16 +11,10 @@ class CreateTest extends TestCase
 {
     protected $faker;
 
-    protected $region;
-
     public function setUp(): void
     {
         parent::setUp();
         $this->faker = Faker::create();
-
-        $this->region = factory(Region::class)->create([
-            'name' => 'Manchester',
-        ]);
     }
 
     public function testNoPermsIsDenied()
@@ -33,12 +27,12 @@ class CreateTest extends TestCase
             $data,
             []
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ])
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 
     public function testNullNameIsFailed()
@@ -55,13 +49,13 @@ class CreateTest extends TestCase
                 'X-Reseller-Id' => 1,
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The name field is required',
                 'status' => 422,
                 'source' => 'name'
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testNotAdminFails()
@@ -77,12 +71,12 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ])
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 
     public function testValidDataSucceeds()
@@ -99,11 +93,7 @@ class CreateTest extends TestCase
                 'X-Reseller-Id' => 1
             ]
         )
-            ->seeInDatabase(
-                'regions',
-                $data,
-                'ecloud'
-            )
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
+        $this->assertDatabaseHas('regions', $data, 'ecloud');
     }
 }

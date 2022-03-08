@@ -1,11 +1,28 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories\V2;
 
 use App\Models\V2\FloatingIp;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(FloatingIp::class, function () {
-    return [
-        'ip_address' => '1.1.1.1'
-    ];
-});
+class FloatingIpFactory extends Factory
+{
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = FloatingIp::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition(): array
+    {
+        return [
+            'ip_address' => '1.1.1.1'
+        ];
+    }
+}

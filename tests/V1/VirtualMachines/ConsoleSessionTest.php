@@ -11,7 +11,8 @@ class ConsoleSessionTest extends TestCase
 {
     public function testValidRequest()
     {
-        return $this->markTestSkipped('WIP');
+        //TODO: check
+        $this->markTestSkipped('WIP');
 
         app()->bind('App\Services\Kingpin\V1\KingpinService', function ($k) {
 
@@ -31,8 +32,6 @@ class ConsoleSessionTest extends TestCase
         $this->get('/v1/vms/999/console-session', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 }

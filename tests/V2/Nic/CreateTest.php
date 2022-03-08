@@ -30,65 +30,63 @@ class CreateTest extends TestCase
             [
                 'name' => 'test-nic',
                 'mac_address' => $macAddress,
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
             ]
-        )
-            ->seeInDatabase(
-                'nics',
-                [
-                    'name' => 'test-nic',
-                    'mac_address' => $macAddress,
-                    'instance_id' => $this->instance()->id,
-                    'network_id'  => $this->network()->id,
-                ],
-                'ecloud'
-            )
-            ->assertResponseStatus(202);
+        )->assertStatus(202);
+
+        $this->assertDatabaseHas(
+            'nics',
+            [
+                'name' => 'test-nic',
+                'mac_address' => $macAddress,
+                'instance_id' => $this->instanceModel()->id,
+                'network_id' => $this->network()->id,
+            ],
+            'ecloud'
+        );
 
         Event::assertDispatched(Created::class);
     }
 
     public function testInvalidMacAddressFails()
     {
-        $this->post('/v2/nics', [
+        $this->post(
+            '/v2/nics',
+            [
                 'mac_address' => 'INVALID_MAC_ADDRESS',
             ]
-        )
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The mac address must be a valid MAC address',
-                'status' => 422,
-            ])
-            ->assertResponseStatus(422);
+        )->assertJsonFragment([
+            'title' => 'Validation Error',
+            'detail' => 'The mac address must be a valid MAC address',
+            'status' => 422,
+            ])->assertStatus(422);
     }
 
     public function testInvalidInstanceIdFails()
     {
         $this->post('/v2/nics', [
                 'instance_id' => 'INVALID_INSTANCE_ID',
-            ]
-        )
-            ->seeJson([
+            ])
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The instance id is not a valid Instance',
                 'status' => 422,
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testInvalidNetworkIdFails()
     {
         $this->post('/v2/nics', [
                 'network_id' => 'INVALID_NETWORK_ID',
-            ]
-        )
-            ->seeJson([
+            ])
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The network id is not a valid Network',
                 'status' => 422,
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testFailedInstanceOrNetworkCausesFailure()
@@ -101,7 +99,7 @@ class CreateTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $model->resource()->associate($this->instance());
+            $model->resource()->associate($this->instanceModel());
             $model->save();
             $model = new Task([
                 'id' => 'sync-test-2',
@@ -115,15 +113,15 @@ class CreateTest extends TestCase
 
         $this->post('/v2/nics', [
                 'mac_address' => $this->faker->macAddress,
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.0.0.6'
-            ])->seeJson([
+            ])->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The specified instance id resource currently has the status of \'failed\' and cannot be used',
-            ])->seeJson([
+            ])->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The specified network id resource currently has the status of \'failed\' and cannot be used',
-            ])->assertResponseStatus(422);
+            ])->assertStatus(422);
     }
 }

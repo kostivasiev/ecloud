@@ -3,7 +3,6 @@
 namespace Tests\V2\Region;
 
 use App\Models\V2\Region;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase
@@ -11,39 +10,39 @@ class GetTest extends TestCase
     public function testGetCollectionAsAdmin()
     {
         // Region only visible to admins
-        factory(Region::class)->create();
+        Region::factory()->create();
 
         $this->region()->is_public = true;
         $this->region()->save();
 
-        $this->get('/v2/regions', [
+        $response = $this->get('/v2/regions', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->region()->id,
             'name' => $this->region()->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
 
-        $this->assertCount(2, $this->response->original);
+        $this->assertCount(2, $response->original);
     }
 
     public function testGetCollectionAsNonAdmin()
     {
         // Region only visible to admins
-        factory(Region::class)->create();
+        Region::factory()->create();
 
         $this->region()->is_public = true;
         $this->region()->save();
 
-        $this->get('/v2/regions', [
+        $response = $this->get('/v2/regions', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->region()->id,
             'name' => $this->region()->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
 
-        $this->assertCount(1, $this->response->original);
+        $this->assertCount(1, $response->original);
     }
 
     public function testGetPublicRegionAsAdmin()
@@ -54,10 +53,10 @@ class GetTest extends TestCase
         $this->get('/v2/regions/' . $this->region()->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->region()->id,
             'name' => $this->region()->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetPublicRegionAsNonAdmin()
@@ -68,10 +67,10 @@ class GetTest extends TestCase
         $this->get('/v2/regions/' . $this->region()->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->region()->id,
             'name' => $this->region()->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetPrivateRegionAsAdmin()
@@ -82,10 +81,10 @@ class GetTest extends TestCase
         $this->get('/v2/regions/' . $this->region()->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->region()->id,
             'name' => $this->region()->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetPrivateRegionAsNonAdmin()
@@ -96,7 +95,7 @@ class GetTest extends TestCase
         $this->get('/v2/regions/' . $this->region()->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testGetPublicRegionAvailabilityZonesAsNonAdmin()
@@ -109,10 +108,10 @@ class GetTest extends TestCase
         $this->get('/v2/regions/' . $this->region()->id . '/availability-zones', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $availabilityZones->first()->id,
             'name' => $availabilityZones->first()->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetPublicRegionAvailabilityZonesAsAdmin()
@@ -125,9 +124,9 @@ class GetTest extends TestCase
         $this->get('/v2/regions/' . $this->region()->id . '/availability-zones', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $availabilityZones->first()->id,
             'name' => $availabilityZones->first()->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }

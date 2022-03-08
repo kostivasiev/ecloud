@@ -25,8 +25,13 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/floating-ips', $data)
-            ->seeInDatabase('floating_ips', $data, 'ecloud')
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
+
+        $this->assertDatabaseHas(
+            'floating_ips',
+            $data,
+            'ecloud'
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == Sync::TASK_NAME_UPDATE;
@@ -35,6 +40,7 @@ class CreateTest extends TestCase
 
     public function testInvalidAzIsFailed()
     {
+        //TODO: Fix this test
         $this->markTestSkipped();
         $this->vpc()->setAttribute('region_id', 'test-fail')->saveQuietly();
 
@@ -48,6 +54,6 @@ class CreateTest extends TestCase
             'detail' => 'The specified availability zone is not available to that VPC',
             'status' => 404,
             'source' => 'availability_zone_id'
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 }

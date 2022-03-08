@@ -6,6 +6,7 @@ use App\Support\Resource;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
@@ -22,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class OrchestratorBuild extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, Syncable, Taskable;
 
     public string $keyPrefix = 'obuild';
 

@@ -32,11 +32,11 @@ class GetTest extends TestCase
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
             });
 
-        $this->firewallRule = factory(FirewallRule::class)->create([
+        $this->firewallRule = FirewallRule::factory()->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
 
-        $this->firewallRulePort = factory(FirewallRulePort::class)->create([
+        $this->firewallRulePort = FirewallRulePort::factory()->create([
             'firewall_rule_id' => $this->firewallRule->id,
         ]);
     }
@@ -49,19 +49,17 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'firewall_policy_id' => $this->firewallPolicy()->id,
-                'source' => $this->firewallRule->source,
-                'destination' => $this->firewallRule->destination,
-                'action' => $this->firewallRule->action,
-                'direction' => $this->firewallRule->direction,
-                'enabled' => $this->firewallRule->enabled,
-                'id' => $this->firewallRule->id,
-                'name' => $this->firewallRule->name,
-                'sequence' => (string)$this->firewallRule->sequence,
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'firewall_policy_id' => $this->firewallPolicy()->id,
+            'source' => $this->firewallRule->source,
+            'destination' => $this->firewallRule->destination,
+            'action' => $this->firewallRule->action,
+            'direction' => $this->firewallRule->direction,
+            'enabled' => $this->firewallRule->enabled,
+            'id' => $this->firewallRule->id,
+            'name' => $this->firewallRule->name,
+            'sequence' => $this->firewallRule->sequence,
+        ])->assertStatus(200);
     }
 
     public function testGetItemDetail()
@@ -72,13 +70,11 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
+        )->assertJsonFragment([
                 'id' => $this->firewallRule->id,
                 'name' => $this->firewallRule->name,
-                'sequence' => (string)$this->firewallRule->sequence,
-            ])
-            ->assertResponseStatus(200);
+                'sequence' => $this->firewallRule->sequence,
+        ])->assertStatus(200);
     }
 
     public function testGetPortsCollection()
@@ -89,14 +85,12 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '1-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'firewall_rule_id' => $this->firewallRule->id,
-                'protocol' => 'TCP',
-                'source' => '443',
-                'destination' => '555'
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'firewall_rule_id' => $this->firewallRule->id,
+            'protocol' => 'TCP',
+            'source' => '443',
+            'destination' => '555'
+        ])->assertStatus(200);
     }
 
     public function testGetHiddenNotAdminFails()
@@ -106,7 +100,7 @@ class GetTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         $this->get('/v2/firewall-rules/' . $this->firewallRule->id)
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testGetHiddenAdminPasses()
@@ -115,6 +109,6 @@ class GetTest extends TestCase
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        $this->get('/v2/firewall-rules/' . $this->firewallRule->id)->assertResponseStatus(200);
+        $this->get('/v2/firewall-rules/' . $this->firewallRule->id)->assertStatus(200);
     }
 }

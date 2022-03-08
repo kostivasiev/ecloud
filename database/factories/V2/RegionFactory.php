@@ -1,11 +1,29 @@
 <?php
-
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories\V2;
 
 use App\Models\V2\Region;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(Region::class, function () {
-    return [
-        'name' => 'United Kingdom'
-    ];
-});
+class RegionFactory extends Factory
+{
+    protected $connection = 'ecloud';
+
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Region::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name' => 'United Kingdom'
+        ];
+    }
+}

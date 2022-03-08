@@ -3,7 +3,6 @@
 namespace Tests\V2\RouterThroughput;
 
 use App\Models\V2\RouterThroughput;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase
@@ -13,7 +12,7 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->routerThroughput = factory(RouterThroughput::class)->create([
+        $this->routerThroughput = RouterThroughput::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
     }
@@ -24,13 +23,13 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->routerThroughput->id,
                 'name' => $this->routerThroughput->name,
                 'availability_zone_id' => $this->routerThroughput->availability_zone_id,
                 "committed_bandwidth" => $this->routerThroughput->committed_bandwidth,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetItemDetail()
@@ -39,12 +38,12 @@ class GetTest extends TestCase
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read, ecloud.write',
         ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->routerThroughput->id,
                 'name' => $this->routerThroughput->name,
                 'availability_zone_id' => $this->routerThroughput->availability_zone_id,
                 "committed_bandwidth" => $this->routerThroughput->committed_bandwidth,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

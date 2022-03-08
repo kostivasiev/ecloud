@@ -29,23 +29,25 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/image-parameters', $data)
-           ->seeInDatabase(
-                'image_parameters',
-                [
-                    'name' => 'Test Image Parameter',
-                    'image_id' => $this->image()->id,
-                    'key' => 'Username',
-                    'type' => 'String',
-                    'description' => 'Lorem ipsum',
-                    'required' => true,
-                    'validation_rule' => '/\w+/',
-                ],
-                'ecloud')
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
+
+        $this->assertDatabaseHas(
+            'image_parameters',
+            [
+                'name' => 'Test Image Parameter',
+                'image_id' => $this->image()->id,
+                'key' => 'Username',
+                'type' => 'String',
+                'description' => 'Lorem ipsum',
+                'required' => true,
+                'validation_rule' => '/\w+/',
+            ],
+            'ecloud'
+        );
     }
 
     public function testStoreNotAdminFails()
     {
-        $this->post('/v2/images', [])->assertResponseStatus(401);
+        $this->post('/v2/images', [])->assertStatus(401);
     }
 }

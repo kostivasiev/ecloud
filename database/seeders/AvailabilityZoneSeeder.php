@@ -16,7 +16,7 @@ class AvailabilityZoneSeeder extends Seeder
      */
     public function run()
     {
-        factory(AvailabilityZone::class)->create([
+        AvailabilityZone::factory()->create([
             'id' => 'az-aaaaaaaa',
             'code' => 'MAN1',
             'name' => 'Dev Availability Zone',
@@ -30,7 +30,7 @@ class AvailabilityZoneSeeder extends Seeder
         /**
          * Credentials
          */
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'id' => 'cred-kingpin',
             'name' => 'Kingpin (G0)',
             'resource_id'=> 'az-aaaaaaaa',
@@ -41,7 +41,7 @@ class AvailabilityZoneSeeder extends Seeder
             'is_hidden'=> false,
         ]);
 
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'id' => 'cred-nsx',
             'name' => 'NSX',
             'resource_id'=> 'az-aaaaaaaa',
@@ -52,7 +52,7 @@ class AvailabilityZoneSeeder extends Seeder
             'is_hidden'=> false,
         ]);
 
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'id' => 'cred-conjurer',
             'name' => 'Conjurer API',
             'resource_id'=> 'az-aaaaaaaa',
@@ -63,7 +63,7 @@ class AvailabilityZoneSeeder extends Seeder
             'is_hidden'=> false,
         ]);
 
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'id' => 'cred-3par',
             'name' => '3PAR',
             'resource_id'=> 'az-aaaaaaaa',
@@ -74,7 +74,7 @@ class AvailabilityZoneSeeder extends Seeder
             'is_hidden'=> false,
         ]);
 
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'id' => 'cred-artisan',
             'name' => 'Artisan API',
             'resource_id'=> 'az-aaaaaaaa',
@@ -85,7 +85,7 @@ class AvailabilityZoneSeeder extends Seeder
             'is_hidden'=> false,
         ]);
 
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'id' => 'cred-ucs',
             'name' => 'UCS API',
             'resource_id'=> 'az-aaaaaaaa',
@@ -96,7 +96,7 @@ class AvailabilityZoneSeeder extends Seeder
             'is_hidden'=> false,
         ]);
 
-        factory(Credential::class)->create([
+        Credential::factory()->create([
             'id' => 'cred-envoy',
             'name' => 'Envoy',
             'resource_id'=> 'az-aaaaaaaa',
@@ -110,7 +110,7 @@ class AvailabilityZoneSeeder extends Seeder
         /**
          * Capacity Alerting
          */
-        factory(AvailabilityZoneCapacity::class)->create([
+        AvailabilityZoneCapacity::factory()->create([
             'id' => 'azc-aaaaaaaa',
             'availability_zone_id' => 'az-aaaaaaaa',
             'type' => 'floating_ip',

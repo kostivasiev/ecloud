@@ -6,6 +6,7 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -21,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class RouterThroughput extends Model implements Filterable, Sortable, AvailabilityZoneable
 {
-    use CustomKey, SoftDeletes, DefaultName, DeletionRules;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
     public string $keyPrefix = 'rtp';
 

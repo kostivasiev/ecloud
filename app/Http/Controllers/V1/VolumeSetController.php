@@ -16,8 +16,8 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\Api\Exceptions\UnprocessableEntityException;
-use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\Api\Resource\Traits\ResponseHelper;
+use App\Services\V1\Resource\Traits\RequestHelper;
+use App\Services\V1\Resource\Traits\ResponseHelper;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class VolumeSetController extends BaseController
@@ -71,9 +71,9 @@ class VolumeSetController extends BaseController
      * @throws \App\Exceptions\V1\SiteNotFoundException
      * @throws \App\Exceptions\V1\SolutionNotFoundException
      * @throws \Illuminate\Validation\ValidationException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResourceException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResponseException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidRouteException
      */
     public function create(Request $request)
     {

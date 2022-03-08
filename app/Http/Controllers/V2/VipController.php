@@ -9,6 +9,7 @@ use App\Models\V2\Vip;
 use App\Resources\V2\VipResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use UKFast\Api\Exceptions\NotFoundException;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -52,7 +53,10 @@ class VipController extends BaseController
     public function create(Create $request)
     {
         $loadBalancer = LoadBalancer::forUser(Auth::user())->findOrFail($request->input('load_balancer_id'));
-        $loadBalancerNetwork = $loadBalancer->loadBalancerNetworks->firstOrFail();
+        $loadBalancerNetwork = $loadBalancer->loadBalancerNetworks->first();
+        if (!$loadBalancerNetwork) {
+            throw new NotFoundException('Loadbalancer Network Not Found');
+        }
         $vip = new Vip([
             'name' => $request->input('name'),
             'load_balancer_network_id' => $loadBalancerNetwork->id

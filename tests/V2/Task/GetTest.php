@@ -5,7 +5,6 @@ namespace Tests\V2\Task;
 use App\Events\V2\Task\Created;
 use App\Models\V2\Region;
 use App\Models\V2\Task;
-use App\Support\Sync;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -45,13 +44,13 @@ class GetTest extends TestCase
         $this->get('/v2/tasks', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->task1->id,
             'name' => $this->task1->name,
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->task2->id,
             'name' => $this->task2->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testRetrievesAllTasksAsAdmin()
@@ -59,13 +58,13 @@ class GetTest extends TestCase
         $this->get('/v2/tasks', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->task1->id,
             'name' => $this->task1->name,
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->task2->id,
             'name' => $this->task2->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetNonOwnedTaskFails()
@@ -73,10 +72,10 @@ class GetTest extends TestCase
         $this->get('/v2/tasks/' . $this->task2->id, [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->dontSeeJson([
+        ])->assertJsonMissing([
             'id' => $this->task2->id,
             'name' => $this->task2->name,
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     public function testGetOwnedTaskSucceeds()
@@ -84,9 +83,9 @@ class GetTest extends TestCase
         $this->get('/v2/tasks/' . $this->task1->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->task1->id,
             'name' => $this->task1->name,
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }

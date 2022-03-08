@@ -3,13 +3,11 @@
 namespace App\Models\V2;
 
 use App\Events\V2\HostGroup\Deleted;
-use App\Events\V2\HostGroup\Deleting;
-use App\Events\V2\HostGroup\Saved;
-use App\Events\V2\HostGroup\Saving;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -25,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
 {
-    use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
     public string $keyPrefix = 'hg';
 

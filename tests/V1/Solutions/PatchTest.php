@@ -23,26 +23,26 @@ class PatchTest extends TestCase
     {
         $testString = 'phpUnit test string';
 
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123,
         ]);
 
 
-        $this->missingFromDatabase('ucs_reseller', [
+        $this->assertDatabaseMissing('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_solution_name' => $testString,
         ]);
 
 
-        $this->json('PATCH', '/v1/solutions/123', [
+        $this->patchJson('/v1/solutions/123', [
             'name' => $testString,
         ], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
+        ])->assertStatus(204);
 
 
-        $this->assertResponseStatus(204) && $this->seeInDatabase('ucs_reseller', [
+        $this->assertDatabaseHas('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_solution_name' => $testString,
         ]);
@@ -52,18 +52,18 @@ class PatchTest extends TestCase
     {
         $testString = 'phpUnit test string';
 
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123,
         ]);
 
-        factory(Tag::class, 1)->create([
+        Tag::factory()->create([
             'metadata_resource' => 'ucs_reseller',
             'metadata_resource_id' => 123,
             'metadata_key' => 'test',
         ]);
 
 
-        $this->missingFromDatabase('metadata', [
+        $this->assertDatabaseMissing('metadata', [
             'metadata_resource' => 'ucs_reseller',
             'metadata_resource_id' => 123,
             'metadata_key' => 'test',
@@ -71,15 +71,15 @@ class PatchTest extends TestCase
         ]);
 
 
-        $this->json('PATCH', '/v1/solutions/123/tags/test', [
+        $this->patchJson('/v1/solutions/123/tags/test', [
             'value' => $testString,
         ], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
+        ])->assertStatus(200);
 
 
-        $this->assertResponseStatus(200) && $this->seeInDatabase('metadata', [
+        $this->assertDatabaseHas('metadata', [
             'metadata_resource' => 'ucs_reseller',
             'metadata_resource_id' => 123,
             'metadata_key' => 'test',
@@ -90,32 +90,30 @@ class PatchTest extends TestCase
     public function testEnableEncryption()
     {
         Event::fake();
-        $solution = factory(Solution::class, 1)->create([
+        $solution = Solution::factory()->create([
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_enabled' => 'No'
         ]);
 
-        $this->missingFromDatabase('ucs_reseller', [
+        $this->assertDatabaseMissing('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_enabled' => 'Yes',
         ]);
 
 
-        $res = $this->json('PATCH', '/v1/solutions/123', [
+        $res = $this->patchJson('/v1/solutions/123', [
             'encryption_enabled' => true,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
+        ])->assertStatus(204);
 
 
         Event::assertDispatched(EncryptionEnabledOnSolutionEvent::class, function ($e) use ($solution) {
             return $e->solution->ucs_reseller_id === $solution->first()->ucs_reseller_id;
         });
 
-        $this->assertResponseStatus(204);
-
-        $this->seeInDatabase('ucs_reseller', [
+        $this->assertDatabaseHas('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_enabled' => 'Yes'
         ]);
@@ -123,29 +121,27 @@ class PatchTest extends TestCase
 
     public function testEnableEncryptionUnauthorised()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123
         ]);
 
-        $this->missingFromDatabase('ucs_reseller', [
+        $this->assertDatabaseMissing('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_enabled' => 'Yes',
         ]);
 
 
-        $this->json('PATCH', '/v1/solutions/123', [
+        $this->patchJson('/v1/solutions/123', [
             'encryption_billing_type' => 'Contract',
         ], [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
-
-        $this->assertResponseStatus(204);
+        ])->assertStatus(204);
 
         /**
          * Should not have been updated due to whitelist
          */
-        $this->missingFromDatabase('ucs_reseller', [
+        $this->assertDatabaseMissing('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_enabled' => 'Yes',
         ]);
@@ -153,27 +149,25 @@ class PatchTest extends TestCase
 
     public function testSetEncryptionDefault()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_default' => 'No'
         ]);
 
-        $this->missingFromDatabase('ucs_reseller', [
+        $this->assertDatabaseMissing('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_default' => 'Yes',
         ]);
 
 
-        $this->json('PATCH', '/v1/solutions/123', [
+        $this->patchJson('/v1/solutions/123', [
             'encryption_default' => true,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
+        ])->assertStatus(204);
 
-        $this->assertResponseStatus(204);
-
-        $this->seeInDatabase('ucs_reseller', [
+        $this->assertDatabaseHas('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_default' => 'Yes'
         ]);
@@ -181,26 +175,24 @@ class PatchTest extends TestCase
 
     public function testSetEncryptionBillingType()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123
         ]);
 
-        $this->missingFromDatabase('ucs_reseller', [
+        $this->assertDatabaseMissing('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_default' => 'Contract',
         ]);
 
 
-        $this->json('PATCH', '/v1/solutions/123', [
+        $this->patchJson('/v1/solutions/123', [
             'encryption_billing_type' => 'Contract',
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
+        ])->assertStatus(204);
 
-        $this->assertResponseStatus(204);
-
-        $this->seeInDatabase('ucs_reseller', [
+        $this->assertDatabaseHas('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_billing_type' => 'Contract'
         ]);
@@ -208,29 +200,27 @@ class PatchTest extends TestCase
 
     public function testSetEncryptionBillingTypeUnauthorised()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123
         ]);
 
-        $this->missingFromDatabase('ucs_reseller', [
+        $this->assertDatabaseMissing('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_default' => 'Contract',
         ]);
 
 
-        $this->json('PATCH', '/v1/solutions/123', [
+        $this->patchJson('/v1/solutions/123', [
             'encryption_billing_type' => 'Contract',
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
-
-        $this->assertResponseStatus(204);
+        ])->assertStatus(204);
 
         /**
          * Should not have been updated due to whitelist
          */
-        $this->missingFromDatabase('ucs_reseller', [
+        $this->assertDatabaseMissing('ucs_reseller', [
             'ucs_reseller_id' => 123,
             'ucs_reseller_encryption_default' => 'Contract',
         ]);
@@ -238,17 +228,15 @@ class PatchTest extends TestCase
 
     public function testSetEncryptionBillingTypeUnknown()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123
         ]);
 
-        $this->json('PATCH', '/v1/solutions/123', [
+        $this->patchJson('/v1/solutions/123', [
             'encryption_billing_type' => 'RANDOM STRING',
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ]);
-
-        $this->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }

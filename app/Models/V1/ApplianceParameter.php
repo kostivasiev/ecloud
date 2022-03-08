@@ -7,12 +7,13 @@ use App\Rules\V1\IsValidUuid;
 use App\Rules\V1\IsValidValidationRule;
 use App\Traits\V1\ColumnPrefixHelper;
 use App\Traits\V1\UUIDHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\Api\Resource\Property\BooleanProperty;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\StringProperty;
+use App\Services\V1\Resource\Property\BooleanProperty;
+use App\Services\V1\Resource\Property\DateTimeProperty;
+use App\Services\V1\Resource\Property\IdProperty;
+use App\Services\V1\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -23,6 +24,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class ApplianceParameter extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     // Table columns have table name prefixes
     use ColumnPrefixHelper;
 
@@ -258,7 +261,7 @@ class ApplianceParameter extends Model implements Filterable, Sortable
      * Map request property to database field
      *
      * @return array
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidPropertyException
      */
     public function properties()
     {

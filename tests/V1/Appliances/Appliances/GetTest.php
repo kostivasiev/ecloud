@@ -3,6 +3,7 @@
 namespace Tests\V1\Appliances\Appliances;
 
 use App\Models\V1\Appliance;
+use App\Models\V1\Appliance\Version\Data;
 use App\Models\V1\AppliancePodAvailability;
 use App\Models\V1\ApplianceVersion;
 use App\Models\V1\Pod;
@@ -23,11 +24,10 @@ class GetTest extends ApplianceTestCase
      */
     public function testValidCollection()
     {
-        $this->get('/v1/appliances', $this->validReadHeaders);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
+        $this->get('/v1/appliances', $this->validReadHeaders)
+            ->assertJsonFragment([
             'total' => count($this->appliances),
-        ]);
+        ])->assertStatus(200);
     }
 
     /**
@@ -37,9 +37,7 @@ class GetTest extends ApplianceTestCase
     {
         $uuid = $this->appliances->first()->uuid;
 
-        $this->get('/v1/appliances/' . $uuid, $this->validReadHeaders);
-
-        $this->assertResponseStatus(200);
+        $this->get('/v1/appliances/' . $uuid, $this->validReadHeaders)->assertStatus(200);
     }
 
     /**
@@ -48,9 +46,7 @@ class GetTest extends ApplianceTestCase
      */
     public function testInvalidItem()
     {
-        $this->get('/v1/appliances/' . Uuid::uuid4()->toString(), $this->validReadHeaders);
-
-        $this->assertResponseStatus(404);
+        $this->get('/v1/appliances/' . Uuid::uuid4()->toString(), $this->validReadHeaders)->assertStatus(404);
     }
 
     /**
@@ -58,9 +54,7 @@ class GetTest extends ApplianceTestCase
      */
     public function testInvalidUuid()
     {
-        $this->get('/v1/appliances/abc', $this->validReadHeaders);
-
-        $this->assertResponseStatus(422);
+        $this->get('/v1/appliances/abc', $this->validReadHeaders)->assertStatus(422);
     }
 
     /**
@@ -72,8 +66,8 @@ class GetTest extends ApplianceTestCase
         $parameters = $appliance->getLatestVersion()->parameters;
 
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/parameters', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $parameters[0]->uuid,
                 'version_id' => $parameters[0]->appliance_version_uuid,
                 'name' => $parameters[0]->name,
@@ -95,8 +89,8 @@ class GetTest extends ApplianceTestCase
         $version = $appliance->versions[0];
 
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/versions', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $version->uuid,
                 'appliance_id' => $version->appliance_uuid,
                 'version' => (int)$version->version,
@@ -116,8 +110,8 @@ class GetTest extends ApplianceTestCase
         $version = $appliance->getLatestVersion();
 
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/version', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+            ->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $version->uuid,
                 'appliance_id' => $version->appliance_uuid,
                 'version' => (int)$version->version,
@@ -134,7 +128,7 @@ class GetTest extends ApplianceTestCase
     {
         $appliance = $this->appliances[0];
 
-        $pod = factory(Pod::class, 1)->create();
+        $pod = Pod::factory()->create();
 
         $appliancePodAvailability = new AppliancePodAvailability();
         $appliancePodAvailability->appliance_id = $appliance->appliance_id;
@@ -142,20 +136,20 @@ class GetTest extends ApplianceTestCase
         $appliancePodAvailability->save();
 
         $this->json('GET', '/v1/appliances/' . $appliance->uuid . '/pods', [], $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
-                'id' => $pod[0]->getKey()
+            ->assertStatus(200)
+            ->assertJsonFragment([
+                'id' => $pod->getKey()
             ]);
     }
 
     public function testApplianceData()
     {
-        $appliance = factory(Appliance::class)->create();
-        $applianceVersion = factory(ApplianceVersion::class)->create([
+        $appliance = Appliance::factory()->create();
+        $applianceVersion = ApplianceVersion::factory()->create([
             'appliance_uuid' => $appliance->appliance_uuid,
             'appliance_version_version' => 1,
         ]);
-        $applianceVersionData = factory(Appliance\Version\Data::class)->create([
+        $applianceVersionData = Data::factory()->create([
             'appliance_version_uuid' => $applianceVersion->appliance_version_uuid,
             'key' => 'key_value',
             'value' => 'value_value',
@@ -166,7 +160,7 @@ class GetTest extends ApplianceTestCase
             '/v1/appliances/' . $appliance->uuid . '/data',
             [],
             DataTest::HEADERS_ADMIN
-        )->seeStatusCode(Response::HTTP_OK)->seeJson([
+        )->assertStatus(Response::HTTP_OK)->assertJsonFragment([
             'data' => [
                 [
                     'key' => $applianceVersionData->key,

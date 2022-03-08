@@ -11,18 +11,18 @@ use Illuminate\Database\Eloquent\Model;
 
 trait LoadBalancerMock
 {
-    protected $loadBalancerSpecification;
-    protected $loadBalancer;
-    protected $loadBalancerInstance;
-    protected $loadBalancerNode;
-    protected $loadBalancerHANodes;
-    protected $loadBalancerNetwork;
+    protected LoadBalancerSpecification $loadBalancerSpecification;
+    protected LoadBalancer $loadBalancer;
+    protected Instance $loadBalancerInstance;
+    protected LoadBalancerNode $loadBalancerNode;
+    protected array $loadBalancerHANodes;
+    protected LoadBalancerNetwork $loadBalancerNetwork;
 
     public function loadBalancerSpecification($id = 'lbs-test'): LoadBalancerSpecification
     {
         if (!isset($this->loadBalancerSpecification)) {
             Model::withoutEvents(function () use ($id) {
-                $this->loadBalancerSpecification = factory(LoadBalancerSpecification::class)->create([
+                $this->loadBalancerSpecification = LoadBalancerSpecification::factory()->create([
                     'id' => $id,
                     'name' => 'medium',
                 ]);
@@ -35,7 +35,7 @@ trait LoadBalancerMock
     {
         if (!isset($this->loadBalancer)) {
             Model::withoutEvents(function () use ($id) {
-                $this->loadBalancer = factory(LoadBalancer::class)->create([
+                $this->loadBalancer = LoadBalancer::factory()->create([
                     'id' => $id,
                     'name' => $id,
                     'availability_zone_id' => $this->availabilityZone()->id,
@@ -58,7 +58,7 @@ trait LoadBalancerMock
     public function newLoadBalancerInstance($id = 'i-lbtest'): Instance
     {
         return Model::withoutEvents(function () use ($id) {
-            return factory(Instance::class)->create([
+            return Instance::factory()->create([
                 'id' => $id,
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Load Balancer ' . uniqid(),
@@ -81,7 +81,7 @@ trait LoadBalancerMock
     public function loadBalancerNode($id = 'ln-test'): LoadBalancerNode
     {
         if (!isset($this->loadBalancerNode)) {
-            $this->loadBalancerNode = factory(LoadBalancerNode::class)->create([
+            $this->loadBalancerNode = LoadBalancerNode::factory()->create([
                 'id' => $id,
                 'instance_id' => $this->loadBalancerInstance()->id,
                 'load_balancer_id' => $this->loadBalancer()->id,
@@ -96,13 +96,13 @@ trait LoadBalancerMock
         if (!isset($this->loadBalancerHANodes)) {
             Model::withoutEvents(function () {
                 $this->loadBalancerHANodes = [];
-                $this->loadBalancerHANodes[] = factory(LoadBalancerNode::class)->create([
+                $this->loadBalancerHANodes[] = LoadBalancerNode::factory()->create([
                     'id' => 'lbn-test1',
                     'instance_id' => $this->newLoadBalancerInstance('i-test1'),
                     'load_balancer_id' => $this->loadBalancer()->id,
                     'node_id' => null,
                 ]);
-                $this->loadBalancerHANodes[] = factory(LoadBalancerNode::class)->create([
+                $this->loadBalancerHANodes[] = LoadBalancerNode::factory()->create([
                     'id' => 'lbn-test2',
                     'instance_id' => $this->newLoadBalancerInstance('i-test2'),
                     'load_balancer_id' => $this->loadBalancer()->id,

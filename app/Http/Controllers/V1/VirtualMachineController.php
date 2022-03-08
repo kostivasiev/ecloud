@@ -180,9 +180,9 @@ class VirtualMachineController extends BaseController
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \GuzzleHttp\Exception\GuzzleException
      * @throws \Illuminate\Validation\ValidationException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResourceException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResponseException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidRouteException
      * @throws Exceptions\PaymentRequiredException
      */
     public function create(
@@ -1098,9 +1098,9 @@ class VirtualMachineController extends BaseController
      * @throws ServiceUnavailableException
      * @throws \App\Solution\Exceptions\InvalidSolutionStateException
      * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResourceException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResponseException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidRouteException
      */
     public function clone(
         Request $request,

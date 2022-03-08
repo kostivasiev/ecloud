@@ -28,13 +28,14 @@ class CreateTest extends TestCase
             [
                 'load_balancer_id' => $this->loadBalancer()->id,
             ]
-        )->seeInDatabase(
+        )->assertStatus(202);
+        $this->assertDatabaseHas(
             'vips',
             [
                 'load_balancer_network_id' => ($this->loadBalancer()->loadBalancerNetworks->first())->id,
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(Created::class, function ($event) {
             $this->assertFalse($event->model->data['allocate_floating_ip']);
@@ -56,14 +57,14 @@ class CreateTest extends TestCase
                 'load_balancer_id' => $this->loadBalancer()->id,
                 'allocate_floating_ip' => true
             ]
-        )  ->seeInDatabase(
+        )->assertStatus(202);
+        $this->assertDatabaseHas(
             'vips',
             [
                 'load_balancer_network_id' => ($this->loadBalancer()->loadBalancerNetworks->first())->id,
             ],
             'ecloud'
-        )
-            ->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(Created::class, function ($event) {
             $this->assertTrue($event->model->data['allocate_floating_ip']);

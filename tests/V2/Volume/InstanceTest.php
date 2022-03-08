@@ -16,13 +16,13 @@ class InstanceTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
 
-        $volume->instances()->attach($this->instance());
+        $volume->instances()->attach($this->instanceModel());
 
         $this->get('/v2/volumes/' . $volume->id . '/instances', [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
-            'id' => $this->instance()->id,
-        ])->assertResponseStatus(200);
+        ])->assertJsonFragment([
+            'id' => $this->instanceModel()->id,
+        ])->assertStatus(200);
     }
 }

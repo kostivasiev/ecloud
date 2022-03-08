@@ -2,8 +2,12 @@
 
 namespace App\Models\V1;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 class DrsRule
 {
+    use HasFactory;
+
     protected $uuid;
 
     protected $name;

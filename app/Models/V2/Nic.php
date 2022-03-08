@@ -8,6 +8,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
@@ -23,7 +24,7 @@ use UKFast\DB\Ditto\Sortable;
 
 class Nic extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Natable, RouterScopable
 {
-    use CustomKey, SoftDeletes, Syncable, Taskable, DeletionRules, DefaultName;
+    use HasFactory, CustomKey, SoftDeletes, Syncable, Taskable, DeletionRules, DefaultName;
 
     public $keyPrefix = 'nic';
 

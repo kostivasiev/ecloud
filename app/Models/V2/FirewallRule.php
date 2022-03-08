@@ -2,10 +2,9 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FirewallRule\Deleted;
-use App\Events\V2\FirewallRule\Saved;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
@@ -23,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class FirewallRule extends Model implements Filterable, Sortable, Manageable
 {
-    use CustomKey, SoftDeletes, DefaultName;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName;
 
     public $keyPrefix = 'fwr';
     public $incrementing = false;

@@ -1,323 +1,314 @@
 <?php
-
 /**
  * v2 Routes
  */
 
-use App\Models\V2\VolumeGroup;
-use Laravel\Lumen\Routing\Router;
-
-$middleware = [
-    'auth',
-    'paginator-limit:' . env('PAGINATION_LIMIT')
-];
-
-$baseRouteParameters = [
+Route::group([
     'prefix' => 'v2',
-    'namespace' => 'V2',
-    'middleware' => $middleware
-];
-
-/** @var Router $router */
-$router->group($baseRouteParameters, function () use ($router) {
+    'namespace' => 'App\Http\Controllers\V2',
+    'middleware' => [
+        'auth',
+        'paginator-limit:' . env('PAGINATION_LIMIT')
+    ]
+], function () {
     /** Availability Zones */
-    $router->get('availability-zones', 'AvailabilityZoneController@index');
-    $router->get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
-    $router->get('availability-zones/{zoneId}/prices', 'AvailabilityZoneController@prices');
-    $router->get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
-    $router->get('availability-zones/{zoneId}/host-specs', 'AvailabilityZoneController@hostSpecs');
-    $router->get('availability-zones/{zoneId}/images', 'AvailabilityZoneController@images');
+    Route::get('availability-zones', 'AvailabilityZoneController@index');
+    Route::get('availability-zones/{zoneId}', 'AvailabilityZoneController@show');
+    Route::get('availability-zones/{zoneId}/prices', 'AvailabilityZoneController@prices');
+    Route::get('availability-zones/{zoneId}/router-throughputs', 'AvailabilityZoneController@routerThroughputs');
+    Route::get('availability-zones/{zoneId}/host-specs', 'AvailabilityZoneController@hostSpecs');
+    Route::get('availability-zones/{zoneId}/images', 'AvailabilityZoneController@images');
 
 
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->post('availability-zones', 'AvailabilityZoneController@create');
-        $router->patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
-        $router->delete('availability-zones/{zoneId}', [
+    Route::group(['middleware' => 'is-admin'], function () {
+        Route::post('availability-zones', 'AvailabilityZoneController@create');
+        Route::patch('availability-zones/{zoneId}', 'AvailabilityZoneController@update');
+        Route::delete('availability-zones/{zoneId}', [
             'middleware' => 'can-be-deleted:' . \App\Models\V2\AvailabilityZone::class   . ',zoneId',
             'uses' => 'AvailabilityZoneController@destroy'
         ]);
-        $router->get('availability-zones/{zoneId}/routers', 'AvailabilityZoneController@routers');
-        $router->get('availability-zones/{zoneId}/dhcps', 'AvailabilityZoneController@dhcps');
-        $router->get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
-        $router->get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
-        $router->get('availability-zones/{zoneId}/load-balancers', 'AvailabilityZoneController@loadBalancers');
-        $router->get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
+        Route::get('availability-zones/{zoneId}/routers', 'AvailabilityZoneController@routers');
+        Route::get('availability-zones/{zoneId}/dhcps', 'AvailabilityZoneController@dhcps');
+        Route::get('availability-zones/{zoneId}/credentials', 'AvailabilityZoneController@credentials');
+        Route::get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
+        Route::get('availability-zones/{zoneId}/load-balancers', 'AvailabilityZoneController@loadBalancers');
+        Route::get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
     });
 
     /** Availability Zone Capacities */
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@index');
-        $router->get('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@show');
-        $router->post('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@create');
-        $router->patch('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@update');
-        $router->delete('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@destroy');
+    Route::group(['middleware' => 'is-admin'], function () {
+        Route::get('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@index');
+        Route::get('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@show');
+        Route::post('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@create');
+        Route::patch('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@update');
+        Route::delete('availability-zone-capacities/{capacityId}', 'AvailabilityZoneCapacitiesController@destroy');
     });
 
     /** Virtual Private Clouds */
-    $router->group([], function () use ($router) {
-        $router->group(['middleware' => 'has-reseller-id'], function () use ($router) {
-            $router->group(['middleware' => ['customer-max-vpc', 'can-enable-support']], function () use ($router) {
-                $router->post('vpcs', 'VpcController@create');
+    Route::group([], function () {
+        Route::group(['middleware' => 'has-reseller-id'], function () {
+            Route::group(['middleware' => ['customer-max-vpc', 'can-enable-support']], function () {
+                Route::post('vpcs', 'VpcController@create');
             });
-            $router->post('vpcs/{vpcId}/deploy-defaults', 'VpcController@deployDefaults');
+            Route::post('vpcs/{vpcId}/deploy-defaults', 'VpcController@deployDefaults');
         });
-        $router->group(['middleware' => 'can-enable-support'], function () use ($router) {
-            $router->patch('vpcs/{vpcId}', 'VpcController@update');
+        Route::group(['middleware' => 'can-enable-support'], function () {
+            Route::patch('vpcs/{vpcId}', 'VpcController@update');
         });
-        $router->get('vpcs', 'VpcController@index');
-        $router->get('vpcs/{vpcId}', 'VpcController@show');
+        Route::get('vpcs', 'VpcController@index');
+        Route::get('vpcs/{vpcId}', 'VpcController@show');
 
-        $router->group(['middleware' => 'vpc-can-delete'], function () use ($router) {
-            $router->delete('vpcs/{vpcId}', 'VpcController@destroy');
+        Route::group(['middleware' => 'vpc-can-delete'], function () {
+            Route::delete('vpcs/{vpcId}', 'VpcController@destroy');
         });
 
-        $router->get('vpcs/{vpcId}/volumes', 'VpcController@volumes');
-        $router->get('vpcs/{vpcId}/instances', 'VpcController@instances');
-        $router->get('vpcs/{vpcId}/tasks', 'VpcController@tasks');
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->get('vpcs/{vpcId}/load-balancers', 'VpcController@loadBalancers');
+        Route::get('vpcs/{vpcId}/volumes', 'VpcController@volumes');
+        Route::get('vpcs/{vpcId}/instances', 'VpcController@instances');
+        Route::get('vpcs/{vpcId}/tasks', 'VpcController@tasks');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::get('vpcs/{vpcId}/load-balancers', 'VpcController@loadBalancers');
         });
     });
 
     /** Dhcps */
-    $router->group([], function () use ($router) {
-        $router->get('dhcps', 'DhcpController@index');
-        $router->get('dhcps/{dhcpId}', 'DhcpController@show');
-        $router->get('dhcps/{dhcpId}/tasks', 'DhcpController@tasks');
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('dhcps', 'DhcpController@create');
-            $router->patch('dhcps/{dhcpId}', 'DhcpController@update');
-            $router->delete('dhcps/{dhcpId}', 'DhcpController@destroy');
+    Route::group([], function () {
+        Route::get('dhcps', 'DhcpController@index');
+        Route::get('dhcps/{dhcpId}', 'DhcpController@show');
+        Route::get('dhcps/{dhcpId}/tasks', 'DhcpController@tasks');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('dhcps', 'DhcpController@create');
+            Route::patch('dhcps/{dhcpId}', 'DhcpController@update');
+            Route::delete('dhcps/{dhcpId}', 'DhcpController@destroy');
         });
     });
 
     /** Networks */
-    $router->group([], function () use ($router) {
-        $router->get('networks', 'NetworkController@index');
-        $router->get('networks/{networkId}', 'NetworkController@show');
-        $router->get('networks/{networkId}/nics', 'NetworkController@nics');
-        $router->get('networks/{networkId}/tasks', 'NetworkController@tasks');
-        $router->post('networks', 'NetworkController@create');
-        $router->patch('networks/{networkId}', 'NetworkController@update');
-        $router->delete('networks/{networkId}', 'NetworkController@destroy');
-        $router->delete('networks/{networkId}', [
+    Route::group([], function () {
+        Route::get('networks', 'NetworkController@index');
+        Route::get('networks/{networkId}', 'NetworkController@show');
+        Route::get('networks/{networkId}/nics', 'NetworkController@nics');
+        Route::get('networks/{networkId}/tasks', 'NetworkController@tasks');
+        Route::post('networks', 'NetworkController@create');
+        Route::patch('networks/{networkId}', 'NetworkController@update');
+        Route::delete('networks/{networkId}', 'NetworkController@destroy');
+        Route::delete('networks/{networkId}', [
             'middleware' => 'can-be-deleted:' . \App\Models\V2\Network::class   . ',networkId',
             'uses' => 'NetworkController@destroy'
         ]);
     });
 
     /** Network Policy */
-    $router->group([], function () use ($router) {
-        $router->get('network-policies', 'NetworkPolicyController@index');
-        $router->get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
-        $router->get('network-policies/{networkPolicyId}/network-rules', 'NetworkPolicyController@networkRules');
-        $router->get('network-policies/{networkPolicyId}/tasks', 'NetworkPolicyController@tasks');
-        $router->post('network-policies', 'NetworkPolicyController@store');
-        $router->patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
-        $router->delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
+    Route::group([], function () {
+        Route::get('network-policies', 'NetworkPolicyController@index');
+        Route::get('network-policies/{networkPolicyId}', 'NetworkPolicyController@show');
+        Route::get('network-policies/{networkPolicyId}/network-rules', 'NetworkPolicyController@networkRules');
+        Route::get('network-policies/{networkPolicyId}/tasks', 'NetworkPolicyController@tasks');
+        Route::post('network-policies', 'NetworkPolicyController@store');
+        Route::patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
+        Route::delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
     });
 
     /** Network Rules */
-    $router->group([], function () use ($router) {
-        $router->get('network-rules', 'NetworkRuleController@index');
-        $router->get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
-        $router->post('network-rules', 'NetworkRuleController@store');
-        $router->group(['middleware' => 'network-rule-can-edit'], function () use ($router) {
-            $router->patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+    Route::group([], function () {
+        Route::get('network-rules', 'NetworkRuleController@index');
+        Route::get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
+        Route::post('network-rules', 'NetworkRuleController@store');
+        Route::group(['middleware' => 'network-rule-can-edit'], function () {
+            Route::patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
         });
-        $router->group(['middleware' => 'network-rule-can-delete'], function () use ($router) {
-            $router->delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+        Route::group(['middleware' => 'network-rule-can-delete'], function () {
+            Route::delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
         });
     });
 
     /** Network Rule Ports */
-    $router->group([], function () use ($router) {
-        $router->get('network-rule-ports', 'NetworkRulePortController@index');
-        $router->get('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@show');
-        $router->post('network-rule-ports', 'NetworkRulePortController@store');
-        $router->group(['middleware' => 'network-rule-port-can-edit'], function () use ($router) {
-            $router->patch('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@update');
+    Route::group([], function () {
+        Route::get('network-rule-ports', 'NetworkRulePortController@index');
+        Route::get('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@show');
+        Route::post('network-rule-ports', 'NetworkRulePortController@store');
+        Route::group(['middleware' => 'network-rule-port-can-edit'], function () {
+            Route::patch('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@update');
         });
-        $router->group(['middleware' => 'network-rule-port-can-delete'], function () use ($router) {
-            $router->delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
+        Route::group(['middleware' => 'network-rule-port-can-delete'], function () {
+            Route::delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
         });
     });
 
     /** Vpn Services */
-    $router->group([], function () use ($router) {
-        $router->get('vpn-services', 'VpnServiceController@index');
-        $router->get('vpn-services/{vpnServiceId}', 'VpnServiceController@show');
-        $router->get('vpn-services/{vpnServiceId}/endpoints', 'VpnServiceController@endpoints');
-        $router->post('vpn-services', 'VpnServiceController@create');
-        $router->patch('vpn-services/{vpnServiceId}', 'VpnServiceController@update');
-        $router->delete('vpn-services/{vpnServiceId}', [
+    Route::group([], function () {
+        Route::get('vpn-services', 'VpnServiceController@index');
+        Route::get('vpn-services/{vpnServiceId}', 'VpnServiceController@show');
+        Route::get('vpn-services/{vpnServiceId}/endpoints', 'VpnServiceController@endpoints');
+        Route::post('vpn-services', 'VpnServiceController@create');
+        Route::patch('vpn-services/{vpnServiceId}', 'VpnServiceController@update');
+        Route::delete('vpn-services/{vpnServiceId}', [
             'middleware' => 'can-be-deleted:' . \App\Models\V2\VpnService::class   . ',vpnServiceId',
             'uses' => 'VpnServiceController@destroy'
         ]);
     });
 
     /** VPN Endpoints */
-    $router->group([], function () use ($router) {
-        $router->get('vpn-endpoints', 'VpnEndpointController@index');
-        $router->get('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@show');
-        $router->get('vpn-endpoints/{vpnEndpointId}/services', 'VpnEndpointController@services');
-        $router->post('vpn-endpoints', 'VpnEndpointController@store');
-        $router->patch('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@update');
-        $router->group(['middleware' => 'vpn-endpoint-can-delete'], function () use ($router) {
-            $router->delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
+    Route::group([], function () {
+        Route::get('vpn-endpoints', 'VpnEndpointController@index');
+        Route::get('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@show');
+        Route::get('vpn-endpoints/{vpnEndpointId}/services', 'VpnEndpointController@services');
+        Route::post('vpn-endpoints', 'VpnEndpointController@store');
+        Route::patch('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@update');
+        Route::group(['middleware' => 'vpn-endpoint-can-delete'], function () {
+            Route::delete('vpn-endpoints/{vpnEndpointId}', 'VpnEndpointController@destroy');
         });
     });
 
     /** Vpn Sessions */
-    $router->group([], function () use ($router) {
-        $router->get('vpn-sessions', 'VpnSessionController@index');
-        $router->get('vpn-sessions/{vpnSessionId}', 'VpnSessionController@show');
-        $router->get('vpn-sessions/{vpnSessionId}/pre-shared-key', 'VpnSessionController@preSharedKey');
-        $router->post('vpn-sessions', 'VpnSessionController@create');
-        $router->patch('vpn-sessions/{vpnSessionId}', 'VpnSessionController@update');
-        $router->delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
+    Route::group([], function () {
+        Route::get('vpn-sessions', 'VpnSessionController@index');
+        Route::get('vpn-sessions/{vpnSessionId}', 'VpnSessionController@show');
+        Route::get('vpn-sessions/{vpnSessionId}/pre-shared-key', 'VpnSessionController@preSharedKey');
+        Route::post('vpn-sessions', 'VpnSessionController@create');
+        Route::patch('vpn-sessions/{vpnSessionId}', 'VpnSessionController@update');
+        Route::delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
     });
 
     /** Vpn Profiles */
-    $router->group([], function () use ($router) {
-        $router->get('vpn-profiles', 'VpnProfileController@index');
-        $router->get('vpn-profiles/{vpnProfileId}', 'VpnProfileController@show');
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('vpn-profiles', 'VpnProfileController@create');
-            $router->patch('vpn-profiles/{vpnProfileId}', 'VpnProfileController@update');
-            $router->delete('vpn-profiles/{vpnProfileId}', 'VpnProfileController@destroy');
+    Route::group([], function () {
+        Route::get('vpn-profiles', 'VpnProfileController@index');
+        Route::get('vpn-profiles/{vpnProfileId}', 'VpnProfileController@show');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('vpn-profiles', 'VpnProfileController@create');
+            Route::patch('vpn-profiles/{vpnProfileId}', 'VpnProfileController@update');
+            Route::delete('vpn-profiles/{vpnProfileId}', 'VpnProfileController@destroy');
         });
     });
 
     /** Vpn Profile Groups */
-    $router->group([], function () use ($router) {
-        $router->get('vpn-profile-groups', 'VpnProfileGroupController@index');
-        $router->get('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@show');
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('vpn-profile-groups', 'VpnProfileGroupController@create');
-            $router->patch('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@update');
-            $router->delete('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@destroy');
+    Route::group([], function () {
+        Route::get('vpn-profile-groups', 'VpnProfileGroupController@index');
+        Route::get('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@show');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('vpn-profile-groups', 'VpnProfileGroupController@create');
+            Route::patch('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@update');
+            Route::delete('vpn-profile-groups/{vpnProfileGroupId}', 'VpnProfileGroupController@destroy');
         });
     });
 
     /** Routers */
-    $router->group([], function () use ($router) {
-        $router->get('routers', 'RouterController@index');
-        $router->get('routers/{routerId}', 'RouterController@show');
-        $router->get('routers/{routerId}/networks', 'RouterController@networks');
-        $router->get('routers/{routerId}/vpns', 'RouterController@vpns');
-        $router->get('routers/{routerId}/firewall-policies', 'RouterController@firewallPolicies');
-        $router->get('routers/{routerId}/tasks', 'RouterController@tasks');
-        $router->post('routers', 'RouterController@create');
-        $router->patch('routers/{routerId}', 'RouterController@update');
-        $router->delete('routers/{routerId}', [
+    Route::group([], function () {
+        Route::get('routers', 'RouterController@index');
+        Route::get('routers/{routerId}', 'RouterController@show');
+        Route::get('routers/{routerId}/networks', 'RouterController@networks');
+        Route::get('routers/{routerId}/vpns', 'RouterController@vpns');
+        Route::get('routers/{routerId}/firewall-policies', 'RouterController@firewallPolicies');
+        Route::get('routers/{routerId}/tasks', 'RouterController@tasks');
+        Route::post('routers', 'RouterController@create');
+        Route::patch('routers/{routerId}', 'RouterController@update');
+        Route::delete('routers/{routerId}', [
             'middleware' => 'can-be-deleted:' . \App\Models\V2\Router::class   . ',routerId',
             'uses' => 'RouterController@destroy'
         ]);
-        $router->post('routers/{routerId}/configure-default-policies', 'RouterController@configureDefaultPolicies');
+        Route::post('routers/{routerId}/configure-default-policies', 'RouterController@configureDefaultPolicies');
     });
 
     /** Instances */
-    $router->group([], function () use ($router) {
-        $router->group(['middleware' => ['customer-max-instance', 'instance-requires-floating-ip']], function () use ($router) {
-            $router->post('instances', 'InstanceController@store');
+    Route::group([], function () {
+        Route::group(['middleware' => ['customer-max-instance', 'instance-requires-floating-ip']], function () {
+            Route::post('instances', 'InstanceController@store');
         });
-        $router->group(['middleware' => ['instance-console-enabled']], function () use ($router) {
-            $router->get('instances/{instanceId}/console-screenshot', 'InstanceController@consoleScreenshot');
-            $router->post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
+        Route::group(['middleware' => ['instance-console-enabled']], function () {
+            Route::get('instances/{instanceId}/console-screenshot', 'InstanceController@consoleScreenshot');
+            Route::post('instances/{instanceId}/console-session', 'InstanceController@consoleSession');
         });
-        $router->get('instances', 'InstanceController@index');
-        $router->get('instances/{instanceId}', 'InstanceController@show');
-        $router->get('instances/{instanceId}/credentials', 'InstanceController@credentials');
-        $router->get('instances/{instanceId}/volumes', 'InstanceController@volumes');
-        $router->get('instances/{instanceId}/nics', 'InstanceController@nics');
-        $router->get('instances/{instanceId}/tasks', 'InstanceController@tasks');
-        $router->get('instances/{instanceId}/floating-ips', 'InstanceController@floatingIps');
-        $router->get('instances/{instanceId}/software', 'InstanceController@software');
-        $router->put('instances/{instanceId}/lock', 'InstanceController@lock');
-        $router->put('instances/{instanceId}/unlock', 'InstanceController@unlock');
-        $router->post('instances/{instanceId}/create-image', 'InstanceController@createImage');
-        $router->post('instances/{instanceId}/migrate', 'InstanceController@migrate');
+        Route::get('instances', 'InstanceController@index');
+        Route::get('instances/{instanceId}', 'InstanceController@show');
+        Route::get('instances/{instanceId}/credentials', 'InstanceController@credentials');
+        Route::get('instances/{instanceId}/volumes', 'InstanceController@volumes');
+        Route::get('instances/{instanceId}/nics', 'InstanceController@nics');
+        Route::get('instances/{instanceId}/tasks', 'InstanceController@tasks');
+        Route::get('instances/{instanceId}/floating-ips', 'InstanceController@floatingIps');
+        Route::get('instances/{instanceId}/software', 'InstanceController@software');
+        Route::put('instances/{instanceId}/lock', 'InstanceController@lock');
+        Route::put('instances/{instanceId}/unlock', 'InstanceController@unlock');
+        Route::post('instances/{instanceId}/create-image', 'InstanceController@createImage');
+        Route::post('instances/{instanceId}/migrate', 'InstanceController@migrate');
 
-        $router->group(['middleware' => 'instance-is-locked'], function () use ($router) {
-            $router->patch('instances/{instanceId}', 'InstanceController@update');
-            $router->delete('instances/{instanceId}', 'InstanceController@destroy');
-            $router->put('instances/{instanceId}/power-on', 'InstanceController@powerOn');
-            $router->put('instances/{instanceId}/power-off', 'InstanceController@powerOff');
-            $router->put('instances/{instanceId}/power-reset', 'InstanceController@powerReset');
-            $router->put('instances/{instanceId}/power-restart', 'InstanceController@guestRestart');
-            $router->put('instances/{instanceId}/power-shutdown', 'InstanceController@guestShutdown');
-            $router->group(['middleware' => 'can-attach-instance-volume'], function () use ($router) {
-                $router->post('instances/{instanceId}/volume-attach', 'InstanceController@volumeAttach');
+        Route::group(['middleware' => 'instance-is-locked'], function () {
+            Route::patch('instances/{instanceId}', 'InstanceController@update');
+            Route::delete('instances/{instanceId}', 'InstanceController@destroy');
+            Route::put('instances/{instanceId}/power-on', 'InstanceController@powerOn');
+            Route::put('instances/{instanceId}/power-off', 'InstanceController@powerOff');
+            Route::put('instances/{instanceId}/power-reset', 'InstanceController@powerReset');
+            Route::put('instances/{instanceId}/power-restart', 'InstanceController@guestRestart');
+            Route::put('instances/{instanceId}/power-shutdown', 'InstanceController@guestShutdown');
+            Route::group(['middleware' => 'can-attach-instance-volume'], function () {
+                Route::post('instances/{instanceId}/volume-attach', 'InstanceController@volumeAttach');
             });
-            $router->post('instances/{instanceId}/volume-detach', 'InstanceController@volumeDetach');
+            Route::post('instances/{instanceId}/volume-detach', 'InstanceController@volumeDetach');
         });
     });
 
     /** Floating Ips */
-    $router->group([], function () use ($router) {
-        $router->get('floating-ips', 'FloatingIpController@index');
-        $router->get('floating-ips/{fipId}', 'FloatingIpController@show');
-        $router->get('floating-ips/{fipId}/tasks', 'FloatingIpController@tasks');
-        $router->post('floating-ips', 'FloatingIpController@store');
+    Route::group([], function () {
+        Route::get('floating-ips', 'FloatingIpController@index');
+        Route::get('floating-ips/{fipId}', 'FloatingIpController@show');
+        Route::get('floating-ips/{fipId}/tasks', 'FloatingIpController@tasks');
+        Route::post('floating-ips', 'FloatingIpController@store');
 
-        $router->group(['middleware' => 'floating-ip-can-be-assigned'], function () use ($router) {
-            $router->post('floating-ips/{fipId}/assign', 'FloatingIpController@assign');
+        Route::group(['middleware' => 'floating-ip-can-be-assigned'], function () {
+            Route::post('floating-ips/{fipId}/assign', 'FloatingIpController@assign');
         });
 
-        $router->group(['middleware' => 'floating-ip-can-be-unassigned'], function () use ($router) {
-            $router->post('floating-ips/{fipId}/unassign', 'FloatingIpController@unassign');
+        Route::group(['middleware' => 'floating-ip-can-be-unassigned'], function () {
+            Route::post('floating-ips/{fipId}/unassign', 'FloatingIpController@unassign');
         });
 
-        $router->patch('floating-ips/{fipId}', 'FloatingIpController@update');
+        Route::patch('floating-ips/{fipId}', 'FloatingIpController@update');
 
-        $router->group(['middleware' => 'floating-ip-can-be-deleted'], function () use ($router) {
-            $router->delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
+        Route::group(['middleware' => 'floating-ip-can-be-deleted'], function () {
+            Route::delete('floating-ips/{fipId}', 'FloatingIpController@destroy');
         });
     });
 
     /** Firewall Policy */
-    $router->group([], function () use ($router) {
-        $router->get('firewall-policies', 'FirewallPolicyController@index');
-        $router->get('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@show');
-        $router->get('firewall-policies/{firewallPolicyId}/firewall-rules', 'FirewallPolicyController@firewallRules');
-        $router->get('firewall-policies/{firewallPolicyId}/tasks', 'FirewallPolicyController@tasks');
-        $router->post('firewall-policies', 'FirewallPolicyController@store');
-        $router->patch('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@update');
-        $router->delete('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@destroy');
+    Route::group([], function () {
+        Route::get('firewall-policies', 'FirewallPolicyController@index');
+        Route::get('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@show');
+        Route::get('firewall-policies/{firewallPolicyId}/firewall-rules', 'FirewallPolicyController@firewallRules');
+        Route::get('firewall-policies/{firewallPolicyId}/tasks', 'FirewallPolicyController@tasks');
+        Route::post('firewall-policies', 'FirewallPolicyController@store');
+        Route::patch('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@update');
+        Route::delete('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@destroy');
     });
 
     /** Firewall Rules */
-    $router->group([], function () use ($router) {
-        $router->get('firewall-rules', 'FirewallRuleController@index');
-        $router->get('firewall-rules/{firewallRuleId}', 'FirewallRuleController@show');
-        $router->get('firewall-rules/{firewallRuleId}/ports', 'FirewallRuleController@ports');
-        $router->post('firewall-rules', 'FirewallRuleController@store');
-        $router->patch('firewall-rules/{firewallRuleId}', 'FirewallRuleController@update');
-        $router->delete('firewall-rules/{firewallRuleId}', 'FirewallRuleController@destroy');
+    Route::group([], function () {
+        Route::get('firewall-rules', 'FirewallRuleController@index');
+        Route::get('firewall-rules/{firewallRuleId}', 'FirewallRuleController@show');
+        Route::get('firewall-rules/{firewallRuleId}/ports', 'FirewallRuleController@ports');
+        Route::post('firewall-rules', 'FirewallRuleController@store');
+        Route::patch('firewall-rules/{firewallRuleId}', 'FirewallRuleController@update');
+        Route::delete('firewall-rules/{firewallRuleId}', 'FirewallRuleController@destroy');
     });
 
     /** Firewall Rule Ports */
-    $router->group([], function () use ($router) {
-        $router->get('firewall-rule-ports', 'FirewallRulePortController@index');
-        $router->get('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@show');
-        $router->post('firewall-rule-ports', 'FirewallRulePortController@store');
-        $router->patch('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@update');
-        $router->delete('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@destroy');
+    Route::group([], function () {
+        Route::get('firewall-rule-ports', 'FirewallRulePortController@index');
+        Route::get('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@show');
+        Route::post('firewall-rule-ports', 'FirewallRulePortController@store');
+        Route::patch('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@update');
+        Route::delete('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@destroy');
     });
 
     /** Regions */
-    $router->group([], function () use ($router) {
-        $router->get('regions', 'RegionController@index');
-        $router->get('regions/{regionId}', 'RegionController@show');
-        $router->get('regions/{regionId}/availability-zones', 'RegionController@availabilityZones');
-        $router->get('regions/{regionId}/vpcs', 'RegionController@vpcs');
-        $router->get('regions/{regionId}/prices', 'RegionController@prices');
+    Route::group([], function () {
+        Route::get('regions', 'RegionController@index');
+        Route::get('regions/{regionId}', 'RegionController@show');
+        Route::get('regions/{regionId}/availability-zones', 'RegionController@availabilityZones');
+        Route::get('regions/{regionId}/vpcs', 'RegionController@vpcs');
+        Route::get('regions/{regionId}/prices', 'RegionController@prices');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('regions', 'RegionController@create');
-            $router->patch('regions/{regionId}', 'RegionController@update');
-            $router->delete('regions/{regionId}', [
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('regions', 'RegionController@create');
+            Route::patch('regions/{regionId}', 'RegionController@update');
+            Route::delete('regions/{regionId}', [
                 'middleware' => 'can-be-deleted:' . \App\Models\V2\Region::class   . ',regionId',
                 'uses' => 'RegionController@destroy'
             ]);
@@ -325,135 +316,135 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Load balancers */
-    $router->group([], function () use ($router) {
-        $router->get('load-balancers', 'LoadBalancerController@index');
-        $router->get('load-balancers/{loadBalancerId}', 'LoadBalancerController@show');
-        $router->patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
-        $router->delete('load-balancers/{loadBalancerId}', 'LoadBalancerController@destroy');
+    Route::group([], function () {
+        Route::get('load-balancers', 'LoadBalancerController@index');
+        Route::get('load-balancers/{loadBalancerId}', 'LoadBalancerController@show');
+        Route::patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
+        Route::delete('load-balancers/{loadBalancerId}', 'LoadBalancerController@destroy');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->get('load-balancers/{loadBalancerId}/networks', 'LoadBalancerController@networks');
-            $router->get('load-balancers/{loadBalancerId}/nodes', 'LoadBalancerController@nodes');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::get('load-balancers/{loadBalancerId}/networks', 'LoadBalancerController@networks');
+            Route::get('load-balancers/{loadBalancerId}/nodes', 'LoadBalancerController@nodes');
         });
 
-        $router->group(['middleware' => 'load-balancer-is-max-for-customer'], function () use ($router) {
-            $router->post('load-balancers', 'LoadBalancerController@store');
+        Route::group(['middleware' => 'load-balancer-is-max-for-customer'], function () {
+            Route::post('load-balancers', 'LoadBalancerController@store');
         });
     });
 
     /** VIPS */
-    $router->group([], function () use ($router) {
-        $router->get('vips', 'VipController@index');
-        $router->get('vips/{vipId}', 'VipController@show');
-        $router->post('vips', [
+    Route::group([], function () {
+        Route::get('vips', 'VipController@index');
+        Route::get('vips/{vipId}', 'VipController@show');
+        Route::post('vips', [
             'middleware' => 'loadbalancer-max-vip',
             'uses' => 'VipController@create'
         ]);
-        $router->patch('vips/{vipId}', 'VipController@update');
-        $router->delete('vips/{vipId}', 'VipController@destroy');
+        Route::patch('vips/{vipId}', 'VipController@update');
+        Route::delete('vips/{vipId}', 'VipController@destroy');
     });
 
     /** Load balancer specifications */
-    $router->get('load-balancer-specs', 'LoadBalancerSpecificationsController@index');
-    $router->get('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@show');
+    Route::get('load-balancer-specs', 'LoadBalancerSpecificationsController@index');
+    Route::get('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@show');
 
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->post('load-balancer-specs', 'LoadBalancerSpecificationsController@create');
-        $router->patch('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@update');
-        $router->delete('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@destroy');
+    Route::group(['middleware' => 'is-admin'], function () {
+        Route::post('load-balancer-specs', 'LoadBalancerSpecificationsController@create');
+        Route::patch('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@update');
+        Route::delete('load-balancer-specs/{lbsId}', 'LoadBalancerSpecificationsController@destroy');
     });
 
     /** Volumes */
-    $router->group([], function () use ($router) {
-        $router->group(['middleware' => 'can-detach'], function () use ($router) {
-            $router->post('volumes/{volumeId}/detach', 'VolumeController@detach');
+    Route::group([], function () {
+        Route::group(['middleware' => 'can-detach'], function () {
+            Route::post('volumes/{volumeId}/detach', 'VolumeController@detach');
         });
-        $router->get('volumes', 'VolumeController@index');
-        $router->get('volumes/{volumeId}', 'VolumeController@show');
-        $router->get('volumes/{volumeId}/instances', 'VolumeController@instances');
-        $router->get('volumes/{volumeId}/tasks', 'VolumeController@tasks');
-        $router->post('volumes', 'VolumeController@store');
-        $router->patch('volumes/{volumeId}', 'VolumeController@update');
-        $router->group(['middleware' => 'volume-can-be-deleted'], function () use ($router) {
-            $router->delete('volumes/{volumeId}', 'VolumeController@destroy');
+        Route::get('volumes', 'VolumeController@index');
+        Route::get('volumes/{volumeId}', 'VolumeController@show');
+        Route::get('volumes/{volumeId}/instances', 'VolumeController@instances');
+        Route::get('volumes/{volumeId}/tasks', 'VolumeController@tasks');
+        Route::post('volumes', 'VolumeController@store');
+        Route::patch('volumes/{volumeId}', 'VolumeController@update');
+        Route::group(['middleware' => 'volume-can-be-deleted'], function () {
+            Route::delete('volumes/{volumeId}', 'VolumeController@destroy');
         });
-        $router->post('volumes/{volumeId}/attach', 'VolumeController@attach');
+        Route::post('volumes/{volumeId}/attach', 'VolumeController@attach');
     });
 
     /** Volume Groups */
-    $router->group([], function () use ($router) {
-        $router->get('volume-groups', 'VolumeGroupController@index');
-        $router->get('volume-groups/{volumeGroupId}', 'VolumeGroupController@show');
-        $router->get('volume-groups/{volumeGroupId}/volumes', 'VolumeGroupController@volumes');
-        $router->post('volume-groups', 'VolumeGroupController@store');
-        $router->patch('volume-groups/{volumeGroupId}', 'VolumeGroupController@update');
-        $router->delete('volume-groups/{volumeGroupId}', [
-            'middleware' => 'can-be-deleted:' . VolumeGroup::class   . ',volumeGroupId',
+    Route::group([], function () {
+        Route::get('volume-groups', 'VolumeGroupController@index');
+        Route::get('volume-groups/{volumeGroupId}', 'VolumeGroupController@show');
+        Route::get('volume-groups/{volumeGroupId}/volumes', 'VolumeGroupController@volumes');
+        Route::post('volume-groups', 'VolumeGroupController@store');
+        Route::patch('volume-groups/{volumeGroupId}', 'VolumeGroupController@update');
+        Route::delete('volume-groups/{volumeGroupId}', [
+            'middleware' => 'can-be-deleted:' . \App\Models\V2\VolumeGroup::class   . ',volumeGroupId',
             'uses' => 'VolumeGroupController@destroy'
         ]);
     });
 
     /** Nics */
-    $router->group([], function () use ($router) {
-        $router->get('nics', 'NicController@index');
-        $router->get('nics/{nicId}', 'NicController@show');
-        $router->get('nics/{nicId}/tasks', 'NicController@tasks');
-        $router->get('nics/{nicId}/ip-addresses', 'NicController@ipAddresses');
-        $router->post('nics/{nicId}/ip-addresses', 'NicController@associateIpAddress');
-        $router->delete('nics/{nicId}/ip-addresses/{ipAddressId}', 'NicController@disassociateIpAddress');
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('nics', 'NicController@create');
-            $router->patch('nics/{nicId}', 'NicController@update');
-            $router->delete('nics/{nicId}', 'NicController@destroy');
+    Route::group([], function () {
+        Route::get('nics', 'NicController@index');
+        Route::get('nics/{nicId}', 'NicController@show');
+        Route::get('nics/{nicId}/tasks', 'NicController@tasks');
+        Route::get('nics/{nicId}/ip-addresses', 'NicController@ipAddresses');
+        Route::post('nics/{nicId}/ip-addresses', 'NicController@associateIpAddress');
+        Route::delete('nics/{nicId}/ip-addresses/{ipAddressId}', 'NicController@disassociateIpAddress');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('nics', 'NicController@create');
+            Route::patch('nics/{nicId}', 'NicController@update');
+            Route::delete('nics/{nicId}', 'NicController@destroy');
         });
     });
 
     /** Credentials */
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('credentials', 'CredentialsController@index');
-        $router->get('credentials/{credentialsId}', 'CredentialsController@show');
-        $router->post('credentials', 'CredentialsController@store');
-        $router->patch('credentials/{credentialsId}', 'CredentialsController@update');
-        $router->delete('credentials/{credentialsId}', 'CredentialsController@destroy');
+    Route::group(['middleware' => 'is-admin'], function () {
+        Route::get('credentials', 'CredentialsController@index');
+        Route::get('credentials/{credentialsId}', 'CredentialsController@show');
+        Route::post('credentials', 'CredentialsController@store');
+        Route::patch('credentials/{credentialsId}', 'CredentialsController@update');
+        Route::delete('credentials/{credentialsId}', 'CredentialsController@destroy');
     });
 
     /** Discount Plans */
-    $router->group([], function () use ($router) {
-        $router->get('discount-plans', 'DiscountPlanController@index');
-        $router->get('discount-plans/{discountPlanId}', 'DiscountPlanController@show');
-        $router->post('discount-plans', 'DiscountPlanController@store');
+    Route::group([], function () {
+        Route::get('discount-plans', 'DiscountPlanController@index');
+        Route::get('discount-plans/{discountPlanId}', 'DiscountPlanController@show');
+        Route::post('discount-plans', 'DiscountPlanController@store');
 
-        $router->group(['middleware' => 'is-pending'], function () use ($router) {
-            $router->post('discount-plans/{discountPlanId}/approve', 'DiscountPlanController@approve');
-            $router->post('discount-plans/{discountPlanId}/reject', 'DiscountPlanController@reject');
+        Route::group(['middleware' => 'is-pending'], function () {
+            Route::post('discount-plans/{discountPlanId}/approve', 'DiscountPlanController@approve');
+            Route::post('discount-plans/{discountPlanId}/reject', 'DiscountPlanController@reject');
         });
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
-            $router->delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::patch('discount-plans/{discountPlanId}', 'DiscountPlanController@update');
+            Route::delete('discount-plans/{discountPlanId}', 'DiscountPlanController@destroy');
         });
     });
 
     /** Billing Metrics */
-    $router->group([], function () use ($router) {
-        $router->get('billing-metrics', 'BillingMetricController@index');
-        $router->get('billing-metrics/{billingMetricId}', 'BillingMetricController@show');
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('billing-metrics', 'BillingMetricController@create');
-            $router->patch('billing-metrics/{billingMetricId}', 'BillingMetricController@update');
-            $router->delete('billing-metrics/{billingMetricId}', 'BillingMetricController@destroy');
+    Route::group([], function () {
+        Route::get('billing-metrics', 'BillingMetricController@index');
+        Route::get('billing-metrics/{billingMetricId}', 'BillingMetricController@show');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('billing-metrics', 'BillingMetricController@create');
+            Route::patch('billing-metrics/{billingMetricId}', 'BillingMetricController@update');
+            Route::delete('billing-metrics/{billingMetricId}', 'BillingMetricController@destroy');
         });
     });
 
     /** Router Throughput */
-    $router->group([], function () use ($router) {
-        $router->get('router-throughputs', 'RouterThroughputController@index');
-        $router->get('router-throughputs/{routerThroughputId}', 'RouterThroughputController@show');
+    Route::group([], function () {
+        Route::get('router-throughputs', 'RouterThroughputController@index');
+        Route::get('router-throughputs/{routerThroughputId}', 'RouterThroughputController@show');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('router-throughputs', 'RouterThroughputController@store');
-            $router->patch('router-throughputs/{routerThroughputId}', 'RouterThroughputController@update');
-            $router->delete('router-throughputs/{routerThroughputId}', [
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('router-throughputs', 'RouterThroughputController@store');
+            Route::patch('router-throughputs/{routerThroughputId}', 'RouterThroughputController@update');
+            Route::delete('router-throughputs/{routerThroughputId}', [
                 'middleware' => 'can-be-deleted:' . \App\Models\V2\RouterThroughput::class   . ',routerThroughputId',
                 'uses' => 'RouterThroughputController@destroy'
             ]);
@@ -461,185 +452,185 @@ $router->group($baseRouteParameters, function () use ($router) {
     });
 
     /** Host */
-    $router->group([], function () use ($router) {
-        $router->get('hosts', 'HostController@index');
-        $router->get('hosts/{id}', 'HostController@show');
-        $router->get('hosts/{id}/tasks', 'HostController@tasks');
-        $router->post('hosts', 'HostController@store');
-        $router->patch('hosts/{id}', 'HostController@update');
-        $router->delete('hosts/{id}', 'HostController@destroy');
+    Route::group([], function () {
+        Route::get('hosts', 'HostController@index');
+        Route::get('hosts/{id}', 'HostController@show');
+        Route::get('hosts/{id}/tasks', 'HostController@tasks');
+        Route::post('hosts', 'HostController@store');
+        Route::patch('hosts/{id}', 'HostController@update');
+        Route::delete('hosts/{id}', 'HostController@destroy');
     });
 
     /** Host Spec */
-    $router->group([], function () use ($router) {
-        $router->get('host-specs', 'HostSpecController@index');
-        $router->get('host-specs/{hostSpecId}', 'HostSpecController@show');
+    Route::group([], function () {
+        Route::get('host-specs', 'HostSpecController@index');
+        Route::get('host-specs/{hostSpecId}', 'HostSpecController@show');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('host-specs', 'HostSpecController@store');
-            $router->patch('host-specs/{hostSpecId}', 'HostSpecController@update');
-            $router->delete('host-specs/{hostSpecId}', 'HostSpecController@destroy');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('host-specs', 'HostSpecController@store');
+            Route::patch('host-specs/{hostSpecId}', 'HostSpecController@update');
+            Route::delete('host-specs/{hostSpecId}', 'HostSpecController@destroy');
         });
     });
 
     /** Host Group */
-    $router->group([], function () use ($router) {
-        $router->get('host-groups', 'HostGroupController@index');
-        $router->get('host-groups/{id}', 'HostGroupController@show');
-        $router->get('host-groups/{id}/tasks', 'HostGroupController@tasks');
-        $router->post('host-groups', 'HostGroupController@store');
-        $router->patch('host-groups/{id}', 'HostGroupController@update');
-        $router->delete('host-groups/{id}', 'HostGroupController@destroy');
+    Route::group([], function () {
+        Route::get('host-groups', 'HostGroupController@index');
+        Route::get('host-groups/{id}', 'HostGroupController@show');
+        Route::get('host-groups/{id}/tasks', 'HostGroupController@tasks');
+        Route::post('host-groups', 'HostGroupController@store');
+        Route::patch('host-groups/{id}', 'HostGroupController@update');
+        Route::delete('host-groups/{id}', 'HostGroupController@destroy');
     });
 
     /** Images */
-    $router->group([], function () use ($router) {
-        $router->get('images', 'ImageController@index');
-        $router->get('images/{imageId}', 'ImageController@show');
-        $router->get('images/{imageId}/parameters', 'ImageController@parameters');
-        $router->get('images/{imageId}/metadata', 'ImageController@metadata');
-        $router->get('images/{imageId}/software', 'ImageController@software');
+    Route::group([], function () {
+        Route::get('images', 'ImageController@index');
+        Route::get('images/{imageId}', 'ImageController@show');
+        Route::get('images/{imageId}/parameters', 'ImageController@parameters');
+        Route::get('images/{imageId}/metadata', 'ImageController@metadata');
+        Route::get('images/{imageId}/software', 'ImageController@software');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('images', 'ImageController@store');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('images', 'ImageController@store');
         });
-        $router->group(['middleware' => 'can-update-image'], function () use ($router) {
-            $router->patch('images/{imageId}', 'ImageController@update');
+        Route::group(['middleware' => 'can-update-image'], function () {
+            Route::patch('images/{imageId}', 'ImageController@update');
         });
-        $router->group(['middleware' => 'can-delete-image'], function () use ($router) {
-            $router->delete('images/{imageId}', 'ImageController@destroy');
+        Route::group(['middleware' => 'can-delete-image'], function () {
+            Route::delete('images/{imageId}', 'ImageController@destroy');
         });
     });
 
     /** Image Parameters */
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('image-parameters', 'ImageParameterController@index');
-        $router->get('image-parameters/{imageParameterId}', 'ImageParameterController@show');
-        $router->post('image-parameters', 'ImageParameterController@store');
-        $router->patch('image-parameters/{imageParameterId}', 'ImageParameterController@update');
-        $router->delete('image-parameters/{imageParameterId}', 'ImageParameterController@destroy');
+    Route::group(['middleware' => 'is-admin'], function () {
+        Route::get('image-parameters', 'ImageParameterController@index');
+        Route::get('image-parameters/{imageParameterId}', 'ImageParameterController@show');
+        Route::post('image-parameters', 'ImageParameterController@store');
+        Route::patch('image-parameters/{imageParameterId}', 'ImageParameterController@update');
+        Route::delete('image-parameters/{imageParameterId}', 'ImageParameterController@destroy');
     });
 
     /** Image metadata */
-    $router->get('image-metadata', 'ImageMetadataController@index');
-    $router->get('image-metadata/{imageMetadataId}', 'ImageMetadataController@show');
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->post('image-metadata', 'ImageMetadataController@store');
-        $router->patch('image-metadata/{imageMetadataId}', 'ImageMetadataController@update');
-        $router->delete('image-metadata/{imageMetadataId}', 'ImageMetadataController@destroy');
+    Route::get('image-metadata', 'ImageMetadataController@index');
+    Route::get('image-metadata/{imageMetadataId}', 'ImageMetadataController@show');
+    Route::group(['middleware' => 'is-admin'], function () {
+        Route::post('image-metadata', 'ImageMetadataController@store');
+        Route::patch('image-metadata/{imageMetadataId}', 'ImageMetadataController@update');
+        Route::delete('image-metadata/{imageMetadataId}', 'ImageMetadataController@destroy');
     });
 
     /** SSH Key Pairs */
-    $router->group([], function () use ($router) {
-        $router->group(['middleware' => ['has-reseller-id', 'customer-max-ssh-key-pairs']], function () use ($router) {
-            $router->post('ssh-key-pairs', 'SshKeyPairController@create');
+    Route::group([], function () {
+        Route::group(['middleware' => ['has-reseller-id', 'customer-max-ssh-key-pairs']], function () {
+            Route::post('ssh-key-pairs', 'SshKeyPairController@create');
         });
-        $router->patch('ssh-key-pairs/{keypairId}', 'SshKeyPairController@update');
-        $router->get('ssh-key-pairs', 'SshKeyPairController@index');
-        $router->get('ssh-key-pairs/{keypairId}', 'SshKeyPairController@show');
-        $router->delete('ssh-key-pairs/{keypairId}', 'SshKeyPairController@destroy');
+        Route::patch('ssh-key-pairs/{keypairId}', 'SshKeyPairController@update');
+        Route::get('ssh-key-pairs', 'SshKeyPairController@index');
+        Route::get('ssh-key-pairs/{keypairId}', 'SshKeyPairController@show');
+        Route::delete('ssh-key-pairs/{keypairId}', 'SshKeyPairController@destroy');
     });
 
     /** Task */
-    $router->group([], function () use ($router) {
-        $router->get('tasks', 'TaskController@index');
-        $router->get('tasks/{taskId}', 'TaskController@show');
+    Route::group([], function () {
+        Route::get('tasks', 'TaskController@index');
+        Route::get('tasks/{taskId}', 'TaskController@show');
     });
 
     /** Orchestrator Configurations */
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('orchestrator-configs', 'OrchestratorConfigController@index');
-        $router->get('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@show');
-        $router->post('orchestrator-configs', 'OrchestratorConfigController@store');
-        $router->patch('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@update');
-        $router->delete('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@destroy');
-        $router->get('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@showData');
-        $router->get('orchestrator-configs/{orchestratorConfigId}/builds', 'OrchestratorConfigController@builds');
+    Route::group(['middleware' => 'is-admin'], function () {
+        Route::get('orchestrator-configs', 'OrchestratorConfigController@index');
+        Route::get('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@show');
+        Route::post('orchestrator-configs', 'OrchestratorConfigController@store');
+        Route::patch('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@update');
+        Route::delete('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@destroy');
+        Route::get('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@showData');
+        Route::get('orchestrator-configs/{orchestratorConfigId}/builds', 'OrchestratorConfigController@builds');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->put('orchestrator-configs/{orchestratorConfigId}/lock', 'OrchestratorConfigController@lock');
-            $router->put('orchestrator-configs/{orchestratorConfigId}/unlock', 'OrchestratorConfigController@unlock');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::put('orchestrator-configs/{orchestratorConfigId}/lock', 'OrchestratorConfigController@lock');
+            Route::put('orchestrator-configs/{orchestratorConfigId}/unlock', 'OrchestratorConfigController@unlock');
         });
 
-        $router->group(['middleware' => ['orchestrator-config-is-locked', 'orchestrator-config-is-valid']], function () use ($router) {
-            $router->post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
+        Route::group(['middleware' => ['orchestrator-config-is-locked', 'orchestrator-config-is-valid']], function () {
+            Route::post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
         });
 
-        $router->group(['middleware' => 'orchestrator-config-has-reseller-id'], function () use ($router) {
-            $router->post('orchestrator-configs/{orchestratorConfigId}/deploy', 'OrchestratorConfigController@deploy');
+        Route::group(['middleware' => 'orchestrator-config-has-reseller-id'], function () {
+            Route::post('orchestrator-configs/{orchestratorConfigId}/deploy', 'OrchestratorConfigController@deploy');
         });
     });
 
     /** Orchestrator Builds */
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('orchestrator-builds', 'OrchestratorBuildController@index');
-        $router->get('orchestrator-builds/{orchestratorBuildId}', 'OrchestratorBuildController@show');
+    Route::group(['middleware' => 'is-admin'], function () {
+        Route::get('orchestrator-builds', 'OrchestratorBuildController@index');
+        Route::get('orchestrator-builds/{orchestratorBuildId}', 'OrchestratorBuildController@show');
     });
 
     /** IP Addresses */
-    $router->group([], function () use ($router) {
-        $router->get('ip-addresses', 'IpAddressController@index');
-        $router->get('ip-addresses/{ipAddressId}', 'IpAddressController@show');
-        $router->post('ip-addresses', 'IpAddressController@store');
+    Route::group([], function () {
+        Route::get('ip-addresses', 'IpAddressController@index');
+        Route::get('ip-addresses/{ipAddressId}', 'IpAddressController@show');
+        Route::post('ip-addresses', 'IpAddressController@store');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->get('ip-addresses/{ipAddressId}/nics', 'IpAddressController@nics');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::get('ip-addresses/{ipAddressId}/nics', 'IpAddressController@nics');
         });
 
-        $router->patch('ip-addresses/{ipAddressId}', 'IpAddressController@update');
-        $router->delete('ip-addresses/{ipAddressId}', [
+        Route::patch('ip-addresses/{ipAddressId}', 'IpAddressController@update');
+        Route::delete('ip-addresses/{ipAddressId}', [
             'middleware' => 'can-be-deleted:' . \App\Models\V2\IpAddress::class   . ',ipAddressId',
             'uses' => 'IpAddressController@destroy'
         ]);
     });
 
     /** Software */
-    $router->group([], function () use ($router) {
-        $router->get('software', 'SoftwareController@index');
-        $router->get('software/{softwareId}', 'SoftwareController@show');
+    Route::group([], function () {
+        Route::get('software', 'SoftwareController@index');
+        Route::get('software/{softwareId}', 'SoftwareController@show');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('software', 'SoftwareController@store');
-            $router->patch('software/{softwareId}', 'SoftwareController@update');
-            $router->delete('software/{softwareId}', 'SoftwareController@destroy');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('software', 'SoftwareController@store');
+            Route::patch('software/{softwareId}', 'SoftwareController@update');
+            Route::delete('software/{softwareId}', 'SoftwareController@destroy');
         });
 
-        $router->get('software/{softwareId}/scripts', 'SoftwareController@scripts');
-        $router->get('software/{softwareId}/images', 'SoftwareController@images');
+        Route::get('software/{softwareId}/scripts', 'SoftwareController@scripts');
+        Route::get('software/{softwareId}/images', 'SoftwareController@images');
     });
 
     /** Scripts */
-    $router->group([], function () use ($router) {
-        $router->get('scripts', 'ScriptController@index');
-        $router->get('scripts/{scriptId}', 'ScriptController@show');
+    Route::group([], function () {
+        Route::get('scripts', 'ScriptController@index');
+        Route::get('scripts/{scriptId}', 'ScriptController@show');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('scripts', 'ScriptController@store');
-            $router->patch('scripts/{scriptId}', 'ScriptController@update');
-            $router->delete('scripts/{scriptId}', 'ScriptController@destroy');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('scripts', 'ScriptController@store');
+            Route::patch('scripts/{scriptId}', 'ScriptController@update');
+            Route::delete('scripts/{scriptId}', 'ScriptController@destroy');
         });
     });
 
     /** Instance Software */
-    $router->group([], function () use ($router) {
-        $router->get('instance-software', 'InstanceSoftwareController@index');
-        $router->get('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@show');
+    Route::group([], function () {
+        Route::get('instance-software', 'InstanceSoftwareController@index');
+        Route::get('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@show');
 
-        $router->group(['middleware' => 'is-admin'], function () use ($router) {
-            $router->post('instance-software', 'InstanceSoftwareController@store');
-            $router->patch('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@update');
-            $router->delete('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@destroy');
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::post('instance-software', 'InstanceSoftwareController@store');
+            Route::patch('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@update');
+            Route::delete('instance-software/{instanceSoftwareId}', 'InstanceSoftwareController@destroy');
         });
     });
 
     /** Load Balancer Network */
-    $router->group(['middleware' => 'is-admin'], function () use ($router) {
-        $router->get('load-balancer-networks', 'LoadBalancerNetworkController@index');
-        $router->get('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@show');
-        $router->post('load-balancer-networks', 'LoadBalancerNetworkController@store');
-        $router->patch('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@update');
+    Route::group(['middleware' => 'is-admin'], function () {
+        Route::get('load-balancer-networks', 'LoadBalancerNetworkController@index');
+        Route::get('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@show');
+        Route::post('load-balancer-networks', 'LoadBalancerNetworkController@store');
+        Route::patch('load-balancer-networks/{loadBalancerNetworkId}', 'LoadBalancerNetworkController@update');
 
-        $router->delete('load-balancer-networks/{loadBalancerNetworkId}', [
+        Route::delete('load-balancer-networks/{loadBalancerNetworkId}', [
             'middleware' => 'can-be-deleted:' . \App\Models\V2\LoadBalancerNetwork::class   . ',loadBalancerNetworkId',
             'uses' => 'LoadBalancerNetworkController@destroy'
         ]);

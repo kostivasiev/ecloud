@@ -20,7 +20,7 @@ class GetTest extends TestCase
     public function testIndexPublicImageNotAdmin()
     {
         $this->get('/v2/images')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'img-test',
                 'name' => 'Test Image',
                 'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
@@ -28,13 +28,13 @@ class GetTest extends TestCase
                 'description' => 'CentOS (Community enterprise Operating System)',
                 'platform' => 'Linux',
             ])
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'vpc_id' => null,
                 'script_template' => '',
                 'vm_template' => 'CentOS7 x86_64',
                 'active' => true,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testIndexPublicImageAdmin()
@@ -42,7 +42,7 @@ class GetTest extends TestCase
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
         $this->get('/v2/images')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'img-test',
                 'name' => 'Test Image',
                 'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
@@ -54,64 +54,64 @@ class GetTest extends TestCase
                 'vm_template' => 'CentOS7 x86_64',
                 'active' => true,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testIndexPrivateImageNotAdminNotOwner()
     {
         $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'public' => false,
         ]);
 
         $this->get('/v2/images')
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'img-private-test'
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testIndexPrivateImageNotAdminIsOwner()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE,
         ]);
 
         $this->get('/v2/images')
-            ->seeJson([
+            ->assertJsonFragment([
                 'img-private-test'
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testIndexPrivateImageIsAdminNotOwner()
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'public' => false,
         ]);
 
         $this->get('/v2/images')
-            ->seeJson([
+            ->assertJsonFragment([
                 'img-private-test'
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShowPublicImageNotAdmin()
     {
         $this->get('/v2/images/' . $this->image()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'img-test',
                 'name' => 'Test Image',
                 'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
@@ -120,13 +120,13 @@ class GetTest extends TestCase
                 'platform' => 'Linux',
                 'visibility' => Image::VISIBILITY_PUBLIC,
             ])
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'script_template' => '',
                 'vm_template' => 'CentOS7 x86_64',
                 'active' => true,
                 'public' => true,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShowPublicImageAdmin()
@@ -134,7 +134,7 @@ class GetTest extends TestCase
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
         $this->get('/v2/images/' . $this->image()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'img-test',
                 'name' => 'Test Image',
                 'logo_uri' => 'https://images.ukfast.co.uk/logos/centos/300x300_white.png',
@@ -146,55 +146,55 @@ class GetTest extends TestCase
                 'vm_template' => 'CentOS7 x86_64',
                 'active' => true,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShowPrivateImageNotAdminNotOwner()
     {
         $this->be(new Consumer(2, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'public' => false,
         ]);
 
-        $this->get('/v2/images/img-private-test')->assertResponseStatus(404);
+        $this->get('/v2/images/img-private-test')->assertStatus(404);
     }
 
     public function testShowPrivateImageNotAdminIsOwner()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE,
         ]);
 
         $this->get('/v2/images/img-private-test')
-            ->seeJson([
+            ->assertJsonFragment([
                 'img-private-test'
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShowPrivateImageIsAdminNotOwner()
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE,
         ]);
 
         $this->get('/v2/images/img-private-test')
-            ->seeJson([
+            ->assertJsonFragment([
                 'img-private-test',
                 'vpc_id' => $this->vpc()->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testImageSoftware()
@@ -204,12 +204,12 @@ class GetTest extends TestCase
         $this->image()->software()->sync(['soft-aaaaaaaa']);
         
         $this->get('/v2/images/' . $this->image()->id . '/software')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'soft-aaaaaaaa',
                 'name' => 'Test Software',
                 'platform' => 'Linux',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testHiddenImageParamAdmn()
@@ -217,10 +217,10 @@ class GetTest extends TestCase
         $this->imageParameter()->setAttribute('is_hidden', true)->save();
 
         $this->get('/v2/images/' . $this->image()->id . '/parameters')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'iparam-test',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testHiddenImageParamNotAdmn()
@@ -230,9 +230,9 @@ class GetTest extends TestCase
         $this->imageParameter()->setAttribute('is_hidden', true)->save();
 
         $this->get('/v2/images/' . $this->image()->id . '/parameters')
-            ->dontSeeJson([
+            ->assertJsonMissing([
                 'id' => 'iparam-test',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

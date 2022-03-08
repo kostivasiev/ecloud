@@ -9,8 +9,8 @@ use App\Models\V1\Firewall;
 use App\Services\IntapiService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\Api\Resource\Traits\ResponseHelper;
+use App\Services\V1\Resource\Traits\RequestHelper;
+use App\Services\V1\Resource\Traits\ResponseHelper;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class FirewallController extends BaseController

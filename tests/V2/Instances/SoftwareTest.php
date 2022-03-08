@@ -21,17 +21,16 @@ class SoftwareTest extends TestCase
     public function testGetInstanceSoftware()
     {
         $instanceSoftware = InstanceSoftware::factory()->make();
-        $instanceSoftware->instance()->associate($this->instance());
+        $instanceSoftware->instance()->associate($this->instanceModel());
         $instanceSoftware->software()->associate(Software::find('soft-aaaaaaaa'));
         $instanceSoftware->save();
 
         $this->get(
-            '/v2/instances/' . $this->instance()->id . '/software')
-            ->seeJson([
-                'id' => 'soft-aaaaaaaa',
-                'name' => 'Test Software',
-                'platform' => 'Linux',
-            ])
-            ->assertResponseStatus(200);
+            '/v2/instances/' . $this->instanceModel()->id . '/software'
+        )->assertJsonFragment([
+            'id' => 'soft-aaaaaaaa',
+            'name' => 'Test Software',
+            'platform' => 'Linux',
+        ])->assertStatus(200);
     }
 }

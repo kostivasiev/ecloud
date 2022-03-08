@@ -21,7 +21,7 @@ class UpdateTest extends TestCase
         parent::setUp();
         $this->faker = Faker::create();
 
-        $this->loadBalancer = factory(LoadBalancer::class)->create([
+        $this->loadBalancer = LoadBalancer::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
             'vpc_id' => $this->vpc()->id
         ]);
@@ -41,12 +41,11 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeInDatabase(
-                'load_balancers',
-                $data,
-                'ecloud'
-            )
-            ->assertResponseStatus(202);
+        )->assertStatus(202);
+        $this->assertDatabaseHas(
+            'load_balancers',
+            $data,
+            'ecloud'
+        );
     }
 }

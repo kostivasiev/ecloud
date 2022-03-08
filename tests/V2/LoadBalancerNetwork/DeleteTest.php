@@ -25,6 +25,6 @@ class DeleteTest extends TestCase
         $this->vip();
 
         $this->delete('/v2/load-balancer-networks/' . $this->loadBalancerNetwork()->id)
-            ->assertResponseStatus(412);
+            ->assertStatus(412);
     }
 }

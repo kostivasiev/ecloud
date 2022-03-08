@@ -34,24 +34,24 @@ class DeleteTest extends TestCase
             [],
             []
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ])
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 
     public function testFailInvalidId()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->delete('/v2/networks/NOT_FOUND')
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Not found',
                 'detail' => 'No Network with that ID was found',
                 'status' => 404,
             ])
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testSuccessfulDelete()
@@ -59,7 +59,7 @@ class DeleteTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         Event::fake(Created::class);
         $this->delete('/v2/networks/' . $this->network()->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
     }
 
     public function testDependentNicFailsDelete()
@@ -67,7 +67,7 @@ class DeleteTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         Event::fake(Created::class);
         $this->nic();
-        $this->delete('/v2/networks/' . $this->network()->id)->assertResponseStatus(412);
+        $this->delete('/v2/networks/' . $this->network()->id)->assertStatus(412);
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 
@@ -76,7 +76,7 @@ class DeleteTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         Event::fake(Created::class);
         $this->ip();
-        $this->delete('/v2/networks/' . $this->network()->id)->assertResponseStatus(412);
+        $this->delete('/v2/networks/' . $this->network()->id)->assertStatus(412);
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 }

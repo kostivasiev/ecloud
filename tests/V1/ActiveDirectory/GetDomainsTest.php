@@ -18,17 +18,14 @@ class GetDomainsTest extends TestCase
      */
     public function testValidCollection()
     {
-        $total = 2;
-        factory(ActiveDirectoryDomain::class, $total)->create();
+        ActiveDirectoryDomain::factory(2)->create();
 
         $this->get('/v1/active-directory/domains', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
-            'total' => $total,
-        ]);
+        ])->assertJsonFragment([
+            'total' => 2,
+        ])->assertStatus(200);
     }
 
 
@@ -38,16 +35,14 @@ class GetDomainsTest extends TestCase
      */
     public function testValidItem()
     {
-        factory(ActiveDirectoryDomain::class, 1)->create([
+        ActiveDirectoryDomain::factory(1)->create([
             'ad_domain_id' => 123,
         ]);
 
         $this->get('/v1/active-directory/domains/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     /**
@@ -59,9 +54,7 @@ class GetDomainsTest extends TestCase
         $this->get('/v1/active-directory/domains/abc', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     /**
@@ -70,7 +63,7 @@ class GetDomainsTest extends TestCase
      */
     public function testInvalidItemOwner()
     {
-        factory(ActiveDirectoryDomain::class, 1)->create([
+        ActiveDirectoryDomain::factory(1)->create([
             'ad_domain_id' => 123,
             'ad_domain_reseller_id' => 2,
         ]);
@@ -78,9 +71,9 @@ class GetDomainsTest extends TestCase
         $this->get('/v1/active-directory/domains/123', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
+        ])->assertStatus(404);
 
-        $this->assertResponseStatus(404) && $this->seeInDatabase('ad_domain', [
+        $this->assertDatabaseHas('ad_domain', [
             'ad_domain_id' => 123,
             'ad_domain_reseller_id' => 2
         ]);

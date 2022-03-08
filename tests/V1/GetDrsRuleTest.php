@@ -12,16 +12,14 @@ class GetDrsRuleTest extends TestCase
      */
     public function testExceptionWhenKingpinServiceFails()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123,
         ]);
 
         $this->get('/v1/solutions/123/constraints', [
             'X-consumer-custom-id' => '0-1',
             'X-consumer-groups' => env('APP_NAME') . '.read',
-        ]);
-
-        $this->assertResponseStatus(503);
+        ])->assertStatus(503);
     }
 
     /**
@@ -33,9 +31,7 @@ class GetDrsRuleTest extends TestCase
         $this->get('/v1/solutions/123/constraints', [
             'X-consumer-custom-id' => '0-1',
             'X-consumer-groups' => env('APP_NAME') . '.read',
-        ]);
-
-        $this->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 
     /**
@@ -44,16 +40,14 @@ class GetDrsRuleTest extends TestCase
      */
     public function testUnauthorizedWhenNotAdmin()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123,
         ]);
 
         $this->get('/v1/solutions/123/constraints', [
             'X-consumer-custom-id' => '1-1',
             'X-consumer-groups' => env('APP_NAME') . '.read',
-        ]);
-
-        $this->assertResponseStatus(401);
+        ])->assertStatus(401);
     }
 
 }

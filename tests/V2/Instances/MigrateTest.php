@@ -22,12 +22,11 @@ class MigrateTest extends TestCase
         Event::fake(Created::class);
 
         $this->post(
-            '/v2/instances/' . $this->instance()->id . '/migrate',
+            '/v2/instances/' . $this->instanceModel()->id . '/migrate',
             [
                 'host_group_id' => $this->hostGroup()->id
             ],
-        )
-            ->assertResponseStatus(202);
+        )->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -36,8 +35,8 @@ class MigrateTest extends TestCase
     {
         Event::fake(Created::class);
 
-        $this->post('/v2/instances/' . $this->instance()->id . '/migrate')
-            ->assertResponseStatus(202);
+        $this->post('/v2/instances/' . $this->instanceModel()->id . '/migrate')
+            ->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -46,15 +45,15 @@ class MigrateTest extends TestCase
     {
         Event::fake();
 
-        $instance = Instance::withoutEvents(function() {
-            return factory(Instance::class)->create([
+        $instance = Instance::withoutEvents(function () {
+            return Instance::factory()->create([
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),
             ]);
         });
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-' . uniqid(),
             'platform' => 'Windows'
         ])->instances()->save($instance);
@@ -68,7 +67,6 @@ class MigrateTest extends TestCase
             [
                 'host_group_id' => $this->hostGroup()->id
             ],
-        )
-            ->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 }

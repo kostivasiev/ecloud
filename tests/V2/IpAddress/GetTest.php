@@ -27,13 +27,13 @@ class GetTest extends TestCase
             ]);
 
         $this->get('/v2/ip-addresses')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'ip_address' => '1.1.1.1',
                     'network_id' => $this->network()->id,
                     'type' => 'normal'
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 
     public function testGetResource()
@@ -43,14 +43,14 @@ class GetTest extends TestCase
         ]);
 
         $this->get('/v2/ip-addresses/' . $ipAddress->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'id' => $ipAddress->id,
                     'ip_address' => '1.1.1.1',
                     'network_id' => $this->network()->id,
                     'type' => 'normal'
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 
     public function testGetNicsCollection()
@@ -60,10 +60,10 @@ class GetTest extends TestCase
         $ipAddress->nics()->sync($this->nic());
 
         $this->get('/v2/ip-addresses/' . $ipAddress->id . '/nics')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'id' => $this->nic()->id,
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 }

@@ -12,7 +12,7 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->vpnProfileGroup = factory(VpnProfileGroup::class)->create([
+        $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'name' => 'Profile Group Name',
             'description' => 'VPN Profile Group Description',
             'availability_zone_id' => $this->availabilityZone()->id,
@@ -25,25 +25,25 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get('/v2/vpn-profile-groups')
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'name' => 'Profile Group Name',
                     'description' => 'VPN Profile Group Description',
                 ]
             )
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetResource()
     {
         $this->get('/v2/vpn-profile-groups/' . $this->vpnProfileGroup->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'name' => 'Profile Group Name',
                     'description' => 'VPN Profile Group Description',
                 ]
             )
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testIsNotVisibleInNonPublicAZ()
@@ -52,11 +52,11 @@ class GetTest extends TestCase
         $this->availabilityZone()->saveQuietly();
 
         $this->get('/v2/vpn-profile-groups')
-            ->dontSeeJson(
+            ->assertJsonMissing(
                 [
                     'id' => $this->vpnProfileGroup->id,
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 
     public function testIsNotVisibleInNonPublicRegion()
@@ -65,10 +65,10 @@ class GetTest extends TestCase
         $this->region()->saveQuietly();
 
         $this->get('/v2/vpn-profile-groups')
-            ->dontSeeJson(
+            ->assertJsonMissing(
                 [
                     'id' => $this->vpnProfileGroup->id,
                 ]
-            )->assertResponseStatus(200);
+            )->assertStatus(200);
     }
 }

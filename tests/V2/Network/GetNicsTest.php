@@ -4,7 +4,6 @@ namespace Tests\V2\Network;
 
 use App\Models\V2\Nic;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetNicsTest extends TestCase
@@ -20,11 +19,11 @@ class GetNicsTest extends TestCase
     public function testGetCollection()
     {
         $nic = null;
-        Nic::withoutEvents(function() use (&$nic) {
-            $nic = factory(Nic::class)->create([
+        Nic::withoutEvents(function () use (&$nic) {
+            $nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'mac_address' => $this->faker->macAddress,
-                'instance_id' => $this->instance()->id,
+                'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
             ]);
         });
@@ -36,11 +35,11 @@ class GetNicsTest extends TestCase
                 'X-consumer-groups'    => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'mac_address' => $nic->mac_address,
                 'instance_id' => $nic->instance_id,
                 'network_id'  => $nic->network_id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

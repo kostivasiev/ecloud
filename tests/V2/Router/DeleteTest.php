@@ -36,7 +36,7 @@ class DeleteTest extends TestCase
         $this->be($this->consumer);
         Event::fake(Created::class);
         $this->delete('/v2/routers/' . $this->router()->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
         Event::assertDispatched(Created::class);
     }
 
@@ -45,11 +45,11 @@ class DeleteTest extends TestCase
         $this->be($this->consumer);
         $this->network();
         $this->delete('/v2/routers/' . $this->router()->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Precondition Failed',
                     'detail' => 'The specified resource has dependant relationships and cannot be deleted: ' . $this->network()->id,
                 ]
-            )->assertResponseStatus(412);
+            )->assertStatus(412);
     }
 }

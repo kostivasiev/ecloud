@@ -14,7 +14,7 @@ class DeleteTest extends TestCase
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
         $this->delete('/v2/ip-addresses/' . $this->ip()->id)
-            ->assertResponseStatus(204);
+            ->assertStatus(204);
     }
 
     public function testCannotDeleteWhenUsedByNic()
@@ -23,7 +23,7 @@ class DeleteTest extends TestCase
         $this->ip()->nics()->sync($this->nic());
 
         $this->delete('/v2/ip-addresses/' . $this->ip()->id)
-            ->assertResponseStatus(412);
+            ->assertStatus(412);
     }
 
     public function testCannotDeleteWhenUsedByVip()
@@ -32,7 +32,7 @@ class DeleteTest extends TestCase
         $this->vip()->setAttribute('ip_address_id', $this->ip()->id)->saveQuietly();
 
         $this->delete('/v2/ip-addresses/' . $this->ip()->id)
-            ->assertResponseStatus(412);
+            ->assertStatus(412);
     }
 
     public function testCannotDeleteWhenUsedByVipAndNic()
@@ -42,6 +42,6 @@ class DeleteTest extends TestCase
         $this->vip()->setAttribute('ip_address_id', $this->ip()->id)->saveQuietly();
 
         $this->delete('/v2/ip-addresses/' . $this->ip()->id)
-            ->assertResponseStatus(412);
+            ->assertStatus(412);
     }
 }

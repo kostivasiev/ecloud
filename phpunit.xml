@@ -2,7 +2,7 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          backupGlobals="false"
          backupStaticAttributes="false"
-         bootstrap="bootstrap/app.php"
+         bootstrap="vendor/autoload.php"
          colors="true"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
@@ -26,40 +26,40 @@
         </testsuite>
         <testsuite name="v2">
             <directory suffix="Test.php">./tests/V2</directory>
-            <directory suffix="Test.php">./tests/unit</directory>
+            <directory suffix="Test.php">./tests/Unit</directory>
         </testsuite>
     </testsuites>
     <php>
         <ini name="memory_limit" value="1024M"/>
 
-        <server name="APP_NAME" value="ecloud" force="true"/>
-        <server name="APP_ENV" value="testing" force="true"/>
-        <server name="APP_DEBUG" value="true" force="true"/>
-        <server name="APP_TIMEZONE" value="Europe/London" force="true"/>
+        <env name="APP_NAME" value="ecloud" force="true"/>
+        <env name="APP_ENV" value="testing" force="true"/>
+        <env name="APP_DEBUG" value="true" force="true"/>
+        <env name="APP_TIMEZONE" value="Europe/London" force="true"/>
 
-<!--        <server name="LOG_CHANNEL" value="stderr" force="true"/>-->
-        <server name="CACHE_DRIVER" value="array" force="true"/>
-        <server name="QUEUE_CONNECTION" value="sync" force="true"/>
-        <server name="PAGINATION_LIMIT" value="100" force="true"/>
+        <!--        <server name="LOG_CHANNEL" value="stderr" force="true"/>-->
+        <env name="CACHE_DRIVER" value="array" force="true"/>
+        <env name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <env name="PAGINATION_LIMIT" value="100" force="true"/>
 
-        <server name="DB_ECLOUD_CONNECTION" value="ecloud" force="true"/>
-        <server name="DB_ECLOUD_HOST" value="" force="true"/>
-        <server name="DB_ECLOUD_DRIVER" value="sqlite" force="true"/>
-        <server name="DB_ECLOUD_DATABASE" value=":memory:" force="true"/>
-<!--        <server name="DB_ECLOUD_HOST" value="mysql-ukfast-net" force="true"/>-->
-<!--        <server name="DB_ECLOUD_PORT" value="3307" force="true"/>-->
-<!--        <server name="DB_ECLOUD_DATABASE" value="ecloud" force="true"/>-->
-<!--        <server name="DB_ECLOUD_USERNAME" value="root" force="true"/>-->
-<!--        <server name="DB_ECLOUD_PASSWORD" value="password" force="true"/>-->
+        <env name="DB_ECLOUD_CONNECTION" value="ecloud" force="true"/>
+        <env name="DB_ECLOUD_HOST" value="" force="true"/>
+        <env name="DB_ECLOUD_DRIVER" value="sqlite" force="true"/>
+        <env name="DB_ECLOUD_DATABASE" value=":memory:" force="true"/>
+        <!--        <server name="DB_ECLOUD_HOST" value="mysql-ukfast-net" force="true"/>-->
+        <!--        <server name="DB_ECLOUD_PORT" value="3307" force="true"/>-->
+        <!--        <server name="DB_ECLOUD_DATABASE" value="ecloud" force="true"/>-->
+        <!--        <server name="DB_ECLOUD_USERNAME" value="root" force="true"/>-->
+        <!--        <server name="DB_ECLOUD_PASSWORD" value="password" force="true"/>-->
 
-        <server name="DB_RESELLER_CONNECTION" value="reseller" force="true"/>
-        <server name="DB_RESELLER_HOST" value="" force="true"/>
-        <server name="DB_RESELLER_DRIVER" value="sqlite" force="true"/>
-        <server name="DB_RESELLER_DATABASE" value=":memory:" force="true"/>
-<!--        <server name="DB_RESELLER_HOST" value="mysql-ukfast-net" force="true"/>-->
-<!--        <server name="DB_RESELLER_PORT" value="3307" force="true"/>-->
-<!--        <server name="DB_RESELLER_DATABASE" value="reseller" force="true"/>-->
-<!--        <server name="DB_RESELLER_USERNAME" value="root" force="true"/>-->
-<!--        <server name="DB_RESELLER_PASSWORD" value="password" force="true"/>-->
+        <env name="DB_RESELLER_CONNECTION" value="reseller" force="true"/>
+        <env name="DB_RESELLER_HOST" value="" force="true"/>
+        <env name="DB_RESELLER_DRIVER" value="sqlite" force="true"/>
+        <env name="DB_RESELLER_DATABASE" value=":memory:" force="true"/>
+        <!--        <server name="DB_RESELLER_HOST" value="mysql-ukfast-net" force="true"/>-->
+        <!--        <server name="DB_RESELLER_PORT" value="3307" force="true"/>-->
+        <!--        <server name="DB_RESELLER_DATABASE" value="reseller" force="true"/>-->
+        <!--        <server name="DB_RESELLER_USERNAME" value="root" force="true"/>-->
+        <!--        <server name="DB_RESELLER_PASSWORD" value="password" force="true"/>-->
     </php>
 </phpunit>

@@ -1,9 +1,29 @@
 <?php
 
-/** @var \Illuminate\Database\Eloquent\Factory $factory */
+namespace Database\Factories\V2;
 
 use App\Models\V2\Dhcp;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-$factory->define(Dhcp::class, function () {
-    return [];
-});
+class DhcpFactory extends Factory
+{
+    protected $connection = 'ecloud';
+
+    /**
+     * The name of the factory's corresponding model.
+     *
+     * @var string
+     */
+    protected $model = Dhcp::class;
+
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition(): array
+    {
+        return [
+        ];
+    }
+}

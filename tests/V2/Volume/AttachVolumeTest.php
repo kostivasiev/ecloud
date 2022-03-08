@@ -24,11 +24,11 @@ class AttachVolumeTest extends TestCase
 
         // Attach a volume
         $this->post('/v2/volumes/' . $volume->id . '/attach', [
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->assertResponseStatus(202);
+        ])->assertStatus(202);
     }
 
     public function testAttachVolumeInstanceHasFailed()
@@ -47,22 +47,22 @@ class AttachVolumeTest extends TestCase
                 'completed' => true,
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $model->resource()->associate($this->instance());
+            $model->resource()->associate($this->instanceModel());
             $model->save();
         });
 
         // Attach a volume
         $this->post('/v2/volumes/' . $volume->id . '/attach', [
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified instance id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testAttachingAttachedVolumeFails()
@@ -75,14 +75,14 @@ class AttachVolumeTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
 
-        $this->instance()->volumes()->attach($volume);
+        $this->instanceModel()->volumes()->attach($volume);
 
         $this->post('/v2/volumes/' . $volume->id . '/attach', [
-            'instance_id' => $this->instance()->id,
+            'instance_id' => $this->instanceModel()->id,
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'errors' => [
                 [
                     'title' => 'Validation Error',
@@ -91,6 +91,6 @@ class AttachVolumeTest extends TestCase
                     'source' => 'instance_id',
                 ]
             ],
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }

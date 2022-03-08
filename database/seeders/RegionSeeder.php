@@ -14,7 +14,7 @@ class RegionSeeder extends Seeder
      */
     public function run()
     {
-        factory(Region::class)->create([
+        Region::factory()->create([
             'id' => 'reg-aaaaaaaa',
             'name' => 'Dev Region',
             'is_public' => true,

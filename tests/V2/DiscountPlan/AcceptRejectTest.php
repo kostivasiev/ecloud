@@ -4,7 +4,6 @@ namespace Tests\V2\DiscountPlan;
 
 use App\Models\V2\DiscountPlan;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AcceptRejectTest extends TestCase
@@ -17,7 +16,7 @@ class AcceptRejectTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        $this->discountPlan = factory(DiscountPlan::class, 2)->create([
+        $this->discountPlan = DiscountPlan::factory(2)->create([
             'contact_id' => 1,
         ]);
     }
@@ -33,7 +32,7 @@ class AcceptRejectTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->assertResponseStatus(200);
+        )->assertStatus(200);
 
         $discountPlan->refresh();
 
@@ -52,7 +51,7 @@ class AcceptRejectTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
                 'X-Reseller-Id' => 1,
             ]
-        )->assertResponseStatus(200);
+        )->assertStatus(200);
 
         $discountPlan->refresh();
 

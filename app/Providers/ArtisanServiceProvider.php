@@ -11,6 +11,7 @@ use App\Models\V1\Storage;
 use App\Services\Artisan\V1\ArtisanService;
 use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Log;
 use UKFast\Api\Exceptions\NotFoundException;
@@ -41,7 +42,7 @@ class ArtisanServiceProvider extends ServiceProvider
             /**
              * Load via dependency injection in a controller which has datastore_id in the route
              */
-            $routeParams = $this->app['request']->route()[2];
+            $routeParams = Request::route()->parameters();
 
             // Do we have a datastore to get the config from in a route? (i.e does the route have datastore_id?
             if (in_array('datastore_id', array_keys($routeParams))) {

@@ -17,7 +17,7 @@ class UpdateTest extends TestCase
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-test-2',
         ]);
 
@@ -31,7 +31,10 @@ class UpdateTest extends TestCase
                 'required' => false,
                 'validation_rule' => 'UPDATED VALIDATION RULE',
                 'image_id' => 'img-test-2'
-            ])->seeInDatabase(
+            ]
+        )->assertStatus(200);
+
+        $this->assertDatabaseHas(
             'image_parameters',
             [
                 'name' => 'UPDATED NAME',
@@ -43,11 +46,11 @@ class UpdateTest extends TestCase
                 'image_id' => 'img-test-2'
             ],
             'ecloud'
-        )->assertResponseStatus(200);
+        );
     }
 
     public function testUpdateNotAdminFails()
     {
-        $this->patch('/v2/image-parameters/' . $this->imageParameter()->id, [])->assertResponseStatus(401);
+        $this->patch('/v2/image-parameters/' . $this->imageParameter()->id, [])->assertStatus(401);
     }
 }

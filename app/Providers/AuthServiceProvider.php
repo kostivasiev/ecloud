@@ -3,28 +3,28 @@
 namespace App\Providers;
 
 use App\User;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * The policy mappings for the application.
      *
-     * @return void
+     * @var array
      */
-    public function register()
-    {
-        //
-    }
+    protected $policies = [
+        // 'App\Model' => 'App\Policies\ModelPolicy',
+    ];
 
     /**
-     * Boot the authentication services for the application.
+     * Register any authentication / authorization services.
      *
      * @return void
      */
     public function boot()
     {
-        // Here you may define how you wish users to be authenticated for your Lumen
+        // Here you may define how you wish users to be authenticated for your Laravel
         // application. The callback which receives the incoming request instance
         // should return either a User instance or null. You're free to obtain
         // the User instance via an API token or any other method necessary.

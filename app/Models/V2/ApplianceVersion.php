@@ -7,6 +7,7 @@ namespace App\Models\V2;
 
 use App\Traits\V2\ColumnPrefixHelper;
 use App\Traits\V2\UUIDHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Devices\AdminClient;
@@ -14,7 +15,7 @@ use UKFast\SDK\Exception\ServerException;
 
 class ApplianceVersion extends V1ModelWrapper
 {
-    use ColumnPrefixHelper, UUIDHelper, SoftDeletes;
+    use HasFactory, ColumnPrefixHelper, UUIDHelper, SoftDeletes;
 
     protected $connection = 'ecloud';
     protected $table = 'appliance_version';

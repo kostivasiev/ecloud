@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
+use App\Models\V2\Host;
 
 class DeleteTest extends TestCase
 {
     protected Collection $hosts;
     protected Collection $instances;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -26,7 +27,7 @@ class DeleteTest extends TestCase
             ->save();
         $this->hosts = Model::withoutEvents(function () {
             $hostCount = 1;
-            return factory(\App\Models\V2\Host::class, 2)->make([
+            return Host::factory(2)->make([
                 'host_group_id' => $this->hostGroup()->id,
             ])->each(function ($host) use (&$hostCount) {
                 $host->id = 'host-test-' . $hostCount;
@@ -39,7 +40,7 @@ class DeleteTest extends TestCase
 
         $this->instances = Instance::withoutEvents(function () {
             $instanceCount = 1;
-            return factory(Instance::class, 2)->make([
+            return Instance::factory(2)->make([
                 'vpc_id' => $this->vpc()->id,
                 'image_id' => $this->image()->id,
                 'vcpu_cores' => 2,
@@ -70,12 +71,12 @@ class DeleteTest extends TestCase
         $hostId = $this->hosts->first()->id;
         $this->delete(
             '/v2/hosts/'.$hostId
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'Host removal will result in insufficient ram capacity for existing instances',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     /**
@@ -87,7 +88,7 @@ class DeleteTest extends TestCase
 
         // First add another host to make sure we have enough resource
         $host = Model::withoutEvents(function () {
-            return factory(\App\Models\V2\Host::class)->create([
+            return Host::factory()->create([
                 'id' => 'additional-host',
                 'name' => 'additional-host',
                 'host_group_id' => $this->hostGroup()->id,
@@ -96,7 +97,7 @@ class DeleteTest extends TestCase
 
         $this->delete(
             '/v2/hosts/'.$host->id
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
     }
 
     /**
@@ -117,12 +118,12 @@ class DeleteTest extends TestCase
         $this->assertEquals(1, $this->hostGroup()->instances()->count());
 
         $this->delete('/v2/hosts/'.$this->hosts->first()->id)
-            ->seeJson(
+            ->assertJsonFragment(
                 [
                     'title' => 'Validation Error',
                     'detail' => 'Can not delete Host with active instances',
                 ]
-            )->assertResponseStatus(422);
+            )->assertStatus(422);
     }
 
     /**
@@ -140,6 +141,6 @@ class DeleteTest extends TestCase
             $this->hosts[1]->delete();
         });
         $this->delete('/v2/hosts/'.$this->hosts->first()->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
     }
 }

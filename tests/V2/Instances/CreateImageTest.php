@@ -27,7 +27,7 @@ class CreateImageTest extends TestCase
     public function testCreateImageNoVolumes()
     {
         $this->post(
-            '/v2/instances/' . $this->instance()->id . '/create-image',
+            '/v2/instances/' . $this->instanceModel()->id . '/create-image',
             [
                 'name' => 'createImageTest',
             ],
@@ -35,18 +35,18 @@ class CreateImageTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'Cannot create an image of an Instance with no attached volumes',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testCreateImageTest()
     {
-        $this->instance()->volumes()->attach($this->volume);
-        $this->instance()->saveQuietly();
+        $this->instanceModel()->volumes()->attach($this->volume);
+        $this->instanceModel()->saveQuietly();
 
         // Bind so that we can use the image id
         app()->bind(Image::class, function () {
@@ -74,7 +74,7 @@ class CreateImageTest extends TestCase
             );
 
         $this->post(
-            '/v2/instances/' . $this->instance()->id . '/create-image',
+            '/v2/instances/' . $this->instanceModel()->id . '/create-image',
             [
                 'name' => 'createImageTest',
             ],
@@ -82,6 +82,6 @@ class CreateImageTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
     }
 }

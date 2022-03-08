@@ -16,7 +16,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
 
-        $this->credential = factory(Credential::class)->create();
+        $this->credential = Credential::factory()->create();
     }
 
     public function testGetCollection()
@@ -27,15 +27,13 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
             ]
-        )
-            ->seeJson([
+        )->assertJsonFragment([
                 'resource_id' => 'abc-abc132',
                 'host' => 'https://127.0.0.1',
                 'username' => 'someuser',
                 'password' => 'somepassword',
                 'port' => 8080
-            ])
-            ->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetItemDetail()
@@ -46,14 +44,12 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read, ecloud.write',
             ]
-        )
-            ->seeJson([
+        )->assertJsonFragment([
                 'resource_id' => 'abc-abc132',
                 'host' => 'https://127.0.0.1',
                 'username' => 'someuser',
                 'password' => 'somepassword',
                 'port' => 8080
-            ])
-            ->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }

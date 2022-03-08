@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 return [
 
     /*
@@ -13,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'reseller'),
+    'default' => env('DB_RESELLER_CONNECTION', 'reseller'),
 
     /*
     |--------------------------------------------------------------------------
@@ -32,7 +34,6 @@ return [
     */
 
     'connections' => [
-
         // Default database connection
         'reseller' => [
             'driver' => env('DB_RESELLER_DRIVER', 'mysql'),
@@ -74,18 +75,22 @@ return [
     |--------------------------------------------------------------------------
     |
     | Redis is an open source, fast, and advanced key-value store that also
-    | provides a richer set of commands than a typical key-value systems
+    | provides a richer body of commands than a typical key-value system
     | such as APC or Memcached. Laravel makes it easy to dig right in.
     |
     */
 
     'redis' => [
 
-        'client' => 'predis',
+        'client' => env('REDIS_CLIENT', 'phpredis'),
 
-        'cluster' => env('REDIS_CLUSTER', false),
+        'options' => [
+            'cluster' => env('REDIS_CLUSTER', false),
+            'prefix' => '',
+        ],
 
         'default' => [
+            // 'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
@@ -93,11 +98,11 @@ return [
         ],
 
         'cache' => [
+            // 'url' => env('REDIS_URL'),
             'host' => env('REDIS_HOST', '127.0.0.1'),
             'password' => env('REDIS_PASSWORD', null),
             'port' => env('REDIS_PORT', 6379),
             'database' => env('REDIS_CACHE_DB', 1),
         ],
-
     ],
 ];

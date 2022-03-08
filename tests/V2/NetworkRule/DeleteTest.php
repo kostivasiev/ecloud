@@ -19,7 +19,7 @@ class DeleteTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         Model::withoutEvents(function () {
-            $this->networkRule = factory(NetworkRule::class)->make([
+            $this->networkRule = NetworkRule::factory()->make([
                 'id' => 'nr-test-1',
                 'name' => 'nr-test-1',
             ]);
@@ -42,7 +42,7 @@ class DeleteTest extends TestCase
         $this->vpc()->advanced_networking = true;
         $this->vpc()->saveQuietly();
         $this->delete('/v2/network-rules/' . $this->networkRule->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -51,7 +51,7 @@ class DeleteTest extends TestCase
     public function testCanNotDeleteDhcpRules()
     {
         $networkRule = Model::withoutEvents(function () {
-            $networkRule = factory(NetworkRule::class)->make([
+            $networkRule = NetworkRule::factory()->make([
                 'id' => 'nr-dhcp',
                 'name' => 'nr-test-1',
                 'type' => NetworkRule::TYPE_DHCP
@@ -62,13 +62,13 @@ class DeleteTest extends TestCase
             return $networkRule;
         });
 
-        $this->delete('/v2/network-rules/' . $networkRule->id)->assertResponseStatus(403);
+        $this->delete('/v2/network-rules/' . $networkRule->id)->assertStatus(403);
     }
 
     public function testCanNotDeleteCatchall()
     {
         $networkRule = Model::withoutEvents(function () {
-            $networkRule = factory(NetworkRule::class)->make([
+            $networkRule = NetworkRule::factory()->make([
                 'id' => 'nr-' . NetworkRule::TYPE_CATCHALL,
                 'name' => 'nr-test-1',
                 'type' => NetworkRule::TYPE_CATCHALL
@@ -79,6 +79,6 @@ class DeleteTest extends TestCase
             return $networkRule;
         });
 
-        $this->delete('/v2/network-rules/' . $networkRule->id)->assertResponseStatus(403);
+        $this->delete('/v2/network-rules/' . $networkRule->id)->assertStatus(403);
     }
 }

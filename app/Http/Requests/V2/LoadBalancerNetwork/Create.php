@@ -41,9 +41,9 @@ class Create extends FormRequest
                 'required',
                 'string',
                 new ExistsForUser(Network::class),
-                Rule::unique(LoadBalancerNetwork::class)->withoutTrashed()->where(function ($query) {
+                Rule::unique(LoadBalancerNetwork::class)->where(function ($query) {
                     return $query->where('load_balancer_id', app('request')->input('load_balancer_id'));
-                }),
+                })->whereNull('deleted_at'),
             ],
         ];
     }

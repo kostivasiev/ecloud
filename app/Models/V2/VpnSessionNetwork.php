@@ -4,22 +4,14 @@ namespace App\Models\V2;
 
 use App\Events\V2\VpnSession\Deleted;
 use App\Traits\V2\CustomKey;
-use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
-use App\Traits\V2\Syncable;
-use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
 
 class VpnSessionNetwork extends Model implements ResellerScopeable, Natable, RouterScopable
 {
-    use CustomKey, SoftDeletes, DeletionRules;
+    use HasFactory, CustomKey, SoftDeletes, DeletionRules;
 
     public $keyPrefix = 'vpnsn';
 

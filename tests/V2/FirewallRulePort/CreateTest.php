@@ -4,9 +4,7 @@ namespace Tests\V2\FirewallRulePort;
 
 use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallRule;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
@@ -19,7 +17,7 @@ class CreateTest extends TestCase
 
         $this->availabilityZone();
 
-        $this->firewallRule = factory(FirewallRule::class)->create([
+        $this->firewallRule = FirewallRule::factory()->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
 
@@ -36,7 +34,9 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'firewall_rule_ports',
             [
                 'firewall_rule_id' => $this->firewallRule->id,
@@ -45,7 +45,7 @@ class CreateTest extends TestCase
                 'destination' => '555'
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -60,14 +60,16 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'firewall_rule_ports',
             [
                 'firewall_rule_id' => $this->firewallRule->id,
                 'protocol' => 'ICMPv4',
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -84,7 +86,9 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'firewall_rule_ports',
             [
                 'firewall_rule_id' => $this->firewallRule->id,
@@ -93,7 +97,7 @@ class CreateTest extends TestCase
                 'destination' => '555'
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -110,7 +114,9 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+
+        $this->assertDatabaseHas(
             'firewall_rule_ports',
             [
                 'firewall_rule_id' => $this->firewallRule->id,
@@ -119,7 +125,7 @@ class CreateTest extends TestCase
                 'destination' => 'ANY'
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -136,7 +142,7 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -151,7 +157,7 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '1-0',
             'X-consumer-groups' => 'ecloud.write'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }

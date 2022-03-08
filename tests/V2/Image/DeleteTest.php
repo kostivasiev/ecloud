@@ -21,21 +21,21 @@ class DeleteTest extends TestCase
 
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        $this->delete('/v2/images/' . $this->image()->id,)->assertResponseStatus(202);
+        $this->delete('/v2/images/' . $this->image()->id)->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testNotAdminDeletePublicFails()
     {
-        $this->delete('/v2/images/' . $this->image()->id)->assertResponseStatus(403);
+        $this->delete('/v2/images/' . $this->image()->id)->assertStatus(403);
     }
 
     public function testAdminDeletePrivateSucceeds()
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
@@ -43,14 +43,14 @@ class DeleteTest extends TestCase
 
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        $this->delete('/v2/images/img-private-test')->assertResponseStatus(202);
+        $this->delete('/v2/images/img-private-test')->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
 
     public function testNotAdminDeletePrivateIsOwnerSucceeds()
     {
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $this->vpc()->id,
             'visibility' => Image::VISIBILITY_PRIVATE
@@ -60,7 +60,7 @@ class DeleteTest extends TestCase
 
         Event::fake(\App\Events\V2\Task\Created::class);
 
-        $this->delete('/v2/images/img-private-test')->assertResponseStatus(202);
+        $this->delete('/v2/images/img-private-test')->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -68,17 +68,17 @@ class DeleteTest extends TestCase
     public function testNotAdminDeletePrivateNotOwnerFails()
     {
         Event::fake();
-        $vpc = factory(Vpc::class)->create([
+        $vpc = Vpc::factory()->create([
             'id' => 'vpc-' . uniqid(),
             'reseller_id' => 2
         ]);
 
-        factory(Image::class)->create([
+        Image::factory()->create([
             'id' => 'img-private-test',
             'vpc_id' => $vpc->id,
             'visibility' => Image::VISIBILITY_PRIVATE
         ]);
 
-        $this->delete('/v2/images/img-private-test')->assertResponseStatus(404);
+        $this->delete('/v2/images/img-private-test')->assertStatus(404);
     }
 }

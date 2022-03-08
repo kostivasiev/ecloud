@@ -18,7 +18,7 @@ class CreateTest extends TestCase
     {
         parent::setUp();
 
-        $this->routerThroughput = factory(RouterThroughput::class)->create([
+        $this->routerThroughput = RouterThroughput::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,
         ]);
     }
@@ -34,14 +34,13 @@ class CreateTest extends TestCase
             [
                 'X-consumer-custom-id' => '2-0',
                 'X-consumer-groups' => 'ecloud.write',
-            ])
-            ->seeJson([
-                'title' => 'Validation Error',
-                'detail' => 'The specified vpc id was not found',
-                'status' => 422,
-                'source' => 'vpc_id'
-            ])
-            ->assertResponseStatus(422);
+            ]
+        )->assertJsonFragment([
+            'title' => 'Validation Error',
+            'detail' => 'The specified vpc id was not found',
+            'status' => 422,
+            'source' => 'vpc_id'
+        ])->assertStatus(422);
     }
 
     public function testVpcFailureCausesFail()
@@ -71,12 +70,12 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified vpc id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testValidDataSucceeds()
@@ -95,9 +94,8 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-           ->seeInDatabase('routers', $data, 'ecloud')
-            ->assertResponseStatus(202);
+        )->assertStatus(202);
+        $this->assertDatabaseHas('routers', $data, 'ecloud');
         Event::assertDispatched(Created::class);
     }
 }

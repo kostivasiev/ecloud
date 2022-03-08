@@ -1,8 +1,8 @@
 <?php
 namespace Tests\V2\NetworkPolicy;
 
-use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Network;
+use App\Models\V2\NetworkPolicy;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -25,11 +25,11 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'id' => 'np-test',
             'network_id' => $this->network()->id,
             'name' => 'np-test',
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetResource()
@@ -40,11 +40,11 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'id' => 'np-test',
             'network_id' => $this->network()->id,
             'name' => 'np-test',
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetHiddenNotAdminFails()
@@ -54,7 +54,7 @@ class GetTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         $this->get('/v2/network-policies/' . $this->networkPolicy()->id)
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testGetHiddenAdminPasses()
@@ -63,6 +63,6 @@ class GetTest extends TestCase
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        $this->get('/v2/network-policies/' . $this->networkPolicy()->id)->assertResponseStatus(200);
+        $this->get('/v2/network-policies/' . $this->networkPolicy()->id)->assertStatus(200);
     }
 }

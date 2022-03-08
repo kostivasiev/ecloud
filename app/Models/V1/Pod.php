@@ -6,12 +6,13 @@ use App\Models\V1\Pod\ResourceAbstract;
 use App\Models\V1\Pod\ServiceAbstract;
 use App\Services\Artisan\V1\ArtisanService;
 use App\Services\Kingpin\V1\KingpinService;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
-use UKFast\Api\Resource\Property\BooleanProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\IntProperty;
-use UKFast\Api\Resource\Property\StringProperty;
+use App\Services\V1\Resource\Property\BooleanProperty;
+use App\Services\V1\Resource\Property\IdProperty;
+use App\Services\V1\Resource\Property\IntProperty;
+use App\Services\V1\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -20,6 +21,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class Pod extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     /**
      * Eloquent configuration
      * ----------------------
@@ -67,7 +70,7 @@ class Pod extends Model implements Filterable, Sortable
             $factory->create('reseller_id', Filter::$numericDefaults),
             $factory->boolean()->create('active', 'Yes', 'No'),
 
-            $factory->boolean()->create('services_public', 'Yes', 'No', 'ucs_datacentre_public_enabled'),
+            $factory->boolean()->create('services_public', 1, 0, 'ucs_datacentre_public_enabled'),
             $factory->boolean()->create('services_burst', 'Yes', 'No', 'ucs_datacentre_burst_enabled'),
             $factory->boolean()->create('services_gpu', 'Yes', 'No', 'ucs_datacentre_gpu_enabled'),
             $factory->boolean()->create('services_appliances', 'Yes', 'No', 'ucs_datacentre_oneclick_enabled'),
@@ -120,7 +123,7 @@ class Pod extends Model implements Filterable, Sortable
      * Map request property to database field
      *
      * @return array
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidPropertyException
      */
     public function properties()
     {

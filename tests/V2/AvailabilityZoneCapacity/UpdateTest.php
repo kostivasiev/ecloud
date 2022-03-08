@@ -6,7 +6,6 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
@@ -19,24 +18,24 @@ class UpdateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
         $this->vpc = Vpc::withoutEvents(function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-test',
                 'region_id' => $this->region->id,
             ]);
         });
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
-        $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
+        $this->availabilityZoneCapacity = AvailabilityZoneCapacity::factory()->create([
             'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
 
     public function testValidDataIsSuccessful()
     {
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
 
@@ -51,11 +50,12 @@ class UpdateTest extends TestCase
         $this->patch('/v2/availability-zone-capacities/' . $this->availabilityZoneCapacity->id, $data, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeInDatabase(
+        ])->assertStatus(200);
+
+        $this->assertDatabaseHas(
             'availability_zone_capacities',
             $data,
             'ecloud'
-        )
-            ->assertResponseStatus(200);
+        );
     }
 }

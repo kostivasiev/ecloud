@@ -22,7 +22,7 @@ class DeleteTest extends TestCase
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        $this->networkRule = factory(NetworkRule::class)->make([
+        $this->networkRule = NetworkRule::factory()->make([
             'id' => 'nr-test',
             'name' => 'nr-test',
         ]);
@@ -45,7 +45,7 @@ class DeleteTest extends TestCase
         $this->vpc()->saveQuietly();
 
         $this->delete('/v2/network-rule-ports/nrp-test')
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -56,6 +56,6 @@ class DeleteTest extends TestCase
         $this->networkRule->save();
 
         $this->delete('/v2/network-rule-ports/nrp-test')
-            ->assertResponseStatus(403);
+            ->assertStatus(403);
     }
 }

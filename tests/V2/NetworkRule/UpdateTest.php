@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\V2\NetworkRule;
 
 use App\Models\V2\NetworkPolicy;
@@ -20,7 +21,7 @@ class UpdateTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         Model::withoutEvents(function () {
-            $this->networkRule = factory(NetworkRule::class)->make([
+            $this->networkRule = NetworkRule::factory()->make([
                 'id' => 'nr-test',
                 'name' => 'nr-test',
             ]);
@@ -40,14 +41,15 @@ class UpdateTest extends TestCase
             [
                 'action' => 'REJECT',
             ]
-        )->seeInDatabase(
+        )->assertStatus(202);
+        $this->assertDatabaseHas(
             'network_rules',
             [
                 'id' => 'nr-test',
                 'action' => 'REJECT',
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -55,7 +57,7 @@ class UpdateTest extends TestCase
     public function testCanNotEditDhcpRules()
     {
         $dhcpNetworkRule = Model::withoutEvents(function () {
-            $dhcpNetworkRule = factory(NetworkRule::class)->make([
+            $dhcpNetworkRule = NetworkRule::factory()->make([
                 'id' => 'nr-' . uniqid(),
                 'name' => NetworkRule::TYPE_DHCP,
                 'sequence' => 5001,
@@ -71,6 +73,6 @@ class UpdateTest extends TestCase
             return $dhcpNetworkRule;
         });
 
-        $this->patch('/v2/network-rules/' . $dhcpNetworkRule->id)->assertResponseStatus(403);
+        $this->patch('/v2/network-rules/' . $dhcpNetworkRule->id)->assertStatus(403);
     }
 }

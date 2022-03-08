@@ -4,9 +4,10 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\URL;
-use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\Api\Resource\Traits\ResponseHelper;
+use App\Services\V1\Resource\Traits\RequestHelper;
+use App\Services\V1\Resource\Traits\ResponseHelper;
 
 class BaseController extends Controller
 {
@@ -31,10 +32,12 @@ class BaseController extends Controller
         // Pagination limit. Try to set from Request, or default to .env PAGINATION_LIMIT
         $this->perPage = $request->input('per_page', env('PAGINATION_LIMIT'));
 
-        // is the client an admin
-        $this->isAdmin = $request->user()->isAdmin();
+        if (Auth::user()) {
+            // is the client an admin
+            $this->isAdmin = Auth::user()->isAdmin();
 
-        $this->resellerId = $request->user()->resellerId();
+            $this->resellerId = Auth::user()->resellerId();
+        }
     }
 
     /**

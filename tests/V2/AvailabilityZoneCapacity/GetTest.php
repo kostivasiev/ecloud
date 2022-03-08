@@ -19,17 +19,17 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
         $this->vpc = Vpc::withoutEvents(function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-test',
                 'region_id' => $this->region->id,
             ]);
         });
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
-        $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
+        $this->availabilityZoneCapacity = AvailabilityZoneCapacity::factory()->create([
             'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
@@ -39,14 +39,14 @@ class GetTest extends TestCase
         $this->get('/v2/availability-zone-capacities', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZoneCapacity->id,
             'availability_zone_id' => $this->availabilityZone->id,
             'type' => $this->availabilityZoneCapacity->type,
             'alert_warning' => $this->availabilityZoneCapacity->alert_warning,
             'alert_critical' => $this->availabilityZoneCapacity->alert_critical,
             'max' => $this->availabilityZoneCapacity->max
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 
     public function testGetItemDetail()
@@ -54,13 +54,13 @@ class GetTest extends TestCase
         $this->get('/v2/availability-zone-capacities/' . $this->availabilityZoneCapacity->id, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'id' => $this->availabilityZoneCapacity->id,
             'availability_zone_id' => $this->availabilityZone->id,
             'type' => $this->availabilityZoneCapacity->type,
             'alert_warning' => $this->availabilityZoneCapacity->alert_warning,
             'alert_critical' => $this->availabilityZoneCapacity->alert_critical,
             'max' => $this->availabilityZoneCapacity->max
-        ])->assertResponseStatus(200);
+        ])->assertStatus(200);
     }
 }

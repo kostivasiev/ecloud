@@ -14,7 +14,7 @@ class NetworkSeeder extends Seeder
      */
     public function run()
     {
-        factory(Network::class)->create([
+        Network::factory()->create([
             'id' => 'net-aaaaaaaa',
             'name' => 'Dev Network',
             'subnet' => '10.0.0.0/24',

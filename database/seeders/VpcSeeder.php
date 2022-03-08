@@ -16,7 +16,7 @@ class VpcSeeder extends Seeder
      */
     public function run()
     {
-        factory(Vpc::class)->create([
+        Vpc::factory()->create([
             'id' => 'vpc-aaaaaaaa',
             'name' => 'Dev VPC',
             'region_id' => 'reg-aaaaaaaa',

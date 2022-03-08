@@ -3,15 +3,10 @@
 namespace Tests\V2\AvailabilityZone;
 
 use App\Events\V2\AvailabilityZone\Deleted;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Region;
-use App\Models\V2\Vpc;
-use App\Providers\EncryptionServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class AutoDeleteTest extends TestCase
@@ -31,13 +26,13 @@ class AutoDeleteTest extends TestCase
     {
         parent::setUp();
 
-        Model::withoutEvents(function() {
-            $this->dhcp = factory(Dhcp::class)->create([
+        Model::withoutEvents(function () {
+            $this->dhcp = Dhcp::factory()->create([
                 'id' => 'dhcp-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
             ]);
-            $this->credential = factory(Credential::class)->create([
+            $this->credential = Credential::factory()->create([
                 'id' => 'cred-test',
                 'resource_id' => $this->availabilityZone()->id,
             ]);
@@ -53,7 +48,7 @@ class AutoDeleteTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(204);
+        )->assertStatus(204);
 
         Event::assertDispatched(Deleted::class, function ($event) {
             return $event->model->id == $this->availabilityZone()->id;

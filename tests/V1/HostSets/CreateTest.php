@@ -17,9 +17,9 @@ class CreateTest extends TestCase
      */
     public function testCreateHostSetNoSan()
     {
-        $pod = factory(Pod::class, 1)->create()->first();
+        $pod = Pod::factory(1)->create()->first();
 
-        $solution = factory(Solution::class, 1)->create([
+        $solution = Solution::factory(1)->create([
             'ucs_reseller_datacentre_id' => $pod->getKey()
         ])->first();
 
@@ -28,10 +28,11 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write'
-        ])->seeStatusCode(404)->seeJson([
-            'title' => 'SAN not found',
-            'detail' => "No SANS are available on the solution's pod"
-        ]);
+        ])->assertStatus(404)
+            ->assertJsonFragment([
+                'title' => 'SAN not found',
+                'detail' => "No SANS are available on the solution's pod"
+            ]);
     }
 
     /**
@@ -40,15 +41,15 @@ class CreateTest extends TestCase
      */
     public function testCreateHostsetLinkedSan()
     {
-        $pod = factory(Pod::class, 1)->create()->first();
+        $pod = Pod::factory(1)->create()->first();
 
-        $solution = factory(Solution::class, 1)->create([
+        $solution = Solution::factory(1)->create([
             'ucs_reseller_datacentre_id' => $pod->getKey()
         ])->first();
 
-        $san = factory(San::class, 1)->create([])->first();
+        $san = San::factory(1)->create([])->first();
 
-        factory(Storage::class, 1)->create([
+        Storage::factory(1)->create([
             'ucs_datacentre_id' => $pod->getKey(),
             'server_id' => $san->getKey()
         ]);
@@ -61,7 +62,7 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ]);
 
-        $this->assertNotEquals(404, $response->response->getStatusCode());
+        $this->assertNotEquals(404, $response->getStatusCode());
     }
 }
 

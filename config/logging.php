@@ -1,6 +1,6 @@
 <?php
 
-use Carbon\Carbon;
+use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
 
@@ -38,6 +38,7 @@ return [
         'stack' => [
             'driver' => 'stack',
             'channels' => ['daily'],
+            'ignore_exceptions' => false
         ],
 
         'single' => [
@@ -56,7 +57,7 @@ return [
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
-            'username' => 'Lumen Log',
+            'username' => 'Laravel Log',
             'emoji' => ':boom:',
             'level' => 'critical',
         ],
@@ -74,6 +75,7 @@ return [
         'stderr' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
+            'formatter' => env('LOG_STDERR_FORMATTER'),
             'with' => [
                 'stream' => 'php://stderr',
             ],
@@ -87,6 +89,15 @@ return [
         'errorlog' => [
             'driver' => 'errorlog',
             'level' => 'debug',
+        ],
+
+        'null' => [
+            'driver' => 'monolog',
+            'handler' => NullHandler::class,
+        ],
+
+        'emergency' => [
+            'path' => storage_path('logs/laravel.log'),
         ],
 
         'ukfast' => [
@@ -114,13 +125,13 @@ return [
                     'log' => false,
                 ]),
                 'options' => [
-                    'index' => env('ELASTICSEARCH_INDEX_PREFIX') . Carbon::now()->format('-Y-m-d'),
+                    'index' => env('ELASTICSEARCH_INDEX_PREFIX') . Carbon\Carbon::now()->format('-Y-m-d'),
                     'type' => env('ELASTICSEARCH_TYPE'),
                 ],
             ],
             'formatter' => \Monolog\Formatter\ElasticaFormatter::class,
             'formatter_with' => [
-                'index' => env('ELASTICSEARCH_INDEX_PREFIX') . Carbon::now()->format('-Y-m-d'),
+                'index' => env('ELASTICSEARCH_INDEX_PREFIX') . Carbon\Carbon::now()->format('-Y-m-d'),
                 'type' => env('ELASTICSEARCH_TYPE'),
             ],
         ],

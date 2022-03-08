@@ -58,9 +58,9 @@ class HostSetController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\Response
      * @throws \App\Exceptions\V1\SolutionNotFoundException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResourceException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidResponseException
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidRouteException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResourceException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidResponseException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidRouteException
      * @throws \Illuminate\Validation\ValidationException
      * @throws SanNotFoundException
      */

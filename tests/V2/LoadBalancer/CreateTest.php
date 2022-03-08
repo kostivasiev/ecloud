@@ -25,7 +25,7 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $managementRouter = Model::withoutEvents(function () {
-            return factory(Router::class)->create([
+            return Router::factory()->create([
                 'id' => 'rtr-mgmt',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id,
@@ -35,7 +35,7 @@ class CreateTest extends TestCase
         });
 
         Model::withoutEvents(function () use ($managementRouter) {
-            return factory(Network::class)->create([
+            return Network::factory()->create([
                 'id' => 'net-mgmt',
                 'name' => 'Manchester Network',
                 'subnet' => '10.0.0.0/24',
@@ -73,12 +73,12 @@ class CreateTest extends TestCase
                 'vpc_id' => Str::uuid(),
                 'availability_zone_id' => $this->availabilityZone()->id
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The specified vpc id was not found',
             'status' => 422,
             'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testInvalidAvailabilityZoneIsFailed()
@@ -91,12 +91,12 @@ class CreateTest extends TestCase
                 'vpc_id' => Str::uuid(),
                 'availability_zone_id' => Str::uuid()
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The specified vpc id was not found',
             'status' => 422,
             'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testNotOwnedVpcIdIsFailed()
@@ -110,12 +110,12 @@ class CreateTest extends TestCase
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => Str::uuid(),
             ]
-        )->seeJson([
+        )->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The specified vpc id was not found',
             'status' => 422,
             'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testFailedVpcCausesFail()
@@ -133,12 +133,12 @@ class CreateTest extends TestCase
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified vpc id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testValidDataSucceeds()
@@ -154,7 +154,7 @@ class CreateTest extends TestCase
                 'availability_zone_id' => $this->availabilityZone()->id,
                 'network_id' => $this->network()->id,
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';

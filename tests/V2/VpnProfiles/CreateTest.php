@@ -31,10 +31,10 @@ class CreateTest extends TestCase
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->post('/v2/vpn-profiles', $this->data)
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
-            ])->assertResponseStatus(401);
+            ])->assertStatus(401);
     }
 
     public function testCreateResource()
@@ -49,8 +49,8 @@ class CreateTest extends TestCase
         $transformed['diffie_hellman'] = implode(',', $this->data['diffie_hellman']);
 
         $this->post('/v2/vpn-profiles', $this->data)
-            ->seeInDatabase('vpn_profiles', $transformed, 'ecloud')
-            ->assertResponseStatus(201);
+            ->assertStatus(201);
+        $this->assertDatabaseHas('vpn_profiles', $transformed, 'ecloud');
     }
 
     public function testCreateResourceInvalidData()
@@ -75,27 +75,27 @@ class CreateTest extends TestCase
                 ],
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The selected ike version is invalid',
                 'source' => 'ike_version',
             ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The selected encryption_algorithm.0 is invalid',
                 'source' => 'encryption_algorithm.0',
             ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The selected digest_algorithm.0 is invalid',
                 'source' => 'digest_algorithm.0',
             ])
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The selected diffie_hellman.0 is invalid',
                 'source' => 'diffie_hellman.0',
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
 }

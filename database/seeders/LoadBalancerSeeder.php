@@ -17,7 +17,7 @@ class LoadBalancerSeeder extends Seeder
     {
         $this->call(LoadBalancerSpecificationSeeder::class);
 
-        factory(LoadBalancer::class)->create([
+        LoadBalancer::factory()->create([
             'id' => 'lb-aaaaaaaa',
             'vpc_id' => 'vpc-aaaaaaaa',
             'load_balancer_spec_id' => 'lbs-aaaaaaaa',

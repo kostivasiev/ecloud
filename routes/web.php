@@ -1,5 +1,4 @@
 <?php
-error_reporting(E_ALL ^ E_DEPRECATED);
 /*
 |--------------------------------------------------------------------------
 | Application Routes
@@ -12,7 +11,7 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 */
 
 // api docs
-$router->get('{apiVersion}/docs.yaml', function ($apiVersion) {
+Route::get('{apiVersion}/docs.yaml', function ($apiVersion) {
     if (!preg_match('/v[0-9]+/si', $apiVersion)) {
         return 'Invalid version';
     }
@@ -26,8 +25,8 @@ $router->get('{apiVersion}/docs.yaml', function ($apiVersion) {
 });
 
 
-$router->group(['middleware' => ['auth', 'is-admin']], function () use ($router) {
-    $router->get('{apiVersion}/admin-docs.yaml', function ($apiVersion) {
+Route::group(['middleware' => ['auth', 'is-admin']], function ()  {
+    Route::get('{apiVersion}/admin-docs.yaml', function ($apiVersion) {
         if (!preg_match('/v[0-9]+/si', $apiVersion)) {
             return 'Invalid version';
         }
@@ -40,7 +39,3 @@ $router->group(['middleware' => ['auth', 'is-admin']], function () use ($router)
         return \cebe\openapi\Writer::writeToYaml(\cebe\openapi\Reader::readFromYamlFile($filePath));
     });
 });
-
-// api endpoints
-require('v1.php');
-require('v2.php');

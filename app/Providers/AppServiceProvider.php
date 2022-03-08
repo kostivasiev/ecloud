@@ -7,8 +7,8 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\LoadBalancer;
-use App\Models\V2\LoadBalancerNode;
 use App\Models\V2\LoadBalancerNetwork;
+use App\Models\V2\LoadBalancerNode;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Models\V2\OrchestratorBuild;
@@ -36,6 +36,11 @@ use UKFast\Helpers\Encryption\RemoteKeyStore;
 
 class AppServiceProvider extends ServiceProvider
 {
+    /**
+     * Register any application services.
+     *
+     * @return void
+     */
     public function register()
     {
         //

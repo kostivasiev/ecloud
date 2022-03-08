@@ -2,11 +2,9 @@
 
 namespace Tests\V2\NetworkRulePort;
 
-
 use App\Events\V2\Task\Created;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -22,7 +20,7 @@ class CreateTest extends TestCase
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
-        $this->networkRule = factory(NetworkRule::class)->make([
+        $this->networkRule = NetworkRule::factory()->make([
             'id' => 'nr-test',
             'name' => 'nr-test',
         ]);
@@ -39,12 +37,13 @@ class CreateTest extends TestCase
             'protocol' => 'TCP',
             'source' => '443',
             'destination' => '555',
-        ])->seeJsonStructure([
+        ])->assertJsonStructure([
             'data' => [
                 'id',
                 'task_id'
             ]
-        ])->seeInDatabase(
+        ])->assertStatus(202);
+        $this->assertDatabaseHas(
             'network_rule_ports',
             [
                 'network_rule_id' => 'nr-test',
@@ -53,7 +52,7 @@ class CreateTest extends TestCase
                 'destination' => '555',
             ],
             'ecloud'
-        )->assertResponseStatus(202);
+        );
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
@@ -68,7 +67,7 @@ class CreateTest extends TestCase
             'protocol' => 'TCP',
             'source' => '443',
             'destination' => '555',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testCreatePortForCatchallRuleFails()
@@ -81,6 +80,6 @@ class CreateTest extends TestCase
             'protocol' => 'TCP',
             'source' => '443',
             'destination' => '555',
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 }

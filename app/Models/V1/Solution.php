@@ -4,14 +4,15 @@ namespace App\Models\V1;
 
 use App\Exceptions\V1\KingpinException;
 use App\Solution\EncryptionBillingType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
-use UKFast\Api\Resource\Property\BooleanProperty;
-use UKFast\Api\Resource\Property\DateTimeProperty;
-use UKFast\Api\Resource\Property\IdProperty;
-use UKFast\Api\Resource\Property\IntProperty;
-use UKFast\Api\Resource\Property\StringProperty;
+use App\Services\V1\Resource\Property\BooleanProperty;
+use App\Services\V1\Resource\Property\DateTimeProperty;
+use App\Services\V1\Resource\Property\IdProperty;
+use App\Services\V1\Resource\Property\IntProperty;
+use App\Services\V1\Resource\Property\StringProperty;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
@@ -20,6 +21,8 @@ use UKFast\DB\Ditto\Sortable;
 
 class Solution extends Model implements Filterable, Sortable
 {
+    use HasFactory;
+
     const NAME_FORMAT_DESC = 'Alphanumeric, spaces, hyphens and underscores';
     const NAME_FORMAT_REGEX = '^[A-Za-z0-9\-\_\ \.]+$';
 
@@ -229,7 +232,7 @@ class Solution extends Model implements Filterable, Sortable
      * Map request property to database field
      *
      * @return array
-     * @throws \UKFast\Api\Resource\Exceptions\InvalidPropertyException
+     * @throws \App\Services\V1\Resource\Exceptions\InvalidPropertyException
      */
     public function properties()
     {
@@ -535,9 +538,9 @@ class Solution extends Model implements Filterable, Sortable
                     $this->ucs_reseller_type
                 ]
             );
-
             //Load the solution datastores from VMWare
             $datastores = $kingpin->getDatastores($this->getKey());
+
         } catch (KingpinException $exception) {
             throw new \Exception('Failed to load solution datastores.');
         }

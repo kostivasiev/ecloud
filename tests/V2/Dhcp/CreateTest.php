@@ -29,11 +29,11 @@ class CreateTest extends TestCase
     {
         parent::setUp();
 
-        $this->region = factory(Region::class)->create();
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->region = Region::factory()->create();
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
-        $this->router = factory(Router::class)->create([
+        $this->router = Router::factory()->create([
             'vpc_id' => $this->vpc()->id,
             'availability_zone_id' => $this->availabilityZone->id
         ]);
@@ -43,11 +43,11 @@ class CreateTest extends TestCase
     {
         $this->post('/v2/dhcps', [
             'vpc_id' => $this->vpc()->id,
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Unauthorized',
             'detail' => 'Unauthorized',
             'status' => 401,
-        ])->assertResponseStatus(401);
+        ])->assertStatus(401);
     }
 
     public function testNullNameIsFailed()
@@ -57,12 +57,12 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Validation Error',
             'detail' => 'The vpc id field is required',
             'status' => 422,
             'source' => 'vpc_id'
-        ])->assertResponseStatus(422);
+        ])->assertStatus(422);
     }
 
     public function testVpcFailedStateCausesFail()
@@ -84,18 +84,18 @@ class CreateTest extends TestCase
         ], [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson(
+        ])->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified vpc id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testInvalidAzIsFailed()
     {
-        $region = factory(Region::class)->create();
-        $availabilityZone = factory(AvailabilityZone::class)->create([
+        $region = Region::factory()->create();
+        $availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id
         ]);
 
@@ -107,11 +107,11 @@ class CreateTest extends TestCase
         $this->post('/v2/dhcps', $data, [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.write',
-        ])->seeJson([
+        ])->assertJsonFragment([
             'title' => 'Not Found',
             'detail' => 'The specified availability zone is not available to that VPC',
             'status' => 404,
             'source' => 'availability_zone_id'
-        ])->assertResponseStatus(404);
+        ])->assertStatus(404);
     }
 }

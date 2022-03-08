@@ -2,7 +2,6 @@
 
 namespace Tests\V1\Appliances\ApplianceVersions;
 
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Ramsey\Uuid\Uuid;
 use Tests\V1\ApplianceTestCase;
 
@@ -18,11 +17,11 @@ class GetTest extends ApplianceTestCase
      */
     public function testValidCollection()
     {
-        $this->get('/v1/appliance-versions', $this->validWriteHeaders);
-
-        $this->assertResponseStatus(200) && $this->seeJson([
-            'total' => 9,
-        ]);
+        $this->get('/v1/appliance-versions', $this->validWriteHeaders)
+            ->assertStatus(200)
+            ->assertJsonFragment([
+                'total' => 6,
+            ]);
     }
 
     /**
@@ -32,9 +31,8 @@ class GetTest extends ApplianceTestCase
     {
         $uuid = $this->appliances[0]->getLatestVersion()->uuid;
 
-        $this->get('/v1/appliance-versions/' . $uuid, $this->validWriteHeaders);
-
-        $this->assertResponseStatus(200);
+        $this->get('/v1/appliance-versions/' . $uuid, $this->validWriteHeaders)
+            ->assertStatus(200);
     }
 
     /**
@@ -43,9 +41,8 @@ class GetTest extends ApplianceTestCase
      */
     public function testInvalidItem()
     {
-        $this->get('/v1/appliance-versions/' . Uuid::uuid4()->toString(), $this->validWriteHeaders);
-
-        $this->assertResponseStatus(404);
+        $this->get('/v1/appliance-versions/' . Uuid::uuid4()->toString(), $this->validWriteHeaders)
+            ->assertStatus(404);
     }
 
 
@@ -57,10 +54,13 @@ class GetTest extends ApplianceTestCase
         $latestVersion = $this->appliances[0]->getLatestVersion();
         $parameters = $latestVersion->parameters;
 
-        $this->json('GET', '/v1/appliance-versions/' . $latestVersion->uuid . '/parameters', [],
-            $this->validWriteHeaders)
-            ->seeStatusCode(200)
-            ->seeJson([
+        $this->json(
+            'GET',
+            '/v1/appliance-versions/' . $latestVersion->uuid . '/parameters',
+            [],
+            $this->validWriteHeaders
+        )->assertStatus(200)
+            ->assertJsonFragment([
                 'id' => $parameters[0]->uuid,
                 'version_id' => $parameters[0]->appliance_version_uuid,
                 'name' => $parameters[0]->name,

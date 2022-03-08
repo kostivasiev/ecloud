@@ -7,8 +7,8 @@ use App\Models\V1\GpuProfile;
 use App\Models\V1\Pod;
 use App\Models\V1\San;
 use Illuminate\Http\Request;
-use UKFast\Api\Resource\Traits\RequestHelper;
-use UKFast\Api\Resource\Traits\ResponseHelper;
+use App\Services\V1\Resource\Traits\RequestHelper;
+use App\Services\V1\Resource\Traits\ResponseHelper;
 use UKFast\DB\Ditto\QueryTransformer;
 
 class PodController extends BaseController
@@ -30,6 +30,7 @@ class PodController extends BaseController
             ->transform($collectionQuery);
 
         $pods = $collectionQuery->paginate($this->perPage);
+
 
         return $this->respondCollection(
             $request,

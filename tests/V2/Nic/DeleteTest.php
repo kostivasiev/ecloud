@@ -18,7 +18,7 @@ class DeleteTest extends TestCase
         Event::fake([Created::class]);
 
         $this->delete('/v2/nics/' . $this->nic()->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
 
         Event::assertDispatched(Created::class);
     }

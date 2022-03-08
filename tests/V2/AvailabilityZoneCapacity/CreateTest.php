@@ -19,17 +19,17 @@ class CreateTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->region = factory(Region::class)->create();
+        $this->region = Region::factory()->create();
         $this->vpc = Vpc::withoutEvents(function () {
-            return factory(Vpc::class)->create([
+            return Vpc::factory()->create([
                 'id' => 'vpc-test',
                 'region_id' => $this->region->id,
             ]);
         });
-        $this->availabilityZone = factory(AvailabilityZone::class)->create([
+        $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $this->region->id
         ]);
-        $this->availabilityZoneCapacity = factory(AvailabilityZoneCapacity::class)->create([
+        $this->availabilityZoneCapacity = AvailabilityZoneCapacity::factory()->create([
             'availability_zone_id' => $this->availabilityZone->id
         ]);
     }
@@ -51,12 +51,12 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )
-            ->seeInDatabase(
-                'availability_zone_capacities',
-                $data,
-                'ecloud'
-            )
-            ->assertResponseStatus(201);
+        )->assertStatus(201);
+
+        $this->assertDatabaseHas(
+            'availability_zone_capacities',
+            $data,
+            'ecloud'
+        );
     }
 }

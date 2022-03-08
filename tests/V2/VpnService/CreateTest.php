@@ -25,13 +25,13 @@ class CreateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The specified router id was not found',
                 'status' => 422,
                 'source' => 'router_id'
             ])
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testRouterFailCausesFail()
@@ -58,19 +58,19 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The specified router id resource currently has the status of \'failed\' and cannot be used',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 
     public function testValidDataSucceeds()
     {
         Event::fake(Created::class);
 
-        $this->post(
+        $response = $this->post(
             '/v2/vpn-services',
             [
                 'name' => 'Unit Test VPN',
@@ -80,15 +80,15 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(202);
-        $vpnId = (json_decode($this->response->getContent()))->data->id;
+        )->assertStatus(202);
+        $vpnId = (json_decode($response->getContent()))->data->id;
         $vpnItem = VpnService::findOrFail($vpnId);
         $this->assertEquals($vpnItem->router_id, $this->router()->id);
     }
 
     public function testVpnForRouterAlreadyExists()
     {
-        factory(VpnService::class)->create([
+        VpnService::factory()->create([
             'name' => 'First Test VPN',
             'router_id' => $this->router()->id,
         ]);
@@ -102,11 +102,11 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'A VPN already exists for the specified router id',
             ]
-        )->assertResponseStatus(422);
+        )->assertStatus(422);
     }
 }

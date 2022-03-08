@@ -42,13 +42,13 @@ class HardwareTest extends TestCase
     public function testHostWithCredentials($getItemsResponse)
     {
         // Pod, Pod location, Solution and Host setup
-        factory(Pod::class)->create([
+        Pod::factory()->create([
             'ucs_datacentre_vce_server_id' => 1,
             'ucs_datacentre_ucs_api_url' => 'http://localhost'
         ]);
-        factory(Pod\Location::class)->create();
-        factory(Solution::class)->create();
-        $host = factory(Host::class)->create()->first();
+        Pod\Location::factory()->create();
+        Solution::factory()->create();
+        $host = Host::factory()->create()->first();
 
         // Mock the Devices API
         $mockAdminClient = \Mockery::mock(\UKFast\Admin\Devices\AdminClient::class);
@@ -137,10 +137,8 @@ class HardwareTest extends TestCase
         $this->get('/v1/hosts/' . $host->ucs_node_id . '/hardware', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200);
-        $this->seeJson([
+        ])->assertStatus(200)
+            ->assertJsonFragment([
             'data' => [
                 'assign_state' => 'assigned',
                 'associate_state' => 'associated',
@@ -165,12 +163,12 @@ class HardwareTest extends TestCase
     public function testHostWithoutConjurerApiCredentials()
     {
         // Pod, Solution and Host setup
-        factory(Pod::class)->create([
+        Pod::factory()->create([
             'ucs_datacentre_vce_server_id' => 1,
             'ucs_datacentre_ucs_api_url' => 'http://localhost'
         ]);
-        factory(Solution::class)->create();
-        $host = factory(Host::class)->create()->first();
+        Solution::factory()->create();
+        $host = Host::factory()->create()->first();
 
         // Mock the Devices API
         $mockAdminClient = \Mockery::mock(\UKFast\Admin\Devices\AdminClient::class);
@@ -196,13 +194,11 @@ class HardwareTest extends TestCase
         $this->get('/v1/hosts/' . $host->ucs_node_id . '/hardware', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200);
-        $this->seeJson([
-            'data' => [],
-            'meta' => [],
-        ]);
+        ])->assertStatus(200)
+            ->assertJsonFragment([
+                'data' => [],
+                'meta' => [],
+            ]);
     }
 
     public function testHostWithoutUcsApiCredentials()
@@ -215,12 +211,12 @@ class HardwareTest extends TestCase
         ];
 
         // Pod, Solution and Host setup
-        factory(Pod::class)->create([
+        Pod::factory()->create([
             'ucs_datacentre_vce_server_id' => 1,
             'ucs_datacentre_ucs_api_url' => 'http://localhost'
         ]);
-        factory(Solution::class)->create();
-        $host = factory(Host::class)->create()->first();
+        Solution::factory()->create();
+        $host = Host::factory()->create()->first();
 
         // Mock the Devices API
         $mockAdminClient = \Mockery::mock(\UKFast\Admin\Devices\AdminClient::class);
@@ -263,13 +259,11 @@ class HardwareTest extends TestCase
         $this->get('/v1/hosts/' . $host->ucs_node_id . '/hardware', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(200);
-        $this->seeJson([
-            'data' => [],
-            'meta' => [],
-        ]);
+        ])->assertStatus(200)
+            ->assertJsonFragment([
+                'data' => [],
+                'meta' => [],
+            ]);
     }
 
     public function testHostWithoutServiceProfile()
@@ -282,13 +276,13 @@ class HardwareTest extends TestCase
         ];
 
         // Pod, Pod location, Solution and Host setup
-        factory(Pod::class)->create([
+        Pod::factory()->create([
             'ucs_datacentre_vce_server_id' => 1,
             'ucs_datacentre_ucs_api_url' => 'http://localhost'
         ]);
-        factory(Pod\Location::class)->create();
-        factory(Solution::class)->create();
-        $host = factory(Host::class)->create()->first();
+        Pod\Location::factory()->create();
+        Solution::factory()->create();
+        $host = Host::factory()->create()->first();
 
         // Mock the Devices API
         $mockAdminClient = \Mockery::mock(\UKFast\Admin\Devices\AdminClient::class);
@@ -361,14 +355,12 @@ class HardwareTest extends TestCase
         $this->get('/v1/hosts/' . $host->ucs_node_id . '/hardware', [
             'X-consumer-custom-id' => '0-0',
             'X-consumer-groups' => 'ecloud.read',
-        ]);
-
-        $this->assertResponseStatus(500);
-        $this->seeJson([
-            'errors' => [
-                'title' => 'Cannot find service profile with name [1-2]',
-                'status' => 500,
-            ],
-        ]);
+        ])->assertStatus(500)
+            ->assertJsonFragment([
+                'errors' => [
+                    'title' => 'Cannot find service profile with name [1-2]',
+                    'status' => 500,
+                ],
+            ]);
     }
 }

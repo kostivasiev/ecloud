@@ -16,24 +16,26 @@ class DeleteTest extends TestCase
 
     public function testDeleteTag()
     {
-        factory(Solution::class, 1)->create([
+        Solution::factory()->create([
             'ucs_reseller_id' => 123,
         ]);
 
-        factory(Tag::class, 1)->create([
+        Tag::factory()->create([
             'metadata_resource' => 'ucs_reseller',
             'metadata_resource_id' => 123,
             'metadata_key' => 'test',
         ]);
 
-        $this->json('DELETE', '/v1/solutions/123/tags/test', [
+        $this->deleteJson(
+            '/v1/solutions/123/tags/test',
+            [],
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.write',
+            ]
+        )->assertStatus(204);
 
-        ], [
-            'X-consumer-custom-id' => '1-1',
-            'X-consumer-groups' => 'ecloud.write',
-        ]);
-
-        $this->assertResponseStatus(204) && $this->missingFromDatabase('metadata', [
+        $this->assertDatabaseMissing('metadata', [
             'metadata_resource' => 'ucs_reseller',
             'metadata_resource_id' => 123,
             'metadata_key' => 'test',

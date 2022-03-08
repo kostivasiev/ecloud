@@ -20,7 +20,7 @@ class UpdateTest extends TestCase
     {
         parent::setUp();
         Model::withoutEvents(function () {
-            $this->dhcp = factory(Dhcp::class)->create([
+            $this->dhcp = Dhcp::factory()->create([
                 'id' => 'dhcp-test',
                 'vpc_id' => $this->vpc()->id,
                 'availability_zone_id' => $this->availabilityZone()->id
@@ -37,12 +37,12 @@ class UpdateTest extends TestCase
             ],
             []
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
                 'status' => 401,
             ])
-            ->assertResponseStatus(401);
+            ->assertStatus(401);
     }
 
     public function testNullNameIsDenied()
@@ -56,7 +56,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->seeJson(
+        )->assertJsonFragment(
             [
                 'title' => 'Validation Error',
                 'detail' => 'The name field is required',
@@ -64,7 +64,7 @@ class UpdateTest extends TestCase
                 'source' => 'name'
             ]
         )
-            ->assertResponseStatus(422);
+            ->assertStatus(422);
     }
 
     public function testValidDataIsSuccessful()
@@ -81,7 +81,7 @@ class UpdateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertResponseStatus(202);
+        )->assertStatus(202);
 
         $dhcp = Dhcp::findOrFail($this->dhcp->id);
         $this->assertEquals($data['name'], $dhcp->name);

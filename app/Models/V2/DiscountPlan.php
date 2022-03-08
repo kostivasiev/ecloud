@@ -2,12 +2,11 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\DiscountPlan\Created;
 use App\Traits\V2\CustomKey;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Carbon;
-use phpDocumentor\Reflection\Types\Boolean;
 use UKFast\Api\Auth\Consumer;
 use UKFast\DB\Ditto\Factories\FilterFactory;
 use UKFast\DB\Ditto\Factories\SortFactory;
@@ -24,7 +23,7 @@ use UKFast\DB\Ditto\Sortable;
  */
 class DiscountPlan extends Model implements Filterable, Sortable
 {
-    use CustomKey, SoftDeletes;
+    use HasFactory, CustomKey, SoftDeletes;
 
     public $keyPrefix = 'dplan';
     public $incrementing = false;

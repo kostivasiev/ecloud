@@ -5,7 +5,6 @@ namespace Tests\V2\NetworkRulePort;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use Illuminate\Database\Eloquent\Model;
-use Laravel\Lumen\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -21,7 +20,7 @@ class GetTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         Model::withoutEvents(function () {
-            $networkRule = factory(NetworkRule::class)->make([
+            $networkRule = NetworkRule::factory()->make([
                 'id' => 'nr-test',
                 'name' => 'nr-test',
             ]);
@@ -41,25 +40,25 @@ class GetTest extends TestCase
     public function testGetCollection()
     {
         $this->get('v2/network-rule-ports')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'nrp-test',
                 'network_rule_id' => 'nr-test',
                 'protocol' => 'TCP',
                 'source' => '443',
                 'destination' => '555',
-            ])->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 
     public function testGet()
     {
         $this->get('v2/network-rule-ports/nrp-test')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'nrp-test',
                 'network_rule_id' => 'nr-test',
                 'protocol' => 'TCP',
                 'source' => '443',
                 'destination' => '555',
-            ])->assertResponseStatus(200);
+            ])->assertStatus(200);
     }
 
     public function testGetHiddenNotAdminFails()
@@ -69,7 +68,7 @@ class GetTest extends TestCase
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
 
         $this->get('/v2/network-rule-ports/nrp-test')
-            ->assertResponseStatus(404);
+            ->assertStatus(404);
     }
 
     public function testGetHiddenAdminPasses()
@@ -78,6 +77,6 @@ class GetTest extends TestCase
 
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        $this->get('/v2/network-rule-ports/nrp-test')->assertResponseStatus(200);
+        $this->get('/v2/network-rule-ports/nrp-test')->assertStatus(200);
     }
 }

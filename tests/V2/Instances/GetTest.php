@@ -11,7 +11,7 @@ class GetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->instance();
+        $this->instanceModel();
 
         $this->kingpinServiceMock()->shouldReceive('get')->andReturn(
             new Response(200, [], json_encode([
@@ -29,19 +29,17 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'id' => $this->instance()->id,
-                'name' => $this->instance()->name,
-                'vpc_id' => $this->instance()->vpc_id,
-                'platform' => 'Linux',
-            ])
-            ->assertResponseStatus(200);
+        )->assertJsonFragment([
+            'id' => $this->instanceModel()->id,
+            'name' => $this->instanceModel()->name,
+            'vpc_id' => $this->instanceModel()->vpc_id,
+            'platform' => 'Linux',
+        ])->assertStatus(200);
     }
 
     public function testCantSeeHiddenResource()
     {
-        $hidden = factory(Instance::class)->create([
+        $hidden = Instance::factory()->create([
             'is_hidden' => true,
             'vpc_id' => $this->vpc()->id,
         ]);
@@ -52,37 +50,28 @@ class GetTest extends TestCase
                 'X-consumer-custom-id' => '1-1',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'title' => 'Not found',
-                'detail' => 'No Instance with that ID was found',
-            ])
-            ->assertResponseStatus(404);
+        )->assertJsonFragment([
+            'title' => 'Not found',
+            'detail' => 'No Instance with that ID was found',
+        ])->assertStatus(404);
     }
 
     public function testGetResource()
     {
-        $this->get(
-            '/v2/instances/' . $this->instance()->id,
+        $get = $this->get(
+            '/v2/instances/' . $this->instanceModel()->id,
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
-        )
-            ->seeJson([
-                'id' => $this->instance()->id,
-                'name' => $this->instance()->name,
-                'vpc_id' => $this->instance()->vpc_id,
-                'image_id' => $this->image()->id,
-            ])
-            ->assertResponseStatus(200);
-
-        $result = json_decode($this->response->getContent());
-
-        // Test to ensure that platform attribute is present
-        $this->seeJson([
+        )->assertJsonFragment([
+            'id' => $this->instanceModel()->id,
+            'name' => $this->instanceModel()->name,
+            'vpc_id' => $this->instanceModel()->vpc_id,
+            'image_id' => $this->image()->id,
+        ])->assertJsonFragment([
             'platform' => 'Linux',
-        ]);
+        ])->assertStatus(200);
     }
 
     public function testGetFloatingIps()
@@ -90,15 +79,15 @@ class GetTest extends TestCase
         $this->floatingIp()->resource()->associate($this->nic())->save();
 
         $this->get(
-            '/v2/instances/' . $this->instance()->id . '/floating-ips',
+            '/v2/instances/' . $this->instanceModel()->id . '/floating-ips',
             [
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'fip-test',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

@@ -21,7 +21,7 @@ class GetTest extends TestCase
     public function testIndexAdminSucceeds()
     {
         $this->get('/v2/image-parameters')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'iparam-test',
                 'name' => 'Test Image Parameter',
                 'key' => 'Username',
@@ -30,19 +30,19 @@ class GetTest extends TestCase
                 'required' => true,
                 'validation_rule' => '/\w+/',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testIndexNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->get('/v2/image-parameters')->assertResponseStatus(401);
+        $this->get('/v2/image-parameters')->assertStatus(401);
     }
 
     public function testShowAdminSucceeds()
     {
         $this->get('/v2/image-parameters/' . $this->imageParameter()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => 'iparam-test',
                 'name' => 'Test Image Parameter',
                 'key' => 'Username',
@@ -51,12 +51,12 @@ class GetTest extends TestCase
                 'required' => true,
                 'validation_rule' => '/\w+/',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShowNotAdminFails()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->get('/v2/image-parameters/' . $this->imageParameter()->id)->assertResponseStatus(401);
+        $this->get('/v2/image-parameters/' . $this->imageParameter()->id)->assertStatus(401);
     }
 }

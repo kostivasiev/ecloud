@@ -21,57 +21,57 @@ class GetTest extends TestCase
     public function testIndexAdminSucceeds()
     {
         $this->get('/v2/image-metadata')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->imageMetadata()->id,
                 'key' => 'test.key',
                 'value' => 'test.value',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testIndexNotAdminSucceeds()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->get('/v2/image-metadata')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->imageMetadata()->id,
                 'key' => 'test.key',
                 'value' => 'test.value',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShowAdminSucceeds()
     {
         $this->get('/v2/image-metadata/' . $this->imageMetadata()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->imageMetadata()->id,
                 'key' => 'test.key',
                 'value' => 'test.value',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testShowNotAdminSucceeds()
     {
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         $this->get('/v2/image-metadata/' . $this->imageMetadata()->id)
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->imageMetadata()->id,
                 'key' => 'test.key',
                 'value' => 'test.value',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testImageMetadataSucceeds()
     {
         $this->get('/v2/images/' . $this->image()->id . '/metadata')
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->imageMetadata()->id,
                 'key' => 'test.key',
                 'value' => 'test.value',
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

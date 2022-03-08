@@ -21,18 +21,17 @@ class DeleteTest extends TestCase
         Event::fake(Created::class);
 
         $this->delete('/v2/floating-ips/' . $this->floatingIp()->id)
-            ->assertResponseStatus(202);
+            ->assertStatus(202);
     }
 
     public function testAssignedFloatingIpCanNotBeDeleted()
     {
-        $vpnEndpoint = factory(VpnEndpoint::class)->create();
+        $vpnEndpoint = VpnEndpoint::factory()->create();
 
         $this->floatingIp()->resource()->associate($vpnEndpoint)->save();
 
         $this->delete('/v2/floating-ips/' . $this->floatingIp()->id, [
             'resource_id' => $this->nic()->id
-        ])
-            ->assertResponseStatus(403);
+        ])->assertStatus(403);
     }
 }

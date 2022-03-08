@@ -7,13 +7,14 @@ namespace App\Models\V2;
 
 use App\Traits\V2\ColumnPrefixHelper;
 use App\Traits\V2\UUIDHelper;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Exceptions\NotFoundException;
 
 class ApplianceScriptParameters extends Model
 {
-    use ColumnPrefixHelper, UUIDHelper, SoftDeletes;
+    use HasFactory, ColumnPrefixHelper, UUIDHelper, SoftDeletes;
 
     protected $connection = 'ecloud';
     protected $table = 'appliance_script_parameters';

@@ -14,7 +14,7 @@ class GetTest extends TestCase
     {
         parent::setUp();
 
-        $this->vpn = factory(VpnService::class)->create([
+        $this->vpn = VpnService::factory()->create([
             'name' => 'Unit Test VPN',
             'router_id' => $this->router()->id,
         ]);
@@ -29,12 +29,12 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->vpn->id,
                 'router_id' => $this->vpn->router_id,
                 'vpc_id' => $this->vpn->router->vpc->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 
     public function testGetItemDetail()
@@ -46,11 +46,11 @@ class GetTest extends TestCase
                 'X-consumer-groups' => 'ecloud.read',
             ]
         )
-            ->seeJson([
+            ->assertJsonFragment([
                 'id' => $this->vpn->id,
                 'router_id' => $this->vpn->router_id,
                 'vpc_id' => $this->vpn->router->vpc->id,
             ])
-            ->assertResponseStatus(200);
+            ->assertStatus(200);
     }
 }

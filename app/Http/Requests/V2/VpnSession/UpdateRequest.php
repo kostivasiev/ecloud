@@ -6,6 +6,7 @@ use App\Rules\V2\IsNotMaxCommaSeperatedItems;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\ValidCidrNetworkCsvString;
 use App\Rules\V2\ValidIpv4;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Rule;
 use UKFast\FormRequests\FormRequest;
 
@@ -18,7 +19,7 @@ class UpdateRequest extends FormRequest
 
     protected function rules()
     {
-        $vpnSessionId = $this->route()[2]['vpnSessionId'];
+        $vpnSessionId = Request::route('vpnSessionId');
         return [
             'name' => 'sometimes|required|string',
             'vpn_profile_group_id' => [
