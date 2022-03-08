@@ -1,0 +1,129 @@
+#########################################################################
+### Docker Instructions:-
+### First ensure the ActiveDirectoryDomainSeeder has been run
+### with:-
+### `php artisan db:seed --class=Database\\Seeders\\V1\\ResellerSeeder`
+### `php artisan db:seed --class=Database\\Seeders\\V1\\SolutionSiteSeeder`
+### `php artisan db:seed --class=Database\\Seeders\\V1\\SanSeeder`
+#########################################################################
+
+### 1. Get Solution
+GET https://{{host}}/v1/solutions
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-Reseller-Id: 1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Site', function () {
+    client.assert(response.status === 200, '200 response not received');
+})
+client.global.set('solution_id', response.body.data[1].id);
+client.log(response.body.data[1].id);
+%}
+
+### 2. Create Datastore
+POST https://{{host}}/v1/datastores
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-Reseller-Id: 1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "solution_id": "{{solution_id}}",
+    "name": "Test Datastore",
+    "type": "Private",
+    "capacity": 1,
+    "lun_type": "DATA",
+    "san_id": 1,
+    "status": "Completed"
+}
+
+> {%
+client.test('Create Resource', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('datastore_id', response.body.data.id);
+%}
+
+### 3. Get Collection
+GET https://{{host}}/v1/datastores
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 4. Get Resource
+GET https://{{host}}/v1/datastores/{{datastore_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 5. Update Resource
+PATCH https://{{host}}/v1/datastores/{{datastore_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test Datastore (Updated)"
+}
+
+> {%
+client.test('Update Resource', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 6. Verify Resource
+GET https://{{host}}/v1/datastores/{{datastore_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(
+            response.body.data.name === 'Test Datastore (Updated)',
+            'Name mismatch error'
+    );
+});
+%}
+
+### 7. Delete Resource (Will fail automation with a 503 error in Docker)
+DELETE https://{{host}}/v1/datastores/{{datastore_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Delete Resource', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
