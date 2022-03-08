@@ -1,9 +1,9 @@
-##################################################################################
+####################################################################################
 ### Docker Instructions:-
 ### First ensure the ActiveDirectoryDomainSeeder has been run
 ### with:-
-### `artisan db:seed --class=Database\\Seeders\\V1\\ActiveDirectoryDomainSeeder`
-##################################################################################
+### `php artisan db:seed --class=Database\\Seeders\\V1\\ActiveDirectoryDomainSeeder`
+####################################################################################
 ### 1. Get Collection
 GET https://{{host}}/v1/active-directory/domains
 Accept: */*
