@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Event;
 use Tests\CreatesApplication;
 use Tests\Traits\ResellerDatabaseMigrations;
+use UKFast\Api\Auth\Consumer;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -57,6 +58,20 @@ abstract class TestCase extends BaseTestCase
                 'ucs_reseller_encryption_default' => 'Yes',
                 'ucs_reseller_encryption_billing_type' => 'PAYG'
             ]);
+        return $this;
+    }
+
+    public function asAdmin()
+    {
+        $consumer = new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']);
+        $consumer->setIsAdmin(true);
+        $this->be($consumer);
+        return $this;
+    }
+
+    public function asUser()
+    {
+        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
         return $this;
     }
 }
