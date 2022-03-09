@@ -16,16 +16,16 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class HostGroupController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = HostGroup::forUser($request->user());
 
-        $queryTransformer->config(HostGroup::class)
-            ->transform($collection);
-
-        return HostGroupResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return HostGroupResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(Request $request, string $id)
