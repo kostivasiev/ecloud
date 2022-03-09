@@ -4,15 +4,11 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
-use Database\Factories\V2\LoadBalancerSpecificationFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class AvailabilityZoneCapacity
@@ -20,7 +16,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
  */
-class LoadBalancerSpecification extends Model implements Filterable, Sortable
+class LoadBalancerSpecification extends Model implements Searchable
 {
     use CustomKey, HasFactory, DefaultName, SoftDeletes;
 
@@ -59,71 +55,19 @@ class LoadBalancerSpecification extends Model implements Filterable, Sortable
         return $this->hasMany(LoadBalancer::class, 'load_balancer_spec_id', 'id');
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('description', Filter::$stringDefaults),
-            $factory->create('node_count', Filter::$numericDefaults),
-            $factory->create('cpu', Filter::$numericDefaults),
-            $factory->create('ram', Filter::$numericDefaults),
-            $factory->create('hdd', Filter::$numericDefaults),
-            $factory->create('iops', Filter::$numericDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('node_count'),
-            $factory->create('cpu'),
-            $factory->create('ram'),
-            $factory->create('hdd'),
-            $factory->create('iops'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('created_at', 'asc'),
-        ];
-    }
-
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'description' => 'description',
-            'node_count' => 'node_count',
-            'cpu' => 'cpu',
-            'ram' => 'ram',
-            'hdd' => 'hdd',
-            'iops' => 'iops',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'description' => $filter->string(),
+            'node_count' => $filter->numeric(),
+            'cpu' => $filter->numeric(),
+            'ram' => $filter->numeric(),
+            'hdd' => $filter->numeric(),
+            'iops' => $filter->numeric(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

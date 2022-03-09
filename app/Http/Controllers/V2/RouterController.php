@@ -83,13 +83,11 @@ class RouterController extends BaseController
         ));
     }
 
-    public function networks(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function networks(Request $request, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->networks();
-        $queryTransformer->config(Network::class)
-            ->transform($collection);
 
-        return NetworkResource::collection($collection->paginate(
+        return NetworkResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

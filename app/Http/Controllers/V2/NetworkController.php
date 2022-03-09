@@ -25,93 +25,11 @@ class NetworkController extends BaseController
      * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
-        if ($request->hasAny([
-            'vpc_id',
-            'vpc_id:eq', 'vpc_id:in', 'vpc_id:lk',
-            'vpc_id:neq', 'vpc_id:nin', 'vpc_id:nlk',
-        ])) {
-            $networkIds = Network::forUser($request->user())->get();
+        $collection = Network::forUser($request->user());
 
-            if ($request->has('vpc_id') || $request->has('vpc_id:eq')) {
-                if ($request->has('vpc_id')) {
-                    $vpcId = $request->get('vpc_id');
-                    $request->query->remove('vpc_id');
-                } else {
-                    $vpcId = $request->get('vpc_id:eq');
-                    $request->query->remove('vpc_id:eq');
-                }
-
-                $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
-                    return !$network->router || $network->router->vpc_id != $vpcId;
-                });
-            }
-
-            if ($request->has('vpc_id:neq')) {
-                $vpcId = $request->get('vpc_id:neq');
-                $request->query->remove('vpc_id:neq');
-
-                $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
-                    return !$network->router || $network->router->vpc_id == $vpcId;
-                });
-            }
-
-            if ($request->has('vpc_id:lk')) {
-                $vpcId = $request->get('vpc_id:lk');
-                $request->query->remove('vpc_id:lk');
-
-                $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
-                    return !$network->router
-                        || preg_match(
-                            '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
-                            $network->router->vpc_id
-                        ) === 0;
-                });
-            }
-
-            if ($request->has('vpc_id:nlk')) {
-                $vpcId = $request->get('vpc_id:nlk');
-                $request->query->remove('vpc_id:nlk');
-
-                $networkIds = $networkIds->reject(function ($network) use ($vpcId) {
-                    return !$network->router
-                        || preg_match(
-                            '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
-                            $network->router->vpc_id
-                        ) === 1;
-                });
-            }
-
-            if ($request->has('vpc_id:in')) {
-                $ids = explode(',', $request->get('vpc_id:in'));
-                $request->query->remove('vpc_id:in');
-
-                $networkIds = $networkIds->reject(function ($network) use ($ids) {
-                    return !$network->router || !in_array($network->router->vpc_id, $ids);
-                });
-            }
-
-            if ($request->has('vpc_id:nin')) {
-                $ids = explode(',', $request->get('vpc_id:nin'));
-                $request->query->remove('vpc_id:nin');
-
-                $networkIds = $networkIds->reject(function ($network) use ($ids) {
-                    return !$network->router || in_array($network->router->vpc_id, $ids);
-                });
-            }
-
-            $collection = Network::whereIn('id', $networkIds->map(function ($network) {
-                return $network->id;
-            }));
-        } else {
-            $collection = Network::forUser($request->user());
-        }
-
-        $queryTransformer->config(Network::class)
-            ->transform($collection);
-
-        return NetworkResource::collection($collection->paginate(
+        return NetworkResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
