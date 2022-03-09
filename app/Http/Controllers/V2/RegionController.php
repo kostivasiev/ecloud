@@ -56,15 +56,16 @@ class RegionController extends BaseController
         return response('', 204);
     }
 
-    public function availabilityZones(Request $request, QueryTransformer $queryTransformer, string $regionId)
+    public function availabilityZones(Request $request, string $regionId)
     {
         $collection = Region::forUser($request->user())->findOrFail($regionId)->availabilityZones();
-        $queryTransformer->config(AvailabilityZone::class)
-            ->transform($collection);
 
-        return AvailabilityZoneResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return AvailabilityZoneResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function vpcs(Request $request, QueryTransformer $queryTransformer, string $regionId)

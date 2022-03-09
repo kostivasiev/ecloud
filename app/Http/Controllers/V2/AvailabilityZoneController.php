@@ -5,12 +5,10 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
-use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\Product;
 use App\Models\V2\Router;
@@ -38,18 +36,17 @@ class AvailabilityZoneController extends BaseController
     /**
      * Get availability zones collection
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = AvailabilityZone::forUser($request->user());
-        $queryTransformer->config(AvailabilityZone::class)
-            ->transform($collection);
-
-        return AvailabilityZoneResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return AvailabilityZoneResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
@@ -212,20 +209,20 @@ class AvailabilityZoneController extends BaseController
 
     /**
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function capacities(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function capacities(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->availabilityZoneCapacities();
-        $queryTransformer->config(AvailabilityZoneCapacity::class)
-            ->transform($collection);
 
-        return AvailabilityZoneCapacityResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return AvailabilityZoneCapacityResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function destroy(string $zoneId)

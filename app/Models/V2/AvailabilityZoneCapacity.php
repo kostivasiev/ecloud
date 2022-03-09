@@ -7,11 +7,8 @@ use App\Traits\V2\CustomKey;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class AvailabilityZoneCapacity
@@ -19,7 +16,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static find(string $routerId)
  * @method static findOrFail(string $routerUuid)
  */
-class AvailabilityZoneCapacity extends Model implements Filterable, Sortable, AvailabilityZoneable
+class AvailabilityZoneCapacity extends Model implements Searchable, AvailabilityZoneable
 {
     use HasFactory, CustomKey, SoftDeletes;
 
@@ -55,69 +52,18 @@ class AvailabilityZoneCapacity extends Model implements Filterable, Sortable, Av
         return $this->belongsTo(AvailabilityZone::class);
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('availability_zone_id', Filter::$stringDefaults),
-            $factory->create('type', Filter::$stringDefaults),
-            $factory->create('current', Filter::$numericDefaults),
-            $factory->create('alert_warning', Filter::$numericDefaults),
-            $factory->create('alert_critical', Filter::$numericDefaults),
-            $factory->create('max', Filter::$numericDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('availability_zone_id'),
-            $factory->create('type'),
-            $factory->create('current'),
-            $factory->create('alert_warning'),
-            $factory->create('alert_critical'),
-            $factory->create('max'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('created_at', 'asc'),
-        ];
-    }
-
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'availability_zone_id' => 'name',
-            'type' => 'vpc_id',
-            'current' => 'availability_zone_id',
-            'alert_warning' => 'capacity',
-            'alert_critical' => 'vmware_uuid',
-            'max' => 'created_at',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'availability_zone_id' => $filter->string(),
+            'type' => $filter->string(),
+            'current' => $filter->numeric(),
+            'alert_warning' => $filter->numeric(),
+            'alert_critical' => $filter->numeric(),
+            'max' => $filter->numeric(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }
