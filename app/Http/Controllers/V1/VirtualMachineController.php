@@ -395,7 +395,6 @@ class VirtualMachineController extends BaseController
                     $defaultNetwork = SolutionNetwork::withSolution($solution->getKey())->first();
                     $request->request->add(['network_id' => $defaultNetwork->getKey()]);
                 }
-
             }
 
             // If encryption is enabled but no flag passed in, set to the solution default
