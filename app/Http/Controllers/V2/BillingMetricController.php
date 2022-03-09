@@ -13,14 +13,15 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class BillingMetricController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = BillingMetric::forUser($request->user());
-        $queryTransformer->config(BillingMetric::class)
-            ->transform($collection);
-        return BillingMetricResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return BillingMetricResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(Request $request, string $billingMetricId)

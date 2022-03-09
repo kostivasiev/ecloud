@@ -9,19 +9,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Exceptions\InvalidSortException;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sort;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class BillingMetric
  * @package App\Models\V2
  */
-class BillingMetric extends Model implements Filterable, Sortable
+class BillingMetric extends Model implements Searchable
 {
     use HasFactory, CustomKey, SoftDeletes;
 
@@ -124,83 +120,22 @@ class BillingMetric extends Model implements Filterable, Sortable
         return $this->save();
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('resource_id', Filter::$stringDefaults),
-            $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('reseller_id', Filter::$numericDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('key', Filter::$stringDefaults),
-            $factory->create('value', Filter::$stringDefaults),
-            $factory->create('start', Filter::$dateDefaults),
-            $factory->create('end', Filter::$dateDefaults),
-            $factory->create('category', Filter::$stringDefaults),
-            $factory->create('price', Filter::$numericDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|Sort[]
-     * @throws InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('resource_id'),
-            $factory->create('vpc_id'),
-            $factory->create('reseller_id'),
-            $factory->create('name'),
-            $factory->create('key'),
-            $factory->create('value'),
-            $factory->create('start'),
-            $factory->create('end'),
-            $factory->create('category'),
-            $factory->create('price'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|Sort|Sort[]|null
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('created_at', 'desc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'resource_id' => 'resource_id',
-            'vpc_id' => 'vpc_id',
-            'reseller_id' => 'reseller_id',
-            'name' => 'name',
-            'key' => 'key',
-            'value' => 'value',
-            'start' => 'start',
-            'end' => 'end',
-            'category' => 'category',
-            'price' => 'price',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'resource_id' => $filter->string(),
+            'vpc_id' => $filter->string(),
+            'reseller_id' => $filter->numeric(),
+            'name' => $filter->string(),
+            'key' => $filter->string(),
+            'value' => $filter->string(),
+            'start' => $filter->date(),
+            'end' => $filter->date(),
+            'category' => $filter->string(),
+            'price' => $filter->numeric(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }
