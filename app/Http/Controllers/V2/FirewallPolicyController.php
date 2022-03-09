@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateFirewallPolicyRequest;
 use App\Http\Requests\V2\UpdateFirewallPolicyRequest;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
 use App\Models\V2\Task;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\FirewallRuleResource;
@@ -35,15 +34,17 @@ class FirewallPolicyController extends BaseController
         );
     }
 
-    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $firewallPolicyId)
+    public function firewallRules(Request $request, string $firewallPolicyId)
     {
-        $collection = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)->firewallRules();
-        $queryTransformer->config(FirewallRule::class)
-            ->transform($collection);
+        $collection = FirewallPolicy::forUser($request->user())
+            ->findOrFail($firewallPolicyId)->firewallRules();
 
-        return FirewallRuleResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FirewallRuleResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function store(CreateFirewallPolicyRequest $request)

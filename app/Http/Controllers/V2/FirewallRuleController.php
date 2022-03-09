@@ -22,19 +22,18 @@ class FirewallRuleController extends BaseController
 {
     /**
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = FirewallRule::forUser($request->user());
 
-        $queryTransformer->config(FirewallRule::class)
-            ->transform($collection);
-
-        return FirewallRuleResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FirewallRuleResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
