@@ -6,7 +6,6 @@ use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
-use App\Models\V2\LoadBalancer;
 use App\Models\V2\Product;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
@@ -188,20 +187,20 @@ class AvailabilityZoneController extends BaseController
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function loadBalancers(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function loadBalancers(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->loadBalancers();
-        $queryTransformer->config(LoadBalancer::class)
-            ->transform($collection);
 
-        return LoadBalancerResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return LoadBalancerResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**

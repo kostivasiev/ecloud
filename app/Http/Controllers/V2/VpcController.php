@@ -8,7 +8,6 @@ use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
 use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancer;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
@@ -143,15 +142,16 @@ class VpcController extends BaseController
         ));
     }
 
-    public function loadBalancers(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    public function loadBalancers(Request $request, string $vpcId)
     {
         $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->loadBalancers();
-        $queryTransformer->config(LoadBalancer::class)
-            ->transform($collection);
 
-        return LoadBalancerResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return LoadBalancerResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function deployDefaults(DeployDefaultsRequest $request, string $vpcId)
