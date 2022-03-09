@@ -191,12 +191,11 @@ class InstanceController extends BaseController
 
     /**
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @param string $instanceId
      *
      * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function credentials(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function credentials(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
         if (!$instance->deployed && !$request->user()->isAdmin()) {
@@ -214,12 +213,13 @@ class InstanceController extends BaseController
         if (!$request->user()->isAdmin()) {
             $collection->where('credentials.is_hidden', 0);
         }
-        $queryTransformer->config(Credential::class)
-            ->transform($collection);
 
-        return CredentialResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return CredentialResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**

@@ -24,13 +24,12 @@ class CredentialsController extends BaseController
     {
         $collection = Credential::filterHidden($request);
 
-        (new QueryTransformer($request))
-            ->config(Credential::class)
-            ->transform($collection);
-
-        return CredentialResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT')),
-        ));
+        return CredentialResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT')),
+                )
+        );
     }
 
     /**

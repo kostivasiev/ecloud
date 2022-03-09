@@ -11,11 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class Credentials
@@ -24,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $routerUuid)
  * @method static forUser(string $user)
  */
-class Credential extends Model implements Filterable, Sortable
+class Credential extends Model implements Searchable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName;
 
@@ -91,74 +88,24 @@ class Credential extends Model implements Filterable, Sortable
         return $query;
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        $filters = [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('resource_id', Filter::$stringDefaults),
-            $factory->create('host', Filter::$stringDefaults),
-            $factory->create('username', Filter::$stringDefaults),
-            $factory->create('password', Filter::$stringDefaults),
-            $factory->create('port', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-        if (Auth::user()->isAdmin()) {
-            $filters[] = $factory->create('is_hidden', Filter::$numericDefaults);
-        }
-        return $filters;
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('resource_id'),
-            $factory->create('host'),
-            $factory->create('username'),
-            $factory->create('port'),
-            $factory->create('is_hidden'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('name', 'asc'),
-        ];
-    }
-
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'resource_id' => 'resource_id',
-            'host' => 'host',
-            'username' => 'username',
-            'password' => 'password',
-            'port' => 'port',
-            'is_hidden' => 'is_hidden',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(function ($filter) {
+            $filters = [
+                'id' => $filter->string(),
+                'name' => $filter->string(),
+                'resource_id' => $filter->string(),
+                'host' => $filter->string(),
+                'username' => $filter->string(),
+                'password' => $filter->string(),
+                'port' => $filter->string(),
+                'created_at' => $filter->date(),
+                'updated_at' => $filter->date(),
+            ];
+            if (Auth::user()->isAdmin()) {
+                $filters['is_hidden'] = $filter->numeric();
+            }
+            return $filters;
+        });
     }
 }
