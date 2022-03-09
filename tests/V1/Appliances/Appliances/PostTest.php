@@ -29,7 +29,7 @@ class PostTest extends ApplianceTestCase
 
         // Create the appliance record
         $response = $this->json('POST', '/v1/appliances', [
-            'name' => $appliance->name,
+            'name' => $appliance->getAttribute('name'),
             'logo_uri' => $appliance->logo_uri,
             'description' => $appliance->description,
             'documentation_uri' => $appliance->documentation_uri,
@@ -50,7 +50,7 @@ class PostTest extends ApplianceTestCase
             'appliance',
             [
                 'appliance_uuid' => $uuid,
-                'appliance_name' => $appliance->name,
+                'appliance_name' => $appliance->getAttribute('name'),
                 'appliance_logo_uri' => $appliance->logo_uri,
                 'appliance_description' => $appliance->description,
                 'appliance_documentation_uri' => $appliance->documentation_uri,

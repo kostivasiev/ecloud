@@ -2,7 +2,7 @@
 ### Docker Instructions:-
 ### First ensure the ActiveDirectoryDomainSeeder has been run
 ### with:-
-### `php artisan db:seed --class=Database\\Seeders\\V1\\ResellerSeeder`
+### `php artisan db:seed --class=Database\\Seeders\\V1\\SolutionSeeder`
 ### `php artisan db:seed --class=Database\\Seeders\\V1\\SolutionSiteSeeder`
 ### `php artisan db:seed --class=Database\\Seeders\\V1\\SanSeeder`
 #########################################################################

@@ -43,7 +43,7 @@ abstract class TestCase extends BaseTestCase
         ]);
     }
 
-    public function addReseller()
+    public function addSolution()
     {
         \DB::table('ucs_reseller')
             ->insert([

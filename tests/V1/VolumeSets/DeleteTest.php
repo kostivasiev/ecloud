@@ -21,7 +21,7 @@ class DeleteTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->addReseller();
+        $this->addSolution();
         $this->volumeSet = VolumeSet::factory()->create([
             'ucs_reseller_id' => 1,
         ]);
