@@ -6,7 +6,6 @@ use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
-use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\Product;
@@ -251,16 +250,17 @@ class AvailabilityZoneController extends BaseController
         ));
     }
 
-    public function hostSpecs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function hostSpecs(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->hostSpecs();
-        $queryTransformer->config(HostSpec::class)
-            ->transform($collection);
 
-        return HostSpecResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return HostSpecResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function images(Request $request, QueryTransformer $queryTransformer, string $zoneId)

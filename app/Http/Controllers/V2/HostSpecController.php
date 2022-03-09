@@ -7,19 +7,19 @@ use App\Http\Requests\V2\HostSpec\Update;
 use App\Models\V2\HostSpec;
 use App\Resources\V2\HostSpecResource;
 use Illuminate\Http\Request;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class HostSpecController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = HostSpec::query();
-        $queryTransformer->config(HostSpec::class)
-            ->transform($collection);
 
-        return HostSpecResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return HostSpecResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(Request $request, string $hostSpecId)

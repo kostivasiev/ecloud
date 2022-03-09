@@ -7,17 +7,14 @@ use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class HostSpec
  * @package App\Models\V2
  */
-class HostSpec extends Model implements Filterable, Sortable
+class HostSpec extends Model implements Searchable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName;
 
@@ -60,69 +57,18 @@ class HostSpec extends Model implements Filterable, Sortable
         return $this->belongsToMany(AvailabilityZone::class);
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory): array
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('cpu_sockets', Filter::$numericDefaults),
-            $factory->create('cpu_type', Filter::$stringDefaults),
-            $factory->create('cpu_cores', Filter::$numericDefaults),
-            $factory->create('cpu_clock_speed', Filter::$numericDefaults),
-            $factory->create('ram_capacity', Filter::$numericDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory): array
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('cpu_sockets'),
-            $factory->create('cpu_type'),
-            $factory->create('cpu_cores'),
-            $factory->create('cpu_clock_speed'),
-            $factory->create('ram_capacity'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory): array
-    {
-        return [
-            $factory->create('created_at', 'desc'),
-        ];
-    }
-
-    public function databaseNames(): array
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'cpu_sockets' => 'cpu_sockets',
-            'cpu_type' => 'cpu_type',
-            'cpu_cores' => 'cpu_cores',
-            'cpu_clock_speed' => 'cpu_clock_speed',
-            'ram_capacity' => 'ram_capacity',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'cpu_sockets' => $filter->numeric(),
+            'cpu_type' => $filter->string(),
+            'cpu_cores' => $filter->numeric(),
+            'cpu_clock_speed' => $filter->numeric(),
+            'ram_capacity' => $filter->numeric(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }
