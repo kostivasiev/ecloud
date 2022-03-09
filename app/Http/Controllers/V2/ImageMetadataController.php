@@ -8,20 +8,19 @@ use App\Models\V2\ImageMetadata;
 use App\Resources\V2\ImageMetadataResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class ImageMetadataController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = ImageMetadata::forUser(Auth::user());
 
-        $queryTransformer->config(ImageMetadata::class)
-            ->transform($collection);
-
-        return ImageMetadataResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return ImageMetadataResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(string $imageMetadataId)

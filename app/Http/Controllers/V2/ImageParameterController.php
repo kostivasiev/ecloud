@@ -9,20 +9,19 @@ use App\Models\V2\ImageParameter;
 use App\Resources\V2\ImageParameterResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class ImageParameterController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = ImageParameter::forUser(Auth::user());
 
-        $queryTransformer->config(ImageParameter::class)
-            ->transform($collection);
-
-        return ImageParameterResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return ImageParameterResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(string $imageParameterId)
