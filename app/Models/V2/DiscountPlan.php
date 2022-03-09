@@ -91,7 +91,7 @@ class DiscountPlan extends Model implements Searchable
     public function sieve(Sieve $sieve)
     {
         $sieve->configure(fn ($filter) => [
-            'id' => $filter->numeric(),
+            'id' => $filter->string(),
             'reseller_id' => $filter->numeric(),
             'contact_id' => $filter->numeric(),
             'employee_id' => $filter->numeric(),

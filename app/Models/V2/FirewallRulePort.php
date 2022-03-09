@@ -8,11 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class FirewallRulePort
@@ -20,7 +17,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $firewallRuleId)
  * @method static forUser($request)
  */
-class FirewallRulePort extends Model implements Filterable, Sortable, Manageable
+class FirewallRulePort extends Model implements Searchable, Manageable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName;
 
@@ -67,66 +64,16 @@ class FirewallRulePort extends Model implements Filterable, Sortable, Manageable
         return $this->isManaged();
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$enumDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('firewall_rule_id', Filter::$enumDefaults),
-            $factory->create('source', Filter::$stringDefaults),
-            $factory->create('destination', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('firewall_rule_id'),
-            $factory->create('source'),
-            $factory->create('destination'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('name'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'firewall_rule_id' => 'firewall_rule_id',
-            'source' => 'source',
-            'destination' => 'destination',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-            'deleted_at' => 'deleted_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'firewall_rule_id' => $filter->string(),
+            'source' => $filter->string(),
+            'destination' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

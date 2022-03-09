@@ -81,8 +81,11 @@ class SoftwareController extends BaseController
             ->images()
             ->forUser(Auth::user());
 
-        return ImageResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return ImageResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 }

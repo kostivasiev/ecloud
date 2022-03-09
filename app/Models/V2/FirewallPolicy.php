@@ -87,10 +87,10 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
     public function sieve(Sieve $sieve)
     {
         $sieve->configure(fn ($filter) => [
-            'id' => $filter->numeric(),
+            'id' => $filter->string(),
             'name' => $filter->string(),
             'sequence' => $filter->string(),
-            'router_id' => $filter->numeric(),
+            'router_id' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);

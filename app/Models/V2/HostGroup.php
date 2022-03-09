@@ -11,17 +11,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class HostGroup
  * @package App\Models\V2
  */
-class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
+class HostGroup extends Model implements Searchable, ResellerScopeable, AvailabilityZoneable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
 
@@ -107,67 +104,18 @@ class HostGroup extends Model implements Filterable, Sortable, ResellerScopeable
         });
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory): array
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('availability_zone_id', Filter::$stringDefaults),
-            $factory->create('host_spec_id', Filter::$stringDefaults),
-            $factory->create('windows_enabled', Filter::$enumDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory): array
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('vpc_id'),
-            $factory->create('availability_zone_id'),
-            $factory->create('host_spec_id'),
-            $factory->create('windows_enabled'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory): array
-    {
-        return [
-            $factory->create('created_at', 'desc'),
-        ];
-    }
-
-    public function databaseNames(): array
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'vpc_id' => 'vpc_id',
-            'availability_zone_id' => 'availability_zone_id',
-            'host_spec_id' => 'host_spec_id',
-            'windows_enabled' => 'windows_enabled',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'vpc_id' => $filter->string(),
+            'availability_zone_id' => $filter->string(),
+            'host_spec_id' => $filter->string(),
+            'windows_enabled' => $filter->boolean(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 
     public function getRamCapacityAttribute()
