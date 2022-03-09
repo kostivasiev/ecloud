@@ -16,16 +16,16 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class FirewallPolicyController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = FirewallPolicy::forUser($request->user());
 
-        $queryTransformer->config(FirewallPolicy::class)
-            ->transform($collection);
-
-        return FirewallPolicyResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FirewallPolicyResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(Request $request, string $firewallPolicyId)

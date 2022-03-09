@@ -103,15 +103,16 @@ class RouterController extends BaseController
         return response('', 202);
     }
 
-    public function firewallPolicies(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function firewallPolicies(Request $request, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->firewallPolicies();
-        $queryTransformer->config(FirewallPolicy::class)
-            ->transform($collection);
 
-        return FirewallPolicyResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FirewallPolicyResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function tasks(Request $request, QueryTransformer $queryTransformer, string $routerId)

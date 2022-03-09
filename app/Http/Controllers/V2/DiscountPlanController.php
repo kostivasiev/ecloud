@@ -11,7 +11,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use UKFast\Api\Exceptions\BadRequestException;
-use UKFast\DB\Ditto\QueryTransformer;
 
 /**
  * Class DiscountPlanController
@@ -26,13 +25,12 @@ class DiscountPlanController extends BaseController
     public function index(Request $request)
     {
         $collection = DiscountPlan::forUser($request->user());
-        (new QueryTransformer($request))
-            ->config(DiscountPlan::class)
-            ->transform($collection);
-
-        return DiscountPlanResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return DiscountPlanResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
