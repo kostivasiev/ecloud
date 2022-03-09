@@ -23,16 +23,16 @@ use UKFast\DB\Ditto\QueryTransformer;
  */
 class FloatingIpController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = FloatingIp::forUser($request->user());
 
-        $queryTransformer->config(FloatingIp::class)
-            ->transform($collection);
-
-        return FloatingIpResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FloatingIpResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(Request $request, string $fipId)

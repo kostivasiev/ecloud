@@ -8,7 +8,6 @@ use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Http\Requests\V2\Instance\VolumeDetachRequest;
-use App\Jobs\Instance\PowerOn;
 use App\Models\V2\Credential;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Image;
@@ -512,7 +511,7 @@ class InstanceController extends BaseController
      * @param string $instanceId
      * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function floatingIps(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function floatingIps(Request $request, string $instanceId)
     {
         $nics = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
 
@@ -524,12 +523,12 @@ class InstanceController extends BaseController
             })->pluck('id'));
         });
 
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
-
-        return FloatingIpResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FloatingIpResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function createImage(CreateImageRequest $request, $instanceId)
