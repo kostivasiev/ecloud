@@ -6,7 +6,6 @@ use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Credential;
-use App\Models\V2\Dhcp;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
 use App\Models\V2\LoadBalancer;
@@ -140,20 +139,20 @@ class AvailabilityZoneController extends BaseController
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function dhcps(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function dhcps(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->dhcps();
-        $queryTransformer->config(Dhcp::class)
-            ->transform($collection);
 
-        return DhcpResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return DhcpResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**

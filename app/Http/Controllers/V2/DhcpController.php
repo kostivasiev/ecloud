@@ -22,19 +22,18 @@ class DhcpController extends BaseController
 {
     /**
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Dhcp::forUser($request->user());
 
-        $queryTransformer->config(Dhcp::class)
-            ->transform($collection);
-
-        return DhcpResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return DhcpResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
