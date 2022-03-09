@@ -11,14 +11,11 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class LoadBalancerNetworkController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = LoadBalancerNetwork::forUser($request->user());
 
-        $queryTransformer->config(LoadBalancerNetwork::class)
-            ->transform($collection);
-
-        return LoadBalancerNetworkResource::collection($collection->paginate(
+        return LoadBalancerNetworkResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

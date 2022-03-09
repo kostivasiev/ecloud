@@ -92,13 +92,11 @@ class LoadBalancerController extends BaseController
         ));
     }
 
-    public function networks(Request $request, QueryTransformer $queryTransformer, string $loadBalancerId)
+    public function networks(Request $request, string $loadBalancerId)
     {
         $collection = LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId)->loadBalancerNetworks();
-        $queryTransformer->config(LoadBalancerNetwork::class)
-            ->transform($collection);
 
-        return LoadBalancerNetworkResource::collection($collection->paginate(
+        return LoadBalancerNetworkResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

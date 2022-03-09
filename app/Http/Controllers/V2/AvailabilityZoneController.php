@@ -158,14 +158,12 @@ class AvailabilityZoneController extends BaseController
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function credentials(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function credentials(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->credentials();
-        $queryTransformer->config(Credential::class)
-            ->transform($collection);
 
-        return CredentialResource::collection($collection->paginate(
+        return CredentialResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
