@@ -311,7 +311,6 @@ class VirtualMachineController extends BaseController
                 // if admin reseller scope is empty, we won't know the owner for the new VM
                 throw new Exceptions\UnauthorisedException('Unable to determine account id');
             }
-
             // check for demo accounts
             if ($accountsService->isDemoCustomer($request->user()->resellerId())) {
                 throw new Exceptions\ForbiddenException(
@@ -363,6 +362,7 @@ class VirtualMachineController extends BaseController
             if (!in_array($request->input('environment'), ['Burst', 'GPU'])) {
                 // get available compute
                 $maxRam = min($maxRam, $solution->ramAvailable());
+
                 if ($maxRam < 1) {
                     throw new InsufficientResourceException($intapiService->getFriendlyError(
                         'host has insufficient ram, ' . $maxRam . 'GB remaining'
@@ -385,6 +385,7 @@ class VirtualMachineController extends BaseController
                 }
             }
 
+
             if ($solution->isMultiNetwork()) {
                 $rules['network_id'] = ['required', 'integer'];
 
@@ -394,7 +395,9 @@ class VirtualMachineController extends BaseController
                     $defaultNetwork = SolutionNetwork::withSolution($solution->getKey())->first();
                     $request->request->add(['network_id' => $defaultNetwork->getKey()]);
                 }
+
             }
+
             // If encryption is enabled but no flag passed in, set to the solution default
             if ($solution->encryptionEnabled() && !$request->has('encrypt')) {
                 $encrypt_vm = ($solution->ucs_reseller_encryption_default == 'Yes');
@@ -478,6 +481,7 @@ class VirtualMachineController extends BaseController
             $capacityRequested = array_sum(array_column($request->input('hdd_disks'), 'capacity'));
 
             $capacityAllowed = $datastore->usage->available;
+
             if (in_array($request->input('environment'), ['Public', 'Burst'])) {
                 $capacityAllowed = VirtualMachine::MAX_HDD * VirtualMachine::MAX_HDD_COUNT;
             }
@@ -586,7 +590,6 @@ class VirtualMachineController extends BaseController
                     "Unable to launch Appliance '" . $appliance->getKey() . "' at this time."
                 );
             }
-
             $platform = $template->platform();
             $license = $template->license();
         }
@@ -881,6 +884,7 @@ class VirtualMachineController extends BaseController
                     'Accept' => 'application/xml',
                 ]
             ]);
+
 
             $intapiData = $intapiService->getResponseData();
         } catch (\Exception $exception) {

@@ -412,7 +412,6 @@ class Solution extends Model implements Filterable, Sortable
             if (!array_key_exists($vmwareHost->macAddress, $hostsDatabaseRecordsSorted)) {
                 continue;
             }
-
             $hostDatabaseRecord = $hostsDatabaseRecordsSorted[$vmwareHost->macAddress];
             if (!$hostDatabaseRecord instanceof Host) {
                 continue;
