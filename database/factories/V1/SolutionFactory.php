@@ -29,6 +29,9 @@ class SolutionFactory extends Factory
             'ucs_reseller_encryption_enabled' => 'No',
             'ucs_reseller_encryption_default' => 'Yes',
             'ucs_reseller_encryption_billing_type' => 'PAYG',
+            'ucs_reseller_nplusone_active' => 'Yes',
+            'ucs_reseller_nplus_redundancy' => 'None',
+            'ucs_reseller_nplus_overprovision' => 'No',
         ];
     }
 }

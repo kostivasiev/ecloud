@@ -2,7 +2,6 @@
 
 namespace Tests\V1;
 
-use App\Models\V1\Pod;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Event;
