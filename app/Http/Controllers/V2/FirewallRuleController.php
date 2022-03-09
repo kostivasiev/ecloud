@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\FirewallRule\Create;
 use App\Http\Requests\V2\FirewallRule\Update;
 use App\Models\V2\FirewallRule;
@@ -12,7 +11,6 @@ use App\Resources\V2\FirewallRuleResource;
 use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 /**
  * Class FirewallRuleController
@@ -48,15 +46,17 @@ class FirewallRuleController extends BaseController
         );
     }
 
-    public function ports(Request $request, QueryTransformer $queryTransformer, string $firewallRuleId)
+    public function ports(Request $request, string $firewallRuleId)
     {
-        $collection = FirewallRule::forUser($request->user())->findOrFail($firewallRuleId)->firewallRulePorts();
-        $queryTransformer->config(FirewallRulePort::class)
-            ->transform($collection);
+        $collection = FirewallRule::forUser($request->user())
+            ->findOrFail($firewallRuleId)->firewallRulePorts();
 
-        return FirewallRulePortResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FirewallRulePortResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**

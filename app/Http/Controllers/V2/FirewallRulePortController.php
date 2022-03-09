@@ -14,15 +14,16 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class FirewallRulePortController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = FirewallRulePort::forUser($request->user());
-        $queryTransformer->config(FirewallRulePort::class)
-            ->transform($collection);
 
-        return FirewallRulePortResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FirewallRulePortResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(Request $request, string $firewallRulePortId)
