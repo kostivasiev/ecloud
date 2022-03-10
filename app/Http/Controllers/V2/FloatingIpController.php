@@ -7,15 +7,11 @@ use App\Http\Requests\V2\FloatingIp\CreateRequest;
 use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Jobs\Tasks\FloatingIp\Assign;
 use App\Jobs\Tasks\FloatingIp\Unassign;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Task;
-use App\Models\V2\Vpc;
 use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 /**
  * Class InstanceController
@@ -107,13 +103,11 @@ class FloatingIpController extends BaseController
         return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $fipId)
+    public function tasks(Request $request, string $fipId)
     {
         $collection = FloatingIp::forUser($request->user())->findOrFail($fipId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

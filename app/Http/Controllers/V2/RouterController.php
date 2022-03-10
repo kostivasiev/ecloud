@@ -6,7 +6,6 @@ use App\Http\Requests\V2\Router\CreateRequest;
 use App\Http\Requests\V2\Router\UpdateRequest;
 use App\Jobs\Router\ConfigureRouterDefaults;
 use App\Models\V2\Router;
-use App\Models\V2\Task;
 use App\Models\V2\VpnService;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\NetworkResource;
@@ -107,13 +106,11 @@ class RouterController extends BaseController
         );
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function tasks(Request $request, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

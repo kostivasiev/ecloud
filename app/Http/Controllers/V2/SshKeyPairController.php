@@ -15,11 +15,8 @@ class SshKeyPairController extends BaseController
     public function index(Request $request)
     {
         $collection = SshKeyPair::forUser($request->user());
-        (new QueryTransformer($request))
-            ->config(SshKeyPair::class)
-            ->transform($collection);
 
-        return SshKeyPairResource::collection($collection->paginate(
+        return SshKeyPairResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

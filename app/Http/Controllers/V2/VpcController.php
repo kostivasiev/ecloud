@@ -8,7 +8,6 @@ use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
 use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
@@ -131,13 +130,11 @@ class VpcController extends BaseController
         ));
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    public function tasks(Request $request, string $vpcId)
     {
         $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

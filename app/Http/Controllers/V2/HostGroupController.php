@@ -6,13 +6,11 @@ use App\Http\Requests\V2\HostGroup\StoreRequest;
 use App\Http\Requests\V2\HostGroup\UpdateRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
-use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Resources\V2\HostGroupResource;
 use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class HostGroupController extends BaseController
 {
@@ -94,13 +92,11 @@ class HostGroupController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $id)
+    public function tasks(Request $request, string $id)
     {
         $collection = HostGroup::forUser($request->user())->findOrFail($id)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

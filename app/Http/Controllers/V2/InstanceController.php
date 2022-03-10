@@ -16,7 +16,6 @@ use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
-use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\FloatingIpResource;
@@ -490,13 +489,11 @@ class InstanceController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function tasks(Request $request, string $instanceId)
     {
         $collection = Instance::forUser($request->user())->findOrFail($instanceId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

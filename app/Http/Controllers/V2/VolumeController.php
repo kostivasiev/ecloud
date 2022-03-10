@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\Volume\AttachRequest;
-use App\Http\Requests\V2\Volume\DetachRequest;
 use App\Http\Requests\V2\Volume\CreateRequest;
+use App\Http\Requests\V2\Volume\DetachRequest;
 use App\Http\Requests\V2\Volume\UpdateRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
@@ -156,13 +154,11 @@ class VolumeController extends BaseController
         ));
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $volumeId)
+    public function tasks(Request $request, string $volumeId)
     {
         $collection = Volume::forUser($request->user())->findOrFail($volumeId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
