@@ -17,11 +17,7 @@ class VolumeGroupController extends BaseController
     {
         $collection = VolumeGroup::forUser($request->user());
 
-        (new QueryTransformer($request))
-            ->config(VolumeGroup::class)
-            ->transform($collection);
-
-        return VolumeGroupResource::collection($collection->paginate(
+        return VolumeGroupResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
