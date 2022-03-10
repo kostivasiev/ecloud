@@ -13,13 +13,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class Vip extends Model implements Filterable, Sortable, ResellerScopeable
+class Vip extends Model implements Searchable, ResellerScopeable
 {
     use CustomKey, DefaultName, SoftDeletes, Syncable, Taskable, HasFactory;
 
@@ -124,65 +121,16 @@ class Vip extends Model implements Filterable, Sortable, ResellerScopeable
         }
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('load_balancer_network_id', Filter::$stringDefaults),
-            $factory->create('ip_address_id', Filter::$stringDefaults),
-            $factory->create('config_id', Filter::$numericDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('load_balancer_network_id', Filter::$stringDefaults),
-            $factory->create('ip_address_id', Filter::$stringDefaults),
-            $factory->create('config_id', Filter::$numericDefaults),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('created_at', 'asc'),
-        ];
-    }
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'load_balancer_network_id' => 'load_balancer_network_id',
-            'ip_address_id' => 'ip_address_id',
-            'config_id' => 'config_id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at'
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'load_balancer_network_id' => $filter->string(),
+            'ip_address_id' => $filter->string(),
+            'config_id' => $filter->numeric(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }
