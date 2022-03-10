@@ -148,7 +148,7 @@ class ImageController extends BaseController
     {
         $collection = Image::forUser(Auth::user())->findOrFail($imageId)->software();
 
-        return SoftwareResource::collection($collection->paginate(
+        return SoftwareResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

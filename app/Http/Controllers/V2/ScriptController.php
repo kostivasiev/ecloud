@@ -7,18 +7,14 @@ use App\Http\Requests\V2\Script\Update;
 use App\Models\V2\Script;
 use App\Resources\V2\ScriptResource;
 use Illuminate\Http\Request;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class ScriptController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Script::forUser($request->user());
 
-        $queryTransformer->config(Script::class)
-            ->transform($collection);
-
-        return ScriptResource::collection($collection->paginate(
+        return ScriptResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

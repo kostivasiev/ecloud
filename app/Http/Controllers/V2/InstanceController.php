@@ -610,13 +610,11 @@ class InstanceController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function software(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function software(Request $request, string $instanceId)
     {
         $collection = Instance::forUser($request->user())->findOrFail($instanceId)->software();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return SoftwareResource::collection($collection->paginate(
+        return SoftwareResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
