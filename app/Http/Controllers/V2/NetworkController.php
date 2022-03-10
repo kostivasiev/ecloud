@@ -90,13 +90,11 @@ class NetworkController extends BaseController
      * @param string $networkId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function nics(Request $request, QueryTransformer $queryTransformer, string $networkId)
+    public function nics(Request $request, string $networkId)
     {
         $collection = Network::forUser($request->user())->findOrFail($networkId)->nics();
-        $queryTransformer->config(Nic::class)
-            ->transform($collection);
 
-        return NicResource::collection($collection->paginate(
+        return NicResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

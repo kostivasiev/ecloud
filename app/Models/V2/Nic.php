@@ -14,15 +14,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Exceptions\InvalidSortException;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sort;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class Nic extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, Natable, RouterScopable
+class Nic extends Model implements Searchable, ResellerScopeable, AvailabilityZoneable, Natable, RouterScopable
 {
     use HasFactory, CustomKey, SoftDeletes, Syncable, Taskable, DeletionRules, DefaultName;
 
@@ -175,65 +170,16 @@ class Nic extends Model implements Filterable, Sortable, ResellerScopeable, Avai
         });
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('mac_address', Filter::$stringDefaults),
-            $factory->create('instance_id', Filter::$stringDefaults),
-            $factory->create('network_id', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|Sort[]
-     * @throws InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('mac_address'),
-            $factory->create('instance_id'),
-            $factory->create('network_id'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|Sort|Sort[]|null
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('created_at', 'desc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'mac_address' => 'mac_address',
-            'instance_id' => 'instance_id',
-            'network_id' => 'network_id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'mac_address' => $filter->string(),
+            'instance_id' => $filter->string(),
+            'network_id' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

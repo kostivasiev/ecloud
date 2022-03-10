@@ -16,7 +16,6 @@ use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
-use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Resources\V2\CredentialResource;
@@ -244,13 +243,11 @@ class InstanceController extends BaseController
      * @param string $instanceId
      * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function nics(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function nics(Request $request, string $instanceId)
     {
         $collection = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
-        $queryTransformer->config(Nic::class)
-            ->transform($collection);
 
-        return NicResource::collection($collection->paginate(
+        return NicResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
