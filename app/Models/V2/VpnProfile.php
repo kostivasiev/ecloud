@@ -13,8 +13,10 @@ use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class VpnProfile extends Model implements Filterable, Sortable
+class VpnProfile extends Model implements Searchable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
@@ -37,69 +39,18 @@ class VpnProfile extends Model implements Filterable, Sortable
         parent::__construct($attributes);
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('ike_version', Filter::$stringDefaults),
-            $factory->create('encryption_algorithm', Filter::$enumDefaults),
-            $factory->create('digest_algorithm', Filter::$enumDefaults),
-            $factory->create('diffie_hellman', Filter::$enumDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('ike_version'),
-            $factory->create('encryption_algorithm'),
-            $factory->create('digest_algorithm'),
-            $factory->create('diffie_hellman'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('id', 'asc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'ike_version' => 'ike_version',
-            'encryption_algorithm' => 'encryption_algorithm',
-            'digest_algorithm' => 'digest_algorithm',
-            'diffie_hellman' => 'diffie_hellman',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'ike_version' => $filter->string(),
+            'encryption_algorithm' => $filter->string(),
+            'digest_algorithm' => $filter->string(),
+            'diffie_hellman' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 
     public function getDigestAlgorithmAttribute()
