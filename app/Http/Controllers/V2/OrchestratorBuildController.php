@@ -6,7 +6,6 @@ use App\Models\V2\OrchestratorBuild;
 use App\Resources\V2\OrchestratorBuildResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 /**
  * Class OrchestratorBuildController
@@ -14,14 +13,11 @@ use UKFast\DB\Ditto\QueryTransformer;
  */
 class OrchestratorBuildController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = OrchestratorBuild::forUser(Auth::user());
 
-        $queryTransformer->config(OrchestratorBuild::class)
-            ->transform($collection);
-
-        return OrchestratorBuildResource::collection($collection->paginate(
+        return OrchestratorBuildResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
