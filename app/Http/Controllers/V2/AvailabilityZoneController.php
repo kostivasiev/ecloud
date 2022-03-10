@@ -5,8 +5,6 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Credential;
-use App\Models\V2\Product;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
 use App\Resources\V2\AvailabilityZoneCapacityResource;
@@ -236,12 +234,7 @@ class AvailabilityZoneController extends BaseController
 
         $products = $availabilityZone->products();
 
-        // Hacky Resource specific filtering
-        (new QueryTransformer(Product::transformRequest($request)))
-            ->config(Product::class)
-            ->transform($products);
-
-        return ProductResource::collection($products->paginate(
+        return ProductResource::collection($products->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

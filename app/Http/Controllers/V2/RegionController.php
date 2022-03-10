@@ -84,12 +84,7 @@ class RegionController extends BaseController
         $region = Region::forUser($request->user())->findOrFail($regionId);
         $products = Product::forRegion($region);
 
-        // Hacky Resource specific filtering
-        (new QueryTransformer(Product::transformRequest($request)))
-            ->config(Product::class)
-            ->transform($products);
-
-        return ProductResource::collection($products->paginate(
+        return ProductResource::collection($products->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
