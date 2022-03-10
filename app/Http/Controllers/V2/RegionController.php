@@ -6,13 +6,11 @@ use App\Http\Requests\V2\CreateRegionRequest;
 use App\Http\Requests\V2\UpdateRegionRequest;
 use App\Models\V2\Product;
 use App\Models\V2\Region;
-use App\Models\V2\Vpc;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\ProductResource;
 use App\Resources\V2\RegionResource;
 use App\Resources\V2\VpcResource;
 use Illuminate\Http\Request;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class RegionController extends BaseController
 {
@@ -64,13 +62,11 @@ class RegionController extends BaseController
         );
     }
 
-    public function vpcs(Request $request, QueryTransformer $queryTransformer, string $regionId)
+    public function vpcs(Request $request, string $regionId)
     {
         $collection = Region::forUser($request->user())->findOrFail($regionId)->vpcs();
-        $queryTransformer->config(Vpc::class)
-            ->transform($collection);
 
-        return VpcResource::collection($collection->paginate(
+        return VpcResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

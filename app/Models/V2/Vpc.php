@@ -15,13 +15,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, RegionAble
+class Vpc extends Model implements Searchable, ResellerScopeable, RegionAble
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -133,71 +130,18 @@ class Vpc extends Model implements Filterable, Sortable, ResellerScopeable, Regi
         return (bool) BillingMetric::getActiveByKey($this, UpdateSupportEnabledBilling::getKeyName());
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('reseller_id', Filter::$stringDefaults),
-            $factory->create('region_id', Filter::$stringDefaults),
-            $factory->boolean()->create('console_enabled', '1', '0'),
-            $factory->boolean()->create('support_enabled', '1', '0'),
-            $factory->boolean()->create('advanced_networking', '1', '0'),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('reseller_id'),
-            $factory->create('region_id'),
-            $factory->create('console_enabled'),
-            $factory->create('support_enabled'),
-            $factory->create('advanced_networking'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('name', 'asc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'reseller_id' => 'reseller_id',
-            'region_id' => 'region_id',
-            'console_enabled' => 'console_enabled',
-            'advanced_networking' => 'advanced_networking',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'reseller_id' => $filter->string(),
+            'region_id' => $filter->string(),
+            'console_enabled' => $filter->boolean(),
+            'support_enabled' => $filter->boolean(),
+            'advanced_networking' => $filter->boolean(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

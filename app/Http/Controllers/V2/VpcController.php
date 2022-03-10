@@ -25,11 +25,8 @@ class VpcController extends BaseController
     public function index(Request $request)
     {
         $collection = Vpc::forUser($request->user());
-        (new QueryTransformer($request))
-            ->config(Vpc::class)
-            ->transform($collection);
 
-        return VpcResource::collection($collection->paginate(
+        return VpcResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
