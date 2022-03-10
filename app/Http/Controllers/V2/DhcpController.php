@@ -6,13 +6,11 @@ use App\Http\Requests\V2\CreateDhcpRequest;
 use App\Http\Requests\V2\UpdateDhcpRequest;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Dhcp;
-use App\Models\V2\Task;
 use App\Models\V2\Vpc;
 use App\Resources\V2\DhcpResource;
 use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 /**
  * Class DhcpController
@@ -22,19 +20,18 @@ class DhcpController extends BaseController
 {
     /**
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Dhcp::forUser($request->user());
 
-        $queryTransformer->config(Dhcp::class)
-            ->transform($collection);
-
-        return DhcpResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return DhcpResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
@@ -104,13 +101,11 @@ class DhcpController extends BaseController
         return response('', 202);
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $dhcpId)
+    public function tasks(Request $request, string $dhcpId)
     {
         $collection = Dhcp::forUser($request->user())->findOrFail($dhcpId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

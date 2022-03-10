@@ -9,13 +9,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class NetworkRulePort extends Model implements Filterable, Sortable, Manageable
+class NetworkRulePort extends Model implements Searchable, Manageable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
@@ -83,52 +80,17 @@ class NetworkRulePort extends Model implements Filterable, Sortable, Manageable
         return $this->isManaged();
     }
 
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('network_rule_id', Filter::$stringDefaults),
-            $factory->create('protocol', Filter::$stringDefaults),
-            $factory->create('source', Filter::$stringDefaults),
-            $factory->create('destination', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('network_rule_id'),
-            $factory->create('protocol'),
-            $factory->create('source'),
-            $factory->create('destination'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('name', 'asc'),
-        ];
-    }
-
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'network_rule_id' => 'network_rule_id',
-            'protocol' => 'protocol',
-            'source' => 'source',
-            'destination' => 'destination',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'network_rule_id' => $filter->string(),
+            'protocol' => $filter->string(),
+            'source' => $filter->string(),
+            'destination' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

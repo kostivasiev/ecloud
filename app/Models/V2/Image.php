@@ -12,17 +12,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class Image
  * @package App\Models\V2
  */
-class Image extends Model implements Filterable, Sortable, ResellerScopeable
+class Image extends Model implements Searchable, ResellerScopeable
 {
     use HasFactory, CustomKey, SoftDeletes, DeletionRules, DefaultName, Syncable, Taskable;
 
@@ -162,88 +159,25 @@ class Image extends Model implements Filterable, Sortable, ResellerScopeable
         return null;
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory): array
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('logo_uri', Filter::$stringDefaults),
-            $factory->create('documentation_uri', Filter::$stringDefaults),
-            $factory->create('description', Filter::$stringDefaults),
-            $factory->create('script_template', Filter::$stringDefaults),
-            $factory->create('readiness_script', Filter::$stringDefaults),
-            $factory->create('vm_template', Filter::$stringDefaults),
-            $factory->create('platform', Filter::$enumDefaults),
-            $factory->create('active', Filter::$enumDefaults),
-            $factory->create('public', Filter::$enumDefaults),
-            $factory->create('visibility', Filter::$enumDefaults),
-            $factory->create('publisher', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory): array
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('vpc_id'),
-            $factory->create('logo_uri'),
-            $factory->create('documentation_uri'),
-            $factory->create('description'),
-            $factory->create('script_template'),
-            $factory->create('readiness_script'),
-            $factory->create('vm_template'),
-            $factory->create('platform'),
-            $factory->create('active'),
-            $factory->create('public'),
-            $factory->create('visibility'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory): array
-    {
-        return [
-            $factory->create('created_at', 'desc'),
-        ];
-    }
-
-    public function databaseNames(): array
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'vpc_id' => 'vpc_id',
-            'logo_uri' => 'logo_uri',
-            'documentation_uri' => 'documentation_uri',
-            'description' => 'description',
-            'script_template' => 'script_template',
-            'readiness_script' => 'readiness_script',
-            'vm_template' => 'vm_template',
-            'platform' => 'platform',
-            'active' => 'active',
-            'public' => 'public',
-            'visibility' => 'visibility',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'vpc_id' => $filter->string(),
+            'logo_uri' => $filter->string(),
+            'documentation_uri' => $filter->string(),
+            'description' => $filter->string(),
+            'script_template' => $filter->string(),
+            'readiness_script' => $filter->string(),
+            'vm_template' => $filter->string(),
+            'platform' => $filter->string(),
+            'active' => $filter->boolean(),
+            'public' => $filter->boolean(),
+            'visibility' => $filter->boolean(),
+            'publisher' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

@@ -4,10 +4,8 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\VpnSession\CreateRequest;
 use App\Http\Requests\V2\VpnSession\UpdateRequest;
-use App\Models\V2\Credential;
 use App\Models\V2\VpnSession;
 use App\Models\V2\VpnSessionNetwork;
-use App\Resources\V2\CredentialResource;
 use App\Resources\V2\VpnSessionResource;
 use App\Support\Sync;
 use Illuminate\Http\Request;

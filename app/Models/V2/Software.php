@@ -9,13 +9,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class Software extends Model implements Filterable, Sortable
+class Software extends Model implements Searchable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, HasFactory;
 
@@ -66,65 +63,16 @@ class Software extends Model implements Filterable, Sortable
         return $query->where('visibility', Software::VISIBILITY_PUBLIC);
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('platform', Filter::$stringDefaults),
-            $factory->create('visibility', Filter::$enumDefaults),
-            $factory->create('license', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('platform'),
-            $factory->create('visibility'),
-            $factory->create('license'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('id', 'asc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'platform' => 'platform',
-            'visibility' => 'visibility',
-            'license' => 'license',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'platform' => $filter->string(),
+            'visibility' => $filter->boolean(),
+            'license' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

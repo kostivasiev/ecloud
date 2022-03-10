@@ -9,24 +9,23 @@ use App\Resources\V2\AvailabilityZoneCapacityResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class AvailabilityZoneCapacitiesController extends BaseController
 {
     /**
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @return AnonymousResourceCollection
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = AvailabilityZoneCapacity::query();
-        $queryTransformer->config(AvailabilityZoneCapacity::class)
-            ->transform($collection);
 
-        return AvailabilityZoneCapacityResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return AvailabilityZoneCapacityResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**

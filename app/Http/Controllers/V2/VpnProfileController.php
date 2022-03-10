@@ -11,14 +11,11 @@ use UKFast\DB\Ditto\QueryTransformer;
 
 class VpnProfileController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = VpnProfile::query();
 
-        $queryTransformer->config(VpnProfile::class)
-            ->transform($collection);
-
-        return VpnProfileResource::collection($collection->paginate(
+        return VpnProfileResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

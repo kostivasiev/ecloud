@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\NetworkRulePort\Create;
 use App\Http\Requests\V2\NetworkRulePort\Update;
 use App\Models\V2\NetworkRulePort;
@@ -10,17 +9,14 @@ use App\Resources\V2\NetworkRulePortResource;
 use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class NetworkRulePortController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = NetworkRulePort::forUser($request->user());
-        $queryTransformer->config(NetworkRulePort::class)
-            ->transform($collection);
 
-        return NetworkRulePortResource::collection($collection->paginate(
+        return NetworkRulePortResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

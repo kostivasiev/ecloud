@@ -5,7 +5,6 @@ namespace App\Http\Controllers\V2;
 use App\Models\V2\Task;
 use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
-use UKFast\DB\Ditto\QueryTransformer;
 
 /**
  * Class TaskController
@@ -13,14 +12,11 @@ use UKFast\DB\Ditto\QueryTransformer;
  */
 class TaskController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Task::forUser($request->user());
 
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
-
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

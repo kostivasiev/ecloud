@@ -8,7 +8,6 @@ use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Http\Requests\V2\Instance\VolumeDetachRequest;
-use App\Jobs\Instance\PowerOn;
 use App\Models\V2\Credential;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Image;
@@ -17,8 +16,6 @@ use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
-use App\Models\V2\Nic;
-use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\FloatingIpResource;
@@ -191,12 +188,11 @@ class InstanceController extends BaseController
 
     /**
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @param string $instanceId
      *
      * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function credentials(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function credentials(Request $request, string $instanceId)
     {
         $instance = Instance::forUser($request->user())->findOrFail($instanceId);
         if (!$instance->deployed && !$request->user()->isAdmin()) {
@@ -214,12 +210,13 @@ class InstanceController extends BaseController
         if (!$request->user()->isAdmin()) {
             $collection->where('credentials.is_hidden', 0);
         }
-        $queryTransformer->config(Credential::class)
-            ->transform($collection);
 
-        return CredentialResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return CredentialResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
@@ -245,13 +242,11 @@ class InstanceController extends BaseController
      * @param string $instanceId
      * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function nics(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function nics(Request $request, string $instanceId)
     {
         $collection = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
-        $queryTransformer->config(Nic::class)
-            ->transform($collection);
 
-        return NicResource::collection($collection->paginate(
+        return NicResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -494,13 +489,11 @@ class InstanceController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function tasks(Request $request, string $instanceId)
     {
         $collection = Instance::forUser($request->user())->findOrFail($instanceId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -512,7 +505,7 @@ class InstanceController extends BaseController
      * @param string $instanceId
      * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function floatingIps(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function floatingIps(Request $request, string $instanceId)
     {
         $nics = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
 
@@ -524,12 +517,12 @@ class InstanceController extends BaseController
             })->pluck('id'));
         });
 
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
-
-        return FloatingIpResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FloatingIpResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function createImage(CreateImageRequest $request, $instanceId)
@@ -614,13 +607,11 @@ class InstanceController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function software(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function software(Request $request, string $instanceId)
     {
         $collection = Instance::forUser($request->user())->findOrFail($instanceId)->software();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return SoftwareResource::collection($collection->paginate(
+        return SoftwareResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

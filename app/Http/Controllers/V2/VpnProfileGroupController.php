@@ -6,18 +6,14 @@ use App\Http\Requests\V2\VpnProfileGroup\Update;
 use App\Models\V2\VpnProfileGroup;
 use App\Resources\V2\VpnProfileGroupResource;
 use Illuminate\Http\Request;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class VpnProfileGroupController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = VpnProfileGroup::forUser($request->user());
 
-        $queryTransformer->config(VpnProfileGroup::class)
-            ->transform($collection);
-
-        return VpnProfileGroupResource::collection($collection->paginate(
+        return VpnProfileGroupResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

@@ -194,4 +194,23 @@ class GetTest extends TestCase
                 'mgmt_api_url' => $pod->ucs_datacentre_vmware_api_url
             ]);
     }
+
+    public function testGetGpuProfileCollection()
+    {
+        $pod = Pod::factory()->create([
+            'ucs_datacentre_id' => 123,
+            'ucs_datacentre_vmware_api_url' => 'http://example.com'
+        ])->first();
+        $this->get(
+            sprintf(
+                '/v1/pods/%d/gpu-profiles',
+                $pod->getKey()
+            ),
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.read, ecloud.write',
+                'X-Reseller-Id' => 1,
+            ]
+        )->assertStatus(200);
+    }
 }

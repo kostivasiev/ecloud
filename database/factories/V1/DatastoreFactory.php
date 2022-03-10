@@ -26,7 +26,7 @@ class DatastoreFactory extends Factory
             'reseller_lun_ucs_site_id' => 1,
             'reseller_lun_status' => 'Completed',
             'reseller_lun_type' => 'Hybrid',
-            'reseller_lun_size_gb' => $this->faker->numberBetween(10, 100),
+            'reseller_lun_size_gb' => 100,
             'reseller_lun_name' => 'MCS_PX_VV_1_DATA',
             'reseller_lun_friendly_name' => '',
             'reseller_lun_wwn' => '',

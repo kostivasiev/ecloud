@@ -9,13 +9,10 @@ use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class NetworkRule extends Model implements Filterable, Sortable, Manageable
+class NetworkRule extends Model implements Searchable, Manageable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules;
 
@@ -88,64 +85,21 @@ class NetworkRule extends Model implements Filterable, Sortable, Manageable
         return $this->isManaged();
     }
 
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('network_policy_id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('sequence', Filter::$numericDefaults),
-            $factory->create('source', Filter::$stringDefaults),
-            $factory->create('destination', Filter::$stringDefaults),
-            $factory->create('action', Filter::$stringDefaults),
-            $factory->create('direction', Filter::$stringDefaults),
-            $factory->create('enabled', Filter::$numericDefaults),
-            $factory->create('type', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('network_policy_id'),
-            $factory->create('name'),
-            $factory->create('sequence'),
-            $factory->create('source'),
-            $factory->create('destination'),
-            $factory->create('action'),
-            $factory->create('direction'),
-            $factory->create('enabled'),
-            $factory->create('type'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('sequence'),
-        ];
-    }
-
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'network_policy_id' => 'network_policy_id',
-            'name' => 'name',
-            'sequence' => 'sequence',
-            'source' => 'source',
-            'destination' => 'destination',
-            'action' => 'action',
-            'direction' => 'direction',
-            'enabled' => 'enabled',
-            'type' => 'type',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'network_policy_id' => $filter->string(),
+            'name' => $filter->string(),
+            'sequence' => $filter->numeric(),
+            'source' => $filter->string(),
+            'destination' => $filter->string(),
+            'action' => $filter->string(),
+            'direction' => $filter->string(),
+            'enabled' => $filter->numeric(),
+            'type' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

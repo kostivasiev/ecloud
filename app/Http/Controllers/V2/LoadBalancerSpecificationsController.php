@@ -18,13 +18,11 @@ class LoadBalancerSpecificationsController extends BaseController
      * @param QueryTransformer $queryTransformer
      * @return AnonymousResourceCollection
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = LoadBalancerSpecification::query();
-        $queryTransformer->config(LoadBalancerSpecification::class)
-            ->transform($collection);
 
-        return LoadBalancerSpecificationResource::collection($collection->paginate(
+        return LoadBalancerSpecificationResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

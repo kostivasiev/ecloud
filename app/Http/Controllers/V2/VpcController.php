@@ -8,8 +8,6 @@ use App\Http\Requests\V2\Vpc\UpdateRequest;
 use App\Jobs\Vpc\Defaults\ConfigureVpcDefaults;
 use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancer;
-use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Models\V2\Vpc;
 use App\Resources\V2\InstanceResource;
@@ -27,11 +25,8 @@ class VpcController extends BaseController
     public function index(Request $request)
     {
         $collection = Vpc::forUser($request->user());
-        (new QueryTransformer($request))
-            ->config(Vpc::class)
-            ->transform($collection);
 
-        return VpcResource::collection($collection->paginate(
+        return VpcResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -132,26 +127,25 @@ class VpcController extends BaseController
         ));
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    public function tasks(Request $request, string $vpcId)
     {
         $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
-    public function loadBalancers(Request $request, QueryTransformer $queryTransformer, string $vpcId)
+    public function loadBalancers(Request $request, string $vpcId)
     {
         $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->loadBalancers();
-        $queryTransformer->config(LoadBalancer::class)
-            ->transform($collection);
 
-        return LoadBalancerResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return LoadBalancerResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function deployDefaults(DeployDefaultsRequest $request, string $vpcId)

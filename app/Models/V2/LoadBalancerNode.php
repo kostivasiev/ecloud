@@ -10,15 +10,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Factory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sort;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class LoadBalancerNode extends Model implements Filterable, Sortable
+class LoadBalancerNode extends Model implements Searchable
 {
     use CustomKey, SoftDeletes, HasFactory, Syncable, Taskable;
 
@@ -64,63 +60,15 @@ class LoadBalancerNode extends Model implements Filterable, Sortable
         });
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('load_balancer_id', Filter::$stringDefaults),
-            $factory->create('instance_id', Filter::$stringDefaults),
-            $factory->create('node_id', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('load_balancer_id'),
-            $factory->create('instance_id'),
-            $factory->create('node_id'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('id', 'asc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'load_balancer_id' => 'load_balancer_id',
-            'instance_id' => 'instance_id',
-            'node_id' => 'node_id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'load_balancer_id' => $filter->string(),
+            'instance_id' => $filter->string(),
+            'node_id' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

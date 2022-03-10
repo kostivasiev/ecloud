@@ -27,6 +27,7 @@ class HostFactory extends Factory
             'ucs_node_specification_id' => 1,
             'ucs_node_status' => 'Completed',
             'ucs_node_location_id' => 1,
+            'ucs_node_eth0_mac' => 'AA:BB:CC:DD:EE:FF',
         ];
     }
 }

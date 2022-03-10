@@ -12,7 +12,6 @@ use App\Resources\V2\SoftwareResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use UKFast\DB\Ditto\QueryTransformer;
 
 /**
  * Class ImageController
@@ -20,16 +19,16 @@ use UKFast\DB\Ditto\QueryTransformer;
  */
 class ImageController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Image::forUser(Auth::user());
 
-        $queryTransformer->config(Image::class)
-            ->transform($collection);
-
-        return ImageResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return ImageResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(string $imageId)
@@ -125,25 +124,31 @@ class ImageController extends BaseController
     {
         $collection = Image::forUser(Auth::user())->findOrFail($imageId)->imageParameters()->forUser(Auth::user());
 
-        return ImageParameterResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return ImageParameterResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function metadata(Request $request, string $imageId)
     {
         $collection = Image::forUser(Auth::user())->findOrFail($imageId)->imageMetadata();
 
-        return ImageMetadataResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return ImageMetadataResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function software(Request $request, string $imageId)
     {
         $collection = Image::forUser(Auth::user())->findOrFail($imageId)->software();
 
-        return SoftwareResource::collection($collection->paginate(
+        return SoftwareResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

@@ -10,7 +10,6 @@ use App\Resources\V2\OrchestratorBuildResource;
 use App\Resources\V2\OrchestratorConfigResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 /**
  * Class OrchestratorConfigController
@@ -18,14 +17,11 @@ use UKFast\DB\Ditto\QueryTransformer;
  */
 class OrchestratorConfigController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = OrchestratorConfig::forUser(Auth::user());
 
-        $queryTransformer->config(OrchestratorConfig::class)
-            ->transform($collection);
-
-        return OrchestratorConfigResource::collection($collection->paginate(
+        return OrchestratorConfigResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -110,13 +106,13 @@ class OrchestratorConfigController extends BaseController
         );
     }
 
-    public function builds(Request $request, QueryTransformer $queryTransformer, string $orchestratorConfigId)
+    public function builds(Request $request, string $orchestratorConfigId)
     {
-        $collection = OrchestratorConfig::forUser($request->user())->findOrFail($orchestratorConfigId)->orchestratorBuilds();
-        $queryTransformer->config(OrchestratorBuild::class)
-            ->transform($collection);
+        $collection = OrchestratorConfig::forUser($request->user())
+            ->findOrFail($orchestratorConfigId)
+            ->orchestratorBuilds();
 
-        return OrchestratorBuildResource::collection($collection->paginate(
+        return OrchestratorBuildResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

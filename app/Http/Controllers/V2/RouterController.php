@@ -5,10 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\Router\CreateRequest;
 use App\Http\Requests\V2\Router\UpdateRequest;
 use App\Jobs\Router\ConfigureRouterDefaults;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Network;
 use App\Models\V2\Router;
-use App\Models\V2\Task;
 use App\Models\V2\VpnService;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\NetworkResource;
@@ -25,11 +22,7 @@ class RouterController extends BaseController
     {
         $collection = Router::forUser($request->user());
 
-        (new QueryTransformer($request))
-            ->config(Router::class)
-            ->transform($collection);
-
-        return RouterResource::collection($collection->paginate(
+        return RouterResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -83,13 +76,11 @@ class RouterController extends BaseController
         ));
     }
 
-    public function networks(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function networks(Request $request, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->networks();
-        $queryTransformer->config(Network::class)
-            ->transform($collection);
 
-        return NetworkResource::collection($collection->paginate(
+        return NetworkResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -103,24 +94,23 @@ class RouterController extends BaseController
         return response('', 202);
     }
 
-    public function firewallPolicies(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function firewallPolicies(Request $request, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->firewallPolicies();
-        $queryTransformer->config(FirewallPolicy::class)
-            ->transform($collection);
 
-        return FirewallPolicyResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FirewallPolicyResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function tasks(Request $request, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

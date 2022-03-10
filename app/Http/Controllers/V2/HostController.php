@@ -5,25 +5,23 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\Host\StoreRequest;
 use App\Http\Requests\V2\Host\UpdateRequest;
 use App\Models\V2\Host;
-use App\Models\V2\Task;
 use App\Resources\V2\HostResource;
 use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class HostController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Host::forUser($request->user());
 
-        $queryTransformer->config(Host::class)
-            ->transform($collection);
-
-        return HostResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return HostResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(Request $request, string $id)
@@ -90,13 +88,11 @@ class HostController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $id)
+    public function tasks(Request $request, string $id)
     {
         $collection = Host::forUser($request->user())->findOrFail($id)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

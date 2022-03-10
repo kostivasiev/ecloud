@@ -10,7 +10,6 @@ use App\Resources\V2\VipResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use UKFast\Api\Exceptions\NotFoundException;
-use UKFast\DB\Ditto\QueryTransformer;
 
 /**
  * Class VipController
@@ -22,14 +21,11 @@ class VipController extends BaseController
      * @param Request $request
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Vip::forUser($request->user());
 
-        $queryTransformer->config(Vip::class)
-            ->transform($collection);
-
-        return VipResource::collection($collection->paginate(
+        return VipResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

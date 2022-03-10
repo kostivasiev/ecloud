@@ -4,12 +4,10 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\IpAddress\CreateRequest;
 use App\Http\Requests\V2\IpAddress\UpdateRequest;
 use App\Models\V2\IpAddress;
-use App\Models\V2\Nic;
 use App\Resources\V2\IpAddressResource;
 use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class IpAddressController extends BaseController
 {
@@ -60,13 +58,11 @@ class IpAddressController extends BaseController
         return response('', 204);
     }
 
-    public function nics(Request $request, QueryTransformer $queryTransformer, string $ipAddressId)
+    public function nics(Request $request, string $ipAddressId)
     {
         $collection = IpAddress::forUser($request->user())->findOrFail($ipAddressId)->nics();
-        $queryTransformer->config(Nic::class)
-            ->transform($collection);
 
-        return NicResource::collection($collection->paginate(
+        return NicResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

@@ -11,17 +11,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class Orchestrator
  * @package App\Models\V2
  */
-class OrchestratorBuild extends Model implements Filterable, Sortable
+class OrchestratorBuild extends Model implements Searchable
 {
     use HasFactory, CustomKey, SoftDeletes, Syncable, Taskable;
 
@@ -56,52 +53,12 @@ class OrchestratorBuild extends Model implements Filterable, Sortable
         return $query;
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory): array
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('orchestrator_config_id', Filter::$stringDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory): array
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('orchestrator_config_id'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory): array
-    {
-        return [
-            $factory->create('created_at', 'desc'),
-        ];
-    }
-
-    public function databaseNames(): array
-    {
-        return [
-            'id' => 'id',
-            'state' => 'state',
-            'orchestrator_config_id' => 'orchestrator_config_id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'orchestrator_config_id' => $filter->string(),
+        ]);
     }
 
     /**
@@ -117,7 +74,6 @@ class OrchestratorBuild extends Model implements Filterable, Sortable
         $this->state = $state;
         $this->save();
     }
-
 
     public function render($definition) : Collection
     {

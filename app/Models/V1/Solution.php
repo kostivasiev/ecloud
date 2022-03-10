@@ -412,7 +412,6 @@ class Solution extends Model implements Filterable, Sortable
             if (!array_key_exists($vmwareHost->macAddress, $hostsDatabaseRecordsSorted)) {
                 continue;
             }
-
             $hostDatabaseRecord = $hostsDatabaseRecordsSorted[$vmwareHost->macAddress];
             if (!$hostDatabaseRecord instanceof Host) {
                 continue;
@@ -540,7 +539,6 @@ class Solution extends Model implements Filterable, Sortable
             );
             //Load the solution datastores from VMWare
             $datastores = $kingpin->getDatastores($this->getKey());
-
         } catch (KingpinException $exception) {
             throw new \Exception('Failed to load solution datastores.');
         }

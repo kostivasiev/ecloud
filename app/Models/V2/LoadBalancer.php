@@ -12,11 +12,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class LoadBalancer
@@ -24,7 +21,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $loadBalancerId)
  * @method static forUser(string $user)
  */
-class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZoneable, ResellerScopeable
+class LoadBalancer extends Model implements Searchable, AvailabilityZoneable, ResellerScopeable
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, HasFactory;
 
@@ -148,69 +145,17 @@ class LoadBalancer extends Model implements Filterable, Sortable, AvailabilityZo
         return (int) $this->loadBalancerNodes()->count();
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('availability_zone_id', Filter::$stringDefaults),
-            $factory->create('vpc_id', Filter::$stringDefaults),
-            $factory->create('load_balancer_spec_id', Filter::$stringDefaults),
-            $factory->create('config_id', Filter::$numericDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('availability_zone_id'),
-            $factory->create('vpc_id'),
-            $factory->create('load_balancer_spec_id'),
-            $factory->create('config_id'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('created_at', 'desc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'availability_zone_id' => 'availability_zone_id',
-            'vpc_id' => 'vpc_id',
-            'load_balancer_spec_id' => 'load_balancer_spec_id',
-            'config_id' => 'config_id',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'name' => $filter->string(),
+            'availability_zone_id' => $filter->string(),
+            'vpc_id' => $filter->string(),
+            'load_balancer_spec_id' => $filter->string(),
+            'config_id' => $filter->numeric(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

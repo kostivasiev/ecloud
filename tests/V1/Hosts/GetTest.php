@@ -3,7 +3,10 @@
 namespace Tests\V1\Hosts;
 
 use App\Models\V1\Host;
+use App\Models\V1\HostSpecification;
+use App\Models\V1\Pod;
 use App\Models\V1\Solution;
+use App\Services\Kingpin\V1\KingpinService;
 use Tests\V1\TestCase;
 
 class GetTest extends TestCase
@@ -19,10 +22,17 @@ class GetTest extends TestCase
      */
     public function testValidCollection()
     {
-        Solution::factory(1)->create();
+        $solution = Solution::factory()->create();
+        $specification = HostSpecification::factory()->create([
+            'ucs_specification_active' => 'Yes',
+        ]);
 
         $count = 2;
-        Host::factory($count)->create();
+        Host::factory($count)->create([
+            'ucs_node_ucs_reseller_id' => $solution->getKey(),
+            'ucs_node_status' => 'Active',
+            'ucs_node_specification_id' => $specification->getKey(),
+        ]);
 
         $this->get('/v1/hosts', [
             'X-consumer-custom-id' => '1-1',
@@ -37,43 +47,47 @@ class GetTest extends TestCase
      * Test for valid item
      * @return void
      */
-//    public function testValidItem()
-//    {
-//        // mock services
-//        $service = Mockery::mock('App\Services\Kingpin\V1\KingpinService');
-//        $service->shouldReceive('getHostByMac')->once()->andReturn((object) [
-//            'uuid' => 'HostSystem-host-01',
-//            'name' => '172.1.1.2',
-//            'macAddress' => '12:3a:b4:56:c7:e8',
-//            'powerStatus' => 'poweredOn',
-//            'networkStatus' => 'connected',
-//            'vms' => [],
-//            'stats' => null,
-//        ]);
-//        $this->app->instance('App\Services\Kingpin\V1\KingpinService', $service);
-//
-//
-//        // populate db
-//        factory(Pod::class, 1)->create();
-//        factory(Solution::class, 1)->create();
-//
-//        factory(Host::class, 1)->create([
-//            'ucs_node_id' => 123,
-//        ]);
-//
-//
-//        // call api
-//        $this->get('/v1/hosts/123', [
-//            'X-consumer-custom-id' => '1-1',
-//            'X-consumer-groups' => 'ecloud.read',
-//        ]);
-//
-//
-//        echo $this->response->getContent();
-//        exit(PHP_EOL);
-//
-//        $this->assertResponseStatus(200);
-//    }
+    public function testValidItem()
+    {
+        app()->bind(KingpinService::class, function () {
+            $service = \Mockery::mock('App\Services\Kingpin\V1\KingpinService');
+            $service->allows('getHostByMac')
+                ->once()
+                ->andReturn((object) [
+                'uuid' => 'HostSystem-host-01',
+                'name' => '172.1.1.2',
+                'macAddress' => '12:3a:b4:56:c7:e8',
+                'powerStatus' => 'poweredOn',
+                'networkStatus' => 'connected',
+                'vms' => [],
+                'stats' => null,
+            ]);
+            return $service;
+        });
+
+        // populate db
+        $pod = Pod::factory()->create();
+        Solution::factory()->create();
+        $hostSpecification = HostSpecification::factory()->create();
+
+        $host = Host::factory()->create([
+            'ucs_node_status' => 'Active',
+            'ucs_node_ucs_reseller_id' => 1,
+            'ucs_node_specification_id' => $hostSpecification->getKey(),
+        ]);
+
+        // call api
+        $response = $this->get(
+            sprintf('/v1/hosts/%d', $host->getKey()),
+            [
+                'X-consumer-custom-id' => '1-1',
+                'X-consumer-groups' => 'ecloud.read',
+            ]
+        )->assertJsonFragment([
+            'pod_id' => $pod->getKey(),
+            'name' => $hostSpecification->ucs_specification_friendly_name,
+        ])->assertStatus(200);
+    }
 
     /**
      * Test for invalid item

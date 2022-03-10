@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\LoadBalancer\CreateRequest;
 use App\Http\Requests\V2\LoadBalancer\UpdateRequest;
-use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerNetwork;
 use App\Resources\V2\InstanceResource;
@@ -27,13 +26,13 @@ class LoadBalancerController extends BaseController
     public function index(Request $request)
     {
         $collection = LoadBalancer::forUser($request->user());
-        (new QueryTransformer($request))
-            ->config(LoadBalancer::class)
-            ->transform($collection);
 
-        return LoadBalancerResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return LoadBalancerResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
@@ -93,13 +92,11 @@ class LoadBalancerController extends BaseController
         ));
     }
 
-    public function networks(Request $request, QueryTransformer $queryTransformer, string $loadBalancerId)
+    public function networks(Request $request, string $loadBalancerId)
     {
         $collection = LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId)->loadBalancerNetworks();
-        $queryTransformer->config(LoadBalancerNetwork::class)
-            ->transform($collection);
 
-        return LoadBalancerNetworkResource::collection($collection->paginate(
+        return LoadBalancerNetworkResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

@@ -14,20 +14,16 @@ use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class AvailabilityZones
  * @package App\Models\V2
  * @method static findOrFail(string $zoneId)
  */
-class AvailabilityZone extends Model implements Filterable, Sortable, RegionAble
+class AvailabilityZone extends Model implements Searchable, RegionAble
 {
     use HasFactory, CustomKey, SoftDeletes, DeletionRules;
 
@@ -227,72 +223,19 @@ class AvailabilityZone extends Model implements Filterable, Sortable, RegionAble
         })->where('is_public', '=', true);
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('code', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('datacentre_site_id', Filter::$numericDefaults),
-            $factory->create('region_id', Filter::$stringDefaults),
-            $factory->create('is_public', Filter::$numericDefaults),
-            $factory->create('san_name', Filter::$stringDefaults),
-            $factory->create('ucs_compute_name', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('code'),
-            $factory->create('name'),
-            $factory->create('datacentre_site_id'),
-            $factory->create('region_id'),
-            $factory->create('is_public'),
-            $factory->create('san_name'),
-            $factory->create('ucs_compute_name'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('code', 'asc'),
-        ];
-    }
-
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'code' => 'code',
-            'name' => 'name',
-            'datacentre_site_id' => 'datacentre_site_id',
-            'region_id' => 'region_id',
-            'is_public' => 'is_public',
-            'san_name' => 'san_name',
-            'ucs_compute_name' => 'ucs_compute_name',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->configure(fn ($filter) => [
+            'id' => $filter->string(),
+            'code' => $filter->string(),
+            'name' => $filter->string(),
+            'datacentre_site_id' => $filter->numeric(),
+            'region_id' => $filter->string(),
+            'is_public' => $filter->numeric(),
+            'san_name' => $filter->string(),
+            'ucs_compute_name' => $filter->string(),
+            'created_at' => $filter->date(),
+            'updated_at' => $filter->date(),
+        ]);
     }
 }

@@ -5,16 +5,6 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\AvailabilityZoneCapacity;
-use App\Models\V2\Credential;
-use App\Models\V2\Dhcp;
-use App\Models\V2\HostSpec;
-use App\Models\V2\Image;
-use App\Models\V2\Instance;
-use App\Models\V2\LoadBalancer;
-use App\Models\V2\Product;
-use App\Models\V2\Router;
-use App\Models\V2\RouterThroughput;
 use App\Resources\V2\AvailabilityZoneCapacityResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
@@ -38,18 +28,17 @@ class AvailabilityZoneController extends BaseController
     /**
      * Get availability zones collection
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = AvailabilityZone::forUser($request->user());
-        $queryTransformer->config(AvailabilityZone::class)
-            ->transform($collection);
-
-        return AvailabilityZoneResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return AvailabilityZoneResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
@@ -111,14 +100,12 @@ class AvailabilityZoneController extends BaseController
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function routers(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function routers(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->routers();
-        $queryTransformer->config(Router::class)
-            ->transform($collection);
 
-        return RouterResource::collection($collection->paginate(
+        return RouterResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -129,34 +116,32 @@ class AvailabilityZoneController extends BaseController
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function routerThroughputs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function routerThroughputs(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->routerThroughputs();
-        $queryTransformer->config(RouterThroughput::class)
-            ->transform($collection);
 
-        return RouterThroughputResource::collection($collection->paginate(
+        return RouterThroughputResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function dhcps(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function dhcps(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->dhcps();
-        $queryTransformer->config(Dhcp::class)
-            ->transform($collection);
 
-        return DhcpResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return DhcpResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
@@ -165,14 +150,12 @@ class AvailabilityZoneController extends BaseController
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function credentials(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function credentials(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->credentials();
-        $queryTransformer->config(Credential::class)
-            ->transform($collection);
 
-        return CredentialResource::collection($collection->paginate(
+        return CredentialResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -194,38 +177,38 @@ class AvailabilityZoneController extends BaseController
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @param QueryTransformer $queryTransformer
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function loadBalancers(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function loadBalancers(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->loadBalancers();
-        $queryTransformer->config(LoadBalancer::class)
-            ->transform($collection);
 
-        return LoadBalancerResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return LoadBalancerResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
      * @param Request $request
-     * @param QueryTransformer $queryTransformer
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function capacities(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function capacities(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->availabilityZoneCapacities();
-        $queryTransformer->config(AvailabilityZoneCapacity::class)
-            ->transform($collection);
 
-        return AvailabilityZoneCapacityResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return AvailabilityZoneCapacityResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function destroy(string $zoneId)
@@ -245,37 +228,34 @@ class AvailabilityZoneController extends BaseController
 
         $products = $availabilityZone->products();
 
-        // Hacky Resource specific filtering
-        (new QueryTransformer(Product::transformRequest($request)))
-            ->config(Product::class)
-            ->transform($products);
-
-        return ProductResource::collection($products->paginate(
+        return ProductResource::collection($products->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
 
-    public function hostSpecs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function hostSpecs(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->hostSpecs();
-        $queryTransformer->config(HostSpec::class)
-            ->transform($collection);
 
-        return HostSpecResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return HostSpecResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
-    public function images(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function images(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->images();
-        $queryTransformer->config(Image::class)
-            ->transform($collection);
 
-        return ImageResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return ImageResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 }

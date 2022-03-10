@@ -10,18 +10,14 @@ use App\Resources\V2\ScriptResource;
 use App\Resources\V2\SoftwareResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class SoftwareController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Software::forUser($request->user());
 
-        $queryTransformer->config(Software::class)
-            ->transform($collection);
-
-        return SoftwareResource::collection($collection->paginate(
+        return SoftwareResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -69,7 +65,7 @@ class SoftwareController extends BaseController
     {
         $collection = Software::forUser(Auth::user())->findOrFail($softwareId)->scripts();
 
-        return ScriptResource::collection($collection->paginate(
+        return ScriptResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -81,8 +77,11 @@ class SoftwareController extends BaseController
             ->images()
             ->forUser(Auth::user());
 
-        return ImageResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return ImageResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 }

@@ -9,7 +9,6 @@ use App\Http\Requests\V2\Nic\UpdateRequest;
 use App\Http\Requests\V2\UpdateNicRequest;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
-use App\Models\V2\Task;
 use App\Resources\V2\IpAddressResource;
 use App\Resources\V2\NicResource;
 use App\Resources\V2\TaskResource;
@@ -17,17 +16,14 @@ use App\Tasks\Nic\AssociateIp;
 use App\Tasks\Nic\DisassociateIp;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class NicController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = Nic::forUser($request->user());
-        $queryTransformer->config(Nic::class)
-            ->transform($collection);
 
-        return NicResource::collection($collection->paginate(
+        return NicResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -77,13 +73,11 @@ class NicController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $nicId)
+    public function tasks(Request $request, string $nicId)
     {
         $collection = Nic::forUser($request->user())->findOrFail($nicId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

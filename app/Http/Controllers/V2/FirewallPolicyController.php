@@ -5,27 +5,24 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateFirewallPolicyRequest;
 use App\Http\Requests\V2\UpdateFirewallPolicyRequest;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
-use App\Models\V2\Task;
 use App\Resources\V2\FirewallPolicyResource;
 use App\Resources\V2\FirewallRuleResource;
 use App\Resources\V2\TaskResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class FirewallPolicyController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = FirewallPolicy::forUser($request->user());
 
-        $queryTransformer->config(FirewallPolicy::class)
-            ->transform($collection);
-
-        return FirewallPolicyResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FirewallPolicyResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function show(Request $request, string $firewallPolicyId)
@@ -35,15 +32,17 @@ class FirewallPolicyController extends BaseController
         );
     }
 
-    public function firewallRules(Request $request, QueryTransformer $queryTransformer, string $firewallPolicyId)
+    public function firewallRules(Request $request, string $firewallPolicyId)
     {
-        $collection = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)->firewallRules();
-        $queryTransformer->config(FirewallRule::class)
-            ->transform($collection);
+        $collection = FirewallPolicy::forUser($request->user())
+            ->findOrFail($firewallPolicyId)->firewallRules();
 
-        return FirewallRuleResource::collection($collection->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return FirewallRuleResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     public function store(CreateFirewallPolicyRequest $request)
@@ -74,13 +73,11 @@ class FirewallPolicyController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function tasks(Request $request, QueryTransformer $queryTransformer, string $firewallPolicyId)
+    public function tasks(Request $request, string $firewallPolicyId)
     {
         $collection = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId)->tasks();
-        $queryTransformer->config(Task::class)
-            ->transform($collection);
 
-        return TaskResource::collection($collection->paginate(
+        return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
