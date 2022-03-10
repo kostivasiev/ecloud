@@ -5,8 +5,6 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\Router\CreateRequest;
 use App\Http\Requests\V2\Router\UpdateRequest;
 use App\Jobs\Router\ConfigureRouterDefaults;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Models\V2\VpnService;
@@ -25,11 +23,7 @@ class RouterController extends BaseController
     {
         $collection = Router::forUser($request->user());
 
-        (new QueryTransformer($request))
-            ->config(Router::class)
-            ->transform($collection);
-
-        return RouterResource::collection($collection->paginate(
+        return RouterResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

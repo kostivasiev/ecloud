@@ -5,8 +5,6 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\CreateAvailabilityZoneRequest;
 use App\Http\Requests\V2\UpdateAvailabilityZoneRequest;
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Router;
-use App\Models\V2\RouterThroughput;
 use App\Resources\V2\AvailabilityZoneCapacityResource;
 use App\Resources\V2\AvailabilityZoneResource;
 use App\Resources\V2\CredentialResource;
@@ -102,14 +100,12 @@ class AvailabilityZoneController extends BaseController
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function routers(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function routers(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->routers();
-        $queryTransformer->config(Router::class)
-            ->transform($collection);
 
-        return RouterResource::collection($collection->paginate(
+        return RouterResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
@@ -120,14 +116,12 @@ class AvailabilityZoneController extends BaseController
      * @param string $zoneId
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
      */
-    public function routerThroughputs(Request $request, QueryTransformer $queryTransformer, string $zoneId)
+    public function routerThroughputs(Request $request, string $zoneId)
     {
         $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
             ->routerThroughputs();
-        $queryTransformer->config(RouterThroughput::class)
-            ->transform($collection);
 
-        return RouterThroughputResource::collection($collection->paginate(
+        return RouterThroughputResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

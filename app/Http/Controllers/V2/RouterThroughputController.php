@@ -7,17 +7,14 @@ use App\Http\Requests\V2\RouterThroughput\UpdateRequest;
 use App\Models\V2\RouterThroughput;
 use App\Resources\V2\RouterThroughputResource;
 use Illuminate\Http\Request;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class RouterThroughputController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
         $collection = RouterThroughput::forUser($request->user());
-        $queryTransformer->config(RouterThroughput::class)
-            ->transform($collection);
 
-        return RouterThroughputResource::collection($collection->paginate(
+        return RouterThroughputResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
