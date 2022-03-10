@@ -4,7 +4,6 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\CreateRegionRequest;
 use App\Http\Requests\V2\UpdateRegionRequest;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Product;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
@@ -20,11 +19,8 @@ class RegionController extends BaseController
     public function index(Request $request)
     {
         $collection = Region::forUser($request->user());
-        (new QueryTransformer($request))
-            ->config(Region::class)
-            ->transform($collection);
 
-        return RegionResource::collection($collection->paginate(
+        return RegionResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
