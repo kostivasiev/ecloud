@@ -5,11 +5,11 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
-    protected function rules()
+    public function rules()
     {
         return [
             'name' => ['nullable', 'string', 'max:255'],

@@ -3,7 +3,7 @@
 namespace Tests\V1\PublicSupport;
 
 use App\Models\V1\PublicSupport;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class GetTest extends TestCase

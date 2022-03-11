@@ -6,20 +6,10 @@ use App\Models\V2\Script;
 use App\Models\V2\Software;
 use App\Rules\V2\ExistsForUser;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class Create extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
     public function rules(): array
     {
         return [

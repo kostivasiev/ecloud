@@ -4,7 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class PowerResetTest extends TestCase

@@ -12,15 +12,10 @@ use App\Rules\V2\ValidCidrNetworkCsvString;
 use App\Rules\V2\ValidIpv4;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
-    public function authorize()
-    {
-        return true;
-    }
-
     public function rules()
     {
         return [

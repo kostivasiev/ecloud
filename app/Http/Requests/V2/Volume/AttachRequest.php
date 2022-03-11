@@ -9,7 +9,7 @@ use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\Volume\IsNotSharedVolume;
 use App\Rules\V2\VolumeNotAttached;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @deprecated use instance volume

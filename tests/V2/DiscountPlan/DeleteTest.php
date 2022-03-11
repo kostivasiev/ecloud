@@ -3,7 +3,7 @@
 namespace Tests\V2\DiscountPlan;
 
 use App\Models\V2\DiscountPlan;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase

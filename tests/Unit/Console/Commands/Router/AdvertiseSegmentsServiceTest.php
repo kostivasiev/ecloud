@@ -1,13 +1,12 @@
 <?php
 
-namespace Tests\unit\Console\Commands\Router;
+namespace Tests\Unit\Console\Commands\Router;
 
 use App\Console\Commands\Router\AdvertiseSegmentsService;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Arr;
 use Tests\TestCase;
 
 class AdvertiseSegmentsServiceTest extends TestCase

@@ -1,16 +1,11 @@
 <?php
 namespace App\Http\Requests\V2\VpnProfileGroup;
 
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class Create extends FormRequest
 {
-    public function authorize()
-    {
-        return true;
-    }
-
-    protected function rules()
+    public function rules()
     {
         return [
             'name' => 'required|string|max:255',

@@ -4,7 +4,7 @@ namespace App\Http\Requests\V2\OrchestratorConfig;
 
 use App\Models\V2\OrchestratorConfig;
 use App\Rules\V2\ExistsForUser;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class DeployRequest extends FormRequest
 {

@@ -4,7 +4,7 @@ namespace Tests\V2\Region;
 
 use App\Models\V2\Region;
 use Faker\Factory as Faker;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 

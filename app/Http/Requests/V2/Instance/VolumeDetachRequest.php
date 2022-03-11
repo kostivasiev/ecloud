@@ -7,7 +7,7 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\Instance\DetachedIsNotShared;
 use App\Rules\V2\VolumeAttachedToInstance;
 use App\Rules\V2\VolumeNotOSVolume;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class VolumeDetachRequest extends FormRequest
 {

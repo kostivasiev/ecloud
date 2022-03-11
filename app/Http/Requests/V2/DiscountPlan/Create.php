@@ -4,7 +4,7 @@ namespace App\Http\Requests\V2\DiscountPlan;
 
 use App\Rules\V2\DateIsTodayOrFirstOfMonth;
 use Illuminate\Support\Facades\Auth;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class Create
@@ -12,11 +12,6 @@ use UKFast\FormRequests\FormRequest;
  */
 class Create extends FormRequest
 {
-    public function authorize()
-    {
-        return true;
-    }
-
     public function rules()
     {
         $rules = [

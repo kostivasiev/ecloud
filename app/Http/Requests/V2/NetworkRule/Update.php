@@ -3,7 +3,7 @@
 namespace App\Http\Requests\V2\NetworkRule;
 
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class Update extends FormRequest
 {

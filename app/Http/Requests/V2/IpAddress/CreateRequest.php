@@ -8,7 +8,7 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IpAddress\IsInSubnet;
 use App\Rules\V2\IpAddress\IsAvailable;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {

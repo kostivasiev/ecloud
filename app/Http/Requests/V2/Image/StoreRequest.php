@@ -5,7 +5,7 @@ namespace App\Http\Requests\V2\Image;
 use App\Models\V2\Image;
 use App\Models\V2\Software;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRequest extends FormRequest
 {

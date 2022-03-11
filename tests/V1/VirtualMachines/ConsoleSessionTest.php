@@ -4,7 +4,7 @@ namespace Tests\V1\VirtualMachines;
 
 use App\Models\V1\Pod;
 use App\Models\V1\VirtualMachine;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class ConsoleSessionTest extends TestCase

@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\V2;
 
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateAvailabilityZoneRequest extends FormRequest
 {

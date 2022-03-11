@@ -7,7 +7,7 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\Instance\IsNotSharedVolume;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\VolumeNotAttachedToInstance;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 use Request;
 
 class VolumeAttachRequest extends FormRequest

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Jobs\LoadBalancer;
+namespace Tests\Unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\DeleteAntiAffinity;

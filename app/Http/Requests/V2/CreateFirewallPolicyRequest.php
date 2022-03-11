@@ -5,20 +5,10 @@ namespace App\Http\Requests\V2;
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CreateFirewallPolicyRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
     /**
      * @return array
      */

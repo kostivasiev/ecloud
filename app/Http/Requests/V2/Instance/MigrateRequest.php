@@ -6,7 +6,7 @@ use App\Models\V2\HostGroup;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\Instance\IsCompatiblePlatform;
 use App\Rules\V2\IsResourceAvailable;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class MigrateRequest extends FormRequest
 {

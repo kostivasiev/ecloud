@@ -5,7 +5,7 @@ namespace App\Http\Requests\V2\Vpc;
 use App\Models\V2\AvailabilityZone;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsSameRegion;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class DefaultsRequest

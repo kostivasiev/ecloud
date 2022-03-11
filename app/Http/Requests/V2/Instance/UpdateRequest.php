@@ -13,7 +13,7 @@ use App\Rules\V2\Volume\HasAvailableInstances;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
@@ -32,16 +32,6 @@ class UpdateRequest extends FormRequest
     ) {
         parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
         $this->instanceId = Request::route('instanceId');
-    }
-
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
     }
 
     /**
