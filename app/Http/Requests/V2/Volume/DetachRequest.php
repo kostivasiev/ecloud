@@ -7,7 +7,7 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsVolumeAttached;
 use App\Rules\V2\Volume\DetachedIsNotShared;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * @deprecated use instance volume

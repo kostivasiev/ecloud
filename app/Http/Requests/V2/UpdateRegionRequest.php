@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\V2;
 
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class UpdateRegionRequest
@@ -10,16 +10,6 @@ use UKFast\FormRequests\FormRequest;
  */
 class UpdateRegionRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *

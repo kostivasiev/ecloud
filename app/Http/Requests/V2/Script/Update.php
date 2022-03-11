@@ -4,20 +4,10 @@ namespace App\Http\Requests\V2\Script;
 
 use App\Models\V2\Script;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class Update extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *

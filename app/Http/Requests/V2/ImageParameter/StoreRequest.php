@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\V2\ImageParameter;
 
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRequest extends FormRequest
 {

@@ -3,7 +3,7 @@
 namespace App\Http\Requests\V2\OrchestratorConfig;
 
 use Carbon\Carbon;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRequest extends FormRequest
 {

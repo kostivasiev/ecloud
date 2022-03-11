@@ -665,9 +665,9 @@ abstract class TestCase extends BaseTestCase
         return $this;
     }
 
-    public function asUser()
+    public function asUser($resellerId = 1)
     {
-        $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
+        $this->be(new Consumer($resellerId, [config('app.name') . '.read', config('app.name') . '.write']));
         return $this;
     }
 

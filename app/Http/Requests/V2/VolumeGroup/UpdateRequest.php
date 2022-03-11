@@ -1,11 +1,11 @@
 <?php
 namespace App\Http\Requests\V2\VolumeGroup;
 
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
-    protected function rules()
+    public function rules()
     {
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],

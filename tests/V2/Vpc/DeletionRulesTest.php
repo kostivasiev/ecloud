@@ -3,7 +3,7 @@
 namespace Tests\V2\Vpc;
 
 use App\Models\V2\Vpc;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;;
 use Tests\TestCase;
 
 class DeletionRulesTest extends TestCase

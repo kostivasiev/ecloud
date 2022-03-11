@@ -74,13 +74,9 @@ class UpdateTest extends TestCase
         $data = [
             'name' => 'Updated Name',
         ];
-        $this->patch(
+        $this->asAdmin()->patch(
             '/v2/dhcps/' . $this->dhcp->id,
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
+            $data
         )->assertStatus(202);
 
         $dhcp = Dhcp::findOrFail($this->dhcp->id);

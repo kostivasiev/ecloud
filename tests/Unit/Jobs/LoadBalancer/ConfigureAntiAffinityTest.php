@@ -1,17 +1,14 @@
 <?php
 
-namespace Tests\unit\Jobs\LoadBalancer;
+namespace Tests\Unit\Jobs\LoadBalancer;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancer\ConfigureAntiAffinity;
-use App\Jobs\LoadBalancer\ConfigurePeers;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
-use UKFast\Admin\Loadbalancers\AdminClient;
-use UKFast\Admin\Loadbalancers\AdminClusterClient;
 
 class ConfigureAntiAffinityTest extends TestCase
 {

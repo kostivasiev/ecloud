@@ -7,20 +7,10 @@ use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsSameAvailabilityZone;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class AssignRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return false;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *

@@ -4,7 +4,7 @@ namespace Tests\V1\GPU;
 
 use App\Models\V1\GpuProfile;
 use App\Models\V1\VirtualMachine;
-use Laravel\Lumen\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\V1\TestCase;
 
 

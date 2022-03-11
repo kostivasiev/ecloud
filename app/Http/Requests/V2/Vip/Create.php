@@ -6,7 +6,7 @@ use App\Models\V2\LoadBalancer;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class Create extends FormRequest
 {

@@ -6,26 +6,16 @@ use App\Models\V2\IpAddress;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IpAddress\IsClusterType;
 use App\Rules\V2\IpAddress\IsSameNetworkAsNic;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class AssociateIpRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    protected function authorize()
-    {
-        return false;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
      * @return array
      */
-    protected function rules()
+    public function rules()
     {
         return [
             'ip_address_id' => [

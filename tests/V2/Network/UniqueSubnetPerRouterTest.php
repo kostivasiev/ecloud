@@ -10,7 +10,7 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
 use Illuminate\Support\Facades\Event;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;;
 use Tests\TestCase;
 
 class UniqueSubnetPerRouterTest extends TestCase

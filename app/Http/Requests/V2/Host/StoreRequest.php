@@ -4,7 +4,7 @@ namespace App\Http\Requests\V2\Host;
 
 use App\Models\V2\HostGroup;
 use App\Rules\V2\IsResourceAvailable;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRequest extends FormRequest
 {

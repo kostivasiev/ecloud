@@ -4,7 +4,7 @@ namespace Tests\V2\Instances;
 
 use Faker\Factory as Faker;
 use GuzzleHttp\Psr7\Response;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;;
 use Tests\TestCase;
 
 class GetNicsTest extends TestCase

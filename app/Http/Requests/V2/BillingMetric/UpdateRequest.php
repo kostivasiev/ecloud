@@ -9,7 +9,7 @@ use App\Models\V2\Vpc;
 use App\Models\V2\VpnService;
 use App\Rules\V2\ExistsForUser;
 use Illuminate\Support\Facades\Auth;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {

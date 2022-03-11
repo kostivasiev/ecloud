@@ -6,7 +6,7 @@ use App\Models\V2\FirewallPolicy;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class Update extends FormRequest
 {

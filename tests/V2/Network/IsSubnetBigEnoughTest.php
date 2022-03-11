@@ -3,7 +3,7 @@
 namespace Tests\V2\Network;
 
 use App\Rules\V2\IsSubnetBigEnough;
-use Laravel\Lumen\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\DatabaseMigrations;;
 use Tests\TestCase;
 
 class IsSubnetBigEnoughTest extends TestCase

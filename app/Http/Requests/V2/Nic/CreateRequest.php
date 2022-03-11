@@ -6,26 +6,16 @@ use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidMacAddress;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    protected function authorize()
-    {
-        return false;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
      * @return array
      */
-    protected function rules()
+    public function rules()
     {
         return [
             'name' => [

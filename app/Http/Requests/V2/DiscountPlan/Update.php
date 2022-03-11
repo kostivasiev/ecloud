@@ -5,7 +5,7 @@ namespace App\Http\Requests\V2\DiscountPlan;
 use App\Rules\V2\CommitmentIsGreater;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class Update
@@ -13,11 +13,6 @@ use UKFast\FormRequests\FormRequest;
  */
 class Update extends FormRequest
 {
-    public function authorize()
-    {
-        return true;
-    }
-
     public function rules()
     {
         $discountPlanId = app('request')->route('discountPlanId');

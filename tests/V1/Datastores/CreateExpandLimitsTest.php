@@ -5,31 +5,23 @@ namespace Tests\V1\Datastores;
 use App\Datastore\Status;
 use App\Models\V1\Datastore;
 use Illuminate\Http\Request;
-use Laravel\Lumen\Routing\ProvidesConvenienceMethods;
 use Mockery;
 use Tests\V1\TestCase;
 use UKFast\Api\Exceptions\ForbiddenException;
 
 class CreateExpandLimitsTest extends TestCase
 {
-
-    use ProvidesConvenienceMethods;
-
     /**
      * Test Creation
      */
-
     public function testValidMinCapacity()
     {
         $request = $this->getRequest('POST', [
             'solution_id' => 1,
             'capacity' => 1,
         ]);
-        $validator = $this->getValidationFactory()
-            ->make(
-                $request->all(),
-                Datastore::getRules()
-            );
+
+        $validator = app('validator')->make($request->all(), Datastore::getRules());
         $this->assertFalse($validator->fails());
     }
 
@@ -39,7 +31,7 @@ class CreateExpandLimitsTest extends TestCase
             'solution_id' => 1,
             'capacity' => 0,
         ]);
-        $validator = $this->getValidationFactory()
+        $validator = app('validator')
             ->make(
                 $request->all(),
                 Datastore::getRules()
@@ -53,11 +45,7 @@ class CreateExpandLimitsTest extends TestCase
             'solution_id' => 1,
             'capacity' => 16000,
         ]);
-        $validator = $this->getValidationFactory()
-            ->make(
-                $request->all(),
-                Datastore::getRules()
-            );
+        $validator = app('validator')->make($request->all(), Datastore::getRules());
         $this->assertFalse($validator->fails());
     }
 
@@ -67,11 +55,7 @@ class CreateExpandLimitsTest extends TestCase
             'solution_id' => 1,
             'capacity' => 16001,
         ]);
-        $validator = $this->getValidationFactory()
-            ->make(
-                $request->all(),
-                Datastore::getRules()
-            );
+        $validator = app('validator')->make($request->all(), Datastore::getRules());
         $this->assertTrue($validator->fails());
     }
 
@@ -85,11 +69,7 @@ class CreateExpandLimitsTest extends TestCase
     public function testExpandValidMinCapacity()
     {
         $request = $this->getRequest('POST', ['capacity' => 2]);
-        $validator = $this->getValidationFactory()
-            ->make(
-                $request->all(),
-                Datastore::getExpandRules()
-            );
+        $validator = app('validator')->make($request->all(), Datastore::getExpandRules());
         $this->assertFalse($validator->fails());
 
         $datastore = $this->getDatastore(1);
@@ -103,11 +83,7 @@ class CreateExpandLimitsTest extends TestCase
     public function testExpandValidMaxCapacity()
     {
         $request = $this->getRequest('POST', ['capacity' => 16000]);
-        $validator = $this->getValidationFactory()
-            ->make(
-                $request->all(),
-                Datastore::getExpandRules()
-            );
+        $validator = app('validator')->make($request->all(), Datastore::getExpandRules());
         $this->assertFalse($validator->fails());
 
         $datastore = $this->getDatastore(1);
@@ -121,7 +97,7 @@ class CreateExpandLimitsTest extends TestCase
     public function testExpandInvalidMinCapacity()
     {
         $request = $this->getRequest('POST', ['capacity' => 0]);
-        $validator = $this->getValidationFactory()
+        $validator = app('validator')
             ->make(
                 $request->all(),
                 Datastore::getExpandRules()
@@ -132,11 +108,7 @@ class CreateExpandLimitsTest extends TestCase
     public function testExpandInvalidMaxCapacity()
     {
         $request = $this->getRequest('POST', ['capacity' => 16001]);
-        $validator = $this->getValidationFactory()
-            ->make(
-                $request->all(),
-                Datastore::getExpandRules()
-            );
+        $validator = app('validator')->make($request->all(),Datastore::getExpandRules());
         $this->assertTrue($validator->fails());
     }
 
@@ -147,11 +119,7 @@ class CreateExpandLimitsTest extends TestCase
     public function testExpandInvalidMinCapacityReturnsException()
     {
         $request = $this->getRequest('POST', ['capacity' => 2]);
-        $validator = $this->getValidationFactory()
-            ->make(
-                $request->all(),
-                Datastore::getExpandRules()
-            );
+        $validator = app('validator')->make($request->all(),Datastore::getExpandRules());
         $this->assertFalse($validator->fails());
 
         $datastore = $this->getDatastore(16);

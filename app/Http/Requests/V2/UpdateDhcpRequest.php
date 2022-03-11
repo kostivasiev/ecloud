@@ -2,9 +2,7 @@
 
 namespace App\Http\Requests\V2;
 
-use App\Models\V2\Vpc;
-use App\Rules\V2\ExistsForUser;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class UpdateDhcpsRequest
@@ -12,16 +10,6 @@ use UKFast\FormRequests\FormRequest;
  */
 class UpdateDhcpRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return false;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *

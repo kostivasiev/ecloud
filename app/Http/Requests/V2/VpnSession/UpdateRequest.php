@@ -8,16 +8,11 @@ use App\Rules\V2\ValidCidrNetworkCsvString;
 use App\Rules\V2\ValidIpv4;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
-    public function authorize()
-    {
-        return true;
-    }
-
-    protected function rules()
+    public function rules()
     {
         $vpnSessionId = Request::route('vpnSessionId');
         return [

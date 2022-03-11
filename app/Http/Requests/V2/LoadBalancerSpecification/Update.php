@@ -2,8 +2,7 @@
 
 namespace App\Http\Requests\V2\LoadBalancerSpecification;
 
-use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class Update extends FormRequest
 {

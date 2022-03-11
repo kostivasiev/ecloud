@@ -5,7 +5,7 @@ namespace App\Http\Requests\V2\NetworkRulePort;
 use App\Models\V2\NetworkRule;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\ValidPortReference;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class Update extends FormRequest
 {

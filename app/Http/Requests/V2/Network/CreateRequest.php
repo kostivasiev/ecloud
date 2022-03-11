@@ -10,7 +10,7 @@ use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsRestrictedSubnet;
 use App\Rules\V2\IsSubnetBigEnough;
 use App\Rules\V2\ValidCidrSubnet;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 /**
  * Class CreateNetworkRequest
@@ -18,16 +18,6 @@ use UKFast\FormRequests\FormRequest;
  */
 class CreateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return false;
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *

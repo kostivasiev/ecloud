@@ -5,7 +5,7 @@ namespace App\Http\Requests\V2\OrchestratorConfig;
 use App\Models\V2\OrchestratorConfig;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {

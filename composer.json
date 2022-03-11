@@ -33,7 +33,6 @@
         "ukfast/api-paginator": "^2.1",
         "ukfast/api-validation": "^1.4",
         "ukfast/ditto": "^4.1",
-        "ukfast/form-requests": "^2.1",
         "ukfast/health-check": "^2.0",
         "ukfast/laravel-sieve": "^0.5",
         "ukfast/log-provider": "^3.0",

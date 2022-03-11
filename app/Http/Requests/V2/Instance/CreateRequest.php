@@ -20,23 +20,13 @@ use App\Rules\V2\IsSameVpc;
 use App\Rules\V2\IsValidRamMultiple;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
     protected $image;
     protected $config;
     protected string $platform;
-
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
 
     /**
      * Get the validation rules that apply to the request.

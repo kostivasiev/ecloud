@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\V2\Vip;
 
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class Update extends FormRequest
 {

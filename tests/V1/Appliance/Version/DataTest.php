@@ -4,8 +4,8 @@ namespace Tests\V1\Appliance\Version;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\ApplianceVersion;
-use Laravel\Lumen\Testing\DatabaseMigrations;
-use Laravel\Lumen\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\HttpFoundation\Response;
 
 use Tests\V1\TestCase;

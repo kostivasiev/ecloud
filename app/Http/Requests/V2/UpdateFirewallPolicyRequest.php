@@ -4,7 +4,7 @@ namespace App\Http\Requests\V2;
 
 use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateFirewallPolicyRequest extends FormRequest
 {

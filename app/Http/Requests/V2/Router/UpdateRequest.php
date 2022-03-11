@@ -3,25 +3,13 @@
 namespace App\Http\Requests\V2\Router;
 
 use App\Models\V2\Router;
-use App\Models\V2\Vpc;
-use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\RouterThroughput\ExistsForAvailabilityZone;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
-use UKFast\FormRequests\FormRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     *
-     * @return bool
-     */
-    public function authorize()
-    {
-        return ($this->user()->isAdmin());
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
