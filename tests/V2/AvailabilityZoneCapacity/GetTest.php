@@ -6,7 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneCapacity;
 use App\Models\V2\Region;
 use App\Models\V2\Vpc;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase

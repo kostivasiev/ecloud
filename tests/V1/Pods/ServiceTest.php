@@ -3,7 +3,7 @@
 namespace Tests\V1\Pods;
 
 use App\Models\V1\Pod;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class ServiceTest extends TestCase

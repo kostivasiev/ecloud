@@ -3,7 +3,7 @@
 namespace Tests\V2\VpnService;
 
 use App\Models\V2\VpnService;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetTest extends TestCase

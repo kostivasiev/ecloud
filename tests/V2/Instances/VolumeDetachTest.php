@@ -6,7 +6,7 @@ use App\Events\V2\Task\Created;
 use App\Models\V2\Volume;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class VolumeDetachTest extends TestCase

@@ -3,7 +3,7 @@
 namespace Tests\V2\AvailabilityZone;
 
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GetInstancesTest extends TestCase

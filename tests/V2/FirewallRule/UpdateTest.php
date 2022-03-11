@@ -5,7 +5,7 @@ namespace Tests\V2\FirewallRule;
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase

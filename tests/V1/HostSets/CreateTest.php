@@ -6,7 +6,7 @@ use App\Models\V1\Pod;
 use App\Models\V1\San;
 use App\Models\V1\Solution;
 use App\Models\V1\Storage;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class CreateTest extends TestCase

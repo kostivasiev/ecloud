@@ -3,7 +3,7 @@
 namespace Tests\V1\Appliances\Pods;
 
 use App\Models\V1\AppliancePodAvailability;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\V1\ApplianceTestCase;
 
 class PostTest extends ApplianceTestCase

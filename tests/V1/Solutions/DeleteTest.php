@@ -4,7 +4,7 @@ namespace Tests\V1\Solutions;
 
 use App\Models\V1\Solution;
 use App\Models\V1\Tag;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\V1\TestCase;
 
 class DeleteTest extends TestCase
