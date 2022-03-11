@@ -4,7 +4,7 @@ namespace Tests\V1\Appliance\Version;
 
 use App\Models\V1\Appliance;
 use App\Models\V1\ApplianceVersion;
-use Illuminate\Foundation\Testing\DatabaseMigrations;;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Symfony\Component\HttpFoundation\Response;
 
