@@ -171,8 +171,8 @@ class Product extends V1ModelWrapper implements Searchable
         $sieve->configure(fn ($filter) => [
             'id' => $filter->string(),
             'name' => $filter->string(),
-            'category' => $filter->string(),
-            'availability_zone_id' => $filter->string()
+            'category' => $filter->for('product_subcategory')->string(),
+            'availability_zone_id' => $filter->string(),
         ]);
     }
 
