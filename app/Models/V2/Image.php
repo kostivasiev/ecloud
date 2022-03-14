@@ -174,7 +174,7 @@ class Image extends Model implements Searchable, ResellerScopeable
             'platform' => $filter->string(),
             'active' => $filter->boolean(),
             'public' => $filter->boolean(),
-            'visibility' => $filter->boolean(),
+            'visibility' => $filter->string(),
             'publisher' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
