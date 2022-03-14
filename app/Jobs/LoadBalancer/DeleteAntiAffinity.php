@@ -22,7 +22,7 @@ class DeleteAntiAffinity extends TaskJob
 
         foreach ($loadBalancerNodeInstances as $instance) {
             if ($instance !== null) {
-                $loadBalancerNodeInstanceId = $instance;
+                $loadBalancerNodeInstanceId = $instance->id;
                 break;
             }
         }
