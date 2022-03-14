@@ -43,6 +43,11 @@ class FirewallRulePortController extends BaseController
             'destination'
         ]));
 
+        if ($request->has('protocol') && $request->get('protocol') === 'ICMPv4') {
+            $firewallRulePort->source = null;
+            $firewallRulePort->destination = null;
+        }
+
         $task = $firewallRulePort->firewallRule->firewallPolicy->withTaskLock(function () use ($firewallRulePort) {
             $firewallRulePort->save();
             return $firewallRulePort->firewallRule->firewallPolicy->createSync(Sync::TYPE_UPDATE);

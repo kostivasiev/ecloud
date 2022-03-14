@@ -31,11 +31,13 @@ class Update extends FormRequest
             'source' => [
                 'required_if:protocol,TCP,UDP',
                 'string',
+                'nullable',
                 new ValidFirewallRulePortSourceDestination()
             ],
             'destination' => [
                 'required_if:protocol,TCP,UDP',
                 'string',
+                'nullable',
                 new ValidFirewallRulePortSourceDestination(),
             ]
         ];
