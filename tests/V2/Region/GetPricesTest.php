@@ -2,13 +2,8 @@
 
 namespace Tests\V2\Region;
 
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\LoadBalancer;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
-use App\Models\V2\Region;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 
@@ -47,5 +42,26 @@ class GetPricesTest extends TestCase
                 'price'  => $product->getPrice(),
                 'rate'  => strtolower($product->product_duration_type),
             ])->assertStatus(200);
+    }
+
+    public function testGetPricesByCategory()
+    {
+        Product::factory()->create([
+            'product_name' => $this->availabilityZone()->id . ': ' . $this->faker->word(),
+            'product_subcategory' => 'Support',
+        ])->each(function ($product) {
+            ProductPrice::factory()->create([
+                'product_price_product_id' => $product->id
+            ]);
+        });
+
+        $this->asUser()->get('/v2/regions/' . $this->region()->id . '/prices?category=Support')
+            ->assertJsonFragment([
+                'category'  => 'support',
+            ])
+            ->assertJsonMissing([
+                'category'  => 'compute',
+            ])
+            ->assertStatus(200);
     }
 }
