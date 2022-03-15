@@ -30,6 +30,9 @@ class ValidPortReference implements Rule
             if (!preg_match('/\d+/', $port)) {
                 return false;
             }
+            if (preg_match('/[\s\.]+/', $port)) {
+                return false;
+            }
         }
         return true;
     }
