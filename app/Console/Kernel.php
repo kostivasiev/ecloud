@@ -51,6 +51,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Router\AdvertiseSegmentsService::class,
         \App\Console\Commands\Firewall\SquidUpdate::class,
         \App\Console\Commands\Router\FixEdgeClusters::class,
+        \App\Console\Commands\Router\FixMissingPolicies::class,
     ];
 
     /**
