@@ -8,6 +8,7 @@ use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
+use Illuminate\Support\Str;
 
 class Deploy extends Job
 {
@@ -72,10 +73,10 @@ class Deploy extends Job
                                     'resource_type' => 'L4PortSetServiceEntry',
                                     'source_ports' => $port->source == 'ANY' ?
                                         [] :
-                                        explode(',', $port->source),
+                                        explode(',', trim(Str::replace('.', ',', $port->source))),
                                     'destination_ports' => $port->destination == 'ANY' ?
                                         [] :
-                                        explode(',', $port->destination),
+                                        explode(',', trim(Str::replace('.', ',', $port->destination))),
                                 ];
                             })->toArray(),
                             'profiles' => [
