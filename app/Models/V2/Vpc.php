@@ -143,5 +143,6 @@ class Vpc extends Model implements Searchable, ResellerScopeable, RegionAble
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
+        $sieve->setDefaultSort('created_at', 'desc');
     }
 }
