@@ -20,10 +20,22 @@ class DeleteAntiAffinity extends TaskJob
 
         $loadBalancerNodeInstances = $loadBalancer->loadBalancerNodes->pluck('instance');
 
+        foreach ($loadBalancerNodeInstances as $instance) {
+            if ($instance !== null) {
+                $loadBalancerNodeInstanceId = $instance->id;
+                break;
+            }
+        }
+
+        if (empty($loadBalancerNodeInstanceId)) {
+            $this->info("Skipping, LB no load balancer node instances.");
+            return;
+        }
+
         // First, we'll retrieve the host group ID for the first instance
         $response = $loadBalancer->availabilityZone->kingpinService()->get(
             '/api/v2/vpc/' . $loadBalancer->vpc->id .
-            '/instance/' . $loadBalancerNodeInstances->first()->id
+            '/instance/' . $loadBalancerNodeInstanceId
         );
         $response = json_decode($response->getBody()->getContents());
         $hostGroupId = $response->hostGroupID;
