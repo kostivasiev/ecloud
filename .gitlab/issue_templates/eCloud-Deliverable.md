@@ -1,23 +1,28 @@
 <!-- Title: eCloud-Deliverable.md -->
 
-### What is the Feature/Change?
-<!-- Enter clear and concise description of what your feature or change request is -->
+### User Story
+<!-- A sentence or two that outlines the desired outcome written from the perspective of the end user or customer -->
 
+<!-- gui example -->
+End User - View a list of my VPCs so that I can manage my resources   
 
-
-<!-- ENFORCEMENT-END -->
-### User Stories
-
-End User Example - View my VPCs so that I can manage my resources   
-API User Example - Retrieve a vpc collection so that I can perform actions on my data   
+<!-- api example -->
+API User - Retrieve a vpc collection so that I can perform actions on my resources   
 
 
 ### Acceptance Criteria
+<!-- The conditions/requirements that must be met to be accepted -->
 
-* [ ] gui example - Given I am on the VPC collection page | When the page loads | Then I see a list of my VPCs showing ID, Name, status, etc
-* [ ] api example - Given I request the collection/item | When the request completes | Then I can see the id, name, status, etc
+<!-- gui example -->
+* [ ] GIVEN I am on the VPC collection page | WHEN the page loads | THEN I see a list of my VPCs showing ID, Name, status, etc   
+* [ ] GIVEN I am on the VPC item page | WHEN the name is updated | THEN a request is made to the api AND I see a confirmation message
+
+<!-- api example -->
+* [ ] GIVEN I request the collection/item | WHEN the request completes | THEN I can see the id, name, status, etc
+* [ ] GIVEN I create an item | WHEN the correct properties are provided | THEN an accepted status is returned
 
 
+<!-- ENFORCEMENT-END -->
 
 <!--- Set Team label - Delete as appropriate -->
 /label ~PHP ~DevOps 
