@@ -26,8 +26,8 @@ class ValidPortReference implements Rule
         return Str::of($value)->split('/[\s,]+/')
                 ->filter(function ($item) {
                     // validate port or port range
-            return !preg_match('/^[0-9]+-?(?:(?<=-)[0-9]+|\b)$/', $item);
-        })->count() < 1;
+                    return !preg_match('/^[0-9]+-?(?:(?<=-)[0-9]+|\b)$/', $item);
+                })->count() < 1;
     }
 
     public function message()
