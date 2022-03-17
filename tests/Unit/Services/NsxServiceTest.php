@@ -16,5 +16,7 @@ class NsxServiceTest extends TestCase
         ],
             $this->nsxServiceMock()->csvToArray('1, 2, 3 ,4-5')
         );
+
+        $this->assertEquals(['1'], $this->nsxServiceMock()->csvToArray('1'));
     }
 }
