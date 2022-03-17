@@ -23,6 +23,10 @@ final class NsxService
      */
     private $client;
 
+    private $functions = [
+        'csvToArray' => 'csvToArray',
+    ];
+
     public function __construct($client)
     {
         $this->client = $client;
