@@ -5,7 +5,6 @@ namespace App\Jobs\Nsx\FirewallPolicy;
 use App\Jobs\TaskJob;
 use App\Models\V2\FirewallRulePort;
 use App\Services\V2\NsxService;
-use Illuminate\Support\Str;
 
 class Deploy extends TaskJob
 {
@@ -55,10 +54,10 @@ class Deploy extends TaskJob
                                     'resource_type' => 'L4PortSetServiceEntry',
                                     'source_ports' => $port->source == 'ANY' ?
                                         [] :
-                                        explode(',', trim(Str::replace('.', ',', $port->source))),
+                                        explode(',', $port->source),
                                     'destination_ports' => $port->destination == 'ANY' ?
                                         [] :
-                                        explode(',', trim(Str::replace('.', ',', $port->destination))),
+                                        explode(',', $port->destination),
                                 ];
                             })->toArray(),
                             'profiles' => [

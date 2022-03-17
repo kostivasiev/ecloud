@@ -2,17 +2,11 @@
 
 namespace Tests\V2\FirewallRule;
 
-use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
-use App\Events\V2\FirewallRule\Saved as FirewallRuleSaved;
 use App\Events\V2\Task\Created;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
 use App\Models\V2\Task;
 use App\Support\Sync;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
@@ -52,7 +46,7 @@ class CreateTest extends TestCase
             'enabled' => true
         ], 'ecloud');
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
     }
@@ -90,7 +84,7 @@ class CreateTest extends TestCase
             ]
         )->assertStatus(422);
 
-        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertNotDispatched(Created::class);
     }
 
     public function testSourceANYSucceeds()
@@ -120,7 +114,7 @@ class CreateTest extends TestCase
             'enabled' => true
         ], 'ecloud');
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
     }
@@ -152,7 +146,7 @@ class CreateTest extends TestCase
             'enabled' => true
         ], 'ecloud');
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
     }
@@ -173,7 +167,7 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertStatus(422);
 
-        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertNotDispatched(Created::class);
     }
 
     public function testMissingDestinationFails()
@@ -192,7 +186,7 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertStatus(422);
 
-        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertNotDispatched(Created::class);
     }
 
     public function testPortsValidSucceeds()
@@ -218,7 +212,7 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertStatus(202);
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
     }
@@ -245,6 +239,42 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertStatus(422);
 
-        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertNotDispatched(Created::class);
+    }
+
+    public function testSourceDestinationCsvWhitespaceRemoved()
+    {
+        Event::fake(Created::class);
+
+        $this->asUser()->post('/v2/firewall-rules', [
+            'name' => 'Demo firewall rule 1',
+            'sequence' => 10,
+            'firewall_policy_id' => $this->firewallPolicy()->id,
+            'source' => '212.22.18.10/24, 212.22.18.10/24',
+            'destination' => '212.22.18.10/24, 212.22.18.10/24',
+            'action' => 'ALLOW',
+            'direction' => 'IN',
+            'ports' => [
+                [
+                    'source' => '1, 2, 3 ,4-5',
+                    'destination' => '1, 2, 3 ,4-5',
+                    'protocol' => 'TCP'
+                ]
+            ],
+            'enabled' => true
+        ])
+            ->assertStatus(202);
+
+        $this->assertDatabaseHas('firewall_rules', [
+            'source' => '212.22.18.10/24,212.22.18.10/24',
+            'destination' => '212.22.18.10/24,212.22.18.10/24',
+        ], 'ecloud');
+
+        $this->assertDatabaseHas('firewall_rule_ports', [
+            'source' => '1,2,3,4-5',
+            'destination' => '1,2,3,4-5',
+        ], 'ecloud');
+
+        Event::assertDispatched(Created::class);
     }
 }

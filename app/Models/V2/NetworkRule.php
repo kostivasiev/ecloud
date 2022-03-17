@@ -2,10 +2,10 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\NetworkRule\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -53,6 +53,22 @@ class NetworkRule extends Model implements Searchable, Manageable
     public function networkRulePorts()
     {
         return $this->hasMany(NetworkRulePort::class);
+    }
+
+    protected function source(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => preg_replace('/\s+/', '', $value),
+            set: fn ($value) => preg_replace('/\s+/', '', $value),
+        );
+    }
+
+    protected function destination(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => preg_replace('/\s+/', '', $value),
+            set: fn ($value) => preg_replace('/\s+/', '', $value),
+        );
     }
 
     /**

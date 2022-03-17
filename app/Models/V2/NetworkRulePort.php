@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,14 +41,20 @@ class NetworkRulePort extends Model implements Searchable, Manageable
         return $this->belongsTo(NetworkRule::class);
     }
 
-    public function getSourceAttribute()
+    protected function source(): Attribute
     {
-        return preg_replace('/\s+/', '', $this->attributes['source']);
+        return Attribute::make(
+            get: fn ($value) => preg_replace('/\s+/', '', $value),
+            set: fn ($value) => preg_replace('/\s+/', '', $value),
+        );
     }
 
-    public function getDestinationAttribute()
+    protected function destination(): Attribute
     {
-        return preg_replace('/\s+/', '', $this->attributes['destination']);
+        return Attribute::make(
+            get: fn ($value) => preg_replace('/\s+/', '', $value),
+            set: fn ($value) => preg_replace('/\s+/', '', $value),
+        );
     }
 
     /**

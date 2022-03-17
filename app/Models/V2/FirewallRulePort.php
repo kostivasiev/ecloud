@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -35,6 +36,22 @@ class FirewallRulePort extends Model implements Searchable, Manageable
         'source',
         'destination'
     ];
+
+    protected function source(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => preg_replace('/\s+/', '', $value),
+            set: fn ($value) => preg_replace('/\s+/', '', $value),
+        );
+    }
+
+    protected function destination(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => preg_replace('/\s+/', '', $value),
+            set: fn ($value) => preg_replace('/\s+/', '', $value),
+        );
+    }
 
     public function firewallRule()
     {
