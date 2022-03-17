@@ -161,25 +161,4 @@ class CreateTest extends TestCase
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
-
-    public function testSourceDestinationCsvWhitespaceRemoved()
-    {
-        Event::fake(Created::class);
-
-        $this->asUser()->post('/v2/firewall-rule-ports', [
-            'firewall_rule_id' => $this->firewallRule->id,
-            'protocol' => 'TCP',
-            'source' => '1, 2, 3 ,4-5',
-            'destination' => '1, 2, 3 ,4-5'
-        ])->assertStatus(202);
-
-
-        $this->assertDatabaseHas('firewall_rule_ports', [
-            'firewall_rule_id' => $this->firewallRule->id,
-            'source' => '1,2,3,4-5',
-            'destination' => '1,2,3,4-5',
-        ], 'ecloud');
-
-        Event::assertDispatched(Created::class);
-    }
 }

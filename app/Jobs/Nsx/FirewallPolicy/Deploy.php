@@ -13,6 +13,7 @@ class Deploy extends TaskJob
         $firewallPolicy = $this->task->resource;
         $router = $firewallPolicy->router;
         $availabilityZone = $router->availabilityZone;
+        $nsxService = $availabilityZone->nsxService();
 
         /**
          * @see https://185.197.63.88/policy/api_includes/method_PatchGatewayPolicyForDomain.html
@@ -25,7 +26,7 @@ class Deploy extends TaskJob
                     'display_name' => $firewallPolicy->id,
                     'description' => $firewallPolicy->name,
                     'sequence_number' => $firewallPolicy->sequence,
-                    'rules' => $firewallPolicy->firewallRules->map(function ($rule) use ($router) {
+                    'rules' => $firewallPolicy->firewallRules->map(function ($rule) use ($router, $nsxService) {
                         return [
                             'action' => $rule->action,
                             'resource_type' => 'Rule',
@@ -34,12 +35,12 @@ class Deploy extends TaskJob
                             'sequence_number' => $rule->sequence,
                             'sources_excluded' => false,
                             'destinations_excluded' => false,
-                            'source_groups' => explode(',', $rule->source),
-                            'destination_groups' => explode(',', $rule->destination),
+                            'source_groups' => $nsxService->csvToArray($rule->source),
+                            'destination_groups' => $nsxService->csvToArray($rule->destination),
                             'services' => [
                                 'ANY'
                             ],
-                            'service_entries' => $rule->firewallRulePorts->map(function ($port) {
+                            'service_entries' => $rule->firewallRulePorts->map(function ($port) use ($nsxService) {
                                 if ($port->protocol == 'ICMPv4') {
                                     return [
                                         'id' => $port->id,
@@ -54,10 +55,10 @@ class Deploy extends TaskJob
                                     'resource_type' => 'L4PortSetServiceEntry',
                                     'source_ports' => $port->source == 'ANY' ?
                                         [] :
-                                        explode(',', $port->source),
+                                        $nsxService->csvToArray($port->source),
                                     'destination_ports' => $port->destination == 'ANY' ?
                                         [] :
-                                        explode(',', $port->destination),
+                                        $nsxService->csvToArray($port->destination),
                                 ];
                             })->toArray(),
                             'profiles' => [

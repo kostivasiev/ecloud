@@ -41,22 +41,6 @@ class NetworkRulePort extends Model implements Searchable, Manageable
         return $this->belongsTo(NetworkRule::class);
     }
 
-    protected function source(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => preg_replace('/\s+/', '', $value),
-            set: fn ($value) => preg_replace('/\s+/', '', $value),
-        );
-    }
-
-    protected function destination(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => preg_replace('/\s+/', '', $value),
-            set: fn ($value) => preg_replace('/\s+/', '', $value),
-        );
-    }
-
     /**
      * @param $query
      * @param $user

@@ -4,6 +4,7 @@ namespace App\Services\V2;
 
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 final class NsxService
 {
@@ -37,5 +38,15 @@ final class NsxService
             ]);
         }
         return call_user_func_array([$this->client, $name], $arguments);
+    }
+
+    /**
+     * Convert CSV string to array and remove white space
+     * @param string $string
+     * @return array
+     */
+    public function csvToArray(string $string) : array
+    {
+        return Str::of($string)->split('/[\s,]+/')->toArray();
     }
 }

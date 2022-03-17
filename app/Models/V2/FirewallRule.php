@@ -70,20 +70,9 @@ class FirewallRule extends Model implements Searchable, Manageable
             });
     }
 
-    protected function source(): Attribute
+    public function getSanitisedSource() : string
     {
-        return Attribute::make(
-            get: fn ($value) => preg_replace('/\s+/', '', $value),
-            set: fn ($value) => preg_replace('/\s+/', '', $value),
-        );
-    }
-
-    protected function destination(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => preg_replace('/\s+/', '', $value),
-            set: fn ($value) => preg_replace('/\s+/', '', $value),
-        );
+        return preg_replace('/\s+/', '', $this->source);
     }
 
     public function isManaged() :bool

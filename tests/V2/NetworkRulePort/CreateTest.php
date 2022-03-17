@@ -82,25 +82,4 @@ class CreateTest extends TestCase
             'destination' => '555',
         ])->assertStatus(422);
     }
-
-    public function testSourceDestinationCsvWhitespaceRemoved()
-    {
-        Event::fake(Created::class);
-
-        $this->asUser()->post('/v2/network-rule-ports', [
-            'network_rule_id' => $this->networkRule->id,
-            'protocol' => 'TCP',
-            'source' => '1, 2, 3 ,4-5',
-            'destination' => '1, 2, 3 ,4-5'
-        ])->assertStatus(202);
-
-
-        $this->assertDatabaseHas('network_rule_ports', [
-            'network_rule_id' => $this->networkRule->id,
-            'source' => '1,2,3,4-5',
-            'destination' => '1,2,3,4-5',
-        ], 'ecloud');
-
-        Event::assertDispatched(Created::class);
-    }
 }

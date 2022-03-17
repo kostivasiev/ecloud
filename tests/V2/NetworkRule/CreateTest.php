@@ -82,44 +82,4 @@ class CreateTest extends TestCase
             ]
         )->assertStatus(422);
     }
-
-    public function testSourceDestinationCsvWhitespaceRemoved()
-    {
-        Event::fake(Created::class);
-
-        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
-
-        $this->asUser()->post(
-            '/v2/network-rules',
-            [
-                'network_policy_id' => $this->networkPolicy()->id,
-                'sequence' => 1,
-                'source' => '212.22.18.10/24, 212.22.18.10/24',
-                'destination' => '212.22.18.10/24, 212.22.18.10/24',
-                'action' => 'ALLOW',
-                'enabled' => true,
-                'direction' => 'IN_OUT',
-                'ports' => [
-                    [
-                        'source' => '1, 2, 3 ,4-5',
-                        'destination' => '1, 2, 3 ,4-5',
-                        'protocol' => 'TCP'
-                    ]
-                ],
-            ]
-        )->assertStatus(202);
-
-        $this->assertDatabaseHas('network_rules', [
-            'network_policy_id' => $this->networkPolicy()->id,
-            'source' => '212.22.18.10/24,212.22.18.10/24',
-            'destination' => '212.22.18.10/24,212.22.18.10/24',
-        ], 'ecloud');
-
-        $this->assertDatabaseHas('network_rule_ports', [
-            'source' => '1,2,3,4-5',
-            'destination' => '1,2,3,4-5',
-        ], 'ecloud');
-
-        Event::assertDispatched(Created::class);
-    }
 }

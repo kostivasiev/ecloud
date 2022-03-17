@@ -37,22 +37,6 @@ class FirewallRulePort extends Model implements Searchable, Manageable
         'destination'
     ];
 
-    protected function source(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => preg_replace('/\s+/', '', $value),
-            set: fn ($value) => preg_replace('/\s+/', '', $value),
-        );
-    }
-
-    protected function destination(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => preg_replace('/\s+/', '', $value),
-            set: fn ($value) => preg_replace('/\s+/', '', $value),
-        );
-    }
-
     public function firewallRule()
     {
         return $this->belongsTo(FirewallRule::class);
