@@ -70,11 +70,6 @@ class FirewallRule extends Model implements Searchable, Manageable
             });
     }
 
-    public function getSanitisedSource() : string
-    {
-        return preg_replace('/\s+/', '', $this->source);
-    }
-
     public function isManaged() :bool
     {
         return (bool) $this->firewallPolicy->router->isManaged();
