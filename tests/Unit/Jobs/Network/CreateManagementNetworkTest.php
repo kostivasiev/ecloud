@@ -2,116 +2,154 @@
 
 namespace Tests\Unit\Jobs\Network;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\Network\CreateManagementNetwork;
 use App\Models\V2\Network;
-use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Support\Sync;
+use App\Tasks\Vpc\CreateManagementInfrastructure;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Bus;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class CreateManagementNetworkTest extends TestCase
 {
     protected Task $task;
-    protected Router $managementRouter;
-    public bool $first = true;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        Model::withoutEvents(function () {
-            $this->managementRouter = Router::factory()->create([
-                'id' => 'rtr-mgttest',
-                'vpc_id' => $this->vpc()->id,
-                'availability_zone_id' => $this->availabilityZone()->id,
-                'router_throughput_id' => $this->routerThroughput()->id,
-            ]);
-        });
-    }
+        $this->router()->setAttribute('is_management', true)->saveQuietly();
 
-    public function testJobIsSkippedIfNoManagementRouter()
-    {
         Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
+                'name' => CreateManagementInfrastructure::$name,
+                'data' => [
+                    'availability_zone_id' => $this->router()->availability_zone_id,
+                    'management_router_id' => $this->router()->id,
+                ]
             ]);
-            $this->task->resource()->associate($this->router());
+            $this->task->resource()->associate($this->vpc());
             $this->task->save();
         });
+    }
 
-        Bus::fake();
-        $job = new CreateManagementNetwork($this->task);
-        $job->handle();
+    public function testJobFailsIfNoManagementRouter()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        $this->task->setAttribute('data', null)->saveQuietly();
+
+        dispatch(new CreateManagementNetwork($this->task));
+
+        $this->task->refresh();
+
         $this->assertNull($this->task->data);
+
+        Event::assertDispatched(JobFailed::class);
+
+        Event::assertNotDispatched(Created::class, function ($event) {
+            return $event->model->resource instanceof Network
+                && $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
+
+        Event::assertNotDispatched(JobProcessed::class, function ($event) {
+            return $event->job->isReleased();
+        });
     }
 
     public function testManagementNetworkIsCreated()
     {
-        Model::withoutEvents(function () {
-            $this->task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $this->router()->setAttribute('is_management', true)->saveQuietly();
-            $this->task->resource()->associate($this->router());
-            $this->task->data = [
-                'management_router_id' => $this->managementRouter->id,
-            ];
-            $this->task->save();
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        dispatch(new CreateManagementNetwork($this->task));
+
+        $this->task->refresh();
+
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->resource instanceof Network
+                && $event->model->name == Sync::TASK_NAME_UPDATE;
         });
 
-        Bus::fake();
-        $job = new CreateManagementNetwork($this->task);
-        $job->handle();
+        $event = Event::dispatched(Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        })->first()[0];
+        $event->model->setAttribute('completed', true)->saveQuietly();
+
+        dispatch(new CreateManagementNetwork($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
 
         $managementNetwork = Network::find($this->task->data['management_network_id']);
         $this->assertNotNull($managementNetwork);
-        $this->assertEquals($this->managementRouter->id, $managementNetwork->router_id);
+        $this->assertEquals($this->router()->id, $managementNetwork->router_id);
+    }
+
+    public function testCreateManagementNetworkExistsSkips()
+    {
+        $this->network();
+
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        dispatch(new CreateManagementNetwork($this->task));
+
+        $this->task->refresh();
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        Event::assertNotDispatched(Created::class, function ($event) {
+            return $event->model->resource instanceof Network
+                && $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+
+        $this->assertEquals($this->network()->id, $this->task->data['management_network_id']);
     }
 
     public function testManagementNetworkOnAdvancedRange()
     {
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
         $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
-        Model::withoutEvents(function () {
-            $this->task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $this->router()->setAttribute('is_management', true)->saveQuietly();
-            $this->task->resource()->associate($this->router());
-            $this->task->data = [
-                'management_router_id' => $this->managementRouter->id,
-            ];
-            $this->task->save();
+
+        dispatch(new CreateManagementNetwork($this->task));
+
+        $this->task->refresh();
+
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->resource instanceof Network
+                && $event->model->name == Sync::TASK_NAME_UPDATE;
         });
 
-        Bus::fake();
-        $job = new CreateManagementNetwork($this->task);
-        $job->handle();
+        $event = Event::dispatched(Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE;
+        })->first()[0];
+        $event->model->setAttribute('completed', true)->saveQuietly();
+
+        dispatch(new CreateManagementNetwork($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
 
         $managementNetwork = Network::find($this->task->data['management_network_id']);
         $this->assertNotNull($managementNetwork);
-        $this->assertEquals($this->managementRouter->id, $managementNetwork->router_id);
+        $this->assertEquals($this->router()->id, $managementNetwork->router_id);
     }
 
     public function testSubnetAvailability()
     {
-        Model::withoutEvents(function () {
-            $this->task = new Task([
-                'id' => 'sync-1',
-                'name' => Sync::TASK_NAME_UPDATE,
-            ]);
-            $this->router()->setAttribute('is_management', true)->saveQuietly();
-            $this->task->resource()->associate($this->router());
-            $this->task->data = [
-                'management_router_id' => $this->managementRouter->id,
-            ];
-            $this->task->save();
-        });
-
         $job = new CreateManagementNetwork($this->task);
 
         $this->router()->setAttribute('is_management', true)->saveQuietly();
