@@ -53,8 +53,7 @@ class CreateManagementNetwork extends TaskJob
 
             $lock = Cache::lock('subnet.' . $subnet, 60);
             try {
-                $managementNetwork->subnet = $this->getNextAvailableSubnet($subnet,
-                    $managementRouter->availability_zone_id);
+                $managementNetwork->subnet = $this->getNextAvailableSubnet($subnet, $managementRouter->availability_zone_id);
                 $managementNetwork->syncSave();
             } finally {
                 $lock->release();
