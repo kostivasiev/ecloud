@@ -16,10 +16,6 @@ class Update extends Task
     {
         return [
             DeployManagementInfrastructure::class,
-//            CreateManagementRouter::class,
-//            CreateManagementNetwork::class,
-//            CreateManagementFirewallPolicies::class,
-//            CreateManagementNetworkPolicies::class,
             Deploy::class,
             DeployRouterLocale::class,
             DeployRouterDefaultRule::class,
