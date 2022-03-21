@@ -4,163 +4,81 @@ namespace Tests\unit\Console\Commands\Router;
 
 use App\Console\Commands\Router\FixMissingPolicies;
 use App\Events\V2\Task\Created;
+use App\Tasks\Vpc\CreateManagementInfrastructure;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class FixMissingPoliciesTest extends TestCase
 {
-    protected $command;
-
     public function setUp(): void
     {
         parent::setUp();
-        $this->command = \Mockery::mock(FixMissingPolicies::class)
-            ->makePartial();
         $this->router()->setAttribute('is_management', true)->saveQuietly();
+    }
+
+    public function testMissingFirewallPolicyDispatches()
+    {
+        Event::fake([Created::class]);
         $this->network();
+
+        $this->artisan(FixMissingPolicies::class)
+            ->expectsOutput('Management router ' . $this->router()->id . ' has no firewall policy. Re-deploying management infrastructure...')
+            ->assertExitCode(0);
+
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == CreateManagementInfrastructure::$name;
+        });
     }
 
-    public function testFixFirewallPolicies()
+    public function testMissingNetworkDispatches()
     {
         Event::fake([Created::class]);
-        $this->command
-            ->allows('info')
-            ->withAnyArgs()
-            ->andReturnTrue();
-        $this->command->allows('option')->with('test-run')->andReturnFalse();
-        $this->command->fixFirewallPolicies($this->router());
+        $this->router();
 
-        $this->router()->refresh();
+        $this->artisan(FixMissingPolicies::class)
+            ->expectsOutput('Management router ' . $this->router()->id . ' has no management network. Re-deploying management infrastructure...')
+            ->assertExitCode(0);
 
-        Event::assertDispatched(Created::class);
-
-        $firewallPolicies = $this->router()->firewallPolicies()->get();
-        $firewallRules = $firewallPolicies->first()->firewallRules()->get();
-        $firewallRulePorts = $firewallRules->first()->firewallRulePorts()->get();
-        $this->assertEquals(1, $firewallPolicies->count());
-        $this->assertEquals(1, $firewallRules->count());
-        $this->assertEquals(2, $firewallRulePorts->count());
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == CreateManagementInfrastructure::$name;
+        });
     }
 
-    public function testFixFirewallHasPolicy()
-    {
-        $this->command
-            ->allows('info')
-            ->with(\Mockery::capture($message))
-            ->andReturnTrue();
-        $this->firewallPolicy();
-
-        $this->command->fixFirewallPolicies($this->router());
-
-        $this->assertEquals(
-            sprintf(
-                'Firewall Policy present for %s, skipping.',
-                $this->router()->id
-            ),
-            $message
-        );
-    }
-
-    public function testFixNetworkPolicies()
+    public function testMissingNetworkPolicyDispatches()
     {
         Event::fake([Created::class]);
+        $this->network();
 
-        $this->command
-            ->allows('info')
-            ->withAnyArgs()
-            ->andReturnTrue();
+        $this->artisan(FixMissingPolicies::class)
+            ->expectsOutput('Management router ' . $this->router()->id . ' has no firewall policy. Re-deploying management infrastructure...')
+            ->assertExitCode(0);
 
-        $this->command->allows('option')
-            ->with('test-run')
-            ->andReturnFalse();
-
-        $this->command->fixNetworkPolicies($this->router());
-
-        $this->router()->refresh();
-
-        Event::assertDispatched(Created::class);
-
-        $networkPolicy = $this->router()->networks()->first()->networkPolicy;
-        $this->assertNotNull($networkPolicy);
-
-        $networkRules = $networkPolicy->networkRules()->first();
-        $networkRulePorts = $networkRules->networkRulePorts()->get();
-
-        $this->assertEquals(1, $networkRules->count());
-        $this->assertEquals(2, $networkRulePorts->count());
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == CreateManagementInfrastructure::$name;
+        });
     }
 
-    public function testFixNetworkHasPolicy()
-    {
-        $this->command
-            ->allows('info')
-            ->with(\Mockery::capture($message))
-            ->andReturnTrue();
-
-        $this->networkPolicy();
-
-        $this->command->fixNetworkPolicies($this->router());
-
-        $this->assertEquals(
-            sprintf(
-                'Network Policy present for %s, skipping.',
-                $this->router()->id
-            ),
-            $message
-        );
-    }
-
-    public function testHandleFixAll()
+    public function testTestRunDoesNotDispatchTask()
     {
         Event::fake([Created::class]);
-        $this->command->allows('option')
-            ->with('router')
-            ->andReturnFalse();
-        $this->command->allows('option')
-            ->with('test-run')
-            ->andReturnFalse();
+        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
+        $this->network();
 
-        $this->command
-            ->allows('info')
-            ->with(\Mockery::capture($message))
-            ->andReturnTrue();
-        $this->command->allows('option')->with('test-run')->andReturnFalse();
+        $this->artisan(FixMissingPolicies::class, ['--test-run' => true])
+            ->expectsOutput('Management router ' . $this->router()->id . ' has no network policy. Re-deploying management infrastructure...')
+            ->assertExitCode(0);
 
-        $this->command->handle();
-
-
-        $this->router()->refresh();
-
-        Event::assertDispatched(Created::class);
-
-        $firewallPolicies = $this->router()->firewallPolicies()->get();
-        $firewallRules = $firewallPolicies->first()->firewallRules()->get();
-        $firewallRulePorts = $firewallRules->first()->firewallRulePorts()->get();
-
-        $this->assertEquals(1, $firewallPolicies->count());
-        $this->assertEquals(1, $firewallRules->count());
-        $this->assertEquals(2, $firewallRulePorts->count());
-
-        $networkPolicy = $this->router()->networks()->first()->networkPolicy;
-        $this->assertNotNull($networkPolicy);
-
-        $networkRules = $networkPolicy->networkRules()->first();
-        $networkRulePorts = $networkRules->networkRulePorts()->get();
-
-        $this->assertEquals(1, $networkRules->count());
-        $this->assertEquals(2, $networkRulePorts->count());
+        Event::assertNotDispatched(Created::class, function ($event) {
+            return $event->model->name == CreateManagementInfrastructure::$name;
+        });
     }
 
-    public function testHandleDoesNothingWithNonManagement()
+    public function testDoesNothingWithNonManagement()
     {
         $this->router()->setAttribute('is_management', false)->saveQuietly();
-        $this->command->allows('option')
-            ->with('router')
-            ->andReturn($this->router()->id);
-        $this->command->allows('option')
-            ->with('test-run')
-            ->andReturnFalse();
 
-        $this->assertEquals(0, $this->command->handle());
+        Event::assertNotDispatched(Created::class, function ($event) {
+            return $event->model->name == CreateManagementInfrastructure::$name;
+        });
     }
 }

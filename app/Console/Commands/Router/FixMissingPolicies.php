@@ -42,7 +42,6 @@ class FixMissingPolicies extends Command
                 $this->info('Management router ' . $router->id . ' has no management network. Re-deploying management infrastructure...');
                 $deploy = true;
             }
-
             if ($router->firewallPolicies()->count() < 1) {
                 $this->info('Management router ' . $router->id . ' has no firewall policy. Re-deploying management infrastructure...');
                 $deploy = true;
@@ -67,7 +66,6 @@ class FixMissingPolicies extends Command
                     $this->info('Task ID: ' . $task->id);
                 }
             }
-
         });
         return Command::SUCCESS;
     }
