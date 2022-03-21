@@ -29,13 +29,15 @@ class FixMissingPolicies extends Command
      */
     public function handle()
     {
+        $deployed = 0;
+
         if ($this->option('test-run')) {
             $this->info('==== TEST MODE ====');
         }
         $routers = ($this->option('router')) ?
             Router::isManagement()->where('id', '=', $this->option('router'))->get():
             Router::isManagement()->get();
-        $routers->each(function (Router $router) {
+        $routers->each(function (Router $router) use (&$deployed) {
             $deploy = false;
 
             if ($router->networks()->count() < 1) {
@@ -65,8 +67,12 @@ class FixMissingPolicies extends Command
                     );
                     $this->info('Task ID: ' . $task->id);
                 }
+                $deployed++;
             }
         });
+
+        $this->info($deployed . ' Management infrastructure updated');
+
         return Command::SUCCESS;
     }
 }
