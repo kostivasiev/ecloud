@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\V2\TaskException;
 use App\Http\Requests\V2\FirewallRulePort\Create;
 use App\Http\Requests\V2\FirewallRulePort\Update;
 use App\Models\V2\FirewallRulePort;
@@ -10,7 +9,6 @@ use App\Resources\V2\FirewallRulePortResource;
 use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class FirewallRulePortController extends BaseController
 {

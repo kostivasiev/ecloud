@@ -3,6 +3,7 @@
 namespace App\Rules\V2;
 
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Str;
 
 class ValidPortReference implements Rule
 {
@@ -21,17 +22,12 @@ class ValidPortReference implements Rule
             return false;
         }
 
-        foreach (explode(",", $value) as $port) {
-            if (strpos($port, '-')) {
-                if (!preg_match('/\d+\-\d+/', $port)) {
-                    return false;
-                }
-            }
-            if (!preg_match('/\d+/', $port)) {
-                return false;
-            }
-        }
-        return true;
+        // Remove white space & explode
+        return Str::of($value)->split('/[\s,]+/')
+                ->filter(function ($item) {
+                    // validate port or port range
+                    return !preg_match('/^[0-9]+-?(?:(?<=-)[0-9]+|\b)$/', $item);
+                })->count() < 1;
     }
 
     public function message()

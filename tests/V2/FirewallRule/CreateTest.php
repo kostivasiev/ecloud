@@ -2,17 +2,12 @@
 
 namespace Tests\V2\FirewallRule;
 
-use App\Events\V2\FirewallPolicy\Saved as FirewallPolicySaved;
-use App\Events\V2\FirewallRule\Saved as FirewallRuleSaved;
 use App\Events\V2\Task\Created;
-use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
 use App\Models\V2\Task;
 use App\Support\Sync;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
@@ -52,7 +47,7 @@ class CreateTest extends TestCase
             'enabled' => true
         ], 'ecloud');
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
     }
@@ -90,7 +85,7 @@ class CreateTest extends TestCase
             ]
         )->assertStatus(422);
 
-        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertNotDispatched(Created::class);
     }
 
     public function testSourceANYSucceeds()
@@ -120,7 +115,7 @@ class CreateTest extends TestCase
             'enabled' => true
         ], 'ecloud');
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
     }
@@ -152,7 +147,7 @@ class CreateTest extends TestCase
             'enabled' => true
         ], 'ecloud');
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
     }
@@ -173,7 +168,7 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertStatus(422);
 
-        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertNotDispatched(Created::class);
     }
 
     public function testMissingDestinationFails()
@@ -192,7 +187,7 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertStatus(422);
 
-        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertNotDispatched(Created::class);
     }
 
     public function testPortsValidSucceeds()
@@ -218,7 +213,7 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertStatus(202);
 
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+        Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
     }
@@ -245,6 +240,6 @@ class CreateTest extends TestCase
             'X-consumer-groups' => 'ecloud.write',
         ])->assertStatus(422);
 
-        Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
+        Event::assertNotDispatched(Created::class);
     }
 }

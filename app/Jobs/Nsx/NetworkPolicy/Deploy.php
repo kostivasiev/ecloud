@@ -25,6 +25,7 @@ class Deploy extends Job
         $network = $this->model->network;
         $router = $network->router;
         $availabilityZone = $router->availabilityZone;
+        $nsxService = $availabilityZone->nsxService();
 
         /**
          * @see https://vdc-download.vmware.com/vmwb-repository/dcr-public/d9f0d8ce-b56e-45fa-9d32-ad9b95baa071/bd4b6353-6bbf-45ca-b7ef-3fa6c4905e94/api_includes/method_UpdateSecurityPolicyForDomain.html
@@ -43,19 +44,19 @@ class Deploy extends Job
                     'scope' => [
                         '/infra/domains/default/groups/' . $this->model->id,
                     ],
-                    'rules' => $this->model->networkRules->map(function ($rule) use ($router) {
+                    'rules' => $this->model->networkRules->map(function ($rule) use ($router, $nsxService) {
                         return [
                             'action' => $rule->action,
                             'resource_type' => 'Rule',
                             'id' => $rule->id,
                             'display_name' => $rule->id,
                             'sequence_number' => $rule->sequence,
-                            'source_groups' => explode(',', $rule->source),
-                            'destination_groups' => explode(',', $rule->destination),
+                            'source_groups' => $nsxService->csvToArray($rule->source),
+                            'destination_groups' => $nsxService->csvToArray($rule->destination),
                             'services' => [
                                 'ANY'
                             ],
-                            'service_entries' => $rule->networkRulePorts->map(function ($port) {
+                            'service_entries' => $rule->networkRulePorts->map(function ($port) use ($nsxService) {
                                 if ($port->protocol == 'ICMPv4') {
                                     return [
                                         'id' => $port->getKey(),
@@ -72,10 +73,10 @@ class Deploy extends Job
                                     'resource_type' => 'L4PortSetServiceEntry',
                                     'source_ports' => $port->source == 'ANY' ?
                                         [] :
-                                        explode(',', $port->source),
+                                        $nsxService->csvToArray($port->source),
                                     'destination_ports' => $port->destination == 'ANY' ?
                                         [] :
-                                        explode(',', $port->destination),
+                                        $nsxService->csvToArray($port->destination),
                                 ];
                             })->toArray(),
                             'profiles' => [

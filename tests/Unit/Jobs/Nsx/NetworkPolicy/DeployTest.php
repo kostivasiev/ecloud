@@ -83,12 +83,8 @@ class DeployTest extends TestCase
                                         'display_name' => 'nrp-test',
                                         'l4_protocol' => 'TCP',
                                         'resource_type' => 'L4PortSetServiceEntry',
-                                        'source_ports' => [
-                                            '443'
-                                        ],
-                                        'destination_ports' => [
-                                            '555'
-                                        ],
+                                        'source_ports' => ['1', '2', '3', '4-5'],
+                                        'destination_ports' => ['1', '2', '3', '4-5']
                                     ]
                                 ],
                                 'profiles' => [
@@ -121,8 +117,8 @@ class DeployTest extends TestCase
                 'id' => 'nrp-test',
                 'name' => 'nrp-test',
                 'protocol' => 'TCP',
-                'source' => '443',
-                'destination' => '555',
+                'source' => '1, 2, 3 ,4-5',
+                'destination' => '1, 2, 3 ,4-5',
             ]);
 
             $this->networkPolicy()->networkRules()->save($networkRule);

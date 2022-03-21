@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\NetworkRule\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
