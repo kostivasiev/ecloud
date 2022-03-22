@@ -1,0 +1,23 @@
+# See: https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/monitoring/-/blob/master/openapi.yaml
+
+
+### Get devices collection
+GET https://kong.staging.rnd.ukfast/monitoring/v1/devices
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+### Get device item GET monitoring/v1/devices/{referenceType}/{referenceId}
+GET https://kong.staging.rnd.ukfast/monitoring/v1/devices/server/44454c44-d835-420a-99bf-f1624c4834a6
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+### Get device item 404
+GET https://kong.staging.rnd.ukfast/monitoring/v1/devices/server/idontexist
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json

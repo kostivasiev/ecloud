@@ -20,6 +20,7 @@ use App\Jobs\Instance\Deploy\OsCustomisation;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
 use App\Jobs\Instance\Deploy\PrepareOsUsers;
 use App\Jobs\Instance\Deploy\RegisterLicenses;
+use App\Jobs\Instance\Deploy\RegisterLogicMonitorDevice;
 use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Jobs\Instance\Deploy\RunBootstrapScript;
 use App\Jobs\Instance\Deploy\RunImageReadinessScript;
@@ -71,6 +72,7 @@ class Update extends Job
                     new RunImageReadinessScript($this->task->resource),
                     new InstallSoftware($this->task),
                     new RunBootstrapScript($this->task->resource),
+                    new RegisterLogicMonitorDevice($this->task->resource),
                     new DeployCompleted($this->task->resource),
                 ],
             ])->dispatch();
