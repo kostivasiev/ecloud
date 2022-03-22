@@ -53,7 +53,7 @@ class PrepareWindowsOSUsersTest extends TestCase
                 '/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id . '/guest/windows/user',
                 [
                     'json' => [
-                        'targetUsername' => 'logic.monitor.i-test',
+                        'targetUsername' => 'lm.i-test',
                         'targetPassword' => $this->credential->password,
                         'username' => 'graphite.rack',
                         'password' => $this->credential->password,

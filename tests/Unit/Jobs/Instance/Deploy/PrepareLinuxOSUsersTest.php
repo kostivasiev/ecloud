@@ -68,7 +68,7 @@ class PrepareLinuxOSUsersTest extends TestCase
                 '/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/user',
                 [
                     'json' => [
-                        'targetUsername' => 'logic.monitor.' . $this->instanceModel()->id,
+                        'targetUsername' => 'lm.' . $this->instanceModel()->id,
                         'targetPassword' => $this->credential->password,
                         'targetSudo' => false,
                         'username' => config('instance.guest_admin_username.linux'),

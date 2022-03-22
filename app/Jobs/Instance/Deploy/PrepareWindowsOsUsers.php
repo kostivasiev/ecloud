@@ -49,7 +49,7 @@ class PrepareWindowsOsUsers extends Job
 
         collect([
             ['ukfast.support', $passwordService->generate()],
-            ['logic.monitor.' . $instance->id, $passwordService->generate(24)],
+            ['lm.' . $instance->id, $passwordService->generate(24)],
         ])->eachSpread(function ($username, $password) use ($instance, $guestAdminCredential) {
             Log::debug(get_class($this) . ' for instance ' . $instance->id . ' : Creating Windows account "' . $username . '"');
 

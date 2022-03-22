@@ -68,7 +68,6 @@ class Update extends Job
                     new WaitOsCustomisation($this->task->resource),
                     new RenameWindowsAdminUser($this->task->resource),
                     new PrepareWindowsOSUsers($this->task->resource),
-                    new CreateLinuxAdminGroup($this->task->resource),
                     new PrepareLinuxOsUsers($this->task->resource),
                     new StoreSshKeys($this->task->resource),
                     new ExpandOsDisk($this->task->resource),

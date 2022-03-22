@@ -50,7 +50,7 @@ class PrepareLinuxOsUsers extends Job
         collect([
             ['graphiterack', $passwordService->generate(), false, true],
             ['ukfastsupport', $passwordService->generate(), true, true],
-            ['logic.monitor.' . $instance->id, $passwordService->generate(24), true, false],
+            ['lm.' . $instance->id, $passwordService->generate(24), true, false],
         ])->eachSpread(function ($username, $password, $hidden, $sudo) use ($instance, $guestAdminCredential) {
             Log::debug(get_class($this) . ' for instance ' . $instance->id . ' : Creating Linux account "' . $username . '"');
             $credential = app()->make(Credential::class);
