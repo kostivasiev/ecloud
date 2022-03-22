@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
@@ -110,7 +111,7 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
 
     public function getPlatformAttribute()
     {
-        return $this->image ? $this->image->platform : null;
+        return $this?->image?->platform;
     }
 
     public function volumes()
@@ -132,6 +133,13 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
         return $query->whereHas('vpc', function ($query) use ($user) {
             $query->where('is_hidden', false)->where('reseller_id', $user->resellerId());
         });
+    }
+
+    public function getGuestAdminCredentials(): ?Credential
+    {
+        return $this->credentials()
+            ->where('username', config('instance.guest_admin_username.' . strtolower($this->platform)))
+            ->first();
     }
 
     public function image()

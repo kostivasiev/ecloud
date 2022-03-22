@@ -12,18 +12,22 @@ use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
 use App\Jobs\Instance\Deploy\CreateFloatingIp;
+use App\Jobs\Instance\Deploy\CreateLinuxAdminGroup;
 use App\Jobs\Instance\Deploy\Deploy;
 use App\Jobs\Instance\Deploy\DeployCompleted;
 use App\Jobs\Instance\Deploy\ExpandOsDisk;
 use App\Jobs\Instance\Deploy\InstallSoftware;
 use App\Jobs\Instance\Deploy\OsCustomisation;
+use App\Jobs\Instance\Deploy\PrepareLinuxOsUsers;
 use App\Jobs\Instance\Deploy\PrepareOsDisk;
-use App\Jobs\Instance\Deploy\PrepareOsUsers;
+use App\Jobs\Instance\Deploy\PrepareWindowsOsUsers;
 use App\Jobs\Instance\Deploy\RegisterLicenses;
 use App\Jobs\Instance\Deploy\RegisterLogicMonitorDevice;
+use App\Jobs\Instance\Deploy\RenameWindowsAdminUser;
 use App\Jobs\Instance\Deploy\RunApplianceBootstrap;
 use App\Jobs\Instance\Deploy\RunBootstrapScript;
 use App\Jobs\Instance\Deploy\RunImageReadinessScript;
+use App\Jobs\Instance\Deploy\StoreSshKeys;
 use App\Jobs\Instance\Deploy\UpdateNetworkAdapter;
 use App\Jobs\Instance\Deploy\WaitOsCustomisation;
 use App\Jobs\Instance\PowerOn;
@@ -63,7 +67,10 @@ class Update extends Job
                     new OsCustomisation($this->task->resource),
                     new PowerOn($this->task->resource),
                     new WaitOsCustomisation($this->task->resource),
-                    new PrepareOsUsers($this->task->resource),
+                    new RenameWindowsAdminUser($this->task->resource),
+                    new PrepareWindowsOSUsers($this->task->resource),
+                    new PrepareLinuxOsUsers($this->task->resource),
+                    new StoreSshKeys($this->task->resource),
                     new ExpandOsDisk($this->task->resource),
                     new ConfigureWinRm($this->task->resource),
                     new ActivateWindows($this->task->resource),

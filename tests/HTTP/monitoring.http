@@ -21,3 +21,45 @@ Accept: */*
 Cache-Control: no-cache
 Authorization: myukfast
 Content-Type:  application/json
+
+
+
+### Get device item GET monitoring/v1/devices/{referenceType}/{referenceId}
+POST https://kong.staging.rnd.ukfast/monitoring/v1/devices
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+{
+
+}
+
+### Get account
+GET https://kong.staging.rnd.ukfast/monitoring/v1/account
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+X-Reseller-Id: 1
+
+### Account not found
+GET https://kong.staging.rnd.ukfast/monitoring/v1/account
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+X-Reseller-Id: 100
+
+
+###
+POST https://kong.staging.rnd.ukfast/monitoring/v1/account
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+X-Reseller-Id: 10
+
+{
+    "name": "banana 2"
+}

@@ -15,5 +15,9 @@ return [
     'max_limit' => [
         'per_vpc' => env('MAX_INSTANCE_PER_VPC', 80),
         'total' => env('MAX_INSTANCE_TOTAL', 400),
+    ],
+    'guest_admin_username' => [
+        'windows' => env('GUEST_ADMIN_USERNAME_WINDOWS', 'graphite.rack'),
+        'linux' => env('GUEST_ADMIN_USERNAME_LINUX', 'root')
     ]
 ];
