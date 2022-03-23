@@ -27,29 +27,7 @@ Magento is a feature-rich eCommerce platform built on open-source technology tha
 
 <p><b>This image will require the assignment of a floating IP during launch. This is to allow guest customisations to complete during the launch process.</b></p>
 EOM,
-            'script_template' => <<<'EOM'
-sed -i '/^DOMAIN=\"\"/c\DOMAIN="'{{{magento_external_url}}}'"\' /scripts/.ubuntu.addon.sh
-sed -i 's/WP=\"no\"/WP=\"yes\"/g' /scripts/.ubuntu.addon.sh
-sed -i 's/VARNISH=\"no\"/VARNISH=\"yes\"/g' /scripts/.ubuntu.addon.sh
-
-sh /scripts/.ubuntu.addon.sh
-
-ippaddr=$(ip a|grep inet| grep -v '127.0.0.1'|grep -v 'inet6'|awk '{print $2}'|sed 's/\// /'| awk '{print $1}')
-sed -i 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'/$ippaddr/g /etc/systemd/system/varnish.service
-sed -i 's/[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}\.[0-9]\{1,3\}'/$ippaddr/g /etc/varnish/default.vcl
-systemctl daemon-reload
-service varnish restart
-
-kbvariable="$(cat /proc/meminfo | grep -i "memtotal" | awk '{print $2}')"
-memoryvariable="$(($kbvariable / 1024 / 4))"
-sed -i "/Xms/c\-Xms$memoryvariable\m" /etc/elasticsearch/jvm.options
-sed -i "/Xmx/c\-Xmx$memoryvariable\m" /etc/elasticsearch/jvm.options
-
-php-fpm -t
-service php-fpm restart
-
-if ! systemctl restart nginx; then exit 5; fi
-EOM,
+            'script_template' => null,
             'readiness_script' => null,
             'vm_template' => 'ubuntu2004-magento-cache',
             'platform' => 'Linux',
