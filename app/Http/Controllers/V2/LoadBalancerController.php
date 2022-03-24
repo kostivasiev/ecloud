@@ -112,6 +112,7 @@ class LoadBalancerController extends BaseController
             fn ($q) => $q->where('load_balancers.id', $loadBalancerId),
         );
 
+        // Stops endpoint from returning back the load balancer itself
         $instances->where('image_id', '!=', 'img-loadbalancer');
 
         return InstanceResource::collection($instances->search()->paginate(
