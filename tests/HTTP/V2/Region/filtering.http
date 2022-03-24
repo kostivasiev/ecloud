@@ -1,0 +1,101 @@
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+
+### Test Filtering
+
+# product: az-aaaaaaaa: cpanel-license
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices?name:eq=cpanel
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+
+# product: az-aaaaaaaa: mssql standard 2 core pack
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices?name:eq=mssql_enterprise_2_core_pack
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### product: az-aaaaaaaa: software:mcafee
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices?name=software:mcafee
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### product: az-aaaaaaaa: windows-os-license
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices?name=windows
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+
+### Test in
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices?name:in=windows,software
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.length == 2, "More then 2 records returned");
+});
+%}
+
+### test not in
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices?name:nin=windows,software
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.filter(e => e.id == "windows").length == 0, "Unexpected Parameter found in collection");
+});
+%}
+
+### test like
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices?name:lk=win*
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
