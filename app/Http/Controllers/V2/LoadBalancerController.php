@@ -100,4 +100,20 @@ class LoadBalancerController extends BaseController
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
+
+    public function instances(Request $request, string $loadBalancerId)
+    {
+        $lb = LoadBalancer::forUser($request->user())
+            ->with('networks.router.networks.nics.instance')
+            ->findOrFail($loadBalancerId);
+
+        
+        foreach ($lb->networks as $lbNetwork) {
+            foreach ($lbNetwork->router->networks as $siblingNetwork) {
+                foreach ($siblingNetwork->nics as $nic) {
+                    dump($nic->instance->name);
+                }
+            }
+        }
+    }
 }
