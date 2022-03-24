@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\LoadBalancer\CreateRequest;
 use App\Http\Requests\V2\LoadBalancer\UpdateRequest;
+use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerNetwork;
 use App\Resources\V2\InstanceResource;
@@ -103,17 +104,19 @@ class LoadBalancerController extends BaseController
 
     public function instances(Request $request, string $loadBalancerId)
     {
-        $lb = LoadBalancer::forUser($request->user())
-            ->with('networks.router.networks.nics.instance')
-            ->findOrFail($loadBalancerId);
+        // Make sure they can access the loadbalancer
+        LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId);
 
-        
-        foreach ($lb->networks as $lbNetwork) {
-            foreach ($lbNetwork->router->networks as $siblingNetwork) {
-                foreach ($siblingNetwork->nics as $nic) {
-                    dump($nic->instance->name);
-                }
+        $instances = Instance::whereHas(
+            'nics.network.router.networks.loadBalancers',
+            function ($q) use ($loadBalancerId) {
+                $q->where('')
+                $q->where('load_balancers.id', $loadBalancerId);
             }
-        }
+        );
+
+        return InstanceResource::collection($instances->search()->paginate(
+            $request->input('per_age', env('PAGINATION_LIMIT'))
+        ));
     }
 }
