@@ -110,7 +110,7 @@ class LoadBalancerController extends BaseController
         $instances = Instance::whereHas(
             'nics.network.router.networks.loadBalancers',
             function ($q) use ($loadBalancerId) {
-                $q->where('')
+                $q->where('image_id', '!=', 'img-loadbalancer');
                 $q->where('load_balancers.id', $loadBalancerId);
             }
         );
