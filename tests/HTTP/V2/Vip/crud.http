@@ -86,7 +86,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "load_balancer_network_id" : ""
+  "load_balancer_id" : "{{load_balancer_id}}"
 }
 > {%
 client.test('Create', function () {
@@ -96,7 +96,20 @@ client.test('Create', function () {
 %}
 
 ### 2 Get Collection
-GET https://{{host}}/{{version}}/vips
+GET https://{{host}}/{{version}}/vips?load_balancer_id:eq=lb-54e87c9e-dev
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### 2 Test filtering
+GET https://{{host}}/{{version}}/vips?load_balancer_id={{load_balancer_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write

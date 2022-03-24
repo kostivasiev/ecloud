@@ -126,7 +126,7 @@ class Vip extends Model implements Searchable, ResellerScopeable
         $sieve->configure(fn ($filter) => [
             'id' => $filter->string(),
             'name' => $filter->string(),
-            'load_balancer_network_id' => $filter->string(),
+            'load_balancer_id' => $filter->for('loadBalancerNetwork.load_balancer_id')->string(),
             'ip_address_id' => $filter->string(),
             'config_id' => $filter->numeric(),
             'created_at' => $filter->date(),
