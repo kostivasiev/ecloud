@@ -7,7 +7,7 @@ use UKFast\Sieve\ModifiesQueries;
 use UKFast\Sieve\SearchTerm;
 use UKFast\Sieve\WrapsFilter;
 
-class ProductFilter extends StringFilter implements WrapsFilter
+class ProductNameFilter extends StringFilter implements WrapsFilter
 {
     public function modifyQuery($query, SearchTerm $search)
     {
