@@ -3,6 +3,7 @@
 namespace App\Jobs\LoadBalancer;
 
 use App\Jobs\TaskJob;
+use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Log;
 use UKFast\Admin\Loadbalancers\AdminClient;
@@ -33,10 +34,19 @@ class DeleteAntiAffinity extends TaskJob
         }
 
         // First, we'll retrieve the host group ID for the first instance
-        $response = $loadBalancer->availabilityZone->kingpinService()->get(
-            '/api/v2/vpc/' . $loadBalancer->vpc->id .
-            '/instance/' . $loadBalancerNodeInstanceId
-        );
+        try {
+            $response = $loadBalancer->availabilityZone->kingpinService()->get(
+                '/api/v2/vpc/' . $loadBalancer->vpc->id .
+                '/instance/' . $loadBalancerNodeInstanceId
+            );
+        } catch (ClientException $e) {
+            if ($e->hasResponse() && $e->getResponse()->getStatusCode() == '404') {
+                $this->info("Skipping, instance not found");
+                return;
+            }
+
+            throw $e;
+        }
         $response = json_decode($response->getBody()->getContents());
         $hostGroupId = $response->hostGroupID;
 
