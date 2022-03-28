@@ -24,7 +24,7 @@ class UpdateBilling implements Billable
         if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
-        $model = $event->model;
+        $model = $event->model->resource;
 
         $time = Carbon::now();
 
