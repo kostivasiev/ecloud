@@ -27,7 +27,7 @@ class UpdateRamBillingTest extends TestCase
 
         $this->standardTier = config('billing.ram_tiers.standard');
 
-        $this->task = Model::withoutEvents(function() {
+        $this->task = Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => true,
@@ -57,14 +57,14 @@ class UpdateRamBillingTest extends TestCase
 
         $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
         $mockAdminCustomerClient = \Mockery::mock(\UKFast\Admin\Account\AdminCustomerClient::class)->makePartial();
-        $mockAdminCustomerClient->shouldReceive('getById')->andReturn(
+        $mockAdminCustomerClient->allows('getById')->andReturns(
             new \UKFast\Admin\Account\Entities\Customer(
                 [
                     'accountStatus' => ''
                 ]
             )
         );
-        $mockAccountAdminClient->shouldReceive('customers')->andReturn(
+        $mockAccountAdminClient->allows('customers')->andReturns(
             $mockAdminCustomerClient
         );
         app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {

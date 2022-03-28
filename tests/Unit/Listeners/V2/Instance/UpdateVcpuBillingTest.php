@@ -73,7 +73,7 @@ class UpdateVcpuBillingTest extends TestCase
 
         $this->instanceModel()->loadBalancer()->associate($this->loadBalancer())->save();
 
-        $task = Model::withoutEvents(function() {
+        $task = Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'sync-1',
                 'completed' => true,

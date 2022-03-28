@@ -9,28 +9,22 @@ use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerSpecification;
 use App\Models\V2\Product;
 use App\Support\Sync;
+use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class UpdateBilling implements Billable
 {
+    use BillableListener;
+
+    const RESOURCE = LoadBalancer::class;
+
     public function handle(Updated $event)
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
-
-        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
-
-        if (!$event->model->completed) {
-            return;
-        }
-
-        if (get_class($event->model->resource) != LoadBalancer::class) {
-            return;
-        }
-
         $loadBalancer = $event->model->resource;
 
         if (get_class($loadBalancer) != LoadBalancer::class) {
