@@ -24,7 +24,7 @@ class UpdateWindowsLicenseBilling implements Billable
      */
     public function handle(Updated $event)
     {
-        if (!$this->validateNotDeletedResourceEvent($event)) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
 
