@@ -13,21 +13,6 @@ trait BillableListener
         if ($event->model->name != Sync::TASK_NAME_UPDATE) {
             return false;
         }
-
-        return $this->validateEventStatusAndResource($event);
-    }
-
-    protected function validateNotDeletedResourceEvent(Updated $event): bool
-    {
-        if ($event->model->name == Sync::TASK_NAME_DELETE) {
-            return false;
-        }
-
-        return $this->validateEventStatusAndResource($event);
-    }
-
-    protected function validateEventStatusAndResource(Updated $event): bool
-    {
         if (!$event->model->completed) {
             return false;
         }
