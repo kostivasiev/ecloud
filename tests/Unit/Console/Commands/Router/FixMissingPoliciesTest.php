@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\unit\Console\Commands\Router;
+namespace Tests\Unit\Console\Commands\Router;
 
 use App\Console\Commands\Router\FixMissingPolicies;
 use App\Events\V2\Task\Created;
