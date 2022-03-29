@@ -1,6 +1,7 @@
 <?php
 namespace App\Rules\V2;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\AvailabilityZoneable;
 use App\Support\Resource;
 use Illuminate\Contracts\Validation\Rule;
@@ -35,8 +36,14 @@ class IsSameAvailabilityZone implements Rule
 
         $resource1 = $resourceClass::findOrFail($this->resourceId);
 
-        if (!($resource1 instanceof AvailabilityZoneable)) {
-            return true;
+        if ($resourceClass instanceof AvailabilityZone) {
+            $resource1AvailabilityZoneID = $resource1->id;
+        } else {
+            if (!($resource1 instanceof AvailabilityZoneable)) {
+                return true;
+            }
+
+            $resource1AvailabilityZoneID = $resource1->availabilityZone->id;
         }
 
         $resource2Class = Resource::classFromId($value);
@@ -50,7 +57,7 @@ class IsSameAvailabilityZone implements Rule
             return true;
         }
 
-        return $resource1->availabilityZone->id == $resource2->availabilityZone->id;
+        return $resource1AvailabilityZoneID == $resource2->availabilityZone->id;
     }
 
     public function message()
