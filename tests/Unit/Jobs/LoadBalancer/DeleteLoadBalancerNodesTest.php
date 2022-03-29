@@ -40,6 +40,6 @@ class DeleteLoadBalancerNodesTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
 
         $task->refresh();
-        $this->assertNotNull($task->data['load_balancer_node_ids']);
+        $this->assertNotNull($task->data['loadbalancer_node_ids']);
     }
 }
