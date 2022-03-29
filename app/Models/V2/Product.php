@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Models\V2\Filters\ProductNameFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Http\Request;
@@ -170,7 +171,7 @@ class Product extends V1ModelWrapper implements Searchable
     {
         $sieve->configure(fn ($filter) => [
             'id' => $filter->string(),
-            'name' => $filter->string(),
+            'name' => $filter->for('product_name')->wrap(new ProductNameFilter)->string(),
             'category' => $filter->for('product_subcategory')->string(),
             'availability_zone_id' => $filter->string(),
         ]);
