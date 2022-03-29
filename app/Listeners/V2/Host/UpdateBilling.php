@@ -7,6 +7,7 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
 use App\Models\V2\HostSpec;
 use App\Support\Sync;
+use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -17,25 +18,16 @@ use Illuminate\Support\Facades\Log;
  */
 class UpdateBilling implements Billable
 {
+    use BillableListener;
+
+    const RESOURCE = Host::class;
+
     public function handle(Updated $event)
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
-
-        $sync = $event->model;
-
-        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
-
-        if (!$event->model->completed) {
-            return;
-        }
-
-        if (!($sync->resource instanceof Host)) {
-            return;
-        }
-
-        $host = $sync->resource;
+        $host = $event->model->resource;
 
         $currentActiveMetric = BillingMetric::getActiveByKey($host, $host->hostGroup->hostSpec->id);
         if (!empty($currentActiveMetric)) {

@@ -40,14 +40,14 @@ class UpdateLicenseBillingTest extends TestCase
 
         $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
         $mockAdminCustomerClient = \Mockery::mock(\UKFast\Admin\Account\AdminCustomerClient::class)->makePartial();
-        $mockAdminCustomerClient->shouldReceive('getById')->andReturn(
+        $mockAdminCustomerClient->allows('getById')->andReturns(
             new \UKFast\Admin\Account\Entities\Customer(
                 [
                     'accountStatus' => ''
                 ]
             )
         );
-        $mockAccountAdminClient->shouldReceive('customers')->andReturn(
+        $mockAccountAdminClient->allows('customers')->andReturns(
             $mockAdminCustomerClient
         );
         app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
@@ -57,7 +57,7 @@ class UpdateLicenseBillingTest extends TestCase
 
     public function testCreatingHostInWindowsEnabledHostGroupAddsBilling()
     {
-        $host = Model::withoutEvents(function() {
+        $host = Model::withoutEvents(function () {
             return Host::factory()->create([
                 'id' => 'h-test-2',
                 'name' => 'h-test-2',
@@ -68,7 +68,7 @@ class UpdateLicenseBillingTest extends TestCase
         $this->hostSpec()->cpu_sockets = 2;
         $this->hostSpec()->cpu_cores = 6;
 
-        $task = Model::withoutEvents(function() use ($host) {
+        $task = Model::withoutEvents(function () use ($host) {
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => true,
@@ -92,7 +92,7 @@ class UpdateLicenseBillingTest extends TestCase
 
     public function testCreatingHostInWindowsEnabledHostGroupAddsBillingMinCores()
     {
-        $host = Model::withoutEvents(function() {
+        $host = Model::withoutEvents(function () {
             return Host::factory()->create([
                 'id' => 'h-test-2',
                 'name' => 'h-test-2',
@@ -103,7 +103,7 @@ class UpdateLicenseBillingTest extends TestCase
         $this->hostSpec()->cpu_sockets = 2;
         $this->hostSpec()->cpu_cores = 6;
 
-        $task = Model::withoutEvents(function() use ($host) {
+        $task = Model::withoutEvents(function () use ($host) {
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => true,
@@ -130,7 +130,7 @@ class UpdateLicenseBillingTest extends TestCase
 
     public function testCreatingHostInWindowsNotEnabledHostGroupDoesNotAddBilling()
     {
-        $hostGroup = Model::withoutEvents(function() {
+        $hostGroup = Model::withoutEvents(function () {
             return HostGroup::factory()->create([
                 'id' => 'hg-test-2',
                 'name' => 'hg-test-2',
@@ -141,7 +141,7 @@ class UpdateLicenseBillingTest extends TestCase
             ]);
         });
 
-        $host = Model::withoutEvents(function() use ($hostGroup) {
+        $host = Model::withoutEvents(function () use ($hostGroup) {
             return Host::factory()->create([
                 'id' => 'h-test-2',
                 'name' => 'h-test-2',
@@ -149,7 +149,7 @@ class UpdateLicenseBillingTest extends TestCase
             ]);
         });
 
-        $task = Model::withoutEvents(function() use ($host) {
+        $task = Model::withoutEvents(function () use ($host) {
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => true,

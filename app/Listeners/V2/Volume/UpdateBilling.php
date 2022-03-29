@@ -8,11 +8,16 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Task;
 use App\Models\V2\Volume;
 use App\Support\Sync;
+use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateBilling implements Billable
 {
+    use BillableListener;
+
+    const RESOURCE = Volume::class;
+
     /**
      * @param Updated $event
      * @return void
@@ -27,18 +32,9 @@ class UpdateBilling implements Billable
         }
 
         if ($event->model instanceof Task) {
-            if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+            if (!$this->validateBillableResourceEvent($event)) {
                 return;
             }
-
-            if (!$event->model->completed) {
-                return;
-            }
-
-            if (get_class($event->model->resource) != Volume::class) {
-                return;
-            }
-
             $volume = $event->model->resource;
         }
 

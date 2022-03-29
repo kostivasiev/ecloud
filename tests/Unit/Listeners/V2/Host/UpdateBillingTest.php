@@ -38,14 +38,14 @@ class UpdateBillingTest extends TestCase
 
         $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
         $mockAdminCustomerClient = \Mockery::mock(\UKFast\Admin\Account\AdminCustomerClient::class)->makePartial();
-        $mockAdminCustomerClient->shouldReceive('getById')->andReturn(
+        $mockAdminCustomerClient->allows('getById')->andReturns(
             new \UKFast\Admin\Account\Entities\Customer(
                 [
                     'accountStatus' => ''
                 ]
             )
         );
-        $mockAccountAdminClient->shouldReceive('customers')->andReturn(
+        $mockAccountAdminClient->allows('customers')->andReturns(
             $mockAdminCustomerClient
         );
         app()->bind(\UKFast\Admin\Account\AdminClient::class, function () use ($mockAccountAdminClient) {
@@ -59,7 +59,7 @@ class UpdateBillingTest extends TestCase
         //$sync = $this->host()->syncs()->latest()->first();
         // Even though $this->>host() will mock the sync and we can use above, use this instead
         // as we're going to refactor host deployment sync soon so we only have to test this small unit.
-        $sync = Model::withoutEvents(function() {
+        $sync = Model::withoutEvents(function () {
             $sync = new Task([
                 'id' => 'sync-1',
                 'completed' => true,

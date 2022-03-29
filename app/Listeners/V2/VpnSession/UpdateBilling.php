@@ -7,28 +7,22 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Product;
 use App\Models\V2\VpnSession;
 use App\Support\Sync;
+use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class UpdateBilling implements Billable
 {
+    use BillableListener;
+
+    const RESOURCE = VpnSession::class;
+
     public function handle($event)
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
-
-        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
-
-        if (!$event->model->completed) {
-            return;
-        }
-
-        if (get_class($event->model->resource) != VpnSession::class) {
-            return;
-        }
-
         $vpnSession = $event->model->resource;
 
         $currentActiveMetric = BillingMetric::where('resource_id', $vpnSession->id)

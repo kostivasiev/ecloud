@@ -24,7 +24,7 @@ class UpdateBillingTest extends TestCase
     {
         parent::setUp();
 
-        Volume::withoutEvents(function() {
+        Volume::withoutEvents(function () {
             $this->volume = Volume::factory()->create([
                 'id' => 'vol-test',
                 'vpc_id' => $this->vpc()->id,
@@ -38,7 +38,7 @@ class UpdateBillingTest extends TestCase
 
     public function testResizingVolumeAddsBillingMetric()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'task-1',
                 'completed' => true,
@@ -59,7 +59,7 @@ class UpdateBillingTest extends TestCase
 
     public function testDefaultIopsBilling()
     {
-        Volume::withoutEvents(function() {
+        Volume::withoutEvents(function () {
             $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
@@ -79,7 +79,7 @@ class UpdateBillingTest extends TestCase
 
     public function testUnattachedVolumeWithNonDefaultIops()
     {
-        Volume::withoutEvents(function() {
+        Volume::withoutEvents(function () {
             $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
@@ -100,7 +100,7 @@ class UpdateBillingTest extends TestCase
 
     public function testAttachedVolumeWithDefaultIops()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
@@ -128,7 +128,7 @@ class UpdateBillingTest extends TestCase
 
     public function testAttachedVolumeWithNonDefaultIops()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
@@ -172,7 +172,7 @@ class UpdateBillingTest extends TestCase
         ]);
 
 
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->volume = Volume::factory()->create([
                 'id' => 'vol-abc123xyz',
                 'vpc_id' => $this->vpc()->id,
