@@ -36,7 +36,7 @@ class IsSameAvailabilityZone implements Rule
 
         $resource1 = $resourceClass::findOrFail($this->resourceId);
 
-        if ($resourceClass instanceof AvailabilityZone) {
+        if ($resource1 instanceof AvailabilityZone) {
             $resource1AvailabilityZoneID = $resource1->id;
         } else {
             if (!($resource1 instanceof AvailabilityZoneable)) {
