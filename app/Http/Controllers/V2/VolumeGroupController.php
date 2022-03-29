@@ -54,13 +54,14 @@ class VolumeGroupController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function volumes(Request $request, QueryTransformer $queryTransformer, string $volumeGroupId)
+    public function volumes(Request $request, string $volumeGroupId)
     {
-        $collection = VolumeGroup::forUser($request->user())->findOrFail($volumeGroupId)->volumes()->forUser($request->user());
-        $queryTransformer->config(Volume::class)
-            ->transform($collection);
+        $collection = VolumeGroup::forUser($request->user())
+            ->findOrFail($volumeGroupId)
+            ->volumes()
+            ->forUser($request->user());
 
-        return VolumeResource::collection($collection->paginate(
+        return VolumeResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
