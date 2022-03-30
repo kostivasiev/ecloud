@@ -6556,11 +6556,11 @@
         },
         {
             "name": "ukfast/admin-client",
-            "version": "v2.7.0",
+            "version": "v2.7.3",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git",
-                "reference": "79035ecb40ab0477ab3c92b4e7032545ea5b966a"
+                "reference": "e1f7085536420dbd42f080956924410a801aef74"
             },
             "require": {
                 "ext-json": "*",
@@ -6591,7 +6591,7 @@
             "support": {
                 "email": "developers@ukfast.co.uk"
             },
-            "time": "2022-03-29T09:18:24+00:00"
+            "time": "2022-03-30T13:20:46+00:00"
         },
         {
             "name": "ukfast/api-auth",
