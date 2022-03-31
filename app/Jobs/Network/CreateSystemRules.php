@@ -60,6 +60,5 @@ class CreateSystemRules extends TaskJob
         }
 
         // if advanced_networking create network rule in system policy allowing inbound traffic from the collector
-
     }
 }

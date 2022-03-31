@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use UKFast\Admin\Monitoring\AdminClient;
 use UKFast\Admin\Monitoring\AdminCollectorClient;
