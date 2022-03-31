@@ -9,7 +9,6 @@ use App\Jobs\Instance\Undeploy\DeleteNics;
 use App\Jobs\Instance\Undeploy\DeleteVolumes;
 use App\Jobs\Instance\Undeploy\DetachSharedVolumes;
 use App\Jobs\Instance\Undeploy\RemoveCredentials;
-use App\Jobs\Instance\Undeploy\RemoveMonitoring;
 use App\Jobs\Instance\Undeploy\RevokeLicenses;
 use App\Jobs\Instance\Undeploy\UnassignFloatingIP;
 use App\Jobs\Instance\Undeploy\Undeploy;
@@ -33,7 +32,6 @@ class Delete extends Job
     {
         $this->deleteTaskBatch([
             [
-                new RemoveMonitoring($this->task->resource),
                 new PowerOff($this->task->resource, true),
                 new DetachSharedVolumes($this->task),
                 new Undeploy($this->task->resource),

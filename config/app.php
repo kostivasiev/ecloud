@@ -171,7 +171,6 @@ return [
         UKFast\ApiInternalCommunication\AccountAdminClientServiceProvider::class,
         UKFast\ApiInternalCommunication\DevicesAdminClientServiceProvider::class,
         UKFast\ApiInternalCommunication\eCloudAdminClientServiceProvider::class,
-        UKFast\ApiInternalCommunication\MonitoringAdminClientServiceProvider::class,
         UKFast\ApiInternalCommunication\NetworkingAdminClientServiceProvider::class,
         UKFast\ApiInternalCommunication\BillingAdminClientServiceProvider::class,
         UKFast\ApiInternalCommunication\LicensesAdminClientServiceProvider::class,
