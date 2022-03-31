@@ -1,21 +1,22 @@
 <?php
 
-namespace Tests\Unit\Jobs\Network;
+namespace Tests\Unit\Jobs\NetworkPolicy;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\Network\CreateSystemRules;
+use App\Jobs\NetworkPolicy\AllowLogicMonitor;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use UKFast\Admin\Monitoring\AdminClient;
 use UKFast\Admin\Monitoring\AdminCollectorClient;
 use UKFast\Admin\Monitoring\Entities\Collector;
 
-class CreateSystemRulesTest extends TestCase
+class AllowLogicMonitorTest extends TestCase
 {
     protected Task $task;
 
@@ -33,49 +34,65 @@ class CreateSystemRulesTest extends TestCase
         });
     }
 
+    public function testNoAdvancedNetworkingFails()
+    {
+        $this->getAdminClientMock();
+        dispatch(new AllowLogicMonitor($this->networkPolicy()));
+
+        $networkRule = $this->networkPolicy()
+            ->networkRules()
+            ->where('name', '=', 'Collector_Rule')
+            ->first();
+        $this->assertNull($networkRule);
+    }
+
     public function testNoCollectorFound()
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
-        $this->firewallPolicy()->setAttribute('name', 'System')->saveQuietly();
+
         $this->getAdminClientMock(true);
-        dispatch(new CreateSystemRules($this->task));
+        dispatch(new AllowLogicMonitor($this->networkPolicy()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
 
-        $this->assertCount(0, $this->firewallPolicy()->firewallRules()->get()->toArray());
+        $this->assertCount(0, $this->networkPolicy()->networkRules()->get()->toArray());
     }
 
-    public function testFirewallRuleCreated()
+    public function testNetworkRulesCreated()
     {
+        $this->vpc()->setAttribute('advanced_networking', true)->saveQuietly();
+
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
-        $this->firewallPolicy()->setAttribute('name', 'System')->saveQuietly();
         $this->getAdminClientMock();
-        dispatch(new CreateSystemRules($this->task));
+        dispatch(new AllowLogicMonitor($this->networkPolicy()));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
 
-        $firewallRule = $this->firewallPolicy()->firewallRules()->first();
-        $firewallRulePorts = $firewallRule->firewallRulePorts()->get();
+        // Validate Rule and Ports have been created
+        $networkRule = $this->networkPolicy()->networkRules()->first();
+        $networkRulePorts = $networkRule->networkRulePorts()->get();
 
-        $this->assertEquals(config('firewall.system.rules')[0]['name'], $firewallRule->name);
-        $this->assertEquals(config('firewall.system.rules')[0]['ports'][0]['protocol'], $firewallRulePorts[0]->protocol);
-        $this->assertEquals(config('firewall.system.rules')[0]['ports'][1]['destination'], $firewallRulePorts[1]->destination);
-        $this->assertEquals(config('firewall.system.rules')[0]['ports'][2]['destination'], $firewallRulePorts[2]->destination);
-        $this->assertEquals(config('firewall.system.rules')[0]['ports'][3]['destination'], $firewallRulePorts[3]->destination);
+        $this->assertEquals('123.123.123.123', $networkRule->source);
+        $this->assertEquals(config('firewall.system.rules')[0]['name'], $networkRule->name);
+        $this->assertEquals(config('firewall.system.rules')[0]['ports'][0]['protocol'], $networkRulePorts[0]->protocol);
+        $this->assertEquals(config('firewall.system.rules')[0]['ports'][1]['destination'], $networkRulePorts[1]->destination);
+        $this->assertEquals(config('firewall.system.rules')[0]['ports'][2]['destination'], $networkRulePorts[2]->destination);
+        $this->assertEquals(config('firewall.system.rules')[0]['ports'][3]['destination'], $networkRulePorts[3]->destination);
     }
+
 
     /**
      * Gets AdminClient mock
      * @param bool $fails
-     * @return CreateSystemRulesTest
+     * @return AllowLogicMonitorTest
      */
-    private function getAdminClientMock(bool $fails = false): CreateSystemRulesTest
+    private function getAdminClientMock(bool $fails = false): AllowLogicMonitorTest
     {
         app()->bind(AdminClient::class, function () use ($fails) {
             $mock = \Mockery::mock(AdminClient::class)->makePartial();

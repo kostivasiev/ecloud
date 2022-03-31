@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\NetworkPolicy;
 
 use App\Jobs\Job;
+use App\Jobs\NetworkPolicy\AllowLogicMonitor;
 use App\Jobs\NetworkPolicy\CreateDefaultNetworkRules;
 use App\Jobs\Nsx\DeployCheck;
 use App\Jobs\Nsx\NetworkPolicy\UndeployTrashedRules;
@@ -35,6 +36,7 @@ class Update extends Job
                 ),
                 new CreateDefaultNetworkRules($this->task->resource, $this->task->data),
                 new DeployNetworkPolicy($this->task->resource),
+                new AllowLogicMonitor($this->task->resource),
                 new UndeployTrashedRules($this->task->resource),
                 new DeployCheck(
                     $this->task->resource,
