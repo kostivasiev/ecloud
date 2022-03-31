@@ -27,7 +27,7 @@ Content-Type:  application/json
 
 {
     "reference_type": "server",
-    "reference_id": "i-10d78ef4-dev3",
+    "reference_id": "i-10d78ef4-dev",
     "collector_id": "254fa2d8-e63a-4535-a892-f31290e3b94e",
     "display_name": "Test",
     "tier_id": "8485a243-8a83-11ec-915e-005056ad1662",
@@ -39,6 +39,14 @@ Content-Type:  application/json
     "password": "twe2Wjc90obkYpN4fp3onmAze"
 }
 ###
+
+DELETE https://kong.staging.rnd.ukfast/monitoring/v1/devices/7799334a-ec7f-443e-b853-491a4da2d428
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+
 
 # accounts
 
