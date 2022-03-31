@@ -139,6 +139,6 @@ class CreateLogicMonitorAccountTest extends TestCase
 
         $task->refresh();
 
-        $this->assertEquals(123, $task->data['logic_monitor_account_id']);
+        $this->assertEquals(123, $task->resource->deploy_data['logic_monitor_account_id']);
     }
 }

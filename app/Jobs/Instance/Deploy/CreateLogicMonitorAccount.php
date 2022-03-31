@@ -34,7 +34,7 @@ class CreateLogicMonitorAccount extends Job
 
         $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
         if (!empty($accounts)) {
-            $this->task->updateData('logic_monitor_account_id', $accounts[0]->id);
+            $this->saveLogicMonitorAccountId($accounts[0]->id);
             Log::info($this::class . ' : Logic Monitor account already exists, skipping', [
                 'logic_monitor_account_id' => $accounts[0]->id
             ]);
@@ -42,16 +42,26 @@ class CreateLogicMonitorAccount extends Job
         }
 
         try {
-            $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
+            $customer = $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
         } catch (NotFoundException) {
             $this->fail(new \Exception('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id));
             return;
         }
 
         $response = $adminMonitoringClient->accounts()->createEntity(new Account([
-            'name' => $instance->vpc->reseller_id
+            'name' => $customer->name
         ]));
 
-        $this->task->updateData('logic_monitor_account_id', $response->getId());
+        $id = $response->getId();
+        $this->saveLogicMonitorAccountId($id);
+        Log::info($this::class . ' : Logic Monitor account created: ' . $id);
+    }
+
+    protected function saveLogicMonitorAccountId($id)
+    {
+        $deploy_data = $this->task->resource->deploy_data;
+        $deploy_data['logic_monitor_account_id'] = $id;
+        $this->task->resource->deploy_data = $deploy_data;
+        $this->task->resource->save();
     }
 }

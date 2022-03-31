@@ -26,14 +26,24 @@ Authorization: myukfast
 Content-Type:  application/json
 
 {
-
+    "reference_type": "server",
+    "reference_id": "i-10d78ef4-dev",
+    "collector_id": "254fa2d8-e63a-4535-a892-f31290e3b94e",
+    "display_name": "Test",
+    "tier_id": "8485a243-8a83-11ec-915e-005056ad1662",
+    "account_id": "80cd084c-f17a-4c57-b03e-15ff0058762d",
+    "ip_address": "46.37.163.92",
+    "snmp_community": "public",
+    "platform": "Linux",
+    "username": "lm.i-10d78ef4-dev",
+    "password": "twe2Wjc90obkYpN4fp3onmAze"
 }
 ###
 
 # accounts
 
 ### Get account
-GET https://kong.staging.rnd.ukfast/monitoring/v1/account
+GET https://kong.staging.rnd.ukfast/monitoring/v1/accounts
 Accept: */*
 Cache-Control: no-cache
 Authorization: myukfast
@@ -41,7 +51,7 @@ Content-Type:  application/json
 X-Reseller-Id: 1
 
 ### Account not found
-GET https://kong.staging.rnd.ukfast/monitoring/v1/account
+GET https://kong.staging.rnd.ukfast/monitoring/v1/accounts/qwerty
 Accept: */*
 Cache-Control: no-cache
 Authorization: myukfast
@@ -49,7 +59,7 @@ Content-Type:  application/json
 X-Reseller-Id: 100
 
 ###
-POST https://kong.staging.rnd.ukfast/monitoring/v1/account
+POST https://kong.staging.rnd.ukfast/monitoring/v1/accounts
 Accept: */*
 Cache-Control: no-cache
 Authorization: myukfast
