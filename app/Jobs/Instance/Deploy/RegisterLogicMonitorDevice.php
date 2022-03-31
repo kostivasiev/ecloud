@@ -66,13 +66,14 @@ class RegisterLogicMonitorDevice extends Job
         $collector = $collectorsPage->getItems()[0];
 
         $logicMonitorCredentials = $instance->credentials()
-            ->where('username','lm.' . $instance->id)
+            ->where('username', 'lm.' . $instance->id)
             ->first();
         if (!$logicMonitorCredentials) {
             $this->fail(new \Exception('Failed to load logic monitor credentials for instance ' . $instance->id));
             return;
         }
 
+        // TODO: REMOVE THIS
         Log::debug(['reference_type' => 'server',
             'reference_id' => $instance->id,
             'collector_id' => $collector->id,
