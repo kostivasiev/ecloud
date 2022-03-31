@@ -87,7 +87,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-DELETE https://{{host}}/{{version}}/floating-ips/fip-183052b7-dev
+DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
