@@ -1,5 +1,6 @@
 # See: https://gitlab.devops.ukfast.co.uk/ukfast/api.ukfast/monitoring/-/blob/master/openapi.yaml
 
+## devices
 
 ### Get devices collection
 GET https://kong.staging.rnd.ukfast/monitoring/v1/devices
@@ -8,15 +9,8 @@ Cache-Control: no-cache
 Authorization: myukfast
 Content-Type:  application/json
 
-### Get device item GET monitoring/v1/devices/{referenceType}/{referenceId}
-GET https://kong.staging.rnd.ukfast/monitoring/v1/devices/server/44454c44-d835-420a-99bf-f1624c4834a6
-Accept: */*
-Cache-Control: no-cache
-Authorization: myukfast
-Content-Type:  application/json
-
-### Get device item 404
-GET https://kong.staging.rnd.ukfast/monitoring/v1/devices/server/idontexist
+### Get device item
+GET https://kong.staging.rnd.ukfast/monitoring/v1/devices/135e06d1-fa77-4f3b-8e68-f2a2b032ca04
 Accept: */*
 Cache-Control: no-cache
 Authorization: myukfast
@@ -24,7 +18,7 @@ Content-Type:  application/json
 
 
 
-### Get device item GET monitoring/v1/devices/{referenceType}/{referenceId}
+### Create device
 POST https://kong.staging.rnd.ukfast/monitoring/v1/devices
 Accept: */*
 Cache-Control: no-cache
@@ -34,6 +28,9 @@ Content-Type:  application/json
 {
 
 }
+###
+
+# accounts
 
 ### Get account
 GET https://kong.staging.rnd.ukfast/monitoring/v1/account
@@ -51,7 +48,6 @@ Authorization: myukfast
 Content-Type:  application/json
 X-Reseller-Id: 100
 
-
 ###
 POST https://kong.staging.rnd.ukfast/monitoring/v1/account
 Accept: */*
@@ -63,3 +59,20 @@ X-Reseller-Id: 10
 {
     "name": "banana 2"
 }
+###
+
+# collectors
+
+### Get collection
+GET https://kong.staging.rnd.ukfast/monitoring/v1/collectors
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
+
+### Get collection - filtered
+GET https://kong.staging.rnd.ukfast/monitoring/v1/collectors?is_shared=true&datacentre_id=8
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json

@@ -80,8 +80,8 @@ class Update extends Job
                     new RunImageReadinessScript($this->task->resource),
                     new InstallSoftware($this->task),
                     new RunBootstrapScript($this->task->resource),
-                    new CreateLogicMonitorAccount($this->task->resource),
-                    new RegisterLogicMonitorDevice($this->task->resource),
+                    new CreateLogicMonitorAccount($this->task),
+                    new RegisterLogicMonitorDevice($this->task),
                     new DeployCompleted($this->task->resource),
                 ],
             ])->dispatch();

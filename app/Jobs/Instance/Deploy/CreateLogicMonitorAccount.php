@@ -3,51 +3,55 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
-use App\Models\V2\Instance;
-use App\Traits\V2\LoggableModelJob;
+use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
-use UKFast\Admin\Monitoring\AdminClient;
+use UKFast\Admin\Monitoring\AdminClient as MonitoringAdminClient;
+use UKFast\Admin\Account\AdminClient as AccountAdminClient;
+use UKFast\Admin\Monitoring\Entities\Account;
 use UKFast\SDK\Exception\NotFoundException;
 
 class CreateLogicMonitorAccount extends Job
 {
-    use Batchable, LoggableModelJob;
+    use Batchable, LoggableTaskJob;
 
-    private $model;
+    private $task;
 
-    public function __construct(Instance $instance)
+    public function __construct(Task $task)
     {
-        $this->model = $instance;
+        $this->task = $task;
     }
 
-    public function handle(AdminClient $adminMonitoringClient)
+    public function handle(MonitoringAdminClient $adminMonitoringClient, AccountAdminClient $accountAdminClient)
     {
-        $instance = $this->model;
+        $instance = $this->task->resource;
 
-        if (empty($this->model->deploy_data['floating_ip_id'])) {
-            Log::info(get_class($this) . ' : No floating IP assigned to the instance, skipping');
+        if (empty($instance->deploy_data['floating_ip_id'])) {
+            Log::info($this::class . ' : No floating IP assigned to the instance, skipping');
             return;
         }
 
-
-        // When the instance is already registered | Then the job skips as no further action required
-        try {
-            $device = $adminMonitoringClient
-                ->setResellerId($instance->vpc->reseller_id)
-                ->account()->getById('vcentre-vm', $instance->id);
-            if (!empty($device)) {
-                Log::info();
-            }
-        } catch (NotFoundException) {
-            // device does not exist
+        $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
+        if (!empty($accounts)) {
+            $this->task->updateData('logic_monitor_account_id', $accounts[0]->id);
+            Log::info($this::class . ' : Logic Monitor account already exists, skipping', [
+                'logic_monitor_account_id' => $accounts[0]->id
+            ]);
+            return;
         }
 
-    // When the instance is NOT registered | Then load the target collector for the AZ the instance is deploying into
+        try {
+            $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
+        } catch (NotFoundException) {
+            $this->fail(new \Exception('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id));
+            return;
+        }
 
-    // When the reseller is NOT registered | Then load the reseller name and create an account
+        $response = $adminMonitoringClient->accounts()->createEntity(new Account([
+            'name' => $instance->vpc->reseller_id
+        ]));
 
-    // When the register device endpoint is called | Then provide the instances name, id, 'eCloud', platform, ip, tier, collectorId, creds
-
+        $this->task->updateData('logic_monitor_account_id', $response->getId());
     }
 }
