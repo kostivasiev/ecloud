@@ -6556,11 +6556,11 @@
         },
         {
             "name": "ukfast/admin-client",
-            "version": "v2.5.5",
+            "version": "v2.7.4",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/client-libraries/php-admin-sdk.git",
-                "reference": "c6702c4e4b4142dcaadaba026b324abfdc5e3fd7"
+                "reference": "f608386ae66e23ffec84126af562f8046a061dca"
             },
             "require": {
                 "ext-json": "*",
@@ -6591,7 +6591,7 @@
             "support": {
                 "email": "developers@ukfast.co.uk"
             },
-            "time": "2022-03-09T11:05:47+00:00"
+            "time": "2022-03-31T09:27:29+00:00"
         },
         {
             "name": "ukfast/api-auth",
@@ -6734,11 +6734,11 @@
         },
         {
             "name": "ukfast/api-internal-communication",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/api-internal-communication.git",
-                "reference": "351d53bc9d8f358358cbd3d99d7570b137893959"
+                "reference": "7cbf2ee7ff375cb930aba7729ef0a526f2666cde"
             },
             "require": {
                 "guzzlehttp/guzzle": "~6.0|~7.0",
@@ -6765,7 +6765,7 @@
                 }
             ],
             "description": "Handles APIs talking to each other",
-            "time": "2022-03-01T14:36:41+00:00"
+            "time": "2022-03-17T16:11:22+00:00"
         },
         {
             "name": "ukfast/api-paginator",
@@ -10805,5 +10805,5 @@
     "platform-overrides": {
         "php": "8.1"
     },
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
