@@ -6,6 +6,7 @@ use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
+use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -54,22 +55,26 @@ class AllowLogicMonitor extends Job
             return;
         }
 
+        $ipAddresses = [];
         foreach ($collectors as $collector) {
-            $rules = config('firewall.system.rules');
-            foreach ($rules as $rule) {
-                $networkRule = app()->make(NetworkRule::class);
-                $networkRule->fill($rule);
-                $networkRule->source = $collector->ip_address;
-                $networkRule->networkPolicy()->associate($this->model);
-                $networkRule->save();
-                foreach ($rule['ports'] as $port) {
-                    $networkRulePort = app()->make(NetworkRulePort::class);
-                    $networkRulePort->fill($port);
-                    $networkRulePort->networkRule()->associate($networkRule);
-                    $networkRulePort->save();
-                }
-                $this->model->syncSave();
+            $ipAddresses[] = $collector->ipAddress;
+        }
+        $ipAddresses = implode(',', $ipAddresses);
+
+        $rules = config('firewall.system.rules');
+        foreach ($rules as $rule) {
+            $networkRule = app()->make(NetworkRule::class);
+            $networkRule->fill($rule);
+            $networkRule->source = $ipAddresses;
+            $networkRule->networkPolicy()->associate($this->model);
+            $networkRule->save();
+            foreach ($rule['ports'] as $port) {
+                $networkRulePort = app()->make(NetworkRulePort::class);
+                $networkRulePort->fill($port);
+                $networkRulePort->networkRule()->associate($networkRule);
+                $networkRulePort->save();
             }
+            $this->model->syncSave();
         }
     }
 }
