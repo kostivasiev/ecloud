@@ -12,7 +12,7 @@ return [
         ],
         'dev' => [
             'to' => [
-                'paul.mcnally@ukfast.co.uk'
+                'paul.mcnally@ans.co.uk'
             ]
         ]
     ],
@@ -21,8 +21,8 @@ return [
     ],
     'health' => [
         'to' => [
-            'gavin.taylor@ukfast.co.uk',
-            'lee.spottiswood@ukfast.co.uk',
+            'gavin.taylor@ans.co.uk',
+            'lee.spottiswood@ans.co.uk',
         ]
     ]
 ];
