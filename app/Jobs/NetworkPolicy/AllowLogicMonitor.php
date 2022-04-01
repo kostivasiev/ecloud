@@ -6,7 +6,6 @@ use App\Jobs\Job;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
-use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
@@ -66,15 +65,14 @@ class AllowLogicMonitor extends Job
             $networkRule = app()->make(NetworkRule::class);
             $networkRule->fill($rule);
             $networkRule->source = $ipAddresses;
-            $networkRule->networkPolicy()->associate($this->model);
-            $networkRule->save();
+            $this->model->networkRules()->save($networkRule);
+
             foreach ($rule['ports'] as $port) {
                 $networkRulePort = app()->make(NetworkRulePort::class);
                 $networkRulePort->fill($port);
                 $networkRulePort->networkRule()->associate($networkRule);
                 $networkRulePort->save();
             }
-            $this->model->syncSave();
         }
     }
 }

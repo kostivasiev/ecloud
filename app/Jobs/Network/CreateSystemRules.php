@@ -16,7 +16,6 @@ class CreateSystemRules extends TaskJob
     {
         $network = $this->task->resource;
         $router = $network->router;
-        $advancedNetworking = $router->vpc->advanced_networking;
 
         // identify LM collector for target AZ from monitoring API
         $client = app()->make(AdminClient::class)
@@ -38,27 +37,37 @@ class CreateSystemRules extends TaskJob
 
         // Create firewall rule in system policy allowing inbound traffic from the collector
         $firewallPolicy = $router->firewallPolicies()->where('name', '=', 'System')->first();
+
+        if (!$firewallPolicy) {
+            $this->info('System policy not found', [
+                'network_id' => $network->id,
+                'router_id' => $router->id,
+            ]);
+            return;
+        }
         $policyRules = config('firewall.system.rules');
 
+        $ipAddresses = [];
         foreach ($collectors as $collector) {
-            // now we have the ip address
-            foreach ($policyRules as $rule) {
-                $firewallRule = app()->make(FirewallRule::class);
-                $firewallRule->fill($rule);
-                $firewallRule->source = $collector->ip_address;
-                $firewallRule->firewallPolicy()->associate($firewallPolicy);
-                $firewallRule->save();
-
-                foreach ($rule['ports'] as $port) {
-                    $firewallRulePort = app()->make(FirewallRulePort::class);
-                    $firewallRulePort->fill($port);
-                    $firewallRulePort->firewallRule()->associate($firewallRule);
-                    $firewallRulePort->save();
-                }
-                $firewallPolicy->syncSave();
-            }
+            $ipAddresses[] = $collector->ipAddress;
         }
+        $ipAddresses = implode(',', $ipAddresses);
 
-        // if advanced_networking create network rule in system policy allowing inbound traffic from the collector
+        // now we have the ip address
+        foreach ($policyRules as $rule) {
+            $firewallRule = app()->make(FirewallRule::class);
+            $firewallRule->fill($rule);
+            $firewallRule->source = $ipAddresses;
+            $firewallRule->firewallPolicy()->associate($firewallPolicy);
+            $firewallRule->save();
+
+            foreach ($rule['ports'] as $port) {
+                $firewallRulePort = app()->make(FirewallRulePort::class);
+                $firewallRulePort->fill($port);
+                $firewallRulePort->firewallRule()->associate($firewallRule);
+                $firewallRulePort->save();
+            }
+            $firewallPolicy->syncSave();
+        }
     }
 }

@@ -35,14 +35,14 @@ class Update extends Job
                     '/infra/domains/default/groups/'
                 ),
                 new CreateDefaultNetworkRules($this->task->resource, $this->task->data),
-                new DeployNetworkPolicy($this->task->resource),
                 new AllowLogicMonitor($this->task->resource),
+                new DeployNetworkPolicy($this->task->resource),
                 new UndeployTrashedRules($this->task->resource),
                 new DeployCheck(
                     $this->task->resource,
                     $this->task->resource->network->router->availabilityZone,
                     '/infra/domains/default/security-policies/'
-                )
+                ),
             ]
         ])->dispatch();
     }

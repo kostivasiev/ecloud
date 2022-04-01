@@ -36,7 +36,7 @@ class AllowLogicMonitorTest extends TestCase
     public function testNoAdvancedNetworkingFails()
     {
         $this->getAdminClientMock();
-        dispatch(new AllowLogicMonitor($this->networkPolicy()));
+        dispatch(new AllowLogicMonitor($this->networkPolicy(), $this->task));
 
         $networkRule = $this->networkPolicy()
             ->networkRules()
@@ -50,7 +50,7 @@ class AllowLogicMonitorTest extends TestCase
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
         $this->getAdminClientMock(true);
-        dispatch(new AllowLogicMonitor($this->networkPolicy()));
+        dispatch(new AllowLogicMonitor($this->networkPolicy(), $this->task));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -66,7 +66,7 @@ class AllowLogicMonitorTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
         $this->getAdminClientMock();
-        dispatch(new AllowLogicMonitor($this->networkPolicy()));
+        dispatch(new AllowLogicMonitor($this->networkPolicy(), $this->task));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -109,12 +109,12 @@ class AllowLogicMonitorTest extends TestCase
                             return [
                                 new Collector([
                                     'name' => 'Collector Display Name',
-                                    'datacentre_id' => 4,
+                                    'datacentreId' => 4,
                                     'datacentre' => 'MAN4',
-                                    'ip_address' => '123.123.123.123',
-                                    'is_shared' => true,
-                                    'created_at' => '2020-01-01T10:30:00+00:00',
-                                    'updated_at' => '2020-01-01T10:30:00+00:00'
+                                    'ipAddress' => '123.123.123.123',
+                                    'isShared' => true,
+                                    'createdAt' => '2020-01-01T10:30:00+00:00',
+                                    'updatedAt' => '2020-01-01T10:30:00+00:00'
                                 ])
                             ];
                         });
