@@ -25,7 +25,7 @@ class CreateSystemRules extends TaskJob
             'is_shared' => true,
         ]);
 
-        if (count($collectors) < 0) {
+        if (empty($collectors)) {
             $this->info('No Collector found for datacentre', [
                 'availability_zone_id' => $router->availabilityZone->id,
                 'network_id' => $network->id,
