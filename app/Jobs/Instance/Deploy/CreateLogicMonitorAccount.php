@@ -34,7 +34,7 @@ class CreateLogicMonitorAccount extends Job
 
         $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
         if (!empty($accounts)) {
-            $this->saveLogicMonitorAccountId($accounts[0]->id);
+            $this->task->updateData('logic_monitor_account_id', $accounts[0]->id);
             Log::info($this::class . ' : Logic Monitor account already exists, skipping', [
                 'logic_monitor_account_id' => $accounts[0]->id
             ]);
@@ -53,15 +53,7 @@ class CreateLogicMonitorAccount extends Job
         ]));
 
         $id = $response->getId();
-        $this->saveLogicMonitorAccountId($id);
+        $this->task->updateData('logic_monitor_account_id', $id);
         Log::info($this::class . ' : Logic Monitor account created: ' . $id);
-    }
-
-    protected function saveLogicMonitorAccountId($id)
-    {
-        $deploy_data = $this->task->resource->deploy_data;
-        $deploy_data['logic_monitor_account_id'] = $id;
-        $this->task->resource->deploy_data = $deploy_data;
-        $this->task->resource->save();
     }
 }

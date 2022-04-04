@@ -6,10 +6,8 @@ use App\Jobs\Instance\Deploy\RegisterLogicMonitorDevice;
 use App\Models\V2\Credential;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
-use UKFast\Admin\Devices\Entities\Device;
 use UKFast\Admin\Monitoring\AdminClient;
 use UKFast\Admin\Monitoring\Entities\Collector;
 use UKFast\SDK\Page;
@@ -42,17 +40,14 @@ class RegisterLogicMonitorDeviceTest extends TestCase
         Event::fake([JobFailed::class, JobProcessed::class]);
 
         $this->instanceModel()->setAttribute('deploy_data', [
-            'floating_ip_id' => $this->floatingIp()->id
-        ])->saveQuietly();
+            'floating_ip_id' => $this->floatingIp()->id,
+        ])
+            ->setAttribute('device_id', 'some-device-id')
+            ->saveQuietly();
 
         app()->bind(AdminClient::class, function () {
-            $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
-            $mockAdminMonitoringClient->expects('devices->getAll')->andReturnUsing(function () {
-                return [
-                    new Device()
-                ];
-            });
-            $mockAdminMonitoringClient->shouldNotReceive('collectors->getPage');
+            $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class)->makePartial();
+            $mockAdminMonitoringClient->allows('collectors->getPage')->andThrow(\Exception::class, 'This should not be called');
             return $mockAdminMonitoringClient;
         });
 
@@ -76,8 +71,6 @@ class RegisterLogicMonitorDeviceTest extends TestCase
 
         app()->bind(AdminClient::class, function () {
             $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
-            // Device does not already exist
-            $mockAdminMonitoringClient->expects('devices->getAll')->andReturn([]);
             // Get collector ID (empty collection / no collector)
             $mockAdminMonitoringClient->expects('collectors->getPage')->andReturnUsing(function () {
                 $page = \Mockery::mock(Page::class)->makePartial();
@@ -90,7 +83,9 @@ class RegisterLogicMonitorDeviceTest extends TestCase
         });
 
         dispatch(new RegisterLogicMonitorDevice(
-            $this->createSyncUpdateTask($this->instanceModel())
+            $this->createSyncUpdateTask($this->instanceModel(), [
+                'logic_monitor_account_id' => 'some-account-id'
+            ])
         ));
 
         Event::assertNotDispatched(JobFailed::class);
@@ -109,8 +104,6 @@ class RegisterLogicMonitorDeviceTest extends TestCase
 
         app()->bind(AdminClient::class, function () {
             $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
-            // Device does not already exist
-            $mockAdminMonitoringClient->expects('devices->getAll')->andReturn([]);
             // Get collector ID
             $mockAdminMonitoringClient->expects('collectors->getPage')->andReturnUsing(function () {
                 $page = \Mockery::mock(Page::class)->makePartial();
@@ -133,9 +126,9 @@ class RegisterLogicMonitorDeviceTest extends TestCase
             return $mockAdminMonitoringClient;
         });
 
-        $task = $this->createSyncUpdateTask($this->instanceModel());
-
-        $task->setAttribute('data', ['logic_monitor_account_id' => 321])->saveQuietly();
+        $task = $this->createSyncUpdateTask($this->instanceModel(), [
+            'logic_monitor_account_id' => 'some-account-id'
+        ]);
 
         dispatch(new RegisterLogicMonitorDevice($task));
 
@@ -148,13 +141,10 @@ class RegisterLogicMonitorDeviceTest extends TestCase
 
         $this->instanceModel()->setAttribute('deploy_data', [
             'floating_ip_id' => $this->floatingIp()->id,
-            'logic_monitor_account_id' => 321
         ])->saveQuietly();
 
         app()->bind(AdminClient::class, function () {
             $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
-            // Device does not already exist
-            $mockAdminMonitoringClient->expects('devices->getAll')->andReturn([]);
             // Get collector ID
             $mockAdminMonitoringClient->expects('collectors->getPage')->andReturnUsing(function () {
                 $page = \Mockery::mock(Page::class)->makePartial();
@@ -183,7 +173,9 @@ class RegisterLogicMonitorDeviceTest extends TestCase
             return $mockAdminMonitoringClient;
         });
 
-        $task = $this->createSyncUpdateTask($this->instanceModel());
+        $task = $this->createSyncUpdateTask($this->instanceModel(), [
+            'logic_monitor_account_id' => 'some-account-id'
+        ]);
 
         $credential = app()->make(Credential::class);
         $credential->fill([
@@ -200,6 +192,6 @@ class RegisterLogicMonitorDeviceTest extends TestCase
 
         $this->instanceModel()->refresh();
 
-        $this->assertEquals('device-123', $this->instanceModel()->deploy_data['logic_monitor_device_id']);
+        $this->assertEquals('device-123', $this->instanceModel()->device_id);
     }
 }

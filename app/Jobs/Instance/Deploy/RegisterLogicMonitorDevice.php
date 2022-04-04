@@ -31,22 +31,19 @@ class RegisterLogicMonitorDevice extends Job
             return;
         }
 
-        $floatingIp = FloatingIp::find($instance->deploy_data['floating_ip_id']);
-        if (!$floatingIp) {
-            $this->fail(new \Exception('Failed to load floating IP for instance', [
-                'instance_id' => $instance->id,
-                'floating_ip_id' => $instance->deploy_data['floating_ip_id']
-            ]));
+        if (!empty($instance->device_id)) {
+            Log::info($this::class . ' : The device is already registered, skipping');
             return;
         }
 
-        $device = $adminMonitoringClient->devices()->getAll([
-            'reference_type' => 'server',
-            'reference_id:eq' => $instance->id
-        ]);
+        $floatingIp = FloatingIp::find($instance->deploy_data['floating_ip_id']);
+        if (!$floatingIp) {
+            $this->fail(new \Exception('Failed to load floating IP ' . $instance->deploy_data['floating_ip_id'] . ' for instance ' . $instance->id));
+            return;
+        }
 
-        if (!empty($device)) {
-            Log::info($this::class . ' : The device is already registered, skipping');
+        if (empty($this->task->data['logic_monitor_account_id'])) {
+            $this->fail(new \Exception('Logic monitor account ID was not found in task data'));
             return;
         }
 
@@ -79,7 +76,7 @@ class RegisterLogicMonitorDevice extends Job
             'collector_id' => $collector->id,
             'display_name' => $instance->name,
             'tier_id' => '8485a243-8a83-11ec-915e-005056ad1662', // This is the free tier from Monitoring APIO
-            'account_id' => $instance->deploy_data['logic_monitor_account_id'],
+            'account_id' => $this->task->data['logic_monitor_account_id'],
             'ip_address' => $floatingIp->getIPAddress(),
             'snmp_community' => 'public',
             'platform' => $instance->platform,
@@ -87,12 +84,10 @@ class RegisterLogicMonitorDevice extends Job
             'password' => $logicMonitorCredentials->password,
         ]));
 
-        $deploy_data = $instance->deploy_data;
-        $deploy_data['logic_monitor_device_id'] = $response->getId();
-        $instance->deploy_data = $deploy_data;
+        $instance->device_id = $response->getId();
         $instance->save();
 
-        Log::info($this::class . ' : Logic Monitor device registered : ' . $deploy_data['logic_monitor_device_id'], [
+        Log::info($this::class . ' : Logic Monitor device registered : ' . $instance->device_id, [
             'instance_id' => $instance->id
         ]);
     }
