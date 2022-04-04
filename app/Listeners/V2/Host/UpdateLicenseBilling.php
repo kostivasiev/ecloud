@@ -7,11 +7,16 @@ use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Host;
 use App\Support\Sync;
+use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateLicenseBilling implements Billable
 {
+    use BillableListener;
+
+    const RESOURCE = Host::class;
+
     /**
      * @param Updated $event
      * @return void
@@ -19,21 +24,10 @@ class UpdateLicenseBilling implements Billable
      */
     public function handle(Updated $event)
     {
-        $task = $event->model;
-
-        if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
-
-        if (!$event->model->completed) {
-            return;
-        }
-
-        if (!($task->resource instanceof Host)) {
-            return;
-        }
-
-        $host = $task->resource;
+        $host = $event->model->resource;
 
         if (!$host->hostGroup->windows_enabled) {
             return;

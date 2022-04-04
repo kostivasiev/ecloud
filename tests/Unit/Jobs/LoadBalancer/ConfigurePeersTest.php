@@ -19,26 +19,47 @@ class ConfigurePeersTest extends TestCase
     {
         parent::setUp();
         $this->loadBalancer()->setAttribute('config_id', 123456)->saveQuietly();
-        app()->bind(AdminClient::class, function () {
-            $mock = \Mockery::mock(AdminClient::class)->makePartial();
-            $mock->allows('setResellerId')->andReturnSelf();
-            $mock->allows('clusters')->andReturnUsing(function () {
-                $clusterMock = \Mockery::mock(AdminClusterClient::class)->makePartial();
-                $clusterMock->allows('configurePeers')
-                    ->with($this->loadBalancer()->config_id)
-                    ->andReturnTrue();
-                return $clusterMock;
-            });
-            return $mock;
-        });
     }
 
     public function testSuccessful()
     {
         $task = $this->createSyncUpdateTask($this->loadBalancer());
+        $task->setAttribute('data', ['loadbalancer_node_ids' => 'foo'])->saveQuietly();
+
         Event::fake([JobFailed::class, Created::class]);
 
+        $adminLoadBalancersClient = \Mockery::mock(AdminClient::class)->makePartial();
+        $adminLoadBalancersClient->expects('setResellerId')->andReturnSelf();
+        $adminLoadBalancersClient->expects('clusters')->andReturnUsing(function () {
+            $adminClusterClient = \Mockery::mock(AdminClusterClient::class)->makePartial();
+            $adminClusterClient->expects('configurePeers')
+                ->with($this->loadBalancer()->config_id)
+                ->andReturnTrue();
+            return $adminClusterClient;
+        });
+
+        app()->bind(AdminClient::class, function () use ($adminLoadBalancersClient) {
+            return $adminLoadBalancersClient;
+        });
+
         dispatch(new ConfigurePeers($task));
+        Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testNoNodesCreatedSkips()
+    {
+        $task = $this->createSyncUpdateTask($this->loadBalancer());
+        Event::fake([JobFailed::class, Created::class]);
+
+        $adminLoadBalancersClient = \Mockery::mock(AdminClient::class)->makePartial();
+        $adminLoadBalancersClient->shouldNotReceive('setResellerId');
+
+        app()->bind(AdminClient::class, function () use ($adminLoadBalancersClient) {
+            return $adminLoadBalancersClient;
+        });
+
+        dispatch(new ConfigurePeers($task));
+
         Event::assertNotDispatched(JobFailed::class);
     }
 }

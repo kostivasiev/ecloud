@@ -15,7 +15,7 @@ class UpdateBillingTest extends TestCase
 
     public function testBilling()
     {
-        $task = Model::withoutEvents(function() {
+        $task = Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'sync-1',
                 'completed' => true,

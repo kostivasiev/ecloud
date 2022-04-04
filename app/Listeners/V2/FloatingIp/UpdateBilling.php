@@ -8,12 +8,17 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Task;
 use App\Support\Sync;
+use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class UpdateBilling implements Billable
 {
+    use BillableListener;
+
+    const RESOURCE = FloatingIp::class;
+
     /**
      * @param Updated $event
      * @return void
@@ -21,26 +26,11 @@ class UpdateBilling implements Billable
      */
     public function handle(Updated $event)
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
-
-        if (!($event->model instanceof Task)) {
-            return;
-        }
-
-        if (!$event->model->completed) {
-            return;
-        }
-
-        if ($event->model->name != Sync::TASK_NAME_UPDATE) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
 
         $floatingIp = $event->model->resource;
-
-        if (get_class($floatingIp) != FloatingIp::class) {
-            return;
-        }
-
         $currentActiveMetric = BillingMetric::getActiveByKey($floatingIp, self::getKeyName());
 
         if (!empty($currentActiveMetric)) {

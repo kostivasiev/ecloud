@@ -8,41 +8,23 @@ use App\Models\V2\Product;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Support\Sync;
+use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class UpdateBilling implements Billable
 {
+    use BillableListener;
+
+    const RESOURCE = Router::class;
+
     public function handle($event)
     {
-        Log::info(get_class($this) . ' : Started', ['id' => $event->model->id]);
-
-        $model = $event->model;
-        if ($model instanceof Task) {
-            if ($event->model->name !== Sync::TASK_NAME_UPDATE) {
-                return;
-            }
-
-            if (!$model->completed) {
-                return;
-            }
-
-            if (get_class($event->model->resource) != Router::class) {
-                return;
-            }
-
-            $model = $event->model->resource;
-        }
-
-        if (!($model instanceof Router)) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
-
-        // If is management router, don't add a billing entry
-        if ($model->isManaged()) {
-            return;
-        }
+        $model = $event->model->resource;
 
         $time = Carbon::now();
 
