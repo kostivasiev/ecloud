@@ -15,7 +15,8 @@ class Update extends Task
     {
         return [
             AwaitRouterSync::class,
-            CreateSystemRules::class,
+//            CreateSystemRules::class,
+        // create lm network policy rule
             Deploy::class,
             DeploySecurityProfile::class,
             DeployDiscoveryProfile::class,

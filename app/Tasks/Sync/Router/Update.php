@@ -20,6 +20,7 @@ class Update extends Task
             Deploy::class,
             DeployRouterLocale::class,
             CreateSystemPolicy::class,
+            // Create LM policy rule (collector)
             DeployRouterDefaultRule::class,
             CreateDhcp::class,
             AwaitDhcpSync::class,
