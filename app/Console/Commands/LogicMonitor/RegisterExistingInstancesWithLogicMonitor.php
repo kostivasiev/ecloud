@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands\LogicMonitor;
 
+use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\Router;
@@ -39,17 +41,65 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $routers = Router::withoutTrashed()->get();
 
         foreach ($routers as $router) {
-            if ($router->firewallPolicies()->count() < 1) {
-                //create policy
+            /* TODO: ?check LM rule exists, if does then skip */
+
+            $network = $router->network();
+            // identify LM collector for target AZ from monitoring API
+            $client = $adminMonitoringClient
+                ->setResellerId($router->getResellerId());
+
+            //check for collector in routers AZ, if none then skip
+            $collectors = $client->collectors()->getAll([
+                'datacentre_id' => $router->availabilityZone->datacentre_site_id,
+                'is_shared' => true,
+            ]);
+
+            if (empty($collectors)) {
+                $this->info('No Collector found for datacentre', [
+                    'availability_zone_id' => $router->availabilityZone->id,
+                    'network_id' => $network->id,
+                    'router_id' => $router->id,
+                    'datacentre_site_id' => $router->availabilityZone->datacentre_site_id,
+                ]);
+
+                break;
             }
 
-            /**
-            check LM rule exists, if does then skip
+            // Create firewall rule in system policy allowing inbound traffic from the collector
+            $firewallPolicy = $router->firewallPolicies()->where('name', '=', 'System')->first();
 
-            check for collector in routers AZ, if none then skip
+            if (!$firewallPolicy) {
+                $this->info('System policy not found', [
+                    'network_id' => $network->id,
+                    'router_id' => $router->id,
+                ]);
 
-            create LM rule to open ports inbound from collectors IP
-             */
+                break;
+            }
+            $policyRules = config('firewall.system.rules');
+
+            $ipAddresses = [];
+            foreach ($collectors as $collector) {
+                $ipAddresses[] = $collector->ipAddress;
+            }
+            $ipAddresses = implode(',', $ipAddresses);
+
+            //  create LM rule to open ports inbound from collectors IP
+            foreach ($policyRules as $rule) {
+                $firewallRule = app()->make(FirewallRule::class);
+                $firewallRule->fill($rule);
+                $firewallRule->source = $ipAddresses;
+                $firewallRule->firewallPolicy()->associate($firewallPolicy);
+                $firewallRule->save();
+
+                foreach ($rule['ports'] as $port) {
+                    $firewallRulePort = app()->make(FirewallRulePort::class);
+                    $firewallRulePort->fill($port);
+                    $firewallRulePort->firewallRule()->associate($firewallRule);
+                    $firewallRulePort->save();
+                }
+                $firewallPolicy->syncSave();
+            }
         }
 
         $instances = Instance::withoutTrashed()->get();
