@@ -11,6 +11,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use App\Models\V2\Router;
+use App\Services\V2\PasswordService;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Log;
@@ -37,12 +38,14 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
     protected $description = 'Command description';
 
     private $policyRules = null;
+    private $passwordService;
 
-    public function __construct()
+    public function __construct(PasswordService $passwordService)
     {
         parent::__construct();
 
         $this->policyRules = config('firewall.system.rules');
+        $this->passwordService = $passwordService;
     }
 
     /**
@@ -50,8 +53,10 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      *
      * @return int
      */
-    public function handle(MonitoringAdminClient $adminMonitoringClient, AccountAdminClient $accountAdminClient)
-    {
+    public function handle(
+        MonitoringAdminClient $adminMonitoringClient,
+        AccountAdminClient $accountAdminClient
+    ) {
         $routers = Router::withoutTrashed()->get();
 
         foreach ($routers as $router) {
@@ -64,7 +69,12 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             })->first();
 
             if (!$systemPolicy) {
-                $this->createSystemPolicy($router);
+                try {
+                    $this->createSystemPolicy($router);
+                } catch (\Exception $exception) {
+                    //error creating system policy
+                    break;
+                }
             }
 
             // check for collector in routers AZ, if none then skip
@@ -165,9 +175,11 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                 ->where('username', 'lm.' . $instance->id)
                 ->first();
             if (!$logicMonitorCredentials) {
-                $logicMonitorCredentials = $this->createLMCredentials($instance);
+                if (!($logicMonitorCredentials = $this->createLMCredentials($instance))) {#
+                    //cant get guest admin credentials
+                    break;
+                }
             }
-
 
             // check account exists for customer, if not then create
             $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
@@ -267,14 +279,45 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
 
     /**
      * @param $instance
-     * @return Credential
+     * @return Credential|bool
      * @throws BindingResolutionException
      */
-    private function createLMCredentials($instance): Credential
+    private function createLMCredentials($instance)
     {
+        $guestAdminCredential = $instance->getGuestAdminCredentials();
+
+        if (!$guestAdminCredential) {
+            $message = get_class($this) . ' : Failed for ' . $instance->id . ', no admin credentials found';
+            Log::error($message);
+
+            return false;
+        }
+
+        list($username, $password, $hidden, $sudo) =
+            ['lm.' . $instance->id, $this->passwordService->generate(24), true, false];
         $credential = app()->make(Credential::class);
-        $credential->fill(['username' => 'lm.' . $instance->id,]);
-        $instance->credentials()->save($credential);
+        $credential->fill([
+            'name' => $username,
+            'resource_id' => $instance->id,
+            'username' => $username,
+            'is_hidden' => $hidden,
+            'port' => '2020',
+        ]);
+        $credential->password = $password;
+        $credential->save();
+
+        $instance->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
+            [
+                'json' => [
+                    'targetUsername' => $username,
+                    'targetPassword' => $credential->password,
+                    'targetSudo' => $sudo,
+                    'username' => $guestAdminCredential->username,
+                    'password' => $guestAdminCredential->password,
+                ],
+            ]
+        );
 
         return $credential;
     }
