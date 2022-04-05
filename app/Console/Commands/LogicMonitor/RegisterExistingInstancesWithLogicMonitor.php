@@ -185,7 +185,6 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                 break;
             }
 
-
             // check if LM creds exist, if not create
             $availabilityZone = $instance->availabilityZone;
 
