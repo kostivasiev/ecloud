@@ -87,7 +87,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             }
 
             // check LM rule exists, if does then skip
-            if (!$this->hasRule($firewallPolicy, $this->policyRules[0])) {
+            if (!$this->hasSystemRule($firewallPolicy)) {
                 foreach ($this->policyRules as $rule) {
                     $firewallRule = app()->make(FirewallRule::class);
                     $firewallRule->fill($rule);
@@ -112,10 +112,8 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                     $ipAddresses[] = $collector->ipAddress;
                 }
                 $ipAddresses = implode(',', $ipAddresses);
-                $rules = config('firewall.system.rules');
-
-                if (!$this->hasRule($policy, $rules[0])) {
-                    foreach ($rules as $rule) {
+                if (!$this->hasSystemRule($policy)) {
+                    foreach ($this->policyRules as $rule) {
                         $networkRule = app()->make(NetworkRule::class);
                         $networkRule->fill($rule);
                         $networkRule->source = $ipAddresses;
@@ -264,8 +262,8 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      * @param FirewallPolicy $firewallPolicy
      * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
-    private function hasRule(FirewallPolicy $firewallPolicy, $rule)
+    private function hasSystemRule(FirewallPolicy $firewallPolicy, $rule)
     {
-        return $firewallPolicy->where($rule)->count() > 0;
+        return $firewallPolicy->where('name', 'System')->count() > 0;
     }
 }
