@@ -19,9 +19,7 @@ class CreateCollectorRules extends TaskJob
         $router = $this->task->resource;
 
         if ($router->isManaged()) {
-            $this->info('Router is management resource', [
-                'router_id' => $router->id,
-            ]);
+            $this->info('Router is management resource, skipping');
             return;
         }
 
@@ -36,7 +34,6 @@ class CreateCollectorRules extends TaskJob
         if (empty($collectors)) {
             $this->info('No Collector found for datacentre', [
                 'availability_zone_id' => $router->availabilityZone->id,
-                'router_id' => $router->id,
                 'datacentre_site_id' => $router->availabilityZone->datacentre_site_id,
             ]);
             return;

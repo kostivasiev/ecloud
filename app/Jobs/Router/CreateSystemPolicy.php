@@ -26,9 +26,7 @@ class CreateSystemPolicy extends TaskJob
             return;
         }
 
-        $this->info('Create System Policy and Rules Start', [
-            'router_id' => $router->id,
-        ]);
+        $this->info('Create System Policy and Rules Start');
 
         $policyConfig = config('firewall.system');
 
@@ -39,9 +37,7 @@ class CreateSystemPolicy extends TaskJob
 
         $this->task->updateData('system_firewall_policy_id', $firewallPolicy->id);
 
-        $this->info('Create System Policy and Rules End', [
-            'router_id' => $router->id,
-        ]);
+        $this->info('Create System Policy and Rules End');
 
         $this->awaitSyncableResources([
             $firewallPolicy->id,
