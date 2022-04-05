@@ -2,10 +2,13 @@
 
 namespace App\Console\Commands\LogicMonitor;
 
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
+use App\Models\V2\NetworkRule;
+use App\Models\V2\NetworkRulePort;
 use App\Models\V2\Router;
 use Illuminate\Console\Command;
 use Log;
@@ -31,6 +34,15 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      */
     protected $description = 'Command description';
 
+    private $policyRules = null;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->policyRules = config('firewall.system.rules');
+    }
+
     /**
      * Execute the console command.
      *
@@ -41,8 +53,6 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $routers = Router::withoutTrashed()->get();
 
         foreach ($routers as $router) {
-            /* TODO: ?check LM rule exists, if does then skip */
-
             $network = $router->network();
             // identify LM collector for target AZ from monitoring API
             $client = $adminMonitoringClient
@@ -65,40 +75,56 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                 break;
             }
 
+            foreach ($network->policies() as $policy) {
+                $ipAddresses = [];
+                foreach ($collectors as $collector) {
+                    $ipAddresses[] = $collector->ipAddress;
+                }
+                $ipAddresses = implode(',', $ipAddresses);
+                $rules = config('firewall.system.rules');
+
+                if (!$this->hasRule($policy, $rules[0])) {
+                    foreach ($rules as $rule) {
+                        $networkRule = app()->make(NetworkRule::class);
+                        $networkRule->fill($rule);
+                        $networkRule->source = $ipAddresses;
+                        $network->networkRules()->save($networkRule);
+
+                        foreach ($rule['ports'] as $port) {
+                            $networkRulePort = app()->make(NetworkRulePort::class);
+                            $networkRulePort->fill($port);
+                            $networkRulePort->networkRule()->associate($networkRule);
+                            $networkRulePort->save();
+                        }
+                    }
+                }
+            }
+
             // Create firewall rule in system policy allowing inbound traffic from the collector
+            /** @var FirewallPolicy $firewallPolicy */
             $firewallPolicy = $router->firewallPolicies()->where('name', '=', 'System')->first();
 
             if (!$firewallPolicy) {
-                $this->info('System policy not found', [
-                    'network_id' => $network->id,
-                    'router_id' => $router->id,
-                ]);
-
-                break;
+                $firewallPolicy = $this->createSystemPolicy($router);
             }
-            $policyRules = config('firewall.system.rules');
 
-            $ipAddresses = [];
-            foreach ($collectors as $collector) {
-                $ipAddresses[] = $collector->ipAddress;
-            }
-            $ipAddresses = implode(',', $ipAddresses);
+            //  check if these rules exist, if they do, dont make
+            if (!$this->hasRule($firewallPolicy, $this->policyRules[0])) {
+                foreach ($this->policyRules as $rule) {
+                    $firewallRule = app()->make(FirewallRule::class);
+                    $firewallRule->fill($rule);
+                    $firewallRule->source = $ipAddresses;
+                    $firewallRule->firewallPolicy()->associate($firewallPolicy);
+                    $firewallRule->save();
 
-            //  create LM rule to open ports inbound from collectors IP
-            foreach ($policyRules as $rule) {
-                $firewallRule = app()->make(FirewallRule::class);
-                $firewallRule->fill($rule);
-                $firewallRule->source = $ipAddresses;
-                $firewallRule->firewallPolicy()->associate($firewallPolicy);
-                $firewallRule->save();
-
-                foreach ($rule['ports'] as $port) {
-                    $firewallRulePort = app()->make(FirewallRulePort::class);
-                    $firewallRulePort->fill($port);
-                    $firewallRulePort->firewallRule()->associate($firewallRule);
-                    $firewallRulePort->save();
+                    foreach ($rule['ports'] as $port) {
+                        $firewallRulePort = app()->make(FirewallRulePort::class);
+                        $firewallRulePort->fill($port);
+                        $firewallRulePort->firewallRule()->associate($firewallRule);
+                        $firewallRulePort->save();
+                    }
+                    $firewallPolicy->syncSave();
                 }
-                $firewallPolicy->syncSave();
             }
         }
 
@@ -210,5 +236,19 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $instance->deploy_data = $deploy_data;
 
         return $instance->save();
+    }
+
+    private function createSystemPolicy($router)
+    {
+        //TODO: Unsure what default system policy details are.
+    }
+
+    /**
+     * @param FirewallPolicy $firewallPolicy
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    private function hasRule(FirewallPolicy $firewallPolicy, $rule)
+    {
+        return $firewallPolicy->where($rule)->count() > 0;
     }
 }
