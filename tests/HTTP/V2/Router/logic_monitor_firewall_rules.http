@@ -1,0 +1,108 @@
+### 1. Create a VPC with standard networking
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "Logic Monitor Test VPC",
+    "region_id": "{{dev_region_id}}"
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC Id : ' + response.body.data.id);
+%}
+
+### 2. Create a Router
+POST https://{{host}}/{{version}}/routers
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "logic monitor router 1",
+  "vpc_id": "{{vpc_id}}",
+  "availability_zone_id" : "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+    client.assert(response.status === 202, "Response status is not 201");
+    client.global.set('router_id', response.body.data.id);
+    client.log('Router ID: ' + response.body.data.id);
+});
+%}
+
+### 3. Create a VPC with Advanced Networking
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "Logic Monitor Test VPC",
+    "region_id": "{{dev_region_id}}",
+    "advanced_networking": true
+}
+
+> {%
+client.global.set('advanced_vpc_id', response.body.data.id);
+client.log('VPC Id : ' + response.body.data.id);
+%}
+
+### 4. Create a Router on Advanced Networking VPC
+POST https://{{host}}/{{version}}/routers
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "logic monitor advanced router 1",
+  "vpc_id": "{{advanced_vpc_id}}",
+  "availability_zone_id" : "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+    client.assert(response.status === 202, "Response status is not 201");
+    client.global.set('advanced_router_id', response.body.data.id);
+    client.log('Router ID: ' + response.body.data.id);
+});
+%}
+
+### 5. Delete the first router
+DELETE https://{{host}}/{{version}}/routers/{{router_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 6. Delete the first VPC
+DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 7. Delete the second router
+DELETE https://{{host}}/{{version}}/routers/{{advanced_router_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 8. Delete the second VPC
+DELETE https://{{host}}/{{version}}/vpcs/{{advanced_vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
