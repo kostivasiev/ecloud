@@ -146,6 +146,31 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                 break;
             }
 
+            // check if LM creds exist, if not create
+            $availabilityZone = $instance->availabilityZone;
+
+            $collectorsPage = $adminMonitoringClient->collectors()->getPage(1, 15, [
+                'datacentre_id' => $availabilityZone->datacentre_site_id,
+                'is_shared' => true
+            ]);
+
+            if ($collectorsPage->totalItems() < 1) {
+                Log::warning('Failed to load logic monitor collector for availability zone ' . $availabilityZone->id);
+                break;
+            }
+
+            $collector = $collectorsPage->getItems()[0];
+
+            $logicMonitorCredentials = $instance->credentials()
+                ->where('username', 'lm.' . $instance->id)
+                ->first();
+            if (!$logicMonitorCredentials) {
+                //TODO: Create LogicMonitorCredentials
+                Log::error(new \Exception('Failed to load logic monitor credentials for instance ' . $instance->id));
+                break;
+            }
+
+
             // check account exists for customer, if not then create
             $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
             if (!empty($accounts)) {
@@ -182,30 +207,6 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                     'instance_id' => $instance->id,
                     'floating_ip_id' => $instance->deploy_data['floating_ip_id']
                 ]));
-                break;
-            }
-
-            // check if LM creds exist, if not create
-            $availabilityZone = $instance->availabilityZone;
-
-            $collectorsPage = $adminMonitoringClient->collectors()->getPage(1, 15, [
-                'datacentre_id' => $availabilityZone->datacentre_site_id,
-                'is_shared' => true
-            ]);
-
-            if ($collectorsPage->totalItems() < 1) {
-                Log::warning('Failed to load logic monitor collector for availability zone ' . $availabilityZone->id);
-                break;
-            }
-
-            $collector = $collectorsPage->getItems()[0];
-
-            $logicMonitorCredentials = $instance->credentials()
-                ->where('username', 'lm.' . $instance->id)
-                ->first();
-            if (!$logicMonitorCredentials) {
-                //TODO: Create LogicMonitorCredentials
-                Log::error(new \Exception('Failed to load logic monitor credentials for instance ' . $instance->id));
                 break;
             }
 
