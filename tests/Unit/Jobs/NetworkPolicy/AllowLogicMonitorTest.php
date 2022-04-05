@@ -77,12 +77,13 @@ class AllowLogicMonitorTest extends TestCase
         $networkRule = $this->networkPolicy()->networkRules()->first();
         $networkRulePorts = $networkRule->networkRulePorts()->get();
 
+        $ruleConfig = config('firewall.collector.rules')[0];
         $this->assertEquals('123.123.123.123', $networkRule->source);
-        $this->assertEquals(config('firewall.system.rules')[0]['name'], $networkRule->name);
-        $this->assertEquals(config('firewall.system.rules')[0]['ports'][0]['protocol'], $networkRulePorts[0]->protocol);
-        $this->assertEquals(config('firewall.system.rules')[0]['ports'][1]['destination'], $networkRulePorts[1]->destination);
-        $this->assertEquals(config('firewall.system.rules')[0]['ports'][2]['destination'], $networkRulePorts[2]->destination);
-        $this->assertEquals(config('firewall.system.rules')[0]['ports'][3]['destination'], $networkRulePorts[3]->destination);
+        $this->assertEquals($ruleConfig['name'], $networkRule->name);
+        $this->assertEquals($ruleConfig['ports'][0]['protocol'], $networkRulePorts[0]->protocol);
+        $this->assertEquals($ruleConfig['ports'][1]['destination'], $networkRulePorts[1]->destination);
+        $this->assertEquals($ruleConfig['ports'][2]['destination'], $networkRulePorts[2]->destination);
+        $this->assertEquals($ruleConfig['ports'][3]['destination'], $networkRulePorts[3]->destination);
     }
 
 

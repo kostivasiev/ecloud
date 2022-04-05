@@ -5,6 +5,7 @@ namespace App\Tasks\Sync\Router;
 use App\Jobs\Router\AwaitDhcpSync;
 use App\Jobs\Router\CreateDhcp;
 use App\Jobs\Router\CreateSystemPolicy;
+use App\Jobs\Router\CreateCollectorRules;
 use App\Jobs\Router\Deploy;
 use App\Jobs\Router\DeployManagementInfrastructure;
 use App\Jobs\Router\DeployRouterDefaultRule;
@@ -20,7 +21,7 @@ class Update extends Task
             Deploy::class,
             DeployRouterLocale::class,
             CreateSystemPolicy::class,
-            // Create LM policy rule (collector)
+            CreateCollectorRules::class,
             DeployRouterDefaultRule::class,
             CreateDhcp::class,
             AwaitDhcpSync::class,

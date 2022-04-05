@@ -162,35 +162,41 @@ return [
         'name' => 'System',
         'sequence' => 0,
         'rules' => [
-//            [
-//                'name' => 'Collector_Rule',
-//                'action' => 'ALLOW',
-//                'sequence' => 0,
-//                'direction' => 'IN',
-//                'enabled' => true,
-//                'source' => 'ANY',
-//                'destination' => 'ANY',
-//                'ports' => [
-//                    [
-//                        'protocol' => 'ICMPv4'
-//                    ],
-//                    [
-//                        'protocol' => 'TCP',
-//                        'source' => 'ANY',
-//                        'destination' => 2020
-//                    ],
-//                    [
-//                        'protocol' => 'TCP',
-//                        'source' => 'ANY',
-//                        'destination' => 5986
-//                    ],
-//                    [
-//                        'protocol' => 'UDP',
-//                        'source' => 'ANY',
-//                        'destination' => 161
-//                    ]
-//                ]
-//            ]
+        ]
+    ],
+    'collector' => [
+        'name' => 'LM Collector',
+        'sequence' => 0,
+        'rules' => [
+            [
+                'name' => 'Collector_Rule',
+                'action' => 'ALLOW',
+                'sequence' => 0,
+                'direction' => 'IN',
+                'enabled' => true,
+                'source' => 'ANY',
+                'destination' => 'ANY',
+                'ports' => [
+                    [
+                        'protocol' => 'ICMPv4'
+                    ],
+                    [
+                        'protocol' => 'TCP',
+                        'source' => 'ANY',
+                        'destination' => 2020
+                    ],
+                    [
+                        'protocol' => 'TCP',
+                        'source' => 'ANY',
+                        'destination' => 5986
+                    ],
+                    [
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 161
+                    ]
+                ]
+            ]
         ]
     ]
 ];
