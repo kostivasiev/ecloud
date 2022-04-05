@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\LogicMonitor;
 
+use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
@@ -163,9 +164,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                 ->where('username', 'lm.' . $instance->id)
                 ->first();
             if (!$logicMonitorCredentials) {
-                //TODO: Create LogicMonitorCredentials
-                Log::error(new \Exception('Failed to load logic monitor credentials for instance ' . $instance->id));
-                break;
+                $logicMonitorCredentials = $this->createLMCredentials($instance);
             }
 
 
@@ -256,6 +255,15 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $systemPolicy->syncSave();
 
         return $systemPolicy;
+    }
+
+    private function createLMCredentials($instance)
+    {
+        $credential = app()->make(Credential::class);
+        $credential->fill(['username' => 'lm.' . $instance->id,]);
+        $instance->credentials()->save($credential);
+
+        return $credential;
     }
 
     /**
