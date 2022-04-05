@@ -12,6 +12,7 @@ use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use App\Models\V2\Router;
 use Illuminate\Console\Command;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Log;
 use UKFast\Admin\ManagedCloudflare\V1\AccountAdminClient;
 use UKFast\Admin\Monitoring\AdminClient as MonitoringAdminClient;
@@ -26,7 +27,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      *
      * @var string
      */
-    protected $signature = 'lm:register-instances';
+    protected $signature = 'lm:register-all-instances';
 
     /**
      * The console command description.
@@ -236,7 +237,12 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         return 0;
     }
 
-    protected function saveLogicMonitorAccountId($id, $instance)
+    /**
+     * @param $id
+     * @param $instance
+     * @return bool
+     */
+    protected function saveLogicMonitorAccountId($id, $instance): bool
     {
         $deploy_data = $instance->deploy_data;
         $deploy_data['logic_monitor_account_id'] = $id;
@@ -245,7 +251,11 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         return $instance->save();
     }
 
-    private function createSystemPolicy($router)
+    /**
+     * @param $router
+     * @throws BindingResolutionException
+     */
+    private function createSystemPolicy($router): void
     {
         $policyConfig = config('firewall.system');
 
@@ -253,11 +263,14 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $systemPolicy->fill($policyConfig);
         $systemPolicy->router_id = $router->id;
         $systemPolicy->syncSave();
-
-        return $systemPolicy;
     }
 
-    private function createLMCredentials($instance)
+    /**
+     * @param $instance
+     * @return Credential
+     * @throws BindingResolutionException
+     */
+    private function createLMCredentials($instance): Credential
     {
         $credential = app()->make(Credential::class);
         $credential->fill(['username' => 'lm.' . $instance->id,]);
@@ -268,9 +281,9 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
 
     /**
      * @param FirewallPolicy $firewallPolicy
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return bool
      */
-    private function hasSystemRule(FirewallPolicy $firewallPolicy, $rule)
+    private function hasSystemRule(FirewallPolicy $firewallPolicy): bool
     {
         return $firewallPolicy->where('name', 'System')->count() > 0;
     }
