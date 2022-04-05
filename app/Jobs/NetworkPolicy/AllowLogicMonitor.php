@@ -44,7 +44,7 @@ class AllowLogicMonitor extends Job
             'is_shared' => true,
         ]);
 
-        if (count($collectors) < 0) {
+        if (count($collectors) < 1) {
             Log::info('No Collector found for datacentre', [
                 'availability_zone_id' => $router->availabilityZone->id,
                 'network_id' => $network->id,
