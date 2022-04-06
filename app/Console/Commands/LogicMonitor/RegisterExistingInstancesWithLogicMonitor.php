@@ -63,19 +63,11 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         foreach ($networks as $network) {
             $router = $network->router;
 
-            // check 'system' policy exists, if not then create
-            /** @var FirewallPolicy $firewallPolicy */
-            $systemPolicy = $router->whereHas('firewallPolicies', function ($query) {
-                $query->where('name', '=', 'System');
-            })->first();
-
-            if (!$systemPolicy) {
-                try {
-                    $this->createSystemPolicy($router);
-                } catch (\Exception $exception) {
-                    //error creating system policy
-                    break;
-                }
+            try {
+                $this->createSystemPolicy($router);
+            } catch (\Exception $exception) {
+                //error creating system policy
+                break;
             }
 
             // check for collector in routers AZ, if none then skip
