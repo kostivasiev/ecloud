@@ -105,7 +105,7 @@ return [
             [
                 'name' => 'Logic Monitor Collector',
                 'action' => 'ALLOW',
-                'sequence' => 0,
+                'sequence' => 10002,
                 'direction' => 'IN',
                 'enabled' => true,
                 'source' => null,
