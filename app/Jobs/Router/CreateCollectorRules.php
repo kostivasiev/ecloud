@@ -39,11 +39,11 @@ class CreateCollectorRules extends TaskJob
             return;
         }
 
-        $policyConfig = config('firewall.collector');
-        $firewallPolicy = app()->make(FirewallPolicy::class);
-        $firewallPolicy->fill($policyConfig);
-        $firewallPolicy->router()->associate($router);
-        $firewallPolicy->save();
+        $firewallPolicy = FirewallPolicy::systemPolicy()->first();
+        if (!$firewallPolicy) {
+            $this->info('System policy not found');
+            return;
+        }
 
         $ipAddresses = [];
         foreach ($collectors as $collector) {
@@ -52,7 +52,7 @@ class CreateCollectorRules extends TaskJob
         $ipAddresses = implode(',', $ipAddresses);
 
         // now we have the ip address
-        foreach ($policyConfig['rules'] as $rule) {
+        foreach (config('firewall.rule_templates') as $rule) {
             $firewallRule = app()->make(FirewallRule::class);
             $firewallRule->fill($rule);
             $firewallRule->source = $ipAddresses;
