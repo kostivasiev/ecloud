@@ -32,6 +32,10 @@ class CreateDefaultNetworkRules extends Job
     {
         foreach (config('defaults.network_policy.rules') as $rule) {
             if (!$this->model->networkRules()->where('name', $rule['name'])->where('type', $rule['type'])->exists()) {
+                if ($this->model->network->isManaged() && $rule['name'] == 'Logic Monitor Collector') {
+                    Log::info(get_class($this) . ': Skipping management resource');
+                    continue;
+                }
                 $dhcpServerAddress = $this->model->network->getDhcpServerAddress()->toString();
                 $networkRule = app()->make(NetworkRule::class);
                 $networkRule->fill($rule);

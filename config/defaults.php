@@ -101,6 +101,35 @@ return [
                 'direction' => 'IN_OUT',
                 'enabled' => true,
                 'type' => NetworkRule::TYPE_CATCHALL,
+            ],
+            [
+                'name' => 'Logic Monitor Collector',
+                'action' => 'ALLOW',
+                'sequence' => 0,
+                'direction' => 'IN',
+                'enabled' => true,
+                'source' => null,
+                'destination' => 'ANY',
+                'ports' => [
+                    [
+                        'protocol' => 'ICMPv4'
+                    ],
+                    [
+                        'protocol' => 'TCP',
+                        'source' => 'ANY',
+                        'destination' => 2020
+                    ],
+                    [
+                        'protocol' => 'TCP',
+                        'source' => 'ANY',
+                        'destination' => 5986
+                    ],
+                    [
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 161
+                    ]
+                ]
             ]
         ]
     ],
