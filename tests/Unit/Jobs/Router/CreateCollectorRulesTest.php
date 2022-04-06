@@ -29,7 +29,7 @@ class CreateCollectorRulesTest extends TestCase
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $this->task->resource()->associate($this->network());
+            $this->task->resource()->associate($this->router());
             $this->task->save();
         });
         $this->firewallPolicy()
