@@ -319,7 +319,7 @@ Route::group([
     Route::group([], function () {
         Route::get('load-balancers', 'LoadBalancerController@index');
         Route::get('load-balancers/{loadBalancerId}', 'LoadBalancerController@show');
-        Route::get('load-balancers/{loadBalancerId}/instances', 'LoadBalancerController@instances');
+        Route::get('load-balancers/{loadBalancerId}/available-targets', 'LoadBalancerController@instances');
         Route::patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
         Route::delete('load-balancers/{loadBalancerId}', 'LoadBalancerController@destroy');
 
