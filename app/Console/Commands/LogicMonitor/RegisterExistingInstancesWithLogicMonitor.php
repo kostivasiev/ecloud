@@ -39,15 +39,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      */
     protected $description = 'Command description';
 
-    private $passwordService;
-    
     private Task $task;
-
-    public function __construct(PasswordService $passwordService)
-    {
-        parent::__construct();
-        $this->passwordService = $passwordService;
-    }
 
     /**
      * Execute the console command.
@@ -63,12 +55,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         foreach ($networks as $network) {
             $router = $network->router;
 
-            try {
-                $this->createSystemPolicy($router);
-            } catch (\Exception $exception) {
-                //error creating system policy
-                break;
-            }
+            $this->createSystemPolicy($router);
 
             // check for collector in routers AZ, if none then skip
             // create LM rule to open ports inbound from collectors IP
@@ -112,7 +99,9 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                 ->first();
             if (!$logicMonitorCredentials) {
                 if (!($logicMonitorCredentials = $this->createLMCredentials($instance))) {#
-                    //cant get guest admin credentials
+                    Log::error('Logic Monitor account is not creatable', [
+                        'instance' => $instance->id
+                    ]);
                     break;
                 }
             }
@@ -121,7 +110,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
             if (!empty($accounts)) {
                 $this->saveLogicMonitorAccountId($accounts[0]->id, $instance);
-                Log::info($this::class . ' : Logic Monitor account already exists, skipping', [
+                Log::info('Logic Monitor account already exists, skipping', [
                     'logic_monitor_account_id' => $accounts[0]->id
                 ]);
                 break;
@@ -130,7 +119,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             try {
                 $customer = $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
             } catch (NotFoundException) {
-                Log::error(new \Exception('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id));
+                Log::error('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id);
                 break;
             }
 
@@ -149,10 +138,10 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             }
             $floatingIp = FloatingIp::find($instance->deploy_data['floating_ip_id']);
             if (!$floatingIp) {
-                Log::error(new \Exception('Failed to load floating IP for instance', [
+                Log::error('Failed to load floating IP for instance', [
                     'instance_id' => $instance->id,
                     'floating_ip_id' => $instance->deploy_data['floating_ip_id']
-                ]));
+                ]);
                 break;
             }
 
@@ -244,7 +233,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         }
 
         list($username, $password, $hidden, $sudo) =
-            ['lm.' . $instance->id, $this->passwordService->generate(24), true, false];
+            ['lm.' . $instance->id, resolve(PasswordService::class)->generate(24), true, false];
         $credential = app()->make(Credential::class);
         $credential->fill([
             'name' => $username,
