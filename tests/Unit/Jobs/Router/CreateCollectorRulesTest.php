@@ -28,6 +28,9 @@ class CreateCollectorRulesTest extends TestCase
             $this->task = new Task([
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_UPDATE,
+                'data' => [
+                    'system_firewall_policy_id' => $this->firewallPolicy()->id,
+                ]
             ]);
             $this->task->resource()->associate($this->router());
             $this->task->save();
@@ -58,16 +61,13 @@ class CreateCollectorRulesTest extends TestCase
 
     public function testSkipsIfNoSystemPolicy()
     {
+        $this->task->setAttribute('data', [])->saveQuietly();
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
         $this->firewallPolicy()->setAttribute('name', 'Not System')->saveQuietly();
         $this->getAdminClientMock();
         dispatch(new CreateCollectorRules($this->task));
 
-        Event::assertNotDispatched(JobFailed::class);
-        Event::assertDispatched(JobProcessed::class, function ($event) {
-            return !$event->job->isReleased();
-        });
-
+        Event::assertDispatched(JobFailed::class);
         $this->assertCount(0, $this->firewallPolicy()->firewallRules()->get()->toArray());
     }
 
@@ -92,9 +92,6 @@ class CreateCollectorRulesTest extends TestCase
         dispatch(new CreateCollectorRules($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
-        Event::assertDispatched(JobProcessed::class, function ($event) {
-            return !$event->job->isReleased();
-        });
 
         $firewallRule = $this->firewallPolicy()->firewallRules()->first();
         $firewallRulePorts = $firewallRule->firewallRulePorts()->get();
