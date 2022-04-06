@@ -108,7 +108,7 @@ return [
                 'sequence' => 10002,
                 'direction' => 'IN',
                 'enabled' => true,
-                'source' => null,
+                'source' => null, // This will be set in the CreateDefaultNetworkRules job
                 'destination' => 'ANY',
                 'type' => NetworkRule::TYPE_LOGICMONITOR,
                 'ports' => [
