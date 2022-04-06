@@ -6,14 +6,10 @@ use App\Jobs\TaskJob;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
-use App\Models\V2\Router;
-use App\Traits\V2\TaskJobs\AwaitResources;
 use UKFast\Admin\Monitoring\AdminClient;
 
 class CreateCollectorRules extends TaskJob
 {
-    use AwaitResources;
-
     public function handle()
     {
         $router = $this->task->resource;
