@@ -20,10 +20,7 @@ class CreateSystemPolicy extends TaskJob
         }
 
         if (empty($this->task->data['system_firewall_policy_id'])) {
-            $systemPolicy = $router->whereHas('firewallPolicies', function ($query) {
-                $query->where('name', '=', 'System');
-            })->first();
-
+            $systemPolicy = $router->firewallPolicies()->where('name', '=', 'System')->first();
             if ($systemPolicy) {
                 $this->info('A system policy was already detected, skipping.', [
                     'firewall_policy_id' => $systemPolicy->id,
