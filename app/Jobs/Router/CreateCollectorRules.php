@@ -35,7 +35,10 @@ class CreateCollectorRules extends TaskJob
             return;
         }
 
-        $firewallPolicy = FirewallPolicy::systemPolicy()->first();
+        $firewallPolicy = FirewallPolicy::systemPolicy()
+            ->where('router_id', '=', $router->id)
+            ->first();
+
         if (!$firewallPolicy) {
             $this->info('System policy not found');
             return;
