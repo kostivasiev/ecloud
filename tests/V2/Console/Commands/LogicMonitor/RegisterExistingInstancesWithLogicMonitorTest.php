@@ -23,25 +23,6 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
         Router::factory()->create(['id' => 'rtr-62827a58']);
         Network::factory()->create();
 
-        // Fake the queue
-        Queue::fake();
-
-        $this->artisan('lm:register-all-instances')
-            ->assertExitCode(Command::SUCCESS);
-
-        // Assert the job was pushed to the queue
-        Queue::assertPushed(CreateSystemPolicy::class);
-        Queue::assertPushed(CreateCollectorRules::class);
-    }
-
-    public function testWithAdvancedNetworkingSuccess()
-    {
-        //prep
-        //make router with network
-        Vpc::factory()->create(['id'=> 'vpc-a7d7c4e6']);
-        Router::factory()->create(['id' => 'rtr-62827a58']);
-        Network::factory()->create();
-
         /** @var Network $network */
         $network = Network::all()->first();
         NetworkPolicy::factory()->create(['network_id' => $network->id]);
