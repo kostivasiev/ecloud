@@ -77,7 +77,7 @@ class AllowLogicMonitorTest extends TestCase
         $networkRule = $this->networkPolicy()->networkRules()->first();
         $networkRulePorts = $networkRule->networkRulePorts()->get();
 
-        $ruleConfig = config('firewall.collector.rules')[0];
+        $ruleConfig = config('network.rule_templates')[0];
         $this->assertEquals('123.123.123.123', $networkRule->source);
         $this->assertEquals($ruleConfig['name'], $networkRule->name);
         $this->assertEquals($ruleConfig['ports'][0]['protocol'], $networkRulePorts[0]->protocol);

@@ -60,8 +60,7 @@ class AllowLogicMonitor extends Job
         }
         $ipAddresses = implode(',', $ipAddresses);
 
-        $rules = config('firewall.collector.rules');
-        foreach ($rules as $rule) {
+        foreach (config('network.rule_templates') as $rule) {
             $networkRule = app()->make(NetworkRule::class);
             $networkRule->fill($rule);
             $networkRule->source = $ipAddresses;
