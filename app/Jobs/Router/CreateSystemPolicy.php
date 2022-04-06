@@ -14,6 +14,11 @@ class CreateSystemPolicy extends TaskJob
     {
         $router = $this->task->resource;
 
+        if ($router->isManaged()) {
+            $this->info('Router is management resource, skipping');
+            return;
+        }
+
         $systemPolicy = $router->whereHas('firewallPolicies', function ($query) {
             $query->where('name', '=', 'System');
         })->first();
