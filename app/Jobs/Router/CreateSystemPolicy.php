@@ -19,30 +19,29 @@ class CreateSystemPolicy extends TaskJob
             return;
         }
 
-        $systemPolicy = $router->whereHas('firewallPolicies', function ($query) {
-            $query->where('name', '=', 'System');
-        })->first();
+        if (empty($this->task->data['system_policy_id'])) {
+            $systemPolicy = $router->whereHas('firewallPolicies', function ($query) {
+                $query->where('name', '=', 'System');
+            })->first();
 
-        if ($systemPolicy) {
-            $this->info('A system policy was already detected, skipping.', [
-                'vpc_id' => $router->vpc->id,
-                'availability_zone_id' => $router->availability_zone_id
-            ]);
-            return;
+            if ($systemPolicy) {
+                $this->info('A system policy was already detected, skipping.', [
+                    'firewall_policy_id' => $systemPolicy->id,
+                    'vpc_id' => $router->vpc->id,
+                    'availability_zone_id' => $router->availability_zone_id
+                ]);
+                return;
+            }
+
+            $policyConfig = config('firewall.system');
+            $firewallPolicy = app()->make(FirewallPolicy::class);
+            $firewallPolicy->fill($policyConfig);
+            $firewallPolicy->router_id = $router->id;
+            $firewallPolicy->syncSave();
+            $this->task->updateData('system_firewall_policy_id', $firewallPolicy->id);
+        } else {
+            $firewallPolicy = FirewallPolicy::find($this->task->data['system_firewall_policy_id']);
         }
-
-        $this->info('Create System Policy and Rules Start');
-
-        $policyConfig = config('firewall.system');
-
-        $firewallPolicy = app()->make(FirewallPolicy::class);
-        $firewallPolicy->fill($policyConfig);
-        $firewallPolicy->router_id = $router->id;
-        $firewallPolicy->syncSave();
-
-        $this->task->updateData('system_firewall_policy_id', $firewallPolicy->id);
-
-        $this->info('Create System Policy and Rules End');
 
         $this->awaitSyncableResources([
             $firewallPolicy->id,
