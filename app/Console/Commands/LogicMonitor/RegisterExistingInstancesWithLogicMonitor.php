@@ -7,12 +7,9 @@ use App\Jobs\Router\CreateCollectorRules;
 use App\Jobs\Router\CreateSystemPolicy;
 use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
-use App\Models\V2\FirewallRulePort;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
-use App\Models\V2\NetworkRule;
-use App\Models\V2\NetworkRulePort;
+use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Services\V2\PasswordService;
@@ -61,10 +58,10 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         MonitoringAdminClient $adminMonitoringClient,
         AccountAdminClient $accountAdminClient
     ) {
-        $routers = Router::withoutTrashed()->get();
+        $networks = Network::withoutTrashed()->get();
 
-        foreach ($routers as $router) {
-            $network = $router->network();
+        foreach ($networks as $network) {
+            $router = $network->router;
 
             // check 'system' policy exists, if not then create
             /** @var FirewallPolicy $firewallPolicy */
@@ -84,7 +81,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             // check for collector in routers AZ, if none then skip
             // create LM rule to open ports inbound from collectors IP
             $this->createFirewallRules($router);
-            foreach ($network->policies() as $policy) {
+            foreach ($network->networkPolicy()->get() as $policy) {
                 $this->createNetworkRules($policy);
             }
         }
