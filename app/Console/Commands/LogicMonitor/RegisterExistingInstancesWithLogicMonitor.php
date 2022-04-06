@@ -2,6 +2,9 @@
 
 namespace App\Console\Commands\LogicMonitor;
 
+use App\Jobs\NetworkPolicy\AllowLogicMonitor;
+use App\Jobs\Router\CreateCollectorRules;
+use App\Jobs\Router\CreateSystemPolicy;
 use App\Models\V2\Credential;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
@@ -11,7 +14,9 @@ use App\Models\V2\Instance;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use App\Models\V2\Router;
+use App\Models\V2\Task;
 use App\Services\V2\PasswordService;
+use App\Support\Sync;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Log;
@@ -37,14 +42,13 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      */
     protected $description = 'Command description';
 
-    private $policyRules = null;
     private $passwordService;
+    
+    private Task $task;
 
     public function __construct(PasswordService $passwordService)
     {
         parent::__construct();
-
-        $this->policyRules = config('firewall.system.rules');
         $this->passwordService = $passwordService;
     }
 
@@ -78,67 +82,10 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             }
 
             // check for collector in routers AZ, if none then skip
-            $client = $adminMonitoringClient
-                ->setResellerId($router->getResellerId());
-
-            //check for collector in routers AZ, if none then skip
-            $collectors = $client->collectors()->getAll([
-                'datacentre_id' => $router->availabilityZone->datacentre_site_id,
-                'is_shared' => true,
-            ]);
-
-            if (empty($collectors)) {
-                $this->info('No Collector found for datacentre', [
-                    'availability_zone_id' => $router->availabilityZone->id,
-                    'network_id' => $network->id,
-                    'router_id' => $router->id,
-                    'datacentre_site_id' => $router->availabilityZone->datacentre_site_id,
-                ]);
-
-                break;
-            }
-
-            // check LM rule exists, if does then skip
-            if (!$this->hasSystemRule($firewallPolicy)) {
-                foreach ($this->policyRules as $rule) {
-                    $firewallRule = app()->make(FirewallRule::class);
-                    $firewallRule->fill($rule);
-                    $firewallRule->source = $ipAddresses;
-                    $firewallRule->firewallPolicy()->associate($firewallPolicy);
-                    $firewallRule->save();
-
-                    foreach ($rule['ports'] as $port) {
-                        $firewallRulePort = app()->make(FirewallRulePort::class);
-                        $firewallRulePort->fill($port);
-                        $firewallRulePort->firewallRule()->associate($firewallRule);
-                        $firewallRulePort->save();
-                    }
-                    $firewallPolicy->syncSave();
-                }
-            }
-
             // create LM rule to open ports inbound from collectors IP
+            $this->createFirewallRules($router);
             foreach ($network->policies() as $policy) {
-                $ipAddresses = [];
-                foreach ($collectors as $collector) {
-                    $ipAddresses[] = $collector->ipAddress;
-                }
-                $ipAddresses = implode(',', $ipAddresses);
-                if (!$this->hasSystemRule($policy)) {
-                    foreach ($this->policyRules as $rule) {
-                        $networkRule = app()->make(NetworkRule::class);
-                        $networkRule->fill($rule);
-                        $networkRule->source = $ipAddresses;
-                        $network->networkRules()->save($networkRule);
-
-                        foreach ($rule['ports'] as $port) {
-                            $networkRulePort = app()->make(NetworkRulePort::class);
-                            $networkRulePort->fill($port);
-                            $networkRulePort->networkRule()->associate($networkRule);
-                            $networkRulePort->save();
-                        }
-                    }
-                }
+                $this->createNetworkRules($policy);
             }
         }
 
@@ -265,16 +212,30 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
 
     /**
      * @param $router
-     * @throws BindingResolutionException
      */
     private function createSystemPolicy($router): void
     {
-        $policyConfig = config('firewall.system');
+        $task = new Task([
+            'name' => Sync::TASK_NAME_UPDATE,
+        ]);
+        $task->resource()->associate($router);
+        $task->save();
+        dispatch(new CreateSystemPolicy($task));
+    }
 
-        $systemPolicy = app()->make(FirewallPolicy::class);
-        $systemPolicy->fill($policyConfig);
-        $systemPolicy->router_id = $router->id;
-        $systemPolicy->syncSave();
+    private function createNetworkRules($networkPolicy): void
+    {
+        dispatch(new AllowLogicMonitor($networkPolicy));
+    }
+
+    private function createFirewallRules($router): void
+    {
+        $task = new Task([
+            'name' => Sync::TASK_NAME_UPDATE,
+        ]);
+        $task->resource()->associate($router);
+        $task->save();
+        dispatch(new CreateCollectorRules($task));
     }
 
     /**
@@ -320,14 +281,5 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         );
 
         return $credential;
-    }
-
-    /**
-     * @param FirewallPolicy $firewallPolicy
-     * @return bool
-     */
-    private function hasSystemRule(FirewallPolicy $firewallPolicy): bool
-    {
-        return $firewallPolicy->where('name', 'System')->count() > 0;
     }
 }
