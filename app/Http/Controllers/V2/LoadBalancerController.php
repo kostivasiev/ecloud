@@ -102,7 +102,7 @@ class LoadBalancerController extends BaseController
         ));
     }
 
-    public function instances(Request $request, string $loadBalancerId)
+    public function availableTargets(Request $request, string $loadBalancerId)
     {
         // Make sure they can access the loadbalancer
         LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId);
