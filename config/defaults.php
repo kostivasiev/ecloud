@@ -110,6 +110,7 @@ return [
                 'enabled' => true,
                 'source' => null,
                 'destination' => 'ANY',
+                'type' => NetworkRule::TYPE_LOGICMONITOR,
                 'ports' => [
                     [
                         'protocol' => 'ICMPv4'
