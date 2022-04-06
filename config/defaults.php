@@ -110,6 +110,7 @@ return [
                 'enabled' => true,
                 'source' => null, // This will be set in the CreateDefaultNetworkRules job
                 'destination' => 'ANY',
+                'type' => NetworkRule::TYPE_LOGICMONITOR,
                 'ports' => [
                     [
                         'protocol' => 'ICMPv4'
