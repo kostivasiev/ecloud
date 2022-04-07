@@ -25,7 +25,9 @@ class CreateCollectorRules extends TaskJob
         if (empty($this->task->data['collector_firewall_policy_id'])) {
             $firewallPolicy = $router->firewallPolicies()->where('name', '=', 'System')->first();
             if (!$firewallPolicy) {
-                $this->error('Failed to load system policy for router.');
+                $message = 'Failed to load system policy for router.';
+                $this->error($message);
+                $this->fail(new \Exception($message));
                 return;
             }
 
