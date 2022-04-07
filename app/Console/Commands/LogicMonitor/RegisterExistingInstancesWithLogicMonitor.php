@@ -69,7 +69,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             }
         }
 
-        $instances = Instance::withoutTrashed()->get();
+        $instances = Instance::withoutTrashed()->with('availabilityZone')->with('vpc')->get();
 
         foreach ($instances as $instance) {
             // check if device is registered, if so then skip
