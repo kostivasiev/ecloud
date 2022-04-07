@@ -87,7 +87,7 @@ class CreateCollectorRulesTest extends TestCase
         $this->getAdminClientMock();
         dispatch(new CreateCollectorRules($this->task));
 
-        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobFailed::class);
         $this->assertCount(0, $this->firewallPolicy()->firewallRules()->get()->toArray());
     }
 
