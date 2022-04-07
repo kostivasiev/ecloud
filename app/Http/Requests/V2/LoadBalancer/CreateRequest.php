@@ -7,7 +7,9 @@ use App\Models\V2\Network;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\IsSameAvailabilityZone;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 /**
  * Class CreateLoadBalancerClusterRequest
@@ -43,6 +45,7 @@ class CreateRequest extends FormRequest
                 'string',
                 new ExistsForUser(Network::class),
                 new IsResourceAvailable(Network::class),
+                new IsSameAvailabilityZone(app('request')->availability_zone_id),
             ],
         ];
     }

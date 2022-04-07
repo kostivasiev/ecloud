@@ -19,6 +19,7 @@ class NetworkRule extends Model implements Searchable, Manageable
 
     const TYPE_DHCP = 'dhcp';
     const TYPE_CATCHALL = 'catchall';
+    const TYPE_LOGICMONITOR = 'logicmonitor';
 
     public function __construct(array $attributes = [])
     {

@@ -74,6 +74,11 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
         });
     }
 
+    public function scopeSystemPolicy($query)
+    {
+        $query->where('name', '=', 'System');
+    }
+
     public function isManaged() :bool
     {
         return (bool) $this->router->isManaged();
