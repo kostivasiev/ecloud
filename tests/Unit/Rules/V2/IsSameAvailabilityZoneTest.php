@@ -206,4 +206,34 @@ class IsSameAvailabilityZoneTest extends TestCase
 
         $this->assertFalse($result);
     }
+
+    public function testAssigningAvailabilityZoneModelSucceeds()
+    {
+        $rule = new IsSameAvailabilityZone($this->availabilityZone2->id);
+
+        $floatingIp = FloatingIp::factory()->create([
+            'id' => 'fip-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone2->id,
+        ]);
+
+        $result = $rule->passes('floating_ip_id', $floatingIp->id);
+
+        $this->assertTrue($result);
+    }
+
+    public function testAssigningAvailabilityZoneModelFails()
+    {
+        $rule = new IsSameAvailabilityZone($this->availabilityZone2->id);
+
+        $floatingIp = FloatingIp::factory()->create([
+            'id' => 'fip-test',
+            'vpc_id' => $this->vpc()->id,
+            'availability_zone_id' => $this->availabilityZone()->id,
+        ]);
+
+        $result = $rule->passes('floating_ip_id', $floatingIp->id);
+
+        $this->assertFalse($result);
+    }
 }
