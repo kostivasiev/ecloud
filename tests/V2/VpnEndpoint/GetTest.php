@@ -111,7 +111,7 @@ class GetTest extends TestCase
             ])->assertStatus(200);
 
         // neq
-        $response = $this->get('/v2/vpn-endpoints?vpc_id:neq=' . $vpc->id)
+        $this->get('/v2/vpn-endpoints?vpc_id:neq=' . $vpc->id)
             ->assertJsonFragment([
                 'vpc_id' => $this->vpc()->id,
             ])->assertJsonFragment([
