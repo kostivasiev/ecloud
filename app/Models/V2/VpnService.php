@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\Vpn\Creating;
+use App\Models\V2\Filters\VpnService\VpcIdFilter;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -12,11 +13,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
-use UKFast\DB\Ditto\Factories\FilterFactory;
-use UKFast\DB\Ditto\Factories\SortFactory;
-use UKFast\DB\Ditto\Filter;
-use UKFast\DB\Ditto\Filterable;
-use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
 /**
  * Class Vpns
@@ -24,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
  * @method static findOrFail(string $dhcpId)
  * @method static forUser(string $user)
  */
-class VpnService extends Model implements Filterable, Sortable, AvailabilityZoneable, ResellerScopeable
+class VpnService extends Model implements Searchable, AvailabilityZoneable, ResellerScopeable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -93,59 +91,16 @@ class VpnService extends Model implements Filterable, Sortable, AvailabilityZone
         });
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('router_id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('router_id'),
-            $factory->create('name'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('id', 'asc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'router_id' => 'router_id',
-            'name' => 'name',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->setDefaultSort('created_at', 'desc')
+            ->configure(fn ($filter) => [
+                'id' => $filter->string(),
+                'router_id' => $filter->string(),
+                'name' => $filter->string(),
+                'created_at' => $filter->date(),
+                'updated_at' => $filter->date(),
+                'vpc_id' => $filter->wrap(new VpcIdFilter)->string(),
+            ]);
     }
 }
