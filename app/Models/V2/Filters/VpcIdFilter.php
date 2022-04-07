@@ -35,10 +35,6 @@ class VpcIdFilter extends StringFilter implements WrapsFilter
                 $modelIds = $modelIds->reject(function ($model) use ($search) {
                     if ($this->model == VpnService::class) {
                         return !$model->router || $model->router->vpc_id != $search->term();
-                    } else {
-                        if ($this->model == VpnSession::class) {
-                            return !$model->vpnService || $model->vpnService->router->vpc->id != $search->term();
-                        }
                     }
                     return !$model->vpnService || $model->vpnService->router->vpc->id != $search->term();
                 });
@@ -48,10 +44,6 @@ class VpcIdFilter extends StringFilter implements WrapsFilter
                 $modelIds = $modelIds->reject(function ($model) use ($search) {
                     if ($this->model == VpnService::class) {
                         return !$model->router || $model->router->vpc_id == $search->term();
-                    } else {
-                        if ($this->model == VpnSession::class) {
-                            return !$model->vpnService || $model->vpnService->router->vpc->id == $search->term();
-                        }
                     }
                     return !$model->vpnService || $model->vpnService->router->vpc->id == $search->term();
                 });
@@ -65,14 +57,6 @@ class VpcIdFilter extends StringFilter implements WrapsFilter
                                 '/' . str_replace('\*', '\S*', preg_quote($search->term())) . '/',
                                 $model->router->vpc_id
                             ) === 0;
-                    } else {
-                        if ($this->model == VpnSession::class) {
-                            return !$model->vpnService
-                                || preg_match(
-                                    '/' . str_replace('\*', '\S*', preg_quote($search->term())) . '/',
-                                    $model->vpnService->router->vpc->id
-                                ) === 0;
-                        }
                     }
                     return !$model->vpnService
                         || preg_match(
@@ -90,14 +74,6 @@ class VpcIdFilter extends StringFilter implements WrapsFilter
                                 '/' . str_replace('\*', '\S*', preg_quote($search->term())) . '/',
                                 $model->router->vpc_id
                             ) === 1;
-                    } else {
-                        if ($this->model == VpnSession::class) {
-                            return !$model->vpnService
-                                || preg_match(
-                                    '/' . str_replace('\*', '\S*', preg_quote($search->term())) . '/',
-                                    $model->vpnService->router->vpc->id
-                                ) === 1;
-                        }
                     }
                     return !$model->vpnService
                         || preg_match(
@@ -112,10 +88,6 @@ class VpcIdFilter extends StringFilter implements WrapsFilter
                 $modelIds = $modelIds->reject(function ($model) use ($ids) {
                     if ($this->model == VpnService::class) {
                         return !$model->router || !in_array($model->router->vpc_id, $ids);
-                    } else {
-                        if ($this->model == VpnSession::class) {
-                            return !$model->vpnService || !in_array($model->vpnService->router->vpc->id, $ids);
-                        }
                     }
                     return !$model->vpnService || !in_array($model->vpnService->router->vpc->id, $ids);
                 });
@@ -126,10 +98,6 @@ class VpcIdFilter extends StringFilter implements WrapsFilter
                 $modelIds = $modelIds->reject(function ($model) use ($ids) {
                     if ($this->model == VpnService::class) {
                         return !$model->router || in_array($model->router->vpc_id, $ids);
-                    } else {
-                        if ($this->model == VpnSession::class) {
-                            return !$model->vpnService || in_array($model->vpnService->router->vpc->id, $ids);
-                        }
                     }
                     return !$model->vpnService || in_array($model->vpnService->router->vpc->id, $ids);
                 });
