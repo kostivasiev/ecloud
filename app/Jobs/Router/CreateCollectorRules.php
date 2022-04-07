@@ -23,6 +23,20 @@ class CreateCollectorRules extends TaskJob
         }
 
         if (empty($this->task->data['collector_firewall_policy_id'])) {
+            $firewallPolicy = $router->firewallPolicies()->where('name', '=', 'System')->first();
+            if (!$firewallPolicy) {
+                $message = 'Failed to load system policy for router.';
+                $this->error($message);
+                $this->fail(new \Exception($message));
+                return;
+            }
+
+            $collectorRule = $firewallPolicy->firewallRules()->where('name', 'Logic Monitor Collector')->first();
+            if (!empty($collectorRule)) {
+                $this->info('Logic Monitor Collector rule already exists, skipping');
+                return;
+            }
+
             // identify LM collector for target AZ from monitoring API
             $client = app()->make(AdminClient::class)
                 ->setResellerId($router->getResellerId());
@@ -39,12 +53,6 @@ class CreateCollectorRules extends TaskJob
                 return;
             }
 
-            if (empty($this->task->data['system_firewall_policy_id'])) {
-                $this->fail(new \Exception('Failed to get System Firewall Policy'));
-                return false;
-            }
-
-            $firewallPolicy = FirewallPolicy::find($this->task->data['system_firewall_policy_id']);
             $ipAddresses = [];
             foreach ($collectors as $collector) {
                 $ipAddresses[] = $collector->ipAddress;
