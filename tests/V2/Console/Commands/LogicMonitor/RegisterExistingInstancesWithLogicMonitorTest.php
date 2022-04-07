@@ -1,7 +1,6 @@
 <?php
 namespace Tests\V2\Console\Commands\LogicMonitor;
 
-use App\Jobs\NetworkPolicy\AllowLogicMonitor;
 use App\Jobs\Router\CreateCollectorRules;
 use App\Jobs\Router\CreateSystemPolicy;
 use App\Models\V2\Credential;

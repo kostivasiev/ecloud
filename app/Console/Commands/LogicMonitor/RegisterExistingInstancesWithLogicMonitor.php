@@ -51,7 +51,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         MonitoringAdminClient $adminMonitoringClient,
         AccountAdminClient $accountAdminClient
     ) {
-        $networks = Network::withoutTrashed()->get();
+        $networks = Network::withoutTrashed()->with('router')->with('router.vpc')->get();
 
         foreach ($networks as $network) {
             $router = $network->router;
