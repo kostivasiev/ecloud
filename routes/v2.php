@@ -547,11 +547,6 @@ Route::group([
         Route::get('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@showData');
         Route::get('orchestrator-configs/{orchestratorConfigId}/builds', 'OrchestratorConfigController@builds');
 
-        Route::group(['middleware' => 'is-admin'], function () {
-            Route::put('orchestrator-configs/{orchestratorConfigId}/lock', 'OrchestratorConfigController@lock');
-            Route::put('orchestrator-configs/{orchestratorConfigId}/unlock', 'OrchestratorConfigController@unlock');
-        });
-
         Route::group(['middleware' => ['orchestrator-config-is-locked', 'orchestrator-config-is-valid']], function () {
             Route::post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');
         });

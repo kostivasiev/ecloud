@@ -55,6 +55,7 @@ class OrchestratorConfigController extends BaseController
             'reseller_id',
             'employee_id',
             'deploy_on',
+            'locked',
         ]));
         $model->save();
 
@@ -115,23 +116,5 @@ class OrchestratorConfigController extends BaseController
         return OrchestratorBuildResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
-    }
-
-    public function lock(Request $request, string $orchestratorConfigId)
-    {
-        $model = OrchestratorConfig::forUser($request->user())->findOrFail($orchestratorConfigId);
-        $model->locked = true;
-        $model->save();
-
-        return response('', 204);
-    }
-
-    public function unlock(Request $request, string $orchestratorConfigId)
-    {
-        $model = OrchestratorConfig::forUser($request->user())->findOrFail($orchestratorConfigId);
-        $model->locked = false;
-        $model->save();
-
-        return response('', 204);
     }
 }
