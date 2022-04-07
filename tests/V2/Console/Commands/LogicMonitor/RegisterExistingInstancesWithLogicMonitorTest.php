@@ -1,7 +1,6 @@
 <?php
 namespace Tests\V2\Console\Commands\LogicMonitor;
 
-use App\Jobs\NetworkPolicy\AllowLogicMonitor;
 use App\Jobs\Router\CreateCollectorRules;
 use App\Jobs\Router\CreateSystemPolicy;
 use App\Models\V2\Credential;
@@ -20,7 +19,6 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
 {
     public function testCommandDispatchesJobsForInstancesAndRoutersSuccess()
     {
-        $this->markTestSkipped('Needs Refactoring for newer changes');
         //prep
         $mockMonitoringAdminClient = \Mockery::mock(\UKFast\Admin\Monitoring\AdminClient::class);
         $mockMonitoringAdminAccountClient = \Mockery::mock(\UKFast\Admin\Monitoring\AdminAccountClient::class);
@@ -98,9 +96,7 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
                         "username" => "graphite.rack",
                         "password" => "somepassword",]
                     ]
-                ]
-            )
-            ->andReturns(
+            ])->andReturns(
                 new Response(200)
             );
 
@@ -125,7 +121,6 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
 
         // Assert the job was pushed to the queue
         Queue::assertPushed(CreateSystemPolicy::class);
-        Queue::assertPushed(AllowLogicMonitor::class);
         Queue::assertPushed(CreateCollectorRules::class);
     }
 }
