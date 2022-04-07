@@ -2,7 +2,7 @@
 
 namespace App\Models\V2;
 
-use App\Models\V2\Filters\VpnEndpoints\VpcIdFilter;
+use App\Models\V2\Filters\VpcIdFilter;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -85,7 +85,7 @@ class VpnEndpoint extends Model implements Searchable, AvailabilityZoneable, Res
                 'vpn_service_id' => $filter->string(),
                 'created_at' => $filter->date(),
                 'updated_at' => $filter->date(),
-                'vpc_id' => $filter->wrap(new VpcIdFilter)->string(),
+                'vpc_id' => $filter->wrap(new VpcIdFilter($this::class))->string(),
             ]);
     }
 }
