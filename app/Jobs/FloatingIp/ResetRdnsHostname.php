@@ -35,8 +35,9 @@ class ResetRdnsHostname extends TaskJob implements ShouldQueue
 
         $rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
 
-        if (count($rdns->getItems()) !== 1) {
-            $this->warning("Unable to determine RDNS record, can not update.");
+        $count = count($rdns->getItems());
+        if ($count !== 1) {
+            $this->warning("Unable to determine RDNS record, ' . $count . ' records returned, can not update.");
             return;
         }
 
