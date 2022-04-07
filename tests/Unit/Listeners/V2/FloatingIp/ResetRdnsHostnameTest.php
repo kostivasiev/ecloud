@@ -111,6 +111,8 @@ class ResetRdnsHostnameTest extends TestCase
 
         dispatch(new ResetRdnsHostname($task));
 
+        Event::assertDispatched(JobProcessed::class);
+
         Event::assertNotDispatched(JobFailed::class);
     }
 }
