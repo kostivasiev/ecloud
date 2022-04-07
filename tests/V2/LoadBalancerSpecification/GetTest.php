@@ -15,14 +15,13 @@ class GetTest extends TestCase
         parent::setUp();
         $this->image = Image::factory()->create();
 
-        $this->loadBalancerSpecification = LoadBalancerSpecification::factory()->create([
-            'name' => 'medium',
-            'node_count' => 2,
+        LoadBalancerSpecification::factory()->create([
+            'name' => 'super-small',
+            'node_count' => 1,
             'cpu' => 1,
-            'ram' => 2,
-            'hdd' => 20,
-            'iops' => 300,
-            'image_id' => $this->image->id
+            'ram' => 1,
+            'hdd' => 10,
+            "image_id" => 'img-test',
         ]);
 
         LoadBalancerSpecification::factory()->create([
@@ -34,13 +33,14 @@ class GetTest extends TestCase
             "image_id" => 'img-test',
         ]);
 
-        LoadBalancerSpecification::factory()->create([
-            'name' => 'super-small',
-            'node_count' => 1,
+        $this->loadBalancerSpecification = LoadBalancerSpecification::factory()->create([
+            'name' => 'medium',
+            'node_count' => 2,
             'cpu' => 1,
-            'ram' => 1,
-            'hdd' => 10,
-            "image_id" => 'img-test',
+            'ram' => 2,
+            'hdd' => 20,
+            'iops' => 300,
+            'image_id' => $this->image->id
         ]);
 
         LoadBalancerSpecification::factory()->create([

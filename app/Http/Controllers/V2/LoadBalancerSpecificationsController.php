@@ -25,10 +25,7 @@ class LoadBalancerSpecificationsController extends BaseController
         return LoadBalancerSpecificationResource::collection(
             $collection
                 ->search()
-                ->orderBy('node_count')
-                ->orderBy('cpu')
-                ->orderBy('ram')
-                ->orderBy('hdd')
+                ->orderBy('created_at')
                 ->paginate(
                     $request->input('per_page', env('PAGINATION_LIMIT'))
                 )
