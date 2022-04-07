@@ -5,6 +5,7 @@ namespace Tests\Unit\Jobs\Router;
 use App\Events\V2\Task\Created;
 use App\Jobs\Router\CreateCollectorRules;
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRule;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
@@ -44,6 +45,25 @@ class CreateCollectorRulesTest extends TestCase
         });
     }
 
+    public function testSkipIfRuleExists()
+    {
+        FirewallRule::withoutEvents(function () {
+            FirewallRule::factory()->create([
+                'id' => 'fwr-tttttttt',
+                'name' => 'Logic Monitor Collector',
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+            ]);
+        });
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+        $this->getAdminClientMock(true);
+        dispatch(new CreateCollectorRules($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+    }
+
     public function testSkipIfManagementResource()
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
@@ -67,7 +87,7 @@ class CreateCollectorRulesTest extends TestCase
         $this->getAdminClientMock();
         dispatch(new CreateCollectorRules($this->task));
 
-        Event::assertDispatched(JobFailed::class);
+        Event::assertNotDispatched(JobFailed::class);
         $this->assertCount(0, $this->firewallPolicy()->firewallRules()->get()->toArray());
     }
 
