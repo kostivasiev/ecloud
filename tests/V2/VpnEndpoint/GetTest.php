@@ -2,8 +2,11 @@
 namespace Tests\V2\VpnEndpoint;
 
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
+use Illuminate\Database\Eloquent\Model;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -66,5 +69,53 @@ class GetTest extends TestCase
                     'detail' => 'No Vpn Endpoint with that ID was found',
                 ]
             )->assertStatus(404);
+    }
+
+    public function testFilterByVpcId()
+    {
+        // Create another endpoint with a different vpc_id
+        $vpc = Model::withoutEvents(function () {
+            return Vpc::factory()->create([
+                'id' => 'vpc-11111111',
+                'region_id' => $this->region()->id
+            ]);
+        });
+        $router = Model::withoutEvents(function () use ($vpc) {
+            return Router::factory()->create([
+                'id' => 'rtr-11111111',
+                'vpc_id' => $vpc->id,
+            ]);
+        });
+        $floatingIp = Model::withoutEvents(function () use ($vpc) {
+            return FloatingIp::factory()->create([
+                'id' => 'fip-11111111',
+                'vpc_id' => $vpc->id,
+                'ip_address' => '203.0.111.1',
+            ]);
+        });
+        $vpnService = VpnService::factory()->create([
+            'router_id' => $router->id,
+        ]);
+        $vpcEndpoint = VpnEndpoint::factory()->create([
+            'vpn_service_id' => $vpnService->id,
+        ]);
+        $floatingIp->resource()->associate($vpcEndpoint);
+        $floatingIp->save();
+
+        // eq
+        $this->get('/v2/vpn-endpoints?vpc_id:eq=' . $vpc->id)
+            ->assertJsonFragment([
+                'vpc_id' => $vpc->id,
+            ])->assertJsonFragment([
+                'count' => 1
+            ])->assertStatus(200);
+
+        // neq
+        $response = $this->get('/v2/vpn-endpoints?vpc_id:neq=' . $vpc->id)
+            ->assertJsonFragment([
+                'vpc_id' => $this->vpc()->id,
+            ])->assertJsonFragment([
+                'count' => 1
+            ])->assertStatus(200);
     }
 }
