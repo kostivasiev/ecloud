@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\VpnSession\Deleted;
+use App\Models\V2\Filters\VpcIdFilter;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -18,8 +19,10 @@ use UKFast\DB\Ditto\Factories\SortFactory;
 use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
+use UKFast\Sieve\Searchable;
+use UKFast\Sieve\Sieve;
 
-class VpnSession extends Model implements Filterable, Sortable, AvailabilityZoneable, ResellerScopeable
+class VpnSession extends Model implements Searchable, AvailabilityZoneable, ResellerScopeable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -165,74 +168,21 @@ class VpnSession extends Model implements Filterable, Sortable, AvailabilityZone
         });
     }
 
-    /**
-     * @param FilterFactory $factory
-     * @return array|Filter[]
-     */
-    public function filterableColumns(FilterFactory $factory)
+    public function sieve(Sieve $sieve)
     {
-        return [
-            $factory->create('id', Filter::$stringDefaults),
-            $factory->create('name', Filter::$stringDefaults),
-            $factory->create('vpn_profile_group_id', Filter::$stringDefaults),
-            $factory->create('vpn_service_id', Filter::$stringDefaults),
-            $factory->create('vpn_endpoint_id', Filter::$stringDefaults),
-            $factory->create('remote_ip', Filter::$stringDefaults),
-            $factory->create('remote_networks', Filter::$stringDefaults),
-            $factory->create('local_networks', Filter::$stringDefaults),
-            $factory->create('created_at', Filter::$dateDefaults),
-            $factory->create('updated_at', Filter::$dateDefaults),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort[]
-     * @throws \UKFast\DB\Ditto\Exceptions\InvalidSortException
-     */
-    public function sortableColumns(SortFactory $factory)
-    {
-        return [
-            $factory->create('id'),
-            $factory->create('name'),
-            $factory->create('vpn_profile_group_id'),
-            $factory->create('vpn_service_id'),
-            $factory->create('vpn_endpoint_id'),
-            $factory->create('remote_ip'),
-            $factory->create('remote_networks'),
-            $factory->create('local_networks'),
-            $factory->create('created_at'),
-            $factory->create('updated_at'),
-        ];
-    }
-
-    /**
-     * @param SortFactory $factory
-     * @return array|\UKFast\DB\Ditto\Sort|\UKFast\DB\Ditto\Sort[]|null
-     */
-    public function defaultSort(SortFactory $factory)
-    {
-        return [
-            $factory->create('id', 'asc'),
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function databaseNames()
-    {
-        return [
-            'id' => 'id',
-            'name' => 'name',
-            'vpn_profile_group_id' => 'vpn_profile_group_id',
-            'vpn_service_id' => 'vpn_service_id',
-            'vpn_endpoint_id' => 'vpn_endpoint_id',
-            'remote_ip' => 'remote_ip',
-            'remote_networks' => 'remote_networks',
-            'local_networks' => 'local_networks',
-            'created_at' => 'created_at',
-            'updated_at' => 'updated_at',
-        ];
+        $sieve->setDefaultSort('created_at', 'desc')
+            ->configure(fn ($filter) => [
+                'id' => $filter->string(),
+                'name' => $filter->string(),
+                'vpn_profile_group_id' => $filter->string(),
+                'vpn_service_id' => $filter->string(),
+                'vpn_endpoint_id' => $filter->string(),
+                'remote_ip' => $filter->string(),
+                'remote_networks' => $filter->string(),
+                'local_networks' => $filter->string(),
+                'created_at' => $filter->date(),
+                'updated_at' => $filter->date(),
+                'vpc_id' => $filter->wrap(new VpcIdFilter(static::class))->string(),
+            ]);
     }
 }
