@@ -14,6 +14,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Tests\TestCase;
 use UKFast\Admin\SafeDNS\AdminClient;
 use UKFast\Admin\SafeDNS\AdminRecordClient;
+use UKFast\SDK\Page;
 use UKFast\SDK\SafeDNS\Entities\Record;
 use UKFast\SDK\SafeDNS\RecordClient;
 
@@ -90,4 +91,26 @@ class ResetRdnsHostnameTest extends TestCase
         $this->assertEquals($this->floatingIp()->rdns_hostname, $this->reverseIpDefault($this->floatingIp()->ip_address));
     }
 
+    public function testResetRdnsRecordNotFoundWarnsAndCompletes()
+    {
+        $task = $this->createSyncDeleteTask($this->floatingIp());
+
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
+        $mockSafednsAdminClient = \Mockery::mock(AdminClient::class);
+        $mockSafednsAdminClient->shouldReceive('records->getPage')->andReturnUsing(function () {
+            $page = \Mockery::mock(Page::class)->makePartial();
+            $page->shouldReceive('getItems')->andReturn([]);
+            return $page;
+        });
+        $mockSafednsAdminClient->shouldNotReceive('records->update');
+
+        app()->bind(AdminClient::class, function () use ($mockSafednsAdminClient) {
+            return $mockSafednsAdminClient;
+        });
+
+        dispatch(new ResetRdnsHostname($task));
+
+        Event::assertNotDispatched(JobFailed::class);
+    }
 }
