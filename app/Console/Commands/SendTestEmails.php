@@ -12,14 +12,14 @@ class SendTestEmails extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'check:send-test-emails';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Send\'s test emails to emails from alerts config';
 
     /**
      * Execute the console command.
