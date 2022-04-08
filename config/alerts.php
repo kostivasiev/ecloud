@@ -4,11 +4,11 @@ return [
     'from' => 'alerts@ukfast.co.uk',
     'capacity' => [
         'floating_ip' => [
-            'to' => 'networkteam@ukfast.co.uk',
-            'cc' => 'enterprise-infrastructure@ukfast.co.uk',
+            'to' => 'networkteam@ans.co.uk',
+            'cc' => 'enterprise-infrastructure@ans.co.uk',
         ],
         'default' => [
-            'to' => 'enterprise-infrastructure@ukfast.co.uk',
+            'to' => 'enterprise-infrastructure@ans.co.uk',
         ],
         'dev' => [
             'to' => [
