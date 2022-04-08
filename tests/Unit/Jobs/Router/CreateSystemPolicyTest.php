@@ -10,7 +10,6 @@ use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -58,13 +57,58 @@ class CreateSystemPolicyTest extends TestCase
 
     public function testAddSystemPolicy()
     {
-        Bus::fake();
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $job = new CreateSystemPolicy($this->task);
-        $job->handle();
+        dispatch(new CreateSystemPolicy($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
 
         $firewallPolicy = FirewallPolicy::where('router_id', '=', $this->router()->id)->first();
         $this->assertNotEmpty($firewallPolicy);
         $this->assertEquals('System', $firewallPolicy->name);
+    }
+
+    public function testSystemPolicyRulesCreated()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        dispatch(new CreateSystemPolicy($this->task));
+
+        Event::assertNotDispatched(JobFailed::class);
+
+
+        $firewallPolicy = $this->router()
+            ->firewallPolicies()
+            ->where('name', '=', 'System')
+            ->first();
+
+        $this->assertEquals(
+            count(config('firewall.system.rules')),
+            count($firewallPolicy->firewallRules()->get()->toArray())
+        );
+
+        foreach (config('firewall.system.rules') as $rule) {
+            $firewallRule = $firewallPolicy->firewallRules()
+                ->where([
+                    ['name', '=', $rule['name']],
+                    ['direction', '=', $rule['direction']]
+                ])->first();
+            $this->assertEquals($rule['name'], $firewallRule->name);
+            $this->assertEquals($rule['action'], $firewallRule->action);
+            $this->assertEquals($rule['sequence'], $firewallRule->sequence);
+            $this->assertEquals($rule['direction'], $firewallRule->direction);
+            $this->assertEquals($rule['destination'], $firewallRule->destination);
+
+            foreach ($rule['ports'] as $port) {
+                $firewallRulePort = $firewallRule->firewallRulePorts()
+                    ->where([
+                        ['protocol', '=', $port['protocol']],
+                        ['destination', '=', $port['destination']],
+                    ])->first();
+                $this->assertEquals($port['protocol'], $firewallRulePort->protocol);
+                $this->assertEquals($port['source'], $firewallRulePort->source);
+                $this->assertEquals($port['destination'], $firewallRulePort->destination);
+            }
+        }
     }
 }
