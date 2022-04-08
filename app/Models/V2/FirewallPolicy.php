@@ -100,4 +100,37 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
             'updated_at' => $filter->date(),
         ]);
     }
+
+    /**
+     * @param array $rules - A configuration array of rules and ports
+     * @param array $ruleOverrides - keys/values to override in the rule config in $rules array
+     * @param array $portOverrides - keys/values to override in the port config in $rules array
+     * @return $this
+     */
+    public function createRulesAndPorts(
+        array $rules,
+        array $ruleOverrides = [],
+        array $portOverrides = []
+    ): self {
+        foreach ($rules as $rule) {
+            $firewallRule = app()->make(FirewallRule::class);
+            $firewallRule->fill($rule);
+            if (!empty($ruleOverrides)) {
+                $firewallRule->fill($ruleOverrides);
+            }
+            $this->firewallRules()->save($firewallRule);
+            $firewallRule->save();
+
+            foreach ($rule['ports'] as $port) {
+                $firewallRulePort = app()->make(FirewallRulePort::class);
+                $firewallRulePort->fill($port);
+                if (!empty($portOverrides)) {
+                    $firewallRulePort->fill($portOverrides);
+                }
+                $firewallRulePort->firewallRule()->associate($firewallRule);
+                $firewallRulePort->save();
+            }
+        }
+        return $this;
+    }
 }

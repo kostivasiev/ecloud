@@ -4,8 +4,6 @@ namespace App\Jobs\Router;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
-use App\Models\V2\FirewallRulePort;
 use App\Traits\V2\TaskJobs\AwaitResources;
 use UKFast\Admin\Monitoring\AdminClient;
 
@@ -59,21 +57,13 @@ class CreateCollectorRules extends TaskJob
             }
             $ipAddresses = implode(',', $ipAddresses);
 
-            // now we have the ip address
-            foreach (config('firewall.rule_templates') as $rule) {
-                $firewallRule = app()->make(FirewallRule::class);
-                $firewallRule->fill($rule);
-                $firewallRule->source = $ipAddresses;
-                $firewallRule->firewallPolicy()->associate($firewallPolicy);
-                $firewallRule->save();
+            $firewallPolicy->createRulesAndPorts(
+                config('firewall.rule_templates'),
+                [
+                    'source' => $ipAddresses,
+                ]
+            );
 
-                foreach ($rule['ports'] as $port) {
-                    $firewallRulePort = app()->make(FirewallRulePort::class);
-                    $firewallRulePort->fill($port);
-                    $firewallRulePort->firewallRule()->associate($firewallRule);
-                    $firewallRulePort->save();
-                }
-            }
             $firewallPolicy->syncSave();
             $this->task->updateData('collector_firewall_policy_id', $firewallPolicy->id);
         } else {
