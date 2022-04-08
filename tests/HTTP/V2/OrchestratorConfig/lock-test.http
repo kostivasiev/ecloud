@@ -2,7 +2,7 @@
 POST https://{{host}}/{{version}}/orchestrator-configs
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -13,21 +13,25 @@ Content-Type: application/json
 
 > {%
 
-client.global.set("orchestrator_config_id", response.body.data.id);
-client.log("Builder Configuration ID: " + response.body.data.id);
-
 client.test("Request executed successfully", function() {
-  client.assert(response.status === 201, "Response status is not 201");
+    client.global.set("orchestrator_config_id", response.body.data.id);
+    client.log("Builder Configuration ID: " + response.body.data.id);
+
+    client.assert(response.status === 201, "Response status is not 201");
 });
 %}
 
 #### Lock It
-PUT https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/lock
+PATCH https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
+{
+    "locked": true
+}
 
 > {%
 client.test("Request executed successfully", function() {
@@ -39,7 +43,7 @@ client.test("Request executed successfully", function() {
 POST https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/data
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-Reseller-Id: 1
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
@@ -56,12 +60,16 @@ client.test("Request executed successfully", function() {
 %}
 
 #### Unlock It
-PUT https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/unlock
+PATCH https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
+
+{
+    "locked": false
+}
 
 > {%
 client.test("Request executed successfully", function() {
@@ -73,7 +81,7 @@ client.test("Request executed successfully", function() {
 POST https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/data
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-Reseller-Id: 1
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
@@ -93,7 +101,7 @@ client.test("Request executed successfully", function() {
 DELETE https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 

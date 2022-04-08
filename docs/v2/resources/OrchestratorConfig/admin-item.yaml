@@ -27,6 +27,10 @@ patch:
           type: object
           allOf:
             - $ref: 'schema.yaml'
+            - type : object
+              properties :
+                locked :
+                  readOnly : false
   responses:
     200:
       $ref: 'responses/idResponse.yaml'
