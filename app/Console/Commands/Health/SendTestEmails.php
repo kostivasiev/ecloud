@@ -12,7 +12,7 @@ class SendTestEmails extends Command
      *
      * @var string
      */
-    protected $signature = 'check:send-test-emails';
+    protected $signature = 'health:send-test-emails';
 
     /**
      * The console command description.
