@@ -196,6 +196,12 @@ paths:
     $ref: 'resources/DiscountPlan/admin-collection.yaml'
   '/ecloud/v2/discount-plans/{discountPlanId}':
     $ref: 'resources/DiscountPlan/admin-item.yaml'
+  '/ecloud/v2/firewall-policies':
+    $ref: 'resources/FirewallPolicy/admin-collection.yaml'
+  '/ecloud/v2/firewall-policies/{firewallPolicyId}/lock':
+    $ref: 'resources/FirewallPolicy/lockUnlock.yaml'
+  '/ecloud/v2/firewall-policies/{firewallPolicyId}/unlock':
+    $ref: 'resources/FirewallPolicy/lockUnlock.yaml'
   '/ecloud/v2/host-specs':
     $ref: 'resources/HostSpec/admin-collection.yaml'
   '/ecloud/v2/host-specs/{hostSpecId}':
@@ -250,6 +256,12 @@ paths:
     $ref : 'resources/Network/nic-collection.yaml'
   '/ecloud/v2/networks/{networkId}/tasks' :
     $ref : 'resources/Network/tasks-collection.yaml'
+  '/ecloud/v2/network-policies':
+    $ref: 'resources/NetworkPolicy/admin-collection.yaml'
+  '/ecloud/v2/network-policies/{networkPolicyId}/lock':
+    $ref: 'resources/NetworkPolicy/lockUnlock.yaml'
+  '/ecloud/v2/network-policies/{networkPolicyId}/unlock':
+    $ref: 'resources/NetworkPolicy/lockUnlock.yaml'
   '/ecloud/v2/nics':
     $ref: 'resources/Nic/collection.yaml'
   '/ecloud/v2/nics/{nicId}':

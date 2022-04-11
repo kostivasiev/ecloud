@@ -1,0 +1,64 @@
+get:
+  parameters:
+    - $ref: '../../components/parameters/perPage.yaml'
+    - $ref: '../../components/parameters/page.yaml'
+  responses:
+    200:
+      description: Success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '../../components/schemas/networkPolicy.yaml'
+                    - properties:
+                        locked:
+                          type: boolean
+                          required: false
+                          example: true
+                          readOnly: false
+              meta:
+                allOf:
+                  - $ref: '../../components/schemas/meta.yaml'
+                  - type: object
+                    properties:
+                      pagination:
+                        properties:
+                          links:
+                            type: object
+                            properties:
+                              first:
+                                example: 'https://api.ukfast.io/ecloud/v2/network-policies?page=1'
+                              previous:
+                                example: 'https://api.ukfast.io/ecloud/v2/network-policies?page=1'
+                              next:
+                                example: 'https://api.ukfast.io/ecloud/v2/network-policies?page=2'
+                              last:
+                                example: 'https://api.ukfast.io/ecloud/v2/network-policies?page=2'
+  tags:
+    - Network Policies
+
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - $ref: '../../components/schemas/networkPolicy.yaml'
+            - properties:
+                locked:
+                  type: boolean
+                  required: false
+                  example: true
+                  readOnly: false
+  responses:
+    202:
+      description: Accepted
+      $ref: 'responses/idResponse.yaml'
+  tags:
+    - Network Policies
