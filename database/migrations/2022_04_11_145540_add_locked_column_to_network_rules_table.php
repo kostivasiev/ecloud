@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->table('network_policies', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('network_rules', function (Blueprint $table) {
             $table->boolean('locked')->default(false);
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->table('network_policies', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('network_rules', function (Blueprint $table) {
             $table->dropColumn(['locked']);
         });
     }

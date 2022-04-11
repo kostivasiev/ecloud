@@ -104,18 +104,8 @@ Route::group([
         Route::get('network-policies/{networkPolicyId}/network-rules', 'NetworkPolicyController@networkRules');
         Route::get('network-policies/{networkPolicyId}/tasks', 'NetworkPolicyController@tasks');
         Route::post('network-policies', 'NetworkPolicyController@store');
-        Route::patch('network-policies/{networkPolicyId}', [
-            'middleware' => 'is-locked:' . \App\Models\V2\NetworkPolicy::class . ',networkPolicyId',
-            'uses' => 'NetworkPolicyController@update'
-        ]);
-        Route::delete('network-policies/{networkPolicyId}', [
-            'middleware' => 'is-locked:' . \App\Models\V2\NetworkPolicy::class . ',networkPolicyId',
-            'uses' => 'NetworkPolicyController@destroy'
-        ]);
-        Route::group(['middleware' => 'is-admin'], function () {
-            Route::put('network-policies/{networkPolicyId}/lock', 'NetworkPolicyController@lock');
-            Route::put('network-policies/{networkPolicyId}/unlock', 'NetworkPolicyController@unlock');
-        });
+        Route::patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
+        Route::delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
     });
 
     /** Network Rules */
@@ -134,6 +124,10 @@ Route::group([
                 'middleware' => 'is-locked:' . \App\Models\V2\NetworkRule::class . ',networkRuleId',
                 'uses' => 'NetworkRuleController@destroy'
             ]);
+        });
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::put('network-rules/{networkRuleId}/lock', 'NetworkRuleController@lock');
+            Route::put('network-rules/{networkRuleId}/unlock', 'NetworkRuleController@unlock');
         });
     });
 

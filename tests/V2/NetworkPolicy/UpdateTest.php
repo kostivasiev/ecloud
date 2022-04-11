@@ -38,33 +38,4 @@ class UpdateTest extends TestCase
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
-
-    public function testUserCannotUpdateLockedResource()
-    {
-        $this->networkPolicy()->setAttribute('locked', true)->saveQuietly();
-        $this->asUser()
-            ->patch(
-                '/v2/network-policies/' . $this->networkPolicy()->id,
-                [
-                    'name' => 'New Policy Name',
-                ]
-            )->assertJsonFragment([
-                'title' => 'Forbidden',
-                'detail' => 'The specified resource is locked',
-                'status' => 403,
-            ])->assertStatus(403);
-    }
-
-    public function testAdminCanUpdateLockedResource()
-    {
-        Event::fake(Created::class);
-        $this->networkPolicy()->setAttribute('locked', true)->saveQuietly();
-        $this->asAdmin()
-            ->patch(
-                '/v2/network-policies/' . $this->networkPolicy()->id,
-                [
-                    'name' => 'New Policy Name',
-                ]
-            )->assertStatus(202);
-    }
 }

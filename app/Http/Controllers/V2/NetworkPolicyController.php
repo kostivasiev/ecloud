@@ -33,9 +33,6 @@ class NetworkPolicyController extends BaseController
             'name',
             'network_id',
         ]));
-        if ($request->user()->isAdmin()) {
-            $model->locked = $request->input('locked', false);
-        }
 
         $task = $model->syncSave(['catchall_rule_action' => $request->input('catchall_rule_action', 'REJECT')]);
 
@@ -80,23 +77,5 @@ class NetworkPolicyController extends BaseController
         return NetworkRuleResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
-    }
-
-    public function lock(Request $request, $networkPolicyId)
-    {
-        $networkPolicy = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId);
-        $networkPolicy->locked = true;
-        $networkPolicy->save();
-
-        return response('', 204);
-    }
-
-    public function unlock(Request $request, $networkPolicyId)
-    {
-        $networkPolicy = NetworkPolicy::forUser($request->user())->findOrFail($networkPolicyId);
-        $networkPolicy->locked = false;
-        $networkPolicy->save();
-
-        return response('', 204);
     }
 }

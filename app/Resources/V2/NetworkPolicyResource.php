@@ -11,7 +11,7 @@ class NetworkPolicyResource extends UKFastResource
 {
     public function toArray($request)
     {
-        $attributes = [
+        return [
             'id' => $this->id,
             'network_id' => $this->network_id,
             'vpc_id' => $this->network->router->vpc_id,
@@ -26,9 +26,5 @@ class NetworkPolicyResource extends UKFastResource
                 new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
-        if (Auth::user()->isAdmin()) {
-            $attributes['locked'] = $this->locked;
-        }
-        return $attributes;
     }
 }

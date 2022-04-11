@@ -37,11 +37,16 @@ class NetworkRule extends Model implements Searchable, Manageable
             'action',
             'direction',
             'enabled',
-            'type'
+            'type',
+            'locked',
         ];
         $this->casts = [
             'sequence' => 'integer',
             'enabled' => 'boolean',
+            'locked' => 'boolean',
+        ];
+        $this->attributes = [
+            'locked' => false,
         ];
         parent::__construct($attributes);
     }
@@ -86,13 +91,6 @@ class NetworkRule extends Model implements Searchable, Manageable
         return $this->isManaged();
     }
 
-    public function locked(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $this->networkPolicy->locked,
-        );
-    }
-
     public function sieve(Sieve $sieve)
     {
         $sieve->configure(fn ($filter) => [
@@ -108,7 +106,7 @@ class NetworkRule extends Model implements Searchable, Manageable
             'type' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
-            'locked' => $filter->for('networkPolicy.locked')->boolean(),
+            'locked' => $filter->boolean(),
         ]);
     }
 }

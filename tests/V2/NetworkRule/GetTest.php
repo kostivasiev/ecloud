@@ -72,4 +72,22 @@ class GetTest extends TestCase
 
         $this->get('/v2/network-rules/' . $this->networkRule->id)->assertStatus(200);
     }
+
+    public function testAdminCanSeeLockedAttribute()
+    {
+        $this->asAdmin()
+            ->get('/v2/network-rules/' . $this->networkRule->id)
+            ->assertJsonFragment([
+                'locked' => false,
+            ])->assertStatus(200);
+    }
+
+    public function testNonAdminCannotSeeLockedAttribute()
+    {
+        $this->asUser()
+            ->get('/v2/network-rules/' . $this->networkRule->id)
+            ->assertJsonMissing([
+                'locked' => false,
+            ])->assertStatus(200);
+    }
 }

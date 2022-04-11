@@ -14,7 +14,7 @@ get:
                 type: array
                 items:
                   allOf:
-                    - $ref: '../../components/schemas/networkPolicy.yaml'
+                    - $ref: '../../components/schemas/networkRule.yaml'
                     - properties:
                         locked:
                           type: boolean
@@ -32,15 +32,15 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/network-policies?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-rules?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/network-policies?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-rules?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/network-policies?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-rules?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/network-policies?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/network-rules?page=2'
   tags:
-    - Network Policies
+    - Network Rule
 
 post:
   requestBody:
@@ -49,7 +49,7 @@ post:
       application/json:
         schema:
           allOf:
-            - $ref: '../../components/schemas/networkPolicy.yaml'
+            - $ref: '../../components/schemas/networkRule.yaml'
             - properties:
                 locked:
                   type: boolean
@@ -61,4 +61,4 @@ post:
       description: Accepted
       $ref: 'responses/idResponse.yaml'
   tags:
-    - Network Policies
+    - Network Rule

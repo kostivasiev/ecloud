@@ -256,12 +256,12 @@ paths:
     $ref : 'resources/Network/nic-collection.yaml'
   '/ecloud/v2/networks/{networkId}/tasks' :
     $ref : 'resources/Network/tasks-collection.yaml'
-  '/ecloud/v2/network-policies':
-    $ref: 'resources/NetworkPolicy/admin-collection.yaml'
-  '/ecloud/v2/network-policies/{networkPolicyId}/lock':
-    $ref: 'resources/NetworkPolicy/lockUnlock.yaml'
-  '/ecloud/v2/network-policies/{networkPolicyId}/unlock':
-    $ref: 'resources/NetworkPolicy/lockUnlock.yaml'
+  '/ecloud/v2/network-policy-rules':
+    $ref: 'resources/NetworkRule/admin-collection.yaml'
+  '/ecloud/v2/network-policy-rules/{networkPolicyRuleId}/lock':
+    $ref: 'resources/NetworkRule/lockUnlock.yaml'
+  '/ecloud/v2/network-policy-rules/{networkPolicyRuleId}/unlock':
+    $ref: 'resources/NetworkRule/lockUnlock.yaml'
   '/ecloud/v2/nics':
     $ref: 'resources/Nic/collection.yaml'
   '/ecloud/v2/nics/{nicId}':

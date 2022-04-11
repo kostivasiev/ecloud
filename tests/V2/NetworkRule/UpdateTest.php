@@ -76,11 +76,11 @@ class UpdateTest extends TestCase
         $this->patch('/v2/network-rules/' . $dhcpNetworkRule->id)->assertStatus(403);
     }
 
-    public function testLockedPolicyAmendRuleFails()
+    public function testAmendLockedRuleFails()
     {
-        $this->networkPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->networkRule->setAttribute('locked', true)->saveQuietly();
         $this->patch(
-            '/v2/network-rules/nr-test',
+            '/v2/network-rules/' . $this->networkRule->id,
             [
                 'action' => 'REJECT',
             ]

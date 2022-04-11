@@ -4,13 +4,14 @@ namespace App\Resources\V2;
 
 use DateTimeZone;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Responses\UKFastResource;
 
 class NetworkRuleResource extends UKFastResource
 {
     public function toArray($request)
     {
-        return [
+        $attributes = [
             'id' => $this->id,
             'network_policy_id' => $this->network_policy_id,
             'name' => $this->name,
@@ -30,5 +31,11 @@ class NetworkRuleResource extends UKFastResource
                 new DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $attributes['locked'] = $this->locked;
+        }
+
+        return $attributes;
     }
 }

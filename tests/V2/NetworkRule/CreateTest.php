@@ -83,37 +83,8 @@ class CreateTest extends TestCase
         )->assertStatus(422);
     }
 
-    public function testCreateRuleLockedPolicyFailsForUser()
+    public function testCreateLockedRule()
     {
-        $this->networkPolicy()->setAttribute('locked', true)->saveQuietly();
-
-        Event::fake([Created::class]);
-        $this->vpc()->advanced_networking = true;
-        $this->vpc()->saveQuietly();
-
-        $this->asUser()
-            ->post(
-                '/v2/network-rules',
-                [
-                    'network_policy_id' => $this->networkPolicy()->id,
-                    'sequence' => 1,
-                    'source' => '10.0.1.0/32',
-                    'destination' => '10.0.2.0/32',
-                    'action' => 'ALLOW',
-                    'enabled' => true,
-                    'direction' => 'IN_OUT'
-                ]
-            )->assertJsonFragment([
-                'title' => 'Forbidden',
-                'detail' => 'The specified resource is locked',
-            ])->assertStatus(403);
-
-    }
-
-    public function testCreateRuleLockedPolicySucceedsForAdmin()
-    {
-        $this->networkPolicy()->setAttribute('locked', true)->saveQuietly();
-
         Event::fake([Created::class]);
         $this->vpc()->advanced_networking = true;
         $this->vpc()->saveQuietly();
@@ -128,8 +99,10 @@ class CreateTest extends TestCase
                     'destination' => '10.0.2.0/32',
                     'action' => 'ALLOW',
                     'enabled' => true,
-                    'direction' => 'IN_OUT'
+                    'direction' => 'IN_OUT',
+                    'locked' => true,
                 ]
             )->assertStatus(202);
+        $this->assertTrue($this->networkPolicy()->networkRules()->first()->locked);
     }
 }

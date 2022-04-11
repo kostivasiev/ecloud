@@ -83,9 +83,9 @@ class DeleteTest extends TestCase
         $this->delete('/v2/network-rules/' . $networkRule->id)->assertStatus(403);
     }
 
-    public function testLockedPolicyPreventsDeleteForUser()
+    public function testDeleteLockedRuleFailsForUser()
     {
-        $this->networkPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->networkRule->setAttribute('locked', true)->saveQuietly();
 
         $this->asUser()
             ->delete('/v2/network-rules/' . $this->networkRule->id)
@@ -96,10 +96,10 @@ class DeleteTest extends TestCase
             ])->assertStatus(403);
     }
 
-    public function testLockedPolicyAllowsDeleteForAdmin()
+    public function testDeleteLockedRuleSucceedsForAdmin()
     {
         Event::fake(Created::class);
-        $this->networkPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->networkRule->setAttribute('locked', true)->saveQuietly();
 
         $this->asAdmin()
             ->delete('/v2/network-rules/' . $this->networkRule->id)

@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Middleware\IsLocked;
 use App\Http\Requests\V2\NetworkRule\Create;
 use App\Http\Requests\V2\NetworkRule\Update;
-use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use App\Resources\V2\NetworkRuleResource;
@@ -31,11 +29,6 @@ class NetworkRuleController extends BaseController
 
     public function store(Create $request)
     {
-        $networkPolicy = NetworkPolicy::forUser($request->user())
-            ->findOrFail($request->get('network_policy_id'));
-        if ($request->user()->isScoped() && $networkPolicy->locked === true) {
-            return (new IsLocked())->returnError();
-        }
         $networkRule = app()->make(NetworkRule::class);
         $networkRule->fill($request->only([
             'network_policy_id',
@@ -47,6 +40,10 @@ class NetworkRuleController extends BaseController
             'direction',
             'enabled',
         ]));
+
+        if ($request->user()->isAdmin()) {
+            $networkRule->locked = $request->input('locked', false);
+        }
 
         $task = $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
             $networkRule->save();
@@ -120,5 +117,23 @@ class NetworkRuleController extends BaseController
         });
 
         return $this->responseTaskId($task->id);
+    }
+
+    public function lock(Request $request, $networkRuleId)
+    {
+        $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
+        $networkRule->locked = true;
+        $networkRule->save();
+
+        return response('', 204);
+    }
+
+    public function unlock(Request $request, $networkRuleId)
+    {
+        $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
+        $networkRule->locked = false;
+        $networkRule->save();
+
+        return response('', 204);
     }
 }

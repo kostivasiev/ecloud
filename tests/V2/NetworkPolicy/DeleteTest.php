@@ -25,25 +25,4 @@ class DeleteTest extends TestCase
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }
-
-    public function testNonAdminCannotDeleteLockedResource()
-    {
-        $this->networkPolicy()->setAttribute('locked', true)->saveQuietly();
-        $this->asUser()
-            ->delete('/v2/network-policies/' . $this->networkPolicy()->id)
-            ->assertJsonFragment([
-                'title' => 'Forbidden',
-                'detail' => 'The specified resource is locked',
-                'status' => 403,
-            ])->assertStatus(403);
-    }
-
-    public function testAdminCanDeleteLockedResource()
-    {
-        Event::fake(Created::class);
-        $this->networkPolicy()->setAttribute('locked', true)->saveQuietly();
-        $this->asAdmin()
-            ->delete('/v2/network-policies/' . $this->networkPolicy()->id)
-            ->assertStatus(202);
-    }
 }

@@ -1,9 +1,0 @@
-put:
-  description: Lock / Unlock a firewall policy to changes
-  parameters:
-    - $ref: '../../resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
-  responses:
-    204:
-      description: success
-  tags:
-    - Network Policies

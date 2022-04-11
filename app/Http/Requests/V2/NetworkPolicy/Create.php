@@ -7,7 +7,6 @@ use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\NetworkHasNoPolicy;
 use App\Rules\V2\VpcHasAdvancedNetworking;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class Create extends FormRequest
 {
@@ -18,7 +17,7 @@ class Create extends FormRequest
      */
     public function rules()
     {
-        $rules = [
+        return [
             'name' => 'nullable|string|max:255',
             'network_id' => [
                 'required',
@@ -36,12 +35,6 @@ class Create extends FormRequest
                 'in:ALLOW,DROP,REJECT'
             ],
         ];
-
-        if (Auth::user()->isAdmin()) {
-            $rules['locked'] = 'sometimes|boolean';
-        }
-
-        return $rules;
     }
 
     public function messages()
