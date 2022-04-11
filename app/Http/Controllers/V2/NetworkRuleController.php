@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\V2;
 
+use App\Http\Middleware\IsLocked;
 use App\Http\Requests\V2\NetworkRule\Create;
 use App\Http\Requests\V2\NetworkRule\Update;
+use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\NetworkRulePort;
 use App\Resources\V2\NetworkRuleResource;
@@ -29,6 +31,11 @@ class NetworkRuleController extends BaseController
 
     public function store(Create $request)
     {
+        $networkPolicy = NetworkPolicy::forUser($request->user())
+            ->findOrFail($request->get('network_policy_id'));
+        if ($request->user()->isScoped() && $networkPolicy->locked === true) {
+            return (new IsLocked())->returnError();
+        }
         $networkRule = app()->make(NetworkRule::class);
         $networkRule->fill($request->only([
             'network_policy_id',
