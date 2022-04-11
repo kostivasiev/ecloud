@@ -657,9 +657,14 @@ abstract class TestCase extends BaseTestCase
         parent::tearDown();
     }
 
-    public function asAdmin()
+    public function asScopedAdmin($resellerId = 7052)
     {
-        $consumer = new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']);
+        return $this->asAdmin($resellerId);
+    }
+
+    public function asAdmin($resellerId = 0)
+    {
+        $consumer = new Consumer($resellerId, [config('app.name') . '.read', config('app.name') . '.write']);
         $consumer->setIsAdmin(true);
         $this->be($consumer);
         return $this;

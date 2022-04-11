@@ -22,19 +22,17 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $this->post('/v2/firewall-rules', [
-            'name' => 'Demo firewall rule 1',
-            'sequence' => 10,
-            'firewall_policy_id' => $this->firewallPolicy()->id,
-            'source' => '192.168.100.1/24',
-            'destination' => '212.22.18.10/24',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'enabled' => true
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertStatus(202);
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '192.168.100.1/24',
+                'destination' => '212.22.18.10/24',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true
+            ])->assertStatus(202);
 
         $this->assertDatabaseHas('firewall_rules', [
             'name' => 'Demo firewall rule 1',
@@ -66,43 +64,39 @@ class CreateTest extends TestCase
             $model->save();
         });
 
-        $this->post('/v2/firewall-rules', [
-            'name' => 'Demo firewall rule 1',
-            'sequence' => 10,
-            'firewall_policy_id' => $this->firewallPolicy()->id,
-            'source' => '192.168.100.1/24',
-            'destination' => '212.22.18.10/24',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'enabled' => true
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertJsonFragment(
-            [
-                'title' => 'Validation Error',
-                'detail' => 'The specified firewall policy id resource currently has the status of \'failed\' and cannot be used',
-            ]
-        )->assertStatus(422);
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '192.168.100.1/24',
+                'destination' => '212.22.18.10/24',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true
+            ])->assertJsonFragment(
+                [
+                    'title' => 'Validation Error',
+                    'detail' => 'The specified firewall policy id resource currently has the status of \'failed\' and cannot be used',
+                ]
+            )->assertStatus(422);
 
         Event::assertNotDispatched(Created::class);
     }
 
     public function testSourceANYSucceeds()
     {
-        $this->post('/v2/firewall-rules', [
-            'name' => 'Demo firewall rule 1',
-            'sequence' => 10,
-            'firewall_policy_id' => $this->firewallPolicy()->id,
-            'source' => 'ANY',
-            'destination' => '212.22.18.10/24',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'enabled' => true
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertStatus(202);
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => 'ANY',
+                'destination' => '212.22.18.10/24',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true
+            ])->assertStatus(202);
 
         $this->assertDatabaseHas('firewall_rules', [
             'name' => 'Demo firewall rule 1',
@@ -122,19 +116,17 @@ class CreateTest extends TestCase
 
     public function testDestinationANYSucceeds()
     {
-        $this->post('/v2/firewall-rules', [
-            'name' => 'Demo firewall rule 1',
-            'sequence' => 10,
-            'firewall_policy_id' => $this->firewallPolicy()->id,
-            'source' => '212.22.18.10/24',
-            'destination' => 'ANY',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'enabled' => true
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertStatus(202);
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '212.22.18.10/24',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true
+            ])->assertStatus(202);
 
         $this->assertDatabaseHas('firewall_rules', [
             'name' => 'Demo firewall rule 1',
@@ -154,64 +146,58 @@ class CreateTest extends TestCase
 
     public function testMissingSourceFails()
     {
-        $this->post('/v2/firewall-rules', [
-            'name' => 'Demo firewall rule 1',
-            'sequence' => 10,
-            'firewall_policy_id' => $this->firewallPolicy()->id,
-            'source' => '',
-            'destination' => '212.22.18.10/24',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'enabled' => true
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertStatus(422);
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '',
+                'destination' => '212.22.18.10/24',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true
+            ])->assertStatus(422);
 
         Event::assertNotDispatched(Created::class);
     }
 
     public function testMissingDestinationFails()
     {
-        $this->post('/v2/firewall-rules', [
-            'name' => 'Demo firewall rule 1',
-            'sequence' => 10,
-            'firewall_policy_id' => $this->firewallPolicy()->id,
-            'source' => '212.22.18.10/24',
-            'destination' => '',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'enabled' => true
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertStatus(422);
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '212.22.18.10/24',
+                'destination' => '',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true
+            ])->assertStatus(422);
 
         Event::assertNotDispatched(Created::class);
     }
 
     public function testPortsValidSucceeds()
     {
-        $this->post('/v2/firewall-rules', [
-            'name' => 'Demo firewall rule 1',
-            'sequence' => 10,
-            'firewall_policy_id' => $this->firewallPolicy()->id,
-            'source' => '212.22.18.10/24',
-            'destination' => 'ANY',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'ports' => [
-                [
-                    'source' => '80',
-                    'destination' => '443',
-                    'protocol' => 'TCP'
-                ]
-            ],
-            'enabled' => true
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertStatus(202);
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '212.22.18.10/24',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'ports' => [
+                    [
+                        'source' => '80',
+                        'destination' => '443',
+                        'protocol' => 'TCP'
+                    ]
+                ],
+                'enabled' => true
+            ])->assertStatus(202);
 
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -220,26 +206,75 @@ class CreateTest extends TestCase
 
     public function testPortsInvalidFails()
     {
-        $this->post('/v2/firewall-rules', [
-            'name' => 'Demo firewall rule 1',
-            'sequence' => 10,
-            'firewall_policy_id' => $this->firewallPolicy()->id,
-            'source' => '212.22.18.10/24',
-            'destination' => 'ANY',
-            'action' => 'ALLOW',
-            'direction' => 'IN',
-            'ports' => [
-                [
-                    'destination' => 'ANY',
-                    'protocol' => 'TCP'
-                ]
-            ],
-            'enabled' => true
-        ], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertStatus(422);
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '212.22.18.10/24',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'ports' => [
+                    [
+                        'destination' => 'ANY',
+                        'protocol' => 'TCP'
+                    ]
+                ],
+                'enabled' => true
+            ])->assertStatus(422);
 
         Event::assertNotDispatched(Created::class);
+    }
+
+    public function testCreateRuleLockedPolicyFailsForUser()
+    {
+        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+
+        $this->asUser()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '212.22.18.10/24',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'ports' => [
+                    [
+                        'destination' => 'ANY',
+                        'protocol' => 'TCP',
+                        'source' => 'ANY',
+                    ]
+                ],
+                'enabled' => true
+            ])->assertJsonFragment([
+                'title' => 'Forbidden',
+                'detail' => 'The specified resource is locked',
+            ])->assertStatus(403);
+    }
+
+    public function testCreateRuleLockedPolicySucceedsForAdmin()
+    {
+        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '212.22.18.10/24',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'ports' => [
+                    [
+                        'destination' => 'ANY',
+                        'protocol' => 'TCP',
+                        'source' => 'ANY',
+                    ]
+                ],
+                'enabled' => true
+            ])->assertStatus(202);
     }
 }

@@ -104,8 +104,18 @@ Route::group([
         Route::get('network-policies/{networkPolicyId}/network-rules', 'NetworkPolicyController@networkRules');
         Route::get('network-policies/{networkPolicyId}/tasks', 'NetworkPolicyController@tasks');
         Route::post('network-policies', 'NetworkPolicyController@store');
-        Route::patch('network-policies/{networkPolicyId}', 'NetworkPolicyController@update');
-        Route::delete('network-policies/{networkPolicyId}', 'NetworkPolicyController@destroy');
+        Route::patch('network-policies/{networkPolicyId}', [
+            'middleware' => 'is-locked:' . \App\Models\V2\NetworkPolicy::class . ',networkPolicyId',
+            'uses' => 'NetworkPolicyController@update'
+        ]);
+        Route::delete('network-policies/{networkPolicyId}', [
+            'middleware' => 'is-locked:' . \App\Models\V2\NetworkPolicy::class . ',networkPolicyId',
+            'uses' => 'NetworkPolicyController@destroy'
+        ]);
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::put('network-policies/{networkPolicyId}/lock', 'NetworkPolicyController@lock');
+            Route::put('network-policies/{networkPolicyId}/unlock', 'NetworkPolicyController@unlock');
+        });
     });
 
     /** Network Rules */
@@ -114,10 +124,16 @@ Route::group([
         Route::get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
         Route::post('network-rules', 'NetworkRuleController@store');
         Route::group(['middleware' => 'network-rule-can-edit'], function () {
-            Route::patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
+            Route::patch('network-rules/{networkRuleId}', [
+                'middleware' => 'is-locked:' . \App\Models\V2\NetworkRule::class . ',networkRuleId',
+                'uses' => 'NetworkRuleController@update'
+            ]);
         });
         Route::group(['middleware' => 'network-rule-can-delete'], function () {
-            Route::delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
+            Route::delete('network-rules/{networkRuleId}', [
+                'middleware' => 'is-locked:' . \App\Models\V2\NetworkRule::class . ',networkRuleId',
+                'uses' => 'NetworkRuleController@destroy'
+            ]);
         });
     });
 
@@ -127,10 +143,16 @@ Route::group([
         Route::get('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@show');
         Route::post('network-rule-ports', 'NetworkRulePortController@store');
         Route::group(['middleware' => 'network-rule-port-can-edit'], function () {
-            Route::patch('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@update');
+            Route::patch('network-rule-ports/{networkRulePortId}', [
+                'middleware' => 'is-locked:' . \App\Models\V2\NetworkRulePort::class . ',networkRulePortId',
+                'uses' => 'NetworkRulePortController@update'
+            ]);
         });
         Route::group(['middleware' => 'network-rule-port-can-delete'], function () {
-            Route::delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
+            Route::delete('network-rule-ports/{networkRulePortId}', [
+                'middleware' => 'is-locked:' . \App\Models\V2\NetworkRulePort::class . ',networkRulePortId',
+                'uses' => 'NetworkRulePortController@destroy'
+            ]);
         });
     });
 
@@ -274,8 +296,18 @@ Route::group([
         Route::get('firewall-policies/{firewallPolicyId}/firewall-rules', 'FirewallPolicyController@firewallRules');
         Route::get('firewall-policies/{firewallPolicyId}/tasks', 'FirewallPolicyController@tasks');
         Route::post('firewall-policies', 'FirewallPolicyController@store');
-        Route::patch('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@update');
-        Route::delete('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@destroy');
+        Route::patch('firewall-policies/{firewallPolicyId}', [
+            'middleware' => 'is-locked:' . \App\Models\V2\FirewallPolicy::class . ',firewallPolicyId',
+            'uses' => 'FirewallPolicyController@update'
+        ]);
+        Route::delete('firewall-policies/{firewallPolicyId}', [
+            'middleware' => 'is-locked:' . \App\Models\V2\FirewallPolicy::class . ',firewallPolicyId',
+            'uses' => 'FirewallPolicyController@destroy'
+        ]);
+        Route::group(['middleware' => 'is-admin'], function () {
+            Route::put('firewall-policies/{firewallPolicyId}/lock', 'FirewallPolicyController@lock');
+            Route::put('firewall-policies/{firewallPolicyId}/unlock', 'FirewallPolicyController@unlock');
+        });
     });
 
     /** Firewall Rules */
@@ -284,8 +316,14 @@ Route::group([
         Route::get('firewall-rules/{firewallRuleId}', 'FirewallRuleController@show');
         Route::get('firewall-rules/{firewallRuleId}/ports', 'FirewallRuleController@ports');
         Route::post('firewall-rules', 'FirewallRuleController@store');
-        Route::patch('firewall-rules/{firewallRuleId}', 'FirewallRuleController@update');
-        Route::delete('firewall-rules/{firewallRuleId}', 'FirewallRuleController@destroy');
+        Route::patch('firewall-rules/{firewallRuleId}', [
+            'middleware' => 'is-locked:' . \App\Models\V2\FirewallRule::class . ',firewallRuleId',
+            'uses' => 'FirewallRuleController@update'
+        ]);
+        Route::delete('firewall-rules/{firewallRuleId}', [
+            'middleware' => 'is-locked:' . \App\Models\V2\FirewallRule::class . ',firewallRuleId',
+            'uses' => 'FirewallRuleController@destroy'
+        ]);
     });
 
     /** Firewall Rule Ports */
@@ -293,8 +331,14 @@ Route::group([
         Route::get('firewall-rule-ports', 'FirewallRulePortController@index');
         Route::get('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@show');
         Route::post('firewall-rule-ports', 'FirewallRulePortController@store');
-        Route::patch('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@update');
-        Route::delete('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@destroy');
+        Route::patch('firewall-rule-ports/{firewallRulePortId}', [
+            'middleware' => 'is-locked:' . \App\Models\V2\FirewallRulePort::class . ',firewallRulePortId',
+            'uses' => 'FirewallRulePortController@update'
+        ]);
+        Route::delete('firewall-rule-ports/{firewallRulePortId}', [
+            'middleware' => 'is-locked:' . \App\Models\V2\FirewallRulePort::class . ',firewallRulePortId',
+            'uses' => 'FirewallRulePortController@destroy'
+        ]);
     });
 
     /** Regions */

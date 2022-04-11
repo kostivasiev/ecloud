@@ -26,10 +26,37 @@ class DeleteTest extends TestCase
     {
         Event::fake([\App\Events\V2\Task\Created::class]);
 
-        $this->delete('/v2/firewall-rules/' . $this->firewallRule->id, [], [
-            'X-consumer-custom-id' => '0-0',
-            'X-consumer-groups' => 'ecloud.write',
-        ])->assertStatus(202);
+        $this->asAdmin()
+            ->delete('/v2/firewall-rules/' . $this->firewallRule->id)
+            ->assertStatus(202);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
+    }
+
+    public function testLockedPolicyPreventsDeleteForUser()
+    {
+        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+
+        $this->asUser()
+            ->delete('/v2/firewall-rules/' . $this->firewallRule->id)
+            ->assertJsonFragment([
+                'title' => 'Forbidden',
+                'detail' => 'The specified resource is locked',
+                'status' => 403,
+            ])->assertStatus(403);
+    }
+
+    public function testLockedPolicyAllowsDeleteForAdmin()
+    {
+        Event::fake([\App\Events\V2\Task\Created::class]);
+
+        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+
+        $this->asAdmin()
+            ->delete('/v2/firewall-rules/' . $this->firewallRule->id)
+            ->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';

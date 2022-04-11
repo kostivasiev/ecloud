@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FirewallRule;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
@@ -10,7 +11,7 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    protected FirewallRule $firewall_rule;
+    protected FirewallRule $firewallRule;
 
     public function setUp(): void
     {
@@ -19,18 +20,18 @@ class UpdateTest extends TestCase
         $this->availabilityZone();
 
         // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('patch')
+        $this->nsxServiceMock()->allows('patch')
             ->andReturnUsing(function () {
                 return new Response(200, [], '');
             });
 
         // TODO - Replace with real mock
-        $this->nsxServiceMock()->shouldReceive('get')
+        $this->nsxServiceMock()->allows('get')
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
             });
 
-        $this->firewall_rule = FirewallRule::factory()->create([
+        $this->firewallRule = FirewallRule::factory()->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
     }
@@ -38,7 +39,7 @@ class UpdateTest extends TestCase
     public function testEmptySourceFails()
     {
         $this->patch(
-            '/v2/firewall-rules/' . $this->firewall_rule->id,
+            '/v2/firewall-rules/' . $this->firewallRule->id,
             [
                 'source' => '',
             ],
@@ -52,7 +53,7 @@ class UpdateTest extends TestCase
     public function testEmptyDestinationFails()
     {
         $this->patch(
-            '/v2/firewall-rules/' . $this->firewall_rule->id,
+            '/v2/firewall-rules/' . $this->firewallRule->id,
             [
                 'destination' => '',
             ],
@@ -66,7 +67,7 @@ class UpdateTest extends TestCase
     public function testInvalidPortFails()
     {
         $this->patch(
-            '/v2/firewall-rules/' . $this->firewall_rule->id,
+            '/v2/firewall-rules/' . $this->firewallRule->id,
             [
                 'name' => 'Changed',
                 'ports' => [
@@ -80,5 +81,45 @@ class UpdateTest extends TestCase
                 'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertStatus(422);
+    }
+
+    public function testLockedPolicyAmendRuleFails()
+    {
+        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->asUser()
+            ->patch(
+                '/v2/firewall-rules/' . $this->firewallRule->id,
+                [
+                    'name' => 'Changed',
+                    'ports' => [
+                        [
+                            'source' => "ANY",
+                        ]
+                    ]
+                ],
+            )->assertJsonFragment([
+                'title' => 'Forbidden',
+                'detail' => 'The specified resource is locked'
+            ])->assertStatus(403);
+    }
+
+    public function testUpdateSuccessful()
+    {
+        Event::fake([Created::class]);
+        $this->asAdmin()
+            ->patch(
+                '/v2/firewall-rules/' . $this->firewallRule->id,
+                [
+                    'name' => 'Changed',
+                    'ports' => [
+                        [
+                            'protocol' => 'TCP',
+                            'source' => "ANY",
+                            'destination' => "ANY",
+                        ]
+                    ]
+                ],
+            )->assertStatus(202);
+        Event::assertDispatched(Created::class);
     }
 }
