@@ -6,6 +6,7 @@ use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CreateFirewallPolicyRequest extends FormRequest
 {
@@ -14,7 +15,7 @@ class CreateFirewallPolicyRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'name' => 'nullable|string|max:255',
             'sequence' => 'required|integer',
             'router_id' => [
@@ -25,6 +26,12 @@ class CreateFirewallPolicyRequest extends FormRequest
                 new IsResourceAvailable(Router::class),
             ]
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $rules['locked'] = 'sometimes|boolean';
+        }
+
+        return $rules;
     }
 
     /**
