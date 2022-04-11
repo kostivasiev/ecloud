@@ -29,6 +29,13 @@ class NetworkPolicy extends Model implements Searchable, ResellerScopeable, Mana
             'id',
             'network_id',
             'name',
+            'locked',
+        ];
+        $this->attributes = [
+            'locked' => false,
+        ];
+        $this->casts = [
+            'locked' => 'boolean',
         ];
         parent::__construct($attributes);
     }
@@ -78,6 +85,7 @@ class NetworkPolicy extends Model implements Searchable, ResellerScopeable, Mana
             'id' => $filter->string(),
             'network_id' => $filter->string(),
             'name' => $filter->string(),
+            'locked' => $filter->boolean(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);

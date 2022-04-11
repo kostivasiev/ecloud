@@ -37,9 +37,14 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
             'name',
             'sequence',
             'router_id',
+            'locked',
+        ];
+        $this->attributes = [
+            'locked' => false,
         ];
         $this->casts = [
-            'sequence' => 'integer'
+            'sequence' => 'integer',
+            'locked' => 'boolean',
         ];
         parent::__construct($attributes);
     }
@@ -96,6 +101,7 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
             'name' => $filter->string(),
             'sequence' => $filter->string(),
             'router_id' => $filter->string(),
+            'locked' => $filter->boolean(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
