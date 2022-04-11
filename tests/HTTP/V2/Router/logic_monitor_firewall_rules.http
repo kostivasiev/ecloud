@@ -96,7 +96,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-###
+### 5. Create Network
 POST https://{{host}}/{{version}}/networks
 Accept: */*
 Cache-Control: no-cache
@@ -117,8 +117,7 @@ client.global.set('network_id', response.body.data.id);
 client.log('Network ID: ' + response.body.data.id);
 %}
 
-###
-# Create a Network Policy
+### 6. Create a Network Policy
 POST https://{{host}}/{{version}}/network-policies
 Accept: */*
 Cache-Control: no-cache
@@ -138,7 +137,7 @@ client.test('Create a Network Policy', function () {
 });
 %}
 
-### 5. Delete the first router
+### 7. Delete the first router
 DELETE https://{{host}}/{{version}}/routers/{{router_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -146,7 +145,7 @@ X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
-### 6. Delete the first VPC
+### 8. Delete the first VPC
 DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -154,7 +153,23 @@ X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
-### 7. Delete the second router
+### 9. Delete network policy
+DELETE https://{{host}}/{{version}}/network-policies/{{network_policy_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 10. Delete network
+DELETE https://{{host}}/{{version}}/networks/{{network_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 11. Delete the second router
 DELETE https://{{host}}/{{version}}/routers/{{advanced_router_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -162,7 +177,7 @@ X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
-### 8. Delete the second VPC
+### 12. Delete the second VPC
 DELETE https://{{host}}/{{version}}/vpcs/{{advanced_vpc_id}}
 Accept: */*
 Cache-Control: no-cache

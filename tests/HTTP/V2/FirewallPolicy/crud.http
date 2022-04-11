@@ -8,7 +8,8 @@ Content-Type:  application/json
 {
   "name": "Test Policy - Delete Rules",
   "sequence": 10,
-  "router_id": "{{dev_router_id}}"
+  "router_id": "{{dev_router_id}}",
+  "locked": true
 }
 
 > {%
@@ -30,6 +31,13 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
+
+###
+# Unlock Policy Item
+GET https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}/unlock
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
 
 ###
 # Get Policy Item

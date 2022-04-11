@@ -40,6 +40,7 @@ class CreateDefaultNetworkRules extends Job
                 $dhcpServerAddress = $this->model->network->getDhcpServerAddress()->toString();
                 $networkRule = app()->make(NetworkRule::class);
                 $networkRule->fill($rule);
+                $networkRule->locked = true;
                 if ($rule['type'] == NetworkRule::TYPE_DHCP && $rule['direction'] == 'IN') {
                     $networkRule->source = $dhcpServerAddress;
                 }
