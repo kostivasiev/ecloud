@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Models\V2\Filters\NullDateFilter;
 use App\Support\Resource;
 use App\Traits\V2\CustomKey;
 use Carbon\Carbon;
