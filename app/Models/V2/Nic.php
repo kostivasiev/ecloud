@@ -109,8 +109,8 @@ class Nic extends Model implements Searchable, ResellerScopeable, AvailabilityZo
             return $this->attributes['ip_address'];
         }
 
-        if ($this->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->exists()) {
-            return $this->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->first()->ip_address;
+        if ($this->ipAddresses()->withType(IpAddress::TYPE_DHCP)->exists()) {
+            return $this->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first()->ip_address;
         }
 
         return null;
@@ -122,7 +122,7 @@ class Nic extends Model implements Searchable, ResellerScopeable, AvailabilityZo
      * @return mixed|void
      * @throws \Exception
      */
-    public function assignIpAddress(array $denyList = [], string $type = IpAddress::TYPE_NORMAL) : IpAddress
+    public function assignIpAddress(array $denyList = [], string $type = IpAddress::TYPE_DHCP) : IpAddress
     {
         $lock = Cache::lock("ip_address." . $this->network->id, 60);
         try {

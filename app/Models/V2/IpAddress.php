@@ -19,7 +19,7 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
     public $keyPrefix = 'ip';
     public $children;
 
-    const TYPE_NORMAL = 'normal';
+    const TYPE_DHCP = 'dhcp';
     const TYPE_CLUSTER = 'cluster';
 
     public function __construct(array $attributes = [])
