@@ -13,14 +13,11 @@ class IpAddressController extends BaseController
 {
     public function index(Request $request)
     {
-        $collection = IpAddress::forUser($request->user())->search();
-
-        if (!$request->has('sort')) {
-            $collection->sortByIp();
-        }
+        $collection = IpAddress::forUser($request->user())
+            ->sortByIp();
 
         return IpAddressResource::collection(
-            $collection->paginate(
+            $collection->search()->paginate(
                 $request->input('per_page', env('PAGINATION_LIMIT'))
             )
         );

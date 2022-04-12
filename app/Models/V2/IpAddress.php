@@ -112,6 +112,11 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
 
     public function scopeSortByIp($query)
     {
-        $query->orderByRaw('INET_ATON(ip_address) ASC');
+        if (request()->has('sort')) {
+            list($field, $direction) = explode(':', request()->get('sort'));
+            if ($field == 'ip_address') {
+                $query->orderByRaw('INET_ATON(ip_address) ' . $direction);
+            }
+        }
     }
 }
