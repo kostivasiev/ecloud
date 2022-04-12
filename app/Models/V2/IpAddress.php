@@ -109,4 +109,9 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
             'updated_at' => $filter->date(),
         ]);
     }
+
+    public function scopeSortByIp($query)
+    {
+        $query->orderByRaw('INET_ATON(ip_address) ASC');
+    }
 }
