@@ -26,7 +26,7 @@ class GetTest extends TestCase
                 'network_id' => $this->network()->id
             ]);
 
-        $this->get('/v2/ip-addresses?sort=ip_address:asc')
+        $this->get('/v2/ip-addresses')
             ->assertJsonFragment(
                 [
                     'ip_address' => '1.1.1.1',
