@@ -7,6 +7,7 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\Vpc;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
@@ -89,5 +90,26 @@ class GetTest extends TestCase
                 'price' => $this->billingMetric->price,
             ])
             ->assertStatus(200);
+    }
+
+    public function testGetCollectionFilterNullEndDate()
+    {
+        BillingMetric::factory(3)->create([
+            'start' => Carbon::now()->subDays(1)->toIso8601String(),
+            'end' => null
+        ]);
+        BillingMetric::factory(3)->create([
+            'end' => Carbon::now()->toIso8601String(),
+        ]);
+        $start = Carbon::now()->toIso8601String();
+        $totalMetrics = BillingMetric::count();
+
+        $this->asAdmin()
+            ->get('/v2/billing-metrics?start:lt=' . $start . '&end:eq=null')
+            ->assertJsonFragment([
+                'count' => 4,
+            ])->assertStatus(200);
+        $this->assertGreaterThan(4, $totalMetrics);
+        $this->assertEquals(7, $totalMetrics);
     }
 }

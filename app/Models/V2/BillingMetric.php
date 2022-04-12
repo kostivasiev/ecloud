@@ -2,6 +2,7 @@
 
 namespace App\Models\V2;
 
+use App\Models\V2\Filters\NullDateFilter;
 use App\Support\Resource;
 use App\Traits\V2\CustomKey;
 use Carbon\Carbon;
@@ -130,8 +131,8 @@ class BillingMetric extends Model implements Searchable
             'name' => $filter->string(),
             'key' => $filter->string(),
             'value' => $filter->string(),
-            'start' => $filter->date(),
-            'end' => $filter->date(),
+            'start' => $filter->wrap(new NullDateFilter)->date(),
+            'end' => $filter->wrap(new NullDateFilter)->date(),
             'category' => $filter->string(),
             'price' => $filter->numeric(),
             'created_at' => $filter->date(),
