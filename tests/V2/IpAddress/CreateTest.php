@@ -1,6 +1,7 @@
 <?php
 namespace Tests\V2\IpAddress;
 
+use App\Models\V2\IpAddress;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -18,7 +19,7 @@ class CreateTest extends TestCase
             'name' => 'Test',
             'ip_address' => '10.0.0.4',
             'network_id' => $this->network()->id,
-            'type' => 'normal',
+            'type' => IpAddress::TYPE_DHCP,
         ];
 
         $this->post('/v2/ip-addresses', $data)
@@ -38,7 +39,7 @@ class CreateTest extends TestCase
             'name' => 'Test',
             'ip_address' => '10.0.0.4',
             'network_id' => $this->network()->id,
-            'type' => 'normal',
+            'type' => IpAddress::TYPE_DHCP,
         ];
 
         $this->post('/v2/ip-addresses', $data)
