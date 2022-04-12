@@ -42,7 +42,7 @@ class GetTest extends TestCase
         $ipAddress = IpAddress::factory()->create();
         $this->nic()->ipAddresses()->sync($ipAddress);
 
-        $this->get('/v2/nics/' . $this->nic()->id . '/ip-addresses')
+        $this->get('/v2/nics/' . $this->nic()->id . '/ip-addresses?sort=ip_address:asc')
             ->assertJsonFragment(
                 [
                     'id' => $ipAddress->id,
