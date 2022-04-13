@@ -53,4 +53,20 @@ class MismatchVolumeGroupTest extends TestCase
                 'detail' => 'Resources must be in the same Vpc',
             ])->assertStatus(422);
     }
+
+    public function testAssignMismatchedSharedVolumeToVolumeGroup()
+    {
+        $this->volume()->setAttribute('is_shared', true)->saveQuietly();
+
+        $this->asAdmin()
+            ->patch(
+                '/v2/volumes/' . $this->volume()->id,
+                [
+                    'volume_group_id' => $this->secondaryVolumeGroup->id,
+                ]
+            )->assertJsonFragment([
+                'title' => 'Validation Error',
+                'detail' => 'Resources must be in the same Vpc',
+            ])->assertStatus(422);
+    }
 }
