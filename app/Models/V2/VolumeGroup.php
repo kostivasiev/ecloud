@@ -13,7 +13,7 @@ use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class VolumeGroup extends Model implements Searchable, ResellerScopeable, AvailabilityZoneable
+class VolumeGroup extends Model implements Searchable, ResellerScopeable, AvailabilityZoneable, VpcAble
 {
     use CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable, HasFactory;
 
