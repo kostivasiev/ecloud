@@ -21,7 +21,7 @@ client.log('IP Address ID: ' + response.body.data.id);
 %}
 
 ###
-GET https://{{host}}/{{version}}/ip-addresses?sort=ip_address:asc
+GET https://{{host}}/{{version}}/ip-addresses?sort=ip_address:desc
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_admin}}

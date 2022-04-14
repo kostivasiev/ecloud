@@ -114,7 +114,7 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
     {
         if (request()->has('sort')) {
             list($field, $direction) = explode(':', request()->get('sort'));
-            if ($field == 'ip_address') {
+            if ($field == 'ip_address' && in_array(strtolower($direction), ['asc', 'desc'])) {
                 $query->orderByRaw('INET_ATON(ip_address) ' . $direction);
             }
         }
