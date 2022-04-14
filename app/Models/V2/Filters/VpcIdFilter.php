@@ -2,9 +2,8 @@
 
 namespace App\Models\V2\Filters;
 
-use App\Models\V2\VpnEndpoint;
+use App\Models\V2\VpcAble;
 use App\Models\V2\VpnService;
-use App\Models\V2\VpnSession;
 use UKFast\Sieve\Filters\StringFilter;
 use UKFast\Sieve\ModifiesQueries;
 use UKFast\Sieve\SearchTerm;
@@ -13,22 +12,16 @@ use UKFast\Sieve\WrapsFilter;
 class VpcIdFilter extends StringFilter implements WrapsFilter
 {
 
-    protected string $model;
-    protected array $allowableModels = [];
+    protected $model;
 
     public function __construct(string $model)
     {
         $this->model = $model;
-        $this->allowableModels = [
-            VpnEndpoint::class,
-            VpnService::class,
-            VpnSession::class,
-        ];
     }
 
     public function modifyQuery($query, SearchTerm $search)
     {
-        if (in_array($this->model, $this->allowableModels)) {
+        if ($this->model instanceof VpcAble) {
             $modelIds = $this->model::forUser(request()->user())->get();
 
             if ($search->operator() == 'eq') {
