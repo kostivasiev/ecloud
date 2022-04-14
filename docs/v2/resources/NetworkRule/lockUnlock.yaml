@@ -1,9 +1,0 @@
-put:
-  description: Lock / Unlock a network rule to changes
-  parameters:
-    - $ref: '../../resources/NetworkRule/parameters/networkRuleId.yaml'
-  responses:
-    204:
-      description: success
-  tags:
-    - Network Rule
