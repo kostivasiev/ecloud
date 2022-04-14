@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Middleware\IsLocked;
+use App\Http\Middleware\FirewallPolicy\IsLocked;
 use App\Http\Requests\V2\FirewallRule\Create;
 use App\Http\Requests\V2\FirewallRule\Update;
 use App\Models\V2\FirewallPolicy;
