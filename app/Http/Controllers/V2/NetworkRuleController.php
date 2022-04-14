@@ -41,10 +41,6 @@ class NetworkRuleController extends BaseController
             'enabled',
         ]));
 
-        if ($request->user()->isAdmin()) {
-            $networkRule->locked = $request->input('locked', false);
-        }
-
         $task = $networkRule->networkPolicy->withTaskLock(function () use ($request, $networkRule) {
             $networkRule->save();
 
@@ -117,23 +113,5 @@ class NetworkRuleController extends BaseController
         });
 
         return $this->responseTaskId($task->id);
-    }
-
-    public function lock(Request $request, $networkRuleId)
-    {
-        $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
-        $networkRule->locked = true;
-        $networkRule->save();
-
-        return response('', 204);
-    }
-
-    public function unlock(Request $request, $networkRuleId)
-    {
-        $networkRule = NetworkRule::forUser($request->user())->findOrFail($networkRuleId);
-        $networkRule->locked = false;
-        $networkRule->save();
-
-        return response('', 204);
     }
 }

@@ -75,19 +75,4 @@ class UpdateTest extends TestCase
 
         $this->patch('/v2/network-rules/' . $dhcpNetworkRule->id)->assertStatus(403);
     }
-
-    public function testAmendLockedRuleFails()
-    {
-        $this->networkRule->setAttribute('locked', true)->saveQuietly();
-        $this->patch(
-            '/v2/network-rules/' . $this->networkRule->id,
-            [
-                'action' => 'REJECT',
-            ]
-        )->assertJsonFragment([
-            'title' => 'Forbidden',
-            'detail' => 'The specified resource is locked',
-            'status' => 403,
-        ])->assertStatus(403);
-    }
 }

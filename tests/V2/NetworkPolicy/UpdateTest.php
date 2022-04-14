@@ -1,7 +1,6 @@
 <?php
 namespace Tests\V2\NetworkPolicy;
 
-use App\Events\V2\Task\Created;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;

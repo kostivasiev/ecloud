@@ -71,13 +71,6 @@ class NetworkRulePort extends Model implements Searchable, Manageable
         return $this->isManaged();
     }
 
-    public function locked(): Attribute
-    {
-        return new Attribute(
-            get: fn ($value) => $this->networkRule->networkPolicy->locked,
-        );
-    }
-
     public function sieve(Sieve $sieve)
     {
         $sieve->configure(fn ($filter) => [

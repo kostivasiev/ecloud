@@ -20,8 +20,10 @@ class DeleteTest extends TestCase
         $this->vpc()->advanced_networking = true;
         $this->vpc()->saveQuietly();
 
-        $this->delete('/v2/network-policies/' . $this->networkPolicy()->id)
-            ->assertStatus(202);
+        $this->delete(
+            '/v2/network-policies/' . $this->networkPolicy()->id,
+            []
+        )->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class);
     }

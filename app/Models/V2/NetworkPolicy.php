@@ -29,7 +29,6 @@ class NetworkPolicy extends Model implements Searchable, ResellerScopeable, Mana
             'id',
             'network_id',
             'name',
-            'locked',
         ];
         parent::__construct($attributes);
     }

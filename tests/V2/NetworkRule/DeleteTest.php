@@ -1,7 +1,6 @@
 <?php
 namespace Tests\V2\NetworkRule;
 
-use App\Events\V2\Task\Created;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use Illuminate\Database\Eloquent\Model;
@@ -81,28 +80,5 @@ class DeleteTest extends TestCase
         });
 
         $this->delete('/v2/network-rules/' . $networkRule->id)->assertStatus(403);
-    }
-
-    public function testDeleteLockedRuleFailsForUser()
-    {
-        $this->networkRule->setAttribute('locked', true)->saveQuietly();
-
-        $this->asUser()
-            ->delete('/v2/network-rules/' . $this->networkRule->id)
-            ->assertJsonFragment([
-                'title' => 'Forbidden',
-                'detail' => 'The specified resource is locked',
-                'status' => 403,
-            ])->assertStatus(403);
-    }
-
-    public function testDeleteLockedRuleSucceedsForAdmin()
-    {
-        Event::fake(Created::class);
-        $this->networkRule->setAttribute('locked', true)->saveQuietly();
-
-        $this->asAdmin()
-            ->delete('/v2/network-rules/' . $this->networkRule->id)
-            ->assertStatus(202);
     }
 }

@@ -82,27 +82,4 @@ class CreateTest extends TestCase
             ]
         )->assertStatus(422);
     }
-
-    public function testCreateLockedRule()
-    {
-        Event::fake([Created::class]);
-        $this->vpc()->advanced_networking = true;
-        $this->vpc()->saveQuietly();
-
-        $this->asAdmin()
-            ->post(
-                '/v2/network-rules',
-                [
-                    'network_policy_id' => $this->networkPolicy()->id,
-                    'sequence' => 1,
-                    'source' => '10.0.1.0/32',
-                    'destination' => '10.0.2.0/32',
-                    'action' => 'ALLOW',
-                    'enabled' => true,
-                    'direction' => 'IN_OUT',
-                    'locked' => true,
-                ]
-            )->assertStatus(202);
-        $this->assertTrue($this->networkPolicy()->networkRules()->first()->locked);
-    }
 }

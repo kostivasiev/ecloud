@@ -4,7 +4,6 @@ namespace App\Resources\V2;
 
 use DateTimeZone;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use UKFast\Responses\UKFastResource;
 
 class NetworkPolicyResource extends UKFastResource

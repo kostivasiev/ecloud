@@ -5,7 +5,6 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -37,16 +36,11 @@ class NetworkRule extends Model implements Searchable, Manageable
             'action',
             'direction',
             'enabled',
-            'type',
-            'locked',
+            'type'
         ];
         $this->casts = [
             'sequence' => 'integer',
             'enabled' => 'boolean',
-            'locked' => 'boolean',
-        ];
-        $this->attributes = [
-            'locked' => false,
         ];
         parent::__construct($attributes);
     }
@@ -106,7 +100,6 @@ class NetworkRule extends Model implements Searchable, Manageable
             'type' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
-            'locked' => $filter->boolean(),
         ]);
     }
 }
