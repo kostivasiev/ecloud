@@ -22,7 +22,7 @@ use UKFast\DB\Ditto\Sortable;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class VpnSession extends Model implements Searchable, AvailabilityZoneable, ResellerScopeable
+class VpnSession extends Model implements Searchable, AvailabilityZoneable, ResellerScopeable, VpcAble
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -75,6 +75,11 @@ class VpnSession extends Model implements Searchable, AvailabilityZoneable, Rese
     public function availabilityZone()
     {
         return $this->vpnService->router->availabilityZone();
+    }
+
+    public function vpc()
+    {
+        return $this->vpnService->router->vpc();
     }
 
     public function vpnSessionNetworks()
@@ -182,7 +187,7 @@ class VpnSession extends Model implements Searchable, AvailabilityZoneable, Rese
                 'local_networks' => $filter->string(),
                 'created_at' => $filter->date(),
                 'updated_at' => $filter->date(),
-                'vpc_id' => $filter->wrap(new VpcIdFilter(static::class))->string(),
+                'vpc_id' => $filter->wrap(new VpcIdFilter($this))->string(),
             ]);
     }
 }

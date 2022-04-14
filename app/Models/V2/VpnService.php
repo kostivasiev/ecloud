@@ -22,7 +22,7 @@ use UKFast\Sieve\Sieve;
  * @method static findOrFail(string $dhcpId)
  * @method static forUser(string $user)
  */
-class VpnService extends Model implements Searchable, AvailabilityZoneable, ResellerScopeable
+class VpnService extends Model implements Searchable, AvailabilityZoneable, ResellerScopeable, VpcAble
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -54,6 +54,11 @@ class VpnService extends Model implements Searchable, AvailabilityZoneable, Rese
     public function router()
     {
         return $this->belongsTo(Router::class);
+    }
+
+    public function vpc()
+    {
+        return $this->router->vpc();
     }
 
     public function vpnEndpoints()
@@ -100,7 +105,7 @@ class VpnService extends Model implements Searchable, AvailabilityZoneable, Rese
                 'name' => $filter->string(),
                 'created_at' => $filter->date(),
                 'updated_at' => $filter->date(),
-                'vpc_id' => $filter->wrap(new VpcIdFilter(static::class))->string(),
+                'vpc_id' => $filter->wrap(new VpcIdFilter($this))->string(),
             ]);
     }
 }

@@ -3,7 +3,9 @@
 namespace App\Models\V2\Filters;
 
 use App\Models\V2\VpcAble;
+use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnService;
+use App\Models\V2\VpnSession;
 use UKFast\Sieve\Filters\StringFilter;
 use UKFast\Sieve\ModifiesQueries;
 use UKFast\Sieve\SearchTerm;
@@ -14,7 +16,7 @@ class VpcIdFilter extends StringFilter implements WrapsFilter
 
     protected $model;
 
-    public function __construct(string $model)
+    public function __construct($model)
     {
         $this->model = $model;
     }

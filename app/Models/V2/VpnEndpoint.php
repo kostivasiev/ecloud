@@ -15,7 +15,7 @@ use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class VpnEndpoint extends Model implements Searchable, AvailabilityZoneable, ResellerScopeable
+class VpnEndpoint extends Model implements Searchable, AvailabilityZoneable, ResellerScopeable, VpcAble
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
@@ -61,6 +61,11 @@ class VpnEndpoint extends Model implements Searchable, AvailabilityZoneable, Res
         return $this->vpnService->router->availabilityZone();
     }
 
+    public function vpc()
+    {
+        return $this->vpnService->router->vpc();
+    }
+
     /**
      * @param $query
      * @param $user
@@ -85,7 +90,7 @@ class VpnEndpoint extends Model implements Searchable, AvailabilityZoneable, Res
                 'vpn_service_id' => $filter->string(),
                 'created_at' => $filter->date(),
                 'updated_at' => $filter->date(),
-                'vpc_id' => $filter->wrap(new VpcIdFilter(static::class))->string(),
+                'vpc_id' => $filter->wrap(new VpcIdFilter($this))->string(),
             ]);
     }
 }
