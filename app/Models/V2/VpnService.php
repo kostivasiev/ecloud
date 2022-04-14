@@ -105,7 +105,7 @@ class VpnService extends Model implements Searchable, AvailabilityZoneable, Rese
                 'name' => $filter->string(),
                 'created_at' => $filter->date(),
                 'updated_at' => $filter->date(),
-                'vpc_id' => $filter->wrap(new VpcIdFilter($this))->string(),
+                'vpc_id' => $filter->for('router.vpc_id')->string(),
             ]);
     }
 }
