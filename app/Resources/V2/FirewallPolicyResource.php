@@ -40,7 +40,7 @@ class FirewallPolicyResource extends UKFastResource
             )->toIso8601String(),
         ];
         if (Auth::user()->isAdmin()) {
-            $attributes['locked'] = $this->locked;
+            $attributes['type'] = $this->type;
         }
         return $attributes;
     }

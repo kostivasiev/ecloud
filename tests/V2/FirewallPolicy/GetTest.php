@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FirewallPolicy;
 
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use Tests\TestCase;
 
@@ -71,37 +72,41 @@ class GetTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testUserCannotSeeLockedState()
+    public function testUserCannotSeeType()
     {
         $this->asUser()
             ->get('/v2/firewall-policies/' . $this->firewallPolicy()->id)
             ->assertJsonMissing([
-                'locked' => false
+                'type' => null
             ])->assertStatus(200);
 
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
 
         $this->asUser()
             ->get('/v2/firewall-policies/' . $this->firewallPolicy()->id)
             ->assertJsonMissing([
-                'locked' => true
+                'type' => FirewallPolicy::TYPE_SYSTEM
             ])->assertStatus(200);
     }
 
-    public function testAdminCanSeeLockedState()
+    public function testAdminCanSeeType()
     {
         $this->asAdmin()
             ->get('/v2/firewall-policies/' . $this->firewallPolicy()->id)
             ->assertJsonFragment([
-                'locked' => false
+                'type' => null
             ])->assertStatus(200);
 
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
 
         $this->asAdmin()
             ->get('/v2/firewall-policies/' . $this->firewallPolicy()->id)
             ->assertJsonFragment([
-                'locked' => true
+                'type' => FirewallPolicy::TYPE_SYSTEM
             ])->assertStatus(200);
     }
 }

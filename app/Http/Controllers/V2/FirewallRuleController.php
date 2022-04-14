@@ -70,7 +70,7 @@ class FirewallRuleController extends BaseController
     {
         $firewallPolicy = FirewallPolicy::forUser($request->user())
             ->findOrFail($request->get('firewall_policy_id'));
-        if ($request->user()->isScoped() && $firewallPolicy->locked === true) {
+        if ($request->user()->isScoped() && $firewallPolicy->isSystem()) {
             return (new IsLocked())->returnError();
         }
         $firewallRule = app()->make(FirewallRule::class);

@@ -65,11 +65,9 @@ class FirewallRulePort extends Model implements Searchable, Manageable
         return $this->isManaged();
     }
 
-    public function locked(): Attribute
+    public function isSystem(): bool
     {
-        return new Attribute(
-            get: fn ($value) => $this->firewallRule->firewallPolicy->locked,
-        );
+        return $this->firewallRule->isSystem();
     }
 
     public function sieve(Sieve $sieve)

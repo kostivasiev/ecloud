@@ -3,6 +3,7 @@
 namespace Tests\V2\FirewallRule;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
@@ -85,7 +86,9 @@ class UpdateTest extends TestCase
 
     public function testLockedPolicyAmendRuleFails()
     {
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
         $this->asUser()
             ->patch(
                 '/v2/firewall-rules/' . $this->firewallRule->id,

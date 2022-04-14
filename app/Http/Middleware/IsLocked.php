@@ -8,7 +8,7 @@ class IsLocked
     public function handle($request, Closure $next, $modelType, $idRouteParameter = 'id')
     {
         $model = $modelType::forUser($request->user())->findOrFail($request->route($idRouteParameter));
-        if ($request->user()->isScoped() && $model->locked === true) {
+        if ($request->user()->isScoped() && $model->isSystem()) {
             return $this->returnError();
         }
 

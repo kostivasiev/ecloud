@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FirewallRule;
 
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -37,7 +38,9 @@ class DeleteTest extends TestCase
 
     public function testLockedPolicyPreventsDeleteForUser()
     {
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
 
         $this->asUser()
             ->delete('/v2/firewall-rules/' . $this->firewallRule->id)
@@ -52,7 +55,9 @@ class DeleteTest extends TestCase
     {
         Event::fake([\App\Events\V2\Task\Created::class]);
 
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
 
         $this->asAdmin()
             ->delete('/v2/firewall-rules/' . $this->firewallRule->id)

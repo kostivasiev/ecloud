@@ -24,11 +24,15 @@ class CreateFirewallPolicyRequest extends FormRequest
                 'exists:ecloud.routers,id,deleted_at,NULL',
                 new ExistsForUser(Router::class),
                 new IsResourceAvailable(Router::class),
-            ]
+            ],
+            'type' => [
+                'sometimes',
+                'string',
+            ],
         ];
 
         if (Auth::user()->isAdmin()) {
-            $rules['locked'] = 'sometimes|boolean';
+            $rules['type'] = 'sometimes|string';
         }
 
         return $rules;

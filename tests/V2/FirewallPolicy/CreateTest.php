@@ -88,7 +88,7 @@ class CreateTest extends TestCase
             'name' => 'Demo policy rule 1',
             'sequence' => 10,
             'router_id' => $this->router()->id,
-            'locked' => true,
+            'type' => FirewallPolicy::TYPE_SYSTEM,
         ];
         $post = $this->asAdmin()
             ->post(
@@ -97,7 +97,7 @@ class CreateTest extends TestCase
             )->assertStatus(202);
 
         $policyId = (json_decode($post->getContent()))->data->id;
-        $this->assertTrue(FirewallPolicy::findOrFail($policyId)->locked);
+        $this->assertNotNull(FirewallPolicy::findOrFail($policyId)->type);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
@@ -110,7 +110,7 @@ class CreateTest extends TestCase
             'name' => 'Demo policy rule 1',
             'sequence' => 10,
             'router_id' => $this->router()->id,
-            'locked' => true,
+            'type' => FirewallPolicy::TYPE_SYSTEM,
         ];
         $post = $this->asUser()
             ->post(
@@ -119,7 +119,7 @@ class CreateTest extends TestCase
             )->assertStatus(202);
 
         $policyId = (json_decode($post->getContent()))->data->id;
-        $this->assertFalse(FirewallPolicy::findOrFail($policyId)->locked);
+        $this->assertNull(FirewallPolicy::findOrFail($policyId)->type);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';

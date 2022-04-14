@@ -80,11 +80,9 @@ class FirewallRule extends Model implements Searchable, Manageable
         return $this->isManaged();
     }
 
-    public function locked(): Attribute
+    public function isSystem(): bool
     {
-        return new Attribute(
-            get: fn ($value) => $this->firewallPolicy->locked,
-        );
+        return $this->firewallPolicy->isSystem();
     }
 
     public function sieve(Sieve $sieve)
@@ -102,7 +100,6 @@ class FirewallRule extends Model implements Searchable, Manageable
             'enabled' => $filter->numeric(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
-            'locked' => $filter->for('firewallPolicy.locked')->boolean(),
         ]);
     }
 }

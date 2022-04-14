@@ -114,20 +114,10 @@ Route::group([
         Route::get('network-rules/{networkRuleId}', 'NetworkRuleController@show');
         Route::post('network-rules', 'NetworkRuleController@store');
         Route::group(['middleware' => 'network-rule-can-edit'], function () {
-            Route::patch('network-rules/{networkRuleId}', [
-                'middleware' => 'is-locked:' . \App\Models\V2\NetworkRule::class . ',networkRuleId',
-                'uses' => 'NetworkRuleController@update'
-            ]);
+            Route::patch('network-rules/{networkRuleId}', 'NetworkRuleController@update');
         });
         Route::group(['middleware' => 'network-rule-can-delete'], function () {
-            Route::delete('network-rules/{networkRuleId}', [
-                'middleware' => 'is-locked:' . \App\Models\V2\NetworkRule::class . ',networkRuleId',
-                'uses' => 'NetworkRuleController@destroy'
-            ]);
-        });
-        Route::group(['middleware' => 'is-admin'], function () {
-            Route::put('network-rules/{networkRuleId}/lock', 'NetworkRuleController@lock');
-            Route::put('network-rules/{networkRuleId}/unlock', 'NetworkRuleController@unlock');
+            Route::delete('network-rules/{networkRuleId}', 'NetworkRuleController@destroy');
         });
     });
 
@@ -137,16 +127,10 @@ Route::group([
         Route::get('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@show');
         Route::post('network-rule-ports', 'NetworkRulePortController@store');
         Route::group(['middleware' => 'network-rule-port-can-edit'], function () {
-            Route::patch('network-rule-ports/{networkRulePortId}', [
-                'middleware' => 'is-locked:' . \App\Models\V2\NetworkRulePort::class . ',networkRulePortId',
-                'uses' => 'NetworkRulePortController@update'
-            ]);
+            Route::patch('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@update');
         });
         Route::group(['middleware' => 'network-rule-port-can-delete'], function () {
-            Route::delete('network-rule-ports/{networkRulePortId}', [
-                'middleware' => 'is-locked:' . \App\Models\V2\NetworkRulePort::class . ',networkRulePortId',
-                'uses' => 'NetworkRulePortController@destroy'
-            ]);
+            Route::delete('network-rule-ports/{networkRulePortId}', 'NetworkRulePortController@destroy');
         });
     });
 

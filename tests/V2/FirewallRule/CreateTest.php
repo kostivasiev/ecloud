@@ -3,6 +3,7 @@
 namespace Tests\V2\FirewallRule;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
@@ -229,7 +230,9 @@ class CreateTest extends TestCase
 
     public function testCreateRuleLockedPolicyFailsForUser()
     {
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
 
         $this->asUser()
             ->post('/v2/firewall-rules', [
@@ -256,7 +259,9 @@ class CreateTest extends TestCase
 
     public function testCreateRuleLockedPolicySucceedsForAdmin()
     {
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
 
         $this->asAdmin()
             ->post('/v2/firewall-rules', [

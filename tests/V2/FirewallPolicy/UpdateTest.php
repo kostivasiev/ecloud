@@ -3,6 +3,7 @@
 namespace Tests\V2\FirewallPolicy;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\FirewallPolicy;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -45,7 +46,9 @@ class UpdateTest extends TestCase
 
     public function testLockedPolicyDoesNotUpdate()
     {
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
 
         $this->asUser()
             ->patch(
@@ -63,31 +66,38 @@ class UpdateTest extends TestCase
     public function testAdminCanLockPolicy()
     {
         // make sure policy is unlocked
-        $this->firewallPolicy()->setAttribute('locked', false)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', null)
+            ->saveQuietly();
 
         $this->asAdmin()
             ->put('/v2/firewall-policies/' . $this->firewallPolicy()->id . '/lock')
             ->assertStatus(204);
         $this->firewallPolicy()->refresh();
-        $this->assertTrue($this->firewallPolicy()->locked);
+        $this->assertEquals(
+            FirewallPolicy::TYPE_SYSTEM,
+            $this->firewallPolicy()->type
+        );
     }
 
     public function testAdminCanUnlockPolicy()
     {
         // make sure policy is unlocked
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
 
         $this->asAdmin()
             ->put('/v2/firewall-policies/' . $this->firewallPolicy()->id . '/unlock')
             ->assertStatus(204);
         $this->firewallPolicy()->refresh();
-        $this->assertFalse($this->firewallPolicy()->locked);
+        $this->assertNull($this->firewallPolicy()->type);
     }
 
     public function testUserCannotLockPolicy()
     {
         // make sure policy is unlocked
-        $this->firewallPolicy()->setAttribute('locked', false)->saveQuietly();
+        $this->firewallPolicy()->setAttribute('type', null)->saveQuietly();
 
         $this->asUser()
             ->put('/v2/firewall-policies/' . $this->firewallPolicy()->id . '/lock')
@@ -96,13 +106,15 @@ class UpdateTest extends TestCase
                 'detail' => 'Unauthorized',
             ])->assertStatus(401);
         $this->firewallPolicy()->refresh();
-        $this->assertFalse($this->firewallPolicy()->locked);
+        $this->assertNull($this->firewallPolicy()->type);
     }
 
     public function testUserCannotUnlockPolicy()
     {
         // make sure policy is unlocked
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
 
         $this->asUser()
             ->put('/v2/firewall-policies/' . $this->firewallPolicy()->id . '/unlock')
@@ -110,7 +122,8 @@ class UpdateTest extends TestCase
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
             ])->assertStatus(401);
+
         $this->firewallPolicy()->refresh();
-        $this->assertTrue($this->firewallPolicy()->locked);
+        $this->assertEquals(FirewallPolicy::TYPE_SYSTEM, $this->firewallPolicy()->type);
     }
 }

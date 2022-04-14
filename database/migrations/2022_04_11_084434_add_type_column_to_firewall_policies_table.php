@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('firewall_policies', function (Blueprint $table) {
-            $table->boolean('locked')->default(false);
+            $table->string('type')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('firewall_policies', function (Blueprint $table) {
-            $table->dropColumn(['locked']);
+            $table->dropColumn(['type']);
         });
     }
 };

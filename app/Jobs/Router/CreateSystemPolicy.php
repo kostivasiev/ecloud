@@ -40,7 +40,7 @@ class CreateSystemPolicy extends TaskJob
             $firewallPolicy->createRulesAndPorts(
                 $policyConfig['rules'],
                 [
-                    'locked' => true,
+                    'type' => FirewallPolicy::TYPE_SYSTEM,
                 ]
             );
 

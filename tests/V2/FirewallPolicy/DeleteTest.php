@@ -2,6 +2,7 @@
 
 namespace Tests\V2\FirewallPolicy;
 
+use App\Models\V2\FirewallPolicy;
 use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 
@@ -55,7 +56,9 @@ class DeleteTest extends TestCase
 
     public function testUserCannotDeleteLockedPolicy()
     {
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
         $this->asUser()
             ->delete('/v2/firewall-policies/' . $this->firewallPolicy()->id)
             ->assertJsonFragment([
@@ -68,7 +71,9 @@ class DeleteTest extends TestCase
 
     public function testAdminCanDeleteLockedPolicy()
     {
-        $this->firewallPolicy()->setAttribute('locked', true)->saveQuietly();
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
         $this->asAdmin()
             ->delete('/v2/firewall-policies/' . $this->firewallPolicy()->id)
             ->assertStatus(202);
