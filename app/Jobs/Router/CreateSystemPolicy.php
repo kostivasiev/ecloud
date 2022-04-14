@@ -34,7 +34,7 @@ class CreateSystemPolicy extends TaskJob
             $firewallPolicy = app()->make(FirewallPolicy::class);
             $firewallPolicy->fill($policyConfig);
             $firewallPolicy->router_id = $router->id;
-            $firewallPolicy->locked = true;
+            $firewallPolicy->type = FirewallPolicy::TYPE_SYSTEM;
             $firewallPolicy->save();
 
             $firewallPolicy->createRulesAndPorts(
