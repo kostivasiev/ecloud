@@ -44,6 +44,11 @@ class UpdateRequest extends FormRequest
                 'required',
                 'json'
             ],
+            'locked' => [
+                'sometimes',
+                'required',
+                'boolean',
+            ],
         ];
     }
 
