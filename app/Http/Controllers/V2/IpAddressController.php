@@ -15,7 +15,7 @@ class IpAddressController extends BaseController
     {
         $collection = IpAddress::forUser($request->user());
 
-        if (!$request->has('sort')) {
+        if ($request->has('sort')) {
             $collection->sortByIp();
         }
 
