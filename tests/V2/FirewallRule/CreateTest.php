@@ -228,7 +228,7 @@ class CreateTest extends TestCase
         Event::assertNotDispatched(Created::class);
     }
 
-    public function testCreateRuleLockedPolicyFailsForUser()
+    public function testCreateRuleForSystemPolicyFailsForUser()
     {
         $this->firewallPolicy()
             ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
@@ -257,7 +257,7 @@ class CreateTest extends TestCase
             ])->assertStatus(403);
     }
 
-    public function testCreateRuleLockedPolicySucceedsForAdmin()
+    public function testCreateRuleForSystemPolicySucceedsForAdmin()
     {
         $this->firewallPolicy()
             ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)

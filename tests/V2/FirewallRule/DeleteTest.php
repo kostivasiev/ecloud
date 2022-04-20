@@ -36,7 +36,7 @@ class DeleteTest extends TestCase
         });
     }
 
-    public function testLockedPolicyPreventsDeleteForUser()
+    public function testSystemPolicyPreventsDeleteForUser()
     {
         $this->firewallPolicy()
             ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
@@ -51,7 +51,7 @@ class DeleteTest extends TestCase
             ])->assertStatus(403);
     }
 
-    public function testLockedPolicyAllowsDeleteForAdmin()
+    public function testSystemPolicyAllowsDeleteForAdmin()
     {
         Event::fake([\App\Events\V2\Task\Created::class]);
 

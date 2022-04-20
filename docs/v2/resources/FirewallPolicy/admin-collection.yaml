@@ -13,14 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  allOf:
-                    - $ref: '../../components/schemas/firewallPolicy.yaml'
-                    - properties:
-                        locked:
-                          type: boolean
-                          required: false
-                          example: true
-                          readOnly: false
+                  $ref: '../../components/schemas/firewallPolicy.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'

@@ -8,8 +8,7 @@ Content-Type:  application/json
 {
   "name": "Test Policy - Delete Rules",
   "sequence": 10,
-  "router_id": "{{dev_router_id}}",
-  "locked": true
+  "router_id": "{{dev_router_id}}"
 }
 
 > {%

@@ -15,7 +15,7 @@ class CreateFirewallPolicyRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = [
+        return [
             'name' => 'nullable|string|max:255',
             'sequence' => 'required|integer',
             'router_id' => [
@@ -25,13 +25,8 @@ class CreateFirewallPolicyRequest extends FormRequest
                 new ExistsForUser(Router::class),
                 new IsResourceAvailable(Router::class),
             ],
+            'type' => 'sometimes|string',
         ];
-
-        if (Auth::user()->isAdmin()) {
-            $rules['type'] = 'sometimes|string';
-        }
-
-        return $rules;
     }
 
     /**

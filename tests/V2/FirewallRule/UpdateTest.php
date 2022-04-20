@@ -20,18 +20,6 @@ class UpdateTest extends TestCase
 
         $this->availabilityZone();
 
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->allows('patch')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->allows('get')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-            });
-
         $this->firewallRule = FirewallRule::factory()->create([
             'firewall_policy_id' => $this->firewallPolicy()->id,
         ]);
@@ -84,7 +72,7 @@ class UpdateTest extends TestCase
         )->assertStatus(422);
     }
 
-    public function testLockedPolicyAmendRuleFails()
+    public function testSystemPolicyAmendRuleFails()
     {
         $this->firewallPolicy()
             ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)

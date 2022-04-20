@@ -17,18 +17,6 @@ class GetTest extends TestCase
 
         $this->availabilityZone();
 
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->allows('patch')
-            ->andReturnUsing(function () {
-                return new Response(200, [], '');
-            });
-
-        // TODO - Replace with real mock
-        $this->nsxServiceMock()->allows('get')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode(['publish_status' => 'REALIZED']));
-            });
-
         $this->firewallRule = FirewallRule::factory()
             ->for($this->firewallPolicy())
             ->create();

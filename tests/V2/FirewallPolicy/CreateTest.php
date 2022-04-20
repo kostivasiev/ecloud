@@ -81,48 +81,4 @@ class CreateTest extends TestCase
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
-
-    public function testAdminCanCreateLockedPolicy()
-    {
-        $data = [
-            'name' => 'Demo policy rule 1',
-            'sequence' => 10,
-            'router_id' => $this->router()->id,
-            'type' => FirewallPolicy::TYPE_SYSTEM,
-        ];
-        $post = $this->asAdmin()
-            ->post(
-                '/v2/firewall-policies',
-                $data
-            )->assertStatus(202);
-
-        $policyId = (json_decode($post->getContent()))->data->id;
-        $this->assertNotNull(FirewallPolicy::findOrFail($policyId)->type);
-
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == 'sync_update';
-        });
-    }
-
-    public function testNonAdminCannotCreateLockedPolicy()
-    {
-        $data = [
-            'name' => 'Demo policy rule 1',
-            'sequence' => 10,
-            'router_id' => $this->router()->id,
-            'type' => FirewallPolicy::TYPE_SYSTEM,
-        ];
-        $post = $this->asUser()
-            ->post(
-                '/v2/firewall-policies',
-                $data
-            )->assertStatus(202);
-
-        $policyId = (json_decode($post->getContent()))->data->id;
-        $this->assertNull(FirewallPolicy::findOrFail($policyId)->type);
-
-        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == 'sync_update';
-        });
-    }
 }

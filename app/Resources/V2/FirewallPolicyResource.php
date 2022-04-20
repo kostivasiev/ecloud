@@ -24,12 +24,13 @@ class FirewallPolicyResource extends UKFastResource
      */
     public function toArray($request)
     {
-        $attributes = [
+        return [
             'id' => $this->id,
             'name' => $this->name,
             'sequence' => $this->sequence,
             'router_id' => $this->router_id,
             'sync' => $this->sync,
+            'type' => $this->type,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
@@ -39,9 +40,5 @@ class FirewallPolicyResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
-        if (Auth::user()->isAdmin()) {
-            $attributes['type'] = $this->type;
-        }
-        return $attributes;
     }
 }
