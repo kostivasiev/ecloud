@@ -49,6 +49,9 @@ class FirewallPolicyController extends BaseController
     {
         $model = app()->make(FirewallPolicy::class);
         $model->fill($request->only(['name', 'sequence', 'router_id']));
+        if ($request->user()->isAdmin()) {
+            $model->type = $request->input('type');
+        }
         $task = $model->syncSave();
 
         return $this->responseIdMeta($request, $model->id, 202, $task->id);
