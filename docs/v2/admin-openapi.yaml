@@ -198,10 +198,6 @@ paths:
     $ref: 'resources/DiscountPlan/admin-item.yaml'
   '/ecloud/v2/firewall-policies':
     $ref: 'resources/FirewallPolicy/admin-collection.yaml'
-  '/ecloud/v2/firewall-policies/{firewallPolicyId}/lock':
-    $ref: 'resources/FirewallPolicy/lockUnlock.yaml'
-  '/ecloud/v2/firewall-policies/{firewallPolicyId}/unlock':
-    $ref: 'resources/FirewallPolicy/lockUnlock.yaml'
   '/ecloud/v2/host-specs':
     $ref: 'resources/HostSpec/admin-collection.yaml'
   '/ecloud/v2/host-specs/{hostSpecId}':

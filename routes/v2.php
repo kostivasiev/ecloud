@@ -282,10 +282,6 @@ Route::group([
             'middleware' => 'firewallpolicy-is-locked:' . \App\Models\V2\FirewallPolicy::class . ',firewallPolicyId',
             'uses' => 'FirewallPolicyController@destroy'
         ]);
-        Route::group(['middleware' => 'is-admin'], function () {
-            Route::put('firewall-policies/{firewallPolicyId}/lock', 'FirewallPolicyController@lock');
-            Route::put('firewall-policies/{firewallPolicyId}/unlock', 'FirewallPolicyController@unlock');
-        });
     });
 
     /** Firewall Rules */

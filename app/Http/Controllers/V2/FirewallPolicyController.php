@@ -49,10 +49,6 @@ class FirewallPolicyController extends BaseController
     {
         $model = app()->make(FirewallPolicy::class);
         $model->fill($request->only(['name', 'sequence', 'router_id']));
-        if ($request->user()->isAdmin()) {
-            $model->type = $request->input('type');
-        }
-
         $task = $model->syncSave();
 
         return $this->responseIdMeta($request, $model->id, 202, $task->id);
@@ -83,23 +79,5 @@ class FirewallPolicyController extends BaseController
         return TaskResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
-    }
-
-    public function lock(Request $request, $firewallPolicyId)
-    {
-        $firewallPolicy = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
-        $firewallPolicy->type = FirewallPolicy::TYPE_SYSTEM;
-        $firewallPolicy->save();
-
-        return response('', 204);
-    }
-
-    public function unlock(Request $request, $firewallPolicyId)
-    {
-        $firewallPolicy = FirewallPolicy::forUser($request->user())->findOrFail($firewallPolicyId);
-        $firewallPolicy->type = null;
-        $firewallPolicy->save();
-
-        return response('', 204);
     }
 }
