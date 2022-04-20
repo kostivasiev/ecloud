@@ -45,4 +45,9 @@ class ProductNameFilter extends StringFilter implements WrapsFilter
     {
         return $this->filter->operators();
     }
+
+    public function getWrapped(): ModifiesQueries
+    {
+        return $this->filter;
+    }
 }
