@@ -37,7 +37,7 @@ class CreateRequest extends FormRequest
             'type' => [
                 'required',
                 'string',
-                Rule::in([IpAddress::TYPE_NORMAL,IpAddress::TYPE_CLUSTER])
+                Rule::in([IpAddress::TYPE_DHCP,IpAddress::TYPE_CLUSTER])
             ]
         ];
     }

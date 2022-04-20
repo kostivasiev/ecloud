@@ -29,9 +29,9 @@ class UpdateNodeTest extends TestCase
             ->setAttribute('instance_id', $this->loadBalancerInstance()->id)
             ->saveQuietly();
         $this->nic()->ipAddresses()->save(IpAddress::factory()->create([
-            'network_id' => $this->network()->id,
-            'type' => IpAddress::TYPE_NORMAL,
-            'ip_address' => '1.1.1.1'
+                                                                           'network_id' => $this->network()->id,
+                                                                           'type' => IpAddress::TYPE_DHCP,
+                                                                           'ip_address' => '1.1.1.1'
         ]));
     }
 
@@ -80,9 +80,9 @@ class UpdateNodeTest extends TestCase
             ])->id,
         ]);
         $nic->ipAddresses()->save(IpAddress::factory()->create([
-            'network_id' => $this->network()->id,
-            'type' => IpAddress::TYPE_NORMAL,
-            'ip_address' => '2.2.2.2'
+                                                                   'network_id' => $this->network()->id,
+                                                                   'type' => IpAddress::TYPE_DHCP,
+                                                                   'ip_address' => '2.2.2.2'
         ]));
         $nic->setAttribute('instance_id', $this->loadBalancerInstance()->id)->saveQuietly();
 
