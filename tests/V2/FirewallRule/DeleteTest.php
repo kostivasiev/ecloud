@@ -46,7 +46,7 @@ class DeleteTest extends TestCase
             ->delete('/v2/firewall-rules/' . $this->firewallRule->id)
             ->assertJsonFragment([
                 'title' => 'Forbidden',
-                'detail' => 'The specified resource is locked',
+                'detail' => 'The System policy is not editable',
                 'status' => 403,
             ])->assertStatus(403);
     }

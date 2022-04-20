@@ -25,7 +25,7 @@ class IsSystem
             'errors' => [
                 [
                     'title' => 'Forbidden',
-                    'detail' => 'The specified resource is locked',
+                    'detail' => 'The System policy is not editable',
                     'status' => 403,
                 ]
             ]
