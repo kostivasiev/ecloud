@@ -57,7 +57,7 @@ class CreateTest extends TestCase
             'name' => 'Test',
             'ip_address' => '1.1.1.1',
             'network_id' => $this->network()->id,
-            'type' => 'normal',
+            'type' => IpAddress::TYPE_DHCP,
         ];
 
         $this->post('/v2/ip-addresses', $data)->assertStatus(422);
