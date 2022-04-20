@@ -3,6 +3,7 @@
 namespace Tests\V2\FirewallRulePort;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -160,5 +161,53 @@ class CreateTest extends TestCase
         ])->assertStatus(422);
 
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
+    }
+
+    public function testCreatePortLockedPolicyFailsForUser()
+    {
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
+
+        $this->asUser()
+            ->post('/v2/firewall-rule-ports', [
+                'firewall_rule_id' => $this->firewallRule->id,
+                'protocol' => 'TCP',
+                'source' => '443',
+                'destination' => '555'
+            ])->assertJsonFragment([
+                'title' => 'Forbidden',
+                'detail' => 'The specified resource is locked',
+            ])->assertStatus(403);
+    }
+
+    public function testCreatePortLockedPolicySucceedsForAdmin()
+    {
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
+
+        $this->asAdmin()
+            ->post('/v2/firewall-rule-ports', [
+                'firewall_rule_id' => $this->firewallRule->id,
+                'protocol' => 'TCP',
+                'source' => '443',
+                'destination' => '555'
+            ])->assertStatus(202);
+
+        $this->assertDatabaseHas(
+            'firewall_rule_ports',
+            [
+                'firewall_rule_id' => $this->firewallRule->id,
+                'protocol' => 'TCP',
+                'source' => '443',
+                'destination' => '555'
+            ],
+            'ecloud'
+        );
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 }

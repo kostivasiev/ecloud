@@ -290,7 +290,7 @@ Route::group([
         Route::get('firewall-rules/{firewallRuleId}', 'FirewallRuleController@show');
         Route::get('firewall-rules/{firewallRuleId}/ports', 'FirewallRuleController@ports');
         Route::post('firewall-rules', [
-            'middleware' => 'firewallpolicy-is-system:' . \App\Models\V2\FirewallRule::class . ',firewall_policy_id',
+            'middleware' => 'firewallpolicy-is-system:' . \App\Models\V2\FirewallPolicy::class . ',firewall_policy_id',
             'uses' => 'FirewallRuleController@store'
         ]);
         Route::patch('firewall-rules/{firewallRuleId}', [
@@ -307,7 +307,10 @@ Route::group([
     Route::group([], function () {
         Route::get('firewall-rule-ports', 'FirewallRulePortController@index');
         Route::get('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@show');
-        Route::post('firewall-rule-ports', 'FirewallRulePortController@store');
+        Route::post('firewall-rule-ports', [
+            'middleware' => 'firewallpolicy-is-system:' . \App\Models\V2\FirewallRule::class . ',firewall_rule_id',
+            'uses' => 'FirewallRulePortController@store'
+        ]);
         Route::patch('firewall-rule-ports/{firewallRulePortId}', [
             'middleware' => 'firewallpolicy-is-system:' . \App\Models\V2\FirewallRulePort::class . ',firewallRulePortId',
             'uses' => 'FirewallRulePortController@update'
