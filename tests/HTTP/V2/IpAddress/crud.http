@@ -7,9 +7,8 @@ Content-Type: application/json
 
 {
     "name": "Test",
-    "ip_address": "1.1.1.1",
-    "network_id": "{{dev_network_id}}",
-    "type": "cluster"
+    "ip_address": "10.0.0.5",
+    "network_id": "{{dev_network_id}}"
 }
 
 > {%
