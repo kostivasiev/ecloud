@@ -2,12 +2,16 @@
 namespace App\Http\Middleware\FirewallPolicy;
 
 use Closure;
+use Illuminate\Http\Request;
 
-class IsLocked
+class IsSystem
 {
-    public function handle($request, Closure $next, $modelType, $idRouteParameter = 'id')
+    public function handle(Request $request, Closure $next, $modelType, $idRouteParameter = 'id')
     {
-        $model = $modelType::forUser($request->user())->findOrFail($request->route($idRouteParameter));
+        $modelInstanceId = ($request->method() == 'POST') ?
+            $request->input($idRouteParameter):
+            $request->route($idRouteParameter);
+        $model = $modelType::forUser($request->user())->findOrFail($modelInstanceId);
         if ($request->user()->isScoped() && $model->isSystem()) {
             return $this->returnError();
         }

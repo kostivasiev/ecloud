@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\V2;
 
-use App\Http\Middleware\FirewallPolicy\IsLocked;
 use App\Http\Requests\V2\FirewallRule\Create;
 use App\Http\Requests\V2\FirewallRule\Update;
-use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
 use App\Resources\V2\FirewallRulePortResource;
@@ -68,11 +66,6 @@ class FirewallRuleController extends BaseController
      */
     public function store(Create $request)
     {
-        $firewallPolicy = FirewallPolicy::forUser($request->user())
-            ->findOrFail($request->get('firewall_policy_id'));
-        if ($request->user()->isScoped() && $firewallPolicy->isSystem()) {
-            return (new IsLocked())->returnError();
-        }
         $firewallRule = app()->make(FirewallRule::class);
         $firewallRule->fill($request->only([
             'name',
