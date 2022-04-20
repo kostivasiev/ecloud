@@ -26,7 +26,7 @@ class IpAddressFactory extends Factory
             'name' => 'test IP',
              // Not yet supported until we convert other resources to the new laravel model format
              //'network_id' => Network::where('id','net-test')->firstOr(fn() => Network::factory(['id' => 'net-test'])->create())->id,
-            'type' => 'normal'
+            'type' => IpAddress::TYPE_DHCP
         ];
     }
 }

@@ -19,7 +19,7 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
     public $keyPrefix = 'ip';
     public $children;
 
-    const TYPE_NORMAL = 'normal';
+    const TYPE_DHCP = 'dhcp';
     const TYPE_CLUSTER = 'cluster';
 
     public function __construct(array $attributes = [])
@@ -39,6 +39,10 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
             'network_id',
             'type',
         ]);
+
+        $this->attributes = [
+            'type' => self::TYPE_CLUSTER
+        ];
 
         parent::__construct($attributes);
     }
@@ -108,5 +112,18 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
+    }
+
+    public function scopeSortByIp($query)
+    {
+        if (request()->has('sort')) {
+            if (!preg_match('/\:/i', request()->get('sort'))) {
+                request()->request->set('sort', request()->get('sort') . ':asc');
+            }
+            list($field, $direction) = explode(':', request()->get('sort'));
+            if ($field == 'ip_address' && in_array(strtolower($direction), ['asc', 'desc'])) {
+                $query->orderByRaw('INET_ATON(ip_address) ' . $direction);
+            }
+        }
     }
 }
