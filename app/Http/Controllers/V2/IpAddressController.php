@@ -15,6 +15,10 @@ class IpAddressController extends BaseController
     {
         $collection = IpAddress::forUser($request->user());
 
+        if ($request->has('sort')) {
+            $collection->sortByIp();
+        }
+
         return IpAddressResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));

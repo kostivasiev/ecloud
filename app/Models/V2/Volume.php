@@ -18,7 +18,7 @@ use UKFast\DB\Ditto\Filter;
 use UKFast\DB\Ditto\Filterable;
 use UKFast\DB\Ditto\Sortable;
 
-class Volume extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable
+class Volume extends Model implements Filterable, Sortable, ResellerScopeable, AvailabilityZoneable, VpcAble
 {
     use CustomKey, SoftDeletes, DefaultName, Syncable, Taskable, HasFactory;
 
