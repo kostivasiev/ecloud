@@ -50,7 +50,7 @@ class UpdateTest extends TestCase
             'ip_addresses',
             [
                 'name' => 'UPDATED',
-                'ip_address' => '10.0.0.6',
+                'ip_address' => $this->ip()->ip_address,
                 'type' => IpAddress::TYPE_DHCP,
             ],
             'ecloud'
