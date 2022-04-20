@@ -25,10 +25,6 @@ class CreateFirewallPolicyRequest extends FormRequest
                 new ExistsForUser(Router::class),
                 new IsResourceAvailable(Router::class),
             ],
-            'type' => [
-                'sometimes',
-                'string',
-            ],
         ];
 
         if (Auth::user()->isAdmin()) {
