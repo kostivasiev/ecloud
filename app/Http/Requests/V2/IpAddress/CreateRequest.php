@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2\IpAddress;
 
+use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IpAddress\IsInSubnet;
@@ -33,6 +34,11 @@ class CreateRequest extends FormRequest
                 Rule::exists(Network::class, 'id')->whereNull('deleted_at'),
                 new ExistsForUser(Network::class),
             ],
+            'type' => [
+                'required',
+                'string',
+                Rule::in([IpAddress::TYPE_DHCP,IpAddress::TYPE_CLUSTER])
+            ]
         ];
     }
 }

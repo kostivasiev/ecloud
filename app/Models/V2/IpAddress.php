@@ -40,10 +40,6 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
             'type',
         ]);
 
-        $this->attributes = [
-            'type' => self::TYPE_CLUSTER
-        ];
-
         parent::__construct($attributes);
     }
 
