@@ -103,7 +103,7 @@ client.test('Get Item', function () {
     client.assert(response.status === 200, '200 response not received');
     client.assert(response.body.data.name === 'Test - Renamed', 'Name was not updated');
     client.assert(response.body.data.ip_address === '2.2.2.2', 'ip_address was not updated');
-    client.assert(response.body.data.type === 'normal', 'type was not updated');
+    client.assert(response.body.data.type === 'dhcp', 'type was not updated');
 });
 %}
 
