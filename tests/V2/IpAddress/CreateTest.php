@@ -19,13 +19,14 @@ class CreateTest extends TestCase
             'name' => 'Test',
             'ip_address' => '10.0.0.4',
             'network_id' => $this->network()->id,
+            'type' => IpAddress::TYPE_DHCP,
         ];
 
         $this->post('/v2/ip-addresses', $data)
             ->assertStatus(201);
         $this->assertDatabaseHas(
             'ip_addresses',
-             array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
+            $data,
             'ecloud'
         );
     }
@@ -37,14 +38,15 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Test',
             'ip_address' => '10.0.0.4',
-            'network_id' => $this->network()->id
+            'network_id' => $this->network()->id,
+            'type' => IpAddress::TYPE_DHCP,
         ];
 
         $this->post('/v2/ip-addresses', $data)
             ->assertStatus(201);
         $this->assertDatabaseHas(
             'ip_addresses',
-             array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
+            $data,
             'ecloud'
         );
     }
@@ -54,7 +56,8 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Test',
             'ip_address' => '1.1.1.1',
-            'network_id' => $this->network()->id
+            'network_id' => $this->network()->id,
+            'type' => IpAddress::TYPE_DHCP,
         ];
 
         $this->post('/v2/ip-addresses', $data)->assertStatus(422);
