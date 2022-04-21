@@ -91,12 +91,12 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
 
     public function isManaged() :bool
     {
-        return (bool) $this->router->isManaged();
+        return $this->router->isManaged() || $this->type == static::TYPE_SYSTEM;
     }
 
     public function isHidden(): bool
     {
-        return $this->isManaged();
+        return $this->isManaged() && $this->type != static::TYPE_SYSTEM;
     }
 
     public function sieve(Sieve $sieve)

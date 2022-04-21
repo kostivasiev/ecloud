@@ -13,7 +13,13 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../components/schemas/firewallPolicy.yaml'
+                  allOf:
+                    - $ref: '../../components/schemas/firewallPolicy.yaml'
+                    - properties:
+                      is_managed:
+                        type: boolean
+                        example: true
+                        readOnly: true
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -47,11 +53,6 @@ post:
                 type: string
                 required: true
                 example: 'rtr-4c63cf58'
-                readOnly: false
-              locked:
-                type: boolean
-                required: false
-                example: true
                 readOnly: false
   responses:
     202:
