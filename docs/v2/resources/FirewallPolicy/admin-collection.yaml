@@ -13,13 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  allOf:
-                    - $ref: '../../components/schemas/firewallPolicy.yaml'
-                    - properties:
-                      is_managed:
-                        type: boolean
-                        example: true
-                        readOnly: true
+                  $ref: '../../components/schemas/firewallPolicyAdmin.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
