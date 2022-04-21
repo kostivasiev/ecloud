@@ -3,6 +3,7 @@
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use UKFast\Responses\UKFastResource;
 
 /**
@@ -27,7 +28,7 @@ class FirewallRuleResource extends UKFastResource
      */
     public function toArray($request)
     {
-        return [
+        $response = [
             'id' => $this->id,
             'name' => $this->name,
             'sequence' => $this->sequence,
@@ -47,5 +48,11 @@ class FirewallRuleResource extends UKFastResource
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $response['is_managed'] = $this->isManaged();
+        }
+
+        return $response;
     }
 }

@@ -72,12 +72,12 @@ class FirewallRule extends Model implements Searchable, Manageable
 
     public function isManaged() :bool
     {
-        return (bool) $this->firewallPolicy->router->isManaged();
+        return $this->firewallPolicy->router->isManaged() || $this->firewallPolicy->type == FirewallPolicy::TYPE_SYSTEM;
     }
 
     public function isHidden(): bool
     {
-        return $this->isManaged();
+        return $this->isManaged() && $this->firewallPolicy->type != FirewallPolicy::TYPE_SYSTEM;
     }
 
     public function isSystem(): bool
