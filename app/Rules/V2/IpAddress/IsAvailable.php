@@ -21,7 +21,7 @@ class IsAvailable implements Rule
             return false;
         }
 
-        $lock = Cache::lock("ip_address." . $value, 5);
+        $lock = Cache::lock("ip_address." . $this->network->id, 5);
         try {
             $lock->block(5);
             return $this->network->ipAddresses()->where('ip_address', $value)->count() == 0;

@@ -22,6 +22,7 @@ class CreateRequest extends FormRequest
         return [
             'name' => 'nullable|string|max:255',
             'ip_address' => [
+                'sometimes',
                 'required',
                 'ip',
                 new IsInSubnet(app('request')->input('network_id')),

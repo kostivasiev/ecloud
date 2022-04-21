@@ -2,6 +2,7 @@
 namespace Tests\V2\IpAddress;
 
 use App\Models\V2\IpAddress;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -61,5 +62,25 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/ip-addresses', $data)->assertStatus(422);
+    }
+
+    public function testAutoAllocatedIpAddress()
+    {
+        $data = [
+            'name' => 'Test',
+            'network_id' => $this->network()->id,
+            'type' => IpAddress::TYPE_DHCP,
+        ];
+        $response = $this->post(
+            '/v2/ip-addresses',
+            $data
+        )->assertStatus(201);
+
+        $this->assertDatabaseHas(IpAddress::class, $data, 'ecloud');
+
+        $ipAddressId = (json_decode($response->getContent()))->data->id;
+        $ipAddress = IpAddress::findOrFail($ipAddressId);
+
+        $this->assertNotNull($ipAddress->ip_address);
     }
 }
