@@ -79,9 +79,11 @@ class MigrateIpAddressToIpAddressModel extends Command
 
                     $nic->ip_address = null;
                     $nic->save();
+                } else {
+                    if (!$ipAddress->exists) {
+                        $this->updated++;
+                    }
                 }
-
-
             } finally {
                 $lock->release();
             }
