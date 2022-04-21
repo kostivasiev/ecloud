@@ -95,6 +95,6 @@ class Kernel extends HttpKernel
     'load-balancer-is-max-for-customer' => \App\Http\Middleware\Loadbalancer\IsMaxForForCustomer::class,
     'can-be-deleted' => \App\Http\Middleware\CanBeDeleted::class,
     'loadbalancer-max-vip' => \App\Http\Middleware\Vips\MaxVipLimitReached::class,
-    'firewallpolicy-is-system' => \App\Http\Middleware\FirewallPolicy\IsSystem::class,
+    'is-managed' => \App\Http\Middleware\IsManaged::class,
     ];
 }

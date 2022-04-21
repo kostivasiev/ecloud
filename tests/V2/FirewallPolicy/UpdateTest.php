@@ -58,7 +58,7 @@ class UpdateTest extends TestCase
                 ]
             )->assertJsonFragment([
                 'title' => 'Forbidden',
-                'detail' => 'The System policy is not editable',
+                'detail' => 'The specified resource is not editable',
                 'status' => 403,
             ])->assertStatus(403);
     }
