@@ -27,8 +27,7 @@ class MigrateIpAddressToIpAddressModel extends Command
     public function __construct(
         public int $updated = 0,
         public int $errors = 0
-    )
-    {
+    ) {
         parent::__construct();
     }
     /**
