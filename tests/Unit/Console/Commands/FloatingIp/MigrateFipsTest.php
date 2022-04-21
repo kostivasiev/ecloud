@@ -27,6 +27,7 @@ class MigrateFipsTest extends TestCase
         $this->ip();
         $this->job = \Mockery::mock(MigrateFips::class)->makePartial();
         $this->job->allows('option')->with('test-run')->andReturnFalse();
+        $this->job->allows('info')->withAnyArgs()->andReturnTrue();
     }
 
     public function testSuccessfulChange()

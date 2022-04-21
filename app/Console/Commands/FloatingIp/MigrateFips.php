@@ -15,6 +15,7 @@ class MigrateFips extends Command
     {
         FloatingIp::where('resource_type', '=', 'nic')
             ->each(function ($floatingIp) {
+                $this->info('Processing floating ip ' . $floatingIp->id);
                 $nic = $floatingIp->resource;
                 $networkId = $nic->first()->network_id;
                 $ipAddress = IpAddress::where('network_id', $networkId)->first();
@@ -31,6 +32,7 @@ class MigrateFips extends Command
                     $nic->setAttribute('ip_address', null)->saveQuietly();
                     $floatingIp->resource()->associate($ipAddress);
                     $floatingIp->save();
+                    $this->info('Floating Ip ' . $floatingIp->id . ' updated.');
                 }
             });
     }
