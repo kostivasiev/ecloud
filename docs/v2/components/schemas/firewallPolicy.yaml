@@ -18,6 +18,10 @@ properties:
     required: true
     example: 'rtr-4c63cf58'
     readOnly: true
+  type:
+    type: string
+    readOnly: true
+    example: 'system'
   sync:
     type: object
     readOnly: true
