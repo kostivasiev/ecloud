@@ -40,16 +40,3 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/firewall-rules?page=2'
   tags:
     - Firewall Rules
-post:
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          $ref: '../../components/schemas/firewallRule.yaml'
-  responses:
-    202:
-      description: Accepted
-      $ref: '../../resources/FirewallRule/responses/idResponse.yaml'
-  tags:
-    - Firewall Rules

@@ -40,23 +40,3 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/firewall-policies?page=2'
   tags:
     - Firewall Policies
-post:
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          allOf:
-          - $ref: '../../components/schemas/firewallPolicy.yaml'
-          - properties:
-              router_id:
-                type: string
-                required: true
-                example: 'rtr-4c63cf58'
-                readOnly: false
-  responses:
-    202:
-      description: Accepted
-      $ref: '../../resources/FirewallPolicy/responses/idResponse.yaml'
-  tags:
-    - Firewall Policies
