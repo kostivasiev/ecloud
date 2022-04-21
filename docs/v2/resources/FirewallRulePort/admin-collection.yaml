@@ -14,7 +14,7 @@ get:
                 type: array
                 items:
                   allOf:
-                    - $ref: '../../components/schemas/firewallPolicy.yaml'
+                    - $ref: '../../components/schemas/firewallRulePort.yaml'
                     - properties:
                         is_managed :
                           type : boolean
@@ -31,32 +31,25 @@ get:
                             type: object
                             properties:
                               first:
-                                example: 'https://api.ukfast.io/ecloud/v2/firewall-policies?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rule-ports?page=1'
                               previous:
-                                example: 'https://api.ukfast.io/ecloud/v2/firewall-policies?page=1'
+                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rule-ports?page=1'
                               next:
-                                example: 'https://api.ukfast.io/ecloud/v2/firewall-policies?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rule-ports?page=2'
                               last:
-                                example: 'https://api.ukfast.io/ecloud/v2/firewall-policies?page=2'
+                                example: 'https://api.ukfast.io/ecloud/v2/firewall-rule-ports?page=2'
   tags:
-    - Firewall Policies
+    - Firewall Rule Ports
 post:
   requestBody:
     required: true
     content:
       application/json:
         schema:
-          allOf:
-          - $ref: '../../components/schemas/firewallPolicy.yaml'
-          - properties:
-              router_id:
-                type: string
-                required: true
-                example: 'rtr-4c63cf58'
-                readOnly: false
+          $ref: '../../components/schemas/firewallRulePort.yaml'
   responses:
     202:
       description: Accepted
-      $ref: '../../resources/FirewallPolicy/responses/idResponse.yaml'
+      $ref: '../../resources/FirewallRulePort/responses/idResponse.yaml'
   tags:
-    - Firewall Policies
+    - Firewall Rule Ports
