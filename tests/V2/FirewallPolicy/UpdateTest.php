@@ -44,7 +44,7 @@ class UpdateTest extends TestCase
         });
     }
 
-    public function testLockedPolicyDoesNotUpdate()
+    public function testManagedPolicyDoesNotUpdate()
     {
         $this->firewallPolicy()
             ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)

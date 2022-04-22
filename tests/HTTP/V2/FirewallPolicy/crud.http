@@ -32,13 +32,6 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-# Unlock Policy Item
-GET https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}/unlock
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-###
 # Get Policy Item
 GET https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
 X-consumer-custom-id:  0-0

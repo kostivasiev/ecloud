@@ -132,7 +132,7 @@ class UpdateTest extends TestCase
         Event::assertNotDispatched(\App\Events\V2\Task\Created::class);
     }
 
-    public function testLockedPolicySucceedsAsAdmin()
+    public function testSystemPolicySucceedsAsAdmin()
     {
         $this->firewallPolicy()
             ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
@@ -166,7 +166,7 @@ class UpdateTest extends TestCase
         });
     }
 
-    public function testLockedPolicyFailsAsUser()
+    public function testSystemPolicyFailsAsUser()
     {
         $this->firewallPolicy()
             ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
