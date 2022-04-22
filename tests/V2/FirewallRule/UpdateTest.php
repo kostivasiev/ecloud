@@ -94,6 +94,29 @@ class UpdateTest extends TestCase
             ])->assertStatus(403);
     }
 
+    public function testSystemPolicyAmendAsAdminSucceeds()
+    {
+        Event::fake([Created::class]);
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
+        $this->asAdmin()
+            ->patch(
+                '/v2/firewall-rules/' . $this->firewallRule->id,
+                [
+                    'name' => 'Changed',
+                    'ports' => [
+                        [
+                            'protocol' => 'TCP',
+                            'source' => "ANY",
+                            'destination' => "ANY",
+                        ]
+                    ]
+                ],
+            )->assertStatus(202);
+        Event::assertDispatched(Created::class);
+    }
+
     public function testUpdateSuccessful()
     {
         Event::fake([Created::class]);
