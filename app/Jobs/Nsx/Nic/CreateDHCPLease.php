@@ -52,10 +52,10 @@ class CreateDHCPLease extends Job
         } while (!empty($cursor));
 
 
-        if (!$nic->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->exists()) {
+        if (!$nic->ipAddresses()->withType(IpAddress::TYPE_DHCP)->exists()) {
             $ipAddress = $nic->assignIpAddress($assignedIpsNsx->toArray());
         } else {
-            $ipAddress = $nic->ipAddresses()->withType(IpAddress::TYPE_NORMAL)->first();
+            $ipAddress = $nic->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first();
         }
 
         $nic->refresh();
