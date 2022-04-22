@@ -174,7 +174,7 @@ abstract class TestCase extends BaseTestCase
                     'ip_address' => '1.1.1.1',
                     'name' => 'test IP',
                     'network_id' => $this->network()->id,
-                    'type' => 'normal'
+                    'type' => IpAddress::TYPE_DHCP
                 ]);
             });
         }

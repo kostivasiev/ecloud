@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7937c23b6b71a09c5087daa436e55ef6",
+    "content-hash": "0e488b5a53e8b0644c9b2e57156db5d6",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -7072,16 +7072,16 @@
         },
         {
             "name": "ukfast/laravel-sieve",
-            "version": "v0.5.2",
+            "version": "v0.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ukfast/laravel-sieve.git",
-                "reference": "b5f186e07a17756a858d07c12f53d01ff430dafc"
+                "reference": "6f6ec908d4b7cfd813ff44267e989b1dff575a18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ukfast/laravel-sieve/zipball/b5f186e07a17756a858d07c12f53d01ff430dafc",
-                "reference": "b5f186e07a17756a858d07c12f53d01ff430dafc",
+                "url": "https://api.github.com/repos/ukfast/laravel-sieve/zipball/6f6ec908d4b7cfd813ff44267e989b1dff575a18",
+                "reference": "6f6ec908d4b7cfd813ff44267e989b1dff575a18",
                 "shasum": ""
             },
             "require": {
@@ -7111,9 +7111,9 @@
             "description": "A library for filtering eloquent queries",
             "support": {
                 "issues": "https://github.com/ukfast/laravel-sieve/issues",
-                "source": "https://github.com/ukfast/laravel-sieve/tree/v0.5.2"
+                "source": "https://github.com/ukfast/laravel-sieve/tree/v0.7.1"
             },
-            "time": "2022-03-07T10:53:20+00:00"
+            "time": "2022-04-14T07:55:34+00:00"
         },
         {
             "name": "ukfast/log-provider",
