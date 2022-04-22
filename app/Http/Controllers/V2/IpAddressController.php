@@ -46,7 +46,7 @@ class IpAddressController extends BaseController
         );
 
         if (!$request->ip_address) {
-            $ipAddress->autoAllocate($request->network_id);
+            $ipAddress->allocateAddress($request->network_id);
         }
 
         $ipAddress->save();

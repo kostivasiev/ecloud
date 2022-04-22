@@ -124,7 +124,7 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
         }
     }
 
-    public function autoAllocate($networkId)
+    public function allocateAddress($networkId)
     {
         $lock = Cache::lock("ip_address." . $networkId, 60);
         try {
