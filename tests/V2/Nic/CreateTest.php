@@ -24,12 +24,10 @@ class CreateTest extends TestCase
     {
         Event::fake([Created::class]);
 
-        $macAddress = $this->faker->macAddress;
         $this->post(
             '/v2/nics',
             [
                 'name' => 'test-nic',
-                'mac_address' => $macAddress,
                 'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
             ]
@@ -39,7 +37,6 @@ class CreateTest extends TestCase
             'nics',
             [
                 'name' => 'test-nic',
-                'mac_address' => $macAddress,
                 'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
             ],
@@ -47,20 +44,6 @@ class CreateTest extends TestCase
         );
 
         Event::assertDispatched(Created::class);
-    }
-
-    public function testInvalidMacAddressFails()
-    {
-        $this->post(
-            '/v2/nics',
-            [
-                'mac_address' => 'INVALID_MAC_ADDRESS',
-            ]
-        )->assertJsonFragment([
-            'title' => 'Validation Error',
-            'detail' => 'The mac address must be a valid MAC address',
-            'status' => 422,
-            ])->assertStatus(422);
     }
 
     public function testInvalidInstanceIdFails()
@@ -112,7 +95,6 @@ class CreateTest extends TestCase
         });
 
         $this->post('/v2/nics', [
-                'mac_address' => $this->faker->macAddress,
                 'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
                 'ip_address' => '10.0.0.6'
