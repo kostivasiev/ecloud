@@ -105,10 +105,6 @@ class Nic extends Model implements Searchable, ResellerScopeable, AvailabilityZo
      */
     public function getIpAddressAttribute()
     {
-        if (!empty($this->attributes['ip_address'])) {
-            return $this->attributes['ip_address'];
-        }
-
         if ($this->ipAddresses()->withType(IpAddress::TYPE_DHCP)->exists()) {
             return $this->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first()->ip_address;
         }

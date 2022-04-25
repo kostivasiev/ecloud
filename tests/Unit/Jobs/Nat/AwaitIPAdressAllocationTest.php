@@ -35,7 +35,6 @@ class AwaitIPAdressAllocationTest extends TestCase
                 'network_id' => $this->network()->id,
             ]);
 
-            $this->nic->ip_address = '10.3.4.5';
 
             $this->nat = app()->make(Nat::class);
             $this->nat->id = 'nat-test';
@@ -44,6 +43,8 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nat->action = NAT::ACTION_SNAT;
             $this->nat->save();
         });
+
+        dd($this->nic->getIPAddress());
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
