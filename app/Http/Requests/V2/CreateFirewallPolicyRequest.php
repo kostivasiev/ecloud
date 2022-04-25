@@ -6,6 +6,7 @@ use App\Models\V2\Router;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CreateFirewallPolicyRequest extends FormRequest
 {
@@ -23,7 +24,8 @@ class CreateFirewallPolicyRequest extends FormRequest
                 'exists:ecloud.routers,id,deleted_at,NULL',
                 new ExistsForUser(Router::class),
                 new IsResourceAvailable(Router::class),
-            ]
+            ],
+            'type' => 'sometimes|string',
         ];
     }
 

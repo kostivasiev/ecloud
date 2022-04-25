@@ -22,6 +22,7 @@ class CreateRequest extends FormRequest
         return [
             'name' => 'nullable|string|max:255',
             'ip_address' => [
+                'sometimes',
                 'required',
                 'ip',
                 new IsInSubnet(app('request')->input('network_id')),
@@ -34,11 +35,6 @@ class CreateRequest extends FormRequest
                 Rule::exists(Network::class, 'id')->whereNull('deleted_at'),
                 new ExistsForUser(Network::class),
             ],
-            'type' => [
-                'required',
-                'string',
-                Rule::in([IpAddress::TYPE_DHCP,IpAddress::TYPE_CLUSTER])
-            ]
         ];
     }
 }

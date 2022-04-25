@@ -8,6 +8,7 @@ use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
@@ -39,6 +40,10 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
             'network_id',
             'type',
         ]);
+
+        $this->attributes = [
+            'type' => self::TYPE_CLUSTER
+        ];
 
         parent::__construct($attributes);
     }
@@ -120,6 +125,20 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
             if ($field == 'ip_address' && in_array(strtolower($direction), ['asc', 'desc'])) {
                 $query->orderByRaw('INET_ATON(ip_address) ' . $direction);
             }
+        }
+    }
+
+    public function allocateAddressAndSave($networkId)
+    {
+        $lock = Cache::lock("ip_address." . $networkId, 60);
+        try {
+            $lock->block(60);
+            $network = Network::forUser(request()->user())->findOrFail($networkId);
+            $ip = $network->getNextAvailableIp();
+            $this->ip_address = $ip;
+            return $this->save();
+        } finally {
+            $lock->release();
         }
     }
 }

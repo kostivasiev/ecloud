@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -56,12 +57,17 @@ class FirewallRulePort extends Model implements Searchable, Manageable
 
     public function isManaged() :bool
     {
-        return (bool) $this->firewallRule->firewallPolicy->router->isManaged();
+        return $this->firewallRule->firewallPolicy->router->isManaged() || $this->firewallRule->firewallPolicy->type == FirewallPolicy::TYPE_SYSTEM;
     }
 
     public function isHidden(): bool
     {
-        return $this->isManaged();
+        return $this->isManaged() && $this->firewallRule->firewallPolicy->type != FirewallPolicy::TYPE_SYSTEM;
+    }
+
+    public function isSystem(): bool
+    {
+        return $this->firewallRule->isSystem();
     }
 
     public function sieve(Sieve $sieve)

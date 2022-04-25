@@ -1,13 +1,19 @@
 <?php
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\V2\IpAddressCreationException;
 use App\Http\Requests\V2\IpAddress\CreateRequest;
 use App\Http\Requests\V2\IpAddress\UpdateRequest;
 use App\Models\V2\IpAddress;
+use App\Models\V2\Network;
 use App\Resources\V2\IpAddressResource;
 use App\Resources\V2\NicResource;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class IpAddressController extends BaseController
 {
@@ -31,6 +37,9 @@ class IpAddressController extends BaseController
         );
     }
 
+    /**
+     * @throws \App\Exceptions\V2\IpAddressCreationException
+     */
     public function store(CreateRequest $request)
     {
         $ipAddress = new IpAddress(
@@ -38,11 +47,19 @@ class IpAddressController extends BaseController
                 'name',
                 'ip_address',
                 'network_id',
-                'type'
             ])
         );
 
-        $ipAddress->save();
+        if (!$request->ip_address) {
+            try {
+                $ipAddress->allocateAddressAndSave($request->network_id);
+            } catch (LockTimeoutException $e) {
+                throw new IpAddressCreationException;
+            }
+        } else {
+            $ipAddress->save();
+        }
+
         return $this->responseIdMeta($request, $ipAddress->id, 201);
     }
 

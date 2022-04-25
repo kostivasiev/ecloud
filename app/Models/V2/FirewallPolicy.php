@@ -24,6 +24,7 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
+    public const TYPE_SYSTEM = 'system';
     public $keyPrefix = 'fwp';
 
     public function __construct(array $attributes = [])
@@ -37,9 +38,13 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
             'name',
             'sequence',
             'router_id',
+            'type',
+        ];
+        $this->attributes = [
+            'type' => null,
         ];
         $this->casts = [
-            'sequence' => 'integer'
+            'sequence' => 'integer',
         ];
         parent::__construct($attributes);
     }
@@ -79,14 +84,19 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
         $query->where('name', '=', 'System');
     }
 
+    public function isSystem(): bool
+    {
+        return (bool) $this->type == self::TYPE_SYSTEM;
+    }
+
     public function isManaged() :bool
     {
-        return (bool) $this->router->isManaged();
+        return $this->router->isManaged() || $this->type == static::TYPE_SYSTEM;
     }
 
     public function isHidden(): bool
     {
-        return $this->isManaged();
+        return $this->isManaged() && $this->type != static::TYPE_SYSTEM;
     }
 
     public function sieve(Sieve $sieve)
@@ -96,6 +106,7 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
             'name' => $filter->string(),
             'sequence' => $filter->string(),
             'router_id' => $filter->string(),
+            'type' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
