@@ -33,8 +33,10 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
             ]);
+
+            $this->nic->ip_address = '10.3.4.5';
+
             $this->nat = app()->make(Nat::class);
             $this->nat->id = 'nat-test';
             $this->nat->destination()->associate($this->floatingIp);
@@ -92,8 +94,10 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
             ]);
+
+            $this->nic->ip_address = '10.3.4.5';
+
             $this->nat = app()->make(Nat::class);
             $this->nat->id = 'nat-test';
             $this->nat->destination()->associate($this->floatingIp);

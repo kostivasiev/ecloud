@@ -23,20 +23,26 @@ class NicTest extends TestCase
             'ip_address' => '1.1.1.1',
         ]);
 
+        $nic->ip_address = '1.1.1.1';
+
         $this->assertEquals('1.1.1.1', $nic->ip_address);
     }
 
     public function testIpaddressAttributeReturnsDhcpIpAddress()
     {
+        //todo
         $ipAddress = IpAddress::factory()->create();
 
         $this->nic()->ipAddresses()->sync($ipAddress);
 
-        $this->assertDatabaseMissing('nics', [
-            'id' => $this->nic()->id,
-            'ip_address' => '1.1.1.1'
-        ],
-        'ecloud');
+        $this->assertDatabaseMissing(
+            'nics',
+            [
+                'id' => $this->nic()->id,
+                'ip_address' => '1.1.1.1'
+            ],
+            'ecloud'
+        );
 
         $this->assertEquals('1.1.1.1', $this->nic()->ip_address);
     }
