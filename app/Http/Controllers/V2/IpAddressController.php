@@ -53,13 +53,14 @@ class IpAddressController extends BaseController
 
         if (!$request->ip_address) {
             try {
-                $ipAddress->allocateAddress($request->network_id);
+                $ipAddress->allocateAddressAndSave($request->network_id);
             } catch (LockTimeoutException $e) {
                 throw new IpAddressCreationException;
             }
+        } else {
+            $ipAddress->save();
         }
 
-        $ipAddress->save();
         return $this->responseIdMeta($request, $ipAddress->id, 201);
     }
 
