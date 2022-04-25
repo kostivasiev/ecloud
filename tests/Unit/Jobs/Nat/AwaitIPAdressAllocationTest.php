@@ -44,8 +44,6 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nat->save();
         });
 
-        dd($this->nic->getIPAddress());
-
         Event::fake([JobFailed::class, JobProcessed::class]);
 
         dispatch(new AwaitIPAddressAllocation($this->nat));
