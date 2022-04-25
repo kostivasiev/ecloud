@@ -4,10 +4,13 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\IpAddress\CreateRequest;
 use App\Http\Requests\V2\IpAddress\UpdateRequest;
 use App\Models\V2\IpAddress;
+use App\Models\V2\Network;
 use App\Resources\V2\IpAddressResource;
 use App\Resources\V2\NicResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class IpAddressController extends BaseController
 {
@@ -41,6 +44,10 @@ class IpAddressController extends BaseController
                 'type'
             ])
         );
+
+        if (!$request->ip_address) {
+            $ipAddress->allocateAddress($request->network_id);
+        }
 
         $ipAddress->save();
         return $this->responseIdMeta($request, $ipAddress->id, 201);
