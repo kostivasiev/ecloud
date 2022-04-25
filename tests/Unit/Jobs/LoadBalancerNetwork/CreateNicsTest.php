@@ -7,7 +7,6 @@ use App\Jobs\LoadBalancerNetwork\CreateNics;
 use App\Models\V2\Network;
 use App\Models\V2\Nic;
 use App\Support\Sync;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -27,21 +26,6 @@ class CreateNicsTest extends TestCase
 
         $this->assertCount(0, $this->loadBalancerInstance()->nics);
 
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->loadBalancerInstance()->id . '/nic',
-                [
-                    'json' => [
-                        'networkId' => $this->loadBalancerNetwork()->network_id,
-                    ],
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'macAddress' => '00:50:56:8a:eb:f2'
-                ]));
-            });
-
         $task = $this->createSyncUpdateTask($this->loadBalancerNetwork());
 
         dispatch(new CreateNics($task));
@@ -54,12 +38,9 @@ class CreateNicsTest extends TestCase
 
         $nic = $this->loadBalancerInstance()->nics->first();
 
-        $this->assertEquals('00:50:56:8a:eb:f2', $nic->mac_address);
         $this->assertEquals($this->loadBalancerNetwork()->network_id, $nic->network_id);
 
         $task->refresh();
-
-        $this->assertNotNull($task->data['nic_ids']);
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -82,21 +63,6 @@ class CreateNicsTest extends TestCase
         $this->loadBalancerNode();
 
         $this->assertCount(0, $this->loadBalancerInstance()->nics);
-
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->loadBalancerInstance()->id . '/nic',
-                [
-                    'json' => [
-                        'networkId' => $this->loadBalancerNetwork()->network_id,
-                    ],
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'macAddress' => '00:50:56:8a:eb:f2'
-                ]));
-            });
 
         $task = $this->createSyncUpdateTask($this->loadBalancerNetwork());
 
@@ -159,21 +125,6 @@ class CreateNicsTest extends TestCase
         });
 
         $this->assertCount(1, $this->loadBalancerInstance()->nics);
-
-        $this->kingpinServiceMock()->expects('post')
-            ->withArgs([
-                '/api/v2/vpc/' . $this->vpc()->id . '/instance/' . $this->loadBalancerInstance()->id . '/nic',
-                [
-                    'json' => [
-                        'networkId' => $this->loadBalancerNetwork()->network_id,
-                    ],
-                ]
-            ])
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'macAddress' => '00:50:56:8a:eb:f2'
-                ]));
-            });
 
         $task = $this->createSyncUpdateTask($this->loadBalancerNetwork());
 

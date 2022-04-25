@@ -24,11 +24,6 @@ class CreateRequest extends FormRequest
                 'string',
                 'max:255'
             ],
-            'mac_address' => [
-                'required',
-                'string',
-                new ValidMacAddress()
-            ],
             'instance_id' => [
                 'required',
                 'string',

@@ -39,7 +39,6 @@ class NicController extends BaseController
     {
         $nic = new Nic($request->only([
             'name',
-            'mac_address',
             'instance_id',
             'network_id',
         ]));
