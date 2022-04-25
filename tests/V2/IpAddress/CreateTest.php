@@ -67,7 +67,6 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Test',
             'network_id' => $this->network()->id,
-            'type' => IpAddress::TYPE_DHCP,
         ];
         $response = $this->post(
             '/v2/ip-addresses',
