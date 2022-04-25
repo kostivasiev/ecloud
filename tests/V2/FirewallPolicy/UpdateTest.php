@@ -9,7 +9,6 @@ use Tests\TestCase;
 
 class UpdateTest extends TestCase
 {
-    protected FirewallPolicy $policy;
     protected array $oldData;
 
     public function setUp(): void
@@ -20,9 +19,8 @@ class UpdateTest extends TestCase
 
         $this->oldData = [
             'name' => 'Demo Firewall Policy 1',
-            'router_id' => $this->router()->id,
         ];
-        $this->policy = FirewallPolicy::factory()->create($this->oldData)->first();
+        $this->firewallPolicy()->fill($this->oldData)->saveQuietly();
         Event::fake([Created::class]);
     }
 
@@ -31,22 +29,37 @@ class UpdateTest extends TestCase
         $data = [
             'name' => 'Updated Firewall Policy 1',
         ];
-        $patch = $this->patch(
-            '/v2/firewall-policies/' . $this->policy->id,
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertStatus(202);
+        $this->asAdmin()
+            ->patch(
+                '/v2/firewall-policies/' . $this->firewallPolicy()->id,
+                $data
+            )->assertStatus(202);
 
-        $firewallPolicy = FirewallPolicy::findOrFail((json_decode($patch->getContent()))->data->id);
-        $this->assertEquals($data['name'], $firewallPolicy->name);
-        $this->assertNotEquals($this->oldData['name'], $firewallPolicy->name);
+        $this->firewallPolicy()->refresh();
+        $this->assertEquals($data['name'], $this->firewallPolicy()->name);
+        $this->assertNotEquals($this->oldData['name'], $this->firewallPolicy()->name);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
     }
 
+    public function testManagedPolicyDoesNotUpdate()
+    {
+        $this->firewallPolicy()
+            ->setAttribute('type', FirewallPolicy::TYPE_SYSTEM)
+            ->saveQuietly();
+
+        $this->asUser()
+            ->patch(
+                '/v2/firewall-policies/' . $this->firewallPolicy()->id,
+                [
+                    'name' => 'Updated Firewall Policy 1',
+                ]
+            )->assertJsonFragment([
+                'title' => 'Forbidden',
+                'detail' => 'The specified resource is not editable',
+                'status' => 403,
+            ])->assertStatus(403);
+    }
 }
