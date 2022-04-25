@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('nics', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('nics', function (Blueprint $table) {
             $table->dropColumn('ip_address');
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('nics', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('nics', function (Blueprint $table) {
             $table->ipAddress('ip_address')->after('network_id')->nullable();
         });
     }
