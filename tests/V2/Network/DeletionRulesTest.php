@@ -22,8 +22,8 @@ class DeletionRulesTest extends TestCase
                 'mac_address' => $this->faker->macAddress,
                 'instance_id' => $this->instanceModel()->id,
                 'network_id' => $this->network()->id,
-                'ip_address' => $this->faker->ipv4,
             ]);
+            $this->nics->ip_address = $this->faker->ipv4;
         });
     }
 

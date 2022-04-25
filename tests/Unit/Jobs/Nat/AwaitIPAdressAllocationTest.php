@@ -25,7 +25,7 @@ class AwaitIPAdressAllocationTest extends TestCase
 
     public function testJobSucceedsWithValidIPAddresses()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
@@ -118,7 +118,7 @@ class AwaitIPAdressAllocationTest extends TestCase
 
     public function testJobReleasedWhenNoTranslatedIPAddress()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
@@ -126,7 +126,6 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '',
             ]);
             $this->nat = app()->make(Nat::class);
             $this->nat->id = 'nat-test';
