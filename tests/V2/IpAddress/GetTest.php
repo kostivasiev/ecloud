@@ -31,7 +31,7 @@ class GetTest extends TestCase
                 [
                     'ip_address' => '1.1.1.1',
                     'network_id' => $this->network()->id,
-                    'type' => 'normal'
+                    'type' => IpAddress::TYPE_DHCP
                 ]
             )->assertStatus(200);
     }
@@ -48,7 +48,7 @@ class GetTest extends TestCase
                     'id' => $ipAddress->id,
                     'ip_address' => '1.1.1.1',
                     'network_id' => $this->network()->id,
-                    'type' => 'normal'
+                    'type' => IpAddress::TYPE_DHCP,
                 ]
             )->assertStatus(200);
     }

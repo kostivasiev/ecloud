@@ -1,0 +1,23 @@
+get:
+  parameters:
+    - $ref: '../../resources/FirewallPolicy/parameters/firewallPolicyId.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                allOf:
+                  - $ref: '../../components/schemas/firewallPolicy.yaml'
+                  - properties:
+                      is_managed :
+                        type : boolean
+                        example : true
+                        readOnly : true
+              meta:
+                type: object
+  tags:
+    - Firewall Policies

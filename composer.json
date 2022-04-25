@@ -34,7 +34,7 @@
         "ukfast/api-validation": "^1.4",
         "ukfast/ditto": "^4.1",
         "ukfast/health-check": "^2.0",
-        "ukfast/laravel-sieve": "^0.5",
+        "ukfast/laravel-sieve": "^0.7",
         "ukfast/log-provider": "^3.0",
         "ukfast/responses": "~1.0",
         "vlucas/phpdotenv": "^5.2",
