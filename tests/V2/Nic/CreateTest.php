@@ -3,6 +3,7 @@
 namespace Tests\V2\Nic;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\Nic;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Faker\Factory as Faker;
@@ -70,6 +71,17 @@ class CreateTest extends TestCase
                 'status' => 422,
             ])
             ->assertStatus(422);
+    }
+
+    public function testNicLimitForInstanceReachedFails()
+    {
+        config(['instance.nics.max' => 2]);
+        $this->nic();
+        Nic::factory()->for($this->instanceModel())->create();
+
+        $this->post('/v2/nics', [
+            'instance_id' => $this->instanceModel()->id,
+        ])->assertStatus(422);
     }
 
     public function testFailedInstanceOrNetworkCausesFailure()
