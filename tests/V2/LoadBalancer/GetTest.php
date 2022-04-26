@@ -65,7 +65,7 @@ class GetTest extends TestCase
             ->assertStatus(200);
     }
 
-    public function testGetLoadbalancerInstancesCollection()
+    public function testGetLoadBalancerAvailableTargetsCollection()
     {
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
         $this->loadBalancerNetwork();
