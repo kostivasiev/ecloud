@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('instance_volume', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('instance_volume', function (Blueprint $table) {
             $table->index('instance_id', 'instance_volume_instance_id');
             $table->index('volume_id', 'instance_volume_volume_id');
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('instance_volume', function (Blueprint $table) {
+        Schema::connection('ecloud')->table('instance_volume', function (Blueprint $table) {
             $table->dropIndex('instance_volume_instance_id');
             $table->dropIndex('instance_volume_volume_id');
         });
