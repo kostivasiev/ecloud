@@ -21,9 +21,38 @@ class VolumeController extends BaseController
 {
     public function index(Request $request)
     {
-        $collection = Volume::forUser($request->user());
+        if ($request->hasAny([
+            'attached',
+            'attached:eq',
+            'attached:neq',
+        ])) {
+            if ($request->has('attached') || $request->has('attached:eq')) {
+                if ($request->has('attached')) {
+                    $attached = filter_var($request->get('attached'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('attached');
+                } else {
+                    $attached = filter_var($request->get('attached:eq'), FILTER_VALIDATE_BOOLEAN);
+                    $request->query->remove('attached:eq');
+                }
+            } elseif ($request->has('attached:neq')) {
+                $attached = !filter_var($request->get('attached:neq'), FILTER_VALIDATE_BOOLEAN);
+                $request->query->remove('attached:neq');
+            }
 
-        return VolumeResource::collection($collection->search()->paginate(
+            if ($attached) {
+                $collection = Volume::forUser($request->user())->has('instances', '>', 0);
+            } else {
+                $collection = Volume::forUser($request->user())->has('instances', '=', 0);
+            }
+        } else {
+            $collection = Volume::forUser($request->user());
+        }
+
+        (new QueryTransformer($request))
+            ->config(Volume::class)
+            ->transform($collection);
+
+        return VolumeResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
