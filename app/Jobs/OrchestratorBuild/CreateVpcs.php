@@ -44,7 +44,6 @@ class CreateVpcs extends Job
             $vpc = app()->make(Vpc::class);
             $vpc->fill($definition->only(['name', 'region_id', 'advanced_networking', 'console_enabled'])->toArray());
             $vpc->reseller_id = $orchestratorBuild->orchestratorConfig->reseller_id;
-
             $vpc->syncSave();
 
             if ($definition->has('support_enabled') && $definition->get('support_enabled') === true) {
