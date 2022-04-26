@@ -225,13 +225,11 @@ class InstanceController extends BaseController
      * @param string $instanceId
      * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
-    public function volumes(Request $request, QueryTransformer $queryTransformer, string $instanceId)
+    public function volumes(Request $request, string $instanceId)
     {
         $collection = Instance::forUser($request->user())->findOrFail($instanceId)->volumes();
-        $queryTransformer->config(Volume::class)
-            ->transform($collection);
 
-        return VolumeResource::collection($collection->paginate(
+        return VolumeResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }

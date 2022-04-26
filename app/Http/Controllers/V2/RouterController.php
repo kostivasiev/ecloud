@@ -65,13 +65,11 @@ class RouterController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function vpns(Request $request, QueryTransformer $queryTransformer, string $routerId)
+    public function vpns(Request $request, string $routerId)
     {
         $collection = Router::forUser($request->user())->findOrFail($routerId)->vpns();
-        $queryTransformer->config(VpnService::class)
-            ->transform($collection);
 
-        return VpnServiceResource::collection($collection->paginate(
+        return VpnServiceResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
