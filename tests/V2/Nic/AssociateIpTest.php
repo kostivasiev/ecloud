@@ -21,7 +21,7 @@ class AssociateIpTest extends TestCase
     {
         $ipAddress = IpAddress::factory()->create([
             'network_id' => $this->network()->id,
-            'type' => 'normal'
+            'type' => IpAddress::TYPE_DHCP
         ]);
 
         $this->post(
@@ -48,7 +48,7 @@ class AssociateIpTest extends TestCase
         
         $ipAddress = IpAddress::factory()->create([
             'network_id' => $network->id,
-            'type' => 'normal'
+            'type' => IpAddress::TYPE_DHCP
         ]);
 
         $this->post(

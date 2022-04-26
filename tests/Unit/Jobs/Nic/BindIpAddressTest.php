@@ -144,7 +144,7 @@ class BindIpAddressTest extends TestCase
         // Mock the DHCP IP address
         $this->nic()->ipAddresses()->save(IpAddress::factory()->create([
             'network_id' => $this->network()->id,
-            'type' => IpAddress::TYPE_NORMAL,
+            'type' => IpAddress::TYPE_DHCP,
             'ip_address' => '2.2.2.2'
         ]));
 

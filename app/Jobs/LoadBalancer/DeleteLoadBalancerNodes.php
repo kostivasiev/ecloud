@@ -14,15 +14,15 @@ class DeleteLoadBalancerNodes extends TaskJob
     {
         $loadBalancer = $this->task->resource;
         $loadBalancerNodeIds = [];
-        if (empty($this->task->data['load_balancer_node_ids'])) {
+        if (empty($this->task->data['loadbalancer_node_ids'])) {
             $loadBalancer->loadBalancerNodes()
                 ->each(function ($loadBalancerNode) use (&$loadBalancerNodeIds) {
                     $loadBalancerNodeIds[] = $loadBalancerNode->id;
                     $loadBalancerNode->syncDelete();
                 });
-            $this->task->updateData('load_balancer_node_ids', $loadBalancerNodeIds);
+            $this->task->updateData('loadbalancer_node_ids', $loadBalancerNodeIds);
         } else {
-            $loadBalancerNodeIds = LoadBalancerNode::whereIn('id', $this->task->data['load_balancer_node_ids'])
+            $loadBalancerNodeIds = LoadBalancerNode::whereIn('id', $this->task->data['loadbalancer_node_ids'])
                 ->get()
                 ->pluck('id')
                 ->toArray();

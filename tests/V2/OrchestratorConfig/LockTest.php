@@ -21,52 +21,6 @@ class LockTest extends TestCase
             ->setIsAdmin(true);
     }
 
-    public function testLockConfigurationNonAdmin()
-    {
-        $this->be($this->user);
-        $this->put('/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/lock')
-            ->assertJsonFragment(
-                [
-                    'title' => 'Unauthorized',
-                    'detail' => 'Unauthorized',
-                ]
-            )->assertStatus(401);
-    }
-
-    public function testLockConfigurationAsAdmin()
-    {
-        $this->be($this->adminUser);
-        $this->put('/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/lock')
-            ->assertStatus(204);
-        $this->orchestratorConfig->refresh();
-        $this->assertTrue($this->orchestratorConfig->locked);
-    }
-
-    public function testUnlockConfigurationNonAdmin()
-    {
-        $this->be($this->user);
-        $this->put('/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/unlock')
-            ->assertJsonFragment(
-                [
-                    'title' => 'Unauthorized',
-                    'detail' => 'Unauthorized',
-                ]
-            )->assertStatus(401);
-    }
-
-    public function testUnlockConfigurationAsAdmin()
-    {
-        $this->be($this->adminUser);
-        // lock the config
-        $this->orchestratorConfig->locked = true;
-        $this->orchestratorConfig->saveQuietly();
-
-        $this->put('/v2/orchestrator-configs/' . $this->orchestratorConfig->id . '/unlock')
-            ->assertStatus(204);
-        $this->orchestratorConfig->refresh();
-        $this->assertFalse($this->orchestratorConfig->locked);
-    }
-
     public function testUpdateDataOnLockedConfig()
     {
         $this->be($this->adminUser);

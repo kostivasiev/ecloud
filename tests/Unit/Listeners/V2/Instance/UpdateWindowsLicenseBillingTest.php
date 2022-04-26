@@ -19,7 +19,7 @@ class UpdateWindowsLicenseBillingTest extends TestCase
     {
         parent::setUp();
 
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'task-1',
                 'completed' => true,
@@ -29,7 +29,7 @@ class UpdateWindowsLicenseBillingTest extends TestCase
         });
     }
 
-    public function testInstertWindowsLicenseBilling()
+    public function testInsertWindowsLicenseBilling()
     {
         $this->instanceModel()->vcpu_cores = 1;
         $this->instanceModel()->image->setAttribute('platform', 'Windows')->saveQuietly();

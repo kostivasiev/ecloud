@@ -2,14 +2,19 @@
 
 namespace Tests\Unit\Jobs\Router;
 
+use App\Events\V2\Task\Created;
 use App\Jobs\Router\CreateManagementFirewallPolicies;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Support\Sync;
+use App\Tasks\Vpc\CreateManagementInfrastructure;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class CreateManagementFirewallPoliciesTest extends TestCase
@@ -37,6 +42,38 @@ class CreateManagementFirewallPoliciesTest extends TestCase
 
     public function testNoPoliciesAddedIfNoManagementNetwork()
     {
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        $task = new Task([
+            'id' => 'sync-1',
+            'name' => CreateManagementInfrastructure::$name,
+            'data' => [
+                'management_router_id' => $this->managementRouter->id
+            ]
+        ]);
+        $task->resource()->associate($this->vpc());
+        $task->save();
+
+        dispatch(new CreateManagementFirewallPolicies($task));
+
+        $task->refresh();
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        Event::assertNotDispatched(Created::class, function ($event) {
+            return $event->model->resource instanceof FirewallPolicy
+                && $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+    }
+
+    public function testFirewallPolicyExistsSkips()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
         Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'sync-1',
@@ -44,11 +81,26 @@ class CreateManagementFirewallPoliciesTest extends TestCase
             ]);
             $this->router()->setAttribute('is_management', true)->saveQuietly();
             $this->task->resource()->associate($this->router());
+            $this->task->updateData('management_router_id', $this->router()->id);
+            $this->task->updateData('management_network_id', $this->network()->id);
         });
 
-        Bus::fake();
-        $job = new CreateManagementFirewallPolicies($this->task);
-        $this->assertNull($job->handle());
+        $this->firewallPolicy();
+
+        dispatch(new CreateManagementFirewallPolicies($this->task));
+
+        $this->task->refresh();
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        Event::assertNotDispatched(Created::class, function ($event) {
+            return $event->model->resource instanceof FirewallPolicy
+                && $event->model->name == Sync::TASK_NAME_UPDATE;
+        });
+
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
     }
 
     public function testAddFirewallPolicies()

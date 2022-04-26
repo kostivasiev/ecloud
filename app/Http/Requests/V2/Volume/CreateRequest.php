@@ -7,9 +7,10 @@ use App\Models\V2\VolumeGroup;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\IsSameVpc;
 use App\Rules\V2\Volume\HasAvailablePorts;
-use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateRequest extends FormRequest
 {
@@ -54,6 +55,7 @@ class CreateRequest extends FormRequest
             ],
             'volume_group_id' => [
                 Rule::exists(VolumeGroup::class, 'id')->whereNull('deleted_at'),
+                new IsSameVpc($this->request->get('vpc_id')),
                 new ExistsForUser(VolumeGroup::class),
                 new HasAvailablePorts
             ]

@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\V2\Volume;
 
+use App\Models\V2\Volume;
 use App\Models\V2\VolumeGroup;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsSameVpc;
 use App\Rules\V2\IsVolumeAttached;
 use App\Rules\V2\Volume\HasAvailablePorts;
 use App\Rules\V2\Volume\IsMemberOfVolumeGroup;
@@ -11,6 +13,7 @@ use App\Rules\V2\Volume\IsNotAttachedToInstance;
 use App\Rules\V2\Volume\IsOperatingSystemVolume;
 use App\Rules\V2\Volume\IsSharedVolume;
 use App\Rules\V2\VolumeCapacityIsGreater;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -24,6 +27,7 @@ class UpdateRequest extends FormRequest
     public function rules()
     {
         $volumeId = app('request')->route('volumeId');
+        $volume = Volume::forUser(Auth::user())->findOrFail($volumeId);
 
         return [
             'name' => ['sometimes', 'required', 'string', 'max:255'],
@@ -51,6 +55,7 @@ class UpdateRequest extends FormRequest
                 'nullable',
                 Rule::exists(VolumeGroup::class, 'id')->whereNull('deleted_at'),
                 new ExistsForUser(VolumeGroup::class),
+                new IsSameVpc($volume->vpc_id),
                 new IsMemberOfVolumeGroup($volumeId),
                 new HasAvailablePorts,
                 new IsOperatingSystemVolume($volumeId),

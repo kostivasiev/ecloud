@@ -31,8 +31,7 @@ Content-Type: application/json
 {
     "name": "Test",
     "ip_address": "10.0.17.5",
-    "network_id": "{{network_id}}",
-    "type": "cluster"
+    "network_id": "{{network_id}}"
 }
 
 > {%
@@ -97,8 +96,7 @@ Content-Type: application/json
 {
     "name": "Updated",
     "ip_address": "172.22.2.4",
-    "network_id": "{{network_id}}",
-    "type": "cluster"
+    "network_id": "{{network_id}}"
 }
 
 > {%

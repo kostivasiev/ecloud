@@ -52,6 +52,9 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Firewall\SquidUpdate::class,
         \App\Console\Commands\Router\FixEdgeClusters::class,
         \App\Console\Commands\Router\FixMissingPolicies::class,
+        \App\Console\Commands\LogicMonitor\RegisterExistingInstancesWithLogicMonitor::class,
+        \App\Console\Commands\FirewallPolicy\ApplyDefaultRules::class,
+        \App\Console\Commands\Nic\MigrateIpAddressToIpAddressModel::class,
     ];
 
     /**

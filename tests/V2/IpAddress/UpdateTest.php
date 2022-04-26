@@ -1,8 +1,6 @@
 <?php
 namespace Tests\V2\IpAddress;
 
-use App\Models\V2\IpAddress;
-use App\Models\V2\Network;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -21,7 +19,6 @@ class UpdateTest extends TestCase
             [
                 'name' => 'UPDATED',
                 'ip_address' => '10.0.0.6',
-                'type' => 'cluster',
             ]
         )->assertStatus(200);
         $this->assertDatabaseHas(
@@ -43,7 +40,6 @@ class UpdateTest extends TestCase
             [
                 'name' => 'UPDATED',
                 'ip_address' => '10.0.0.6',
-                'type' => 'cluster',
             ]
         )->assertStatus(200);
         $this->assertDatabaseHas(
@@ -51,7 +47,6 @@ class UpdateTest extends TestCase
             [
                 'name' => 'UPDATED',
                 'ip_address' => $this->ip()->ip_address,
-                'type' => 'normal',
             ],
             'ecloud'
         );

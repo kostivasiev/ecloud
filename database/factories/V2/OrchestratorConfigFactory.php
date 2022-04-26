@@ -92,7 +92,8 @@ EOM;
         return [
             'reseller_id' => 1,
             'employee_id' => 1,
-            'data' => $data
+            'data' => $data,
+            'locked' => false,
         ];
     }
 }

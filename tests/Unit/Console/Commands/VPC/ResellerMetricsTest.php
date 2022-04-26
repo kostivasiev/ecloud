@@ -31,6 +31,7 @@ class ResellerMetricsTest extends TestCase
             'reseller_id' => $this->resellerId,
             'vpc_id' => $this->vpc()->id,
             'start' => Carbon::now()->subtract('month', 1)->toString(),
+            'price' => 0.0001,
         ]);
 
         app()->bind(AccountAdminClient::class, function () {

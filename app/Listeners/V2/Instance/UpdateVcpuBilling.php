@@ -8,12 +8,16 @@ use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
 use App\Support\Sync;
 use App\Traits\V2\InstanceOnlineState;
+use App\Traits\V2\Listeners\BillableListener;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateVcpuBilling implements Billable
 {
-    use InstanceOnlineState;
+    use InstanceOnlineState, BillableListener;
+
+    const RESOURCE = Instance::class;
+
     /**
      * @param Updated $event
      * @return void
@@ -21,23 +25,10 @@ class UpdateVcpuBilling implements Billable
      */
     public function handle(Updated $event)
     {
-        if ($event->model->name == Sync::TASK_NAME_DELETE) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
-
-        if (!$event->model->completed) {
-            return;
-        }
-
         $instance = $event->model->resource;
-
-        if (get_class($instance) != Instance::class) {
-            return;
-        }
-
-        if ($instance->isManaged()) {
-            return;
-        }
 
         if (!empty($instance->host_group_id)) {
             $instance->billingMetrics()

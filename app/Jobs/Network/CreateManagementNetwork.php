@@ -1,11 +1,11 @@
 <?php
+
 namespace App\Jobs\Network;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Traits\V2\TaskJobs\AwaitResources;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use IPLib\Factory;
 
@@ -13,48 +13,65 @@ class CreateManagementNetwork extends TaskJob
 {
     use AwaitResources;
 
-    public $lock;
-
     public function handle()
     {
-        $router = $this->task->resource;
-        if (!empty($this->task->data['management_router_id'])) {
-            $managementRouter = Router::find($this->task->data['management_router_id']);
-            if (empty($this->task->data['management_network_id'])) {
-                $this->info('Create Management Network Start', ['router_id' => $managementRouter->id]);
+        $vpc = $this->task->resource;
 
-                $managementNetwork = app()->make(Network::class);
-                $managementNetwork->name = 'Management Network for ' . $managementRouter->id;
-                $managementNetwork->router_id = $managementRouter->id; // needs to be the management router
+        if (empty($this->task->data['management_router_id'])) {
+            $message = 'Unable to determine management router.';
+            $this->error($message);
+            $this->fail(new \Exception($message));
+            return;
+        }
 
-                $subnet = $router->vpc->advanced_networking ?
-                    config('network.management_range.advanced') :
-                    config('network.management_range.standard');
+        $managementRouter = Router::find($this->task->data['management_router_id']);
+        if (empty($managementRouter)) {
+            $message = 'Unable to load management router.';
+            $this->error($message);
+            $this->fail(new \Exception($message));
+            return;
+        }
 
-                $lock = Cache::lock('subnet.'.$subnet, 60);
-                try {
-                    $managementNetwork->subnet = $this->getNextAvailableSubnet($subnet, $managementRouter->availability_zone_id);
-                    $managementNetwork->syncSave();
-                } finally {
-                    $lock->release();
-                }
-
-                // Store the management network id, so we can backoff everything else
-                $this->task->updateData('management_network_id', $managementNetwork->id);
-
-                $this->info('Create Management Network End', [
-                    'router_id' => $managementRouter->id,
-                    'network_id' => $managementNetwork->id,
+        if (empty($this->task->data['management_network_id'])) {
+            if ($managementRouter->networks()->count() > 0) {
+                $this->info('A management network was detected, skipping.', [
+                    'vpc_id' => $vpc->id
                 ]);
-            } else {
-                $managementNetwork = Network::findOrFail($this->task->data['management_network_id']);
+                $this->task->updateData('management_network_id', $managementRouter->networks()->first()->id);
+                return;
             }
 
-            if ($managementNetwork) {
-                $this->awaitSyncableResources([
-                    $managementNetwork->id,
-                ]);
+            $this->info('Create Management Network Start', ['router_id' => $managementRouter->id]);
+
+            $managementNetwork = app()->make(Network::class);
+            $managementNetwork->name = 'Management Network for ' . $managementRouter->id;
+            $managementNetwork->router_id = $managementRouter->id; // needs to be the management router
+
+            $subnet = $vpc->advanced_networking ?
+                config('network.management_range.advanced') :
+                config('network.management_range.standard');
+
+            $lock = Cache::lock('subnet.' . $subnet, 60);
+            try {
+                $managementNetwork->subnet = $this->getNextAvailableSubnet($subnet, $managementRouter->availability_zone_id);
+                $managementNetwork->syncSave();
+            } finally {
+                $lock->release();
             }
+
+            // Store the management network id, so we can backoff everything else
+            $this->task->updateData('management_network_id', $managementNetwork->id);
+
+            $this->info('Create Management Network End', [
+                'router_id' => $managementRouter->id,
+                'network_id' => $managementNetwork->id,
+            ]);
+        }
+
+        if ($this->task->data['management_network_id']) {
+            $this->awaitSyncableResources([
+                $this->task->data['management_network_id']
+            ]);
         }
     }
 

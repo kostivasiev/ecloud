@@ -274,8 +274,14 @@ Route::group([
         Route::get('firewall-policies/{firewallPolicyId}/firewall-rules', 'FirewallPolicyController@firewallRules');
         Route::get('firewall-policies/{firewallPolicyId}/tasks', 'FirewallPolicyController@tasks');
         Route::post('firewall-policies', 'FirewallPolicyController@store');
-        Route::patch('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@update');
-        Route::delete('firewall-policies/{firewallPolicyId}', 'FirewallPolicyController@destroy');
+        Route::patch('firewall-policies/{firewallPolicyId}', [
+            'middleware' => 'is-managed:' . \App\Models\V2\FirewallPolicy::class . ',firewallPolicyId',
+            'uses' => 'FirewallPolicyController@update'
+        ]);
+        Route::delete('firewall-policies/{firewallPolicyId}', [
+            'middleware' => 'is-managed:' . \App\Models\V2\FirewallPolicy::class . ',firewallPolicyId',
+            'uses' => 'FirewallPolicyController@destroy'
+        ]);
     });
 
     /** Firewall Rules */
@@ -283,18 +289,36 @@ Route::group([
         Route::get('firewall-rules', 'FirewallRuleController@index');
         Route::get('firewall-rules/{firewallRuleId}', 'FirewallRuleController@show');
         Route::get('firewall-rules/{firewallRuleId}/ports', 'FirewallRuleController@ports');
-        Route::post('firewall-rules', 'FirewallRuleController@store');
-        Route::patch('firewall-rules/{firewallRuleId}', 'FirewallRuleController@update');
-        Route::delete('firewall-rules/{firewallRuleId}', 'FirewallRuleController@destroy');
+        Route::post('firewall-rules', [
+            'middleware' => 'is-managed:' . \App\Models\V2\FirewallPolicy::class . ',firewall_policy_id',
+            'uses' => 'FirewallRuleController@store'
+        ]);
+        Route::patch('firewall-rules/{firewallRuleId}', [
+            'middleware' => 'is-managed:' . \App\Models\V2\FirewallRule::class . ',firewallRuleId',
+            'uses' => 'FirewallRuleController@update'
+        ]);
+        Route::delete('firewall-rules/{firewallRuleId}', [
+            'middleware' => 'is-managed:' . \App\Models\V2\FirewallRule::class . ',firewallRuleId',
+            'uses' => 'FirewallRuleController@destroy'
+        ]);
     });
 
     /** Firewall Rule Ports */
     Route::group([], function () {
         Route::get('firewall-rule-ports', 'FirewallRulePortController@index');
         Route::get('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@show');
-        Route::post('firewall-rule-ports', 'FirewallRulePortController@store');
-        Route::patch('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@update');
-        Route::delete('firewall-rule-ports/{firewallRulePortId}', 'FirewallRulePortController@destroy');
+        Route::post('firewall-rule-ports', [
+            'middleware' => 'is-managed:' . \App\Models\V2\FirewallRule::class . ',firewall_rule_id',
+            'uses' => 'FirewallRulePortController@store'
+        ]);
+        Route::patch('firewall-rule-ports/{firewallRulePortId}', [
+            'middleware' => 'is-managed:' . \App\Models\V2\FirewallRulePort::class . ',firewallRulePortId',
+            'uses' => 'FirewallRulePortController@update'
+        ]);
+        Route::delete('firewall-rule-ports/{firewallRulePortId}', [
+            'middleware' => 'is-managed:' . \App\Models\V2\FirewallRulePort::class . ',firewallRulePortId',
+            'uses' => 'FirewallRulePortController@destroy'
+        ]);
     });
 
     /** Regions */
@@ -548,11 +572,6 @@ Route::group([
         Route::delete('orchestrator-configs/{orchestratorConfigId}', 'OrchestratorConfigController@destroy');
         Route::get('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@showData');
         Route::get('orchestrator-configs/{orchestratorConfigId}/builds', 'OrchestratorConfigController@builds');
-
-        Route::group(['middleware' => 'is-admin'], function () {
-            Route::put('orchestrator-configs/{orchestratorConfigId}/lock', 'OrchestratorConfigController@lock');
-            Route::put('orchestrator-configs/{orchestratorConfigId}/unlock', 'OrchestratorConfigController@unlock');
-        });
 
         Route::group(['middleware' => ['orchestrator-config-is-locked', 'orchestrator-config-is-valid']], function () {
             Route::post('orchestrator-configs/{orchestratorConfigId}/data', 'OrchestratorConfigController@storeData');

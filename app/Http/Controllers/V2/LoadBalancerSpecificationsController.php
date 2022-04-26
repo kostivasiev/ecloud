@@ -22,9 +22,14 @@ class LoadBalancerSpecificationsController extends BaseController
     {
         $collection = LoadBalancerSpecification::query();
 
-        return LoadBalancerSpecificationResource::collection($collection->search()->paginate(
-            $request->input('per_page', env('PAGINATION_LIMIT'))
-        ));
+        return LoadBalancerSpecificationResource::collection(
+            $collection
+                ->search()
+                ->orderBy('created_at')
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
     }
 
     /**
