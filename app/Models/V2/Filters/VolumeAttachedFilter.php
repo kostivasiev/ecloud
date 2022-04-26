@@ -14,11 +14,11 @@ class VolumeAttachedFilter extends StringFilter implements WrapsFilter
         $operator = '=';
         $count = 0;
 
-        if ($search->operator() == 'eq' && $search->term() == "true") {
+        if ($search->operator() == 'eq' && $search->term() == 'true') {
             $operator = '>';
         }
 
-        if ($search->operator() == 'neq' && $search->term() == "false") {
+        if ($search->operator() == 'neq' && $search->term() == 'false') {
             $operator = '>';
         }
 
