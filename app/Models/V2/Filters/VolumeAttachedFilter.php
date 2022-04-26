@@ -19,8 +19,7 @@ class VolumeAttachedFilter extends StringFilter implements WrapsFilter
             $operator = '>';
         }
 
-        $query->withCount('instances')
-            ->having('instances_count', $operator, $count);
+        $query->has('instances', $operator, $count);
     }
 
     public function wrap(ModifiesQueries $filter)
