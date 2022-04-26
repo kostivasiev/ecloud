@@ -47,6 +47,7 @@ class IpAddressController extends BaseController
                 'name',
                 'ip_address',
                 'network_id',
+                'type',
             ])
         );
 
