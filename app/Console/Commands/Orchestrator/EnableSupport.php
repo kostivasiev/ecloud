@@ -65,7 +65,7 @@ class EnableSupport extends Command
                         $this->updated++;
                     }
                 });
-        });
+            });
 
         $this->info('Total Updated: ' . $this->updated);
 
