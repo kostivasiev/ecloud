@@ -6,7 +6,7 @@ Content-Type:  application/json
 
 {
     "vpc_id": "{{dev_vpc_id}}",
-    "name": "Test multi nic",
+    "name": "Test",
     "vcpu_cores": 1,
     "ram_capacity": 1024,
     "image_id": "{{dev_image_id}}",
