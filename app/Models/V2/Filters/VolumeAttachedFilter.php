@@ -14,15 +14,13 @@ class VolumeAttachedFilter extends StringFilter implements WrapsFilter
         $operator = '=';
         $count = 0;
 
-        if ($search->operator() == 'eq' && $search->term() == 'true') {
+        if (($search->operator() == 'eq' && $search->term() == 'true') ||
+            ($search->operator() == 'neq' && $search->term() == 'false')) {
             $operator = '>';
         }
 
-        if ($search->operator() == 'neq' && $search->term() == 'false') {
-            $operator = '>';
-        }
-
-        $query->has('instances', $operator, $count);
+        $query->withCount('instances')
+            ->having('instances_count', $operator, $count);
     }
 
     public function wrap(ModifiesQueries $filter)
