@@ -121,19 +121,4 @@ class GetTest extends TestCase
         $this->get('/v2/vpn-sessions/' . $this->vpnSession->id . '/pre-shared-key')
             ->assertStatus(404);
     }
-
-    public function testVpcIdFiltering()
-    {
-        $this->get('/v2/vpn-sessions?vpc_id:eq=' . $this->vpc()->id)
-            ->assertJsonFragment([
-                'vpc_id' => $this->vpc()->id,
-            ])->assertJsonFragment([
-                'count' => 1,
-            ])->assertStatus(200);
-
-        $this->get('/v2/vpn-sessions?vpc_id:neq=' . $this->vpc()->id)
-            ->assertJsonFragment([
-                'count' => 0,
-            ])->assertStatus(200);
-    }
 }

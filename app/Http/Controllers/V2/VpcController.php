@@ -107,11 +107,13 @@ class VpcController extends BaseController
         return $this->responseTaskId($task->id);
     }
 
-    public function volumes(Request $request, string $vpcId)
+    public function volumes(Request $request, QueryTransformer $queryTransformer, string $vpcId)
     {
         $collection = Vpc::forUser($request->user())->findOrFail($vpcId)->volumes()->forUser($request->user());
+        $queryTransformer->config(Volume::class)
+            ->transform($collection);
 
-        return VolumeResource::collection($collection->search()->paginate(
+        return VolumeResource::collection($collection->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
