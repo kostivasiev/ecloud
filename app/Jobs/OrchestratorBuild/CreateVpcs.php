@@ -46,6 +46,10 @@ class CreateVpcs extends Job
             $vpc->reseller_id = $orchestratorBuild->orchestratorConfig->reseller_id;
             $vpc->syncSave();
 
+            if ($definition->has('support_enabled') && $definition->get('support_enabled') === true) {
+                dispatch(new UpdateSupportEnabledBilling($vpc, true));
+            }
+
             Log::info(get_class($this) . ' : OrchestratorBuild created VPC ' . $vpc->id, ['id' => $this->model->id]);
 
             $orchestratorBuild->updateState('vpc', $index, $vpc->id);
