@@ -3,10 +3,13 @@
 namespace Tests\V2\Volume;
 
 use App\Models\V2\Volume;
+use Tests\Mocks\Resources\VolumeMock;
 use Tests\TestCase;
 
 class GetTest extends TestCase
 {
+    use VolumeMock;
+
     public function setUp(): void
     {
         parent::setUp();
@@ -67,5 +70,49 @@ class GetTest extends TestCase
             'capacity' => 100,
             'vmware_uuid' => 'uuid-test-uuid-test-uuid-test',
         ])->assertStatus(200);
+    }
+
+    public function testFilterCollectionByAttached()
+    {
+        $this->instanceModel()->volumes()->attach($this->volume());
+
+        // First way of doing this
+        $this->asUser()
+            ->get('/v2/volumes?attached:eq=true')
+            ->assertJsonFragment([
+                'id' => $this->volume()->id,
+                'attached' => true,
+            ])
+            ->assertStatus(200);
+
+        // Second way of doing this
+        $this->asUser()
+            ->get('/v2/volumes?attached:neq=false')
+            ->assertJsonFragment([
+                'id' => $this->volume()->id,
+                'attached' => true,
+            ])
+            ->assertStatus(200);
+    }
+
+    public function testFilterCollectionByUnattached()
+    {
+        // First way of doing this
+        $this->asUser()
+            ->get('/v2/volumes?attached:eq=false')
+            ->assertJsonFragment([
+                'id' => $this->volume()->id,
+                'attached' => false,
+            ])
+            ->assertStatus(200);
+
+        // Second way of doing this
+        $this->asUser()
+            ->get('/v2/volumes?attached:neq=true')
+            ->assertJsonFragment([
+                'id' => $this->volume()->id,
+                'attached' => false,
+            ])
+            ->assertStatus(200);
     }
 }

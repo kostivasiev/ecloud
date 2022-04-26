@@ -1,0 +1,61 @@
+### 1. Get vpn-endpoints collection
+GET https://{{host}}/{{version}}/vpn-endpoints
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.global.set('vpc_id', response.body.data[2].vpc_id);
+client.log('VPC ID: ' + response.body.data[2].vpc_id);
+%}
+
+### 2. Get filtered vpn-endpoints collection
+GET https://{{host}}/{{version}}/vpn-endpoints?vpc_id:eq={{vpc_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### 3. Get vpn-sessions collection
+GET https://{{host}}/{{version}}/vpn-sessions
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.global.set('vpc_id', response.body.data[2].vpc_id);
+client.log('VPC ID: ' + response.body.data[2].vpc_id);
+%}
+
+### 4. Get filtered vpn-sessions collection
+GET https://{{host}}/{{version}}/vpn-sessions?vpc_id:eq={{vpc_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### 5. Get vpn-services collection
+GET https://{{host}}/{{version}}/vpn-services
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.global.set('vpc_id', response.body.data[2].vpc_id);
+client.log('VPC ID: ' + response.body.data[2].vpc_id);
+%}
+
+### 6. Get filtered vpn-services collection
+GET https://{{host}}/{{version}}/vpn-services?vpc_id:eq={{vpc_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### 7. Get volumes
+GET https://{{host}}/{{version}}/volumes?attached:eq=true
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.global.set('volume_id', response.body.data[2].vpc_id);
+client.log('Volume ID: ' + response.body.data[2].vpc_id);
+%}

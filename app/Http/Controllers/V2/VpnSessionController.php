@@ -12,97 +12,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use UKFast\Api\Exceptions\NotFoundException;
-use UKFast\DB\Ditto\QueryTransformer;
 
 class VpnSessionController extends BaseController
 {
-    public function index(Request $request, QueryTransformer $queryTransformer)
+    public function index(Request $request)
     {
-        if ($request->hasAny([
-            'vpc_id',
-            'vpc_id:eq', 'vpc_id:in', 'vpc_id:lk',
-            'vpc_id:neq', 'vpc_id:nin', 'vpc_id:nlk',
-        ])) {
-            $vpnSessionIds = VpnSession::forUser($request->user())->get();
-
-            if ($request->has('vpc_id') || $request->has('vpc_id:eq')) {
-                if ($request->has('vpc_id')) {
-                    $vpcId = $request->get('vpc_id');
-                    $request->query->remove('vpc_id');
-                } else {
-                    $vpcId = $request->get('vpc_id:eq');
-                    $request->query->remove('vpc_id:eq');
-                }
-
-                $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($vpcId) {
-                    return !$vpnService->vpnService || $vpnService->vpnService->router->vpc->id != $vpcId;
-                });
-            }
-
-            if ($request->has('vpc_id:neq')) {
-                $vpcId = $request->get('vpc_id:neq');
-                $request->query->remove('vpc_id:neq');
-
-                $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($vpcId) {
-                    return !$vpnService->vpnService || $vpnService->vpnService->router->vpc->id == $vpcId;
-                });
-            }
-
-            if ($request->has('vpc_id:lk')) {
-                $vpcId = $request->get('vpc_id:lk');
-                $request->query->remove('vpc_id:lk');
-
-                $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($vpcId) {
-                    return !$vpnService->vpnService
-                        || preg_match(
-                            '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
-                            $vpnService->vpnService->router->vpc->id
-                        ) === 0;
-                });
-            }
-
-            if ($request->has('vpc_id:nlk')) {
-                $vpcId = $request->get('vpc_id:nlk');
-                $request->query->remove('vpc_id:nlk');
-
-                $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($vpcId) {
-                    return !$vpnService->vpnService
-                        || preg_match(
-                            '/' . str_replace('\*', '\S*', preg_quote($vpcId)) . '/',
-                            $vpnService->vpnService->router->vpc->id
-                        ) === 1;
-                });
-            }
-
-            if ($request->has('vpc_id:in')) {
-                $ids = explode(',', $request->get('vpc_id:in'));
-                $request->query->remove('vpc_id:in');
-
-                $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($ids) {
-                    return !$vpnService->vpnService || !in_array($vpnService->vpnService->router->vpc->id, $ids);
-                });
-            }
-
-            if ($request->has('vpc_id:nin')) {
-                $ids = explode(',', $request->get('vpc_id:nin'));
-                $request->query->remove('vpc_id:nin');
-
-                $vpnSessionIds = $vpnSessionIds->reject(function ($vpnService) use ($ids) {
-                    return !$vpnService->vpnService || in_array($vpnService->vpnService->router->vpc->id, $ids);
-                });
-            }
-
-            $collection = VpnSession::whereIn('id', $vpnSessionIds->map(function ($vpnService) {
-                return $vpnService->id;
-            }));
-        } else {
-            $collection = VpnSession::forUser($request->user());
-        }
-
-        $queryTransformer->config(VpnSession::class)
-            ->transform($collection);
-
-        return VpnSessionResource::collection($collection->paginate(
+        $collection = VpnSession::forUser($request->user());
+        return VpnSessionResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
         ));
     }
