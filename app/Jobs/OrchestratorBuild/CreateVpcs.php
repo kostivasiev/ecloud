@@ -3,6 +3,7 @@
 namespace App\Jobs\OrchestratorBuild;
 
 use App\Jobs\Job;
+use App\Jobs\Vpc\UpdateSupportEnabledBilling;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\Vpc;
 use App\Traits\V2\LoggableModelJob;
@@ -45,6 +46,9 @@ class CreateVpcs extends Job
             $vpc->reseller_id = $orchestratorBuild->orchestratorConfig->reseller_id;
             $vpc->syncSave();
 
+            if ($definition->has('support_enabled') && $definition->get('support_enabled') === true) {
+                dispatch(new UpdateSupportEnabledBilling($vpc, true));
+            }
 
             Log::info(get_class($this) . ' : OrchestratorBuild created VPC ' . $vpc->id, ['id' => $this->model->id]);
 
