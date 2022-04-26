@@ -12,6 +12,7 @@ use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class CreateVpcsTest extends TestCase
@@ -97,6 +98,7 @@ class CreateVpcsTest extends TestCase
                     'region_id' => 'reg-test',
                     'console_enabled' => true,
                     'advanced_networking' => true,
+                    'support_enabled' => true,
                 ]
             ]
         ]);
@@ -116,7 +118,6 @@ class CreateVpcsTest extends TestCase
         });
 
         $vpc = Vpc::findOrFail($this->orchestratorBuild->state['vpc'][0]);
-        dispatch(new UpdateSupportEnabledBilling($vpc, true));
         $this->assertTrue($vpc->support_enabled);
     }
 
