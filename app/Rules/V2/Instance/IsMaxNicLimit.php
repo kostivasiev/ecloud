@@ -10,7 +10,10 @@ class IsMaxNicLimit implements Rule
 {
     public function passes($attribute, $value)
     {
-        $instance = Instance::forUser(Auth::user())->findOrFail($value);
+        $instance = Instance::forUser(Auth::user())->find($value);
+        if (!$instance) {
+            return false;
+        }
 
         if ($instance->nics->count() < config('instance.nics.max')) {
             return true;
