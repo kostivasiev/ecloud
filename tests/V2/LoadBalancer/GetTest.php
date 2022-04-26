@@ -64,4 +64,15 @@ class GetTest extends TestCase
             ])
             ->assertStatus(200);
     }
+
+    public function testGetLoadbalancerInstancesCollection()
+    {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+        $this->loadBalancerNetwork();
+        $this->get('/v2/load-balancers/' . $this->loadBalancer()->id . '/available-targets')
+            ->assertJsonFragment([
+                'id' => $this->loadBalancerInstance()->id,
+            ])
+            ->assertStatus(200);
+    }
 }
