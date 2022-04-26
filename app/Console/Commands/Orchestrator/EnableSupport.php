@@ -19,8 +19,13 @@ class EnableSupport extends Command
 
     public function handle()
     {
-        OrchestratorBuild::where('created_at', '>=', '15-02-2022 00:00:00')
+        OrchestratorBuild::where('created_at', '>=', '2022-02-15 00:00:00')
             ->each(function ($orchestratorBuild) {
+                if (empty($orchestratorBuild->orchestratorConfig)) {
+                    $this->warn('config ' . $orchestratorBuild->orchestrator_config_id . ' was not found, skipping');
+                    return;
+                }
+
                 $configData = json_decode($orchestratorBuild->orchestratorConfig->data, true);
                 if (!array_key_exists('vpcs', $configData)) {
                     return;
