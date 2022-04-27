@@ -35,9 +35,6 @@ class MigrateFipsTest extends TestCase
 
         $this->job->handle();
 
-        $this->nic()->refresh();
-        $this->floatingIp()->refresh();
-        $this->ip()->refresh();
 
         $this->assertDatabaseHas(
             Nic::class,
