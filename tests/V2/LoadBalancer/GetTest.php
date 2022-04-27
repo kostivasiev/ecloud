@@ -92,6 +92,9 @@ class GetTest extends TestCase
             ->assertJsonFragment([
                 'id' => $instance->id,
             ])
+            ->assertJsonMissing([
+                'id' => $this->loadBalancer()->id
+            ])
             ->assertStatus(200);
     }
 }
