@@ -3,6 +3,7 @@
 namespace App\Jobs\LoadBalancerNetwork;
 
 use App\Jobs\TaskJob;
+use App\Models\V2\Nic;
 use App\Traits\V2\TaskJobs\AwaitResources;
 
 class CreateNics extends TaskJob
@@ -19,42 +20,15 @@ class CreateNics extends TaskJob
 
         $loadBalancer = $loadBalancerNetwork->loadBalancer;
 
-        if (empty($this->task->data['nic_ids'])) {
-            $data = $this->task->data ?? [];
+        $loadBalancer->instances->each(function ($instance) use ($loadBalancerNetwork, &$data) {
+            $this->createResource(Nic::class, [
+                'network_id' => $loadBalancerNetwork->network_id,
+                'instance_id' => $instance->id,
+            ]);
 
-            $loadBalancer->instances->each(function ($instance) use ($loadBalancerNetwork, &$data) {
-                $nic = $instance->nics()->firstOrNew(
-                    ['network_id' => $loadBalancerNetwork->network_id],
-                    [
-                        'instance_id' => $instance->id,
-                    ]
-                );
-
-                if ($nic->isDirty()) {
-                    $response = $instance->availabilityZone->kingpinService()->post(
-                        '/api/v2/vpc/' . $instance->vpc->id .
-                        '/instance/' . $instance->id .
-                        '/nic',
-                        [
-                            'json' => [
-                                'networkId' => $loadBalancerNetwork->network_id,
-                            ],
-                        ]
-                    );
-
-                    $nic->mac_address = json_decode($response->getBody()->getContents())->macAddress;
-                    $nic->syncSave();
-
-                    $this->info('Created new NIC ' . $nic->id . ' on load balancer node ' . $instance->id . ' for network ' . $loadBalancerNetwork->network_id);
-
-                    $data[] = $nic->id;
-                }
-            });
-            $this->task->updateData('nic_ids', $data);
-        }
-
-        if (isset($this->task->data['nic_ids'])) {
-            $this->awaitSyncableResources($this->task->data['nic_ids']);
-        }
+            if ($this->job->hasFailed() || $this->job->isReleased()) {
+                return false;
+            }
+        });
     }
 }
