@@ -74,10 +74,6 @@ class MigrateFipsTest extends TestCase
 
         $this->job->handle();
 
-        $nic->refresh();
-        $ip->refresh();
-        $floatingIp->refresh();
-
         $this->assertNull($nic->ip_address);
         $this->assertEquals($originalIp, $ip->ip_address);
         $this->assertNotEquals('nic', $floatingIp->resource_type);
