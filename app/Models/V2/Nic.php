@@ -99,16 +99,11 @@ class Nic extends Model implements Searchable, ResellerScopeable, AvailabilityZo
     }
 
     /**
-     * IF the database has the ip_address field populated return that, otherwise look for
-     * an IP address in the ip_addresses table of type 'dhcp' (DHCP)
+     * Look for an IP address in the ip_addresses table of type 'dhcp' (DHCP)
      * @return mixed|null
      */
     public function getIpAddressAttribute()
     {
-        if (!empty($this->attributes['ip_address'])) {
-            return $this->attributes['ip_address'];
-        }
-
         if ($this->ipAddresses()->withType(IpAddress::TYPE_DHCP)->exists()) {
             return $this->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first()->ip_address;
         }
