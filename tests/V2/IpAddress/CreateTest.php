@@ -27,7 +27,7 @@ class CreateTest extends TestCase
             ->assertStatus(201);
         $this->assertDatabaseHas(
             'ip_addresses',
-             array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
+            array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
             'ecloud'
         );
     }
@@ -46,7 +46,7 @@ class CreateTest extends TestCase
             ->assertStatus(201);
         $this->assertDatabaseHas(
             'ip_addresses',
-             array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
+            array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
             'ecloud'
         );
     }
