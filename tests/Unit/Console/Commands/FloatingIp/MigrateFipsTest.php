@@ -21,10 +21,9 @@ class MigrateFipsTest extends TestCase
     {
         parent::setUp();
         Event::fake(Created::class);
-        $this->nic()->setAttribute('ip_address', $this->faker->ipv4())->saveQuietly();
+        $this->nic()->ipAddresses()->attach($this->ip());
         $this->floatingIp()->resource()->associate($this->nic());
         $this->floatingIp()->save();
-        $this->ip();
         $this->job = \Mockery::mock(MigrateFips::class)->makePartial();
         $this->job->allows('option')->with('test-run')->andReturnFalse();
         $this->job->allows('info')->withAnyArgs()->andReturnTrue();
@@ -32,10 +31,6 @@ class MigrateFipsTest extends TestCase
 
     public function testSuccessfulChange()
     {
-        $originalIp = $this->nic()->ip_address;
-
-        $this->assertNotNull($this->nic()->ip_address);
-        $this->assertNotEquals($originalIp, $this->ip()->ip_address);
         $this->assertEquals('nic', $this->floatingIp()->resource_type);
 
         $this->job->handle();
@@ -52,7 +47,8 @@ class MigrateFipsTest extends TestCase
             ],
             'ecloud'
         );
-        $this->assertEquals($originalIp, $this->ip()->ip_address);
+        $this->floatingIp()->refresh();
+
         $this->assertNotEquals('nic', $this->floatingIp()->resource_type);
         $this->assertEquals('ip', $this->floatingIp()->resource_type);
     }

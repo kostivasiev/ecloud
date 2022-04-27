@@ -17,20 +17,9 @@ class MigrateFips extends Command
             ->each(function ($floatingIp) {
                 $this->info('Processing floating ip ' . $floatingIp->id);
                 $nic = $floatingIp->resource;
-                $networkId = $nic->network_id;
 
-                $ipAddress = IpAddress::where('network_id', $networkId)->first();
-                if (!$ipAddress) {
-                    $ipAddress = app()->make(IpAddress::class);
-                    $ipAddress->fill([
-                        'network_id' => $networkId,
-                    ]);
-                    $ipAddress->save();
-                }
-                $ipAddress->ip_address = $nic->ip_address;
+                $ipAddress = $nic->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first();
                 if (!$this->option('test-run')) {
-                    $ipAddress->save();
-                    $nic->setAttribute('ip_address', null)->saveQuietly();
                     $floatingIp->resource()->associate($ipAddress);
                     $floatingIp->save();
                 }
