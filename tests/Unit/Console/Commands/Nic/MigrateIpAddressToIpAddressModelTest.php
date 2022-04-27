@@ -10,6 +10,10 @@ class MigrateIpAddressToIpAddressModelTest extends TestCase
 {
     public function testSuccess()
     {
+        /**
+         * Test marked skipped pending removal of run-once script
+         */
+        $this->markTestSkipped();
         $this->assertEquals(0, IpAddress::all()->count());
 
         $command = \Mockery::mock(MigrateIpAddressToIpAddressModel::class)->makePartial();
@@ -46,6 +50,10 @@ class MigrateIpAddressToIpAddressModelTest extends TestCase
 
     public function testNoIpOnNicModelSkips()
     {
+        /**
+         * Test marked skipped pending removal of run-once script
+         */
+        $this->markTestSkipped();
         $this->nic();
 
         $pendingCommand = $this->artisan('nic:migrate-ip-address')
@@ -74,6 +82,10 @@ class MigrateIpAddressToIpAddressModelTest extends TestCase
 
     public function testIpRecordAlreadyExistsTypeClusterOutputsError()
     {
+        /**
+         * Test marked skipped pending removal of run-once script
+         */
+        $this->markTestSkipped();
         $this->nic()->setAttribute('ip_address', '10.0.0.5')->save();
 
         IpAddress::factory()->for($this->network())->create([
