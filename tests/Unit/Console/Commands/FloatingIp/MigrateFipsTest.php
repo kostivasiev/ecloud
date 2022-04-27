@@ -35,7 +35,6 @@ class MigrateFipsTest extends TestCase
 
         $this->job->handle();
 
-
         $this->assertDatabaseHas(
             Nic::class,
             [
@@ -55,7 +54,6 @@ class MigrateFipsTest extends TestCase
         $nic = Nic::factory()
             ->forNetwork()
             ->create();
-            ]);
         $ip = IpAddress::factory()
             ->for($nic->network)
             ->create([
