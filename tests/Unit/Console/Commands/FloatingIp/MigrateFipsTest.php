@@ -54,9 +54,7 @@ class MigrateFipsTest extends TestCase
     {
         $nic = Nic::factory()
             ->forNetwork()
-            ->create([
-                'mac_address' => $this->faker->macAddress(),
-                'ip_address' => null
+            ->create();
             ]);
         $ip = IpAddress::factory()
             ->for($nic->network)
