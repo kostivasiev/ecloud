@@ -4,6 +4,7 @@ namespace Tests\Unit\Jobs\Nat;
 
 use App\Jobs\Nat\AwaitIPAddressAllocation;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
 use Illuminate\Database\Eloquent\Model;
@@ -33,8 +34,8 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
             ]);
+
             $this->nat = app()->make(Nat::class);
             $this->nat->id = 'nat-test';
             $this->nat->destination()->associate($this->floatingIp);
@@ -42,6 +43,9 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nat->action = NAT::ACTION_SNAT;
             $this->nat->save();
         });
+
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($this->nic);
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
@@ -92,7 +96,6 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
             ]);
             $this->nat = app()->make(Nat::class);
             $this->nat->id = 'nat-test';
@@ -101,6 +104,11 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nat->action = NAT::ACTION_DNAT;
             $this->nat->save();
         });
+
+        $ipAddress = IpAddress::factory()->create([
+            'ip_address' => '10.3.4.5',
+        ]);
+        $ipAddress->nics()->sync($this->nic);
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
@@ -122,7 +130,6 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '',
             ]);
             $this->nat = app()->make(Nat::class);
             $this->nat->id = 'nat-test';
