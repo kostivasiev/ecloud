@@ -18,8 +18,19 @@ class MigrateFips extends Command
                 $this->info('Processing floating ip ' . $floatingIp->id);
                 $nic = $floatingIp->resource;
                 $networkId = $nic->network_id;
-                $ipAddress = $nic->ipAddresses()->where('network_id', $networkId)->first();
+
+                $ipAddress = IpAddress::where('network_id', $networkId)->first();
+                if (!$ipAddress) {
+                    $ipAddress = app()->make(IpAddress::class);
+                    $ipAddress->fill([
+                        'network_id' => $networkId,
+                    ]);
+                    $ipAddress->save();
+                }
+                $ipAddress->ip_address = $nic->ip_address;
                 if (!$this->option('test-run')) {
+                    $ipAddress->save();
+                    $nic->setAttribute('ip_address', null)->saveQuietly();
                     $floatingIp->resource()->associate($ipAddress);
                     $floatingIp->save();
                 }
