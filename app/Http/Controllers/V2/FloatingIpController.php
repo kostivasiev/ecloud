@@ -8,8 +8,11 @@ use App\Http\Requests\V2\FloatingIp\UpdateRequest;
 use App\Jobs\Tasks\FloatingIp\Assign;
 use App\Jobs\Tasks\FloatingIp\Unassign;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\IpAddress;
+use App\Models\V2\Nic;
 use App\Resources\V2\FloatingIpResource;
 use App\Resources\V2\TaskResource;
+use App\Support\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -40,22 +43,6 @@ class FloatingIpController extends BaseController
 
     public function store(CreateRequest $request)
     {
-//        $availabilityZone = AvailabilityZone::forUser(Auth::user())
-//            ->findOrFail($request->availability_zone_id)
-//            ->region_id;
-//        $vpc = Vpc::forUser(Auth::user())->findOrFail($request->vpc_id)->region_id;
-//
-//        if ($availabilityZone !== $vpc) {
-//            return response()->json([
-//                'errors' => [
-//                    'title' => 'Not Found',
-//                    'detail' => 'The specified availability zone is not available to that VPC',
-//                    'status' => 404,
-//                    'source' => 'availability_zone_id'
-//                ]
-//            ], 404);
-//        }
-
         $floatingIp = new FloatingIp(
             $request->only(['vpc_id', 'name', 'availability_zone_id', 'rdns_hostname'])
         );
@@ -85,10 +72,16 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
+        $resourceId = $request->resource_id;
+        if (Resource::classFromId($resourceId) == Nic::class) {
+            $resourceId = Nic::forUser($request->user())->findOrFail($resourceId)
+                ->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first()->getKey();
+        }
+
         $task = $floatingIp->createTaskWithLock(
             Assign::$name,
             Assign::class,
-            ['resource_id' => $request->resource_id]
+            ['resource_id' => $resourceId]
         );
 
         return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);

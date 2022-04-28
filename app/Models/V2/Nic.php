@@ -99,8 +99,7 @@ class Nic extends Model implements Searchable, ResellerScopeable, AvailabilityZo
     }
 
     /**
-     * IF the database has the ip_address field populated return that, otherwise look for
-     * an IP address in the ip_addresses table of type 'dhcp' (DHCP)
+     * Look for an IP address in the ip_addresses table of type 'dhcp' (DHCP)
      * @return mixed|null
      */
     public function getIpAddressAttribute()

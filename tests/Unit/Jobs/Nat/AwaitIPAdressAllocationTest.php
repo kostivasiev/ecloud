@@ -4,6 +4,7 @@ namespace Tests\Unit\Jobs\Nat;
 
 use App\Jobs\Nat\AwaitIPAddressAllocation;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Nat;
 use App\Models\V2\Nic;
 use Illuminate\Database\Eloquent\Model;
@@ -35,7 +36,6 @@ class AwaitIPAdressAllocationTest extends TestCase
                 'network_id' => $this->network()->id,
             ]);
 
-
             $this->nat = app()->make(Nat::class);
             $this->nat->id = 'nat-test';
             $this->nat->destination()->associate($this->floatingIp);
@@ -43,6 +43,9 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nat->action = NAT::ACTION_SNAT;
             $this->nat->save();
         });
+
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($this->nic);
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
@@ -56,7 +59,7 @@ class AwaitIPAdressAllocationTest extends TestCase
 
     public function testJobReleasedWhenNoSourceIPAddress()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
@@ -85,7 +88,7 @@ class AwaitIPAdressAllocationTest extends TestCase
 
     public function testJobReleasedWhenNoDestinationIPAddress()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '',
@@ -104,6 +107,11 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nat->action = NAT::ACTION_DNAT;
             $this->nat->save();
         });
+
+        $ipAddress = IpAddress::factory()->create([
+            'ip_address' => '10.3.4.5',
+        ]);
+        $ipAddress->nics()->sync($this->nic);
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 

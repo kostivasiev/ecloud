@@ -4,6 +4,7 @@ namespace Tests\Unit\Jobs\Instance\Undeploy;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Undeploy\UnassignFloatingIP;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
@@ -25,7 +26,7 @@ class UnassignFloatingIpTest extends TestCase
         });
     }
 
-    public function testFloatingIpUnassignJobIsDispatched()
+    public function testFloatingIpAssignedToNicJobIsDispatched()
     {
         Event::fake([JobProcessed::class, Created::class]);
 
@@ -33,7 +34,28 @@ class UnassignFloatingIpTest extends TestCase
         $this->floatingIp()->save();
 
         $job = \Mockery::mock(UnassignFloatingIP::class, [$this->instanceModel()])->makePartial();
-        $job->shouldReceive('awaitTask')->andReturn(true);
+        $job->shouldReceive('awaitTasks')->andReturn(true);
+        $job->handle();
+
+        Event::assertNotDispatched(JobFailed::class);
+
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == 'floating_ip_unassign';
+        });
+    }
+
+    public function testFloatingIpUnassignJobIsDispatched()
+    {
+        Event::fake([JobProcessed::class, Created::class]);
+
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($this->nic());
+
+        $this->floatingIp()->resource()->associate($ipAddress);
+        $this->floatingIp()->save();
+
+        $job = \Mockery::mock(UnassignFloatingIP::class, [$this->instanceModel()])->makePartial();
+        $job->shouldReceive('awaitTasks')->andReturn(true);
         $job->handle();
 
         Event::assertNotDispatched(JobFailed::class);
@@ -47,7 +69,10 @@ class UnassignFloatingIpTest extends TestCase
     {
         Event::fake([JobProcessed::class, Created::class, JobFailed::class]);
 
-        $this->floatingIp()->resource()->associate($this->nic());
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($this->nic());
+
+        $this->floatingIp()->resource()->associate($ipAddress);
         $this->floatingIp()->save();
 
         $task = new Task([
@@ -57,7 +82,6 @@ class UnassignFloatingIpTest extends TestCase
             'name' => Sync::TASK_NAME_UPDATE,
         ]);
         $this->floatingIp()->tasks()->save($task);
-
         // Bind and return test ID on creation
         app()->bind(Task::class, function () use ($task) {
             return $task;
@@ -72,7 +96,10 @@ class UnassignFloatingIpTest extends TestCase
     {
         Event::fake([JobProcessed::class, Created::class, JobFailed::class]);
 
-        $this->floatingIp()->resource()->associate($this->nic());
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($this->nic());
+
+        $this->floatingIp()->resource()->associate($ipAddress);
         $this->floatingIp()->save();
 
         $task = new Task([

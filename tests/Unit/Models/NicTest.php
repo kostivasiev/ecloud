@@ -21,8 +21,8 @@ class NicTest extends TestCase
             'instance_id' => $this->instanceModel()->id,
             'network_id' => $this->network()->id,
         ]);
-
-        $nic->ip_address = '1.1.1.1';
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($nic);
 
         $this->assertEquals('1.1.1.1', $nic->ip_address);
     }

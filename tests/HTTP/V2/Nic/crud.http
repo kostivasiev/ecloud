@@ -1,6 +1,6 @@
 # First create an instance, we can confirm that an IP address was assigned to the instance's NIC
 POST https://{{host}}/{{version}}/instances
-X-consumer-custom-id:  0-0
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
@@ -34,7 +34,6 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "mac_address": "3D:F2:C9:A6:B3:5F",
   "instance_id": "{{instance_id}}",
   "network_id": "{{dev_network_id}}"
 }
