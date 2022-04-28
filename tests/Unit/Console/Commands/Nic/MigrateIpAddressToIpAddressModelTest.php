@@ -63,8 +63,6 @@ class MigrateIpAddressToIpAddressModelTest extends TestCase
 
     public function testIpRecordAlreadyExistsDhcpSuccess()
     {
-        $this->nic()->setAttribute('ip_address', '10.0.0.5')->save();
-
         IpAddress::factory()->for($this->network())->create([
             'ip_address' => '10.0.0.5',
             'type' => IpAddress::TYPE_DHCP
