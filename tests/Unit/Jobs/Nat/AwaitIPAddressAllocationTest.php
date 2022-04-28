@@ -13,7 +13,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class AwaitIPAdressAllocationTest extends TestCase
+class AwaitIPAddressAllocationTest extends TestCase
 {
     protected Nat $nat;
     protected FloatingIp $floatingIp;
