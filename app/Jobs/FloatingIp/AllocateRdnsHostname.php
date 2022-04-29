@@ -37,9 +37,18 @@ class AllocateRdnsHostname extends TaskJob
         $dnsName = $this->reverseIpLookup($this->model->ip_address);
         $this->rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
 
-        if (count($this->rdns->getItems()) !== 1) {
-            $this->info("More than one RDNS found", ['floating_ip_id' => $this->model->id]);
-            $this->fail(new \Exception('More than one RDNS found ' . $this->model->id));
+        $rdnsCount = count($this->rdns->getItems());
+
+        if ($rdnsCount === 0) {
+            $message = sprintf('No RDNS found on %s', $this->model->id);
+            $this->info($message, ['floating_ip_id' => $this->model->id]);
+            $this->fail(new \Exception($message));
+
+            return;
+        } elseif ($rdnsCount > 1) {
+            $message = sprintf('%d RDNS found on %s', $rdnsCount, $this->model->id);
+            $this->info($message, ['floating_ip_id' => $this->model->id]);
+            $this->fail(new \Exception($message));
 
             return;
         }
