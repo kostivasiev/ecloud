@@ -36,7 +36,7 @@ trait RdnsTrait
         return new Record($record);
     }
 
-    public function getRecords($ip): ?Page
+    public function getRecords($ip)
     {
         $safednsClient = app()->make(AdminClient::class);
         $dnsName = $this->reverseIpLookup($ip);

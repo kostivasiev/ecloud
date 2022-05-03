@@ -7,6 +7,7 @@ use App\Models\V2\FloatingIp;
 use App\Traits\V2\Jobs\FloatingIp\RdnsTrait;
 use Illuminate\Bus\Batchable;
 use Illuminate\Queue\InteractsWithQueue;
+use UKFast\Admin\SafeDNS\AdminClient;
 
 class AllocateRdnsHostname extends TaskJob
 {
@@ -52,6 +53,7 @@ class AllocateRdnsHostname extends TaskJob
         $this->rdns = $this->rdns->getItems()[0];
 
         if ($this->rdns['content'] != trim($this->model->rdns_hostname)) {
+            $safednsClient = app(AdminClient::class);
             $safednsClient->records()->update($this->createRecord(
                 $this->rdns['id'],
                 $this->rdns['name'],
