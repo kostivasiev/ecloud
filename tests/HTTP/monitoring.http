@@ -30,7 +30,6 @@ Content-Type:  application/json
     "reference_id": "i-10d78ef4-dev",
     "collector_id": "254fa2d8-e63a-4535-a892-f31290e3b94e",
     "display_name": "Test",
-    "tier_id": "8485a243-8a83-11ec-915e-005056ad1662",
     "account_id": "80cd084c-f17a-4c57-b03e-15ff0058762d",
     "ip_address": "46.37.163.93",
     "snmp_community": "public",

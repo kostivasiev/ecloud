@@ -75,7 +75,6 @@ class RegisterLogicMonitorDevice extends Job
             'reference_id' => $instance->id,
             'collector_id' => $collector->id,
             'display_name' => $instance->name,
-            'tier_id' => '8485a243-8a83-11ec-915e-005056ad1662', // This is the free tier from Monitoring APIO
             'account_id' => $this->task->data['logic_monitor_account_id'],
             'ip_address' => $floatingIp->getIPAddress(),
             'snmp_community' => 'public',
