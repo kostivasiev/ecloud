@@ -31,7 +31,16 @@ class RegisterLogicMonitorDevice extends Job
             return;
         }
 
-        if (!empty($instance->device_id)) {
+        $device = $adminMonitoringClient->devices()->getPage(
+            1,
+            15,
+            [
+                'resource_id' => $instance->id,
+                'resource_type' => 'server',
+            ]
+        );
+
+        if (count($device->getItems()) > 0) {
             Log::info($this::class . ' : The device is already registered, skipping');
             return;
         }
@@ -83,10 +92,9 @@ class RegisterLogicMonitorDevice extends Job
             'password' => $logicMonitorCredentials->password,
         ]));
 
-        $instance->device_id = $response->getId();
         $instance->save();
 
-        Log::info($this::class . ' : Logic Monitor device registered : ' . $instance->device_id, [
+        Log::info($this::class . ' : Logic Monitor device registered : ' . $response->getId(), [
             'instance_id' => $instance->id
         ]);
     }

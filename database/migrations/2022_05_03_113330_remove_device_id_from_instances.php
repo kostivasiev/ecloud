@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->string('device_id')->after('load_balancer_id')->nullable();
+            $table->dropColumn(['device_id']);
         });
     }
 
@@ -26,7 +26,7 @@ return new class extends Migration
     public function down()
     {
         Schema::connection('ecloud')->table('instances', function (Blueprint $table) {
-            $table->dropColumn(['device_id']);
+            $table->string('device_id')->after('load_balancer_id')->nullable();
         });
     }
 };

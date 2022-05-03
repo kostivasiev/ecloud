@@ -39,7 +39,6 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
         'deploy_data',
         'host_group_id',
         'volume_group_id',
-        'device_id',
     ];
 
     protected $appends = [
@@ -205,7 +204,6 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
             'backup_enabled' => $filter->string(),
             'host_group_id' => $filter->string(),
             'volume_group_id' => $filter->string(),
-            'device_id' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);

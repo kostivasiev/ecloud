@@ -7,6 +7,7 @@ use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use UKFast\Admin\Monitoring\AdminClient;
 use UKFast\Responses\UKFastResource;
 
 class InstanceResource extends UKFastResource
@@ -49,7 +50,18 @@ class InstanceResource extends UKFastResource
         if (Auth::user()->isAdmin()) {
             $response['is_hidden'] = $this->isHidden();
             $response['load_balancer_id'] = ($this->loadBalancerNode) ? $this->loadBalancerNode->load_balancer_id : null;
-            $response['device_id'] = $this->device_id;
+            $adminMonitoringClient = app(AdminClient::class);
+            $device = $adminMonitoringClient->devices()->getPage(
+                1,
+                15,
+                [
+                    'resource_id' => $this->id,
+                    'resource_type' => 'server',
+                ]
+            );
+            if (count($device->getItems()) > 0) {
+                $response['device_id'] = $device->getItems()[0]['id'];
+            }
         }
 
         return $response;
