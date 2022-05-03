@@ -89,10 +89,7 @@ class AllocateIp extends Job
                         continue;
                     }
 
-                    $safednsClient = app()->make(\UKFast\Admin\SafeDNS\AdminClient::class);
-                    $dnsName = $this->reverseIpLookup($checkIp);
-                    $rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
-
+                    $rdns = $this->getRecords($checkIp);
                     $rdnsCount = count($rdns->getItems());
 
                     if ($rdnsCount === 1) {

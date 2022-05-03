@@ -2,6 +2,8 @@
 
 namespace App\Traits\V2\Jobs\FloatingIp;
 
+use UKFast\Admin\SafeDNS\AdminClient;
+use UKFast\SDK\Page;
 use UKFast\SDK\SafeDNS\Entities\Record;
 
 trait RdnsTrait
@@ -32,5 +34,13 @@ trait RdnsTrait
         ];
 
         return new Record($record);
+    }
+
+    public function getRecords($ip): ?Page
+    {
+        $safednsClient = app()->make(AdminClient::class);
+        $dnsName = $this->reverseIpLookup($ip);
+
+        return $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
     }
 }

@@ -7,7 +7,6 @@ use App\Models\V2\FloatingIp;
 use App\Traits\V2\Jobs\FloatingIp\RdnsTrait;
 use Illuminate\Bus\Batchable;
 use Illuminate\Queue\InteractsWithQueue;
-use UKFast\Admin\SafeDNS\AdminClient;
 
 class AllocateRdnsHostname extends TaskJob
 {
@@ -33,10 +32,7 @@ class AllocateRdnsHostname extends TaskJob
             $this->model->rdns_hostname = $this->reverseIpDefault($this->model->ip_address);
         }
 
-        $safednsClient = app()->make(AdminClient::class);
-        $dnsName = $this->reverseIpLookup($this->model->ip_address);
-        $this->rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
-
+        $this->rdns = $this->getRecords($this->model->ip_address);
         $rdnsCount = count($this->rdns->getItems());
 
         if ($rdnsCount === 0) {
