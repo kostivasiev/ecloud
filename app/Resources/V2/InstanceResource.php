@@ -57,7 +57,7 @@ class InstanceResource extends UKFastResource
             ]);
 
             if (count($device) > 0) {
-                $response['device_id'] = $device['id'];
+                $response['device_id'] = $device[0]['id'];
             }
         }
 
