@@ -98,12 +98,10 @@ class AllocateIp extends Job
                     } elseif ($rdnsCount === 0) {
                         $message = sprintf('No RDNS found on %s', $this->model->id);
                         Log::error($message, ['floating_ip_id' => $this->model->id]);
-                        $this->fail(new \Exception($message));
                         continue;
                     } elseif ($rdnsCount > 1) {
                         $message = sprintf('%d RDNS found on %s', $rdnsCount, $this->model->id);
                         Log::error($message, ['floating_ip_id' => $this->model->id]);
-                        $this->fail(new \Exception($message));
                         continue;
                     }
 
