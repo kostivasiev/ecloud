@@ -31,16 +31,12 @@ class RegisterLogicMonitorDevice extends Job
             return;
         }
 
-        $device = $adminMonitoringClient->devices()->getPage(
-            1,
-            15,
-            [
-                'resource_id' => $instance->id,
-                'resource_type' => 'server',
-            ]
-        );
+        $device = $adminMonitoringClient->devices()->getAll([
+            'reference_type' => 'server',
+            'reference_id:eq' => $instance->id
+        ]);
 
-        if (count($device->getItems()) > 0) {
+        if (count($device) > 0) {
             Log::info($this::class . ' : The device is already registered, skipping');
             return;
         }

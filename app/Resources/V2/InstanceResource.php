@@ -51,16 +51,13 @@ class InstanceResource extends UKFastResource
             $response['is_hidden'] = $this->isHidden();
             $response['load_balancer_id'] = ($this->loadBalancerNode) ? $this->loadBalancerNode->load_balancer_id : null;
             $adminMonitoringClient = app(AdminClient::class);
-            $device = $adminMonitoringClient->devices()->getPage(
-                1,
-                15,
-                [
-                    'resource_id' => $this->id,
-                    'resource_type' => 'server',
-                ]
-            );
-            if (count($device->getItems()) > 0) {
-                $response['device_id'] = $device->getItems()[0]['id'];
+            $device = $adminMonitoringClient->devices()->getAll([
+                'reference_type' => 'server',
+                'reference_id:eq' => $this->id
+            ]);
+
+            if (count($device) > 0) {
+                $response['device_id'] = $device['id'];
             }
         }
 

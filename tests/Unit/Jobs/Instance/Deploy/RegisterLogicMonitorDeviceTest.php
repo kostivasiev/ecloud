@@ -9,6 +9,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Admin\Monitoring\AdminClient;
+use UKFast\Admin\Monitoring\AdminDeviceClient;
 use UKFast\Admin\Monitoring\Entities\Collector;
 use UKFast\SDK\Page;
 use UKFast\SDK\SelfResponse;
@@ -41,13 +42,18 @@ class RegisterLogicMonitorDeviceTest extends TestCase
 
         $this->instanceModel()->setAttribute('deploy_data', [
             'floating_ip_id' => $this->floatingIp()->id,
-        ])
-            ->setAttribute('device_id', 'some-device-id')
-            ->saveQuietly();
+        ])->saveQuietly();
 
-        app()->bind(AdminClient::class, function () {
-            $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class)->makePartial();
-            $mockAdminMonitoringClient->allows('collectors->getPage')->andThrow(\Exception::class, 'This should not be called');
+        $mockMonitoringAdminDeviceClient = \Mockery::mock(AdminDeviceClient::class);
+        $mockMonitoringAdminDeviceClient->shouldReceive('getAll')->andReturn(
+            [1]
+        );
+        $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class)->makePartial();
+        $mockAdminMonitoringClient->allows('collectors->getPage')->andThrow(\Exception::class, 'This should not be called');
+        $mockAdminMonitoringClient->shouldReceive('devices')->andReturn(
+            $mockMonitoringAdminDeviceClient
+        );
+        app()->bind(AdminClient::class, function () use ($mockAdminMonitoringClient) {
             return $mockAdminMonitoringClient;
         });
 
@@ -70,7 +76,13 @@ class RegisterLogicMonitorDeviceTest extends TestCase
         ])->saveQuietly();
 
         app()->bind(AdminClient::class, function () {
-            $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
+            $mockMonitoringAdminDeviceClient = \Mockery::mock(AdminDeviceClient::class);
+            $mockMonitoringAdminDeviceClient->shouldReceive('getAll')->andReturn([]);
+            $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class)->makePartial();
+            $mockAdminMonitoringClient->shouldReceive('devices')->andReturn(
+                $mockMonitoringAdminDeviceClient
+            );
+
             // Get collector ID (empty collection / no collector)
             $mockAdminMonitoringClient->expects('collectors->getPage')->andReturnUsing(function () {
                 $page = \Mockery::mock(Page::class)->makePartial();
@@ -103,7 +115,12 @@ class RegisterLogicMonitorDeviceTest extends TestCase
         ])->saveQuietly();
 
         app()->bind(AdminClient::class, function () {
+            $mockMonitoringAdminDeviceClient = \Mockery::mock(AdminDeviceClient::class);
+            $mockMonitoringAdminDeviceClient->shouldReceive('getAll')->andReturn([]);
             $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
+            $mockAdminMonitoringClient->shouldReceive('devices')->andReturn(
+                $mockMonitoringAdminDeviceClient
+            );
             // Get collector ID
             $mockAdminMonitoringClient->expects('collectors->getPage')->andReturnUsing(function () {
                 $page = \Mockery::mock(Page::class)->makePartial();
@@ -144,7 +161,19 @@ class RegisterLogicMonitorDeviceTest extends TestCase
         ])->saveQuietly();
 
         app()->bind(AdminClient::class, function () {
+            $mockMonitoringAdminDeviceClient = \Mockery::mock(AdminDeviceClient::class);
+            $mockMonitoringAdminDeviceClient->shouldReceive('getAll')->andReturn([]);
+            $mockMonitoringAdminDeviceClient->expects('createEntity')
+                ->withAnyArgs()
+                ->andReturnUsing(function () {
+                    $mockSelfResponse =  \Mockery::mock(SelfResponse::class)->makePartial();
+                    $mockSelfResponse->allows('getId')->andReturns('device-123');
+                    return $mockSelfResponse;
+                });
             $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
+            $mockAdminMonitoringClient->shouldReceive('devices')->andReturn(
+                $mockMonitoringAdminDeviceClient
+            );
             // Get collector ID
             $mockAdminMonitoringClient->expects('collectors->getPage')->andReturnUsing(function () {
                 $page = \Mockery::mock(Page::class)->makePartial();
@@ -161,14 +190,6 @@ class RegisterLogicMonitorDeviceTest extends TestCase
                 });
                 return $page;
             });
-            // Register device
-            $mockAdminMonitoringClient->expects('devices->createEntity')
-                ->withAnyArgs()
-                ->andReturnUsing(function () {
-                    $mockSelfResponse =  \Mockery::mock(SelfResponse::class)->makePartial();
-                    $mockSelfResponse->allows('getId')->andReturns('device-123');
-                    return $mockSelfResponse;
-                });
 
             return $mockAdminMonitoringClient;
         });
@@ -189,9 +210,5 @@ class RegisterLogicMonitorDeviceTest extends TestCase
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
         });
-
-        $this->instanceModel()->refresh();
-
-        $this->assertEquals('device-123', $this->instanceModel()->device_id);
     }
 }
