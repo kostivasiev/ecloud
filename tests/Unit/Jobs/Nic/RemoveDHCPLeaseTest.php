@@ -33,7 +33,9 @@ class RemoveDHCPLeaseTest extends TestCase
 
         $this->assertTrue($this->nic()->ipAddresses()->count() > 0);
 
-        dispatch(new RemoveDHCPLease($this->nic()));
+        $task = $this->createSyncDeleteTask($this->nic());
+
+        dispatch(new RemoveDHCPLease($task));
 
         $this->assertTrue($this->nic()->ipAddresses()->count() == 0);
 

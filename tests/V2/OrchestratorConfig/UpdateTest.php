@@ -24,6 +24,7 @@ class UpdateTest extends TestCase
             [
                 'reseller_id' => 2,
                 'employee_id' => 2,
+                'locked' => true,
             ]
         )->assertStatus(200);
         $this->assertDatabaseHas(
@@ -31,6 +32,7 @@ class UpdateTest extends TestCase
             [
                 'reseller_id' => 2,
                 'employee_id' => 2,
+                'locked' => true,
             ],
             'ecloud'
         );

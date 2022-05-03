@@ -4,8 +4,8 @@ namespace App\Http\Requests\V2\Nic;
 
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
+use App\Rules\V2\Instance\IsMaxNicLimit;
 use App\Rules\V2\IsResourceAvailable;
-use App\Rules\V2\ValidMacAddress;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
@@ -24,16 +24,12 @@ class CreateRequest extends FormRequest
                 'string',
                 'max:255'
             ],
-            'mac_address' => [
-                'required',
-                'string',
-                new ValidMacAddress()
-            ],
             'instance_id' => [
                 'required',
                 'string',
                 'exists:ecloud.instances,id,deleted_at,NULL',
                 new IsResourceAvailable(Instance::class),
+                new IsMaxNicLimit(),
             ],
             'network_id' => [
                 'required',

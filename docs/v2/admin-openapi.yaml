@@ -196,6 +196,18 @@ paths:
     $ref: 'resources/DiscountPlan/admin-collection.yaml'
   '/ecloud/v2/discount-plans/{discountPlanId}':
     $ref: 'resources/DiscountPlan/admin-item.yaml'
+  '/ecloud/v2/firewall-policies':
+    $ref: 'resources/FirewallPolicy/admin-collection.yaml'
+  '/ecloud/v2/firewall-policies/{firewallPolicyId}':
+    $ref: 'resources/FirewallPolicy/admin-item.yaml'
+  '/ecloud/v2/firewall-rules':
+    $ref: 'resources/FirewallRule/admin-collection.yaml'
+  '/ecloud/v2/firewall-rules/{firewallRuleId}':
+    $ref: 'resources/FirewallRule/admin-item.yaml'
+  '/ecloud/v2/firewall-rule-ports':
+    $ref: 'resources/FirewallRulePort/admin-collection.yaml'
+  '/ecloud/v2/firewall-rule-ports/{firewallRulePortId}':
+    $ref: 'resources/FirewallRulePort/admin-item.yaml'
   '/ecloud/v2/host-specs':
     $ref: 'resources/HostSpec/admin-collection.yaml'
   '/ecloud/v2/host-specs/{hostSpecId}':

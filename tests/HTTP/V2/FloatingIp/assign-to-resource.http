@@ -98,7 +98,8 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-  "vpc_id": "{{dev_vpc_id}}"
+  "vpc_id": "{{dev_vpc_id}}",
+  "availability_zone_id": "{{dev_availability_zone_id}}"
 }
 
 > {%
@@ -130,6 +131,14 @@ client.test("Request executed successfully", function() {
 
 ###
 GET https://{{host}}/{{version}}/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### Check the IPs associated with the instance
+GET https://{{host}}/{{version}}/instances/{{instance_id}}/floating-ips
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}

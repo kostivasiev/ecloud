@@ -39,7 +39,6 @@ class NicController extends BaseController
     {
         $nic = new Nic($request->only([
             'name',
-            'mac_address',
             'instance_id',
             'network_id',
         ]));
@@ -85,6 +84,10 @@ class NicController extends BaseController
     public function ipAddresses(Request $request, string $nicId)
     {
         $collection = Nic::forUser($request->user())->findOrFail($nicId)->ipAddresses();
+
+        if ($request->has('sort')) {
+            $collection->sortByIp();
+        }
 
         return IpAddressResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))

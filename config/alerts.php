@@ -4,15 +4,15 @@ return [
     'from' => 'alerts@ukfast.co.uk',
     'capacity' => [
         'floating_ip' => [
-            'to' => 'networkteam@ukfast.co.uk',
-            'cc' => 'enterprise-infrastructure@ukfast.co.uk',
+            'to' => 'networkteam@ans.co.uk',
+            'cc' => 'enterprise-infrastructure@ans.co.uk',
         ],
         'default' => [
-            'to' => 'enterprise-infrastructure@ukfast.co.uk',
+            'to' => 'enterprise-infrastructure@ans.co.uk',
         ],
         'dev' => [
             'to' => [
-                'paul.mcnally@ukfast.co.uk'
+                'paul.mcnally@ans.co.uk'
             ]
         ]
     ],
@@ -21,8 +21,8 @@ return [
     ],
     'health' => [
         'to' => [
-            'gavin.taylor@ukfast.co.uk',
-            'lee.spottiswood@ukfast.co.uk',
+            'gavin.taylor@ans.co.uk',
+            'lee.spottiswood@ans.co.uk',
         ]
     ]
 ];

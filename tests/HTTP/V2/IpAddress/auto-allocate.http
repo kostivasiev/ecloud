@@ -1,0 +1,100 @@
+### 1. Create IP Address using normal process
+POST https://{{host}}/{{version}}/ip-addresses
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test",
+    "ip_address": "10.0.0.1",
+    "network_id": "{{dev_network_id}}",
+    "type": "dhcp"
+}
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('ip_address_id_1', response.body.data.id);
+client.log('IP Address ID: ' + response.body.data.id);
+%}
+
+### 2. Check address is present
+GET https://{{host}}/{{version}}/ip-addresses/{{ip_address_id_1}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 3. Create IP Address without specifying address
+POST https://{{host}}/{{version}}/ip-addresses
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test",
+    "network_id": "{{dev_network_id}}",
+    "type": "dhcp"
+}
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('ip_address_id_2', response.body.data.id);
+client.log('IP Address ID: ' + response.body.data.id);
+%}
+
+### 4. Check address is present
+GET https://{{host}}/{{version}}/ip-addresses/{{ip_address_id_2}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 5. Delete 1st address
+DELETE https://{{host}}/{{version}}/ip-addresses/{{ip_address_id_1}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 6. Delete 2nd address
+DELETE https://{{host}}/{{version}}/ip-addresses/{{ip_address_id_2}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}

@@ -24,6 +24,7 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 
+    public const TYPE_SYSTEM = 'system';
     public $keyPrefix = 'fwp';
 
     public function __construct(array $attributes = [])
@@ -37,9 +38,13 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
             'name',
             'sequence',
             'router_id',
+            'type',
+        ];
+        $this->attributes = [
+            'type' => null,
         ];
         $this->casts = [
-            'sequence' => 'integer'
+            'sequence' => 'integer',
         ];
         parent::__construct($attributes);
     }
@@ -74,14 +79,24 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
         });
     }
 
+    public function scopeSystemPolicy($query)
+    {
+        $query->where('name', '=', 'System');
+    }
+
+    public function isSystem(): bool
+    {
+        return (bool) $this->type == self::TYPE_SYSTEM;
+    }
+
     public function isManaged() :bool
     {
-        return (bool) $this->router->isManaged();
+        return $this->router->isManaged() || $this->type == static::TYPE_SYSTEM;
     }
 
     public function isHidden(): bool
     {
-        return $this->isManaged();
+        return $this->isManaged() && $this->type != static::TYPE_SYSTEM;
     }
 
     public function sieve(Sieve $sieve)
@@ -91,8 +106,42 @@ class FirewallPolicy extends Model implements Searchable, ResellerScopeable, Man
             'name' => $filter->string(),
             'sequence' => $filter->string(),
             'router_id' => $filter->string(),
+            'type' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
+    }
+
+    /**
+     * @param array $rules - A configuration array of rules and ports
+     * @param array $ruleOverrides - keys/values to override in the rule config in $rules array
+     * @param array $portOverrides - keys/values to override in the port config in $rules array
+     * @return $this
+     */
+    public function createRulesAndPorts(
+        array $rules,
+        array $ruleOverrides = [],
+        array $portOverrides = []
+    ): self {
+        foreach ($rules as $rule) {
+            $firewallRule = app()->make(FirewallRule::class);
+            $firewallRule->fill($rule);
+            if (!empty($ruleOverrides)) {
+                $firewallRule->fill($ruleOverrides);
+            }
+            $this->firewallRules()->save($firewallRule);
+            $firewallRule->save();
+
+            foreach ($rule['ports'] as $port) {
+                $firewallRulePort = app()->make(FirewallRulePort::class);
+                $firewallRulePort->fill($port);
+                if (!empty($portOverrides)) {
+                    $firewallRulePort->fill($portOverrides);
+                }
+                $firewallRulePort->firewallRule()->associate($firewallRule);
+                $firewallRulePort->save();
+            }
+        }
+        return $this;
     }
 }
