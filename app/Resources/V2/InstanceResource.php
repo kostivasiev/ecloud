@@ -50,15 +50,6 @@ class InstanceResource extends UKFastResource
         if (Auth::user()->isAdmin()) {
             $response['is_hidden'] = $this->isHidden();
             $response['load_balancer_id'] = ($this->loadBalancerNode) ? $this->loadBalancerNode->load_balancer_id : null;
-//            $adminMonitoringClient = app(AdminClient::class);
-//            $device = $adminMonitoringClient->devices()->getAll([
-//                'reference_type' => 'server',
-//                'reference_id:eq' => $this->id
-//            ]);
-//
-//            if (count($device) > 0) {
-//                $response['device_id'] = $device[0]['id'];
-//            }
         }
 
         return $response;
