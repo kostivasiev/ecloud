@@ -10,8 +10,3 @@ allOf:
         type : boolean
         readOnly : true
         example : false
-      device_id :
-        description: "Monitoring device ID"
-        type : string
-        readOnly : true
-        example : "135e06d1-fa77-4f3b-8e68-f2a2b032ca04"
