@@ -79,7 +79,7 @@ class RegisterLogicMonitorDevice extends Job
             'reference_type' => 'server',
             'reference_id' => $instance->id,
             'collector_id' => $collector->id,
-            'display_name' => $instance->name,
+            'display_name' => $instance->id,
             'account_id' => $this->task->data['logic_monitor_account_id'],
             'ip_address' => $floatingIp->getIPAddress(),
             'snmp_community' => 'public',
