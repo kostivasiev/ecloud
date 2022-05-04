@@ -41,6 +41,10 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
             'type',
         ]);
 
+        $this->attributes = [
+            'type' => self::TYPE_CLUSTER
+        ];
+
         parent::__construct($attributes);
     }
 
@@ -124,7 +128,7 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
         }
     }
 
-    public function allocateAddress($networkId)
+    public function allocateAddressAndSave($networkId)
     {
         $lock = Cache::lock("ip_address." . $networkId, 60);
         try {
@@ -132,7 +136,7 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
             $network = Network::forUser(request()->user())->findOrFail($networkId);
             $ip = $network->getNextAvailableIp();
             $this->ip_address = $ip;
-            return $ip;
+            return $this->save();
         } finally {
             $lock->release();
         }

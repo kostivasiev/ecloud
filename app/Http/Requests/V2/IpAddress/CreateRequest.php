@@ -35,11 +35,6 @@ class CreateRequest extends FormRequest
                 Rule::exists(Network::class, 'id')->whereNull('deleted_at'),
                 new ExistsForUser(Network::class),
             ],
-            'type' => [
-                'required',
-                'string',
-                Rule::in([IpAddress::TYPE_DHCP,IpAddress::TYPE_CLUSTER])
-            ]
         ];
     }
 }

@@ -2,6 +2,7 @@
 namespace Tests\V2\IpAddress;
 
 use App\Models\V2\IpAddress;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -20,14 +21,13 @@ class CreateTest extends TestCase
             'name' => 'Test',
             'ip_address' => '10.0.0.4',
             'network_id' => $this->network()->id,
-            'type' => IpAddress::TYPE_DHCP,
         ];
 
         $this->post('/v2/ip-addresses', $data)
             ->assertStatus(201);
         $this->assertDatabaseHas(
             'ip_addresses',
-            $data,
+            array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
             'ecloud'
         );
     }
@@ -39,15 +39,14 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Test',
             'ip_address' => '10.0.0.4',
-            'network_id' => $this->network()->id,
-            'type' => IpAddress::TYPE_DHCP,
+            'network_id' => $this->network()->id
         ];
 
         $this->post('/v2/ip-addresses', $data)
             ->assertStatus(201);
         $this->assertDatabaseHas(
             'ip_addresses',
-            $data,
+            array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
             'ecloud'
         );
     }
@@ -57,8 +56,7 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Test',
             'ip_address' => '1.1.1.1',
-            'network_id' => $this->network()->id,
-            'type' => IpAddress::TYPE_DHCP,
+            'network_id' => $this->network()->id
         ];
 
         $this->post('/v2/ip-addresses', $data)->assertStatus(422);
@@ -69,7 +67,6 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Test',
             'network_id' => $this->network()->id,
-            'type' => IpAddress::TYPE_DHCP,
         ];
         $response = $this->post(
             '/v2/ip-addresses',
@@ -82,5 +79,44 @@ class CreateTest extends TestCase
         $ipAddress = IpAddress::findOrFail($ipAddressId);
 
         $this->assertNotNull($ipAddress->ip_address);
+    }
+
+    public function testCacheLockFailedDuringAutoAllocation()
+    {
+        Cache::shouldReceive('lock')->withAnyArgs()->andReturnSelf();
+        Cache::shouldReceive('block')->withAnyArgs()->andThrow(new LockTimeoutException());
+        Cache::shouldReceive('release')->andReturnTrue();
+
+        $this->post(
+            '/v2/ip-addresses',
+            [
+                'name' => 'Test',
+                'network_id' => $this->network()->id,
+                'type' => IpAddress::TYPE_DHCP,
+            ]
+        )->assertJsonFragment([
+            'title' => 'Failed',
+            'detail' => 'Failed to automatically assign an ip address',
+        ])->assertStatus(424);
+    }
+
+    public function testCacheLockFailedDuringValidation()
+    {
+        Cache::shouldReceive('lock')->withAnyArgs()->andReturnSelf();
+        Cache::shouldReceive('block')->withAnyArgs()->andThrow(new LockTimeoutException());
+        Cache::shouldReceive('release')->andReturnTrue();
+
+        $this->post(
+            '/v2/ip-addresses',
+            [
+                'name' => 'Test',
+                'ip_address' => '10.0.0.1',
+                'network_id' => $this->network()->id,
+                'type' => IpAddress::TYPE_DHCP,
+            ]
+        )->assertJsonFragment([
+            'title' => 'Validation Failure',
+            'detail' => 'Failed to check ip address availability',
+        ])->assertStatus(424);
     }
 }

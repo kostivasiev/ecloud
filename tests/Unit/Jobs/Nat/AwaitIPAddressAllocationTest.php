@@ -13,7 +13,7 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class AwaitIPAdressAllocationTest extends TestCase
+class AwaitIPAddressAllocationTest extends TestCase
 {
     protected Nat $nat;
     protected FloatingIp $floatingIp;
@@ -59,7 +59,7 @@ class AwaitIPAdressAllocationTest extends TestCase
 
     public function testJobReleasedWhenNoSourceIPAddress()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
@@ -88,7 +88,7 @@ class AwaitIPAdressAllocationTest extends TestCase
 
     public function testJobReleasedWhenNoDestinationIPAddress()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '',
@@ -105,6 +105,11 @@ class AwaitIPAdressAllocationTest extends TestCase
             $this->nat->action = NAT::ACTION_DNAT;
             $this->nat->save();
         });
+
+        $ipAddress = IpAddress::factory()->create([
+            'ip_address' => '10.3.4.5',
+        ]);
+        $ipAddress->nics()->sync($this->nic);
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
