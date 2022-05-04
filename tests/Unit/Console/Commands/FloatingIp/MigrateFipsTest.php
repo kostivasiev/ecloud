@@ -31,6 +31,7 @@ class MigrateFipsTest extends TestCase
 
     public function testSuccessfulChange()
     {
+        $this->markTestSkipped('Command scheduled for removal');
         $this->assertEquals('nic', $this->floatingIp()->resource_type);
 
         $this->job->handle();
@@ -51,6 +52,7 @@ class MigrateFipsTest extends TestCase
 
     public function testRecordUnchanged()
     {
+        $this->markTestSkipped('Command scheduled for removal');
         $nic = Nic::factory()
             ->forNetwork()
             ->create();

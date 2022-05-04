@@ -47,7 +47,6 @@ class AwaitNatSyncTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
             ]);
 
             $nat = app()->make(Nat::class);
@@ -83,7 +82,7 @@ class AwaitNatSyncTest extends TestCase
 
     public function testJobFailedWhenDestinationNatSyncFailed()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
@@ -91,7 +90,6 @@ class AwaitNatSyncTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
             ]);
 
             $nat = app()->make(Nat::class);
@@ -127,7 +125,7 @@ class AwaitNatSyncTest extends TestCase
 
     public function testJobReleasedWhenSourceNatExistsAndSyncInProgress()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
@@ -135,7 +133,6 @@ class AwaitNatSyncTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
             ]);
 
             $nat = app()->make(Nat::class);
@@ -173,7 +170,7 @@ class AwaitNatSyncTest extends TestCase
 
     public function testJobReleasedWhenDestinationNatExistsAndSyncInProgress()
     {
-        Model::withoutEvents(function() {
+        Model::withoutEvents(function () {
             $this->floatingIp = FloatingIp::factory()->create([
                 'id' => 'fip-test',
                 'ip_address' => '10.2.3.4',
@@ -181,7 +178,6 @@ class AwaitNatSyncTest extends TestCase
             $this->nic = Nic::factory()->create([
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
-                'ip_address' => '10.3.4.5',
             ]);
             $nat = app()->make(Nat::class);
             $nat->id = 'nat-test-snat';
