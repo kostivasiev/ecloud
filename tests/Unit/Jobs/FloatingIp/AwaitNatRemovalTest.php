@@ -51,7 +51,6 @@ class AwaitNatRemovalTest extends TestCase
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
             ]);
-//            $this->nic->ip_address = '10.3.4.5';
 
             $nat = app()->make(Nat::class);
             $nat->id = 'nat-test';
