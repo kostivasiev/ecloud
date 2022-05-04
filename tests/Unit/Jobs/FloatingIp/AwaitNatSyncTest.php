@@ -49,8 +49,6 @@ class AwaitNatSyncTest extends TestCase
                 'network_id' => $this->network()->id,
             ]);
 
-            $this->nic->ip_address = '10.3.4.5';
-
             $nat = app()->make(Nat::class);
             $nat->id = 'nat-test-snat';
             $nat->source()->associate($this->nic);
@@ -94,8 +92,6 @@ class AwaitNatSyncTest extends TestCase
                 'network_id' => $this->network()->id,
             ]);
 
-            $this->nic->ip_address = '10.3.4.5';
-
             $nat = app()->make(Nat::class);
             $nat->id = 'nat-test-snat';
             $nat->source()->associate($this->nic);
@@ -138,8 +134,6 @@ class AwaitNatSyncTest extends TestCase
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
             ]);
-
-            $this->nic->ip_address = '10.3.4.5';
 
             $nat = app()->make(Nat::class);
             $nat->id = 'nat-test-snat';
@@ -185,9 +179,6 @@ class AwaitNatSyncTest extends TestCase
                 'id' => 'nic-test',
                 'network_id' => $this->network()->id,
             ]);
-
-            $this->nic->ip_address = '10.3.4.5';
-
             $nat = app()->make(Nat::class);
             $nat->id = 'nat-test-snat';
             $nat->source()->associate($this->nic);
