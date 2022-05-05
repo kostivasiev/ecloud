@@ -21,23 +21,17 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
     {
         parent::setUp();
         $this->networkPolicy();
-
-        // Admin Account Client
-        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () {
-            $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
-            $mockAccountAdminClient->expects('customers->getById')->andReturn(
-                new \UKFast\Admin\Account\Entities\Customer(
-                    [
-                        'name' => 'Paul\s Pies'
-                    ]
-                )
-            );
-            return $mockAccountAdminClient;
-        });
     }
 
     public function testCommandDispatchesJobsForFirewallAndNetworkPolicies()
     {
+        // Admin Account Client
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () {
+            $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+            $mockAccountAdminClient->shouldNotReceive('customers->getById');
+            return $mockAccountAdminClient;
+        });
+
         Queue::fake();
 
         $this->artisan('lm:register-all-instances')
@@ -56,6 +50,19 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
                 'username' => config('instance.guest_admin_username.linux'),
             ])
         );
+
+        // Admin Account Client
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () {
+            $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+            $mockAccountAdminClient->expects('customers->getById')->andReturn(
+                new \UKFast\Admin\Account\Entities\Customer(
+                    [
+                        'name' => 'Paul\s Pies'
+                    ]
+                )
+            );
+            return $mockAccountAdminClient;
+        });
 
         // Admin Monitoring Client
         app()->bind(AdminClient::class, function () {
