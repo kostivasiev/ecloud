@@ -33,7 +33,9 @@ class RemoveIpAddressBindingsTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new RemoveIpAddressBindings($this->nic()));
+        $task = $this->createSyncDeleteTask($this->nic());
+
+        dispatch(new RemoveIpAddressBindings($task));
 
         Event::assertNotDispatched(JobFailed::class);
 

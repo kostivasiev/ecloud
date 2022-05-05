@@ -11,6 +11,7 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
+use App\Models\V2\NetworkRule;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Services\V2\PasswordService;
@@ -51,10 +52,11 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         MonitoringAdminClient $adminMonitoringClient,
         AccountAdminClient $accountAdminClient
     ) {
-        $networks = Network::withoutTrashed()->get();
+        $networks = Network::withoutTrashed()->with('router')->with('router.vpc')->get();
 
         foreach ($networks as $network) {
             $router = $network->router;
+            $vpc = $network->router->vpc;
 
             $this->createSystemPolicy($router);
 
@@ -62,10 +64,13 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             // create LM rule to open ports inbound from collectors IP
             $this->createFirewallRules($router);
             foreach ($network->networkPolicy()->get() as $policy) {
-                $this->createNetworkRules($policy);
+                if ($vpc->advanced_networking) {
+                    $this->createNetworkRules($policy);
+                }
             }
         }
-        $instances = Instance::withoutTrashed()->get();
+
+        $instances = Instance::withoutTrashed()->with('availabilityZone')->with('vpc')->get();
 
         foreach ($instances as $instance) {
             // check if device is registered, if so then skip
@@ -218,9 +223,16 @@ dd($collection);
 
     private function createNetworkRules($networkPolicy): void
     {
-        $this->info('Creating Collector_Rule network rule for network policy ' . $networkPolicy->id);
-        if (!$this->option('test-run')) {
-            dispatch(new AllowLogicMonitor($networkPolicy));
+        $rules = config('defaults.network_policy.rules');
+
+        foreach ($rules as $rule) {
+            if ($networkPolicy->networkRules()->where('name', $rule['name'])->count() < 1) {
+                $this->info('Creating network rule ' . $rule['name'] . ' for network policy ' . $networkPolicy->id);
+                $networkRule = new NetworkRule($rule);
+                if (!$this->option('test-run')) {
+                    $networkPolicy->networkRules()->save($networkRule);
+                }
+            }
         }
     }
 

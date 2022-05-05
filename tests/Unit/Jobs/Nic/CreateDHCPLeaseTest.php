@@ -39,7 +39,9 @@ class CreateDHCPLeaseTest extends TestCase
                 ]));
             });
 
-        dispatch(new CreateDHCPLease($this->nic()));
+        $task = $this->createSyncUpdateTask($this->nic());
+
+        dispatch(new CreateDHCPLease($task));
 
         $this->nsxServiceMock()->shouldNotHaveReceived('put');
 
@@ -88,7 +90,9 @@ class CreateDHCPLeaseTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new CreateDHCPLease($this->nic()));
+        $task = $this->createSyncUpdateTask($this->nic());
+
+        dispatch(new CreateDHCPLease($task));
 
         $this->assertEquals('10.0.0.5', $this->nic()->ip_address);
 
@@ -142,7 +146,9 @@ class CreateDHCPLeaseTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new CreateDHCPLease($this->nic()));
+        $task = $this->createSyncUpdateTask($this->nic());
+
+        dispatch(new CreateDHCPLease($task));
 
         $this->assertEquals('10.0.0.4', $this->nic()->ip_address);
 
@@ -185,7 +191,9 @@ class CreateDHCPLeaseTest extends TestCase
 
         Event::fake([JobFailed::class]);
 
-        dispatch(new CreateDHCPLease($nic));
+        $task = $this->createSyncUpdateTask($nic);
+
+        dispatch(new CreateDHCPLease($task));
 
         Event::assertDispatched(JobFailed::class);
     }

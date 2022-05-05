@@ -3,7 +3,9 @@
 namespace App\Jobs\Instance\Undeploy;
 
 use App\Jobs\Job;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
+use App\Models\V2\IpAddress;
 use App\Traits\V2\Jobs\AwaitTask;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -15,6 +17,8 @@ class UnassignFloatingIP extends Job
     
     private $model;
 
+    private $taskIds = [];
+
     public function __construct(Instance $instance)
     {
         $this->model = $instance;
@@ -25,16 +29,30 @@ class UnassignFloatingIP extends Job
         $instance = $this->model;
 
         $instance->nics()->each(function ($nic) {
+            //-- TODO: Delete this after we have run the artisan script to migrate fips from NICs to ipAddress!
             if ($nic->floatingIp()->exists()) {
-                $task = $nic->floatingIp->createTaskWithLock(
+                $this->taskIds[] = $nic->floatingIp->createTaskWithLock(
                     'floating_ip_unassign',
                     \App\Jobs\Tasks\FloatingIp\Unassign::class
                 );
-
                 Log::info('Triggered floating_ip_unassign task for Floating IP (' . $nic->floatingIp->id . ')');
-
-                $this->awaitTask($task);
             }
+            //--
+
+            $nic->ipAddresses()->each(function ($ipAddress) {
+                if ($ipAddress->floatingIp()->exists()) {
+                    $this->taskIds[] = ($ipAddress->floatingIp->createTaskWithLock(
+                        'floating_ip_unassign',
+                        \App\Jobs\Tasks\FloatingIp\Unassign::class
+                    ))->id;
+
+                    Log::info('Triggered floating_ip_unassign task for Floating IP (' . $ipAddress->floatingIp->id . ')');
+                }
+            });
         });
+
+        if (!empty($this->taskIds)) {
+            $this->awaitTasks($this->taskIds);
+        }
     }
 }

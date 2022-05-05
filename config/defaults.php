@@ -101,6 +101,36 @@ return [
                 'direction' => 'IN_OUT',
                 'enabled' => true,
                 'type' => NetworkRule::TYPE_CATCHALL,
+            ],
+            [
+                'name' => 'Logic Monitor Collector',
+                'action' => 'ALLOW',
+                'sequence' => 10002,
+                'direction' => 'IN',
+                'enabled' => true,
+                'source' => null, // This will be set in the CreateDefaultNetworkRules job
+                'destination' => 'ANY',
+                'type' => NetworkRule::TYPE_LOGICMONITOR,
+                'ports' => [
+                    [
+                        'protocol' => 'ICMPv4'
+                    ],
+                    [
+                        'protocol' => 'TCP',
+                        'source' => 'ANY',
+                        'destination' => 2020
+                    ],
+                    [
+                        'protocol' => 'TCP',
+                        'source' => 'ANY',
+                        'destination' => 5986
+                    ],
+                    [
+                        'protocol' => 'UDP',
+                        'source' => 'ANY',
+                        'destination' => 161
+                    ]
+                ]
             ]
         ]
     ],

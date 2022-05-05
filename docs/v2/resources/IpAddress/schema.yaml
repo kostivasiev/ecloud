@@ -20,9 +20,9 @@ properties:
     readOnly: false
   type:
     type: string
-    required: true
+    required: false
     example: 'cluster'
-    readOnly: false
+    readOnly: true
   created_at:
     type: string
     example: '2020-07-07T10:30:00+01:00'

@@ -12,7 +12,7 @@ class IsClusterTypeTest extends TestCase
         $rule = new IsClusterType;
 
         $ipAddress = IpAddress::factory()->create([
-            'type' => IpAddress::TYPE_NORMAL,
+                                                      'type' => IpAddress::TYPE_DHCP,
         ]);
 
         $result = $rule->passes('ip_address_id', $ipAddress->id);

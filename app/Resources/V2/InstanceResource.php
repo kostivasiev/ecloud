@@ -2,15 +2,13 @@
 
 namespace App\Resources\V2;
 
-use App\Services\V2\KingpinService;
 use App\Traits\V2\InstanceOnlineState;
 use DateTimeZone;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use UKFast\Admin\Monitoring\AdminClient;
 use UKFast\Responses\UKFastResource;
-use Illuminate\Support\Facades\Log;
 
 class InstanceResource extends UKFastResource
 {
