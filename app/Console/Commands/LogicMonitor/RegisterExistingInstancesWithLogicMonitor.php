@@ -77,6 +77,8 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             }
         }
 
+        $this->line('------------------------------------');
+
         $instances = Instance::withoutTrashed()->with('availabilityZone')->with('vpc')->get();
 
         foreach ($instances as $instance) {
@@ -90,7 +92,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             })->first();
 
             if (empty($floatingIp)) {
-                $this->info('No floating IP assigned to the instance, skipping');
+                $this->info('No floating IP assigned to instance ' . $instance->id . ', skipping');
                 $this->skipped++;
                 continue;
             }
@@ -185,6 +187,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                     $instance->save();
                 } catch (ApiException $exception) {
                     $this->error('Failed register instance ' . $instance->id . ' device on monitoring API:  ' . print_r($exception->getErrors(), true));
+                    continue;
                 }
             } else {
                 $deviceId = 'test-test-test-test';
