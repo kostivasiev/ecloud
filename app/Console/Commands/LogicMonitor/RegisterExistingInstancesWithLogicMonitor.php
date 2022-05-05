@@ -109,24 +109,22 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             if (!empty($accounts)) {
                 $this->saveLogicMonitorAccountId($accounts[0]->id, $instance);
                 $this->info('Logic Monitor account already exists, skipping');
+            } else {
+                try {
+                    $customer = $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
+                } catch (NotFoundException) {
+                    $this->error('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id);
+                    break;
+                }
+
+                $response = $adminMonitoringClient->accounts()->createEntity(new Account([
+                    'name' => $customer->name
+                ]));
+
+                $id = $response->getId();
+                $this->saveLogicMonitorAccountId($id, $instance);
+                $this->info('Logic Monitor account ' . $id . ' created for instance : ' . $instance->id);
             }
-
-            dd('d');
-            try {
-                $customer = $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
-            } catch (NotFoundException) {
-                $this->error('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id);
-                break;
-            }
-
-            $response = $adminMonitoringClient->accounts()->createEntity(new Account([
-                'name' => $customer->name
-            ]));
-
-            $id = $response->getId();
-            $this->saveLogicMonitorAccountId($id, $instance);
-            $this->info('Logic Monitor account ' . $id . ' created for instance : ' . $instance->id);
-
             // check if fIP assigned, if not then skip
 
             $nics = $instance->nics();

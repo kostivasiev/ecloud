@@ -16,30 +16,62 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $this->networkPolicy();
+    }
+
+    public function testCommandDispatchesJobsForFirewallAndNetworkPolicies()
+    {
+        Queue::fake();
+
+        $this->artisan('lm:register-all-instances')
+            ->assertExitCode(Command::SUCCESS);
+
+        // Assert the job was pushed to the queue
+        Queue::assertPushed(CreateSystemPolicy::class);
+        Queue::assertPushed(AllowLogicMonitor::class);
+        Queue::assertPushed(CreateCollectorRules::class);
+    }
+
+    public function testCommandRegistersInstancesSuccess()
+    {
+        // Create an instance to test with
         $this->credential = $this->instanceModel()->credentials()->save(
             Credential::factory()->create([
                 'username' => config('instance.guest_admin_username.linux'),
             ])
         );
-        NetworkPolicy::factory()->create(['network_id' => $this->network()->id]);
 
-    }
-
-    public function testCommandDispatchesJobsForInstancesAndRoutersSuccess()
-    {
         $mockMonitoringAdminClient = \Mockery::mock(\UKFast\Admin\Monitoring\AdminClient::class);
-
-        $mockMonitoringAdminClient->shouldReceive('devices->getAll')->andReturnNull();
-
         $mockMonitoringAdminClient->shouldReceive('setResellerId')->andReturnSelf();
+
+        // Return null from devices API (device is not registered)
+        $mockMonitoringAdminClient->shouldReceive('devices->getAll')->andReturnNull();
 
         $mockPageItems = \Mockery::mock(\UKFast\SDK\Page::class);
 
         $stdClass = new \stdClass;
         $stdClass->id = 1;
 
-        $mockMonitoringAdminClient->shouldReceive('accounts->getAll')->andReturn(
-            [$stdClass]
+        $mockMonitoringAdminClient->shouldReceive('accounts->getAll')->andReturnNull();
+
+        // Get customer details from accounts API
+        app()->bind(
+            \UKFast\Admin\Account\AdminClient::class,
+            function () {
+                $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+                $mockAccountAdminClient->shouldReceive('customers->getById')->andReturnUsing(function () {
+                    return new class {
+                        public $name = 'ABC Limited';
+                    };
+                });
+                $mockAccountAdminClient->shouldReceive('accounts->createEntity')->andReturnUsing(function () {
+                    return new class {
+                        public $name = 'ABC Limited';
+                    };
+                });
+
+                return $mockAccountAdminClient;
+            }
         );
 
         $mockPageItems->shouldReceive('totalItems')->andReturn(1);
