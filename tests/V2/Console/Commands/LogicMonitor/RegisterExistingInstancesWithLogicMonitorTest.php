@@ -4,114 +4,170 @@ namespace Tests\V2\Console\Commands\LogicMonitor;
 use App\Jobs\Router\CreateCollectorRules;
 use App\Jobs\Router\CreateSystemPolicy;
 use App\Models\V2\Credential;
-use App\Models\V2\Image;
-use App\Models\V2\Instance;
-use App\Models\V2\Network;
-use App\Models\V2\NetworkPolicy;
-use App\Models\V2\Router;
-use App\Models\V2\Vpc;
+use App\Models\V2\IpAddress;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
 use Queue;
 use Tests\TestCase;
+use UKFast\Admin\Monitoring\AdminClient;
+use UKFast\Admin\Monitoring\AdminDeviceClient;
+use UKFast\Admin\Monitoring\Entities\Collector;
+use UKFast\SDK\Page;
+use UKFast\SDK\SelfResponse;
 
 class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
 {
-    public function testCommandDispatchesJobsForInstancesAndRoutersSuccess()
+    public function setUp(): void
     {
-        //prep
-        $mockMonitoringAdminClient = \Mockery::mock(\UKFast\Admin\Monitoring\AdminClient::class);
-        $mockMonitoringAdminAccountClient = \Mockery::mock(\UKFast\Admin\Monitoring\AdminAccountClient::class);
-        $mockMonitoringAdminDeviceClient = \Mockery::mock(\UKFast\Admin\Monitoring\AdminDeviceClient::class);
-        $mockMonitoringAdminCollectorClient = \Mockery::mock(\UKFast\Admin\Monitoring\AdminCollectorClient::class);
-        $mockPageItems = \Mockery::mock(\UKFast\SDK\Page::class);
+        parent::setUp();
+        $this->networkPolicy();
+    }
 
-        $mockMonitoringAdminDeviceClient->shouldReceive('getAll')->andReturn(
-            null
+    public function testCommandDispatchesJobsForFirewallAndNetworkPolicies()
+    {
+        // Admin Account Client
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () {
+            $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+            $mockAccountAdminClient->shouldNotReceive('customers->getById');
+            return $mockAccountAdminClient;
+        });
+
+        Queue::fake();
+
+        $this->artisan('lm:register-all-instances')
+            ->assertExitCode(Command::SUCCESS);
+
+        // Assert the job was pushed to the queue
+        Queue::assertPushed(CreateSystemPolicy::class);
+        Queue::assertPushed(CreateCollectorRules::class);
+    }
+
+    public function testCommandRegistersInstancesLogicMonitorSuccess()
+    {
+        // Create an instance to test with
+        $this->credential = $this->instanceModel()->credentials()->save(
+            Credential::factory()->create([
+                'username' => config('instance.guest_admin_username.linux'),
+            ])
         );
 
-        $mockMonitoringAdminClient->shouldReceive('devices')->andReturn(
-            $mockMonitoringAdminDeviceClient
-        );
+        // Admin Account Client
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () {
+            $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+            $mockAccountAdminClient->expects('customers->getById')->andReturn(
+                new \UKFast\Admin\Account\Entities\Customer(
+                    [
+                        'name' => 'Paul\s Pies'
+                    ]
+                )
+            );
+            return $mockAccountAdminClient;
+        });
 
-        $mockMonitoringAdminClient->shouldReceive('setResellerId')->andReturn(
-            $mockMonitoringAdminClient
-        );
+        // Admin Monitoring Client
+        app()->bind(AdminClient::class, function () {
+            $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
+            $mockAdminMonitoringClient->expects('setResellerId')->andReturnSelf();
+            $mockAdminMonitoringClient->expects('accounts->getAll')->andReturn([]);
+            $mockAdminMonitoringClient->expects('accounts->createEntity')
+                ->withAnyArgs()
+                ->andReturnUsing(function () {
+                    $mockSelfResponse =  \Mockery::mock(SelfResponse::class)->makePartial();
+                    $mockSelfResponse->allows('getId')->andReturns(123);
+                    return $mockSelfResponse;
+                });
 
-        $stdClass = new \stdClass;
-        $stdClass->id = 1;
+            $mockMonitoringAdminDeviceClient = \Mockery::mock(AdminDeviceClient::class);
+            $mockMonitoringAdminDeviceClient->shouldReceive('getAll')->andReturn([]);
+            $mockMonitoringAdminDeviceClient->expects('createEntity')
+                ->withAnyArgs()
+                ->andReturnUsing(function () {
+                    $mockSelfResponse =  \Mockery::mock(SelfResponse::class)->makePartial();
+                    $mockSelfResponse->allows('getId')->andReturns('device-123');
+                    return $mockSelfResponse;
+                });
 
-        $mockMonitoringAdminAccountClient->shouldReceive('getAll')->andReturn(
-            [$stdClass]
-        );
+            $mockAdminMonitoringClient->shouldReceive('devices')->andReturn(
+                $mockMonitoringAdminDeviceClient
+            );
+            // Get collector ID
+            $mockAdminMonitoringClient->expects('collectors->getPage')->andReturnUsing(function () {
+                $page = \Mockery::mock(Page::class)->makePartial();
+                $page->expects('totalItems')->andReturn(2);
+                $page->expects('getItems')->andReturnUsing(function () {
+                    return [
+                        new Collector([
+                            'id' => 123
+                        ]),
+                        new Collector([
+                            'id' => 456
+                        ]),
+                    ];
+                });
+                return $page;
+            });
 
-        $mockMonitoringAdminClient->shouldReceive('accounts')->andReturn(
-            $mockMonitoringAdminAccountClient
-        );
+            return $mockAdminMonitoringClient;
+        });
 
+        // Assign a fIP to the instance
+        $ipAddress = IpAddress::factory()->create();
+        $ipAddress->nics()->sync($this->nic());
+        $this->floatingIp()->resource()->associate($ipAddress);
+        $this->floatingIp()->save();
 
-        $mockPageItems->shouldReceive('totalItems')->andReturn(
-            1
-        );
-
-        $mockPageItems->shouldReceive('getItems')->andReturn(
-            [$stdClass]
-        );
-
-        $mockMonitoringAdminCollectorClient->shouldReceive('getPage')->andReturn(
-            $mockPageItems
-        );
-
-        $mockMonitoringAdminClient->shouldReceive('collectors')->andReturn(
-            $mockMonitoringAdminCollectorClient
-        );
-
-        app()->bind(
-            \UKFast\Admin\Monitoring\AdminClient::class,
-            function () use ($mockMonitoringAdminClient) {
-                return $mockMonitoringAdminClient;
-            }
-        );
-
-        //make instance
-        $image = Image::factory()->create([
-            'platform' => 'windows'
-        ]);
-        $vpc = Vpc::factory()->create();
-        $instance = Instance::factory()->create([
-            'availability_zone_id' => $this->availabilityZone()->id,
-            'image_id' => $image->id,
-            'vpc_id' => $vpc->id
-        ]);
-
+        // Create Logic Monitor credentials
         $this->kingpinServiceMock()
             ->shouldReceive('post')
             ->withArgs([
-                '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
+                '/api/v2/vpc/' . $this->instanceModel()->vpc->id . '/instance/' . $this->instanceModel()->id . '/guest/linux/user',
                 [
                     'json' => [
-                        "targetUsername" => "lm.".$instance->id,
-                        "targetPassword" => "somepassword",
-                        "targetSudo" => false,
-                        "username" => "graphite.rack",
-                        "password" => "somepassword",]
+                        'targetUsername' => 'lm.' . $this->instanceModel()->id,
+                        'targetPassword' => 'somepassword',
+                        'targetSudo' => false,
+                        'username' => 'root',
+                        'password' => 'somepassword'
                     ]
-            ])->andReturns(
+                ]
+            ])
+            ->andReturns(
                 new Response(200)
             );
 
-        Credential::factory()->create([
-            'username' => 'graphite.rack',
-            'resource_id' => $instance->id
-        ]);
+        // Fake the queue
+        Queue::fake();
 
-        Vpc::factory()->create(['id'=> 'vpc-a7d7c4e6']);
-        Router::factory()->create(['id' => 'rtr-62827a58']);
-        Network::factory()->create();
+        $this->artisan('lm:register-all-instances')
+            ->assertExitCode(Command::SUCCESS);
 
-        /** @var Network $network */
-        $network = Network::all()->first();
-        NetworkPolicy::factory()->create(['network_id' => $network->id]);
+        // Assert the job was pushed to the queue
+        Queue::assertPushed(CreateSystemPolicy::class);
+        Queue::assertPushed(CreateCollectorRules::class);
+    }
+
+    public function testNoFloatingIpSkips()
+    {
+        // Create an instance to test with
+        $this->credential = $this->instanceModel()->credentials()->save(
+            Credential::factory()->create([
+                'username' => config('instance.guest_admin_username.linux'),
+            ])
+        );
+
+        // Admin Monitoring Client
+        app()->bind(AdminClient::class, function () {
+            $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
+            $mockAdminMonitoringClient->shouldNotReceive('devices->getAll'); // NOT!
+            return $mockAdminMonitoringClient;
+        });
+
+        // Admin Account Client
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () {
+            $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+            $mockAccountAdminClient->shouldNotReceive('customers->getById');
+            return $mockAccountAdminClient;
+        });
 
         // Fake the queue
         Queue::fake();

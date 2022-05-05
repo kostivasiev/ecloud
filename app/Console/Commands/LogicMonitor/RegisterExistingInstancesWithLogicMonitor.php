@@ -2,26 +2,26 @@
 
 namespace App\Console\Commands\LogicMonitor;
 
-use App\Jobs\NetworkPolicy\AllowLogicMonitor;
 use App\Jobs\Router\CreateCollectorRules;
 use App\Jobs\Router\CreateSystemPolicy;
 use App\Models\V2\Credential;
-use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Instance;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkRule;
-use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Services\V2\PasswordService;
 use App\Support\Sync;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Log;
-use UKFast\Admin\ManagedCloudflare\V1\AccountAdminClient;
+use UKFast\Admin\Account\AdminClient as AccountAdminClient;
 use UKFast\Admin\Monitoring\AdminClient as MonitoringAdminClient;
 use UKFast\Admin\Monitoring\Entities\Account;
 use UKFast\Admin\Monitoring\Entities\Device;
+use UKFast\SDK\Exception\ApiException;
 use UKFast\SDK\Exception\NotFoundException;
 
 class RegisterExistingInstancesWithLogicMonitor extends Command
@@ -31,7 +31,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      *
      * @var string
      */
-    protected $signature = 'lm:register-all-instances';
+    protected $signature = 'lm:register-all-instances {--T|test-run}';
 
     /**
      * The console command description.
@@ -40,7 +40,13 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      */
     protected $description = 'Command description';
 
-    private Task $task;
+    public function __construct(
+        public int $updated = 0,
+        public int $failed = 0,
+        public int $skipped = 0
+    ) {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
@@ -69,18 +75,35 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             }
         }
 
+        $this->line('------------------------------------');
+
         $instances = Instance::withoutTrashed()->with('availabilityZone')->with('vpc')->get();
 
         foreach ($instances as $instance) {
-            // check if device is registered, if so then skip
+            // Check if fIP assigned, if not then skip
+            $floatingIp = FloatingIp::where(function ($query) use ($instance) {
+                $query->whereIn('resource_id', $instance->nics()->pluck('id'));
+                $query->orWhereIn('resource_id', IpAddress::whereHas('nics', function ($query) use ($instance) {
+                    $query->whereIn('id', $instance->nics()->pluck('id'));
+                    $query->where('type', IpAddress::TYPE_DHCP);
+                })->pluck('id'));
+            })->first();
+
+            if (empty($floatingIp)) {
+                $this->info('No floating IP assigned to instance ' . $instance->id . ', skipping');
+                $this->skipped++;
+                continue;
+            }
+
+            // Check if device is registered, if so then skip
             $device = $adminMonitoringClient->devices()->getAll([
                 'reference_type' => 'server',
                 'reference_id:eq' => $instance->id
             ]);
-
             if (!empty($device)) {
-                Log::info($this::class . ' : The device is already registered, skipping');
-                break;
+                $this->info('Device ' . $instance->id . ' is already registered, skipping');
+                $this->skipped++;
+                continue;
             }
 
             // check if LM creds exist, if not create
@@ -92,8 +115,9 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             ]);
 
             if ($collectorsPage->totalItems() < 1) {
-                Log::warning('Failed to load logic monitor collector for availability zone ' . $availabilityZone->id);
-                break;
+                $this->error('Failed to load logic monitor collector for availability zone ' . $availabilityZone->id);
+                $this->failed++;
+                continue;
             }
 
             $collector = $collectorsPage->getItems()[0];
@@ -101,12 +125,13 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             $logicMonitorCredentials = $instance->credentials()
                 ->where('username', 'lm.' . $instance->id)
                 ->first();
-            if (!$logicMonitorCredentials) {
-                if (!($logicMonitorCredentials = $this->createLMCredentials($instance))) {#
-                    Log::error('Logic Monitor account is not creatable', [
-                        'instance' => $instance->id
-                    ]);
-                    break;
+            if (empty($logicMonitorCredentials)) {
+                $this->info('No logic monitor credentials found for instance ' . $instance->id);
+
+                $logicMonitorCredentials = $this->createLMCredentials($instance);
+                if ($logicMonitorCredentials === false) {
+                    $this->failed++;
+                    continue;
                 }
             }
 
@@ -114,66 +139,71 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
             if (!empty($accounts)) {
                 $this->saveLogicMonitorAccountId($accounts[0]->id, $instance);
-                Log::info('Logic Monitor account already exists, skipping', [
-                    'logic_monitor_account_id' => $accounts[0]->id
-                ]);
-                break;
+                $this->info('Logic Monitor account already exists, skipping');
+            } else {
+                try {
+                    $customer = $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
+                } catch (NotFoundException) {
+                    $this->error('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id);
+                    continue;
+                }
+
+                if (!$this->option('test-run')) {
+                    $response = $adminMonitoringClient->accounts()->createEntity(new Account([
+                        'name' => $customer->name
+                    ]));
+
+                    $id = $response->getId();
+                } else {
+                    $id = 'test-test-test-test';
+                }
+
+                $this->saveLogicMonitorAccountId($id, $instance);
+                $this->info('Logic Monitor account ' . $id . ' created for instance : ' . $instance->id);
             }
 
-            try {
-                $customer = $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
-            } catch (NotFoundException) {
-                Log::error('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id);
-                break;
+            if (!$this->option('test-run')) {
+                // register device
+                try {
+                    $response = $adminMonitoringClient->devices()->createEntity(new Device([
+                        'reference_type' => 'server',
+                        'reference_id' => $instance->id,
+                        'collector_id' => $collector->id,
+                        'display_name' => $instance->id,
+                        'account_id' => $instance->deploy_data['logic_monitor_account_id'],
+                        'ip_address' => $floatingIp->getIPAddress(),
+                        'snmp_community' => 'public',
+                        'platform' => $instance->platform,
+                        'username' => $logicMonitorCredentials->username,
+                        'password' => $logicMonitorCredentials->password,
+                    ]));
+
+                    $deviceId = $response->getId();
+                    $deploy_data = $instance->deploy_data;
+                    $deploy_data['logic_monitor_device_id'] = $deviceId;
+                    $instance->deploy_data = $deploy_data;
+                    $instance->save();
+                } catch (ApiException $exception) {
+                    $this->error('Failed register instance ' . $instance->id . ' device on monitoring API:  ' . print_r($exception->getErrors(), true));
+                    continue;
+                }
+            } else {
+                $deviceId = 'test-test-test-test';
             }
 
-            $response = $adminMonitoringClient->accounts()->createEntity(new Account([
-                'name' => $customer->name
-            ]));
+            $this->info('Logic Monitor device registered for instance ' . $instance->id . ' : ' . $deviceId);
+            $this->updated++;
 
-            $id = $response->getId();
-            $this->saveLogicMonitorAccountId($id, $instance);
-            Log::info($this::class . ' : Logic Monitor account created: ' . $id);
-
-            // check if fIP assigned, if not then skip
-            if (empty($instance->deploy_data['floating_ip_id'])) {
-                Log::info(get_class($this) . ' : No floating IP assigned to the instance, skipping');
-                break;
-            }
-            $floatingIp = FloatingIp::find($instance->deploy_data['floating_ip_id']);
-            if (!$floatingIp) {
-                Log::error('Failed to load floating IP for instance', [
-                    'instance_id' => $instance->id,
-                    'floating_ip_id' => $instance->deploy_data['floating_ip_id']
-                ]);
-                break;
-            }
-
-            // register device
-            $response = $adminMonitoringClient->devices()->createEntity(new Device([
-                'reference_type' => 'server',
-                'reference_id' => $instance->id,
-                'collector_id' => $collector->id,
-                'display_name' => $instance->name,
-                'tier_id' => '8485a243-8a83-11ec-915e-005056ad1662', // This is the free tier from Monitoring APIO
-                'account_id' => $instance->deploy_data['logic_monitor_account_id'],
-                'ip_address' => $floatingIp->getIPAddress(),
-                'snmp_community' => 'public',
-                'platform' => $instance->platform,
-                'username' => $logicMonitorCredentials->username,
-                'password' => $logicMonitorCredentials->password,
-            ]));
-
-            $deploy_data = $instance->deploy_data;
-            $deploy_data['logic_monitor_device_id'] = $response->getId();
-            $instance->deploy_data = $deploy_data;
-            $instance->save();
-
-            Log::info($this::class . ' : Logic Monitor device registered : ' . $deploy_data['logic_monitor_device_id'], [
-                'instance_id' => $instance->id
-            ]);
+            $this->line('------------------------------------');
         }
 
+        $this->line('------------------------------------');
+
+        $this->info(
+            'Total Updated: ' . $this->updated .
+            ', Total Skipped: ' . $this->skipped .
+            ', Total Failures: ' . $this->failed
+        );
 
         return 0;
     }
@@ -188,7 +218,10 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $deploy_data = $instance->deploy_data;
         $deploy_data['logic_monitor_account_id'] = $id;
         $instance->deploy_data = $deploy_data;
-
+        $this->info('Logic monitor account ID ' . $id . ' stored for instance ' . $instance->id);
+        if ($this->option('test-run')) {
+            return true;
+        }
         return $instance->save();
     }
 
@@ -202,7 +235,11 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         ]);
         $task->resource()->associate($router);
         $task->save();
-        dispatch(new CreateSystemPolicy($task));
+
+        $this->info('Creating System policy for router ' . $router->id);
+        if (!$this->option('test-run')) {
+            dispatch(new CreateSystemPolicy($task));
+        }
     }
 
     private function createNetworkRules($networkPolicy): void
@@ -211,8 +248,11 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
 
         foreach ($rules as $rule) {
             if ($networkPolicy->networkRules()->where('name', $rule['name'])->count() < 1) {
+                $this->info('Creating network rule ' . $rule['name'] . ' for network policy ' . $networkPolicy->id);
                 $networkRule = new NetworkRule($rule);
-                $networkPolicy->networkRules()->save($networkRule);
+                if (!$this->option('test-run')) {
+                    $networkPolicy->networkRules()->save($networkRule);
+                }
             }
         }
     }
@@ -224,12 +264,15 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         ]);
         $task->resource()->associate($router);
         $task->save();
-        dispatch(new CreateCollectorRules($task));
+        $this->info('Creating logic monitor firewall rules for router ' . $router->id);
+        if (!$this->option('test-run')) {
+            dispatch(new CreateCollectorRules($task));
+        }
     }
 
     /**
      * @param $instance
-     * @return Credential|bool
+     * @return Credential|false|mixed
      * @throws BindingResolutionException
      */
     private function createLMCredentials($instance)
@@ -237,9 +280,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $guestAdminCredential = $instance->getGuestAdminCredentials();
 
         if (!$guestAdminCredential) {
-            $message = get_class($this) . ' : Failed for ' . $instance->id . ', no admin credentials found';
-            Log::error($message);
-
+            $this->error('Failed to create logic monitor credentials: No admin credentials found for instance ' . $instance->id);
             return false;
         }
 
@@ -254,20 +295,34 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             'port' => '2020',
         ]);
         $credential->password = $password;
-        $credential->save();
 
-        $instance->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
-            [
-                'json' => [
-                    'targetUsername' => $username,
-                    'targetPassword' => $credential->password,
-                    'targetSudo' => $sudo,
-                    'username' => $guestAdminCredential->username,
-                    'password' => $guestAdminCredential->password,
-                ],
-            ]
-        );
+        $this->info('Creating logic monitor credentials for instance ' . $instance->id);
+        if (!$this->option('test-run')) {
+            $credential->save();
+        }
+
+        if (!$this->option('test-run')) {
+            try {
+                $instance->availabilityZone->kingpinService()->post(
+                    '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
+                    [
+                        'json' => [
+                            'targetUsername' => $username,
+                            'targetPassword' => $credential->password,
+                            'targetSudo' => $sudo,
+                            'username' => $guestAdminCredential->username,
+                            'password' => $guestAdminCredential->password,
+                        ],
+                    ]
+                );
+            } catch (\Exception $exception) {
+                $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
+                    $exception->getResponse()->getBody()->getContents() :
+                    $exception->getMessage();
+                $this->error('Failed to create logic monitor credentials on instance: ' . $message);
+                return false;
+            }
+        }
 
         return $credential;
     }
