@@ -5,6 +5,7 @@ namespace App\Jobs\FloatingIp;
 use App\Jobs\AvailabilityZoneCapacity\UpdateFloatingIpCapacity;
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
+use App\Traits\V2\Jobs\FloatingIp\RdnsTrait;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Cache;
@@ -14,7 +15,7 @@ use UKFast\Admin\Networking\AdminClient;
 
 class AllocateIp extends Job
 {
-    use Batchable, LoggableModelJob;
+    use Batchable, LoggableModelJob, RdnsTrait;
 
     public FloatingIp $model;
 
@@ -88,8 +89,21 @@ class AllocateIp extends Job
                         continue;
                     }
 
-                    $this->model->ip_address = $checkIp;
-                    $this->model->saveQuietly();
+                    $rdns = $this->getRecords($checkIp);
+                    $rdnsCount = count($rdns->getItems());
+
+                    if ($rdnsCount === 1) {
+                        $this->model->ip_address = $checkIp;
+                        $this->model->saveQuietly();
+                    } elseif ($rdnsCount === 0) {
+                        $message = sprintf('No RDNS found on %s', $this->model->id);
+                        Log::error($message, ['floating_ip_id' => $this->model->id]);
+                        continue;
+                    } elseif ($rdnsCount > 1) {
+                        $message = sprintf('%d RDNS found on %s', $rdnsCount, $this->model->id);
+                        Log::error($message, ['floating_ip_id' => $this->model->id]);
+                        continue;
+                    }
 
                     Log::info('Success. IP ' . $this->model->ip_address . ' was assigned.', ['id' => $this->model->id]);
 

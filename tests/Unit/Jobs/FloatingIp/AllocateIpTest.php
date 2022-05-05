@@ -10,6 +10,9 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
+use UKFast\Admin\SafeDNS\AdminClient;
+use UKFast\Admin\SafeDNS\AdminRecordClient;
+use UKFast\SDK\SafeDNS\Entities\Record;
 
 class AllocateIpTest extends TestCase
 {
@@ -20,6 +23,43 @@ class AllocateIpTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $mockRecordAdminClient = \Mockery::mock(AdminRecordClient::class);
+
+        $mockSafednsAdminClient = \Mockery::mock(AdminClient::class);
+
+        $mockSafednsAdminClient->shouldReceive('records')->andReturn(
+            $mockRecordAdminClient
+        );
+        app()->bind(AdminClient::class, function () use ($mockSafednsAdminClient) {
+            return $mockSafednsAdminClient;
+        });
+
+        app()->bind(AdminRecordClient::class, function () use ($mockRecordAdminClient) {
+            return $mockRecordAdminClient;
+        });
+
+        $mockRecordAdminClient->shouldReceive('getPage')->andReturnUsing(function () {
+            $mockRecord = \Mockery::mock(Record::class);
+            $mockRecord->shouldReceive('totalPages')->andReturn(1);
+            $mockRecord->shouldReceive('getItems')->andReturn(
+                new Collection([
+                    new \UKFast\SDK\SafeDNS\Entities\Record(
+                        [
+                            "id" => 10015521,
+                            "zone" => "1.2.3.in-addr.arpa",
+                            "name" => "1.2.3.4.in-addr.arpa",
+                            "type" => "PTR",
+                            "content" => "198.172.168.0.srvlist.co.uk",
+                            "updated_at" => "1970-01-01T01:00:00+01:00",
+                            "ttl" => 86400,
+                            "priority" => null
+                        ]
+                    )
+                ])
+            );
+
+            return $mockRecord;
+        });
 
         //$this->mockAdminClient = \Mockery::mock(\UKFast\Admin\Devices\AdminClient::class);
         $this->mockNetworkAdminClient = \Mockery::mock(\UKFast\Admin\Networking\AdminClient::class);

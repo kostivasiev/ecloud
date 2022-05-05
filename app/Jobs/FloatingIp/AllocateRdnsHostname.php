@@ -33,13 +33,19 @@ class AllocateRdnsHostname extends TaskJob
             $this->model->rdns_hostname = $this->reverseIpDefault($this->model->ip_address);
         }
 
-        $safednsClient = app()->make(AdminClient::class);
-        $dnsName = $this->reverseIpLookup($this->model->ip_address);
-        $this->rdns = $safednsClient->records()->getPage(1, 15, ['name:eq' => $dnsName]);
+        $this->rdns = $this->getRecords($this->model->ip_address);
+        $rdnsCount = count($this->rdns->getItems());
 
-        if (count($this->rdns->getItems()) !== 1) {
-            $this->info("More than one RDNS found", ['floating_ip_id' => $this->model->id]);
-            $this->fail(new \Exception('More than one RDNS found ' . $this->model->id));
+        if ($rdnsCount === 0) {
+            $message = sprintf('No RDNS found on %s', $this->model->id);
+            $this->info($message, ['floating_ip_id' => $this->model->id]);
+            $this->fail(new \Exception($message));
+
+            return;
+        } elseif ($rdnsCount > 1) {
+            $message = sprintf('%d RDNS found on %s', $rdnsCount, $this->model->id);
+            $this->info($message, ['floating_ip_id' => $this->model->id]);
+            $this->fail(new \Exception($message));
 
             return;
         }
@@ -47,6 +53,7 @@ class AllocateRdnsHostname extends TaskJob
         $this->rdns = $this->rdns->getItems()[0];
 
         if ($this->rdns['content'] != trim($this->model->rdns_hostname)) {
+            $safednsClient = app(AdminClient::class);
             $safednsClient->records()->update($this->createRecord(
                 $this->rdns['id'],
                 $this->rdns['name'],
