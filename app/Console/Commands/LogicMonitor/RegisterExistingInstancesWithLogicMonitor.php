@@ -60,29 +60,22 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $networks = Network::withoutTrashed()->with('router')->with('router.vpc')->get();
 
         foreach ($networks as $network) {
-            $router = $network?->router;
-
-            if (empty($router)) {
-                $this->error('Failed to load router for network ' . $network->id);
-                continue;
-            }
-
-            $vpc = $router?->vpc;
-
-            if (empty($vpc)) {
-                $this->error('Failed to load VPC for router ' . $router->id);
-                continue;
-            }
-
-            $this->createSystemPolicy($router);
-
-            // check for collector in routers AZ, if none then skip
-            // create LM rule to open ports inbound from collectors IP
-            $this->createFirewallRules($router);
-            foreach ($network->networkPolicy()->get() as $policy) {
-                if ($vpc->advanced_networking) {
-                    $this->createNetworkRules($policy);
+            if ($network->router->exists()) {
+                $message = 'Syncing router ' . $network->router->id;
+                if (!$this->option('test-run')) {
+                    $task = $network->router->syncSave();
+                    $message .= ', task id:' . $task->id;
                 }
+                $this->info($message);
+            }
+
+            if ($network->networkPolicy->exists()) {
+                $message = 'Syncing network policy ' . $network->networkPolicy->id;
+                if (!$this->option('test-run')) {
+                    $task = $network->networkPolicy->syncSave();
+                    $message .= ', task id:' . $task->id;
+                }
+                $this->info($message);
             }
         }
 
@@ -236,50 +229,52 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         return $instance->save();
     }
 
-    /**
-     * @param $router
-     */
-    private function createSystemPolicy($router): void
-    {
-        $task = new Task([
-            'name' => Sync::TASK_NAME_UPDATE,
-        ]);
-        $task->resource()->associate($router);
-        $task->save();
+//    /**
+//     * @param $router
+//     */
+//    private function createSystemPolicy($router): void
+//    {
+//        $task = new Task([
+//            'name' => 'create_system_policy',
+//            'job' => CreateSystemPolicy::class
+//        ]);
+//        $task->resource()->associate($router);
+//        $task->save();
+//
+//        $this->info('Creating System policy for router ' . $router->id);
+//        if (!$this->option('test-run')) {
+//            dispatch(new CreateSystemPolicy($task));
+//        }
+//    }
 
-        $this->info('Creating System policy for router ' . $router->id);
-        if (!$this->option('test-run')) {
-            dispatch(new CreateSystemPolicy($task));
-        }
-    }
+//    private function createNetworkRules($networkPolicy): void
+//    {
+//        $rules = config('defaults.network_policy.rules');
+//
+//        foreach ($rules as $rule) {
+//            if ($networkPolicy->networkRules()->where('name', $rule['name'])->count() < 1) {
+//                $this->info('Creating network rule ' . $rule['name'] . ' for network policy ' . $networkPolicy->id);
+//                $networkRule = new NetworkRule($rule);
+//                if (!$this->option('test-run')) {
+//                    $networkPolicy->networkRules()->save($networkRule);
+//                }
+//            }
+//        }
+//    }
 
-    private function createNetworkRules($networkPolicy): void
-    {
-        $rules = config('defaults.network_policy.rules');
-
-        foreach ($rules as $rule) {
-            if ($networkPolicy->networkRules()->where('name', $rule['name'])->count() < 1) {
-                $this->info('Creating network rule ' . $rule['name'] . ' for network policy ' . $networkPolicy->id);
-                $networkRule = new NetworkRule($rule);
-                if (!$this->option('test-run')) {
-                    $networkPolicy->networkRules()->save($networkRule);
-                }
-            }
-        }
-    }
-
-    private function createFirewallRules($router): void
-    {
-        $task = new Task([
-            'name' => Sync::TASK_NAME_UPDATE,
-        ]);
-        $task->resource()->associate($router);
-        $task->save();
-        $this->info('Creating logic monitor firewall rules for router ' . $router->id);
-        if (!$this->option('test-run')) {
-            dispatch(new CreateCollectorRules($task));
-        }
-    }
+//    private function createFirewallRules($router): void
+//    {
+//        $task = new Task([
+//            'name' => 'create_collector_rules',
+//            'job' => CreateCollectorRules::class
+//        ]);
+//        $task->resource()->associate($router);
+//        $task->save();
+//        $this->info('Creating logic monitor firewall rules for router ' . $router->id);
+//        if (!$this->option('test-run')) {
+//            dispatch(new CreateCollectorRules($task));
+//        }
+//    }
 
     /**
      * @param $instance
