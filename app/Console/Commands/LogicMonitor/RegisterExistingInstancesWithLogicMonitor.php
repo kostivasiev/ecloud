@@ -23,6 +23,7 @@ use UKFast\Admin\Account\AdminClient as AccountAdminClient;
 use UKFast\Admin\Monitoring\AdminClient as MonitoringAdminClient;
 use UKFast\Admin\Monitoring\Entities\Account;
 use UKFast\Admin\Monitoring\Entities\Device;
+use UKFast\SDK\Exception\ApiException;
 use UKFast\SDK\Exception\NotFoundException;
 
 class RegisterExistingInstancesWithLogicMonitor extends Command
@@ -144,7 +145,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                     $customer = $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
                 } catch (NotFoundException) {
                     $this->error('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id);
-                    break;
+                    continue;
                 }
 
                 if (!$this->option('test-run')) {
@@ -163,24 +164,28 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
 
             if (!$this->option('test-run')) {
                 // register device
-                $response = $adminMonitoringClient->devices()->createEntity(new Device([
-                    'reference_type' => 'server',
-                    'reference_id' => $instance->id,
-                    'collector_id' => $collector->id,
-                    'display_name' => $instance->id,
-                    'account_id' => $instance->deploy_data['logic_monitor_account_id'],
-                    'ip_address' => $floatingIp->getIPAddress(),
-                    'snmp_community' => 'public',
-                    'platform' => $instance->platform,
-                    'username' => $logicMonitorCredentials->username,
-                    'password' => $logicMonitorCredentials->password,
-                ]));
+                try {
+                    $response = $adminMonitoringClient->devices()->createEntity(new Device([
+                        'reference_type' => 'server',
+                        'reference_id' => $instance->id,
+                        'collector_id' => $collector->id,
+                        'display_name' => $instance->id,
+                        'account_id' => $instance->deploy_data['logic_monitor_account_id'],
+                        'ip_address' => $floatingIp->getIPAddress(),
+                        'snmp_community' => 'public',
+                        'platform' => $instance->platform,
+                        'username' => $logicMonitorCredentials->username,
+                        'password' => $logicMonitorCredentials->password,
+                    ]));
 
-                $deviceId = $response->getId();
-                $deploy_data = $instance->deploy_data;
-                $deploy_data['logic_monitor_device_id'] = $deviceId;
-                $instance->deploy_data = $deploy_data;
-                $instance->save();
+                    $deviceId = $response->getId();
+                    $deploy_data = $instance->deploy_data;
+                    $deploy_data['logic_monitor_device_id'] = $deviceId;
+                    $instance->deploy_data = $deploy_data;
+                    $instance->save();
+                } catch (ApiException $exception) {
+                    $this->error('Failed register instance ' . $instance->id . ' device on monitoring API:  ' . print_r($exception->getErrors(), true));
+                }
             } else {
                 $deviceId = 'test-test-test-test';
             }
