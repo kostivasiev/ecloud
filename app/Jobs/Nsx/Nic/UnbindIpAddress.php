@@ -47,7 +47,7 @@ class UnbindIpAddress extends TaskJob
             ]
         );
 
-        $nic->ipAddresses()->detach($ipAddresses);
+        $nic->ipAddresses()->detach($ipAddress);
 
         $this->info('Address binding removed for ' . $nic->id . ' (' . $nic->mac_address . ') with IP ' . $ipAddress->ip_address);
     }
