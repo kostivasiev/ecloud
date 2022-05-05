@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands\LogicMonitor;
 
-use App\Jobs\NetworkPolicy\AllowLogicMonitor;
 use App\Jobs\Router\CreateCollectorRules;
 use App\Jobs\Router\CreateSystemPolicy;
 use App\Models\V2\Credential;
@@ -16,6 +15,7 @@ use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Services\V2\PasswordService;
 use App\Support\Sync;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Log;
@@ -41,7 +41,13 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      */
     protected $description = 'Command description';
 
-    private Task $task;
+    public function __construct(
+        public int $updated = 0,
+        public int $failed = 0,
+        public int $skipped = 0
+    ) {
+        parent::__construct();
+    }
 
     /**
      * Execute the console command.
@@ -73,14 +79,30 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $instances = Instance::withoutTrashed()->with('availabilityZone')->with('vpc')->get();
 
         foreach ($instances as $instance) {
-            // check if device is registered, if so then skip
+            // Check if fIP assigned, if not then skip
+            $floatingIp = FloatingIp::where(function ($query) use ($instance) {
+                $query->whereIn('resource_id', $instance->nics()->pluck('id'));
+                $query->orWhereIn('resource_id', IpAddress::whereHas('nics', function ($query) use ($instance) {
+                    $query->whereIn('id', $instance->nics()->pluck('id'));
+                    $query->where('type', IpAddress::TYPE_DHCP);
+                })->pluck('id'));
+            })->first();
+
+            if (empty($floatingIp)) {
+                $this->info('No floating IP assigned to the instance, skipping');
+                $this->skipped++;
+                continue;
+            }
+
+            // Check if device is registered, if so then skip
             $device = $adminMonitoringClient->devices()->getAll([
                 'reference_type' => 'server',
                 'reference_id:eq' => $instance->id
             ]);
             if (!empty($device)) {
                 $this->info('Device ' . $instance->id . ' is already registered, skipping');
-                break;
+                $this->skipped++;
+                continue;
             }
 
             // check if LM creds exist, if not create
@@ -93,7 +115,8 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
 
             if ($collectorsPage->totalItems() < 1) {
                 $this->error('Failed to load logic monitor collector for availability zone ' . $availabilityZone->id);
-                break;
+                $this->failed++;
+                continue;
             }
 
             $collector = $collectorsPage->getItems()[0];
@@ -102,13 +125,15 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                 ->where('username', 'lm.' . $instance->id)
                 ->first();
             if (empty($logicMonitorCredentials)) {
-                if (!($logicMonitorCredentials = $this->createLMCredentials($instance))) {
-                    $this->error('Logic Monitor account is not creatable', [
-                        'instance' => $instance->id
-                    ]);
-                    break;
+                $this->info('No logic monitor credentials found for instance ' . $instance->id);
+
+                $logicMonitorCredentials = $this->createLMCredentials($instance);
+                if ($logicMonitorCredentials === false) {
+                    $this->failed++;
+                    continue;
                 }
             }
+
             // check account exists for customer, if not then create
             $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
             if (!empty($accounts)) {
@@ -122,67 +147,57 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                     break;
                 }
 
-                $response = $adminMonitoringClient->accounts()->createEntity(new Account([
-                    'name' => $customer->name
-                ]));
+                if (!$this->option('test-run')) {
+                    $response = $adminMonitoringClient->accounts()->createEntity(new Account([
+                        'name' => $customer->name
+                    ]));
 
-                $id = $response->getId();
+                    $id = $response->getId();
+                } else {
+                    $id = 'test-test-test-test';
+                }
+
                 $this->saveLogicMonitorAccountId($id, $instance);
                 $this->info('Logic Monitor account ' . $id . ' created for instance : ' . $instance->id);
             }
-            // check if fIP assigned, if not then skip
 
-            $nics = $instance->nics();
+            if (!$this->option('test-run')) {
+                // register device
+                $response = $adminMonitoringClient->devices()->createEntity(new Device([
+                    'reference_type' => 'server',
+                    'reference_id' => $instance->id,
+                    'collector_id' => $collector->id,
+                    'display_name' => $instance->id,
+                    'account_id' => $instance->deploy_data['logic_monitor_account_id'],
+                    'ip_address' => $floatingIp->getIPAddress(),
+                    'snmp_community' => 'public',
+                    'platform' => $instance->platform,
+                    'username' => $logicMonitorCredentials->username,
+                    'password' => $logicMonitorCredentials->password,
+                ]));
 
-            $collection = FloatingIp::where(function ($query) use ($nics) {
-                $query->whereIn('resource_id', $nics->pluck('id'));
-
-                $query->orWhereIn('resource_id', IpAddress::whereHas('nics', function ($query) use ($nics) {
-                    return $query->whereIn('id', $nics->pluck('id'));
-                })->pluck('id'));
-            });
-
-dd($collection);
-
-
-
-
-
-            if (empty($instance->deploy_data['floating_ip_id'])) {
-                $this->info('No floating IP assigned to the instance, skipping');
-                break;
-            }
-            $floatingIp = FloatingIp::find($instance->deploy_data['floating_ip_id']);
-            if (!$floatingIp) {
-                $this->error('Failed to load floating IP for instance', [
-                    'instance_id' => $instance->id,
-                    'floating_ip_id' => $instance->deploy_data['floating_ip_id']
-                ]);
-                break;
+                $deviceId = $response->getId();
+                $deploy_data = $instance->deploy_data;
+                $deploy_data['logic_monitor_device_id'] = $deviceId;
+                $instance->deploy_data = $deploy_data;
+                $instance->save();
+            } else {
+                $deviceId = 'test-test-test-test';
             }
 
-            // register device
-            $response = $adminMonitoringClient->devices()->createEntity(new Device([
-                'reference_type' => 'server',
-                'reference_id' => $instance->id,
-                'collector_id' => $collector->id,
-                'display_name' => $instance->id,
-                'account_id' => $instance->deploy_data['logic_monitor_account_id'],
-                'ip_address' => $floatingIp->getIPAddress(),
-                'snmp_community' => 'public',
-                'platform' => $instance->platform,
-                'username' => $logicMonitorCredentials->username,
-                'password' => $logicMonitorCredentials->password,
-            ]));
+            $this->info('Logic Monitor device registered for instance ' . $instance->id . ' : ' . $deviceId);
+            $this->updated++;
 
-            $deploy_data = $instance->deploy_data;
-            $deploy_data['logic_monitor_device_id'] = $response->getId();
-            $instance->deploy_data = $deploy_data;
-            $instance->save();
-
-            $this->info('Logic Monitor device registered for instance ' . $instance->id . ' : ' . $deploy_data['logic_monitor_device_id']);
+            $this->line('------------------------------------');
         }
 
+        $this->line('------------------------------------');
+
+        $this->info(
+            'Total Updated: ' . $this->updated .
+            ', Total Skipped: ' . $this->skipped .
+            ', Total Failures: ' . $this->failed
+        );
 
         return 0;
     }
@@ -197,7 +212,7 @@ dd($collection);
         $deploy_data = $instance->deploy_data;
         $deploy_data['logic_monitor_account_id'] = $id;
         $instance->deploy_data = $deploy_data;
-        $this->info('Logic monitor account ID ' . $id . 'stored for instance ' . $instance->id);
+        $this->info('Logic monitor account ID ' . $id . ' stored for instance ' . $instance->id);
         if ($this->option('test-run')) {
             return true;
         }
@@ -243,7 +258,7 @@ dd($collection);
         ]);
         $task->resource()->associate($router);
         $task->save();
-        $this->info('Creating Collector_Rule firewall rule for router ' . $router->id);
+        $this->info('Creating logic monitor firewall rules for router ' . $router->id);
         if (!$this->option('test-run')) {
             dispatch(new CreateCollectorRules($task));
         }
@@ -251,7 +266,7 @@ dd($collection);
 
     /**
      * @param $instance
-     * @return Credential|bool
+     * @return Credential|false|mixed
      * @throws BindingResolutionException
      */
     private function createLMCredentials($instance)
@@ -259,9 +274,7 @@ dd($collection);
         $guestAdminCredential = $instance->getGuestAdminCredentials();
 
         if (!$guestAdminCredential) {
-            $message = get_class($this) . ' : Failed for ' . $instance->id . ', no admin credentials found';
-            Log::error($message);
-
+            $this->error('Failed to create logic monitor credentials: No admin credentials found for instance ' . $instance->id);
             return false;
         }
 
@@ -277,24 +290,32 @@ dd($collection);
         ]);
         $credential->password = $password;
 
-        $this->info('Creating LM credentials for instance ' . $instance->id);
+        $this->info('Creating logic monitor credentials for instance ' . $instance->id);
         if (!$this->option('test-run')) {
             $credential->save();
         }
 
         if (!$this->option('test-run')) {
-            $instance->availabilityZone->kingpinService()->post(
-                '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
-                [
-                    'json' => [
-                        'targetUsername' => $username,
-                        'targetPassword' => $credential->password,
-                        'targetSudo' => $sudo,
-                        'username' => $guestAdminCredential->username,
-                        'password' => $guestAdminCredential->password,
-                    ],
-                ]
-            );
+            try {
+                $instance->availabilityZone->kingpinService()->post(
+                    '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
+                    [
+                        'json' => [
+                            'targetUsername' => $username,
+                            'targetPassword' => $credential->password,
+                            'targetSudo' => $sudo,
+                            'username' => $guestAdminCredential->username,
+                            'password' => $guestAdminCredential->password,
+                        ],
+                    ]
+                );
+            } catch (\Exception $exception) {
+                $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
+                    $exception->getResponse()->getBody()->getContents() :
+                    $exception->getMessage();
+                $this->error('Failed to create logic monitor credentials on instance: ' . $message);
+                return false;
+            }
         }
 
         return $credential;
