@@ -60,8 +60,19 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $networks = Network::withoutTrashed()->with('router')->with('router.vpc')->get();
 
         foreach ($networks as $network) {
-            $router = $network->router;
-            $vpc = $network->router->vpc;
+            $router = $network?->router;
+
+            if (empty($router)) {
+                $this->error('Failed to load router for network ' . $network->id);
+                continue;
+            }
+
+            $vpc = $router?->vpc;
+
+            if (empty($vpc)) {
+                $this->error('Failed to load VPC for router ' . $router->id);
+                continue;
+            }
 
             $this->createSystemPolicy($router);
 
