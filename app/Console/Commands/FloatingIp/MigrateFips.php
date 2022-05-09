@@ -17,13 +17,23 @@ class MigrateFips extends Command
             ->each(function ($floatingIp) {
                 $this->info('Processing floating ip ' . $floatingIp->id);
                 $nic = $floatingIp->resource;
-
-                $ipAddress = $nic->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first();
-                if (!$this->option('test-run')) {
-                    $floatingIp->resource()->associate($ipAddress);
-                    $floatingIp->save();
+                try {
+                    $ipAddress = $nic->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first();
+                    if (!$this->option('test-run')) {
+                        $floatingIp->resource()->associate($ipAddress);
+                        $floatingIp->save();
+                    }
+                    $this->info('Floating Ip ' . $floatingIp->id . ' associated with ' . $ipAddress->id);
+                } catch (\Exception $e) {
+                    $this->info(
+                        sprintf(
+                            'Floating Ip %s failed to associate with %s with error: %s',
+                            $floatingIp->id,
+                            isset($ipAddress) ? $ipAddress->id : 0,
+                            $e->getMessage(),
+                        )
+                    );
                 }
-                $this->info('Floating Ip ' . $floatingIp->id . ' associated with ' . $ipAddress->id);
             });
     }
 }
