@@ -10,6 +10,12 @@ class CreateNics extends TaskJob
 {
     use AwaitResources;
 
+    public function __construct($task)
+    {
+        parent::__construct($task);
+        $this->tries = 180;
+    }
+
     /**
      * Create a new NIC on the lb's instances if the supplied network doesn't have a NIC already
      * @return void
