@@ -59,6 +59,11 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         AccountAdminClient $accountAdminClient
     ) {
         foreach (Router::all() as $router) {
+            if (empty($router->vpc)) {
+                $this->warn('Failed to load VPC for router: ' . $router->id . ', skipping');
+                continue;
+            }
+
             $message = 'Syncing router ' . $router->id;
             if (!$this->option('test-run')) {
                 try {
