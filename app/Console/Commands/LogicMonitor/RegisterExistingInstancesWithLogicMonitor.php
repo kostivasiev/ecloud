@@ -6,6 +6,7 @@ use App\Jobs\Router\CreateCollectorRules;
 use App\Jobs\Router\CreateSystemPolicy;
 use App\Models\V2\Credential;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
@@ -58,42 +59,42 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         MonitoringAdminClient $adminMonitoringClient,
         AccountAdminClient $accountAdminClient
     ) {
-        foreach (Router::all() as $router) {
-            if (empty($router->vpc)) {
-                $this->warn('Failed to load VPC for router: ' . $router->id . ', skipping');
-                continue;
-            }
-
-            $message = 'Syncing router ' . $router->id;
-            if (!$this->option('test-run')) {
-                try {
-                    $task = $router->syncSave();
-                    $message .= ', task id:' . $task->id;
-                    $this->info($message);
-                } catch (\Exception $exception) {
-                    $this->error('Failed to sync router ' . $router->id . ':' . $exception->getMessage());
-                }
-            } else {
-                $this->info($message);
-            }
-
-            foreach ($router->networks as $network) {
-                if (!empty($network->networkPolicy)) {
-                    $message = 'Syncing network policy ' . $network->networkPolicy->id;
-                    if (!$this->option('test-run')) {
-                        try {
-                            $task = $network->networkPolicy->syncSave();
-                            $message .= ', task id:' . $task->id;
-                            $this->info($message);
-                        } catch (\Exception $exception) {
-                            $this->error('Failed to sync network policy ' . $network->networkPolicy->id . ':' . $exception->getMessage());
-                        }
-                    } else {
-                        $this->info($message);
-                    }
-                }
-            }
-        }
+//        foreach (Router::all() as $router) {
+//            if (empty($router->vpc)) {
+//                $this->warn('Failed to load VPC for router: ' . $router->id . ', skipping');
+//                continue;
+//            }
+//
+//            $message = 'Syncing router ' . $router->id;
+//            if (!$this->option('test-run')) {
+//                try {
+//                    $task = $router->syncSave();
+//                    $message .= ', task id:' . $task->id;
+//                    $this->info($message);
+//                } catch (\Exception $exception) {
+//                    $this->error('Failed to sync router ' . $router->id . ':' . $exception->getMessage());
+//                }
+//            } else {
+//                $this->info($message);
+//            }
+//
+//            foreach ($router->networks as $network) {
+//                if (!empty($network->networkPolicy)) {
+//                    $message = 'Syncing network policy ' . $network->networkPolicy->id;
+//                    if (!$this->option('test-run')) {
+//                        try {
+//                            $task = $network->networkPolicy->syncSave();
+//                            $message .= ', task id:' . $task->id;
+//                            $this->info($message);
+//                        } catch (\Exception $exception) {
+//                            $this->error('Failed to sync network policy ' . $network->networkPolicy->id . ':' . $exception->getMessage());
+//                        }
+//                    } else {
+//                        $this->info($message);
+//                    }
+//                }
+//            }
+//        }
 
         $this->line('------------------------------------');
 
@@ -245,53 +246,6 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         return $instance->save();
     }
 
-//    /**
-//     * @param $router
-//     */
-//    private function createSystemPolicy($router): void
-//    {
-//        $task = new Task([
-//            'name' => 'create_system_policy',
-//            'job' => CreateSystemPolicy::class
-//        ]);
-//        $task->resource()->associate($router);
-//        $task->save();
-//
-//        $this->info('Creating System policy for router ' . $router->id);
-//        if (!$this->option('test-run')) {
-//            dispatch(new CreateSystemPolicy($task));
-//        }
-//    }
-
-//    private function createNetworkRules($networkPolicy): void
-//    {
-//        $rules = config('defaults.network_policy.rules');
-//
-//        foreach ($rules as $rule) {
-//            if ($networkPolicy->networkRules()->where('name', $rule['name'])->count() < 1) {
-//                $this->info('Creating network rule ' . $rule['name'] . ' for network policy ' . $networkPolicy->id);
-//                $networkRule = new NetworkRule($rule);
-//                if (!$this->option('test-run')) {
-//                    $networkPolicy->networkRules()->save($networkRule);
-//                }
-//            }
-//        }
-//    }
-
-//    private function createFirewallRules($router): void
-//    {
-//        $task = new Task([
-//            'name' => 'create_collector_rules',
-//            'job' => CreateCollectorRules::class
-//        ]);
-//        $task->resource()->associate($router);
-//        $task->save();
-//        $this->info('Creating logic monitor firewall rules for router ' . $router->id);
-//        if (!$this->option('test-run')) {
-//            dispatch(new CreateCollectorRules($task));
-//        }
-//    }
-
     /**
      * @param $instance
      * @return Credential|false|mixed
@@ -325,18 +279,32 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
 
         if (!$this->option('test-run')) {
             try {
-                $instance->availabilityZone->kingpinService()->post(
-                    '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
-                    [
-                        'json' => [
-                            'targetUsername' => $username,
-                            'targetPassword' => $credential->password,
-                            'targetSudo' => $sudo,
-                            'username' => $guestAdminCredential->username,
-                            'password' => $guestAdminCredential->password,
-                        ],
-                    ]
-                );
+                if ($instance->platform == Image::PLATFORM_LINUX) {
+                    $instance->availabilityZone->kingpinService()->post(
+                        '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/linux/user',
+                        [
+                            'json' => [
+                                'targetUsername' => $username,
+                                'targetPassword' => $credential->password,
+                                'targetSudo' => $sudo,
+                                'username' => $guestAdminCredential->username,
+                                'password' => $guestAdminCredential->password,
+                            ],
+                        ]
+                    );
+                } else {
+                    $instance->availabilityZone->kingpinService()->post(
+                        '/api/v2/vpc/' . $instance->vpc->id . '/instance/' . $instance->id . '/guest/windows/user',
+                        [
+                            'json' => [
+                                'targetUsername' => $username,
+                                'targetPassword' => $credential->password,
+                                'username' => $guestAdminCredential->username,
+                                'password' => $guestAdminCredential->password,
+                            ],
+                        ]
+                    );
+                }
             } catch (\Exception $exception) {
                 $message = ($exception instanceof RequestException && $exception->hasResponse()) ?
                     $exception->getResponse()->getBody()->getContents() :
