@@ -18,7 +18,7 @@ class Command extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         if (config('app.env') === 'production') {
-            $testMode = $this->options()['test-run'] ?? false;
+            $testMode = $this->options()['test-run'] ?? $this->options()['dry-run'] ?? false;
 
             if (!$testMode && !$this->confirm('Are you sure you want to run without test-run')) {
                 die();
