@@ -10,6 +10,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkRule;
+use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Services\V2\PasswordService;
 use App\Support\Sync;
@@ -57,33 +58,31 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         MonitoringAdminClient $adminMonitoringClient,
         AccountAdminClient $accountAdminClient
     ) {
-        $networks = Network::withoutTrashed()->with('router')->with('router.vpc')->get();
-
-        foreach ($networks as $network) {
-            if (!empty($network->router)) {
-                $message = 'Syncing router ' . $network->router->id;
-                if (!$this->option('test-run')) {
-                    try {
-                        $task = $network->router->syncSave();
-                        $message .= ', task id:' . $task->id;
-                    } catch (\Exception $exception) {
-                        $this->error('Failed to sync router ' . $network->router->id . ':' . $exception->getMessage());
-                    }
+        foreach (Router::all() as $router) {
+            $message = 'Syncing router ' . $router->id;
+            if (!$this->option('test-run')) {
+                try {
+                    $task = $router->syncSave();
+                    $message .= ', task id:' . $task->id;
+                } catch (\Exception $exception) {
+                    $this->error('Failed to sync router ' . $router->id . ':' . $exception->getMessage());
                 }
-                $this->info($message);
             }
+            $this->info($message);
 
-            if (!empty($network->networkPolicy)) {
-                $message = 'Syncing network policy ' . $network->networkPolicy->id;
-                if (!$this->option('test-run')) {
-                    try {
-                        $task = $network->networkPolicy->syncSave();
-                        $message .= ', task id:' . $task->id;
-                    } catch (\Exception $exception) {
-                        $this->error('Failed to sync network policy ' . $network->networkPolicy->id . ':' . $exception->getMessage());
+            foreach ($router->networks as $network) {
+                if (!empty($network->networkPolicy)) {
+                    $message = 'Syncing network policy ' . $network->networkPolicy->id;
+                    if (!$this->option('test-run')) {
+                        try {
+                            $task = $network->networkPolicy->syncSave();
+                            $message .= ', task id:' . $task->id;
+                        } catch (\Exception $exception) {
+                            $this->error('Failed to sync network policy ' . $network->networkPolicy->id . ':' . $exception->getMessage());
+                        }
                     }
+                    $this->info($message);
                 }
-                $this->info($message);
             }
         }
 
