@@ -5,7 +5,7 @@ namespace App\Console\Commands\Billing;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class ProductCreate extends Command
 {

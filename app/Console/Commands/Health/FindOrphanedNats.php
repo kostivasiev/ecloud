@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Health;
 
 use App\Models\V2\Nat;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Carbon;
 
 class FindOrphanedNats extends Command

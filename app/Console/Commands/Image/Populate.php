@@ -7,7 +7,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
 use App\Models\V2\ImageParameter;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use UKFast\Admin\Devices\AdminClient;
 
 class Populate extends Command

@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Health;
 
 use App\Models\V2\Nic;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Carbon;
 
 class FindOrphanedNics extends Command

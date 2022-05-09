@@ -4,7 +4,7 @@ namespace App\Console\Commands\FloatingIp;
 
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Nat;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\Log;
 
 class SetPolymorphicRelationship extends Command

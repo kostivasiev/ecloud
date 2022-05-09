@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Task;
 
 use App\Models\V2\Task;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 

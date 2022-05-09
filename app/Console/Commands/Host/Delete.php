@@ -5,7 +5,7 @@ namespace App\Console\Commands\Host;
 
 use App\Models\V2\Host;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 /**
  * Class Delete

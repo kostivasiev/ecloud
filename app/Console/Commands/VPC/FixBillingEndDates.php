@@ -3,7 +3,7 @@ namespace App\Console\Commands\VPC;
 
 use App\Models\V2\BillingMetric;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Symfony\Component\Console\Command\Command as CommandResponse;
 
 class FixBillingEndDates extends Command

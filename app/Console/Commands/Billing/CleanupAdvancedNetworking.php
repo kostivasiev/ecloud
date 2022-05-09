@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Billing;
 
 use App\Models\V2\Vpc;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class CleanupAdvancedNetworking extends Command
 {

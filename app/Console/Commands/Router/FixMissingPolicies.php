@@ -4,7 +4,7 @@ namespace App\Console\Commands\Router;
 
 use App\Models\V2\Router;
 use App\Tasks\Vpc\CreateManagementInfrastructure;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class FixMissingPolicies extends Command
 {

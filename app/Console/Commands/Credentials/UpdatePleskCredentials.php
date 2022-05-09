@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Credentials;
 
 use App\Models\V2\Credential;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class UpdatePleskCredentials extends Command
 {

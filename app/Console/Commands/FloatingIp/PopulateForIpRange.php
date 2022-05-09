@@ -5,7 +5,7 @@ namespace App\Console\Commands\FloatingIp;
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Vpc;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 

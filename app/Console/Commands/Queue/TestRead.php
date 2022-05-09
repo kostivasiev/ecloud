@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Queue;
 
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\Redis;
 
 class TestRead extends Command

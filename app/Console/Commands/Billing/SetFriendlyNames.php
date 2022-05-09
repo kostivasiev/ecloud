@@ -4,7 +4,7 @@ namespace App\Console\Commands\Billing;
 
 use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 

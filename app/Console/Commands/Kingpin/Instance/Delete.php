@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Kingpin\Instance;
 
 use App\Models\V2\Instance;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 /**
  * Class Delete

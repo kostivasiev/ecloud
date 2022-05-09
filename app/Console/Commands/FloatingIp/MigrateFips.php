@@ -3,7 +3,7 @@ namespace App\Console\Commands\FloatingIp;
 
 use App\Models\V2\FloatingIp;
 use App\Models\V2\IpAddress;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class MigrateFips extends Command
 {

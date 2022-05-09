@@ -5,7 +5,7 @@ namespace App\Console\Commands\Router;
 use App\Events\V2\Router\Creating;
 use App\Listeners\V2\Router\DefaultRouterThroughput;
 use App\Models\V2\Router;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\Log;
 
 class SetDefaultBilling extends Command

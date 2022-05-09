@@ -8,7 +8,7 @@ use App\Models\V2\DiscountPlan;
 use App\Models\V2\Product;
 use App\Models\V2\Vpc;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use UKFast\Admin\Account\AdminClient as AccountAdminClient;
 use UKFast\Admin\Billing\AdminClient as BillingAdminClient;
 use UKFast\Admin\Billing\Entities\Payment;

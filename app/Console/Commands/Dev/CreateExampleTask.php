@@ -4,7 +4,7 @@ namespace App\Console\Commands\Dev;
 
 use App\Models\V2\Instance;
 use App\Tasks\ExampleTask\ExampleTask;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 

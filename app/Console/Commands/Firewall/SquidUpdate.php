@@ -8,7 +8,7 @@ use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRulePort;
 use App\Models\V2\Router;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class SquidUpdate extends Command
 {
