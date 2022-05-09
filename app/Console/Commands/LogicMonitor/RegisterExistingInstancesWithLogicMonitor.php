@@ -64,11 +64,13 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                 try {
                     $task = $router->syncSave();
                     $message .= ', task id:' . $task->id;
+                    $this->info($message);
                 } catch (\Exception $exception) {
                     $this->error('Failed to sync router ' . $router->id . ':' . $exception->getMessage());
                 }
+            } else {
+                $this->info($message);
             }
-            $this->info($message);
 
             foreach ($router->networks as $network) {
                 if (!empty($network->networkPolicy)) {
@@ -77,11 +79,13 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                         try {
                             $task = $network->networkPolicy->syncSave();
                             $message .= ', task id:' . $task->id;
+                            $this->info($message);
                         } catch (\Exception $exception) {
                             $this->error('Failed to sync network policy ' . $network->networkPolicy->id . ':' . $exception->getMessage());
                         }
+                    } else {
+                        $this->info($message);
                     }
-                    $this->info($message);
                 }
             }
         }
