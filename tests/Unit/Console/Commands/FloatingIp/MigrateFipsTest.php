@@ -31,7 +31,6 @@ class MigrateFipsTest extends TestCase
 
     public function testSuccessfulChange()
     {
-//        $this->markTestSkipped('Command scheduled for removal');
         $this->assertEquals('nic', $this->floatingIp()->resource_type);
 
         $this->job->handle();
@@ -40,10 +39,10 @@ class MigrateFipsTest extends TestCase
             Nic::class,
             [
                 'id' => $this->nic()->id,
-                'ip_address' => null,
             ],
             'ecloud'
         );
+
         $this->floatingIp()->refresh();
 
         $this->assertNotEquals('nic', $this->floatingIp()->resource_type);
