@@ -1,13 +1,11 @@
 <?php
 namespace Tests\V2\Console\Commands\LogicMonitor;
 
-use App\Jobs\Router\CreateCollectorRules;
-use App\Jobs\Router\CreateSystemPolicy;
 use App\Models\V2\Credential;
 use App\Models\V2\IpAddress;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
-use Queue;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Admin\Monitoring\AdminClient;
 use UKFast\Admin\Monitoring\AdminDeviceClient;
@@ -25,6 +23,8 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
 
     public function testCommandDispatchesJobsForFirewallAndNetworkPolicies()
     {
+        Event::fake([\App\Events\V2\Task\Created::class]);
+
         // Admin Account Client
         app()->bind(\UKFast\Admin\Account\AdminClient::class, function () {
             $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
@@ -32,14 +32,12 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
             return $mockAccountAdminClient;
         });
 
-        Queue::fake();
-
         $this->artisan('lm:register-all-instances')
             ->assertExitCode(Command::SUCCESS);
 
-        // Assert the job was pushed to the queue
-        Queue::assertPushed(CreateSystemPolicy::class);
-        Queue::assertPushed(CreateCollectorRules::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testCommandRegistersInstancesLogicMonitorSuccess()
@@ -135,15 +133,14 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
                 new Response(200)
             );
 
-        // Fake the queue
-        Queue::fake();
+        Event::fake([\App\Events\V2\Task\Created::class]);
 
         $this->artisan('lm:register-all-instances')
             ->assertExitCode(Command::SUCCESS);
 
-        // Assert the job was pushed to the queue
-        Queue::assertPushed(CreateSystemPolicy::class);
-        Queue::assertPushed(CreateCollectorRules::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 
     public function testNoFloatingIpSkips()
@@ -169,14 +166,13 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
             return $mockAccountAdminClient;
         });
 
-        // Fake the queue
-        Queue::fake();
+        Event::fake([\App\Events\V2\Task\Created::class]);
 
         $this->artisan('lm:register-all-instances')
             ->assertExitCode(Command::SUCCESS);
 
-        // Assert the job was pushed to the queue
-        Queue::assertPushed(CreateSystemPolicy::class);
-        Queue::assertPushed(CreateCollectorRules::class);
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
     }
 }
