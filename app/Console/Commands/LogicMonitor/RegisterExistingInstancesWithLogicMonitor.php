@@ -60,20 +60,28 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
         $networks = Network::withoutTrashed()->with('router')->with('router.vpc')->get();
 
         foreach ($networks as $network) {
-            if ($network->router->exists()) {
+            if (!empty($network->router)) {
                 $message = 'Syncing router ' . $network->router->id;
                 if (!$this->option('test-run')) {
-                    $task = $network->router->syncSave();
-                    $message .= ', task id:' . $task->id;
+                    try {
+                        $task = $network->router->syncSave();
+                        $message .= ', task id:' . $task->id;
+                    } catch (\Exception $exception) {
+                        $this->error('Failed to sync router ' . $network->router->id . ':' . $exception->getMessage());
+                    }
                 }
                 $this->info($message);
             }
 
-            if ($network->networkPolicy->exists()) {
+            if (!empty($network->networkPolicy)) {
                 $message = 'Syncing network policy ' . $network->networkPolicy->id;
                 if (!$this->option('test-run')) {
-                    $task = $network->networkPolicy->syncSave();
-                    $message .= ', task id:' . $task->id;
+                    try {
+                        $task = $network->networkPolicy->syncSave();
+                        $message .= ', task id:' . $task->id;
+                    } catch (\Exception $exception) {
+                        $this->error('Failed to sync network policy ' . $network->networkPolicy->id . ':' . $exception->getMessage());
+                    }
                 }
                 $this->info($message);
             }
