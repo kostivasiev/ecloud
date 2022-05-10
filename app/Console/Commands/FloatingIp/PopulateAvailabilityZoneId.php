@@ -3,7 +3,7 @@
 namespace App\Console\Commands\FloatingIp;
 
 use App\Models\V2\FloatingIp;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class PopulateAvailabilityZoneId extends Command
 {

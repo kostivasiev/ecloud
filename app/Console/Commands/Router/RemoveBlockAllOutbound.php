@@ -6,7 +6,7 @@ use App\Models\V2\FirewallRule;
 use App\Models\V2\Network;
 use App\Models\V2\NetworkRule;
 use App\Models\V2\Router;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class RemoveBlockAllOutbound extends Command
 {

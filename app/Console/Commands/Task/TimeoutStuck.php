@@ -3,20 +3,20 @@
 namespace App\Console\Commands\Task;
 
 use App\Models\V2\Task;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class TimeoutStuck extends Command
 {
-    protected $signature = 'task:timeout-stuck {--hours=12} {--dry-run}';
+    protected $signature = 'task:timeout-stuck {--hours=12} {--test-run}';
 
     protected $description = 'Times out tasks stuck "in-progress"';
 
     public function handle()
     {
         $hours = $this->option('hours');
-        $dryRun = $this->option('dry-run');
+        $dryRun = $this->option('test-run');
         $tasks = Task::query()->whereNull("failure_reason")
                                 ->where('completed', '=', '0')
                                 ->where('updated_at', '<=', Carbon::now()->addHours(-$hours))
@@ -26,7 +26,7 @@ class TimeoutStuck extends Command
         foreach ($tasks as $task) {
             $success = false;
             if ($dryRun) {
-                $this->info("[DRY RUN] Marking task {$task->id} as failed");
+                $this->info("[TEST RUN] Marking task {$task->id} as failed");
             } else {
                 $msg = "Marking task {$task->id} as failed";
                 Log::warning($msg, ['task_id' => $task->id, 'command' => 'task:timeout-stuck']);

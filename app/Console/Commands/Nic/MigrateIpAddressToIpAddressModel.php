@@ -4,7 +4,7 @@ namespace App\Console\Commands\Nic;
 
 use App\Models\V2\IpAddress;
 use App\Models\V2\Nic;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\Cache;
 
 class MigrateIpAddressToIpAddressModel extends Command

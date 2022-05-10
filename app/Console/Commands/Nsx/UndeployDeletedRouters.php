@@ -4,7 +4,7 @@ namespace App\Console\Commands\Nsx;
 
 use App\Models\V2\Router;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class UndeployDeletedRouters extends Command
 {

@@ -6,7 +6,7 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Product;
 use App\Models\V2\ProductPrice;
 use App\Models\V2\RouterThroughput;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class ProductPopulation extends Command
 {

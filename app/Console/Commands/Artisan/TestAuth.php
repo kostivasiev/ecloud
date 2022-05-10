@@ -4,7 +4,7 @@ namespace App\Console\Commands\Artisan;
 
 use App\Models\V2\AvailabilityZone;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class TestAuth extends Command
 {

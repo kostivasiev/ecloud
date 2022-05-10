@@ -4,7 +4,7 @@ namespace App\Console\Commands\Orchestrator;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\Log;
 
 class ScheduledDeploy extends Command

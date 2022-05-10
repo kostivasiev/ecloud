@@ -3,7 +3,7 @@
 namespace App\Console\Commands\Router;
 
 use App\Models\V2\Router;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Str;
 
 class FixEdgeClusters extends Command

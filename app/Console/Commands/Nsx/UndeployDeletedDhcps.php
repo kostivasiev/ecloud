@@ -4,7 +4,7 @@ namespace App\Console\Commands\Nsx;
 use App\Models\V2\Dhcp;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\Log;
 
 class UndeployDeletedDhcps extends Command

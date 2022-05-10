@@ -16,7 +16,7 @@ use App\Models\V2\Task;
 use App\Services\V2\PasswordService;
 use App\Support\Sync;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Log;
 use UKFast\Admin\Account\AdminClient as AccountAdminClient;

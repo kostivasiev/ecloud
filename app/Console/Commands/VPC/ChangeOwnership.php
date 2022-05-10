@@ -6,7 +6,7 @@ use App\Models\V2\AvailabilityZoneable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
 use Carbon\Carbon;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Console\Command\Command as CommandResponse;
 

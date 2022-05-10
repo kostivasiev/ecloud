@@ -4,7 +4,7 @@ namespace App\Console\Commands\Billing;
 
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Vpc;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 

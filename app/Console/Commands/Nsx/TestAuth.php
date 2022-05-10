@@ -5,7 +5,7 @@ namespace App\Console\Commands\Nsx;
 use App\Models\V2\AvailabilityZone;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class TestAuth extends Command
 {

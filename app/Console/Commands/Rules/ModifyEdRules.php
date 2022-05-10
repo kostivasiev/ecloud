@@ -4,7 +4,7 @@ namespace App\Console\Commands\Rules;
 
 use App\Models\V2\FirewallRule;
 use App\Models\V2\NetworkRule;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class ModifyEdRules extends Command
 {

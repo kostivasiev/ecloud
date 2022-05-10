@@ -4,7 +4,7 @@ namespace App\Console\Commands\FirewallPolicy;
 
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\Router;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 class ApplyDefaultRules extends Command
 {

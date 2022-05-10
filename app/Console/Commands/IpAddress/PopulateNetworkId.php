@@ -3,7 +3,7 @@
 namespace App\Console\Commands\IpAddress;
 
 use App\Models\V2\IpAddress;
-use Illuminate\Console\Command;
+use App\Console\Commands\Command;
 
 /**
  * Class PopulateNetworkId
