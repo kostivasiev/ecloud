@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 
 class FindOrphanedNats extends Command
 {
-    protected $signature = 'health:find-orphaned-nats';
+    protected $signature = 'health:find-orphaned-nats {--F|force}';
 
     protected $description = 'Finds orphaned NAT records';
 

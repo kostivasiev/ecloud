@@ -69,23 +69,23 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         if ($this->app->environment() == 'production') {
-            $schedule->command('vpc:process-billing --debug')
+            $schedule->command('vpc:process-billing --debug --force')
                 ->monthlyOn(1, '01:00')
                 ->emailOutputTo(config('alerts.billing.to'));
                 
-            $schedule->command('orchestrator:deploy')
+            $schedule->command('orchestrator:deploy --force')
                 ->everyMinute();
 
-            $schedule->command('health:find-orphaned-nats')
+            $schedule->command('health:find-orphaned-nats --force')
                 ->dailyAt("09:00")
                 ->emailOutputOnFailure(config('alerts.health.to'));
 
-            $schedule->command('health:find-orphaned-nics')
+            $schedule->command('health:find-orphaned-nics --force')
                 ->dailyAt("09:00")
                 ->emailOutputOnFailure(config('alerts.health.to'));
         }
 
-        $schedule->command('task:timeout-stuck --hours=12')
+        $schedule->command('task:timeout-stuck --hours=12 --force')
             ->hourly();
     }
 }

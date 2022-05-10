@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class TimeoutStuck extends Command
 {
-    protected $signature = 'task:timeout-stuck {--hours=12} {--test-run}';
+    protected $signature = 'task:timeout-stuck {--hours=12} {--test-run} {--F|force}';
 
     protected $description = 'Times out tasks stuck "in-progress"';
 

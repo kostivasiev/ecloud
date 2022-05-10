@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 
 class FindOrphanedNics extends Command
 {
-    protected $signature = 'health:find-orphaned-nics';
+    protected $signature = 'health:find-orphaned-nics {--F|force}';
 
     protected $description = 'Finds orphaned NIC records';
 

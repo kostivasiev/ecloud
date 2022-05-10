@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class ScheduledDeploy extends Command
 {
-    protected $signature = 'orchestrator:deploy {--D|debug} {--T|test-run}';
+    protected $signature = 'orchestrator:deploy {--D|debug} {--T|test-run} {--F|force}';
     protected $description = 'Scheduled Orchestration Deployments';
 
     public \DateTimeZone $timeZone;
