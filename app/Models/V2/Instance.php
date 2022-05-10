@@ -141,6 +141,13 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
             ->first();
     }
 
+    public function getGuestSupportCredentials(): ?Credential
+    {
+        return $this->credentials()
+            ->where('username', config('instance.guest_support_username.' . strtolower($this->platform)))
+            ->first();
+    }
+
     public function image()
     {
         return $this->belongsTo(Image::class);

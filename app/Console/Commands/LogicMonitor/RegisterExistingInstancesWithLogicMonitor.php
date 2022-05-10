@@ -264,10 +264,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      */
     private function createLMCredentials($instance)
     {
-        $guestSupportCredential = $instance->credentials()
-            ->where('username', 'ukfastsupport')
-            ->first();
-
+        $guestSupportCredential = $instance->getGuestSupportCredentials();
         if (!$guestSupportCredential) {
             $this->error('Failed to create logic monitor credentials: No support credentials found for instance ' . $instance->id);
             return false;
