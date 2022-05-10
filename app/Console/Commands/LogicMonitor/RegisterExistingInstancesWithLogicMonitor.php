@@ -33,7 +33,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      *
      * @var string
      */
-    protected $signature = 'lm:register-all-instances {--T|test-run}';
+    protected $signature = 'lm:register-all-instances {--T|test-run} {--instance=}';
 
     /**
      * The console command description.
@@ -41,6 +41,8 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      * @var string
      */
     protected $description = 'Command description';
+
+    protected ?string $optInstance;
 
     public function __construct(
         public int $updated = 0,
@@ -97,8 +99,17 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
 //        }
 
         $this->line('------------------------------------');
+        $this->optInstance = $this->option('instance');
 
-        $instances = Instance::withoutTrashed()->with('availabilityZone')->with('vpc')->get();
+        $instances = Instance::withoutTrashed()
+            ->where(function ($query) {
+                if ($this->optInstance) {
+                    $query->where('id', '=', $this->optInstance);
+                }
+            })
+            ->with('availabilityZone')
+            ->with('vpc')
+            ->get();
 
         foreach ($instances as $instance) {
             // Check if fIP assigned, if not then skip
@@ -253,10 +264,12 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
      */
     private function createLMCredentials($instance)
     {
-        $guestAdminCredential = $instance->getGuestAdminCredentials();
+        $guestSupportCredential = $instance->credentials()
+            ->where('username', 'ukfastsupport')
+            ->first();
 
-        if (!$guestAdminCredential) {
-            $this->error('Failed to create logic monitor credentials: No admin credentials found for instance ' . $instance->id);
+        if (!$guestSupportCredential) {
+            $this->error('Failed to create logic monitor credentials: No support credentials found for instance ' . $instance->id);
             return false;
         }
 
@@ -287,8 +300,8 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                                 'targetUsername' => $username,
                                 'targetPassword' => $credential->password,
                                 'targetSudo' => $sudo,
-                                'username' => $guestAdminCredential->username,
-                                'password' => $guestAdminCredential->password,
+                                'username' => $guestSupportCredential->username,
+                                'password' => $guestSupportCredential->password,
                             ],
                         ]
                     );
@@ -299,8 +312,8 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                             'json' => [
                                 'targetUsername' => $username,
                                 'targetPassword' => $credential->password,
-                                'username' => $guestAdminCredential->username,
-                                'password' => $guestAdminCredential->password,
+                                'username' => $guestSupportCredential->username,
+                                'password' => $guestSupportCredential->password,
                             ],
                         ]
                     );

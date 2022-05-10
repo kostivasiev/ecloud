@@ -46,7 +46,7 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
         // Create an instance to test with
         $this->credential = $this->instanceModel()->credentials()->save(
             Credential::factory()->create([
-                'username' => config('instance.guest_admin_username.linux'),
+                'username' => 'ukfastsupport',
             ])
         );
 
@@ -175,5 +175,34 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
 //        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
 //            return $event->model->name == 'sync_update';
 //        });
+    }
+
+    public function testCommandWorksWithSpecifiedInstance()
+    {
+        // Create an instance to test with
+        $this->credential = $this->instanceModel()->credentials()->save(
+            Credential::factory()->create([
+                'username' => config('instance.guest_admin_username.linux'),
+            ])
+        );
+
+        // Admin Monitoring Client
+        app()->bind(AdminClient::class, function () {
+            $mockAdminMonitoringClient = \Mockery::mock(AdminClient::class);
+            $mockAdminMonitoringClient->shouldNotReceive('devices->getAll'); // NOT!
+            return $mockAdminMonitoringClient;
+        });
+
+        // Admin Account Client
+        app()->bind(\UKFast\Admin\Account\AdminClient::class, function () {
+            $mockAccountAdminClient = \Mockery::mock(\UKFast\Admin\Account\AdminClient::class);
+            $mockAccountAdminClient->shouldNotReceive('customers->getById');
+            return $mockAccountAdminClient;
+        });
+
+        Event::fake([\App\Events\V2\Task\Created::class]);
+
+        $this->artisan('lm:register-all-instances --instance=' . $this->instanceModel()->id)
+            ->assertExitCode(Command::SUCCESS);
     }
 }
