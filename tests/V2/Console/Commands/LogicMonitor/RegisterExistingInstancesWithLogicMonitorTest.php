@@ -125,7 +125,7 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
                         'targetUsername' => 'lm.' . $this->instanceModel()->id,
                         'targetPassword' => 'somepassword',
                         'targetSudo' => false,
-                        'username' => 'root',
+                        'username' => 'ukfastsupport',
                         'password' => 'somepassword'
                     ]
                 ]
