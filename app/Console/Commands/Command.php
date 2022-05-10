@@ -29,5 +29,7 @@ class Command extends BaseCommand
         } else {
             return parent::execute($input, $output);
         }
+
+        return self::FAILURE;
     }
 }
