@@ -60,6 +60,6 @@ class AffinityRuleController extends BaseController
         $model = AffinityRule::forUser($request->user())->findOrFail($affinityRuleId);
 
         $task = $model->syncDelete();
-        return $this->responseTaskId($task->id);
+        return $this->responseTaskId($task->id, 204);
     }
 }

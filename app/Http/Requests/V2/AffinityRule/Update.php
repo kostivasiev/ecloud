@@ -12,6 +12,7 @@ class Update extends FormRequest
         return [
             'name' => 'sometimes|nullable|string|max:255',
             'type' => [
+                'sometimes',
                 'required',
                 'string',
                 Rule::in(['affinity', 'anti-affinity']),
