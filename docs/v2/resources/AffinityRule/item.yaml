@@ -32,6 +32,8 @@ patch:
                   readOnly: true
                 vpc_id:
                   readOnly: true
+                type:
+                  readOnly: true
   responses:
     202:
       $ref: '../../resources/AffinityRule/responses/idResponse.yaml'

@@ -17,6 +17,11 @@ properties:
     required: true
     example: 'az-2b66bb79'
     readOnly : false
+  type:
+    type: string
+    required: true
+    example: 'anti-affinity'
+    readOnly: false
   sync :
     type : object
     readOnly : true
