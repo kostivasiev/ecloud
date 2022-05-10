@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
  */
 class ProcessBilling extends Command
 {
-    protected $signature = 'vpc:process-billing {--current-month} {--D|debug} {--T|test-run} {--reseller=}';
+    protected $signature = 'vpc:process-billing {--current-month} {--D|debug} {--T|test-run} {--reseller=} {--F|force}';
     protected $description = 'Process eCloud VPC Billing';
 
     protected \DateTimeZone $timeZone;

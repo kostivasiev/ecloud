@@ -19,12 +19,13 @@ class Command extends BaseCommand
     {
         if (config('app.env') === 'production') {
             $testMode = $this->options()['test-run'] ?? false;
+            $force = $this->options()['force'] ?? false;
 
-            if (!$testMode && !$this->confirm('Are you sure you want to run without test-run')) {
-                die();
+            if ($force || (!$testMode && $this->confirm('Are you sure you want to run without test-run'))) {
+                return parent::execute($input, $output);
             }
+        } else {
+            return parent::execute($input, $output);
         }
-
-        return parent::execute($input, $output);
     }
 }
