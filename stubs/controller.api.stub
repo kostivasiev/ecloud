@@ -1,0 +1,65 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ rootNamespace }}Http\Controllers\Controller;
+use Illuminate\Http\Request;
+
+class {{ class }} extends BaseController
+{
+    public function index()
+    {
+        $collection = Model::forUser($request->user()); // @todo Change model
+
+        // @todo Change resource
+        return ModelResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
+    }
+
+    // @todo change $modelId to url parameter
+    public function show(Request $request, string $modelId)
+    {
+    // @todo change resource and model references
+        return new ModelResource(
+            Model::forUser($request->user())->findOrFail($modelId)
+        );
+    }
+
+    // @todo correct the form request class
+    public function store(Create $request)
+    {
+        // @todo change the model reference
+        $model = app()->make(Model::class);
+        $model->fill($request->only([
+        ])); // @todo add the columns
+
+        $task = $model->syncSave();
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
+    }
+
+    // @todo correct the form request class and change $modelId to url parameter
+    public function update(Update $request, string $modelId)
+    {
+        // @todo change the model reference and change $modelId
+        $model = Model::forUser($request->user())->findOrFail($modelId);
+        $model->update($request->only([
+        ]));
+
+        $task = $model->syncSave();
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
+    }
+
+    // @todo change $modelId to url parameter
+    public function destroy(Request $request, string $modelId)
+    {
+        // @todo change the model reference and change $modelId
+        $model = Model::forUser($request->user())->findOrFail($modelId);
+
+        $task = $model->syncDelete();
+        return $this->responseTaskId($task->id);
+    }
+}

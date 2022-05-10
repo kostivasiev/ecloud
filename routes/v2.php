@@ -642,6 +642,14 @@ Route::group([
         });
     });
 
+    Route::group([], function () {
+        Route::get('affinity-rules', 'AffinityRuleController@index');
+        Route::get('affinity-rules/{affinityRuleId}', 'AffinityRuleController@show');
+        Route::post('affinity-rules', 'AffinityRuleController@store');
+        Route::patch('affinity-rules/{affinityRuleId}', 'AffinityRuleController@update');
+        Route::delete('affinity-rules/{affinityRuleId}', 'AffinityRuleController@destroy');
+    });
+
     /** Load Balancer Network */
     Route::group(['middleware' => 'is-admin'], function () {
         Route::get('load-balancer-networks', 'LoadBalancerNetworkController@index');
