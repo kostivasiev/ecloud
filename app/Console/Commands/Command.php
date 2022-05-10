@@ -23,6 +23,8 @@ class Command extends BaseCommand
 
             if ($force || (!$testMode && $this->confirm('Are you sure you want to run without test-run'))) {
                 return parent::execute($input, $output);
+            } elseif ($testMode) {
+                return parent::execute($input, $output);
             }
         } else {
             return parent::execute($input, $output);
