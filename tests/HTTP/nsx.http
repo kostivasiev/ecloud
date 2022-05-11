@@ -1,0 +1,525 @@
+### Referance NAT Rule
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/nat/USER/nat-rules/Reference_1_to_1_NAT_DNAT
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Referance Firewall Policy
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/Copy_of_ingress
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Referance Firewall Policy Rule
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/Copy_of_ingress/rules/b4822a80-eea7-11ea-bf67-554bdcb2dfaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Dev Router
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Dev Network
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Dev Network
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entity?realized_path=/infra/tier-1s/rtr-aaaaaaaa/segments/net-c43f11d0
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Dev Network creation
+PUT https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-aaaaaaab
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "type": "ROUTED",
+    "subnets": [
+        {
+            "gateway_address": "10.0.2.1/24",
+            "dhcp_config": {
+                "resource_type": "SegmentDhcpV4Config",
+                "server_address": "10.0.2.2/24",
+                "lease_time": 604800,
+                "dns_servers": [
+                    "81.201.138.244",
+                    "94.229.163.244"
+                ]
+            },
+            "network": "10.0.2.0/24"
+        }
+    ],
+    "domain_name": "ecloud.ukfast",
+    "connectivity_path": "/infra/tier-1s/rtr-aaaaaaaa",
+    "advanced_config": {
+        "address_pool_paths": [],
+        "hybrid": false,
+        "inter_router": false,
+        "local_egress": false,
+        "connectivity": "ON"
+    },
+    "dhcp_config_path": "/infra/dhcp-server-configs/dhcp-8035a626",
+    "admin_state": "UP",
+    "replication_mode": "MTEP",
+    "resource_type": "Segment",
+    "id": "net-aaaaaaaa",
+    "display_name": "net-aaaaaaaa",
+    "tags": [
+        {
+            "scope": "ukfast",
+            "tag": "vpc-aaaaaaaa"
+        }
+    ],
+    "path": "/infra/tier-1s/rtr-aaaaaaaa/segments/net-c43f11d0",
+    "relative_path": "net-c43f11d0",
+    "parent_path": "/infra/tier-1s/rtr-aaaaaaaa",
+    "unique_id": "cc074cc4-cc85-44b2-a2af-7c76862ffcc9",
+    "marked_for_delete": false,
+    "overridden": false,
+    "_system_owned": false,
+    "_create_user": "ecloud.api@ecloudgov.dev",
+    "_create_time": 1606915151008,
+    "_last_modified_user": "ecloud.api@ecloudgov.dev",
+    "_last_modified_time": 1607953301778,
+    "_protection": "NOT_PROTECTED"
+}
+
+### Firewall Policy Rule
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/fwp-aaaaaaaa/rules/fwr-edea0c4f
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-76bf77cb/segments/net-54c46e3d/state
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-80b3981e
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-80b3981e
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/?include_mark_for_delete_objects=true
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/dhcp-server-configs/?include_mark_for_delete_objects=true
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/nat/USER/nat-rules/?include_mark_for_delete_objects=true
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+###
+
+GET https://185.197.63.88/policy/api/v1/infra/qos-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entities?intent_path=/infra/domains/default/gateway-policies/fwp-df3f063e
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entity?realized_path=/infra/realized-state/enforcement-points/default/logical-ports/rtr-aaaaaaaa-net-49648e59-dlrp
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entities?intent_path=/infra/domains/default/gateway-policies/fwp-df3f063e
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/realized-entity?realized_path=/infra/realized-state/enforcement-points/default/logical-ports/rtr-aaaaaaaa-net-49648e59-dlrp
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-06e080ef
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/domains/default/gateway-policies/fwp-c6e4e1bd/rules/fwr-ad7adf8e
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Router Throughput QoS profiles
+GET https://185.197.63.88/policy/api/v1/infra/gateway-qos-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Router Throughput QoS profiles search. Search Query: resource_type = GatewayQosProfile & committed_bandwitdth = 500 & burst_size = 1024000000
+GET https://185.197.63.88/policy/api/v1/search/query?query=resource_type:GatewayQosProfile%20AND%20committed_bandwitdth:20%20AND%20burst_size:2048000
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/tier-1s/rtr-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/tier-1s/rtr-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Search AZ default T0
+GET https://185.197.63.88/policy/api/v1/search/query?query=resource_type:Tier0%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/groups
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/np-5470ba95
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/aaa/effective-permissions?feature_name=policy_grouping&object_path=/infra/domains/default/groups/ptest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/search/query?query=resource_type:Group
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/realized-state/status?intent_path=/infra/domains/default/security-policies/np-9d0b08c0
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/np-acb5a46d
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/?include_mark_for_delete_objects=truee
+GET https://185.197.63.88/policy/api/v1/search/query?query=path:/infra/domains/default/security-policies/np-5470ba95
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-18bb0f21
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get a list of TransportZones
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportZone%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-overlay-tz
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get a list of UplinkHostSwitchProfiles
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:UplinkHostSwitchProfile%20AND%20tags.scope:ukfast%20AND%20tags.tag:default-uplink-profile
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get a list of transport-node-profiles
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportNodeProfile
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get a list of transport-node-profiles
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportNodeProfile%20AND%20display_name:tnp-hg-c6568cf7
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### /api/v1/transport-node-collections
+GET https://185.197.63.88/api/v1/transport-node-collections
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Transport Node Profiles
+GET https://185.197.63.88/api/v1/transport-node-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Compute Collections
+GET https://185.197.63.88/api/v1/fabric/compute-collections?origin_type=VC_Cluster&display_name=hg-leef9000
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get transport node collection
+GET https://185.197.63.88/api/v1/transport-node-collections?compute_collection_id=e8040fd9-c4d2-4435-a1c8-0d8ee6b2fc84:domain-c23210
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Reference default network policy rules
+GET https://185.197.63.88/policy/api/v1/infra/domains/default/security-policies/Reference_for_catchall_rule
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+
+
+
+
+
+
+
+
+
+### Get the UUID of a Host / Transport node
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:TransportNode%20AND%20display_name:172.19.0.57
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+###
+GET https://185.197.63.88/api/v1/ns-groups?member_types=TransportNode
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+###
+GET https://185.197.63.88/api/v1/ns-groups/fc23f2fc-6a45-4dc7-90d2-64db975c1527
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+### GET the ns-groups that have the host as a member
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:NSGroup%20AND%20members.value:ebe3adf5-c920-4442-b7fb-573e28d543c1
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-fd91d1dd-dev/locale-services/rtr-fd91d1dd-dev/ipsec-vpn-services?include_mark_for_delete_objects=true'
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+
+### Create VPN Service
+PATCH https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-timtest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVpnService",
+    "enabled": true
+}
+
+### GET VPN Services - ffad7a64-9e54-4dd7-a2db-00f6d1abf5a4
+GET https://185.197.63.88/api/v1/vpn/ipsec/services
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### GET VPN Service
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Delete VPN Service
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-timtest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Get Local Endpoint
+GET https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+POST https://185.197.63.88/api/v1/vpn/ipsec/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVPNLocalEndpoint",
+    "display_name": "timtest-vpn-local-endpoint",
+    "local_address": "203.0.113.76",
+    "local_id": "203.0.113.76",
+    "ipsec_vpn_service_id": {
+        "target_id": "04d4c278-113f-4d95-ade7-650aec147645",
+        "target_type": "IPSecVpnService"
+    },
+    "trust_ca_ids": [],
+    "trust_crl_ids": []
+}
+
+
+### Delete VPN Service
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-0481248c-dev/locale-services/rtr-0481248c-dev/ipsec-vpn-services/vpn-404e4e11-dev
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Create VPN Endpoint
+PATCH https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints/vpne-paultest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "IPSecVpnLocalEndpoint",
+    "display_name": "paultest-vpn-local-endpoint",
+    "local_address": "203.0.113.76"
+}
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints/vpne-paultest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints/vpne-paultest
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/locale-services/rtr-aaaaaaaa/ipsec-vpn-services/vpn-aaaaaaaa/local-endpoints?include_mark_for_delete_objects=true
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+### Reference VPN session
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services/Reference_IPSec_Service/summary
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services/Reference_IPSec_Service/sessions
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/Reference_T1/locale-services/default/ipsec-vpn-services/Reference_IPSec_Service/sessions/fd4af901-8d1e-49d9-ae46-3a98ef3d8c99/detailed-status
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+### DEV VPN session
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### List Local Endpoints for t1 / VPN service
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services/vpn-10a8ad0a-dev/local-endpoints
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services/vpn-10a8ad0a-dev/sessions
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### LIst IkE profiles
+GET https://185.197.63.88/policy/api/v1/infra/ipsec-vpn-ike-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### LIst DPD profiles
+GET https://185.197.63.88/policy/api/v1/infra/ipsec-vpn-dpd-profiles
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### LIst IPSec Tunnel profiles
+GET https://185.197.63.88/policy/api/v1/infra/ipsec-vpn-tunnel-profiles/nsx-default-l3vpn-tunnel-profile
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+
+### Create VPN Session
+### See: https://185.197.63.88/policy/api_includes/method_CreateOrPatchTier1IPSecVpnSession.html
+PATCH https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services/vpn-10a8ad0a-dev/sessions/vpns-paul-test
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "resource_type": "PolicyBasedIPSecVpnSession",
+    "authentication_mode": "PSK",
+    "psk": "qwertyuiop",
+    "display_name": "Pauls Test VPN Session",
+    "dpd_profile_path": "/infra/ipsec-vpn-dpd-profiles/nsx-default-l3vpn-dpd-profile",
+    "ike_profile_path": "/infra/ipsec-vpn-ike-profiles/Unifi_USG",
+    "tunnel_profile_path": "/infra/ipsec-vpn-tunnel-profiles/Unifi_USG",
+    "local_endpoint_path": "/infra/tier-1s/rtr-4b02a884-dev/locale-services/rtr-4b02a884-dev/ipsec-vpn-services/vpn-10a8ad0a-dev/local-endpoints/vpne-f7fc468a-dev",
+    "peer_address": "86.21.40.165",
+    "peer_id": "86.21.40.165",
+    "rules": [
+        {
+            "id": "vpns-paul-test-custom-rule-1",
+            "sources": [
+                {
+                    "subnet": "10.0.0.0/24"
+                }
+            ],
+            "destinations": [
+                {
+                    "subnet": "10.0.3.0/24"
+                }
+            ],
+            "resource_type": "IPSecVpnRule"
+        }
+    ]
+}
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-097208b5/dhcp-static-binding-configs/blah
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+
+###
+PATCH https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-097208b5/ports/test
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+{
+    "address_bindings": [
+        { "ip_address":"1.1.1.1", "mac_address":"aa:bb:cc:dd:ee:ff" },
+        { "ip_address":"1.1.1.2", "mac_address":"aa:bb:cc:dd:ee:ff" }
+    ]
+}
+
+###
+GET https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-097208b5/ports/test
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+###
+DELETE https://185.197.63.88/policy/api/v1/infra/tier-1s/rtr-aaaaaaaa/segments/net-097208b5/ports/test
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+
+
+
+### Get Edge Clusters
+GET https://185.197.63.88/api/v1/edge-clusters
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Search AZ for an edge cluster by tag (az-default or az-advancedNetworking)
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:EdgeCluster%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-default
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json
+
+### Search AZ for an edge cluster by tag (az-default or az-advancedNetworking)
+GET https://185.197.63.88/api/v1/search/query?query=resource_type:EdgeCluster%20AND%20tags.scope:ukfast%20AND%20tags.tag:az-advancedNetworking
+Authorization: Basic {{nsx_username}} {{nsx_password}}
+Content-Type:  application/json

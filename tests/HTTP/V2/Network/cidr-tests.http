@@ -1,0 +1,183 @@
+###
+# Get Router
+GET https://{{host}}/{{version}}/routers?per_page=1&sort=created_at:desc
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.global.set('router_id', response.body.data[0].id);
+client.log('Router ID: ' + response.body.data[0].id);
+%}
+
+###
+# Create a network with small subnet
+POST https://{{host}}/{{version}}/networks
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "cidr-tests",
+    "router_id": "{{router_id}}",
+    "subnet": "192.168.0.0/16"
+}
+
+> {%
+client.test("Test 192.168.0.0/16 is disallowed", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[1].detail === "The subnet is in a restricted CIDR range", "Error message not found");
+});
+%}
+
+###
+# Create a network with small subnet
+POST https://{{host}}/{{version}}/networks
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "cidr-tests",
+    "router_id": "{{dev_router_id}}",
+    "subnet": "10.0.0.1/30"
+}
+
+> {%
+client.test("Test with a small subnet range", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[1].detail === "The subnet network size is too small and must be larger than /30", "Error message not found");
+});
+%}
+
+###
+# Create a network with duplicate subnet
+POST https://{{host}}/{{version}}/networks
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "cidr-tests",
+    "router_id": "{{dev_router_id}}",
+    "subnet": "10.0.0.1/24"
+}
+
+> {%
+client.test("Test existing cidr cannot be reused", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[0].detail === "The subnet is already assigned to another network", "Error message not found");
+});
+%}
+
+###
+# Create a network with public subnet
+POST https://{{host}}/{{version}}/networks
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "cidr-tests",
+    "router_id": "{{dev_router_id}}",
+    "subnet": "208.97.176.25/24"
+}
+
+> {%
+client.test("Test existing cidr cannot be reused", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[0].detail === "The subnet must be a private CIDR range", "Error message not found");
+});
+%}
+
+###
+# Create a network with overlapping subnet
+POST https://{{host}}/{{version}}/networks
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "cidr-tests",
+    "router_id": "{{dev_router_id}}",
+    "subnet": "10.0.0.1/30"
+}
+
+> {%
+client.test("Test existing cidr cannot be reused", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[0].detail === "The subnet must not overlap an existing CIDR range", "Error message not found");
+});
+%}
+
+###
+# Update a network with small subnet
+PATCH https://{{host}}/{{version}}/networks/net-0c140ffc
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "subnet": "10.0.0.1/30"
+}
+
+> {%
+client.test("Test with a small subnet range", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[0].detail === "The subnet network size is too small and must be larger than /30", "Error message not found");
+});
+%}
+
+###
+# Update a network with duplicate subnet
+PATCH https://{{host}}/{{version}}/networks/net-0c140ffc
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "subnet": "10.0.0.0/24"
+}
+
+> {%
+client.test("Test existing cidr cannot be reused", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[0].detail === "The subnet is already assigned to another network", "Error message not found");
+});
+%}
+
+###
+# Update a network with public subnet
+PATCH https://{{host}}/{{version}}/networks/net-0c140ffc
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "subnet": "208.97.176.25/24"
+}
+
+> {%
+client.test("Test existing cidr cannot be reused", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[0].detail === "The subnet must be a private CIDR range", "Error message not found");
+});
+%}
+
+###
+# Update a network with public subnet
+PATCH https://{{host}}/{{version}}/networks/net-0c140ffc
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "subnet": "10.0.0.0/30"
+}
+
+> {%
+client.test("Test existing cidr cannot be reused", function () {
+    client.assert(response.status === 422, "Response was not 422");
+    client.assert(response.body.errors[0].detail === "The subnet must not overlap an existing CIDR range", "Error message not found");
+});
+%}

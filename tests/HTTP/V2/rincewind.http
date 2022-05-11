@@ -1,0 +1,61 @@
+####
+#POST https://{{host}}/{{version}}/regions
+#X-consumer-custom-id:  0-0
+#X-consumer-groups:  ecloud.read, ecloud.write
+#Content-Type:  application/json
+#
+#{
+#  "name": "Test Region - Pete"
+#}
+#
+#> {%
+#client.global.set('region_id', response.body.data.id);
+#client.log('Region UUID: ' + response.body.data.id);
+#%}
+#
+####
+#POST https://{{host}}/{{version}}/availability-zones
+#X-consumer-custom-id:  0-0
+#X-consumer-groups:  ecloud.read, ecloud.write
+#Content-Type:  application/json
+#
+#{
+#  "code": "MAN1",
+#  "name": "Test AZ - Pete",
+#  "datacentre_site_id": 111,
+#  "region_id": "{{region_id}}"
+#}
+#
+#> {%
+#client.global.set('availability_zone_id', response.body.data.id);
+#client.log('Availability Zone UUID: ' + response.body.data.id);
+#%}
+#
+####
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test VPC - test default router throughput",
+  "region_id": "{{dev_region_id}}",
+  "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC UUID: ' + response.body.data.id);
+%}
+
+###
+POST https://{{host}}/{{version}}/vpcs/{{vpc_id}}/deploy-defaults
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
+###

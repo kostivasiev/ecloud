@@ -1,0 +1,87 @@
+###
+# Test without filtering
+GET https://{{host}}/{{version}}/networks
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Test network collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+###
+# Test with filtering for vpc-aaaaaaaa (should be larger number of results)
+GET https://{{host}}/{{version}}/networks?vpc_id:eq=vpc-aaaaaaaa
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Test network collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.meta.pagination.count > 5);
+});
+%}
+
+###
+# Test filtering with only one result
+GET https://{{host}}/{{version}}/networks?vpc_id:eq=vpc-402d7565
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Test network collection', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.meta.pagination.count === 1);
+});
+%}
+###
+
+###
+GET https://{{host}}/{{version}}/networks?vpc_id:lk=vpc-fa7cbc35
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].vpc_id === "vpc-fa7cbc35", "Incorrect vpc_id filtering");
+});
+%}
+###
+
+GET https://{{host}}/{{version}}/networks?vpc_id:lk=vpc-fa7*
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].vpc_id === "vpc-fa7cbc35", "Incorrect vpc_id filtering");
+});
+%}
+
+###
+
+GET https://{{host}}/{{version}}/networks?vpc_id:nlk=vpc-aaa*
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data[0].vpc_id != "vpc-aaaaaaaa", "Incorrect vpc_id filtering");
+});
+%}

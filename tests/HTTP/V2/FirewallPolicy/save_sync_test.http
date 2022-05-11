@@ -1,0 +1,83 @@
+### Create firewall policy
+POST https://{{host}}/{{version}}/firewall-policies
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Sync Test",
+  "sequence": 10,
+  "router_id": "{{dev_router_id}}"
+}
+
+> {%
+client.global.set('firewall_policy_id', response.body.data.id);
+client.log('Firewall Policy ID: ' + response.body.data.id);
+%}
+
+### Check sync is "complete" after job(s) have ran
+GET https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### Create Firewall Rule for above policy
+POST https://{{host}}/{{version}}/firewall-rules
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "Sync Test Rule",
+    "sequence": 10,
+    "firewall_policy_id": "{{firewall_policy_id}}",
+    "action": "ALLOW",
+    "direction": "IN",
+    "enabled": true,
+    "ports": [
+        {
+           "protocol": "UDP"
+        },
+        {
+           "protocol": "TCP",
+           "source": "443",
+           "destination": "555"
+        }
+    ]
+}
+
+> {%
+client.global.set('rule_id', response.body.data.id);
+client.log('Rule ID: ' + response.body.data.id);
+%}
+
+### Check sync is "complete" again after job(s) have ran
+GET https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### Delete rule - Has no effect on the sync of a policy since it deletes the rule directly
+DELETE https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### Delete policy
+DELETE https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}

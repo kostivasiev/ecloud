@@ -1,0 +1,105 @@
+POST https://{{host}}/{{version}}/firewall-rule-ports
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "firewall_rule_id": "{{dev_firewall_rule_id}}",
+    "protocol": "TCP",
+    "source": "333",
+    "destination": "444"
+}
+
+> {%
+client.global.set('firewall_rule_port_id', response.body.data.id);
+client.log('firewall_rule_port_id: ' + response.body.data.id);
+%}
+###
+
+GET https://{{host}}/{{version}}/firewall-rule-ports
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+
+GET https://{{host}}/{{version}}/firewall-rules/{{dev_firewall_rule_id}}/ports
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+###
+
+
+GET https://{{host}}/{{version}}/firewall-rule-ports/{{firewall_rule_port_id}}
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.name === client.global.get('firewall_rule_port_id'));
+  client.assert(response.body.data.firewall_rule_id === 'fwr-aaaaaaaa');
+  client.assert(response.body.data.source === "111");
+  client.assert(response.body.data.destination === "222");
+
+});
+%}
+###
+
+PATCH https://{{host}}/{{version}}/firewall-rule-ports/{{firewall_rule_port_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Updated Name",
+    "protocol": "UDP",
+    "source": "555",
+    "destination": "443"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+###
+
+# Confirm PATCH
+GET https://{{host}}/{{version}}/firewall-rule-ports/{{firewall_rule_port_id}}
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.name === "Updated Name");
+  client.assert(response.body.data.protocol === "UDP");
+  client.assert(response.body.data.source === "555");
+  client.assert(response.body.data.destination === "443");
+
+});
+%}
+###
+
+# Delete firewall rule port
+DELETE https://{{host}}/{{version}}/firewall-rule-ports/{{firewall_rule_port_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}

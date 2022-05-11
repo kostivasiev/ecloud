@@ -1,0 +1,114 @@
+### 1. Create Policy
+POST https://{{host}}/{{version}}/firewall-policies
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Accept Spaces Policy",
+  "sequence": 10,
+  "router_id": "{{dev_router_id}}"
+}
+
+> {%
+client.global.set('firewall_policy_id', response.body.data.id);
+client.log('Firewall Policy ID: ' + response.body.data.id);
+%}
+
+### 2. Create Firewall Rule
+POST https://{{host}}/{{version}}/firewall-rules
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "What's in a name?",
+    "sequence": 10,
+    "firewall_policy_id": "{{firewall_policy_id}}",
+    "source": "151.22.13.11, 151.22.13.14, 151.22.13.17",
+    "destination": "192.168.0.11, 192.168.1.22",
+    "action": "ALLOW",
+    "direction": "IN",
+    "enabled": true,
+    "ports": [
+        {
+            "protocol": "TCP",
+            "source": "ANY",
+            "destination": "ANY"
+        }
+    ]
+}
+
+> {%
+client.global.set('rule_id', response.body.data.id);
+client.log('Rule ID: ' + response.body.data.id);
+%}
+
+### 3. Check Firewall Rule
+GET https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request Successful', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(/^\s*$/.test(response.body.source) === false, 'Spaces found in source');
+    client.assert(/^\s*$/.test(response.body.destination) === false, 'Spaces found in source');
+});
+%}
+
+### 4. Update Firewall Rule
+PATCH https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "source": "151.22.13.11, 151.22.13.14, 151.22.13.17",
+    "destination": "192.168.0.11, 192.168.1.22"
+}
+
+> {%
+client.test('Request successful', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 5. Check Firewall Rule
+GET https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request Successful', function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(/^\s*$/.test(response.body.source) === false, 'Spaces found in source');
+    client.assert(/^\s*$/.test(response.body.destination) === false, 'Spaces found in source');
+});
+%}
+
+### 6. Delete Firewall Rule
+DELETE https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request successful', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 7. Delete Firewall Policy
+DELETE https://{{host}}/{{version}}/firewall-policies/{{firewall_policy_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Request successful', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}

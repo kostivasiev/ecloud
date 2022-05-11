@@ -1,0 +1,157 @@
+## store
+POST https://{{host}}/{{version}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "vpc_id": "{{dev_vpc_id}}",
+  "capacity": 25,
+  "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('volume_id', response.body.data.id);
+client.log('Volume ID: ' + response.body.data.id);
+%}
+
+### index
+GET https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### show
+GET https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('volume_id'), "Incorrect resource ID returned");
+});
+%}
+
+### update - capacity
+PATCH https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test - updated",
+    "capacity": 60
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+  client.assert(response.body.data.id === client.global.get('volume_id'), "Incorrect resource ID returned");
+});
+%}
+
+### update - IOPS
+PATCH https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test - updated",
+    "iops": 300
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+  client.assert(response.body.data.id === client.global.get('volume_id'), "Incorrect resource ID returned");
+});
+%}
+
+### destroy
+DELETE https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### attach
+POST https://{{host}}/{{version}}/volumes/{{volume_id}}/attach
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "instance_id": "{{dev_instance_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### detach
+POST https://{{host}}/{{version}}/volumes/{{volume_id}}/detach
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "instance_id": "{{dev_instance_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### instances
+GET https://{{host}}/{{version}}/volumes/{{volume_id}}/instances
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('volume_id'), "Incorrect resource ID returned");
+});
+%}

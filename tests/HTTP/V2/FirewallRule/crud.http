@@ -1,0 +1,102 @@
+# Create Firewall Rule
+POST https://{{host}}/{{version}}/firewall-rules
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "name": "What's in a name?",
+    "sequence": 10,
+    "firewall_policy_id": "{{dev_firewall_policy_id}}",
+    "source": "ANY",
+    "destination": "ANY",
+    "action": "ALLOW",
+    "direction": "IN",
+    "enabled": true,
+    "ports": [
+        {
+            "protocol": "TCP",
+            "source": "ANY",
+            "destination": "ANY"
+        }
+    ]
+}
+
+> {%
+client.global.set('rule_id', response.body.data.id);
+client.log('Rule ID: ' + response.body.data.id);
+%}
+
+###
+# Get Rules Collection
+GET https://{{host}}/{{version}}/firewall-rules
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+# Get Rule Item
+GET https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.sequence === 10);
+});
+%}
+
+###
+
+# Get Rule Ports
+GET https://{{host}}/{{version}}/firewall-rules/{{rule_id}}/ports
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+###
+
+PATCH https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Updated Rule Name"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+###
+# Delete rule
+DELETE https://{{host}}/{{version}}/firewall-rules/{{rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}

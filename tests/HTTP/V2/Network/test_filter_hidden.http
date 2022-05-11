@@ -1,0 +1,31 @@
+### Query as customer
+GET https://{{host}}/{{version}}/networks
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### query as admin
+GET https://{{host}}/{{version}}/networks
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+
+
+

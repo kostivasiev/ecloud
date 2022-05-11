@@ -1,0 +1,64 @@
+###
+# Run these steps one by one
+###
+# 1. First Create a Router
+POST https://{{host}}/{{version}}/routers
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Manchester Router 1",
+  "vpc_id": "vpc-0f822684"
+}
+
+> {%
+client.global.set('router_id', response.body.data.id);
+client.log('Router UUID: ' + response.body.data.id);
+%}
+
+###
+# 2. View the router collection
+GET https://{{host}}/{{version}}/routers
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+# 3. Get detail on the router we created
+GET https://{{host}}/{{version}}/routers/{{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+# 4. Update the router we created
+PATCH https://{{host}}/{{version}}/routers/{{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Manchester Region Router 1"
+}
+
+###
+# 5. Verify the name has changed
+GET https://{{host}}/{{version}}/routers/{{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+# 6. Now delete the router
+DELETE https://{{host}}/{{version}}/routers/{{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+###
+# 7. And verify that the router is deleted
+GET https://{{host}}/{{version}}/routers/{{router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

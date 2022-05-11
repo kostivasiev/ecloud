@@ -1,0 +1,80 @@
+###
+POST https://{{host}}/{{version}}/regions
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test Region - Pete"
+}
+
+> {%
+client.global.set('region_id', response.body.data.id);
+client.log('Region UUID: ' + response.body.data.id);
+%}
+
+###
+POST https://{{host}}/{{version}}/availability-zones
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "code": "MAN1",
+  "name": "Test AZ - Pete",
+  "datacentre_site_id": 111,
+  "region_id": "{{region_id}}"
+}
+
+> {%
+client.global.set('availability_zone_id', response.body.data.id);
+client.log('Availability Zone UUID: ' + response.body.data.id);
+%}
+
+###
+POST https://{{host}}/{{version}}/vpcs
+X-consumer-custom-id:  1-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test VPC - Pete",
+  "region_id": "{{region_id}}",
+  "availability_zone_id": "{{availability_zone_id}}"
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC UUID: ' + response.body.data.id);
+%}
+
+###
+POST https://{{host}}/{{version}}/routers
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Manchester Router 1",
+  "vpc_id": "{{vpc_id}}"
+}
+
+> {%
+client.global.set('router_id', response.body.data.id);
+client.log('Router UUID: ' + response.body.data.id);
+%}
+
+###
+POST https://{{host}}/{{version}}/host-spec
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Host Spec 1"
+}
+
+> {%
+client.global.set('host_spec_id', response.body.data.id);
+client.log('Host Spec UUID: ' + response.body.data.id);
+%}

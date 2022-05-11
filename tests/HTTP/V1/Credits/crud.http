@@ -1,0 +1,14 @@
+### Get Credits
+GET https://{{host}}/v1/credits
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+X-Reseller-Id: 1
+Content-Type: application/json
+
+> {%
+client.test('Get Credits', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}

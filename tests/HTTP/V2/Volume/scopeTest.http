@@ -1,0 +1,160 @@
+## Create a volume
+POST https://{{host}}/{{version}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "Test",
+  "vpc_id": "{{dev_vpc_id}}",
+  "capacity": 25,
+  "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('volume_id', response.body.data.id);
+client.log('Volume ID: ' + response.body.data.id);
+%}
+
+### Create an instance with a volume
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{dev_vpc_id}}",
+    "name": "Test",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": false,
+    "network_id": "{{dev_network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600
+}
+
+> {%
+client.global.set("instance_id", response.body.data.id);
+client.log("Instance ID: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### index ADMIN
+GET https://{{host}}/{{version}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.filter(e => e.vpc_id == 'vpc-aaaaaaaa').length > 0, "Expected records not returned");
+});
+%}
+
+### index NOT ADMIN - OWNER
+GET https://{{host}}/{{version}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.filter(e => e.vpc_id == 'vpc-aaaaaaaa').length > 0, "Expected records not returned");
+});
+%}
+
+### index NOT ADMIN - NOT OWNER
+GET https://{{host}}/{{version}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.filter(e => e.vpc_id == 'vpc-aaaaaaaa').length == 0, "Unexpected records returned");
+});
+%}
+
+### show - ADMIN
+GET https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id == client.global.get('volume_id'), 'Incorrect records returned');
+});
+%}
+
+### show - OWNER
+GET https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id == client.global.get('volume_id'), 'Incorrect records returned');
+});
+%}
+
+### show - NOT OWNER
+GET https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-1
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 404, "Response status is not 404");
+});
+%}
+
+
+### destroy volume
+DELETE https://{{host}}/{{version}}/volumes/{{volume_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### destroy instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json

@@ -1,0 +1,114 @@
+### store
+POST https://{{host}}/{{version}}/host-groups
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+X-Reseller-Id: 1
+
+{
+    "name": "test host group",
+    "vpc_id": "{{dev_vpc_id}}",
+    "availability_zone_id" : "{{dev_availability_zone_id}}",
+    "host_spec_id" : "{{dev_host_spec_id}}",
+    "windows_enabled": true
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('host_group_id', response.body.data.id);
+client.log('Host Group ID: ' + response.body.data.id);
+%}
+
+### index
+GET https://{{host}}/{{version}}/host-groups
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### show
+GET https://{{host}}/{{version}}/host-groups/h-a9241086
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.id === client.global.get('host_group_id'), "Incorrect resource ID returned");
+  client.assert(response.body.data.name === "test host group");
+  client.assert(response.body.data.vpc_id === "vpc-aaaaaaaa");
+  client.assert(response.body.data.availability_zone_id === "az-aaaaaaaa");
+  client.assert(response.body.data.host_spec_id === "hs-aaaaaaaa");
+  client.assert(response.body.data.windows_enabled === true);
+});
+%}
+
+### update
+PATCH https://{{host}}/{{version}}/host-groups/{{host_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "name": "new name"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+###
+
+GET https://{{host}}/{{version}}/host-groups/{{host_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.body.data.name === "new name");
+});
+%}
+
+### destroy
+DELETE https://{{host}}/{{version}}/host-groups/{{host_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+###
+
+GET https://{{host}}/{{version}}/host-groups/{{host_group_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json

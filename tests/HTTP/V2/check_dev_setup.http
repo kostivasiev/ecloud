@@ -1,0 +1,107 @@
+### Make sure dev region exists
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_region_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev az exists
+GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_availability_zone_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev vpc exists
+GET https://{{host}}/{{version}}/vpcs/{{dev_vpc_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_vpc_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev router exists
+GET https://{{host}}/{{version}}/routers/{{dev_router_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_router_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev creds exists
+GET https://{{host}}/{{version}}/credentials/{{dev_credentials_kingpin_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_credentials_kingpin_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev creds exists
+GET https://{{host}}/{{version}}/credentials/{{dev_credentials_nsx_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_credentials_nsx_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev host exists
+GET https://{{host}}/{{version}}/hosts/{{dev_host_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_host_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev host spec exists
+GET https://{{host}}/{{version}}/host-specs/{{dev_host_spec_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_host_spec_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}
+
+### Make sure dev host group exists
+GET https://{{host}}/{{version}}/host-groups/{{dev_host_group_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+    client.test("Find dev_host_group_id", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}

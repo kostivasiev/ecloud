@@ -1,0 +1,55 @@
+### Creat a VIP
+POST https://{{host}}/{{version}}/vpcs
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+X-Reseller-Id: 1
+
+{
+  "region_id": "{{dev_region_id}}"
+}
+
+> {%
+client.global.set('vpc_id', response.body.data.id);
+client.log('VPC UUID: ' + response.body.data.id);
+%}
+
+### Create a floating ip
+POST https://{{host}}/{{version}}/floating-ips
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+  "vpc_id": "{{dev_vpc_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+client.global.set('fip_id', response.body.data.id);
+client.log('Floating IP ID: ' + response.body.data.id);
+%}
+
+### Delete the floating ip
+DELETE https://{{host}}/{{version}}/floating-ips/{{fip_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### Delete the VPC
+DELETE https://{{host}}/{{version}}/vpcs/{{vpc_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+X-Reseller-Id: 1
