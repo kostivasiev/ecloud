@@ -8,18 +8,14 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property $instance_id
+ */
 class Create extends FormRequest
 {
     public function rules()
     {
         return [
-            'rule_id' => [
-                'required',
-                'string',
-                'exists:ecloud.affinity_rules,id,deleted_at,NULL',
-                new ExistsForUser(AffinityRule::class),
-                new IsResourceAvailable(AffinityRule::class),
-            ],
             'instance_id' => [
                 'required',
                 'string',

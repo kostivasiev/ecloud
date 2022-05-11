@@ -10,7 +10,7 @@ class CreateTest extends TestCase
     public const RESOURCE_URI = '/v2/affinity-rules/%s/members/%s';
     public AffinityRule $affinityRule;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
         $this->affinityRule = AffinityRule::factory([

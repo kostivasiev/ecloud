@@ -652,7 +652,7 @@ Route::group([
         Route::get('/{affinityRuleId}/members', 'AffinityRuleMemberController@index');
         Route::get('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@show');
         Route::post('/{affinityRuleId}/members', 'AffinityRuleMemberController@store');
-        Route::patch('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@update');
+//        Route::patch('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@update');
         Route::delete('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@destroy');
     });
 

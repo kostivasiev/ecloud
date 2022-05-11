@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call(VpcSeeder::class);
         $this->call(RouterSeeder::class);
         $this->call(NetworkSeeder::class);
+        $this->call(InstanceSeeder::class);
     }
 }
 
