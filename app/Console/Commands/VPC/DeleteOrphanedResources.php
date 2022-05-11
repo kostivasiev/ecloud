@@ -150,8 +150,7 @@ class DeleteOrphanedResources extends Command
             })->count();
             $this->info('Total with undetermined resources on NSX: ' . $undetermined);
 
-            if ($this->confirm('Delete orphaned ' . strtolower($resourceType) . ' with no resource on NSX? (This mill mark the record deleted in the database only)',
-                true)) {
+            if ($this->confirm('Delete orphaned ' . strtolower($resourceType) . ' with no resource on NSX? (This mill mark the record deleted in the database only)', true)) {
                 $deleted = 0;
 
                 foreach ($markedForDeletion as [$id, $name, $reason, $exists]) {
