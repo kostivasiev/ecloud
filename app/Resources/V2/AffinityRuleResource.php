@@ -15,6 +15,7 @@ class AffinityRuleResource extends UKFastResource
             'vpc_id' => $this->vpc_id,
             'availability_zone_id' => $this->availability_zone_id,
             'type' => $this->type,
+            'sync' => $this->sync,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))

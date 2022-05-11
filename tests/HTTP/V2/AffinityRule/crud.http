@@ -1,0 +1,91 @@
+### 1. Create Affinity Rule
+POST https://{{host}}/{{version}}/affinity-rules
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test Rule",
+    "type": "anti-affinity",
+    "availability_zone_id": "{{dev_availability_zone_id}}",
+    "vpc_id": "{{dev_vpc_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('affinity_rule_id', response.body.data.id);
+%}
+
+### 2. Get Collection
+GET https://{{host}}/{{version}}/affinity-rules
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+    client.assert(response.body.data[0].id === client.global.get('affinity_rule_id'), 'ID was not found');
+});
+%}
+
+### 3. Get Resource
+GET https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 4. Update Resource
+PATCH https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Updated Rule"
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 5. Get Updated Resource
+GET https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+    client.assert(response.body.data.name === 'Updated Rule', 'Update was not successful');
+});
+%}
+
+### 6. Delete Resource
+DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}

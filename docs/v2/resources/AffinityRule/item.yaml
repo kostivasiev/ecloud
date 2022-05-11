@@ -1,0 +1,50 @@
+get:
+  parameters:
+    - $ref: '../../resources/AffinityRule/parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../resources/AffinityRule/schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Affinity Rules
+patch:
+  parameters:
+    - $ref: '../../resources/AffinityRule/parameters/id.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../resources/AffinityRule/schema.yaml'
+            - type : object
+              properties :
+                availability_zone_id:
+                  readOnly: true
+                vpc_id:
+                  readOnly: true
+                type:
+                  readOnly: true
+  responses:
+    202:
+      $ref: '../../resources/AffinityRule/responses/idResponse.yaml'
+  tags:
+    - Affinity Rules
+delete:
+  parameters:
+    - $ref: '../../resources/AffinityRule/parameters/id.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Affinity Rules
+
