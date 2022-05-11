@@ -642,12 +642,18 @@ Route::group([
         });
     });
 
-    Route::group([], function () {
-        Route::get('affinity-rules', 'AffinityRuleController@index');
-        Route::get('affinity-rules/{affinityRuleId}', 'AffinityRuleController@show');
-        Route::post('affinity-rules', 'AffinityRuleController@store');
-        Route::patch('affinity-rules/{affinityRuleId}', 'AffinityRuleController@update');
-        Route::delete('affinity-rules/{affinityRuleId}', 'AffinityRuleController@destroy');
+    Route::group(['prefix' => 'affinity-rules'], function () {
+        Route::get('/', 'AffinityRuleController@index');
+        Route::get('/{affinityRuleId}', 'AffinityRuleController@show');
+        Route::post('/', 'AffinityRuleController@store');
+        Route::patch('/{affinityRuleId}', 'AffinityRuleController@update');
+        Route::delete('/{affinityRuleId}', 'AffinityRuleController@destroy');
+
+        Route::get('/{affinityRuleId}/members', 'AffinityRuleMemberController@index');
+        Route::get('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@show');
+        Route::post('/{affinityRuleId}/members', 'AffinityRuleMemberController@store');
+        Route::patch('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@update');
+        Route::delete('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@destroy');
     });
 
     /** Load Balancer Network */

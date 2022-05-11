@@ -13,11 +13,11 @@ use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class AffinityRule extends Model implements Searchable, AvailabilityZoneable, VpcAble
+class AffinityRuleMember extends Model implements Searchable
 {
-    use HasFactory, CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, Syncable, Taskable;
 
-    public $keyPrefix = 'ar';
+    public $keyPrefix = 'arm';
 
     public function __construct(array $attributes = [])
     {
@@ -27,28 +27,24 @@ class AffinityRule extends Model implements Searchable, AvailabilityZoneable, Vp
 
         $this->fillable([
             'id',
-            'name',
-            'vpc_id',
-            'availability_zone_id',
-            'type',
+            'rule_id',
+            'instance_id',
         ]);
 
         parent::__construct($attributes);
     }
 
-    public function availabilityZone()
+    public function instance()
     {
-        return $this->belongsTo(AvailabilityZone::class);
+        return $this->hasOne(Instance::class);
     }
 
-    public function vpc()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function rule()
     {
-        return $this->belongsTo(Vpc::class);
-    }
-
-    public function members()
-    {
-        return $this->hasMany(AffinityRuleMember::class, 'rule_id');
+        return $this->belongsTo(AffinityRule::class, 'rule_id');
     }
 
     /**
@@ -61,7 +57,7 @@ class AffinityRule extends Model implements Searchable, AvailabilityZoneable, Vp
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('vpc', function ($query) use ($user) {
+        return $query->whereHas('rule.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }
@@ -70,10 +66,8 @@ class AffinityRule extends Model implements Searchable, AvailabilityZoneable, Vp
     {
         $sieve->configure(fn ($filter) => [
             'id' => $filter->string(),
-            'name' => $filter->string(),
-            'vpc_id' => $filter->string(),
-            'availability_zone_id' => $filter->string(),
-            'type' => $filter->string(),
+            'rule_id' => $filter->string(),
+            'instance_id' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
