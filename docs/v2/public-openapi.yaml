@@ -20,6 +20,8 @@ components:
       in: header
       name: Authorization
   schemas:
+    AffinityRule:
+      $ref: 'resources/AffinityRule/schema.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     Dhcp:
@@ -94,6 +96,8 @@ components:
   parameters:
     # DEPRECATED - don't add these directly in this file any more.
     # Path Parameters
+    AffinityRuleId:
+      $ref: 'resources/AffinityRule/parameters/id.yaml'
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     DhcpId:
@@ -166,6 +170,10 @@ components:
 #    ReferenceIdResponse:
 #      $ref: 'resources/References/responses/idResponse.yaml'
 paths:
+  '/ecloud/v2/affinity-rules':
+    $ref: 'resources/AffinityRule/collection.yaml'
+  '/ecloud/v2/affinity-rules/{AffinityRuleId}':
+    $ref: 'resources/AffinityRule/item.yaml'
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
