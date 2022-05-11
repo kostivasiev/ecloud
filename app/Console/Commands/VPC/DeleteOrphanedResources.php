@@ -2,11 +2,11 @@
 
 namespace App\Console\Commands\VPC;
 
+use App\Console\Commands\Command;
 use App\Models\V2\AvailabilityZoneable;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
 use GuzzleHttp\Exception\ClientException;
-use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 
 class DeleteOrphanedResources extends Command
@@ -36,14 +36,18 @@ class DeleteOrphanedResources extends Command
             return [$item->id => $item];
         });
 
-        $this->processDeletion($routers, 'vpc');
+        if ($routers->count() > 0) {
+            $this->processDeletion($routers, 'vpc');
+        }
 
         $networks = Network::with(['router' => fn($q) => $q->withTrashed()])
             ->get()->mapWithKeys(function ($item) {
                 return [$item->id => $item];
             });
 
-        $this->processDeletion($networks, 'router');
+        if ($networks->count() > 0) {
+            $this->processDeletion($networks, 'router');
+        }
 
         return 0;
     }
@@ -151,7 +155,7 @@ class DeleteOrphanedResources extends Command
                 $deleted = 0;
 
                 foreach ($markedForDeletion as [$id, $name, $reason, $exists]) {
-                    if ($exists === false) {
+                    if ($exists === 'No') {
                         $this->info('Deleting ' . $id);
                         if (!$this->option('test-run')) {
                             $resources->get($id)->delete();
