@@ -22,5 +22,9 @@ return [
     'guest_admin_username' => [
         'windows' => env('GUEST_ADMIN_USERNAME_WINDOWS', 'graphite.rack'),
         'linux' => env('GUEST_ADMIN_USERNAME_LINUX', 'root')
+    ],
+    'guest_support_username' => [
+        'windows' => env('GUEST_SUPPORT_USERNAME_WINDOWS', 'ukfast.support'),
+        'linux' => env('GUEST_SUPPORT_USERNAME_LINUX', 'ukfastsupport')
     ]
 ];
