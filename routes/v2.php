@@ -90,7 +90,6 @@ Route::group([
         Route::get('networks/{networkId}/tasks', 'NetworkController@tasks');
         Route::post('networks', 'NetworkController@create');
         Route::patch('networks/{networkId}', 'NetworkController@update');
-        Route::delete('networks/{networkId}', 'NetworkController@destroy');
         Route::delete('networks/{networkId}', [
             'middleware' => 'can-be-deleted:' . \App\Models\V2\Network::class   . ',networkId',
             'uses' => 'NetworkController@destroy'
