@@ -40,8 +40,8 @@ class DeleteOrphanedResources extends Command
 
         $networks = Network::with(['router' => fn($q) => $q->withTrashed()])
             ->get()->mapWithKeys(function ($item) {
-            return [$item->id => $item];
-        });
+                return [$item->id => $item];
+            });
 
         $this->processDeletion($networks, 'router');
 
@@ -54,7 +54,7 @@ class DeleteOrphanedResources extends Command
      * @param string $parent
      * @return void
      */
-    protected function processDeletion(Iterable $resources, string $parent): void
+    protected function processDeletion(iterable $resources, string $parent): void
     {
         $resourceType = Str::plural(Str::afterLast($resources->first()::class, '\\'));
 
@@ -67,7 +67,7 @@ class DeleteOrphanedResources extends Command
                 continue;
             }
 
-            $existsOnNsx = false;
+            $existsOnNsx = 'No';
             $reason = null;
 
             // Has no tasks
@@ -89,24 +89,24 @@ class DeleteOrphanedResources extends Command
                             Network::class => 'policy/api/v1/infra/tier-1s/' . $resource?->router?->id . '/segments/' . $resource->id,
                         };
 
-                       switch ($resource::class) {
-                           case Network::class:
-                               if (empty($resource->$parent)) {
-                                   $existsOnNsx = 'Unknown - No soft deleted parent record found';
-                               } else {
-                                   $resource->availabilityZone->nsxService()->get($endpoint);
-                                   $existsOnNsx = 'Yes';
-                               }
-                               break;
-                           case Router::class:
-                               $resource->availabilityZone->nsxService()->get($endpoint);
-                               $existsOnNsx = 'Yes';
-                               break;
-                       }
+                        switch ($resource::class) {
+                            case Network::class:
+                                if (empty($resource->$parent)) {
+                                    $existsOnNsx = 'Unknown - No soft deleted parent record found';
+                                } else {
+                                    $resource->availabilityZone->nsxService()->get($endpoint);
+                                    $existsOnNsx = 'Yes';
+                                }
+                                break;
+                            case Router::class:
+                                $resource->availabilityZone->nsxService()->get($endpoint);
+                                $existsOnNsx = 'Yes';
+                                break;
+                        }
                     } catch (ClientException $e) {
                         if ($e->hasResponse() && $e->getResponse()->getStatusCode() != 404) {
                             $reason = null;
-                            $skipped[] = [$resource->id, $resource->name,  $e->getMessage()];
+                            $skipped[] = [$resource->id, $resource->name, $e->getMessage()];
                         }
                     }
                 }
@@ -146,7 +146,8 @@ class DeleteOrphanedResources extends Command
             })->count();
             $this->info('Total with undetermined resources on NSX: ' . $undetermined);
 
-            if ($this->confirm('Delete orphaned ' . strtolower($resourceType) . ' with no resource on NSX? (This mill mark the record deleted in the database only)', true)) {
+            if ($this->confirm('Delete orphaned ' . strtolower($resourceType) . ' with no resource on NSX? (This mill mark the record deleted in the database only)',
+                true)) {
                 $deleted = 0;
 
                 foreach ($markedForDeletion as [$id, $name, $reason, $exists]) {
