@@ -11,6 +11,7 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
@@ -186,6 +187,19 @@ class Network extends Model implements Searchable, ResellerScopeable, Availabili
     {
         return $this->getSubnet()->getNetworkPrefix();
     }
+
+    public function loadBalancers(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            LoadBalancer::class,
+            LoadBalancerNetwork::class,
+            'network_id',
+            'id',
+            'id',
+            'load_balancer_id',
+        );
+    }
+
 
     public function sieve(Sieve $sieve)
     {

@@ -343,12 +343,14 @@ Route::group([
     Route::group([], function () {
         Route::get('load-balancers', 'LoadBalancerController@index');
         Route::get('load-balancers/{loadBalancerId}', 'LoadBalancerController@show');
+        
         Route::patch('load-balancers/{loadBalancerId}', 'LoadBalancerController@update');
         Route::delete('load-balancers/{loadBalancerId}', 'LoadBalancerController@destroy');
 
         Route::group(['middleware' => 'is-admin'], function () {
             Route::get('load-balancers/{loadBalancerId}/networks', 'LoadBalancerController@networks');
             Route::get('load-balancers/{loadBalancerId}/nodes', 'LoadBalancerController@nodes');
+            Route::get('load-balancers/{loadBalancerId}/available-targets', 'LoadBalancerController@availableTargets');
         });
 
         Route::group(['middleware' => 'load-balancer-is-max-for-customer'], function () {

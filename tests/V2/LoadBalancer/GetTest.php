@@ -2,6 +2,9 @@
 
 namespace Tests\V2\LoadBalancer;
 
+use App\Models\V2\Image;
+use App\Models\V2\Instance;
+use App\Models\V2\Nic;
 use Faker\Factory as Faker;
 use Tests\Mocks\Resources\LoadBalancerMock;
 use Tests\TestCase;
@@ -61,6 +64,36 @@ class GetTest extends TestCase
                 'name' => $this->loadBalancerNetwork()->name,
                 'load_balancer_id' => $this->loadBalancer()->id,
                 'network_id' => $this->network()->id,
+            ])
+            ->assertStatus(200);
+    }
+
+    public function testGetLoadBalancerAvailableTargetsCollection()
+    {
+        $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
+        $this->loadBalancerNetwork();
+
+        $instance = Instance::create();
+        $instance->image()->associate(Image::first());
+        $instance->save();
+
+        $router = $this->loadBalancer()->networks->first()->router;
+        $network = $router->networks()->create([
+            'name' => 'test-network'
+        ]);
+
+        Nic::create([
+            'mac_address' => '00:00:00:00:00:00',
+            'instance_id' => $instance->id,
+            'network_id' => $network->id,
+        ]);
+        
+        $this->get('/v2/load-balancers/' . $this->loadBalancer()->id . '/available-targets')
+            ->assertJsonFragment([
+                'id' => $instance->id,
+            ])
+            ->assertJsonMissing([
+                'id' => $this->loadBalancer()->id
             ])
             ->assertStatus(200);
     }

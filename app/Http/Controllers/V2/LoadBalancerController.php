@@ -4,6 +4,7 @@ namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\LoadBalancer\CreateRequest;
 use App\Http\Requests\V2\LoadBalancer\UpdateRequest;
+use App\Models\V2\Instance;
 use App\Models\V2\LoadBalancer;
 use App\Models\V2\LoadBalancerNetwork;
 use App\Resources\V2\InstanceResource;
@@ -98,6 +99,24 @@ class LoadBalancerController extends BaseController
 
         return LoadBalancerNetworkResource::collection($collection->search()->paginate(
             $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
+    }
+
+    public function availableTargets(Request $request, string $loadBalancerId)
+    {
+        // Make sure they can access the loadbalancer
+        LoadBalancer::forUser($request->user())->findOrFail($loadBalancerId);
+
+        $instances = Instance::whereHas(
+            'nics.network.router.networks.loadBalancers',
+            fn ($q) => $q->where('load_balancers.id', $loadBalancerId),
+        );
+
+        // Stops endpoint from returning back the load balancer itself
+        $instances->whereNull('load_balancer_id');
+
+        return InstanceResource::collection($instances->search()->paginate(
+            $request->input('per_age', env('PAGINATION_LIMIT'))
         ));
     }
 }
