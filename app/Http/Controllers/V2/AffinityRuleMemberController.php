@@ -16,9 +16,9 @@ class AffinityRuleMemberController extends BaseController
 {
     public function index(Request $request, string $affinityRuleId)
     {
-        $rule = AffinityRule::forUser($request->user())->findOrFail($affinityRuleId);
+        $affinityRule = AffinityRule::forUser($request->user())->findOrFail($affinityRuleId);
 
-        $collection = $rule->affinityRuleMembers();
+        $collection = $affinityRule->affinityRuleMembers();
 
         return AffinityRuleMemberResource::collection(
             $collection->search()
@@ -30,11 +30,11 @@ class AffinityRuleMemberController extends BaseController
 
     public function show(Request $request, string $affinityRuleId, string $affinityRuleMemberId)
     {
-        $rule = AffinityRule::forUser($request->user())
+        $affinityRule = AffinityRule::forUser($request->user())
             ->findOrFail($affinityRuleId);
 
         return new AffinityRuleMemberResource(
-            $rule->affinityRuleMembers()
+            $affinityRule->affinityRuleMembers()
                 ->findOrFail($affinityRuleMemberId)
         );
     }
