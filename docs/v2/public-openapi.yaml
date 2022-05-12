@@ -174,14 +174,14 @@ components:
 #    ReferenceIdResponse:
 #      $ref: 'resources/References/responses/idResponse.yaml'
 paths:
-  '/ecloud/v2/affinity-rules':
-    $ref: 'resources/AffinityRule/collection.yaml'
-  '/ecloud/v2/affinity-rules/{AffinityRuleId}':
-    $ref: 'resources/AffinityRule/item.yaml'
-  '/ecloud/v2/affinity-rules/members':
-    $ref: 'resources/AffinityRuleMember/collection.yaml'
-  '/ecloud/v2/affinity-rules/{AffinityRuleId}/members/{AffinityRuleMemberId}':
-    $ref: 'resources/AffinityRuleMember/item.yaml'
+#  '/ecloud/v2/affinity-rules':
+#    $ref: 'resources/AffinityRule/collection.yaml'
+#  '/ecloud/v2/affinity-rules/{AffinityRuleId}':
+#    $ref: 'resources/AffinityRule/item.yaml'
+#  '/ecloud/v2/affinity-rules/members':
+#    $ref: 'resources/AffinityRuleMember/collection.yaml'
+#  '/ecloud/v2/affinity-rules/{AffinityRuleId}/members/{AffinityRuleMemberId}':
+#    $ref: 'resources/AffinityRuleMember/item.yaml'
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
