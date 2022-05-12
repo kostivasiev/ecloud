@@ -59,11 +59,6 @@ class AffinityRuleController extends BaseController
     {
         $model = AffinityRule::forUser($request->user())->findOrFail($affinityRuleId);
 
-        if ($model->members()->count() > 0) {
-            //can not delete rule with members
-            abort(500);
-        }
-
         $task = $model->syncDelete();
         return $this->responseTaskId($task->id, 204);
     }

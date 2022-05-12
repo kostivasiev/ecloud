@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
+use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,9 +16,13 @@ use UKFast\Sieve\Sieve;
 
 class AffinityRule extends Model implements Searchable, AvailabilityZoneable, VpcAble
 {
-    use HasFactory, CustomKey, SoftDeletes, DefaultName, Syncable, Taskable;
+    use HasFactory, CustomKey, SoftDeletes, DefaultName, Syncable, Taskable, DeletionRules;
 
     public $keyPrefix = 'ar';
+
+    public $children = [
+        'affinityRuleMembers',
+    ];
 
     public function __construct(array $attributes = [])
     {
@@ -46,7 +51,7 @@ class AffinityRule extends Model implements Searchable, AvailabilityZoneable, Vp
         return $this->belongsTo(Vpc::class);
     }
 
-    public function members()
+    public function affinityRuleMembers()
     {
         return $this->hasMany(AffinityRuleMember::class, 'rule_id');
     }

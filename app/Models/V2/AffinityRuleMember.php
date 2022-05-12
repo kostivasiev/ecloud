@@ -42,7 +42,7 @@ class AffinityRuleMember extends Model implements Searchable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function rule()
+    public function affinityRule()
     {
         return $this->belongsTo(AffinityRule::class, 'rule_id');
     }

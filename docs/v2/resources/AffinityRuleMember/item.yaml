@@ -15,28 +15,6 @@ get:
                 type: object
   tags:
     - Affinity Rule Members
-patch:
-  parameters:
-    - $ref: '../../resources/AffinityRuleMember/parameters/id.yaml'
-  requestBody:
-    required: true
-    content:
-      application/json:
-        schema:
-          type: object
-          allOf:
-            - $ref: '../../resources/AffinityRuleMember/schema.yaml'
-            - type : object
-              properties :
-                rule_id:
-                  readOnly: true
-                instance_id:
-                  readOnly: true
-  responses:
-    202:
-      $ref: '../../resources/AffinityRuleMember/responses/idResponse.yaml'
-  tags:
-    - Affinity Rule Members
 delete:
   parameters:
     - $ref: '../../resources/AffinityRuleMember/parameters/id.yaml'

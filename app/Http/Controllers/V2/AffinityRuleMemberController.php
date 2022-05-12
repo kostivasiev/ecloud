@@ -18,7 +18,7 @@ class AffinityRuleMemberController extends BaseController
     {
         $rule = AffinityRule::forUser($request->user())->findOrFail($affinityRuleId);
 
-        $collection = $rule->members();
+        $collection = $rule->affinityRuleMembers();
 
         return AffinityRuleMemberResource::collection(
             $collection->search()
@@ -34,7 +34,7 @@ class AffinityRuleMemberController extends BaseController
             ->findOrFail($affinityRuleId);
 
         return new AffinityRuleMemberResource(
-            $rule->members()
+            $rule->affinityRuleMembers()
                 ->findOrFail($affinityRuleMemberId)
         );
     }
