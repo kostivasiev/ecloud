@@ -35,11 +35,13 @@ class DeletePivotDuplicates extends Command
             $unique = $records->unique();
 
             if ($unique->count() != $records->count()) {
-                $this->info('Removing duplicates for ' . $nic->id);
+                $diff = $records->diffAssoc($unique);
+
+                $this->info('Removing duplicates for ' . $nic->id . ':' . $diff->implode(','));
 
                 if (!$this->option('test-run')) {
                     $nic->ipAddresses()->sync([]);
-                    $nic->ipAddresses()->sync($records->unique()->toArray());
+                    $nic->ipAddresses()->sync($unique->toArray());
                 }
                 $updated++;
             }
