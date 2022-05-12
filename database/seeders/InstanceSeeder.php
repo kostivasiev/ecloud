@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Vpc;
 use Illuminate\Database\Seeder;
@@ -19,6 +20,7 @@ class InstanceSeeder extends Seeder
         Instance::factory()->create([
             'id' => 'i-aaaaaaaa',
             'name' => 'Test Instance',
+            'image_id' => Image::first()->id,
             'vpc_id' => Vpc::first()->id,
             'availability_zone_id' => AvailabilityZone::first()->id,
         ]);

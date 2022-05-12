@@ -27,7 +27,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "instance_id": "{{dev_instance_id}}"
+    "instance_id": "i-b057236e-dev"
 }
 
 > {%

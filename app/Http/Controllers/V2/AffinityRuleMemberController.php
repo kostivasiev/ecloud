@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\V2;
 
-//use App\Http\Requests\V2\AffinityRuleMember\Update;
 use App\Http\Requests\V2\AffinityRuleMember\Create;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Resources\V2\AffinityRuleMemberResource;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
-use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use UKFast\Api\Exceptions\BadRequestException;
@@ -67,28 +65,6 @@ class AffinityRuleMemberController extends BaseController
 
         throw new BadRequestException('Specified Affinity Rule is not available or does not exist.');
     }
-
-    // Don't think this is needed?
-
-//    public function update(Update $request, string $affinityRuleMemberId)
-//    {
-//        //Check User has access to the rule.
-//        AffinityRule::forUser($request->user())
-//            ->findOrFail($request->rule_id);
-//
-//        //Update the specific member;
-//        $model = AffinityRuleMember::forUser($request->user())
-//            ->findOrFail($affinityRuleMemberId);
-//
-//        $model->update($request->only([
-//            'rule_id',
-//            'instance_id',
-//        ]));
-//
-//        $task = $model->syncSave();
-//
-//        return $this->responseIdMeta($request, $model->id, 202, $task->id);
-//    }
 
     public function destroy(Request $request, string $affinityRuleId, string $affinityRuleMemberId)
     {
