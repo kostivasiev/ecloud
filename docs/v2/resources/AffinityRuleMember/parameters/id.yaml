@@ -3,4 +3,4 @@ name: id
 required: true
 schema:
   type: string
-example: i-3f112f25
+example: arm-3f112f25

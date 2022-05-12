@@ -27,7 +27,7 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "instance_id": "i-b057236e-dev"
+    "instance_id": "{{dev_instance_id}}"
 }
 
 > {%
@@ -36,7 +36,6 @@ client.test("Request executed successfully", function () {
 });
 client.global.set('affinity_rule_member_id', response.body.data.id);
 %}
-
 
 ### 3. Get Members
 GET https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members
@@ -65,8 +64,20 @@ client.test("Request executed successfully", function () {
 });
 %}
 
-### 5. Delete Resources
+### 5. Delete rule with members (should fail)
+DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
 
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 6. Delete Member
 DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
@@ -79,7 +90,7 @@ client.test("Request executed successfully", function () {
 });
 %}
 
-### 6. Cleanup Affinity Rule Created
+### 7. Delete Affinity Rule Created
 DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
