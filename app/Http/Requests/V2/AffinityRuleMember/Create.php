@@ -22,7 +22,7 @@ class Create extends FormRequest
     {
         $availabilityZoneId = '';
         $vpcId = '';
-        $affinityRule = AffinityRule::forUser(Auth::user())->find(Request::input('rule_id'));
+        $affinityRule = AffinityRule::forUser(Auth::user())->find(Request::input('affinity_rule_id'));
         if (!empty($affinityRule)) {
             /** @var Instance $affinityRule */
             $availabilityZoneId = $affinityRule->availability_zone_id;
@@ -40,7 +40,7 @@ class Create extends FormRequest
                 new IsSameAvailabilityZone($availabilityZoneId),
                 new IsResourceAvailable(Instance::class),
             ],
-            'rule_id' => [
+            'affinity_rule_id' => [
                 'required',
                 'string',
                 'exists:ecloud.affinity_rules,id,deleted_at,NULL',
@@ -56,7 +56,7 @@ class Create extends FormRequest
         return array_merge(
             parent::all(),
             [
-                'rule_id' => app('request')->route('affinityRuleId')
+                'affinity_rule_id' => app('request')->route('affinityRuleId')
             ]
         );
     }

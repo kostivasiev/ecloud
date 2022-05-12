@@ -24,7 +24,7 @@ class GetTest extends TestCase
 
         $this->affinityRuleMember = AffinityRuleMember::factory()
             ->create([
-                'rule_id' => $this->affinityRule->id,
+                'affinity_rule_id' => $this->affinityRule->id,
                 'instance_id' => $this->instanceModel()->id,
             ]);
     }
@@ -34,7 +34,7 @@ class GetTest extends TestCase
         $this->asUser()
             ->get(sprintf($this::RESOURCE_URI, $this->affinityRule->id, ''))
             ->assertJsonFragment([
-                'rule_id' => $this->affinityRule->id,
+                'affinity_rule_id' => $this->affinityRule->id,
                 'instance_id' => $this->instanceModel()->id,
                 'total_pages' => 1
             ])->assertStatus(200);
@@ -45,7 +45,7 @@ class GetTest extends TestCase
         $this->asUser()
             ->get(sprintf($this::RESOURCE_URI, $this->affinityRule->id, $this->affinityRuleMember->id))
             ->assertJsonFragment([
-                'rule_id' => $this->affinityRule->id,
+                'affinity_rule_id' => $this->affinityRule->id,
                 'instance_id' => $this->instanceModel()->id,
             ])
             ->assertJsonMissing([

@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::connection('ecloud')->create('affinity_rule_members', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('rule_id')->index();
+            $table->uuid('affinity_rule_id')->index();
             $table->uuid('instance_id')->index();
             $table->timestamps();
             $table->softDeletes();

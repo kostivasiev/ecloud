@@ -23,7 +23,7 @@ class CreateTest extends TestCase
     public function testCreateAffinityRuleMember()
     {
         $data = [
-            'rule_id' => $this->affinityRule->id,
+            'affinity_rule_id' => $this->affinityRule->id,
             'instance_id' => $this->instanceModel()->id,
         ];
 

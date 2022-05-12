@@ -27,7 +27,7 @@ class AffinityRuleMember extends Model implements Searchable
 
         $this->fillable([
             'id',
-            'rule_id',
+            'affinity_rule_id',
             'instance_id',
         ]);
 
@@ -44,7 +44,7 @@ class AffinityRuleMember extends Model implements Searchable
      */
     public function affinityRule()
     {
-        return $this->belongsTo(AffinityRule::class, 'rule_id');
+        return $this->belongsTo(AffinityRule::class, 'affinity_rule_id');
     }
 
     /**
@@ -66,7 +66,7 @@ class AffinityRuleMember extends Model implements Searchable
     {
         $sieve->configure(fn ($filter) => [
             'id' => $filter->string(),
-            'rule_id' => $filter->string(),
+            'affinity_rule_id' => $filter->string(),
             'instance_id' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),

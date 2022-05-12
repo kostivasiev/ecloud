@@ -32,27 +32,8 @@ class UpdateTest extends TestCase
 
         $this->affinityRuleMember = AffinityRuleMember::factory()
             ->create([
-                'rule_id' => $this->affinityRule->id,
+                'affinity_rule_id' => $this->affinityRule->id,
                 'instance_id' => $this->instanceModel()->id,
             ]);
-    }
-
-    public function testUpdateResource()
-    {
-        $this->markTestSkipped();
-
-        $data = [
-            'rule_id' => $this->anotherAffinityRule->id,
-        ];
-        $this->asUser()
-            ->patch(
-                sprintf(static::RESOURCE_URI, $this->affinityRule->id, $this->affinityRuleMember->id),
-                $data
-            )->assertStatus(202);
-        $this->assertDatabaseHas(
-            'affinity_rule_members',
-            $data + ['id' => $this->affinityRuleMember->id],
-            'ecloud'
-        );
     }
 }
