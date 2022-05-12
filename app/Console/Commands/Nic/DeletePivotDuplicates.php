@@ -30,7 +30,7 @@ class DeletePivotDuplicates extends Command
     {
         $updated = 0;
 
-        Nic::all()->each(function ($nic) use ($updated) {
+        Nic::all()->each(function ($nic) use (&$updated) {
             $records = $nic->ipAddresses()->pluck('id');
             $unique = $records->unique();
 
@@ -45,9 +45,9 @@ class DeletePivotDuplicates extends Command
                 }
                 $updated++;
             }
-
-            $this->info($updated . ' records updated');
         });
+
+        $this->info('Total: ' . $updated . ' records removed');
 
         return 0;
     }
