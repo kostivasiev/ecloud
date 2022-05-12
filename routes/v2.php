@@ -647,13 +647,17 @@ Route::group([
         Route::get('/{affinityRuleId}', 'AffinityRuleController@show');
         Route::post('/', 'AffinityRuleController@store');
         Route::patch('/{affinityRuleId}', 'AffinityRuleController@update');
-        Route::delete('/{affinityRuleId}', 'AffinityRuleController@destroy');
+        Route::delete('/{affinityRuleId}', [
+            'middleware' => 'can-be-deleted:' . \App\Models\V2\AffinityRule::class   . ',affinityRuleId',
+            'uses' => 'AffinityRuleController@destroy'
+        ]);
 
         Route::get('/{affinityRuleId}/members', 'AffinityRuleMemberController@index');
         Route::get('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@show');
         Route::post('/{affinityRuleId}/members', 'AffinityRuleMemberController@store');
 //        Route::patch('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@update');
         Route::delete('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@destroy');
+
     });
 
     /** Load Balancer Network */
