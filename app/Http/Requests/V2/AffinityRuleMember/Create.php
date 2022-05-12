@@ -50,7 +50,7 @@ class Create extends FormRequest
         ];
     }
 
-    // Add vpcId route parameter to validation data
+    // Add affinityRuleId route parameter to validation data
     public function all($keys = null)
     {
         return array_merge(
