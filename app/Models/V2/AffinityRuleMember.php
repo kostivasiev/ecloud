@@ -57,7 +57,7 @@ class AffinityRuleMember extends Model implements Searchable
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('rule.vpc', function ($query) use ($user) {
+        return $query->whereHas('affinityRule.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }

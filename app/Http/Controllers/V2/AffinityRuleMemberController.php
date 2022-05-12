@@ -44,26 +44,14 @@ class AffinityRuleMemberController extends BaseController
         $model = app()->make(AffinityRuleMember::class);
         $instanceId = $request->instance_id;
 
-        $validator = Validator::make(['rule_id' => $affinityRuleId], [ 'rule_id' => [
-            'required',
-            'string',
-            'exists:ecloud.affinity_rules,id,deleted_at,NULL',
-            new ExistsForUser(AffinityRule::class),
-            new IsResourceAvailable(AffinityRule::class),
-        ]]);
+        $model->fill([
+            'instance_id' => $instanceId,
+            'rule_id' => $affinityRuleId
+        ]);
 
-        if (!$validator->fails()) {
-            $model->fill([
-                'instance_id' => $instanceId,
-                'rule_id' => $affinityRuleId
-            ]);
+        $task = $model->syncSave();
 
-            $task = $model->syncSave();
-
-            return $this->responseIdMeta($request, $model->id, 202, $task->id);
-        }
-
-        throw new BadRequestException('Specified Affinity Rule is not available or does not exist.');
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $affinityRuleId, string $affinityRuleMemberId)

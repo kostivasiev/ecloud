@@ -39,7 +39,25 @@ class Create extends FormRequest
                 new ExistsForUser(Instance::class),
                 new IsSameAvailabilityZone($availabilityZoneId),
                 new IsResourceAvailable(Instance::class),
-            ]
+            ],
+            'rule_id' => [
+                'required',
+                'string',
+                'exists:ecloud.affinity_rules,id,deleted_at,NULL',
+                new ExistsForUser(AffinityRule::class),
+                new IsResourceAvailable(AffinityRule::class),
+            ],
         ];
+    }
+
+    // Add vpcId route parameter to validation data
+    public function all($keys = null)
+    {
+        return array_merge(
+            parent::all(),
+            [
+                'rule_id' => app('request')->route('affinityRuleId')
+            ]
+        );
     }
 }
