@@ -36,7 +36,7 @@ class AffinityRuleMember extends Model implements Searchable
 
     public function instance()
     {
-        return $this->hasOne(Instance::class);
+        return $this->belongsTo(Instance::class);
     }
 
     /**
