@@ -11,7 +11,7 @@ class AffinityRuleMemberResource extends UKFastResource
     {
         return [
             'id' => $this->id,
-            'rule_id' => $this->rule_id,
+            'affinity_rule_id' => $this->affinity_rule_id,
             'instance_id' => $this->instance_id,
             'sync' => $this->sync,
             'created_at' => Carbon::parse(

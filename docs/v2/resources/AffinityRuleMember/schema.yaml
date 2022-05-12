@@ -7,7 +7,7 @@ properties:
     type : string
     example : i-4c63cf58
     readOnly : false
-  rule_id:
+  affinity_rule_id:
     type: string
     required: true
     example: ar-2b66bb79

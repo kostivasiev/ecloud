@@ -46,7 +46,7 @@ class AffinityRuleMemberController extends BaseController
 
         $model->fill([
             'instance_id' => $instanceId,
-            'rule_id' => $affinityRuleId
+            'affinity_rule_id' => $affinityRuleId
         ]);
 
         $task = $model->syncSave();

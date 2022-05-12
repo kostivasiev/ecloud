@@ -21,7 +21,7 @@ class DeleteTest extends TestCase
         ])->create();
 
         $this->affinityRuleMember = AffinityRuleMember::factory([
-            'rule_id' => $this->affinityRule->id,
+            'affinity_rule_id' => $this->affinityRule->id,
             'instance_id' => $this->instanceModel()->id,
         ])->create();
     }

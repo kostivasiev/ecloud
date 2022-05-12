@@ -32,7 +32,7 @@ class UpdateTest extends TestCase
 
         $this->affinityRuleMember = AffinityRuleMember::factory()
             ->create([
-                'rule_id' => $this->affinityRule->id,
+                'affinity_rule_id' => $this->affinityRule->id,
                 'instance_id' => $this->instanceModel()->id,
             ]);
     }
@@ -42,7 +42,7 @@ class UpdateTest extends TestCase
         $this->markTestSkipped();
 
         $data = [
-            'rule_id' => $this->anotherAffinityRule->id,
+            'affinity_rule_id' => $this->anotherAffinityRule->id,
         ];
         $this->asUser()
             ->patch(

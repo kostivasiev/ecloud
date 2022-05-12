@@ -53,7 +53,7 @@ class AffinityRule extends Model implements Searchable, AvailabilityZoneable, Vp
 
     public function affinityRuleMembers()
     {
-        return $this->hasMany(AffinityRuleMember::class, 'rule_id');
+        return $this->hasMany(AffinityRuleMember::class);
     }
 
     /**
