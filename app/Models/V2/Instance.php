@@ -173,9 +173,9 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
         return $this->isManaged() || $this->is_hidden;
     }
 
-    public function members()
+    public function memberOf()
     {
-        return $this->hasMany(AffinityRuleMember::class, 'instance_id');
+        return $this->hasOne(AffinityRuleMember::class, 'instance_id');
     }
 
     /**
