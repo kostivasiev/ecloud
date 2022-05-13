@@ -128,10 +128,17 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             }
 
             // Check if device is registered, if so then skip
-            $device = $adminMonitoringClient->devices()->getAll([
-                'reference_type' => 'server',
-                'reference_id:eq' => $instance->id
-            ]);
+            try {
+                $device = $adminMonitoringClient->devices()->getAll([
+                    'reference_type:eq' => 'server',
+                    'reference_id:eq' => $instance->id
+                ]);
+            } catch (\Exception $exception) {
+                $this->error($exception->getMessage());
+                $this->failed++;
+                continue;
+            }
+
             if (!empty($device)) {
                 $this->info('Device ' . $instance->id . ' is already registered, skipping');
                 $this->skipped++;
@@ -141,10 +148,16 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             // check if LM creds exist, if not create
             $availabilityZone = $instance->availabilityZone;
 
-            $collectorsPage = $adminMonitoringClient->collectors()->getPage(1, 15, [
-                'datacentre_id' => $availabilityZone->datacentre_site_id,
-                'is_shared' => true
-            ]);
+            try {
+                $collectorsPage = $adminMonitoringClient->collectors()->getPage(1, 15, [
+                    'datacentre_id' => $availabilityZone->datacentre_site_id,
+                    'is_shared' => true
+                ]);
+            } catch (\Exception $exception) {
+                $this->error($exception->getMessage());
+                $this->failed++;
+                continue;
+            }
 
             if ($collectorsPage->totalItems() < 1) {
                 $this->error('Failed to load logic monitor collector for availability zone ' . $availabilityZone->id);
@@ -168,7 +181,13 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             }
 
             // check account exists for customer, if not then create
-            $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
+            try {
+                $accounts = $adminMonitoringClient->setResellerId($instance->vpc->reseller_id)->accounts()->getAll();
+            } catch (\Exception $exception) {
+                $this->error($exception->getMessage());
+                $this->failed++;
+                continue;
+            }
             if (!empty($accounts)) {
                 $this->saveLogicMonitorAccountId($accounts[0]->id, $instance);
                 $this->info('Logic Monitor account already exists, skipping');
@@ -177,15 +196,22 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                     $customer = $accountAdminClient->customers()->getById($instance->vpc->reseller_id);
                 } catch (NotFoundException) {
                     $this->error('Failed to load account details for reseller_id ' . $instance->vpc->reseller_id);
+                    $this->failed++;
                     continue;
                 }
 
                 if (!$this->option('test-run')) {
-                    $response = $adminMonitoringClient->accounts()->createEntity(new Account([
-                        'name' => $customer->name
-                    ]));
+                    try {
+                        $response = $adminMonitoringClient->accounts()->createEntity(new Account([
+                            'name' => $customer->name
+                        ]));
 
-                    $id = $response->getId();
+                        $id = $response->getId();
+                    } catch (\Exception $exception) {
+                        $this->error($exception->getMessage());
+                        $this->failed++;
+                        continue;
+                    }
                 } else {
                     $id = 'test-test-test-test';
                 }
@@ -217,6 +243,7 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
                     $instance->save();
                 } catch (ApiException $exception) {
                     $this->error('Failed register instance ' . $instance->id . ' device on monitoring API:  ' . print_r($exception->getErrors(), true));
+                    $this->failed++;
                     continue;
                 }
             } else {
