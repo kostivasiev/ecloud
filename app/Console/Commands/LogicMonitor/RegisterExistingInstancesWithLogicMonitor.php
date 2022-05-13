@@ -130,8 +130,8 @@ class RegisterExistingInstancesWithLogicMonitor extends Command
             // Check if device is registered, if so then skip
             try {
                 $device = $adminMonitoringClient->devices()->getAll([
-                    'reference_type' => 'server',
-                    'reference_id' => $instance->id
+                    'reference_type:eq' => 'server',
+                    'reference_id:eq' => $instance->id
                 ]);
             } catch (\Exception $exception) {
                 $this->error($exception->getMessage());
