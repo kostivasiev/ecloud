@@ -56,7 +56,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\FirewallPolicy\ApplyDefaultRules::class,
         \App\Console\Commands\FloatingIp\MigrateFips::class,
         \App\Console\Commands\Nic\MigrateIpAddressToIpAddressModel::class,
-        \App\Console\Commands\Nic\DeletePivotDuplicates::class,
     ];
 
     /**
