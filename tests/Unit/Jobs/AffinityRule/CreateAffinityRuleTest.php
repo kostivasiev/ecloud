@@ -56,7 +56,8 @@ class CreateAffinityRuleTest extends TestCase
 
     public function testSuccessfulCreation()
     {
-        $this->kingpinServiceMock()
+        $this->setupKingpinExpectations()
+            ->kingpinServiceMock()
             ->expects('post')
             ->withSomeOfArgs(sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id))
             ->andReturnUsing(function () {
@@ -75,7 +76,8 @@ class CreateAffinityRuleTest extends TestCase
 
     public function testExceptionDuringCreation()
     {
-        $this->setExceptionExpectations('info', 'Failed to create affinity rule');
+        $this->setupKingpinExpectations()
+            ->setExceptionExpectations('info', 'Failed to create affinity rule');
 
         $uri = sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id);
         $this->kingpinServiceMock()
@@ -94,7 +96,7 @@ class CreateAffinityRuleTest extends TestCase
         $this->job->handle();
     }
 
-    private function setExceptionExpectations(string $method, string $message): void
+    private function setExceptionExpectations(string $method, string $message): self
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage($message);
@@ -102,5 +104,22 @@ class CreateAffinityRuleTest extends TestCase
         Log::shouldReceive($method)
             ->withSomeOfArgs($message)
             ->andThrows(new \Exception($message));
+
+        return $this;
+    }
+
+    private function setupKingpinExpectations(): self
+    {
+        $this->kingpinServiceMock()->expects('get')->withSomeOfArgs('/api/v2/hostgroup/hg-test/constraint')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    [
+                        'ruleName' => 'string',
+                        'constraintType' => 'HostAffinity',
+                        'enabled' => true,
+                    ]
+                ]));
+            });
+        return $this;
     }
 }
