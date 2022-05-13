@@ -4,7 +4,6 @@ namespace App\Models\V2;
 
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
-use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,15 +13,11 @@ use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class AffinityRule extends Model implements Searchable, AvailabilityZoneable, VpcAble
+class AffinityRuleMember extends Model implements Searchable
 {
-    use HasFactory, CustomKey, SoftDeletes, DefaultName, Syncable, Taskable, DeletionRules;
+    use HasFactory, CustomKey, SoftDeletes, Syncable, Taskable;
 
-    public $keyPrefix = 'ar';
-
-    public $children = [
-        'affinityRuleMembers',
-    ];
+    public $keyPrefix = 'arm';
 
     public function __construct(array $attributes = [])
     {
@@ -32,28 +27,24 @@ class AffinityRule extends Model implements Searchable, AvailabilityZoneable, Vp
 
         $this->fillable([
             'id',
-            'name',
-            'vpc_id',
-            'availability_zone_id',
-            'type',
+            'affinity_rule_id',
+            'instance_id',
         ]);
 
         parent::__construct($attributes);
     }
 
-    public function availabilityZone()
+    public function instance()
     {
-        return $this->belongsTo(AvailabilityZone::class);
+        return $this->belongsTo(Instance::class);
     }
 
-    public function vpc()
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function affinityRule()
     {
-        return $this->belongsTo(Vpc::class);
-    }
-
-    public function affinityRuleMembers()
-    {
-        return $this->hasMany(AffinityRuleMember::class);
+        return $this->belongsTo(AffinityRule::class);
     }
 
     /**
@@ -66,7 +57,7 @@ class AffinityRule extends Model implements Searchable, AvailabilityZoneable, Vp
         if (!$user->isScoped()) {
             return $query;
         }
-        return $query->whereHas('vpc', function ($query) use ($user) {
+        return $query->whereHas('affinityRule.vpc', function ($query) use ($user) {
             $query->where('reseller_id', $user->resellerId());
         });
     }
@@ -75,10 +66,8 @@ class AffinityRule extends Model implements Searchable, AvailabilityZoneable, Vp
     {
         $sieve->configure(fn ($filter) => [
             'id' => $filter->string(),
-            'name' => $filter->string(),
-            'vpc_id' => $filter->string(),
-            'availability_zone_id' => $filter->string(),
-            'type' => $filter->string(),
+            'affinity_rule_id' => $filter->string(),
+            'instance_id' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
