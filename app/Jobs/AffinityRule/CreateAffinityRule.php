@@ -4,7 +4,6 @@ namespace App\Jobs\AffinityRule;
 
 use App\Jobs\Job;
 use App\Models\V2\AffinityRule;
-use App\Models\V2\AvailabilityZone;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
@@ -18,7 +17,6 @@ class CreateAffinityRule extends Job
     private Task $task;
     private AffinityRule $model;
 
-    public const GET_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint';
     public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
     public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
 
@@ -42,23 +40,8 @@ class CreateAffinityRule extends Job
             ->toArray();
 
         $this->model->vpc->hostGroups()->each(function (HostGroup $hostGroup) use ($instanceIds) {
-            if (!$this->affinityRuleExists($hostGroup)) {
-                $this->createAffinityRule($hostGroup, $instanceIds);
-            }
+            $this->createAffinityRule($hostGroup, $instanceIds);
         });
-    }
-
-    public function affinityRuleExists(HostGroup $hostGroup)
-    {
-        try {
-            $response = $hostGroup->availabilityZone->kingpinService()
-                ->get(sprintf(static::GET_CONSTRAINT_URI, $hostGroup->id));
-        } catch (\Exception $e) {
-            return false;
-        }
-        return collect($response->getBody()->getContents())
-                ->where('name', '=', $this->model->id)
-                ->count() > 0;
     }
 
     public function createAffinityRule(HostGroup $hostGroup, array $instanceIds)
@@ -79,6 +62,12 @@ class CreateAffinityRule extends Job
                 ]
             );
             if ($response->getStatusCode() == 200) {
+                $createdRules = [];
+                if (isset($this->task->data['created_rules'])) {
+                    $createdRules = $this->task->data['created_rules'];
+                }
+                $createdRules[] = $hostGroup->id;
+                $this->task->updateData('created_rules', $createdRules);
                 return true;
             } else {
                 $this->fail(new \Exception('Failed to create rule'));

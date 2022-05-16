@@ -56,8 +56,7 @@ class CreateAffinityRuleTest extends TestCase
 
     public function testSuccessfulCreation()
     {
-        $this->setupKingpinExpectations()
-            ->kingpinServiceMock()
+        $this->kingpinServiceMock()
             ->expects('post')
             ->withSomeOfArgs(sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id))
             ->andReturnUsing(function () {
@@ -76,8 +75,7 @@ class CreateAffinityRuleTest extends TestCase
 
     public function testExceptionDuringCreation()
     {
-        $this->setupKingpinExpectations()
-            ->setExceptionExpectations('info', 'Failed to create affinity rule');
+        $this->setExceptionExpectations('info', 'Failed to create affinity rule');
 
         $uri = sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id);
         $this->kingpinServiceMock()
@@ -105,21 +103,6 @@ class CreateAffinityRuleTest extends TestCase
             ->withSomeOfArgs($message)
             ->andThrows(new \Exception($message));
 
-        return $this;
-    }
-
-    private function setupKingpinExpectations(): self
-    {
-        $this->kingpinServiceMock()->expects('get')->withSomeOfArgs('/api/v2/hostgroup/hg-test/constraint')
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    [
-                        'ruleName' => 'string',
-                        'constraintType' => 'HostAffinity',
-                        'enabled' => true,
-                    ]
-                ]));
-            });
         return $this;
     }
 }
