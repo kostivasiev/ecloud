@@ -42,7 +42,7 @@ class IpAddressController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $ipAddress = new IpAddress(
+        $model = new IpAddress(
             $request->only([
                 'name',
                 'ip_address',
@@ -52,31 +52,33 @@ class IpAddressController extends BaseController
 
         if (!$request->ip_address) {
             try {
-                $ipAddress->allocateAddressAndSave($request->network_id);
+                $task = $model->allocateAddressAndSave($request->network_id);
             } catch (LockTimeoutException $e) {
                 throw new IpAddressCreationException;
             }
         } else {
-            $ipAddress->save();
+            $task = $model->syncSave();
         }
 
-        return $this->responseIdMeta($request, $ipAddress->id, 201);
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function update(UpdateRequest $request, string $ipAddressId)
     {
-        $ipAddress = IpAddress::forUser(Auth::user())->findOrFail($ipAddressId);
-        $ipAddress->fill($request->only(['name']));
-        $ipAddress->save();
+        $model = IpAddress::forUser(Auth::user())->findOrFail($ipAddressId);
+        $model->fill($request->only(['name']));
 
-        return $this->responseIdMeta($request, $ipAddress->id, 200);
+        $task = $model->syncSave();
+
+        return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
     public function destroy(Request $request, string $ipAddressId)
     {
-        $ipAddress = IpAddress::forUser($request->user())->findOrFail($ipAddressId);
-        $ipAddress->delete();
-        return response('', 204);
+        $model = IpAddress::forUser($request->user())->findOrFail($ipAddressId);
+
+        $task = $model->syncDelete();
+        return $this->responseTaskId($task->id, 204);
     }
 
     public function nics(Request $request, string $ipAddressId)
