@@ -50,15 +50,7 @@ class IpAddressController extends BaseController
             ])
         );
 
-        if (!$request->ip_address) {
-            try {
-                $task = $model->allocateAddressAndSave($request->network_id);
-            } catch (LockTimeoutException $e) {
-                throw new IpAddressCreationException;
-            }
-        } else {
-            $task = $model->syncSave();
-        }
+        $task = $model->syncSave();
 
         return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }

@@ -128,18 +128,4 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
             }
         }
     }
-
-    public function allocateAddressAndSave($networkId)
-    {
-        $lock = Cache::lock("ip_address." . $networkId, 60);
-        try {
-            $lock->block(60);
-            $network = Network::forUser(request()->user())->findOrFail($networkId);
-            $ip = $network->getNextAvailableIp();
-            $this->ip_address = $ip;
-            return $this->syncSave();
-        } finally {
-            $lock->release();
-        }
-    }
 }
