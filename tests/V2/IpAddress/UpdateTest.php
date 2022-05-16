@@ -20,7 +20,7 @@ class UpdateTest extends TestCase
                 'name' => 'UPDATED',
                 'ip_address' => '10.0.0.6',
             ]
-        )->assertStatus(200);
+        )->assertStatus(202);
         $this->assertDatabaseHas(
             'ip_addresses',
             [
@@ -41,7 +41,7 @@ class UpdateTest extends TestCase
                 'name' => 'UPDATED',
                 'ip_address' => '10.0.0.6',
             ]
-        )->assertStatus(200);
+        )->assertStatus(202);
         $this->assertDatabaseHas(
             'ip_addresses',
             [
