@@ -59,6 +59,9 @@ class AwaitRuleDeletion extends Job
                 $response = $hostGroup->availabilityZone->kingpinService()
                     ->get(sprintf(static::GET_CONSTRAINT_URI, $hostGroup->id));
             } catch (\Exception $e) {
+                Log::info('Contraints not found for hostgroup', [
+                    'host_group_id' => $hostGroup->id,
+                ]);
                 return false;
             }
             return collect(json_decode($response->getBody()->getContents(), true))
