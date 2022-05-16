@@ -5,15 +5,11 @@ use App\Exceptions\V2\IpAddressCreationException;
 use App\Http\Requests\V2\IpAddress\CreateRequest;
 use App\Http\Requests\V2\IpAddress\UpdateRequest;
 use App\Models\V2\IpAddress;
-use App\Models\V2\Network;
 use App\Resources\V2\IpAddressResource;
 use App\Resources\V2\NicResource;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\Response;
 
 class IpAddressController extends BaseController
 {
@@ -49,6 +45,14 @@ class IpAddressController extends BaseController
                 'network_id',
             ])
         );
+
+        if (!$request->ip_address) {
+            try {
+                $model->allocateAddressAndSave($request->network_id);
+            } catch (LockTimeoutException $e) {
+                throw new IpAddressCreationException;
+            }
+        }
 
         $task = $model->syncSave();
 
