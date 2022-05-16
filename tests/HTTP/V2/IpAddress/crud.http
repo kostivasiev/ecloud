@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
     "name": "Test",
-    "ip_address": "10.0.0.3",
+    "ip_address": "10.0.0.1",
     "network_id": "{{dev_network_id}}"
 }
 
