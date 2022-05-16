@@ -15,21 +15,6 @@ class CreateTest extends TestCase
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
     }
 
-    public function allocateAddressAndSave($networkId)
-    {
-        $lock = Cache::lock("ip_address." . $networkId, 60);
-        try {
-            $lock->block(60);
-            $network = Network::forUser(request()->user())->findOrFail($networkId);
-            $ip = $network->getNextAvailableIp();
-            $this->ip_address = $ip;
-            return $this->save(); //<--- from this
-            return $this->syncSave(); //<=== to this
-        } finally {
-            $lock->release();
-        }
-    }
-
     public function testValidDataSucceeds()
     {
         $data = [
