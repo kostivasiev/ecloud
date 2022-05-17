@@ -8,6 +8,7 @@ use App\Models\V2\AffinityRuleMember;
 use App\Resources\V2\AffinityRuleMemberResource;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
+use App\Support\Sync;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use UKFast\Api\Exceptions\BadRequestException;
@@ -49,7 +50,10 @@ class AffinityRuleMemberController extends BaseController
             'affinity_rule_id' => $affinityRuleId
         ]);
 
-        $task = $model->syncSave();
+        $task = $model->withTaskLock(function () use ($model) {
+            $model->save();
+            return $model->affinityRule->syncSave();
+        });
 
         return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
