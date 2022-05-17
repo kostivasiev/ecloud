@@ -1,5 +1,5 @@
 ### Get Collection
-GET https://{{host}}/{{version}}/vpn-endpoints
+GET https://{{host}}/{{version}}/vpn-endpoints?vpc_id:neq=null
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
