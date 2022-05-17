@@ -40,7 +40,7 @@ patch:
                   example : 'net-abc123'
                   readOnly : true
   responses:
-    200:
+    202:
       $ref: 'responses/idResponse.yaml'
   tags:
     - IP Addresses

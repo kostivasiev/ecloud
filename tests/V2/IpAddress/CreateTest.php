@@ -24,7 +24,7 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/ip-addresses', $data)
-            ->assertStatus(201);
+            ->assertStatus(202);
         $this->assertDatabaseHas(
             'ip_addresses',
             array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
@@ -43,7 +43,7 @@ class CreateTest extends TestCase
         ];
 
         $this->post('/v2/ip-addresses', $data)
-            ->assertStatus(201);
+            ->assertStatus(202);
         $this->assertDatabaseHas(
             'ip_addresses',
             array_merge($data, ['type' => IpAddress::TYPE_CLUSTER]),
@@ -71,7 +71,7 @@ class CreateTest extends TestCase
         $response = $this->post(
             '/v2/ip-addresses',
             $data
-        )->assertStatus(201);
+        )->assertStatus(202);
 
         $this->assertDatabaseHas(IpAddress::class, $data, 'ecloud');
 
