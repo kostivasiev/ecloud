@@ -10,7 +10,7 @@ properties:
     readOnly: false
   ip_address:
     type: string
-    required: true
+    required: false
     example: '1.1.1.1'
     readOnly: false
   network_id:
