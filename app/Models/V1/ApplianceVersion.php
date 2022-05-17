@@ -68,6 +68,11 @@ class ApplianceVersion extends Model implements Filterable, Sortable
         'active' => ['nullable']
     ];
 
+    public $attributes = [
+        'appliance_version_script_template' => '',
+        'appliance_version_active' => 'Yes',
+    ];
+
     /**
      * Return Create resource validation rules
      * @return array
