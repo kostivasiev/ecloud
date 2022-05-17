@@ -5,6 +5,7 @@ namespace Tests\Unit\Jobs\AffinityRule;
 use App\Jobs\AffinityRule\CreateAffinityRule;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
+use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Carbon\Carbon;
@@ -56,7 +57,8 @@ class CreateAffinityRuleTest extends TestCase
 
     public function testSuccessfulCreation()
     {
-        $this->kingpinServiceMock()
+        $this->createSecondaryMember()
+            ->kingpinServiceMock()
             ->expects('post')
             ->withSomeOfArgs(sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id))
             ->andReturnUsing(function () {
@@ -75,6 +77,7 @@ class CreateAffinityRuleTest extends TestCase
 
     public function testExceptionDuringCreation()
     {
+        $this->createSecondaryMember();
         $this->setExceptionExpectations('info', 'Failed to create affinity rule');
 
         $uri = sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id);
@@ -94,6 +97,19 @@ class CreateAffinityRuleTest extends TestCase
         $this->job->handle();
     }
 
+    public function testNoActionWhenFewerThanTwoMembers()
+    {
+        Log::shouldReceive('info')
+            ->with(
+                \Mockery::capture($message),
+                \Mockery::capture($data)
+            );
+
+        $this->job->handle();
+
+        $this->assertEquals('Affinity rules need at least two members', $message);
+    }
+
     private function setExceptionExpectations(string $method, string $message): self
     {
         $this->expectException(\Exception::class);
@@ -103,6 +119,33 @@ class CreateAffinityRuleTest extends TestCase
             ->withSomeOfArgs($message)
             ->andThrows(new \Exception($message));
 
+        return $this;
+    }
+
+    private function createSecondaryMember(): self
+    {
+        $secondInstance = Instance::withoutEvents(function () {
+            return Instance::factory()->create([
+                'id' => 'i-test-2',
+                'vpc_id' => $this->vpc()->id,
+                'name' => 'Test Instance ' . uniqid(),
+                'image_id' => $this->image()->id,
+                'vcpu_cores' => 1,
+                'ram_capacity' => 1024,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'deploy_data' => [
+                    'network_id' => $this->network()->id,
+                    'volume_capacity' => 20,
+                    'volume_iops' => 300,
+                    'requires_floating_ip' => false,
+                ]
+            ]);
+        });
+        AffinityRuleMember::factory()
+            ->for($this->affinityRule)
+            ->create([
+                'instance_id' => $secondInstance,
+            ]);
         return $this;
     }
 }

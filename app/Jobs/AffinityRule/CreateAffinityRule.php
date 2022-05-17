@@ -35,6 +35,14 @@ class CreateAffinityRule extends Job
             return;
         }
 
+        if ($this->model->affinityRuleMembers()->count() < 2) {
+            Log::info('Affinity rules need at least two members', [
+                'affinity_rule_id' => $this->model->id,
+                'member_count' => $this->model->affinityRuleMembers()->count(),
+            ]);
+            return;
+        }
+
         $instanceIds = $this->model->affinityRuleMembers()->get()
             ->pluck('instance_id')
             ->toArray();
