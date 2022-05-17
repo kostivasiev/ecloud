@@ -2,6 +2,8 @@
 
 namespace Tests\V2\FloatingIp;
 
+use App\Models\V2\FloatingIpResource;
+use App\Models\V2\IpAddress;
 use App\Models\V2\Task;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -29,11 +31,19 @@ class GetTest extends TestCase
 
     public function testShow()
     {
+        // Create the pivot between a fIP and an IP address
+        $ipAddress = IpAddress::factory()->create();
+        $floatingIpResource = FloatingIpResource::factory()->make();
+        $floatingIpResource->floatingIp()->associate($this->floatingIp());
+        $floatingIpResource->resource()->associate($ipAddress);
+        $floatingIpResource->save();
+
         $this->get('/v2/floating-ips/' . $this->floatingIp()->id)
             ->assertJsonFragment([
                 'id' => 'fip-test',
                 'vpc_id' => $this->vpc()->id,
-                'ip_address' => '1.1.1.1'
+                'ip_address' => '1.1.1.1',
+                'resource_id' => $ipAddress->id
             ])
             ->assertStatus(200);
     }

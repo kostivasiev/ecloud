@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\FloatingIp\Created;
 use App\Events\V2\FloatingIp\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
@@ -76,9 +75,19 @@ class FloatingIp extends Model implements Searchable, ResellerScopeable, Availab
         });
     }
 
+    public function floatingIpResource()
+    {
+        return $this->hasOne(FloatingIpResource::class);
+    }
+
     public function resource()
     {
-        return $this->morphTo();
+        return $this?->floatingIpResource?->resource();
+    }
+
+    public function getResourceIdAttribute()
+    {
+        return $this?->floatingIpResource?->resource->id;
     }
 
     public function sieve(Sieve $sieve)

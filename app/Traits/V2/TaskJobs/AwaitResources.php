@@ -13,7 +13,7 @@ trait AwaitResources
 
     public $backoff = 5;
 
-    public function createResource($resourceType, $attributes = []): ?Model
+    public function createResource($resourceType, $attributes = [], $callback = null): ?Model
     {
         if (!in_array(Syncable::class, class_uses($resourceType))) {
             $this->error($this::class . ': ResourceType '. $resourceType . ' is not a Syncable resource, abort');
@@ -22,6 +22,10 @@ trait AwaitResources
         }
 
         $resource = $resourceType::firstOrNew($attributes);
+
+        if (!empty($callback)) {
+            $callback($resource);
+        }
 
         if (!$resource->exists) {
             $resource->syncSave();

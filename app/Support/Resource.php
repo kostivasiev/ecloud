@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 
 class Resource
@@ -27,5 +28,20 @@ class Resource
             }
         }
         return null;
+    }
+
+    /**
+     * Load a resource using it's ID
+     * @param $id
+     * @return Model|null
+     */
+    public static function getFromId($id): ?Model
+    {
+        $class = static::classFromId($id);
+        if (empty($class)){
+            return null;
+        }
+
+        return $class::find($id);
     }
 }
