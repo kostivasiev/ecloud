@@ -69,4 +69,27 @@ class ValidPortReferenceTest extends TestCase
             $this->rule->passes('', '1.1')
         );
     }
+
+    public function testInvalidPortValuesFail()
+    {
+        $this->assertFalse(
+            $this->rule->passes('', '99999999')
+        );
+
+        $this->assertFalse(
+            $this->rule->passes('', '-1')
+        );
+
+        $this->assertFalse(
+            $this->rule->passes('', '1-9999999')
+        );
+
+        $this->assertFalse(
+            $this->rule->passes('', '99999-9999999')
+        );
+
+        $this->assertTrue(
+            $this->rule->passes('', '1-65535')
+        );
+    }
 }

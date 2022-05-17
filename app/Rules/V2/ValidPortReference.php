@@ -26,12 +26,25 @@ class ValidPortReference implements Rule
         return Str::of($value)->split('/[\s,]+/')
                 ->filter(function ($item) {
                     // validate port or port range
-                    return !preg_match('/^[0-9]+-?(?:(?<=-)[0-9]+|\b)$/', $item);
+                    $result = preg_match('/^[0-9]+-?(?:(?<=-)[0-9]+|\b)$/', $item, $matches);
+                    if ($result) {
+                        if (preg_match('/\-/', $matches[0])) {
+                            $ports = explode('-', $matches[0]);
+                            return !($this->validPort($ports[0]) && $this->validPort($ports[1]));
+                        }
+                        return !($this->validPort($matches[0]));
+                    }
+                    return true;
                 })->count() < 1;
     }
 
     public function message()
     {
         return 'The :attribute must be a valid port or port range';
+    }
+
+    public function validPort(string|int $port): bool
+    {
+        return ((int) $port >= 1 && (int) $port <= 65535);
     }
 }
