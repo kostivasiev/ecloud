@@ -1,4 +1,4 @@
-### check task is returned
+### 1. check task is returned
 POST https://{{host}}/{{version}}/ip-addresses
 Accept: */*
 Cache-Control: no-cache
@@ -20,7 +20,7 @@ client.global.set('ip_address_id', response.body.data.id);
 client.log('IP Address ID: ' + response.body.data.id);
 %}
 
-### check for sync
+### 2. check for sync
 GET https://{{host}}/{{version}}/ip-addresses?sort=ip_address:desc
 Accept: */*
 Cache-Control: no-cache
@@ -34,7 +34,7 @@ client.test('Get Collection', function () {
 });
 %}
 
-### check sync is returned
+### 3. check sync is returned
 GET https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -52,7 +52,7 @@ client.test('Get Item', function () {
 });
 %}
 
-### check task returned
+### 4. check task returned
 PATCH https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -72,7 +72,7 @@ client.test('Update Volume Group', function () {
 });
 %}
 
-### check updated and has sync
+### 5. check updated and has sync
 GET https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -89,7 +89,7 @@ client.test('Get Item', function () {
 });
 %}
 
-### check task created for deleting
+### 6. check task created for deleting
 DELETE https://{{host}}/{{version}}/ip-addresses/{{ip_address_id}}
 Accept: */*
 Cache-Control: no-cache
