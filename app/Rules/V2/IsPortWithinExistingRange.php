@@ -24,7 +24,9 @@ class IsPortWithinExistingRange implements Rule
 
     public function passes($attribute, $value)
     {
-        // if it's a range, then skip this test
+        if (preg_match('/\./', $attribute)) {
+            $attribute = last(explode('.', $attribute));
+        }
         if (str_contains($value, '-')) {
             $ports = explode('-', $value);
             return !($this->isDuplicatePortRange($attribute, $ports[0]) && $this->isDuplicatePortRange($attribute, $ports[1]));

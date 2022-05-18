@@ -24,6 +24,9 @@ class IsUniquePortOrRange implements Rule
 
     public function passes($attribute, $value)
     {
+        if (preg_match('/\./', $attribute)) {
+            $attribute = last(explode('.', $attribute));
+        }
         if (str_contains($value, '-')) {
             $ports = explode('-', $value);
             return $this->isDuplicatePortRange($attribute, $ports);
