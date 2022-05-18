@@ -4,7 +4,6 @@ namespace App\Jobs\AffinityRule;
 
 use App\Jobs\Job;
 use App\Models\V2\AffinityRule;
-use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
