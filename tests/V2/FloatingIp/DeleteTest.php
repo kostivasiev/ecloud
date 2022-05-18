@@ -3,6 +3,7 @@
 namespace Tests\V2\FloatingIp;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\FloatingIpResource;
 use App\Models\V2\VpnEndpoint;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
@@ -28,7 +29,8 @@ class DeleteTest extends TestCase
     {
         $vpnEndpoint = VpnEndpoint::factory()->create();
 
-        $this->floatingIp()->resource()->associate($vpnEndpoint)->save();
+        // Assign fIP
+        FloatingIpResource::factory()->assignedTo($this->floatingIp(), $vpnEndpoint)->create();
 
         $this->delete('/v2/floating-ips/' . $this->floatingIp()->id, [
             'resource_id' => $this->nic()->id

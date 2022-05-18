@@ -26,6 +26,7 @@ class UnassignTest extends TestCase
                 'resource_id' => $this->nic()->id,
             ]
         ]);
+
         $this->task->resource()->associate($this->floatingIp());
 
         Bus::fake();
@@ -33,7 +34,7 @@ class UnassignTest extends TestCase
         $job->handle();
 
         Bus::assertBatched(function (PendingBatch $batch) {
-            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 2;
+            return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 1;
         });
     }
 }

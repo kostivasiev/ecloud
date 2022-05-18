@@ -4,7 +4,9 @@ namespace Tests\Unit\Jobs\VpnEndpoint;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\VpnEndpoint\UnassignFloatingIP;
+use App\Models\V2\FloatingIpResource;
 use App\Models\V2\Task;
+use App\Models\V2\VpnEndpoint;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
@@ -70,10 +72,9 @@ class UnassignFloatingIpTest extends TestCase
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $this->task->resource()->associate($this->vpnEndpoint());
+            $this->task->resource()->associate($this->vpnEndpoint(false));
             $this->task->save();
         });
-
         Event::fake([JobFailed::class, Created::class]);
 
         $assignTask = new Task([
@@ -81,6 +82,9 @@ class UnassignFloatingIpTest extends TestCase
             'completed' => true,
             'name' => 'floating_ip_unassign'
         ]);
+
+        FloatingIpResource::factory()->assignedTo($this->floatingIp(), $this->vpnEndpoint())->create();
+
         $this->vpnEndpoint()->floatingIp->tasks()->save($assignTask);
 
         $this->task->data = [

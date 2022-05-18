@@ -58,15 +58,6 @@ class Vip extends Model implements Searchable, ResellerScopeable
         return $this->loadBalancerNetwork->loadBalancer->getResellerId();
     }
 
-//    public function getFloatingIpIdAttribute()
-//    {
-//        if ($this->ipAddress()->exists() && $this->ipAddress->floatingIp->exists()) {
-//            return $this->ipAddress->floatingIp->id;
-//        }
-//
-//        return null;
-//    }
-
     public function getLoadBalancerIdAttribute()
     {
         return $this->loadBalancerNetwork->loadBalancer->id;

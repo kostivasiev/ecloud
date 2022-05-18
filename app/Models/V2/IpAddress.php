@@ -77,9 +77,14 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
         return $this->network->router;
     }
 
+    public function floatingIpResource()
+    {
+        return $this->hasOne(FloatingIpResource::class, 'resource_id');
+    }
+
     public function floatingIp()
     {
-        return $this->morphOne(FloatingIp::class, 'resource');
+        return $this?->floatingIpResource->floatingIp();
     }
 
     /**
