@@ -4,9 +4,9 @@ namespace Tests\Unit\Jobs\FloatingIpResource;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\FloatingIpResource\CreateDestinationNat;
-use App\Jobs\FloatingIpResource\CreateSourceNat;
 use App\Models\V2\FloatingIpResource;
 use App\Models\V2\Nat;
+use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
@@ -15,19 +15,28 @@ use Tests\TestCase;
 
 class CreateDestinationNatTest extends TestCase
 {
+    protected FloatingIpResource $floatingIpResource;
+
+    protected Task $task;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // Create the pivot between a fIP and an IP address
+        $this->floatingIpResource = FloatingIpResource::factory()->make();
+        $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
+        $this->floatingIpResource->resource()->associate($this->ip());
+        $this->floatingIpResource->save();
+
+        $this->task = $this->createSyncUpdateTask($this->floatingIpResource);
+    }
+
     public function testIpAddressAttachedCreatesNats()
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        // Create the pivot between a fIP and an IP address
-        $floatingIpResource = FloatingIpResource::factory()->make();
-        $floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $floatingIpResource->resource()->associate($this->ip());
-        $floatingIpResource->save();
-
-        $task = $this->createSyncUpdateTask($floatingIpResource);
-
-        dispatch(new CreateDestinationNat($task));
+        dispatch(new CreateDestinationNat($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -48,7 +57,7 @@ class CreateDestinationNatTest extends TestCase
 
         $createDestinationNatTask->model->setAttribute('completed', true)->saveQuietly();
 
-        dispatch(new CreateDestinationNat($task));
+        dispatch(new CreateDestinationNat($this->task));
 
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return !$event->job->isReleased();
@@ -67,14 +76,10 @@ class CreateDestinationNatTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $floatingIpResource = FloatingIpResource::factory()->make();
-        $floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $floatingIpResource->resource()->associate($this->instanceModel());
-        $floatingIpResource->save();
+        $this->floatingIpResource->resource()->associate($this->instanceModel());
+        $this->floatingIpResource->save();
 
-        $task = $this->createSyncUpdateTask($floatingIpResource);
-
-        dispatch(new CreateDestinationNat($task));
+        dispatch(new CreateDestinationNat($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -85,15 +90,7 @@ class CreateDestinationNatTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        // Create the pivot between a fIP and an IP address
-        $floatingIpResource = FloatingIpResource::factory()->make();
-        $floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $floatingIpResource->resource()->associate($this->ip());
-        $floatingIpResource->save();
-
-        $task = $this->createSyncUpdateTask($floatingIpResource);
-
-        dispatch(new CreateDestinationNat($task));
+        dispatch(new CreateDestinationNat($this->task));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -117,7 +114,7 @@ class CreateDestinationNatTest extends TestCase
             ->setAttribute('failure_reason', 'test')
             ->saveQuietly();
 
-        dispatch(new CreateDestinationNat($task));
+        dispatch(new CreateDestinationNat($this->task));
 
         Event::assertDispatched(JobFailed::class);
     }

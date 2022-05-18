@@ -26,7 +26,7 @@ class Assign extends Job
     {
         $this->updateTaskBatch([
             [
-                CreateFloatingIpResource::class
+                CreateFloatingIpResource::class,
             ]
         ])->dispatch();
     }

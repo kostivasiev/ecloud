@@ -22,7 +22,7 @@ class CreateFloatingIpResource extends TaskJob
             return;
         }
 
-        $this->createResource(
+        $this->createSyncableResource(
             FloatingIpResource::class, [
                 'floating_ip_id' => $floatingIp->id
             ],

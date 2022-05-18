@@ -32,7 +32,7 @@ class CreateDestinationNat extends TaskJob
             $this->info('Creating DNAT for floating IP ' . $floatingIp->id);
         }
 
-        $this->createResource(
+        $this->createSyncableResource(
             Nat::class, [
             'action' => Nat::ACTION_DNAT,
             'sequence' => config('defaults.floating-ip.nat.sequence'),

@@ -2,8 +2,7 @@
 
 namespace App\Jobs\Tasks\FloatingIp;
 
-use App\Jobs\FloatingIp\AwaitNatRemoval;
-use App\Jobs\FloatingIp\RemoveNats;
+use App\Jobs\FloatingIp\DeleteFloatingIpResource;
 use App\Jobs\Job;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Task;
@@ -24,21 +23,14 @@ class Unassign extends Job
     public function __construct(Task $task)
     {
         $this->task = $task;
-        $this->model = $this->task->resource;
     }
 
     public function handle()
     {
-        $task = $this->task;
-
         $this->updateTaskBatch([
             [
-                new RemoveNats($this->task->resource),
-                new AwaitNatRemoval($this->task->resource),
+                DeleteFloatingIpResource::class,
             ]
-        ], function () use ($task) {
-            $task->resource->resource()->dissociate();
-            $task->resource->save();
-        })->dispatch();
+        ])->dispatch();
     }
 }
