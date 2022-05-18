@@ -10,7 +10,7 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CreateAffinityRule extends Job
+class CreateAffinityRule extends AffinityRuleJob
 {
     use Batchable, LoggableModelJob;
 
@@ -19,12 +19,6 @@ class CreateAffinityRule extends Job
 
     public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
     public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
 
     public function handle()
     {

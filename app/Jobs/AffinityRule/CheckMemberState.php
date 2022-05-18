@@ -9,7 +9,7 @@ use App\Support\Sync;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 
-class CheckMemberState extends Job
+class CheckMemberState extends AffinityRuleJob
 {
     use Batchable, LoggableModelJob;
 
@@ -17,12 +17,6 @@ class CheckMemberState extends Job
     private $model;
 
     public $backoff = 5;
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
 
     public function handle()
     {

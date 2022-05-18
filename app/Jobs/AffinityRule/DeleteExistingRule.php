@@ -4,12 +4,13 @@ namespace App\Jobs\AffinityRule;
 
 use App\Jobs\Job;
 use App\Models\V2\AffinityRule;
+use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 
-class DeleteExistingRule extends Job
+class DeleteExistingRule extends AffinityRuleJob
 {
     use Batchable, LoggableModelJob;
 
@@ -19,12 +20,6 @@ class DeleteExistingRule extends Job
     public const GET_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint';
     public const DELETE_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint/%s';
     public array $existingRules = [];
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
 
     public function handle()
     {

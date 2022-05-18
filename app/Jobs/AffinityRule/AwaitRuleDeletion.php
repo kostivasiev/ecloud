@@ -10,7 +10,7 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class AwaitRuleDeletion extends Job
+class AwaitRuleDeletion extends AffinityRuleJob
 {
     use Batchable, LoggableModelJob;
 
@@ -20,12 +20,6 @@ class AwaitRuleDeletion extends Job
     public int $backoff = 5;
 
     public const GET_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint';
-
-    public function __construct(Task $task)
-    {
-        $this->task = $task;
-        $this->model = $this->task->resource;
-    }
 
     public function handle()
     {
