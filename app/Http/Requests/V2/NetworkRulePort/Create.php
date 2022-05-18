@@ -10,11 +10,13 @@ use App\Rules\V2\IsUniquePortOrRange;
 use App\Rules\V2\NetworkRulePort\CanCreatePortForNetworkRule;
 use App\Rules\V2\ValidPortReference;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Request;
 
 class Create extends FormRequest
 {
     public function rules()
     {
+        $networkRuleId = Request::input('network_rule_id');
         return [
             'name' => 'nullable|string|max:255',
             'network_rule_id' => [
@@ -34,15 +36,15 @@ class Create extends FormRequest
                 'required_if:protocol,TCP,UDP',
                 'string',
                 new ValidPortReference(),
-                new IsUniquePortOrRange(NetworkRulePort::class),
-                new IsPortWithinExistingRange(NetworkRulePort::class),
+                new IsUniquePortOrRange(NetworkRulePort::class, $networkRuleId),
+                new IsPortWithinExistingRange(NetworkRulePort::class, $networkRuleId),
             ],
             'destination' => [
                 'required_if:protocol,TCP,UDP',
                 'string',
                 new ValidPortReference(),
-                new IsUniquePortOrRange(NetworkRulePort::class),
-                new IsPortWithinExistingRange(NetworkRulePort::class),
+                new IsUniquePortOrRange(NetworkRulePort::class, $networkRuleId),
+                new IsPortWithinExistingRange(NetworkRulePort::class, $networkRuleId),
             ],
         ];
     }

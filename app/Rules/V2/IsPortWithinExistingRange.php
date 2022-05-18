@@ -9,7 +9,7 @@ use Illuminate\Contracts\Validation\Rule;
 class IsPortWithinExistingRange implements Rule
 {
     public FirewallRulePort|NetworkRulePort $model;
-    public string $parentId;
+    public ?string $parentId;
     public string $parentKeyColumn;
 
     public function __construct(string $class, string $parentId = null)

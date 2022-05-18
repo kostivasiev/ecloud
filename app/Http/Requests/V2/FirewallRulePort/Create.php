@@ -9,6 +9,7 @@ use App\Rules\V2\IsPortWithinExistingRange;
 use App\Rules\V2\IsUniquePortOrRange;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Request;
 
 class Create extends FormRequest
 {
@@ -17,6 +18,7 @@ class Create extends FormRequest
      */
     public function rules()
     {
+        $firewallRuleId = Request::input('firewall_rule_id');
         return [
             'name' => [
                 'nullable',
@@ -39,16 +41,16 @@ class Create extends FormRequest
                 'string',
                 'nullable',
                 new ValidFirewallRulePortSourceDestination(),
-                new IsUniquePortOrRange(FirewallRulePort::class),
-                new IsPortWithinExistingRange(FirewallRulePort::class),
+                new IsUniquePortOrRange(FirewallRulePort::class, $firewallRuleId),
+                new IsPortWithinExistingRange(FirewallRulePort::class, $firewallRuleId),
             ],
             'destination' => [
                 'required_if:protocol,TCP,UDP',
                 'string',
                 'nullable',
                 new ValidFirewallRulePortSourceDestination(),
-                new IsUniquePortOrRange(FirewallRulePort::class),
-                new IsPortWithinExistingRange(FirewallRulePort::class),
+                new IsUniquePortOrRange(FirewallRulePort::class, $firewallRuleId),
+                new IsPortWithinExistingRange(FirewallRulePort::class, $firewallRuleId),
             ]
         ];
     }

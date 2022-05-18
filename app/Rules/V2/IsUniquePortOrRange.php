@@ -9,7 +9,7 @@ use Illuminate\Contracts\Validation\Rule;
 class IsUniquePortOrRange implements Rule
 {
     public FirewallRulePort|NetworkRulePort $model;
-    public string $parentId;
+    public ?string $parentId;
     public string $parentKeyColumn;
     
     public function __construct(string $class, string $parentId = null)
@@ -55,7 +55,6 @@ class IsUniquePortOrRange implements Rule
         }
         return !(
             $this->model
-                ->where($this->parentKeyColumn, $this->parentId)
                 ->where($where)
                 ->count() > 0
         );
