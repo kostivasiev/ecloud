@@ -22,4 +22,9 @@ abstract class Job implements ShouldQueue
     */
 
     use InteractsWithQueue, Queueable, SerializesModels;
+
+    public function retryUntil(): \DateTime
+    {
+        return now()->addMinutes(10);
+    }
 }
