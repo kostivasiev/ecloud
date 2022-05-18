@@ -3,6 +3,7 @@
 namespace App\Jobs\AffinityRule;
 
 use App\Jobs\Job;
+use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Task;
 use App\Support\Sync;
@@ -14,6 +15,15 @@ class CheckMemberState extends AffinityRuleJob
     use Batchable, LoggableModelJob;
 
     public $backoff = 5;
+
+    private $task;
+    private $model;
+
+    public function __construct(Task $task)
+    {
+        $this->task = $task;
+        $this->model = $this->task->resource;
+    }
 
     public function handle()
     {

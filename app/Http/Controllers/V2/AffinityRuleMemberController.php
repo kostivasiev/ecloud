@@ -63,10 +63,14 @@ class AffinityRuleMemberController extends BaseController
         AffinityRule::forUser($request->user())
             ->findOrFail($affinityRuleId);
 
-        $member = AffinityRuleMember::forUser($request->user())
+        $model = AffinityRuleMember::forUser($request->user())
             ->findOrFail($affinityRuleMemberId);
 
-        $task = $member->syncDelete();
+        $task = $model->withTaskLock(function () use ($model) {
+            $model->delete();
+            return $model->affinityRule->syncDelete();
+        });
+
         return $this->responseTaskId($task->id, 204);
     }
 }
