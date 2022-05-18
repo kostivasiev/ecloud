@@ -14,9 +14,6 @@ class CreateAffinityRule extends AffinityRuleJob
 {
     use Batchable, LoggableModelJob;
 
-    private Task $task;
-    private AffinityRule $model;
-
     public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
     public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
 

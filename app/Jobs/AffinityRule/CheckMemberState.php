@@ -13,9 +13,6 @@ class CheckMemberState extends AffinityRuleJob
 {
     use Batchable, LoggableModelJob;
 
-    private $task;
-    private $model;
-
     public $backoff = 5;
 
     public function handle()

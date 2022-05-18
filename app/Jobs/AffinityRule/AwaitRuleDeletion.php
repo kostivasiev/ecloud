@@ -14,9 +14,6 @@ class AwaitRuleDeletion extends AffinityRuleJob
 {
     use Batchable, LoggableModelJob;
 
-    public Task $task;
-    public AffinityRule $model;
-
     public int $backoff = 5;
 
     public const GET_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint';

@@ -8,6 +8,9 @@ use App\Models\V2\Task;
 
 class AffinityRuleJob extends Job
 {
+    protected Task $task;
+    protected AffinityRule $model;
+
     public function __construct(Task $task)
     {
         $this->task = $task;
