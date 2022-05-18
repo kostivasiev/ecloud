@@ -43,6 +43,7 @@ class CreateDestinationNat extends TaskJob
             function ($nat) use ($floatingIp, $resource) {
                 $nat->destination()->associate($floatingIp);
                 $nat->translated()->associate($resource);
-            });
+            }
+        );
     }
 }

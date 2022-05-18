@@ -29,6 +29,7 @@ class CreateFloatingIpResource extends TaskJob
             ],
             function ($floatingIpResource) use ($resource) {
                 $floatingIpResource->resource()->associate($resource);
-            });
+            }
+        );
     }
 }

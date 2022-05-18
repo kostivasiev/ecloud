@@ -43,6 +43,7 @@ class CreateSourceNat extends TaskJob
             function ($nat) use ($floatingIp, $resource) {
                 $nat->source()->associate($resource);
                 $nat->translated()->associate($floatingIp);
-            });
+            }
+        );
     }
 }
