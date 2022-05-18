@@ -68,4 +68,9 @@ abstract class TaskJob extends Job
     {
         return $this->hydrateLogContext([]);
     }
+
+    public function retryUntil(): \DateTime
+    {
+        return now()->addMinutes(10);
+    }
 }
