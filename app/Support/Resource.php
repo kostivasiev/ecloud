@@ -38,7 +38,7 @@ class Resource
     public static function getFromId($id): ?Model
     {
         $class = static::classFromId($id);
-        if (empty($class)){
+        if (empty($class)) {
             return null;
         }
 

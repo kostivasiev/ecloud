@@ -23,7 +23,8 @@ class CreateFloatingIpResource extends TaskJob
         }
 
         $this->createSyncableResource(
-            FloatingIpResource::class, [
+            FloatingIpResource::class,
+            [
                 'floating_ip_id' => $floatingIp->id
             ],
             function ($floatingIpResource) use ($resource) {

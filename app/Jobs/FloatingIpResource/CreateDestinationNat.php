@@ -33,12 +33,13 @@ class CreateDestinationNat extends TaskJob
         }
 
         $this->createSyncableResource(
-            Nat::class, [
-            'action' => Nat::ACTION_DNAT,
-            'sequence' => config('defaults.floating-ip.nat.sequence'),
-            'destination_id' => $floatingIp->id,
-            'translated_id' => $resource->id
-        ],
+            Nat::class,
+            [
+                'action' => Nat::ACTION_DNAT,
+                'sequence' => config('defaults.floating-ip.nat.sequence'),
+                'destination_id' => $floatingIp->id,
+                'translated_id' => $resource->id
+            ],
             function ($nat) use ($floatingIp, $resource) {
                 $nat->destination()->associate($floatingIp);
                 $nat->translated()->associate($resource);
