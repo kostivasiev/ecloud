@@ -3,21 +3,20 @@
 namespace App\Jobs\AffinityRule;
 
 use App\Jobs\Job;
-use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 
-class CheckMemberState extends AffinityRuleJob
+class CheckMemberState extends Job
 {
     use Batchable, LoggableModelJob;
 
-    public $backoff = 5;
-
     private $task;
     private $model;
+
+    public $backoff = 5;
 
     public function __construct(Task $task)
     {

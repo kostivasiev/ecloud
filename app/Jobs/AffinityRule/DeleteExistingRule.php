@@ -14,12 +14,12 @@ class DeleteExistingRule extends Job
 {
     use Batchable, LoggableModelJob;
 
+    private Task $task;
+    private AffinityRule $model;
+
     public const GET_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint';
     public const DELETE_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint/%s';
     public array $existingRules = [];
-
-    private Task $task;
-    private AffinityRule $model;
 
     public function __construct(Task $task)
     {

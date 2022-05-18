@@ -14,11 +14,11 @@ class CreateAffinityRule extends Job
 {
     use Batchable, LoggableModelJob;
 
-    public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
-    public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
-
     private Task $task;
     private AffinityRule $model;
+
+    public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
+    public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
 
     public function __construct(Task $task)
     {
