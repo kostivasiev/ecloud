@@ -3,7 +3,10 @@
 namespace App\Http\Requests\V2\NetworkRulePort;
 
 use App\Models\V2\NetworkRule;
+use App\Models\V2\NetworkRulePort;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsPortWithinExistingRange;
+use App\Rules\V2\IsUniquePortOrRange;
 use App\Rules\V2\NetworkRulePort\CanCreatePortForNetworkRule;
 use App\Rules\V2\ValidPortReference;
 use Illuminate\Foundation\Http\FormRequest;
@@ -30,12 +33,16 @@ class Create extends FormRequest
             'source' => [
                 'required_if:protocol,TCP,UDP',
                 'string',
-                new ValidPortReference()
+                new ValidPortReference(),
+                new IsUniquePortOrRange(NetworkRulePort::class),
+                new IsPortWithinExistingRange(NetworkRulePort::class),
             ],
             'destination' => [
                 'required_if:protocol,TCP,UDP',
                 'string',
-                new ValidPortReference()
+                new ValidPortReference(),
+                new IsUniquePortOrRange(NetworkRulePort::class),
+                new IsPortWithinExistingRange(NetworkRulePort::class),
             ],
         ];
     }

@@ -3,9 +3,11 @@
 namespace App\Http\Requests\V2\FirewallRulePort;
 
 use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsPortWithinExistingRange;
+use App\Rules\V2\IsUniquePortOrRange;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
-use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Foundation\Http\FormRequest;
 
 class Create extends FormRequest
@@ -36,13 +38,17 @@ class Create extends FormRequest
                 'required_if:protocol,TCP,UDP',
                 'string',
                 'nullable',
-                new ValidFirewallRulePortSourceDestination()
+                new ValidFirewallRulePortSourceDestination(),
+                new IsUniquePortOrRange(FirewallRulePort::class),
+                new IsPortWithinExistingRange(FirewallRulePort::class),
             ],
             'destination' => [
                 'required_if:protocol,TCP,UDP',
                 'string',
                 'nullable',
-                new ValidFirewallRulePortSourceDestination()
+                new ValidFirewallRulePortSourceDestination(),
+                new IsUniquePortOrRange(FirewallRulePort::class),
+                new IsPortWithinExistingRange(FirewallRulePort::class),
             ]
         ];
     }
