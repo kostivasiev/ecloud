@@ -36,10 +36,7 @@ class DeleteFloatingIpResourceTest extends TestCase
             $this->task->save();
         });
 
-        $this->floatingIpResource = FloatingIpResource::factory()->make();
-        $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $this->floatingIpResource->resource()->associate($this->ipAddress());
-        $this->floatingIpResource->save();
+        $this->floatingIpResource = $this->assignFloatingIp($this->floatingIp(), $this->ipAddress());
     }
 
     public function testSuccess()

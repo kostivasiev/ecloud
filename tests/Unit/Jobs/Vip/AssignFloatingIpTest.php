@@ -5,7 +5,6 @@ namespace Tests\Unit\Jobs\Vip;
 use App\Events\V2\Task\Created;
 use App\Jobs\Tasks\FloatingIp\Assign;
 use App\Jobs\Vip\AssignFloatingIp;
-use App\Models\V2\FloatingIpResource;
 use App\Models\V2\Task;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
@@ -91,11 +90,7 @@ class AssignFloatingIpTest extends TestCase
 
         $clusterIp = $this->vip()->assignClusterIp();
 
-        // Create the pivot between a fIP and resource
-        $this->floatingIpResource = FloatingIpResource::factory()->make();
-        $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $this->floatingIpResource->resource()->associate($clusterIp);
-        $this->floatingIpResource->save();
+        $this->assignFloatingIp($this->floatingIp(), $clusterIp);
 
         $task = $this->createSyncUpdateTask($this->vip(), [
             'allocate_floating_ip' => true,

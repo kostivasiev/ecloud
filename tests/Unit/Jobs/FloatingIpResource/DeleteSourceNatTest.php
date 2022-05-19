@@ -22,11 +22,7 @@ class DeleteSourceNatTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        // Create the pivot between a fIP and an IP address
-        $this->floatingIpResource = FloatingIpResource::factory()->make();
-        $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $this->floatingIpResource->resource()->associate($this->ipAddress());
-        $this->floatingIpResource->save();
+        $this->floatingIpResource = $this->assignFloatingIp($this->floatingIp(), $this->ipAddress());
 
         $this->task = $this->createSyncDeleteTask($this->floatingIpResource);
     }
