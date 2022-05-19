@@ -71,6 +71,6 @@ abstract class TaskJob extends Job
 
     public function retryUntil(): \DateTime
     {
-        return now()->addMinutes(10);
+        return now()->addMinutes(60);
     }
 }

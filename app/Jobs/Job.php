@@ -25,6 +25,6 @@ abstract class Job implements ShouldQueue
 
     public function retryUntil(): \DateTime
     {
-        return now()->addMinutes(10);
+        return now()->addMinutes(60);
     }
 }
