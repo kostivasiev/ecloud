@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Unit\Jobs\AffinityRule;
+namespace Tests\Unit\Jobs\AffinityRuleMember;
 
-use App\Jobs\AffinityRule\AwaitRuleCreation;
+use App\Jobs\AffinityRuleMember\AwaitRuleCreation;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Task;
@@ -39,7 +39,7 @@ class AwaitRuleCreationTest extends TestCase
                 'completed' => false,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $task->resource()->associate($this->affinityRule);
+            $task->resource()->associate($this->affinityRuleMember);
             $task->save();
             return $task;
         });

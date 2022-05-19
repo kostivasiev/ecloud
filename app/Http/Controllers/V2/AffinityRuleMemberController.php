@@ -50,10 +50,10 @@ class AffinityRuleMemberController extends BaseController
             'affinity_rule_id' => $affinityRuleId
         ]);
 
-        $task = $model->withTaskLock(function () use ($model) {
-            $model->save();
-            return $model->affinityRule->syncSave();
-        });
+        $task = $model->affinityRule
+            ->withTaskLock(function () use ($model) {
+                return $model->syncSave();
+            });
 
         return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
@@ -66,10 +66,10 @@ class AffinityRuleMemberController extends BaseController
         $model = AffinityRuleMember::forUser($request->user())
             ->findOrFail($affinityRuleMemberId);
 
-        $task = $model->withTaskLock(function () use ($model) {
-            $model->delete();
-            return $model->affinityRule->syncDelete();
-        });
+        $task = $model->affinityRule
+            ->withTaskLock(function () use ($model) {
+                return $model->syncSave();
+            });
 
         return $this->responseTaskId($task->id, 204);
     }

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Jobs\AffinityRule;
+namespace App\Jobs\AffinityRuleMember;
 
 use App\Jobs\Job;
-use App\Models\V2\AffinityRule;
+use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
@@ -15,7 +15,7 @@ class AwaitRuleDeletion extends Job
     use Batchable, LoggableModelJob;
 
     public Task $task;
-    public AffinityRule $model;
+    public AffinityRuleMember $model;
 
     public int $backoff = 5;
 
@@ -47,7 +47,7 @@ class AwaitRuleDeletion extends Job
             }
         }
         Log::info('Rule deletion complete', [
-            'affinity_rule_id' => $this->model->id,
+            'affinity_rule_id' => $this->model->affinityRule->id,
         ]);
     }
 

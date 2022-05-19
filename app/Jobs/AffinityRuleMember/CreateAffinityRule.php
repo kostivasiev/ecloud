@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Jobs\AffinityRule;
+namespace App\Jobs\AffinityRuleMember;
 
 use App\Jobs\Job;
-use App\Models\V2\AffinityRule;
+use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\HostGroup;
+use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
@@ -15,10 +16,11 @@ class CreateAffinityRule extends Job
     use Batchable, LoggableModelJob;
 
     private Task $task;
-    private AffinityRule $model;
+    private AffinityRuleMember $model;
 
     public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
     public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
+    public const GET_HOSTGROUP_URI = '/api/v2/vpc/%s/instance/%s';
 
     public function __construct(Task $task)
     {
@@ -28,28 +30,33 @@ class CreateAffinityRule extends Job
 
     public function handle()
     {
-        if ($this->model->affinityRuleMembers()->count() <= 0) {
+        $hostGroups = [];
+        if ($this->model->affinityRule->affinityRuleMembers()->count() <= 0) {
             Log::info('Rule has no members, skipping', [
                 'affinity_rule_id' => $this->model->id,
             ]);
             return;
         }
 
-        if ($this->model->affinityRuleMembers()->count() < 2) {
+        if ($this->model->affinityRule->affinityRuleMembers()->count() < 2) {
             Log::info('Affinity rules need at least two members', [
                 'affinity_rule_id' => $this->model->id,
-                'member_count' => $this->model->affinityRuleMembers()->count(),
+                'member_count' => $this->model->affinityRule->affinityRuleMembers()->count(),
             ]);
             return;
         }
 
-        $instanceIds = $this->model->affinityRuleMembers()->get()
+        $instanceIds = $this->model->affinityRule->affinityRuleMembers()->get()
             ->pluck('instance_id')
             ->toArray();
 
-        $this->model->vpc->hostGroups()->each(function (HostGroup $hostGroup) use ($instanceIds) {
+        try {
+            $hostGroup = $this->getHostGroup($this->model->instance);
             $this->createAffinityRule($hostGroup, $instanceIds);
-        });
+        } catch (\Exception $e) {
+            $this->fail($e);
+            return;
+        }
     }
 
     public function createAffinityRule(HostGroup $hostGroup, array $instanceIds)
@@ -63,8 +70,8 @@ class CreateAffinityRule extends Job
                 sprintf($uriEndpoint, $hostGroup->id),
                 [
                     'json' => [
-                        'ruleName' => $this->model->id,
-                        'vpcId' => $this->model->vpc->id,
+                        'ruleName' => $this->model->affinityRule->id,
+                        'vpcId' => $this->model->affinityRule->vpc->id,
                         'instanceIds' => $instanceIds,
                     ],
                 ]
@@ -78,15 +85,53 @@ class CreateAffinityRule extends Job
                 $this->task->updateData('created_rules', $createdRules);
                 return true;
             } else {
-                $this->fail(new \Exception('Failed to create rule'));
+                throw new \Exception('Failed to create rule');
             }
         } catch (\Exception $e) {
             Log::info('Failed to create affinity rule', [
-                'affinity_rule_id' => $this->model->id,
+                'affinity_rule_id' => $this->model->affinityRule->id,
                 'hostgroup_id' => $hostGroup->id,
                 'message' => $e->getMessage(),
             ]);
-            $this->fail($e);
+            throw $e;
         }
+    }
+
+    /**
+     * @param Instance $instance
+     * @return HostGroup|null
+     * @throws \Exception
+     */
+    public function getHostGroup(Instance $instance): ?HostGroup
+    {
+        if ($instance->hostGroup !== null) {
+            return $instance->hostGroup;
+        }
+
+        try {
+            $response = $instance->availabilityZone
+                ->kingpinService()
+                ->get(
+                    sprintf(static::GET_HOSTGROUP_URI, $instance->vpc->id, $instance->id)
+                );
+        } catch (\Exception $e) {
+            Log::info('Unable to retrieve hostgroup data for instance', [
+                'instance_id' => $instance->id,
+                'vpc_id' => $instance->vpc->id,
+            ]);
+            throw $e;
+        }
+        $hostGroup = HostGroup::find(
+            (json_decode($response->getBody()->getContents()))->hostGroupID
+        );
+        if (!$hostGroup) {
+            throw new \Exception(
+                sprintf(
+                    'Hostgroup %s could not be found',
+                    (json_decode($response->getBody()->getContents()))->hostGroupID
+                )
+            );
+        }
+        return $hostGroup;
     }
 }

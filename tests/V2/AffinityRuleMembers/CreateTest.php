@@ -2,13 +2,13 @@
 
 namespace Tests\V2\AffinityRuleMembers;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -34,6 +34,8 @@ class CreateTest extends TestCase
             'affinity_rule_id' => $this->affinityRule->id,
             'instance_id' => $this->instanceModel()->id,
         ];
+
+        Event::fake([Created::class]);
 
         $this->asUser()
             ->post(sprintf(static::RESOURCE_URI, $this->affinityRule->id, ''), $data)
@@ -70,15 +72,10 @@ class CreateTest extends TestCase
             'instance_id' => $this->instanceModel()->id,
         ];
 
-        Event::fake([JobFailed::class]);
+        Event::fake([Created::class]);
 
         $this->asUser()
             ->post(sprintf(static::RESOURCE_URI, $this->affinityRule->id, ''), $data)
             ->assertStatus(202);
-
-        Event::assertDispatched(JobFailed::class);
-
-        $this->affinityRule->refresh();
-        $this->assertEquals(Sync::STATUS_FAILED, $this->affinityRule->sync->status);
     }
 }
