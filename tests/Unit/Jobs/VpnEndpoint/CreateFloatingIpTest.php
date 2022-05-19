@@ -5,6 +5,7 @@ namespace Tests\Unit\Jobs\VpnEndpoint;
 use App\Events\V2\Task\Created;
 use App\Jobs\VpnEndpoint\CreateFloatingIp;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\Nat;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
@@ -27,14 +28,14 @@ class CreateFloatingIpTest extends TestCase
 
         Event::fake([Created::class]);
 
-        $this->assertNull($this->vpnEndpoint('vpne-test', false)->floatingIp);
+        $this->assertFalse($this->vpnEndpoint()->floatingIpResource()->exists());
 
         $task = Task::withoutEvents(function () {
             $task = new Task([
                 'id' => 'task-1',
                 'name' => Sync::TASK_NAME_UPDATE,
             ]);
-            $task->resource()->associate($this->vpnEndpoint('vpne-test', false));
+            $task->resource()->associate($this->vpnEndpoint());
             $task->save();
             return $task;
         });
@@ -47,7 +48,10 @@ class CreateFloatingIpTest extends TestCase
 
         $this->vpnEndpoint()->refresh();
 
-        $this->assertNotNull($this->vpnEndpoint()->floatingIp);
+        Event::assertDispatched(Created::class, function ($event) {
+            return $event->model->name == Sync::TASK_NAME_UPDATE
+                && $event->model->resource instanceof FloatingIp;
+        });
 
         $task->refresh();
 
@@ -72,21 +76,17 @@ class CreateFloatingIpTest extends TestCase
                     'floating_ip_id' => $this->floatingIp()->id,
                 ]
             ]);
-            $task->resource()->associate($this->vpnEndpoint('vpne-test', false));
+            $task->resource()->associate($this->vpnEndpoint());
             $task->save();
             return $task;
         });
+
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
 
         dispatch(new CreateFloatingIp($task));
 
         Event::assertNotDispatched(JobFailed::class);
 
-        $this->vpnEndpoint()->refresh();
-        $this->assertNotNull($this->vpnEndpoint()->floatingIp);
-        $task->refresh();
-        $this->assertEquals($this->floatingIp()->id, $task->data['floating_ip_id']);
-
-        $this->floatingIp()->refresh();
-        $this->assertNotNull($this->floatingIp()->resource_id);
+        Event::assertNotDispatched(Created::class);
     }
 }

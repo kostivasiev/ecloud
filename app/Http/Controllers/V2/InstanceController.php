@@ -509,12 +509,15 @@ class InstanceController extends BaseController
     {
         $nics = Instance::forUser($request->user())->findOrFail($instanceId)->nics();
 
-        $collection = FloatingIp::where(function ($query) use ($nics) {
-            $query->whereIn('resource_id', $nics->pluck('id'));
+        $collection = FloatingIp::whereHas('floatingIpResource', function ($query) use ($nics) {
+            $query->where(function ($query) use ($nics) {
+                //TODO: To be removed - Assigning a NIC directly to a fIP is deprecated
+                $query->whereIn('resource_id', $nics->pluck('id'));
 
-            $query->orWhereIn('resource_id', IpAddress::whereHas('nics', function ($query) use ($nics) {
-                return $query->whereIn('id', $nics->pluck('id'));
-            })->pluck('id'));
+                $query->orWhereIn('resource_id', IpAddress::whereHas('nics', function ($query) use ($nics) {
+                    return $query->whereIn('id', $nics->pluck('id'));
+                })->pluck('id'));
+            });
         });
 
         return FloatingIpResource::collection(

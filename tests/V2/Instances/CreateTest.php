@@ -328,7 +328,7 @@ class CreateTest extends TestCase
     {
         $this->floatingIpResource = FloatingIpResource::factory()->make();
         $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $this->floatingIpResource->resource()->associate($this->ip());
+        $this->floatingIpResource->resource()->associate($this->ipAddress());
         $this->floatingIpResource->save();
 
         $data = [

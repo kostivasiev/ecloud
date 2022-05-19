@@ -54,6 +54,8 @@ class UnassignFloatingIpTest extends TestCase
             $this->task->save();
         });
 
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
+
         Event::fake([JobProcessed::class, Created::class]);
 
         dispatch(new UnassignFloatingIP($this->task));
@@ -83,7 +85,7 @@ class UnassignFloatingIpTest extends TestCase
             'name' => 'floating_ip_unassign'
         ]);
 
-        FloatingIpResource::factory()->assignedTo($this->floatingIp(), $this->vpnEndpoint())->create();
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
 
         $this->vpnEndpoint()->floatingIp->tasks()->save($assignTask);
 
@@ -120,6 +122,8 @@ class UnassignFloatingIpTest extends TestCase
             $task->save();
             $this->floatingIp()->refresh();
         });
+
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
 
         $this->assertEquals(Sync::STATUS_FAILED, $this->floatingIp()->sync->status);
 

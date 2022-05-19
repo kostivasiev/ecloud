@@ -25,7 +25,7 @@ class DeleteDestinationNatTest extends TestCase
         // Create the pivot between a fIP and an IP address
         $this->floatingIpResource = FloatingIpResource::factory()->make();
         $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $this->floatingIpResource->resource()->associate($this->ip());
+        $this->floatingIpResource->resource()->associate($this->ipAddress());
         $this->floatingIpResource->save();
 
         $this->task = $this->createSyncDeleteTask($this->floatingIpResource);
@@ -37,7 +37,7 @@ class DeleteDestinationNatTest extends TestCase
 
         $destinationNat = app()->make(Nat::class);
         $destinationNat->destination()->associate($this->floatingIp());
-        $destinationNat->translated()->associate($this->ip());
+        $destinationNat->translated()->associate($this->ipAddress());
         $destinationNat->action = Nat::ACTION_DNAT;
         $destinationNat->save();
 

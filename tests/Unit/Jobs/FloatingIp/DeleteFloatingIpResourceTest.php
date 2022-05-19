@@ -29,7 +29,7 @@ class DeleteFloatingIpResourceTest extends TestCase
                 'name' => Unassign::$name,
                 'job' => Unassign::class,
                 'data' => [
-                    'resource_id' => $this->ip()->id,
+                    'resource_id' => $this->ipAddress()->id,
                 ]
             ]);
             $this->task->resource()->associate($this->floatingIp());
@@ -38,7 +38,7 @@ class DeleteFloatingIpResourceTest extends TestCase
 
         $this->floatingIpResource = FloatingIpResource::factory()->make();
         $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $this->floatingIpResource->resource()->associate($this->ip());
+        $this->floatingIpResource->resource()->associate($this->ipAddress());
         $this->floatingIpResource->save();
     }
 

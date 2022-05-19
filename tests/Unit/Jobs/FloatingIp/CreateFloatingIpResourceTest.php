@@ -27,7 +27,7 @@ class CreateFloatingIpResourceTest extends TestCase
                 'name' => Assign::$name,
                 'job' => Assign::class,
                 'data' => [
-                    'resource_id' => $this->ip()->id,
+                    'resource_id' => $this->ipAddress()->id,
                 ]
             ]);
             $this->task->resource()->associate($this->floatingIp());
@@ -66,11 +66,11 @@ class CreateFloatingIpResourceTest extends TestCase
 
         $this->assertEquals($this->floatingIp()->id, $floatingIpResource->floatingIp->id);
 
-        $this->assertEquals($this->ip()->id, $floatingIpResource->resource_id);
+        $this->assertEquals($this->ipAddress()->id, $floatingIpResource->resource_id);
         $this->assertEquals('ip', $floatingIpResource->resource_type);
 
         $this->assertInstanceOf(IpAddress::class, $floatingIpResource->resource);
-        $this->assertEquals($this->ip()->id, $floatingIpResource->resource->id);
+        $this->assertEquals($this->ipAddress()->id, $floatingIpResource->resource->id);
     }
 
     public function testUnableToLoadResourceFails()

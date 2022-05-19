@@ -87,7 +87,7 @@ class FloatingIp extends Model implements Searchable, ResellerScopeable, Availab
 
     public function getResourceIdAttribute()
     {
-        return $this?->floatingIpResource?->resource->id;
+        return $this?->floatingIpResource?->resource?->id;
     }
 
     public function sieve(Sieve $sieve)

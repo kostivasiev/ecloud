@@ -23,12 +23,12 @@ trait VpnEndpointMock
                 ]);
             });
 
-            if ($assignFloatingIp) {
-                // Assign fIP
-                $floatingIpResource = FloatingIpResource::factory()->assignedTo($this->floatingIp(), $this->vpnEndpoint)->make();
-                $floatingIpResource->id = 'fipr-test';
-                $floatingIpResource->save();
-            }
+//            if ($assignFloatingIp) {
+//                // Assign fIP
+//                $floatingIpResource = FloatingIpResource::factory()->assignedTo($this->floatingIp(), $this->vpnEndpoint)->make();
+//                $floatingIpResource->id = 'fipr-test';
+//                $floatingIpResource->save();
+//            }
         }
         return $this->vpnEndpoint;
     }

@@ -26,7 +26,7 @@ class CreateDestinationNatTest extends TestCase
         // Create the pivot between a fIP and an IP address
         $this->floatingIpResource = FloatingIpResource::factory()->make();
         $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $this->floatingIpResource->resource()->associate($this->ip());
+        $this->floatingIpResource->resource()->associate($this->ipAddress());
         $this->floatingIpResource->save();
 
         $this->task = $this->createSyncUpdateTask($this->floatingIpResource);
@@ -67,7 +67,7 @@ class CreateDestinationNatTest extends TestCase
 
         $this->assertEquals($this->floatingIp()->id, $nat->destination_id);
         $this->assertEquals('fip', $nat->destinationable_type);
-        $this->assertEquals($this->ip()->id, $nat->translated_id);
+        $this->assertEquals($this->ipAddress()->id, $nat->translated_id);
         $this->assertEquals('ip', $nat->translatedable_type);
         $this->assertEquals(Nat::ACTION_DNAT, $nat->action);
     }

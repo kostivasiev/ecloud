@@ -55,7 +55,7 @@ class VpnEndpoint extends Model implements Filterable, Sortable, AvailabilityZon
 
     public function floatingIp()
     {
-        return $this?->floatingIpResource->floatingIp();
+        return $this?->floatingIpResource?->floatingIp();
     }
 
     public function getResellerId(): int

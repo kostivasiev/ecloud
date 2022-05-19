@@ -15,7 +15,7 @@ class Deploy extends TaskJob
             return;
         }
 
-        if (!$vpnEndpoint->floatingIp) {
+        if (!$vpnEndpoint->floatingIpResource()->exists()) {
             $this->fail(new \Exception('Failed to load floating IP for VPN Endpoint ' . $vpnEndpoint->id));
             return;
         }

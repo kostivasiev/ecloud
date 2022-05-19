@@ -21,7 +21,7 @@ class MigrateFipsTest extends TestCase
     {
         parent::setUp();
         Event::fake(Created::class);
-        $this->nic()->ipAddresses()->attach($this->ip());
+        $this->nic()->ipAddresses()->attach($this->ipAddress());
         $this->floatingIp()->resource()->associate($this->nic());
         $this->floatingIp()->save();
         $this->job = \Mockery::mock(MigrateFips::class)->makePartial();

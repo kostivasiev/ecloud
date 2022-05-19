@@ -15,7 +15,7 @@ class UpdateTest extends TestCase
     public function testValidDataIsSuccessful()
     {
         $this->patch(
-            '/v2/ip-addresses/' . $this->ip()->id,
+            '/v2/ip-addresses/' . $this->ipAddress()->id,
             [
                 'name' => 'UPDATED',
                 'ip_address' => '10.0.0.6',
@@ -24,7 +24,7 @@ class UpdateTest extends TestCase
         $this->assertDatabaseHas(
             'ip_addresses',
             [
-                'id' => $this->ip()->id,
+                'id' => $this->ipAddress()->id,
                 'name' => 'UPDATED',
             ],
             'ecloud'
@@ -36,7 +36,7 @@ class UpdateTest extends TestCase
         $this->be((new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write'])));
 
         $this->patch(
-            '/v2/ip-addresses/' . $this->ip()->id,
+            '/v2/ip-addresses/' . $this->ipAddress()->id,
             [
                 'name' => 'UPDATED',
                 'ip_address' => '10.0.0.6',
@@ -46,7 +46,7 @@ class UpdateTest extends TestCase
             'ip_addresses',
             [
                 'name' => 'UPDATED',
-                'ip_address' => $this->ip()->ip_address,
+                'ip_address' => $this->ipAddress()->ip_address,
             ],
             'ecloud'
         );

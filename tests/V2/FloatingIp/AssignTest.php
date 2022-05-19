@@ -21,7 +21,7 @@ class AssignTest extends TestCase
         Event::fake([Created::class]);
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/assign', [
-            'resource_id' => $this->ip()->id
+            'resource_id' => $this->ipAddress()->id
         ])->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
@@ -33,11 +33,11 @@ class AssignTest extends TestCase
     {
         $floatingIpResource = app()->make(FloatingIpResource::class);
         $floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $floatingIpResource->resource()->associate($this->ip());
+        $floatingIpResource->resource()->associate($this->ipAddress());
         $floatingIpResource->save();
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/assign', [
-            'resource_id' => $this->ip()->id
+            'resource_id' => $this->ipAddress()->id
         ])->assertStatus(409);
     }
 }
