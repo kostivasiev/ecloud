@@ -34,7 +34,10 @@ class DeployTest extends TestCase
             $this->task->save();
         });
 
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
+
         Event::fake([Created::class]);
+
         $this->nsxServiceMock()->shouldReceive('patch')
             ->withArgs([
                 '/policy/api/v1/infra/tier-1s/' . $this->router()->id .
@@ -45,8 +48,8 @@ class DeployTest extends TestCase
                         'resource_type' => 'IPSecVpnLocalEndpoint',
                         'display_name' => $this->vpnEndpoint()->id,
                         'description' => $this->vpnEndpoint()->name,
-                        'local_id' => $this->vpnEndpoint()->floatingIp->ip_address,
-                        'local_address' => $this->vpnEndpoint()->floatingIp->ip_address
+                        'local_id' => $this->floatingIp()->ip_address,
+                        'local_address' => $this->floatingIp()->ip_address
                     ]
                 ]
             ])

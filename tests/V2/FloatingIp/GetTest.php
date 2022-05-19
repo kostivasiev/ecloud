@@ -2,7 +2,6 @@
 
 namespace Tests\V2\FloatingIp;
 
-use App\Models\V2\FloatingIpResource;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Task;
 use Tests\TestCase;
@@ -31,12 +30,8 @@ class GetTest extends TestCase
 
     public function testShow()
     {
-        // Create the pivot between a fIP and an IP address
         $ipAddress = IpAddress::factory()->create();
-        $floatingIpResource = FloatingIpResource::factory()->make();
-        $floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $floatingIpResource->resource()->associate($ipAddress);
-        $floatingIpResource->save();
+        $this->assignFloatingIp($this->floatingIp(), $ipAddress);
 
         $this->get('/v2/floating-ips/' . $this->floatingIp()->id)
             ->assertJsonFragment([

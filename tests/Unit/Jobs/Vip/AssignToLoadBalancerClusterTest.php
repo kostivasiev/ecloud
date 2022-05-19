@@ -19,7 +19,8 @@ class AssignToLoadBalancerClusterTest extends TestCase
     public function testCreateVipSuccess()
     {
         $clusterIp = $this->vip()->assignClusterIp();
-        $this->floatingIp()->resource()->associate($clusterIp)->save();
+
+        $this->assignFloatingIp($this->floatingIp(), $clusterIp);
 
         $this->loadBalancer()->setAttribute('config_id', 321)->saveQuietly();
 
