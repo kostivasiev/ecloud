@@ -25,7 +25,7 @@ class UnassignFloatingIP extends TaskJob
                 Unassign::class
             );
 
-            $this->info('Triggered ' . Unassign::$name . ' task ' . $task->id . ' for Floating IP (' . $vpnEndpoint->floatingIp->id . ')');
+            $this->info('Triggered ' . Unassign::$name . ' task ' . $task->id . ' for Floating IP (' . $vpnEndpoint->floatingIpresource->floatingIp->id . ')');
             $this->task->updateData('floatingip_detach_task_id', $task->id);
         } else {
             $task = Task::findOrFail($this->task->data['floatingip_detach_task_id']);

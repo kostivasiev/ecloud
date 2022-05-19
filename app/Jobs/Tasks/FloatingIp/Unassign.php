@@ -29,7 +29,7 @@ class Unassign extends Job
     {
         $this->updateTaskBatch([
             [
-                DeleteFloatingIpResource::class,
+                new DeleteFloatingIpResource($this->task),
             ]
         ])->dispatch();
     }
