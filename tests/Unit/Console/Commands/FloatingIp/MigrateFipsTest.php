@@ -22,8 +22,7 @@ class MigrateFipsTest extends TestCase
         parent::setUp();
         Event::fake(Created::class);
         $this->nic()->ipAddresses()->attach($this->ipAddress());
-        $this->floatingIp()->resource()->associate($this->nic());
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $this->nic());
         $this->job = \Mockery::mock(MigrateFips::class)->makePartial();
         $this->job->allows('option')->with('test-run')->andReturnFalse();
         $this->job->allows('info')->withAnyArgs()->andReturnTrue();
@@ -31,7 +30,7 @@ class MigrateFipsTest extends TestCase
 
     public function testSuccessfulChange()
     {
-        $this->assertEquals('nic', $this->floatingIp()->resource_type);
+        $this->assertEquals('nic', $this->floatingIp()->floatingIpResource->resource_type);
 
         $this->job->handle();
 
@@ -45,8 +44,8 @@ class MigrateFipsTest extends TestCase
 
         $this->floatingIp()->refresh();
 
-        $this->assertNotEquals('nic', $this->floatingIp()->resource_type);
-        $this->assertEquals('ip', $this->floatingIp()->resource_type);
+        $this->assertNotEquals('nic', $this->floatingIp()->floatingIpResource->resource_type);
+        $this->assertEquals('ip', $this->floatingIp()->floatingIpResource->resource_type);
     }
 
     public function testRecordUnchanged()
@@ -60,13 +59,16 @@ class MigrateFipsTest extends TestCase
             ->create([
                 'ip_address' => $this->faker->ipv4()
             ]);
+
         $floatingIp = FloatingIp::factory()
             ->forVpc()
             ->forAvailabilityZone()
-            ->for($ip, 'resource')
             ->create([
                 'ip_address' => $ip->ip_address,
             ]);
+
+        $this->assignFloatingIp($floatingIp, $ip);
+
         $originalIp = $ip->ip_address;
 
         $this->job->handle();

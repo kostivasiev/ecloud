@@ -30,7 +30,7 @@ class UnassignFloatingIP extends Job
 
         $instance->nics()->each(function ($nic) {
             //-- TODO: Delete this after we have run the artisan script to migrate fips from NICs to ipAddress!
-            if ($nic->floatingIp()->exists()) {
+            if ($nic->floatingIpResource()->exists()) {
                 $this->taskIds[] = $nic->floatingIp->createTaskWithLock(
                     'floating_ip_unassign',
                     \App\Jobs\Tasks\FloatingIp\Unassign::class

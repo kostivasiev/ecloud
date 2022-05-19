@@ -29,8 +29,8 @@ class Deploy extends TaskJob
                     'resource_type' => 'IPSecVpnLocalEndpoint',
                     'display_name' => $vpnEndpoint->id,
                     'description' => $vpnEndpoint->name,
-                    'local_id' => $vpnEndpoint->floatingIp->ip_address,
-                    'local_address' => $vpnEndpoint->floatingIp->ip_address
+                    'local_id' => $vpnEndpoint->floatingIpResource->floatingIp->ip_address,
+                    'local_address' => $vpnEndpoint->floatingIpResource->floatingIp->ip_address
                 ]
             ]
         );

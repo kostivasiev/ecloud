@@ -30,8 +30,7 @@ class UnassignFloatingIpTest extends TestCase
     {
         Event::fake([JobProcessed::class, Created::class]);
 
-        $this->floatingIp()->resource()->associate($this->nic());
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $this->nic());
 
         $job = \Mockery::mock(UnassignFloatingIP::class, [$this->instanceModel()])->makePartial();
         $job->shouldReceive('awaitTasks')->andReturn(true);
@@ -51,8 +50,7 @@ class UnassignFloatingIpTest extends TestCase
         $ipAddress = IpAddress::factory()->create();
         $ipAddress->nics()->sync($this->nic());
 
-        $this->floatingIp()->resource()->associate($ipAddress);
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $ipAddress);
 
         $job = \Mockery::mock(UnassignFloatingIP::class, [$this->instanceModel()])->makePartial();
         $job->shouldReceive('awaitTasks')->andReturn(true);
@@ -72,8 +70,7 @@ class UnassignFloatingIpTest extends TestCase
         $ipAddress = IpAddress::factory()->create();
         $ipAddress->nics()->sync($this->nic());
 
-        $this->floatingIp()->resource()->associate($ipAddress);
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $ipAddress);
 
         $task = new Task([
             'id' => 'task-test',
@@ -99,8 +96,7 @@ class UnassignFloatingIpTest extends TestCase
         $ipAddress = IpAddress::factory()->create();
         $ipAddress->nics()->sync($this->nic());
 
-        $this->floatingIp()->resource()->associate($ipAddress);
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $ipAddress);
 
         $task = new Task([
             'id' => 'task-test',

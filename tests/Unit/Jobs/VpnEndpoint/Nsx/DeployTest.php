@@ -110,6 +110,8 @@ class DeployTest extends TestCase
             $this->task->save();
         });
 
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
+
         $this->expectException(RequestException::class);
         Event::fake([JobFailed::class]);
         $this->nsxServiceMock()->shouldReceive('patch')
@@ -122,8 +124,8 @@ class DeployTest extends TestCase
                         'resource_type' => 'IPSecVpnLocalEndpoint',
                         'display_name' => $this->vpnEndpoint()->id,
                         'description' => $this->vpnEndpoint()->name,
-                        'local_id' => $this->vpnEndpoint()->floatingIp->ip_address,
-                        'local_address' => $this->vpnEndpoint()->floatingIp->ip_address
+                        'local_id' => $this->vpnEndpoint()->floatingIpResource->floatingIp->ip_address,
+                        'local_address' => $this->vpnEndpoint()->floatingIpResource->floatingIp->ip_address
                     ]
                 ]
             ])

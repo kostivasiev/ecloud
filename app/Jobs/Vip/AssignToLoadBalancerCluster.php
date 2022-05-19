@@ -25,7 +25,7 @@ class AssignToLoadBalancerCluster extends TaskJob
 
         $vipEntity->internalCidr = $vip->ipAddress->getIPAddress() . '/' . $vip->loadBalancerNetwork->network->getNetworkPrefix();
 
-        if ($vip->ipAddress->floatingIp()->exists()) {
+        if ($vip->ipAddress->floatingIpResource()->exists()) {
             // convert to CIDR format /32 is 1 IP address in subnet
             $vipEntity->externalCidr = $vip->ipAddress->floatingIp->getIPAddress(). '/32';
         }

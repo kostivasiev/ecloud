@@ -36,8 +36,8 @@ class GetTest extends TestCase
         ]);
 
         $this->vpnEndpoint = VpnEndpoint::factory()->create();
-        $this->floatingIp->resource()->associate($this->vpnEndpoint);
-        $this->floatingIp->save();
+
+        $this->assignFloatingIp($this->floatingIp, $this->vpnEndpoint);
 
         $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id,

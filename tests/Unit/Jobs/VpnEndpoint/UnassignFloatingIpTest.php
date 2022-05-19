@@ -4,9 +4,7 @@ namespace Tests\Unit\Jobs\VpnEndpoint;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\VpnEndpoint\UnassignFloatingIP;
-use App\Models\V2\FloatingIpResource;
 use App\Models\V2\Task;
-use App\Models\V2\VpnEndpoint;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;

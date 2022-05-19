@@ -66,7 +66,7 @@ class CreateFloatingIpTest extends TestCase
 
         Event::fake([Created::class]);
 
-        $this->assertNull($this->vpnEndpoint('vpne-test', false)->floatingIp);
+        $this->assertFalse($this->vpnEndpoint()->floatingIpResource()->exists());
 
         $task = Task::withoutEvents(function () {
             $task = new Task([
