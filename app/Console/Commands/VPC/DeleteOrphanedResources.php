@@ -98,13 +98,21 @@ class DeleteOrphanedResources extends Command
                                 if (empty($resource->$parent)) {
                                     $existsOnNsx = 'Unknown - No soft deleted parent record found';
                                 } else {
-                                    $resource->availabilityZone->nsxService()->get($endpoint);
-                                    $existsOnNsx = 'Yes';
+                                    if ($resource->availabilityZone == null) {
+                                        $existsOnNsx = 'No';
+                                    } else {
+                                        $resource->availabilityZone->nsxService()->get($endpoint);
+                                        $existsOnNsx = 'Yes';
+                                    }
                                 }
                                 break;
                             case Router::class:
-                                $resource->availabilityZone->nsxService()->get($endpoint);
-                                $existsOnNsx = 'Yes';
+                                if ($resource->availabilityZone == null) {
+                                    $existsOnNsx = 'No';
+                                } else {
+                                    $resource->availabilityZone->nsxService()->get($endpoint);
+                                    $existsOnNsx = 'Yes';
+                                }
                                 break;
                         }
                     } catch (ClientException $e) {
