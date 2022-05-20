@@ -68,7 +68,7 @@ class AffinityRuleMemberController extends BaseController
 
         $task = $model->affinityRule
             ->withTaskLock(function () use ($model) {
-                return $model->syncSave();
+                return $model->syncDelete();
             });
 
         return $this->responseTaskId($task->id, 204);

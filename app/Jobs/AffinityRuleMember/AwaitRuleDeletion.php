@@ -57,8 +57,16 @@ class AwaitRuleDeletion extends Job
         if ($hostGroup) {
             try {
                 $response = $hostGroup->availabilityZone->kingpinService()
-                    ->get(sprintf(static::GET_CONSTRAINT_URI, $hostGroup->id));
+                    ->get(
+                        sprintf(static::GET_CONSTRAINT_URI, $hostGroup->id),
+                        [
+                            'headers' => [
+                                'X-MOCK-RULE-MEMBER' => $this->model->id,
+                            ],
+                        ]
+                    );
             } catch (\Exception $e) {
+                Log::info($e->getMessage());
                 Log::info('Contraints not found for hostgroup', [
                     'host_group_id' => $hostGroup->id,
                 ]);

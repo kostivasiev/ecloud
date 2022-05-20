@@ -63,7 +63,14 @@ class DeleteExistingRule extends Job
     {
         try {
             $response = $hostGroup->availabilityZone->kingpinService()
-                ->get(sprintf(static::GET_CONSTRAINT_URI, $hostGroup->id));
+                ->get(
+                    sprintf(static::GET_CONSTRAINT_URI, $hostGroup->id),
+                    [
+                        'body' => [
+                            'X-MOCK-RULE-NAME' => $this->model->id
+                        ]
+                    ]
+                );
         } catch (\Exception $e) {
             return false;
         }

@@ -1,0 +1,317 @@
+### 1. Setup - Create First Instance
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{dev_vpc_id}}",
+    "name": "Affinity Rule Instance 1",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": false,
+    "network_id": "{{dev_network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600
+}
+
+> {%
+client.global.set("instance_id_1", response.body.data.id);
+client.log("Instance ID 1: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/instances/{{instance_id_1}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### 2. Setup - Create Second Instance
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{dev_vpc_id}}",
+    "name": "Affinity Rule Instance 2",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": false,
+    "network_id": "{{dev_network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600
+}
+
+> {%
+client.global.set("instance_id_2", response.body.data.id);
+client.log("Instance ID 2: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/instances/{{instance_id_2}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### 3. Setup - Create Third Instance
+POST https://{{host}}/{{version}}/instances
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vpc_id": "{{dev_vpc_id}}",
+    "name": "Affinity Rule Instance 3",
+    "vcpu_cores": 1,
+    "ram_capacity": 1024,
+    "image_id": "{{dev_image_id}}",
+    "requires_floating_ip": false,
+    "network_id": "{{dev_network_id}}",
+    "volume_capacity": 30,
+    "volume_iops": 600
+}
+
+> {%
+client.global.set("instance_id_3", response.body.data.id);
+client.log("Instance ID 3: " + response.body.data.id);
+
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/instances/{{instance_id_3}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### 4. Create Affinity Rule
+POST https://{{host}}/{{version}}/affinity-rules
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test Rule",
+    "type": "anti-affinity",
+    "availability_zone_id": "{{dev_availability_zone_id}}",
+    "vpc_id": "{{dev_vpc_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('affinity_rule_id', response.body.data.id);
+%}
+
+### 5. Add first instance
+POST https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "instance_id": "{{instance_id_1}}"
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('affinity_rule_member_id_1', response.body.data.id);
+%}
+
+### 6. Add second instance
+POST https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "instance_id": "{{instance_id_2}}"
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('affinity_rule_member_id_2', response.body.data.id);
+%}
+
+### 7. Add third instance
+POST https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "instance_id": "{{instance_id_3}}"
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('affinity_rule_member_id_3', response.body.data.id);
+%}
+
+### 8. Get Members
+GET https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+    client.assert(response.body.data[0].id === client.global.get('affinity_rule_member_id_1'), 'ID was not found');
+});
+%}
+
+### 9. Get First Member
+GET https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id_1}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 10. Get Second Member
+GET https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id_2}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 11. Get Third Member
+GET https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id_3}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 12. Delete rule with members (should fail)
+DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 13. Delete Member 1
+DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id_1}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 14. Get Members (There should only be two members visible)
+GET https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+    client.assert(response.body.data[0].id === client.global.get('affinity_rule_member_id_1'), 'ID was not found');
+});
+%}
+
+### 15. Delete Member 2
+DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id_2}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 16. Delete Member 3
+DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id_3}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 17. Delete Affinity Rule
+DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+### 18. Delete first instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id_1}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### 19. Delete second instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id_2}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### 20. Delete third instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id_3}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
