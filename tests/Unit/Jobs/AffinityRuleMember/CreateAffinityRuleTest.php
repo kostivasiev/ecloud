@@ -61,7 +61,6 @@ class CreateAffinityRuleTest extends TestCase
         $this->createSecondaryMember()
             ->kingpinServiceMock()
             ->expects('post')
-            ->twice()
             ->withSomeOfArgs(sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id))
             ->andReturnUsing(function () {
                 return new Response(200);
@@ -71,16 +70,6 @@ class CreateAffinityRuleTest extends TestCase
             ->expects('get')
             ->withSomeOfArgs(
                 sprintf(CreateAffinityRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
-            )->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    'hostGroupID' => $this->hostGroup()->id,
-                ]));
-            });
-
-        $this->kingpinServiceMock()
-            ->expects('get')
-            ->withSomeOfArgs(
-                sprintf(CreateAffinityRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->secondInstance->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
