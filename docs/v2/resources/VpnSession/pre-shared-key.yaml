@@ -35,21 +35,7 @@ put:
   parameters:
     - $ref: 'parameters/vpnSessionId.yaml'
   responses:
-    200:
+    204:
       description: success
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              data:
-                type: object
-                properties:
-                  psk:
-                    type: string
-                    example: str0ngpsk
-                    readOnly: true
-              meta:
-                type: object
   tags:
     - Vpn Sessions
