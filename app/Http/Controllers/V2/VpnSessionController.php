@@ -48,23 +48,7 @@ class VpnSessionController extends BaseController
 
             // do this here rather than place the key in task data
             if ($request->has('psk')) {
-                $credential = $vpnSession?->credentials()
-                    ->where('username', VpnSession::CREDENTIAL_PSK_USERNAME)
-                    ->first();
-                if (!$credential) {
-                    $credential = new Credential(
-                        [
-                            'name' => 'Pre-shared Key for VPN Session ' . $vpnSession->id,
-                            'host' => null,
-                            'username' => VpnSession::CREDENTIAL_PSK_USERNAME,
-                            'password' => $request->input('psk'),
-                            'port' => null,
-                            'is_hidden' => true,
-                        ]
-                    );
-                } else {
-                    $credential->password = $request->input('psk');
-                }
+                $credential = $vpnSession->updatePskCredential($request->input('psk'));
                 $vpnSession->credentials()->save($credential);
             }
 
@@ -100,6 +84,11 @@ class VpnSessionController extends BaseController
 
         $task = $vpnSession->withTaskLock(function ($vpnSession) use ($request) {
             $vpnSession->save();
+
+            // do this here rather than place the key in task data
+            if ($request->has('psk')) {
+                $vpnSession->updatePskCredential($request->input('psk'));
+            }
 
             if ($request->filled('local_networks')) {
                 $vpnSession->getNetworksByType(VpnSessionNetwork::TYPE_LOCAL)->each(function ($network) {
@@ -165,12 +154,7 @@ class VpnSessionController extends BaseController
     {
         $vpnSession = VpnSession::forUser($request->user())->findOrFail($vpnSessionId);
 
-        $credential = $vpnSession->credentials()
-            ->where('username', VpnSession::CREDENTIAL_PSK_USERNAME)
-            ->firstOrFail();
-        $credential->update([
-            'password' => $request->input('psk'),
-        ]);
+        $vpnSession->updatePskCredential($request->input('psk'));
         $vpnSession->syncSave();
 
         return response('', 204);
