@@ -8,6 +8,7 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsNotMaxCommaSeperatedItems;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsSameAvailabilityZone;
+use App\Rules\V2\IsValidSshPublicKey;
 use App\Rules\V2\ValidCidrNetworkCsvString;
 use App\Rules\V2\ValidIpv4;
 use Illuminate\Support\Facades\Request;
@@ -61,6 +62,12 @@ class CreateRequest extends FormRequest
                 'string',
                 new ValidCidrNetworkCsvString(),
                 new IsNotMaxCommaSeperatedItems(config('vpn-session.max_local_networks'))
+            ],
+            'psk' => [
+                'sometimes',
+                'required',
+                'string',
+                new IsValidSshPublicKey(),
             ],
         ];
     }

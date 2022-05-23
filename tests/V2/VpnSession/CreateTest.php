@@ -2,6 +2,7 @@
 namespace Tests\V2\VpnSession;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\Credential;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
@@ -18,6 +19,7 @@ class CreateTest extends TestCase
     protected VpnEndpoint $vpnEndpoint;
     protected VpnSession $vpnSession;
     protected VpnProfileGroup $vpnProfileGroup;
+    protected string $preSharedKey;
 
     public function setUp(): void
     {
@@ -61,6 +63,7 @@ class CreateTest extends TestCase
             'type' => VpnSessionNetwork::TYPE_REMOTE,
             'ip_address' => '127.1.1.1/32',
         ]);
+        $this->preSharedKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQCuxFiJFGtRIxU7IZA35zya75IJokX21zVrM90rxdWykbZz9cb5obLMXGqPLiHDOKL2frUd9TtTvPI/OQzCu5Sd2x41PdYyLcjXoLAaPqlmUbi3ExzigDKWjVu7RCBYWNBIi63boq3SqUZRdf9oF/R81EGUsF8lMnEIoutDncH8jQ==';
     }
 
     public function testCreateResource()
@@ -223,5 +226,42 @@ class CreateTest extends TestCase
             'detail' => 'remote networks must contain less than 2 comma-seperated items',
             'source' => 'remote_networks',
         ])->assertStatus(422);
+    }
+
+    public function testCreateResourceWithPsk()
+    {
+        Event::fake([Created::class]);
+        $vpnService = VpnService::factory()->create([
+            'name' => 'test-service',
+            'router_id' => $this->router()->id,
+        ]);
+
+        $response = $this->post(
+            '/v2/vpn-sessions',
+            [
+                'name' => 'vpn session test',
+                'vpn_profile_group_id' => $this->vpnProfileGroup->id,
+                'vpn_service_id' => $vpnService->id,
+                'vpn_endpoint_id' => $this->vpnEndpoint->id,
+                'remote_ip' => '211.12.13.1',
+                'local_networks' => '10.0.0.1/32',
+                'remote_networks' => '172.12.23.11/32',
+                'psk' => $this->preSharedKey,
+            ]
+        )->assertStatus(202);
+        Event::assertDispatched(Created::class);
+
+        $credential = VpnSession::findOrFail(json_decode($response->getContent())->data->id)
+            ->credentials()
+            ->where('username', VpnSession::CREDENTIAL_PSK_USERNAME)
+            ->first();
+        $this->assertDatabaseHas(
+            Credential::class,
+            [
+                'id' => $credential->id,
+                'password' => encrypt($this->preSharedKey),
+            ],
+            'ecloud'
+        );
     }
 }

@@ -2,6 +2,7 @@
 namespace Tests\V2\VpnSession;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\Credential;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
@@ -20,6 +21,7 @@ class UpdateTest extends TestCase
     protected VpnSession $vpnSession;
     protected VpnProfileGroup $vpnProfileGroup;
     protected FloatingIp $floatingIp;
+    protected string $preSharedKey;
 
     public function setUp(): void
     {
@@ -67,6 +69,18 @@ class UpdateTest extends TestCase
             'type' => VpnSessionNetwork::TYPE_REMOTE,
             'ip_address' => '127.1.1.1/32',
         ]);
+        $credential = new Credential(
+            [
+                'name' => 'Pre-shared Key for VPN Session ' . $this->vpnSession->id,
+                'host' => null,
+                'username' => VpnSession::CREDENTIAL_PSK_USERNAME,
+                'password' => 'randomPasswordEnteredHere',
+                'port' => null,
+                'is_hidden' => true,
+            ]
+        );
+        $this->vpnSession->credentials()->save($credential);
+        $this->preSharedKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQCuxFiJFGtRIxU7IZA35zya75IJokX21zVrM90rxdWykbZz9cb5obLMXGqPLiHDOKL2frUd9TtTvPI/OQzCu5Sd2x41PdYyLcjXoLAaPqlmUbi3ExzigDKWjVu7RCBYWNBIi63boq3SqUZRdf9oF/R81EGUsF8lMnEIoutDncH8jQ==';
     }
 
     public function testUpdateResource()
@@ -144,5 +158,32 @@ class UpdateTest extends TestCase
             'detail' => 'remote networks must contain less than 2 comma-seperated items',
             'source' => 'remote_networks',
         ])->assertStatus(422);
+    }
+
+    public function testUpdatePreSharedKey()
+    {
+        Event::fake([Created::class]);
+        $response = $this->put(
+            sprintf('/v2/vpn-sessions/%s/pre-shared-key', $this->vpnSession->id),
+            [
+                'psk' => $this->preSharedKey,
+            ]
+        );
+        $this->assertEquals(204, $response->getStatusCode());
+        Event::assertDispatched(Created::class);
+
+        $this->vpnSession->refresh();
+        $credential = $this->vpnSession
+            ->credentials()
+            ->where('username', VpnSession::CREDENTIAL_PSK_USERNAME)
+            ->first();
+        $this->assertDatabaseHas(
+            Credential::class,
+            [
+                'id' => $credential->id,
+                'password' => encrypt($this->preSharedKey),
+            ],
+            'ecloud'
+        );
     }
 }
