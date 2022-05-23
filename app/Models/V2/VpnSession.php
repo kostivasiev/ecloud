@@ -199,7 +199,7 @@ class VpnSession extends Model implements Searchable, AvailabilityZoneable, Rese
         if (!$credential) {
             $credential = new Credential(
                 [
-                    'name' => 'Pre-shared Key for VPN Session ' . $vpnSession->id,
+                    'name' => 'Pre-shared Key for VPN Session ' . $this->id,
                     'host' => null,
                     'username' => VpnSession::CREDENTIAL_PSK_USERNAME,
                     'password' => $psk,
