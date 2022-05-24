@@ -99,8 +99,8 @@ class GetTest extends TestCase
         $vpcEndpoint = VpnEndpoint::factory()->create([
             'vpn_service_id' => $vpnService->id,
         ]);
-        $floatingIp->resource()->associate($vpcEndpoint);
-        $floatingIp->save();
+
+        $this->assignFloatingIp($floatingIp, $vpcEndpoint);
 
         // eq
         $this->get('/v2/vpn-endpoints?vpc_id:eq=' . $vpc->id)
