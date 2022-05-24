@@ -15,22 +15,32 @@ class MigratePolymorphicRelationshipToPivot extends Command
     public function handle()
     {
         $updated = 0;
+        $skipped = 0;
 
-        FloatingIp::all()->each(function ($floatingIp) use (&$updated) {
+        FloatingIp::all()->each(function ($floatingIp) use (&$updated, &$skipped) {
             if ($floatingIp->resource()->exists()) {
                 $this->info('Creating pivot for ' . $floatingIp->id . ' to resource' . $floatingIp->resource->id);
 
                 if (!$this->option('test-run')) {
-                    $floatingIpResource = app()->make(FloatingIpResource::class);
-                    $floatingIpResource->floatingIp()->associate($floatingIp->resource);
+                    $floatingIpResource = FloatingIpResource::firstOrNew([
+                        'floating_ip_id' => $floatingIp->id
+                    ]);
+
                     $floatingIpResource->resource()->associate($floatingIp->resource);
                     $floatingIpResource->save();
+
+                    if($floatingIpResource->wasRecentlyCreated) {
+                        $updated++;
+                    } else {
+                        $this->info('pivot already exists, skipping');
+                        $skipped++;
+                    }
                 }
-                $updated++;
             }
         });
 
         $this->info($updated . ' floating IP\'s updated');
+        $this->info($skipped . ' floating IP\'s skipped');
 
         return 0;
     }
