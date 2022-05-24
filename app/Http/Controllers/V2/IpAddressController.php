@@ -48,14 +48,14 @@ class IpAddressController extends BaseController
             ])
         );
 
-        if ($request->ip_address) {
-            try {
-                $model->setAddressAndSave($request->ip_address);
-            } catch (LockTimeoutException) {
-                throw new IpAddressCreationException;
+        try {
+            if ($request->ip_address) {
+                    $model->setAddressAndSave($request->ip_address);
+            } else {
+                $model->allocateAddressAndSave();
             }
-        } else {
-            $model->allocateAddressAndSave();
+        } catch (LockTimeoutException) {
+            throw new IpAddressCreationException;
         }
 
         $task = $model->syncSave();
