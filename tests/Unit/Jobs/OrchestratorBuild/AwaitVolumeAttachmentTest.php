@@ -7,7 +7,6 @@ use App\Jobs\OrchestratorBuild\AwaitVolumeAttachment;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Task;
-use App\Models\V2\Volume;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
