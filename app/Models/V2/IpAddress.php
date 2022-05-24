@@ -14,7 +14,7 @@ use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class IpAddress extends Model implements Searchable, Natable, RouterScopable
+class IpAddress extends Model implements Searchable, Natable, ResellerScopeable, RouterScopable
 {
     use CustomKey, SoftDeletes, DefaultName, HasFactory, DeletionRules, Syncable;
 
@@ -81,6 +81,11 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
     public function floatingIp()
     {
         return $this->morphOne(FloatingIp::class, 'resource');
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->network->getResellerId();
     }
 
     /**
