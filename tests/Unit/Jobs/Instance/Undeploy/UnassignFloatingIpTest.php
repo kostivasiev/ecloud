@@ -4,9 +4,8 @@ namespace Tests\Unit\Jobs\Instance\Undeploy;
 
 use App\Events\V2\Task\Created;
 use App\Jobs\Instance\Undeploy\UnassignFloatingIP;
+use App\Jobs\Tasks\FloatingIp\Unassign;
 use App\Models\V2\IpAddress;
-use App\Models\V2\Task;
-use App\Support\Sync;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -18,7 +17,7 @@ class UnassignFloatingIpTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        dispatch(new UnassignFloatingIP($this->instanceModel()));
+        dispatch(new UnassignFloatingIP($this->createSyncDeleteTask($this->instanceModel())));
 
         Event::assertNotDispatched(JobFailed::class);
         Event::assertDispatched(JobProcessed::class, function ($event) {
@@ -26,15 +25,14 @@ class UnassignFloatingIpTest extends TestCase
         });
     }
 
-    public function testFloatingIpAssignedToNicJobIsDispatched()
+    public function testFloatingIpAssignedToIpAddressJobIsDispatched()
     {
         Event::fake([JobProcessed::class, Created::class]);
 
-        $this->assignFloatingIp($this->floatingIp(), $this->nic());
+        $this->nic()->ipAddresses()->save($this->ipAddress());
+        $this->assignFloatingIp($this->floatingIp(), $this->ipAddress());
 
-        $job = \Mockery::mock(UnassignFloatingIP::class, [$this->instanceModel()])->makePartial();
-        $job->shouldReceive('awaitTasks')->andReturn(true);
-        $job->handle();
+        dispatch(new UnassignFloatingIP($this->createSyncDeleteTask($this->instanceModel())));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -52,9 +50,7 @@ class UnassignFloatingIpTest extends TestCase
 
         $this->assignFloatingIp($this->floatingIp(), $ipAddress);
 
-        $job = \Mockery::mock(UnassignFloatingIP::class, [$this->instanceModel()])->makePartial();
-        $job->shouldReceive('awaitTasks')->andReturn(true);
-        $job->handle();
+        dispatch(new UnassignFloatingIP($this->createSyncDeleteTask($this->instanceModel())));
 
         Event::assertNotDispatched(JobFailed::class);
 
@@ -72,19 +68,21 @@ class UnassignFloatingIpTest extends TestCase
 
         $this->assignFloatingIp($this->floatingIp(), $ipAddress);
 
-        $task = new Task([
-            'id' => 'task-test',
-            'completed' => false,
-            'failure_reason' => 'Test Failure',
-            'name' => Sync::TASK_NAME_UPDATE,
-        ]);
-        $this->floatingIp()->tasks()->save($task);
-        // Bind and return test ID on creation
-        app()->bind(Task::class, function () use ($task) {
-            return $task;
-        });
+        $task = $this->createSyncDeleteTask($this->instanceModel());
 
-        dispatch(new UnassignFloatingIP($this->instanceModel()));
+        dispatch(new UnassignFloatingIP($task));
+
+        // Mark the delete sync task as completed
+        $unassignTask = Event::dispatched(Created::class, function ($event) {
+            return $event->model->name == Unassign::$name;
+        })->first()[0];
+
+        $unassignTask->model
+            ->setAttribute('completed', false)
+            ->setAttribute('failure_reason', 'test')
+            ->saveQuietly();
+
+        dispatch(new UnassignFloatingIP($task));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -98,21 +96,22 @@ class UnassignFloatingIpTest extends TestCase
 
         $this->assignFloatingIp($this->floatingIp(), $ipAddress);
 
-        $task = new Task([
-            'id' => 'task-test',
-            'completed' => true,
-            'name' => Sync::TASK_NAME_UPDATE,
-        ]);
-        $this->floatingIp()->tasks()->save($task);
+        $task = $this->createSyncDeleteTask($this->instanceModel());
 
-        // Bind and return test ID on creation
-        app()->bind(Task::class, function () use ($task) {
-            return $task;
+        dispatch(new UnassignFloatingIP($task));
+
+        // Mark the delete sync task as completed
+        $unassignTask = Event::dispatched(Created::class, function ($event) {
+            return $event->model->name == Unassign::$name;
+        })->first()[0];
+
+        $unassignTask->model->setAttribute('completed', true)->saveQuietly();
+
+        dispatch(new UnassignFloatingIP($task));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
         });
-
-        $job = new UnassignFloatingIP($this->instanceModel());
-        $job->awaitTask($task);
-
-        $this->assertTrue($job->awaitTask($task));
     }
 }

@@ -38,7 +38,7 @@ class Delete extends Job
                 new DetachSharedVolumes($this->task),
                 new Undeploy($this->task->resource),
                 new DeleteVolumes($this->task->resource),
-                new UnassignFloatingIP($this->task->resource),
+                new UnassignFloatingIP($this->task),
                 new DeleteNics($this->task->resource),
                 new AwaitVolumeRemoval($this->task->resource),
                 new AwaitNicRemoval($this->task->resource),
