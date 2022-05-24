@@ -119,22 +119,22 @@ class Network extends Model implements Searchable, ResellerScopeable, Availabili
     public function getNextAvailableIp(array $denyList = [])
     {
         // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
-        $reserved = 3;
-        $iterator = 0;
 
         $subnet = Subnet::fromString($this->subnet);
-        $ip = $subnet->getStartAddress(); //First reserved IP
+        $ip = $subnet->getStartAddress();
 
-        while ($ip = $ip->getNextAddress()) {
-            $iterator++;
-            if ($iterator <= $reserved) {
-                continue;
-            }
-            if ($ip->toString() === $subnet->getEndAddress()->toString() || !$subnet->contains($ip)) {
-                throw new \Exception('Insufficient available IP\'s in subnet on network ' . $this->id);
+        $start = true;
+        while ($start || $ip = $ip->getNextAddress()) {
+            $start = false;
+            if ($ip == null || !$subnet->contains($ip)) {
+                break;
             }
 
             $checkIp = $ip->toString();
+            if ($this->isReservedAddress($checkIp)) {
+                Log::debug('IP address "' . $checkIp . '" is reserved, skipping');
+                continue;
+            }
 
             if (collect($denyList)->contains($checkIp)) {
                 Log::warning('IP address "' . $checkIp . '" is within the deny list, skipping');
@@ -148,6 +148,8 @@ class Network extends Model implements Searchable, ResellerScopeable, Availabili
 
             return $checkIp;
         }
+
+        throw new \Exception('Insufficient available IP\'s in subnet on network ' . $this->id);
     }
 
     public function getSubnet()
@@ -180,12 +182,32 @@ class Network extends Model implements Searchable, ResellerScopeable, Availabili
     }
 
     /**
+     * @return \IPLib\Address\AddressInterface
+     */
+    public function getBroadcastAddress()
+    {
+        return $this->getSubnet()->getEndAddress();
+    }
+
+    /**
      * Get subnet prefix, eg 10.0.0.1/24 returns 24
      * @return int
      */
     public function getNetworkPrefix()
     {
         return $this->getSubnet()->getNetworkPrefix();
+    }
+
+    public function isReservedAddress($ipAddress)
+    {
+        return in_array($ipAddress, [
+            $this->getBroadcastAddress()->toString(),
+            $this->getNetworkAddress()->toString(),
+            $this->getGatewayAddress()->toString(),
+            $this->getDhcpServerAddress()->toString(),
+            // We currently reserve the 3rd usable address for future use
+            $this->getDhcpServerAddress()->getNextAddress()->toString(),
+        ]);
     }
 
     public function loadBalancers(): HasManyThrough
