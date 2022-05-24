@@ -110,7 +110,7 @@ class CreateTest extends TestCase
             '/v2/ip-addresses',
             [
                 'name' => 'Test',
-                'ip_address' => '10.0.0.1',
+                'ip_address' => '10.0.0.5',
                 'network_id' => $this->network()->id,
                 'type' => IpAddress::TYPE_DHCP,
             ]

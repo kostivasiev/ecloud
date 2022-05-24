@@ -23,6 +23,10 @@ class IsAvailable implements Rule
             return false;
         }
 
+        if ($this->network->isReservedAddress($value)) {
+            return false;
+        }
+
         $lock = Cache::lock("ip_address." . $this->network->id, 5);
         try {
             $lock->block(5);
