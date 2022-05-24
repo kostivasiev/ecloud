@@ -10,7 +10,6 @@ use App\Models\V2\Volume;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class AttachVolumesTest extends TestCase
@@ -24,15 +23,10 @@ class AttachVolumesTest extends TestCase
         parent::setUp();
         $this->orchestratorConfig = OrchestratorConfig::factory()->create([
             'data' => json_encode([
-                'volumes' => [
+                'volume_attaches' => [
                     [
                         'volume_id' => '{volume.0}',
-                        'instance_id' => '{instance.0}',
-                        'vpc_id' => '{vpc.0}',
-                        'name' => 'test volume',
-                        'availability_zone_id' => $this->availabilityZone()->id,
-                        'capacity' => 10,
-                        'iops' => 300
+                        'instance_id' => '{instance.0}'
                     ]
                 ]
             ])
@@ -90,8 +84,6 @@ class AttachVolumesTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->availabilityZone();
-        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
         $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
         $this->orchestratorBuild->updateState('volume', 0, $this->volume->id);
 
@@ -114,16 +106,11 @@ class AttachVolumesTest extends TestCase
     public function testIdPlaceholdersIgnoredSuccess()
     {
         $this->orchestratorConfig->data = json_encode([
-            'volumes' => [
+            'volume_attaches' => [
                 [
-                    'id' => '{volume.0}',
+                    'id' => 'i-xxxxxx',
                     'volume_id' => '{volume.0}',
                     'instance_id' => '{instance.0}',
-                    'name' => 'test volume',
-                    'vpc_id' => '{vpc.0}',
-                    'availability_zone_id' => $this->availabilityZone()->id,
-                    'capacity' => 10,
-                    'iops' => 300
                 ]
             ]
         ]);
@@ -131,8 +118,6 @@ class AttachVolumesTest extends TestCase
 
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->availabilityZone();
-        $this->orchestratorBuild->updateState('vpc', 0, $this->vpc()->id);
         $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
         $this->orchestratorBuild->updateState('volume', 0, $this->volume->id);
 
@@ -147,8 +132,8 @@ class AttachVolumesTest extends TestCase
 
         $this->orchestratorBuild->refresh();
 
-        $this->assertNotNull($this->orchestratorBuild->state['volume']);
+        $this->assertNotNull($this->orchestratorBuild->state['volume_attach']);
 
-        $this->assertEquals(1, count($this->orchestratorBuild->state['volume']));
+        $this->assertEquals(1, count($this->orchestratorBuild->state['volume_attach']));
     }
 }

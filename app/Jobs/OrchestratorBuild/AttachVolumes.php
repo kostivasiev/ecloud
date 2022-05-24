@@ -6,11 +6,9 @@ use App\Jobs\Job;
 use App\Jobs\Tasks\Instance\VolumeAttach;
 use App\Models\V2\Instance;
 use App\Models\V2\OrchestratorBuild;
-use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Volume;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class AttachVolumes extends Job
@@ -30,7 +28,7 @@ class AttachVolumes extends Job
 
         $data = collect(json_decode($orchestratorBuild->orchestratorConfig->data));
 
-        if (!$data->has('volumes')) {
+        if (!$data->has('volume_attaches')) {
             Log::info(
                 get_class($this) . ' : OrchestratorBuild does not contain any volumes to mount, skipping',
                 ['id' => $this->model->id]
@@ -38,7 +36,7 @@ class AttachVolumes extends Job
             return;
         }
 
-        collect($data->get('volumes'))->each(function ($definition, $index) use ($orchestratorBuild) {
+        collect($data->get('volume_attaches'))->each(function ($definition, $index) use ($orchestratorBuild) {
             // Check if a resource has already been created
             if (isset($orchestratorBuild->state['volume_attach']) && isset($orchestratorBuild->state['volume_attach'][$index])) {
                 Log::info(get_class($this) . ' : OrchestratorBuild mounting of volume. ' . $index .
