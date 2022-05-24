@@ -143,7 +143,7 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
 
     public function allocateAddressAndSave(array $denyList = [])
     {
-       return $this->network->withIpAddressLock(function ($network) use ($denyList) {
+        return $this->network->withIpAddressLock(function ($network) use ($denyList) {
             $ip = $network->getNextAvailableIp($denyList);
             $this->ip_address = $ip;
             return $this->save();
