@@ -25,7 +25,7 @@ use UKFast\Sieve\Sieve;
  * @method static forUser(string $user)
  * @method static isManagement()
  */
-class Router extends Model implements Searchable, ResellerScopeable, Manageable, AvailabilityZoneable
+class Router extends Model implements Searchable, ResellerScopeable, Manageable, AvailabilityZoneable, VpcAble
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, DeletionRules, Syncable, Taskable;
 

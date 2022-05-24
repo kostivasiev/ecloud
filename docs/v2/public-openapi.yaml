@@ -22,6 +22,8 @@ components:
   schemas:
     AffinityRule:
       $ref: 'resources/AffinityRule/schema.yaml'
+    AffinityRuleMember :
+      $ref : 'resources/AffinityRuleMember/schema.yaml'
     AvailabilityZone:
       $ref: 'components/schemas/availabilityZone.yaml'
     Dhcp:
@@ -98,6 +100,8 @@ components:
     # Path Parameters
     AffinityRuleId:
       $ref: 'resources/AffinityRule/parameters/id.yaml'
+    AffinityRuleMemberId :
+      $ref : 'resources/AffinityRuleMember/parameters/id.yaml'
     AvailabilityZoneId:
       $ref: 'resources/AvailabilityZone/parameters/availabilityZoneId.yaml'
     DhcpId:
@@ -170,10 +174,14 @@ components:
 #    ReferenceIdResponse:
 #      $ref: 'resources/References/responses/idResponse.yaml'
 paths:
-  '/ecloud/v2/affinity-rules':
-    $ref: 'resources/AffinityRule/collection.yaml'
-  '/ecloud/v2/affinity-rules/{AffinityRuleId}':
-    $ref: 'resources/AffinityRule/item.yaml'
+#  '/ecloud/v2/affinity-rules':
+#    $ref: 'resources/AffinityRule/collection.yaml'
+#  '/ecloud/v2/affinity-rules/{AffinityRuleId}':
+#    $ref: 'resources/AffinityRule/item.yaml'
+#  '/ecloud/v2/affinity-rules/members':
+#    $ref: 'resources/AffinityRuleMember/collection.yaml'
+#  '/ecloud/v2/affinity-rules/{AffinityRuleId}/members/{AffinityRuleMemberId}':
+#    $ref: 'resources/AffinityRuleMember/item.yaml'
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':

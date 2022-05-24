@@ -16,3 +16,4 @@ composer.phar
 tests/HTTP/V2/http-client.env.json
 /http-client.env.json
 .run/
+_ide_helper.php

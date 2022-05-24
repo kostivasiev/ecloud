@@ -1,0 +1,26 @@
+get:
+  parameters:
+    - $ref: '../../resources/AffinityRuleMember/parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../resources/AffinityRuleMember/schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Affinity Rule Members
+delete:
+  parameters:
+    - $ref: '../../resources/AffinityRuleMember/parameters/id.yaml'
+  responses:
+    202:
+      description: Accepted
+  tags:
+    - Affinity Rule Members
+

@@ -5,6 +5,7 @@ namespace App\Models\V2;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
+use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +16,7 @@ use UKFast\Sieve\Sieve;
 
 class IpAddress extends Model implements Searchable, Natable, RouterScopable
 {
-    use CustomKey, SoftDeletes, DefaultName, HasFactory, DeletionRules;
+    use CustomKey, SoftDeletes, DefaultName, HasFactory, DeletionRules, Syncable;
 
     public $keyPrefix = 'ip';
     public $children;

@@ -29,6 +29,7 @@ class IpAddressResource extends UKFastResource
             'ip_address' => $this->ip_address,
             'network_id' => $this->network_id,
             'type' => $this->type,
+            'sync' => $this->sync,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
