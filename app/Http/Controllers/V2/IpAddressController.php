@@ -1,12 +1,14 @@
 <?php
 namespace App\Http\Controllers\V2;
 
+use App\Exceptions\V2\IpAddressCreationException;
 use App\Http\Requests\V2\IpAddress\CreateRequest;
 use App\Http\Requests\V2\IpAddress\UpdateRequest;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
 use App\Resources\V2\IpAddressResource;
 use App\Resources\V2\NicResource;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -47,7 +49,11 @@ class IpAddressController extends BaseController
         );
 
         if ($request->ip_address) {
-            $model->setAddressAndSave($request->ip_address);
+            try {
+                $model->setAddressAndSave($request->ip_address);
+            } catch (LockTimeoutException) {
+                throw new IpAddressCreationException;
+            }
         } else {
             $model->allocateAddressAndSave();
         }
