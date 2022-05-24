@@ -1,13 +1,12 @@
 <?php
 namespace App\Http\Controllers\V2;
 
-use App\Exceptions\V2\IpAddressCreationException;
 use App\Http\Requests\V2\IpAddress\CreateRequest;
 use App\Http\Requests\V2\IpAddress\UpdateRequest;
 use App\Models\V2\IpAddress;
+use App\Models\V2\Network;
 use App\Resources\V2\IpAddressResource;
 use App\Resources\V2\NicResource;
-use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -38,20 +37,19 @@ class IpAddressController extends BaseController
      */
     public function store(CreateRequest $request)
     {
+        $network = Network::forUser($request->user())->findOrFail($request->network_id);
+
         $model = new IpAddress(
             $request->only([
                 'name',
-                'ip_address',
                 'network_id',
             ])
         );
 
-        if (!$request->ip_address) {
-            try {
-                $model->allocateAddressAndSave($request->network_id);
-            } catch (LockTimeoutException $e) {
-                throw new IpAddressCreationException;
-            }
+        if ($request->ip_address) {
+            $model->setAddressAndSave($request->ip_address);
+        } else {
+            $model->allocateAddressAndSave();
         }
 
         $task = $model->syncSave();
