@@ -60,6 +60,7 @@ class CreateVolumesTest extends TestCase
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
         $this->orchestratorBuild->updateState('volume', 0, 'vol-test');
+        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
 
         dispatch(new CreateVolumes($this->orchestratorBuild));
 
@@ -82,6 +83,7 @@ class CreateVolumesTest extends TestCase
         $this->availabilityZone();
         $this->vpc();
         $this->orchestratorBuild->updateState('vpc', 0, 'vpc-test');
+        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
 
         dispatch(new CreateVolumes($this->orchestratorBuild));
 
@@ -120,6 +122,7 @@ class CreateVolumesTest extends TestCase
         $this->availabilityZone();
         $this->vpc();
         $this->orchestratorBuild->updateState('vpc', 0, 'vpc-test');
+        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
 
         dispatch(new CreateVolumes($this->orchestratorBuild));
 
