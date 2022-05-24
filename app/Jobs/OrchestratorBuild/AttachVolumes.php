@@ -28,7 +28,7 @@ class AttachVolumes extends Job
 
         $data = collect(json_decode($orchestratorBuild->orchestratorConfig->data));
 
-        if (!$data->has('volume_attaches')) {
+        if (!$data->has('instance_volumes')) {
             Log::info(
                 get_class($this) . ' : OrchestratorBuild does not contain any volumes to mount, skipping',
                 ['id' => $this->model->id]
@@ -36,9 +36,9 @@ class AttachVolumes extends Job
             return;
         }
 
-        collect($data->get('volume_attaches'))->each(function ($definition, $index) use ($orchestratorBuild) {
+        collect($data->get('instance_volumes'))->each(function ($definition, $index) use ($orchestratorBuild) {
             // Check if a resource has already been created
-            if (isset($orchestratorBuild->state['volume_attach']) && isset($orchestratorBuild->state['volume_attach'][$index])) {
+            if (isset($orchestratorBuild->state['instance_volume']) && isset($orchestratorBuild->state['instance_volume'][$index])) {
                 Log::info(get_class($this) . ' : OrchestratorBuild mounting of volume. ' . $index .
                     ' has already been initiated, skipping', ['id' => $this->model->id]);
                 return;
@@ -56,7 +56,7 @@ class AttachVolumes extends Job
                 'instance_id' => $instance->id,
             ]);
 
-            $orchestratorBuild->updateState('volume_attach', $index, $instance->id);
+            $orchestratorBuild->updateState('instance_volume', $index, $instance->id);
         });
     }
 }

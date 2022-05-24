@@ -23,7 +23,7 @@ class AttachVolumesTest extends TestCase
         parent::setUp();
         $this->orchestratorConfig = OrchestratorConfig::factory()->create([
             'data' => json_encode([
-                'volume_attaches' => [
+                'instance_volumes' => [
                     [
                         'volume_id' => '{volume.0}',
                         'instance_id' => '{instance.0}'
@@ -64,7 +64,7 @@ class AttachVolumesTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->orchestratorBuild->updateState('volume_attach', 0, 'i-test');
+        $this->orchestratorBuild->updateState('instance_volume', 0, 'i-test');
 
         dispatch(new AttachVolumes($this->orchestratorBuild));
 
@@ -75,9 +75,9 @@ class AttachVolumesTest extends TestCase
 
         $this->orchestratorBuild->refresh();
 
-        $this->assertNotNull($this->orchestratorBuild->state['volume_attach']);
+        $this->assertNotNull($this->orchestratorBuild->state['instance_volume']);
 
-        $this->assertEquals(1, count($this->orchestratorBuild->state['volume_attach']));
+        $this->assertEquals(1, count($this->orchestratorBuild->state['instance_volume']));
     }
 
     public function testSuccess()
@@ -98,15 +98,15 @@ class AttachVolumesTest extends TestCase
 
         $this->orchestratorBuild->refresh();
 
-        $this->assertNotNull($this->orchestratorBuild->state['volume_attach']);
+        $this->assertNotNull($this->orchestratorBuild->state['instance_volume']);
 
-        $this->assertEquals(1, count($this->orchestratorBuild->state['volume_attach']));
+        $this->assertEquals(1, count($this->orchestratorBuild->state['instance_volume']));
     }
 
     public function testIdPlaceholdersIgnoredSuccess()
     {
         $this->orchestratorConfig->data = json_encode([
-            'volume_attaches' => [
+            'instance_volumes' => [
                 [
                     'id' => 'i-xxxxxx',
                     'volume_id' => '{volume.0}',
@@ -132,8 +132,8 @@ class AttachVolumesTest extends TestCase
 
         $this->orchestratorBuild->refresh();
 
-        $this->assertNotNull($this->orchestratorBuild->state['volume_attach']);
+        $this->assertNotNull($this->orchestratorBuild->state['instance_volume']);
 
-        $this->assertEquals(1, count($this->orchestratorBuild->state['volume_attach']));
+        $this->assertEquals(1, count($this->orchestratorBuild->state['instance_volume']));
     }
 }

@@ -35,7 +35,7 @@ class AwaitVolumeAttachmentTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        $this->orchestratorBuild->updateState('volume_attach', 0, $this->instanceModel()->id);
+        $this->orchestratorBuild->updateState('instance_volume', 0, $this->instanceModel()->id);
 
         // Put the sync in-progress
         Model::withoutEvents(function () {
@@ -59,7 +59,7 @@ class AwaitVolumeAttachmentTest extends TestCase
     {
         Event::fake(JobFailed::class);
 
-        $this->orchestratorBuild->updateState('volume_attach', 0, $this->instanceModel()->id);
+        $this->orchestratorBuild->updateState('instance_volume', 0, $this->instanceModel()->id);
 
         Model::withoutEvents(function () {
             $task = new Task([
@@ -81,7 +81,7 @@ class AwaitVolumeAttachmentTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->orchestratorBuild->updateState('volume_attach', 0, $this->instanceModel()->id);
+        $this->orchestratorBuild->updateState('instance_volume', 0, $this->instanceModel()->id);
 
         Model::withoutEvents(function () {
             $task = new Task([

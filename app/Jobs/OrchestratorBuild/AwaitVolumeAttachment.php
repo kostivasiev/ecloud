@@ -25,11 +25,11 @@ class AwaitVolumeAttachment extends Job
         $orchestratorBuild = $this->model;
 
         $state = collect($orchestratorBuild->state);
-        if (!$state->has('volume_attach')) {
+        if (!$state->has('instance_volume')) {
             Log::info(get_class($this) . ' : No Volumes pending attachment, skipping', ['id' => $this->model->id]);
             return;
         }
 
-        $this->awaitSyncableResources($state->get('volume_attach'));
+        $this->awaitSyncableResources($state->get('instance_volume'));
     }
 }
