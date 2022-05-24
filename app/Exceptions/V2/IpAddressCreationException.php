@@ -9,7 +9,7 @@ class IpAddressCreationException extends ApiException
 {
     public $statusCode = Response::HTTP_FAILED_DEPENDENCY;
     public $title = 'Failed';
-    public $detail = 'Failed to assign ip address';
+    public $detail = 'Failed to assign IP address';
 
     public function __construct()
     {
