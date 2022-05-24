@@ -19,7 +19,6 @@ class MigratePolymorphicRelationshipToPivot extends Command
 
         FloatingIp::all()->each(function ($floatingIp) use (&$updated, &$skipped) {
             if ($floatingIp->resource()->exists()) {
-
                 $floatingIpResource = FloatingIpResource::firstOrNew([
                     'floating_ip_id' => $floatingIp->id
                 ]);
@@ -39,7 +38,6 @@ class MigratePolymorphicRelationshipToPivot extends Command
                 } else {
                     $updated++;
                 }
-
             }
         });
 
