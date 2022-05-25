@@ -39,6 +39,7 @@ class Create extends FormRequest
             'term_end_date' => [
                 'sometimes',
                 'required',
+                'nullable',
                 'date',
                 'after:today',
                 function ($attribute, $value, $fail) {
