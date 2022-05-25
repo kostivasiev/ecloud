@@ -121,6 +121,6 @@ Content-Type:  application/json
 
 > {%
 client.test('Create a duplicate port', function () {
-    client.assert(response.status === 202, '202 response not received');
+    client.assert(response.status === 422, '422 response not received');
 });
 %}
