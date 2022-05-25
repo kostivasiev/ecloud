@@ -3,8 +3,11 @@
 namespace App\Http\Requests\V2\NetworkRule;
 
 use App\Models\V2\NetworkPolicy;
+use App\Models\V2\NetworkRulePort;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\IsPortWithinExistingRange;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\IsUniquePortOrRange;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use Illuminate\Foundation\Http\FormRequest;
@@ -63,12 +66,12 @@ class Create extends FormRequest
             'ports.*.source' => [
                 'required_if:ports.*.protocol,TCP,UDP',
                 'string',
-                new ValidFirewallRulePortSourceDestination()
+                new ValidFirewallRulePortSourceDestination(),
             ],
             'ports.*.destination' => [
                 'required_if:ports.*.protocol,TCP,UDP',
                 'string',
-                new ValidFirewallRulePortSourceDestination()
+                new ValidFirewallRulePortSourceDestination(),
             ]
         ];
     }

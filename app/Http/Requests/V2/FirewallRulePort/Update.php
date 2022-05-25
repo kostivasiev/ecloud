@@ -2,11 +2,12 @@
 
 namespace App\Http\Requests\V2\FirewallRulePort;
 
-use App\Models\V2\FirewallRule;
-use App\Rules\V2\ExistsForUser;
+use App\Models\V2\FirewallRulePort;
+use App\Rules\V2\IsPortWithinExistingRange;
+use App\Rules\V2\IsUniquePortOrRange;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
-use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Request;
 
 class Update extends FormRequest
 {
@@ -15,6 +16,8 @@ class Update extends FormRequest
      */
     public function rules()
     {
+        $firewallRule = (FirewallRulePort::findOrFail(Request::route('firewallRulePortId')))
+            ->firewallRule;
         return [
             'name' => [
                 'sometimes',
@@ -32,13 +35,17 @@ class Update extends FormRequest
                 'required_if:protocol,TCP,UDP',
                 'string',
                 'nullable',
-                new ValidFirewallRulePortSourceDestination()
+                new ValidFirewallRulePortSourceDestination(),
+                new IsUniquePortOrRange(FirewallRulePort::class, $firewallRule->id),
+                new IsPortWithinExistingRange(FirewallRulePort::class, $firewallRule->id),
             ],
             'destination' => [
                 'required_if:protocol,TCP,UDP',
                 'string',
                 'nullable',
                 new ValidFirewallRulePortSourceDestination(),
+                new IsUniquePortOrRange(FirewallRulePort::class, $firewallRule->id),
+                new IsPortWithinExistingRange(FirewallRulePort::class, $firewallRule->id),
             ]
         ];
     }

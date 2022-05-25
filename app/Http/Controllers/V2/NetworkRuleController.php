@@ -45,7 +45,7 @@ class NetworkRuleController extends BaseController
             $networkRule->save();
 
             if ($request->has('ports')) {
-                foreach ($request->input('ports') as $port) {
+                foreach (array_unique($request->input('ports'), SORT_REGULAR) as $port) {
                     $port['network_rule_id'] = $networkRule->id;
                     $networkRulePort = new NetworkRulePort($port);
                     $networkRulePort->save();
@@ -85,7 +85,7 @@ class NetworkRuleController extends BaseController
                 $networkRule->networkRulePorts->each(function ($port) {
                     $port->delete();
                 });
-                foreach ($request->input('ports') as $port) {
+                foreach (array_unique($request->input('ports'), SORT_REGULAR) as $port) {
                     $port['network_rule_id'] = $networkRule->id;
                     $networkRulePort = new NetworkRulePort($port);
                     $networkRulePort->save();
