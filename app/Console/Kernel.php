@@ -14,9 +14,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         \App\Console\Commands\Nsx\TestAuth::class,
-        \App\Console\Commands\Nsx\UndeployDeletedNetworks::class,
-        \App\Console\Commands\Nsx\UndeployDeletedDhcps::class,
-        \App\Console\Commands\Nsx\UndeployDeletedRouters::class,
         \App\Console\Commands\Kingpin\TestAuth::class,
         \App\Console\Commands\Kingpin\Instance\Delete::class,
         \App\Console\Commands\Queue\TestRead::class,
@@ -56,7 +53,8 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\FirewallPolicy\ApplyDefaultRules::class,
         \App\Console\Commands\FloatingIp\MigrateFips::class,
         \App\Console\Commands\Nic\MigrateIpAddressToIpAddressModel::class,
-        \App\Console\Commands\VPC\DeleteOrphanedResources::class
+        \App\Console\Commands\VPC\DeleteOrphanedResources::class,
+        \App\Console\Commands\Nsx\UndeployOrphanedResources::class
     ];
 
     /**
