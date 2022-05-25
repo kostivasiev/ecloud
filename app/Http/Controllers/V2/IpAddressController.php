@@ -74,7 +74,7 @@ class IpAddressController extends BaseController
         $model = IpAddress::forUser($request->user())->findOrFail($ipAddressId);
 
         $task = $model->syncDelete();
-        return $this->responseTaskId($task->id, 204);
+        return $this->responseTaskId($task->id);
     }
 
     public function nics(Request $request, string $ipAddressId)
