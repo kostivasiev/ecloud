@@ -42,6 +42,7 @@ class Update extends FormRequest
             'term_length' => [
                 'sometimes',
                 'required',
+                'nullable',
                 'integer',
                 'min:1',
                 new CommitmentIsGreater($discountPlanId)
