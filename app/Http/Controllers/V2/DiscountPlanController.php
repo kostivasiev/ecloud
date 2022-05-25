@@ -172,8 +172,11 @@ class DiscountPlanController extends BaseController
      * @param $termLength
      * @return string
      */
-    private function calculateNewEndDate($startDate, $termLength): string
+    private function calculateNewEndDate($startDate, $termLength): ?string
     {
+        if (empty($termLength)) {
+            return null;
+        }
         return date('Y-m-d', strtotime('+ '.$termLength.' months', strtotime($startDate)));
     }
 }
