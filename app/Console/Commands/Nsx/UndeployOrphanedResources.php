@@ -25,6 +25,8 @@ class UndeployOrphanedResources extends Command
      */
     protected $description = 'Undeploy orphaned resources';
 
+    public $markedForDeletion = [];
+
     /**
      * Execute the console command.
      *
@@ -64,8 +66,6 @@ class UndeployOrphanedResources extends Command
 
         $skipped = [];
         $failedDeletes = [];
-
-        $markedForDeletion = [];
 
         foreach ($resources as $resource) {
             if (str_ends_with($resource->id, 'aaaaaaaa')) {
@@ -126,7 +126,7 @@ class UndeployOrphanedResources extends Command
             }
 
             if ($reason) {
-                $markedForDeletion[] = [$resource->id, $resource->name, $reason, $existsOnNsx];
+                $this->markedForDeletion[] = [$resource->id, $resource->name, $reason, $existsOnNsx];
             }
         }
 
@@ -139,22 +139,22 @@ class UndeployOrphanedResources extends Command
             $this->info(count($skipped) . ' ' . $resourceType . ' Skipped');
         }
 
-        if (count($markedForDeletion) > 0) {
+        if (count($this->markedForDeletion) > 0) {
             $this->info($resourceType . ' Marked For Deletion');
             $this->table(
                 ['ID', 'Name', 'Reason', 'Exists on NSX'],
-                $markedForDeletion
+                $this->markedForDeletion
             );
 
-            $markedForDeletion = collect($markedForDeletion);
+            $this->markedForDeletion = collect($this->markedForDeletion);
 
-            $this->info('Total: ' . $markedForDeletion->count());
-            $existsOnNsxTotal = $markedForDeletion->filter(function ($item) {
+            $this->info('Total: ' . $this->markedForDeletion->count());
+            $existsOnNsxTotal = $this->markedForDeletion->filter(function ($item) {
                 return $item[3] === 'Yes';
             })->count();
             $this->info('Total with resources on NSX: ' . $existsOnNsxTotal);
 
-            $undetermined = $markedForDeletion->filter(function ($item) {
+            $undetermined = $this->markedForDeletion->filter(function ($item) {
                 return $item[3] === 'Unknown - No soft deleted parent record found';
             })->count();
             $this->info('Total with undetermined resources on NSX: ' . $undetermined);
@@ -162,7 +162,7 @@ class UndeployOrphanedResources extends Command
             if ($this->confirm('Undeploy orphaned ' . strtolower($resourceType) . ' from NSX?', true)) {
                 $deleted = 0;
 
-                foreach ($markedForDeletion as [$id, $name, $reason, $exists]) {
+                foreach ($this->markedForDeletion as [$id, $name, $reason, $exists]) {
                     if ($exists === 'Yes') {
                         $this->info('Undeploying ' . $id);
                         if (!$this->option('test-run')) {
