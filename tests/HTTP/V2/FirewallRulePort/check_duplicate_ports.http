@@ -76,12 +76,51 @@ Content-Type:  application/json
 {
     "firewall_rule_id": "{{firewall_rule_id}}",
     "protocol": "TCP",
-    "source": "444",
-    "destination": "444"
+    "source": "443",
+    "destination": "443"
 }
 
 > {%
 client.test('Create a duplicate port', function () {
     client.assert(response.status === 422, '422 response not received');
+});
+%}
+
+
+### 4. Create a duplicate port range - should work
+POST https://{{host}}/{{version}}/firewall-rule-ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "firewall_rule_id": "{{firewall_rule_id}}",
+    "protocol": "TCP",
+    "source": "500-510",
+    "destination": "500-510"
+}
+
+> {%
+client.test('Create a duplicate port', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 4. Create a duplicate port range - should fail
+POST https://{{host}}/{{version}}/firewall-rule-ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "firewall_rule_id": "{{firewall_rule_id}}",
+    "protocol": "TCP",
+    "source": "499-501",
+    "destination": "499-501"
+}
+
+> {%
+client.test('Create a duplicate port', function () {
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
