@@ -39,8 +39,6 @@ class IpAddressController extends BaseController
      */
     public function store(CreateRequest $request)
     {
-        $network = Network::forUser($request->user())->findOrFail($request->network_id);
-
         $model = new IpAddress(
             $request->only([
                 'name',
