@@ -186,11 +186,13 @@ class UndeployOrphanedResources extends Command
                     }
                 }
                 $this->info('Total ' . $deleted . ' Undeploys Attempted');
-                $this->info(count($failedDeletes) . ' undeploys failed');
-                $this->table(
-                    ['ID', 'Name', 'Reason'],
-                    $failedDeletes
-                );
+                if (count($failedDeletes) > 0) {
+                    $this->info(count($failedDeletes) . ' undeploys failed');
+                    $this->table(
+                        ['ID', 'Name', 'Reason'],
+                        $failedDeletes
+                    );
+                }
             } else {
                 $this->info('Records were not deleted');
             }
