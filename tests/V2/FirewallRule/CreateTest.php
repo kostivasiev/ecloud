@@ -4,7 +4,6 @@ namespace Tests\V2\FirewallRule;
 
 use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallPolicy;
-use App\Models\V2\FirewallRule;
 use App\Models\V2\Task;
 use App\Support\Sync;
 use Illuminate\Database\Eloquent\Model;
@@ -204,45 +203,6 @@ class CreateTest extends TestCase
         Event::assertDispatched(Created::class, function ($event) {
             return $event->model->name == 'sync_update';
         });
-    }
-
-    public function testDuplicatePortsValidSucceeds()
-    {
-        $response = $this->asAdmin()
-            ->post('/v2/firewall-rules', [
-                'name' => 'Demo firewall rule 1',
-                'sequence' => 10,
-                'firewall_policy_id' => $this->firewallPolicy()->id,
-                'source' => '212.22.18.10/24',
-                'destination' => 'ANY',
-                'action' => 'ALLOW',
-                'direction' => 'IN',
-                'ports' => [
-                    [
-                        'source' => '80',
-                        'destination' => '443',
-                        'protocol' => 'TCP'
-                    ],
-                    [
-                        'source' => '80',
-                        'destination' => '443',
-                        'protocol' => 'TCP'
-                    ],
-                    [
-                        'source' => '80',
-                        'destination' => '8443',
-                        'protocol' => 'TCP'
-                    ]
-                ],
-                'enabled' => true
-            ])->assertStatus(202);
-
-        Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == 'sync_update';
-        });
-
-        $firewallRule = FirewallRule::findOrFail(json_decode($response->getContent())->data->id);
-        $this->assertCount(2, $firewallRule->firewallRulePorts()->get());
     }
 
     public function testPortsInvalidFails()

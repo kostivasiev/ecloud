@@ -2,12 +2,8 @@
 
 namespace App\Http\Requests\V2\NetworkRule;
 
-use App\Models\V2\NetworkRulePort;
-use App\Rules\V2\IsPortWithinExistingRange;
-use App\Rules\V2\IsUniquePortOrRange;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Request;
 
 class Update extends FormRequest
 {
@@ -18,7 +14,6 @@ class Update extends FormRequest
      */
     public function rules()
     {
-        $networkRuleId = Request::route('networkRuleId');
         return [
             'name' => 'sometimes|nullable|string|max:255',
             'sequence' => [
@@ -31,17 +26,13 @@ class Update extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                new ValidFirewallRuleSourceDestination(),
-                new IsUniquePortOrRange(NetworkRulePort::class, $networkRuleId),
-                new IsPortWithinExistingRange(NetworkRulePort::class, $networkRuleId),
+                new ValidFirewallRuleSourceDestination()
             ],
             'destination' => [
                 'sometimes',
                 'required',
                 'string',
-                new ValidFirewallRuleSourceDestination(),
-                new IsUniquePortOrRange(NetworkRulePort::class, $networkRuleId),
-                new IsPortWithinExistingRange(NetworkRulePort::class, $networkRuleId),
+                new ValidFirewallRuleSourceDestination()
             ],
             'direction' => 'sometimes|required|string|in:IN,OUT,IN_OUT',
             'action' => 'sometimes|required|string|in:ALLOW,DROP,REJECT',
