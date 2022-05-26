@@ -42,7 +42,7 @@ class Create extends FormRequest
             'ports' => [
                 'sometimes',
                 'present',
-                'array',
+                'array'
             ],
             'ports.*.protocol' => [
                 'required',
@@ -53,13 +53,13 @@ class Create extends FormRequest
                 'required_if:ports.*.protocol,TCP,UDP',
                 'string',
                 'nullable',
-                new ValidFirewallRulePortSourceDestination(),
+                new ValidFirewallRulePortSourceDestination()
             ],
             'ports.*.destination' => [
                 'required_if:ports.*.protocol,TCP,UDP',
                 'string',
                 'nullable',
-                new ValidFirewallRulePortSourceDestination(),
+                new ValidFirewallRulePortSourceDestination()
             ]
         ];
     }

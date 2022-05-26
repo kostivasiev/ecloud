@@ -83,7 +83,7 @@ class FirewallRuleController extends BaseController
             $firewallRule->save();
 
             if ($request->has('ports')) {
-                foreach (array_unique($request->input('ports'), SORT_REGULAR) as $port) {
+                foreach ($request->input('ports') as $port) {
                     $port['firewall_rule_id'] = $firewallRule->id;
                     $firewallRulePort = new FirewallRulePort($port);
                     if ($firewallRulePort->protocol === 'ICMPv4') {
@@ -126,7 +126,7 @@ class FirewallRuleController extends BaseController
                 $firewallRule->firewallRulePorts->each(function ($port) {
                     $port->delete();
                 });
-                foreach (array_unique($request->input('ports'), SORT_REGULAR) as $port) {
+                foreach ($request->input('ports') as $port) {
                     $port['firewall_rule_id'] = $firewallRule->id;
                     $firewallRulePort = new FirewallRulePort($port);
                     if ($firewallRulePort->protocol === 'ICMPv4') {
