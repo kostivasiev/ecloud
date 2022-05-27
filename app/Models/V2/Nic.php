@@ -119,26 +119,12 @@ class Nic extends Model implements Searchable, ResellerScopeable, AvailabilityZo
      */
     public function assignIpAddress(array $denyList = [], string $type = IpAddress::TYPE_DHCP) : IpAddress
     {
-        $lock = Cache::lock("ip_address." . $this->network->id, 60);
-        try {
-            $lock->block(60);
+        $ipAddress = $this->network->allocateIpAddress($denyList, $type);
 
-            $ip = $this->network->getNextAvailableIp($denyList);
+        $this->ipAddresses()->save($ipAddress);
+        Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to NIC ' . $this->id . ', type: ' . $type);
 
-            $ipAddress = app()->make(IpAddress::class);
-            $ipAddress->fill([
-                'ip_address' => $ip,
-                'network_id' => $this->network->id,
-                'type' => $type
-            ]);
-
-            $this->ipAddresses()->save($ipAddress);
-            Log::info('IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to NIC ' . $this->id . ', type: ' . $type);
-
-            return $ipAddress;
-        } finally {
-            $lock->release();
-        }
+        return $ipAddress;
     }
 
     /**

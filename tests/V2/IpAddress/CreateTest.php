@@ -96,7 +96,7 @@ class CreateTest extends TestCase
             ]
         )->assertJsonFragment([
             'title' => 'Failed',
-            'detail' => 'Failed to automatically assign an ip address',
+            'detail' => 'Failed to assign IP address',
         ])->assertStatus(424);
     }
 
@@ -115,8 +115,8 @@ class CreateTest extends TestCase
                 'type' => IpAddress::TYPE_DHCP,
             ]
         )->assertJsonFragment([
-            'title' => 'Validation Failure',
-            'detail' => 'Failed to check ip address availability',
+            'title' => 'Failed',
+            'detail' => 'Failed to assign IP address',
         ])->assertStatus(424);
     }
 }
