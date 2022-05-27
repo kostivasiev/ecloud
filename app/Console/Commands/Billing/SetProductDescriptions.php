@@ -29,7 +29,7 @@ class SetProductDescriptions extends Command
         'throughput_2.5GB' => 'Router Throughput 2.5Gbps',
         'throughput_1Gb' => 'Router Throughput 1Gbps',
         'volume' => 'Volume Storage 1GB',
-        'hostgroup' => ' Host Group',
+        'hostgroup' => 'Host Group',
         'host_windows' => 'Host - Windows',
         'floating_ip' => 'Floating IP',
         'advanced_networking' => 'Advanced Networking',
