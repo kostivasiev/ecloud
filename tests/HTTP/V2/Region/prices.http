@@ -18,7 +18,7 @@ client.test("Request executed successfully", function() {
 %}
 
 ###
-GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices?category:eq=support
+GET https://{{host}}/{{version}}/regions/{{dev_region_id}}/prices?category:eq=license
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
