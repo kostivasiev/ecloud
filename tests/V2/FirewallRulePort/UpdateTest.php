@@ -32,19 +32,16 @@ class UpdateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
-        $this->patch(
-            '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
-            [
-                'name' => 'Changed',
-                'protocol' => 'UDP',
-                'source' => 'ANY',
-                'destination' => '80'
-            ],
-            [
-                'X-consumer-custom-id' => '1-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertStatus(202);
+        $this->asUser()
+            ->patch(
+                '/v2/firewall-rule-ports/' . $this->firewallRulePort->id,
+                [
+                    'name' => 'Changed',
+                    'protocol' => 'UDP',
+                    'source' => 'ANY',
+                    'destination' => '80'
+                ],
+            )->assertStatus(202);
 
         $this->assertDatabaseHas(
             'firewall_rule_ports',

@@ -5,7 +5,10 @@ namespace Tests\V2\FirewallRulePort;
 use App\Events\V2\Task\Created;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FirewallRule;
+use App\Models\V2\FirewallRulePort;
 use App\Models\V2\Task;
+use App\Rules\V2\FirewallRulePort\UniquePortRangeRule;
+use App\Rules\V2\FirewallRulePort\UniquePortRule;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
@@ -271,7 +274,35 @@ class CreateTest extends TestCase
                 'source' => '400-499',
                 'destination' => '500'
             ])->assertJsonFragment([
-                'detail' => 'This port configuration already exists',
+                'detail' => 'destination port exists within an existing range',
+            ])->assertStatus(422);
+
+        Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
+            return $event->model->name == 'sync_update';
+        });
+    }
+
+    public function testDuplicatePortListRuleDetectedFails()
+    {
+        $response = $this->asUser()
+            ->post('/v2/firewall-rule-ports', [
+                'firewall_rule_id' => $this->firewallRule->id,
+                'protocol' => 'TCP',
+                'source' => '400-499',
+                'destination' => '500-599'
+            ])->assertStatus(202);
+
+        $task = Task::findOrFail(json_decode($response->getContent())->data->task_id);
+        $task->setAttribute('completed', true)->saveQuietly();
+
+        $this->asUser()
+            ->post('/v2/firewall-rule-ports', [
+                'firewall_rule_id' => $this->firewallRule->id,
+                'protocol' => 'TCP',
+                'source' => '400-499',
+                'destination' => '22,80,500-510'
+            ])->assertJsonFragment([
+                'detail' => 'There are port(s) conflicting with existing rules in this configuration',
             ])->assertStatus(422);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
