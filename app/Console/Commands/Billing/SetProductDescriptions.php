@@ -3,10 +3,7 @@
 namespace App\Console\Commands\Billing;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Product;
-use App\Models\V2\ProductPrice;
 use App\Console\Commands\Command;
-use Doctrine\DBAL\Exception;
 
 class SetProductDescriptions extends Command
 {
@@ -62,10 +59,7 @@ class SetProductDescriptions extends Command
                     }
                 }
             });
-
         });
-
-
 
         return Command::SUCCESS;
     }
