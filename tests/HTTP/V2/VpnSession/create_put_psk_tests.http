@@ -1,0 +1,121 @@
+### 1. Create VPN Session with Bad PSK (should fail)
+POST https://{{host}}/{{version}}/vpn-sessions
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "vpn session test",
+    "vpn_profile_group_id": "vpnpg-aaaaaaaa",
+    "vpn_service_id": "vpn-aaaaaaaa",
+    "vpn_endpoint_id": "vpne-aaaaaaaa",
+    "remote_ip": "211.12.13.1",
+    "remote_networks": "10.0.3.0/24",
+    "local_networks": "10.0.0.0/24",
+    "psk": "orange"
+}
+
+> {%
+client.test('Create VPN Session', function () {
+    client.assert(response.status === 422, '422 response not received');
+});
+%}
+
+### 2. Create VPN Session with PSK
+POST https://{{host}}/{{version}}/vpn-sessions
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "vpn session test",
+    "vpn_profile_group_id": "vpnpg-aaaaaaaa",
+    "vpn_service_id": "vpn-aaaaaaaa",
+    "vpn_endpoint_id": "vpne-aaaaaaaa",
+    "remote_ip": "211.12.13.1",
+    "remote_networks": "10.0.3.0/24",
+    "local_networks": "10.0.0.0/24",
+    "psk": "asc98Asc&caSd1123"
+}
+
+> {%
+client.test('Create VPN Session', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('vpn_session_id', response.body.data.id);
+client.log('VPN Session ID: ' + response.body.data.id);
+%}
+
+### 3. Get Resource
+GET https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 4. Get PSK Resource
+GET https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}/pre-shared-key
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 5. Update PSK with bad password
+PUT https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}/pre-shared-key
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "psk": "blue"
+}
+
+> {%
+client.test('Put Resource', function () {
+    client.assert(response.status === 422, '422 response not received');
+});
+%}
+
+### 6. Update PSK with good password
+PUT https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}/pre-shared-key
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "psk": "chUy8&&6dlopU"
+}
+
+> {%
+client.test('Put Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 7. Get PSK Resource
+GET https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}/pre-shared-key
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Get Resource', function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 8. Delete Resource
+GET https://{{host}}/{{version}}/vpn-sessions/{{vpn_session_id}}
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
