@@ -155,8 +155,8 @@ class VpnSessionController extends BaseController
         $vpnSession = VpnSession::forUser($request->user())->findOrFail($vpnSessionId);
 
         $vpnSession->updatePskCredential($request->input('psk'));
-        $vpnSession->syncSave();
+        $task = $vpnSession->syncSave();
 
-        return response('', 204);
+        return $this->responseIdMeta($request, $vpnSession->id, 202, $task->id);
     }
 }
