@@ -57,7 +57,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\FloatingIp\MigrateFips::class,
         \App\Console\Commands\Nic\MigrateIpAddressToIpAddressModel::class,
         \App\Console\Commands\VPC\DeleteOrphanedResources::class,
-        \App\Console\Commands\Billing\SetProductDescriptions::class
     ];
 
     /**
