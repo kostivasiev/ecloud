@@ -19,7 +19,6 @@ class CreateTest extends TestCase
     protected VpnEndpoint $vpnEndpoint;
     protected VpnSession $vpnSession;
     protected VpnProfileGroup $vpnProfileGroup;
-    protected string $preSharedKey;
 
     public function setUp(): void
     {
@@ -63,7 +62,6 @@ class CreateTest extends TestCase
             'type' => VpnSessionNetwork::TYPE_REMOTE,
             'ip_address' => '127.1.1.1/32',
         ]);
-        $this->preSharedKey = 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAAgQCuxFiJFGtRIxU7IZA35zya75IJokX21zVrM90rxdWykbZz9cb5obLMXGqPLiHDOKL2frUd9TtTvPI/OQzCu5Sd2x41PdYyLcjXoLAaPqlmUbi3ExzigDKWjVu7RCBYWNBIi63boq3SqUZRdf9oF/R81EGUsF8lMnEIoutDncH8jQ==';
     }
 
     public function testCreateResource()
@@ -170,7 +168,7 @@ class CreateTest extends TestCase
             'router_id' => $this->router()->id,
         ]);
 
-        $response = $this->post(
+        $this->post(
             '/v2/vpn-sessions',
             [
                 'name' => 'vpn session test',
@@ -236,6 +234,8 @@ class CreateTest extends TestCase
             'router_id' => $this->router()->id,
         ]);
 
+        $password = 'abc&98Jsdc8SDLhjbbi';
+
         $response = $this->post(
             '/v2/vpn-sessions',
             [
@@ -246,7 +246,7 @@ class CreateTest extends TestCase
                 'remote_ip' => '211.12.13.1',
                 'local_networks' => '10.0.0.1/32',
                 'remote_networks' => '172.12.23.11/32',
-                'psk' => $this->preSharedKey,
+                'psk' => $password,
             ]
         )->assertStatus(202);
         Event::assertDispatched(Created::class);
@@ -259,9 +259,39 @@ class CreateTest extends TestCase
             Credential::class,
             [
                 'id' => $credential->id,
-                'password' => encrypt($this->preSharedKey),
+                'password' => encrypt($password),
             ],
             'ecloud'
         );
+    }
+
+    public function testCreateResourceWithBadPsk()
+    {
+        $vpnService = VpnService::factory()->create([
+            'name' => 'test-service',
+            'router_id' => $this->router()->id,
+        ]);
+
+        $this->post(
+            '/v2/vpn-sessions',
+            [
+                'name' => 'vpn session test',
+                'vpn_profile_group_id' => $this->vpnProfileGroup->id,
+                'vpn_service_id' => $vpnService->id,
+                'vpn_endpoint_id' => $this->vpnEndpoint->id,
+                'remote_ip' => '211.12.13.1',
+                'local_networks' => '10.0.0.1/32',
+                'remote_networks' => '172.12.23.11/32',
+                'psk' => 'orange',
+            ]
+        )->assertJsonFragment([
+            'detail' => 'The psk must be at least 8 characters',
+        ])->assertJsonFragment([
+            'detail' => 'The psk must contain at least one uppercase and one lowercase letter',
+        ])->assertJsonFragment([
+            'detail' => 'The psk must contain at least one symbol',
+        ])->assertJsonFragment([
+            'detail' => 'The psk must contain at least one number',
+        ])->assertStatus(422);
     }
 }

@@ -1,8 +1,8 @@
 <?php
 namespace App\Http\Requests\V2\VpnSession;
 
-use App\Rules\V2\IsValidSshPublicKey;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class UpdateKeyRequest extends FormRequest
 {
@@ -12,7 +12,7 @@ class UpdateKeyRequest extends FormRequest
             'psk' => [
                 'required',
                 'string',
-                new IsValidSshPublicKey(),
+                Password::min(8)->mixedCase()->letters()->numbers()->symbols(),
             ],
         ];
     }

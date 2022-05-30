@@ -8,12 +8,12 @@ use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsNotMaxCommaSeperatedItems;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsSameAvailabilityZone;
-use App\Rules\V2\IsValidSshPublicKey;
 use App\Rules\V2\ValidCidrNetworkCsvString;
 use App\Rules\V2\ValidIpv4;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class CreateRequest extends FormRequest
 {
@@ -67,7 +67,7 @@ class CreateRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                new IsValidSshPublicKey(),
+                Password::min(8)->mixedCase()->letters()->numbers()->symbols(),
             ],
         ];
     }
