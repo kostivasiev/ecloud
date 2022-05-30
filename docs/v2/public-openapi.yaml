@@ -359,7 +359,7 @@ paths:
   '/ecloud/v2/regions/{regionId}':
     $ref: 'resources/Region/item.yaml'
   '/ecloud/v2/regions/{regionId}/prices':
-    $ref: 'resources/AvailabilityZone/prices-collection.yaml'
+    $ref: 'resources/Region/prices-collection.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/collection.yaml'
   '/ecloud/v2/routers/{routerId}':
