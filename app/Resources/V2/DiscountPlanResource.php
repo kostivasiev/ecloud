@@ -22,7 +22,7 @@ class DiscountPlanResource extends UKFastResource
             'discount_rate' => $this->discount_rate,
             'term_length' => $this->term_length,
             'term_start_date' => Carbon::parse($this->term_start_date)->toDateString(),
-            'term_end_date' => Carbon::parse($this->term_end_date)->toDateString(),
+            'term_end_date' => $this->term_end_date ? Carbon::parse($this->term_end_date)->toDateString() : null,
             'status' => $this->status,
             'response_date' => $this->response_date ?
                 Carbon::parse($this->created_at, new \DateTimeZone(config('app.timezone')))->toIso8601String() : null,

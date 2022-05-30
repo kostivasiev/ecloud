@@ -6,15 +6,15 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Cache;
 use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class IpAddress extends Model implements Searchable, Natable, RouterScopable
+class IpAddress extends Model implements Searchable, Natable, ResellerScopeable, RouterScopable
 {
     use CustomKey, SoftDeletes, DefaultName, HasFactory, DeletionRules, Syncable;
 
@@ -83,6 +83,11 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
         return $this->morphOne(FloatingIp::class, 'resource');
     }
 
+    public function getResellerId(): int
+    {
+        return $this->network->getResellerId();
+    }
+
     /**
      * @param $query
      * @param $user
@@ -129,17 +134,24 @@ class IpAddress extends Model implements Searchable, Natable, RouterScopable
         }
     }
 
-    public function allocateAddressAndSave($networkId)
+    public function setAddressAndSave($ip)
     {
-        $lock = Cache::lock("ip_address." . $networkId, 60);
-        try {
-            $lock->block(60);
-            $network = Network::forUser(request()->user())->findOrFail($networkId);
-            $ip = $network->getNextAvailableIp();
+        return $this->network->withIpAddressLock(function () use ($ip) {
+            if ($this->network->ipAddresses()->where('ip_address', $ip)->count() > 0) {
+                throw new Exception('IP address already assigned');
+            }
+
             $this->ip_address = $ip;
             return $this->save();
-        } finally {
-            $lock->release();
-        }
+        });
+    }
+
+    public function allocateAddressAndSave(array $denyList = [])
+    {
+        return $this->network->withIpAddressLock(function ($network) use ($denyList) {
+            $ip = $network->getNextAvailableIp($denyList);
+            $this->ip_address = $ip;
+            return $this->save();
+        });
     }
 }

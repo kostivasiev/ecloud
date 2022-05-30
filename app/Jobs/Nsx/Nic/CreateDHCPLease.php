@@ -36,9 +36,8 @@ class CreateDHCPLease extends TaskJob
             $cursor = $response->cursor ?? null;
         } while (!empty($cursor));
 
-
         if (!$nic->ipAddresses()->withType(IpAddress::TYPE_DHCP)->exists()) {
-            $ipAddress = $nic->assignIpAddress($assignedIpsNsx->toArray());
+            $ipAddress = $nic->assignIpAddress($assignedIpsNsx->toArray(), IpAddress::TYPE_DHCP);
         } else {
             $ipAddress = $nic->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first();
         }
