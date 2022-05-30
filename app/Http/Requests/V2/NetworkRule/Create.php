@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\NetworkRule;
 
 use App\Models\V2\NetworkPolicy;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\FirewallRulePort\ValidPortArrayRule;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
@@ -53,7 +54,8 @@ class Create extends FormRequest
             'ports' => [
                 'sometimes',
                 'present',
-                'array'
+                'array',
+                new ValidPortArrayRule(),
             ],
             'ports.*.protocol' => [
                 'required',
