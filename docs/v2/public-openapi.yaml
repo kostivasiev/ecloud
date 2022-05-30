@@ -188,6 +188,8 @@ paths:
     $ref: 'resources/AvailabilityZone/item.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/router-throughputs':
     $ref: 'resources/AvailabilityZone/router-throughputs-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/prices':
+    $ref: 'resources/AvailabilityZone/prices-collection.yaml'
   '/ecloud/v2/billing-metrics':
     $ref: 'resources/BillingMetric/public_collection.yaml'
   '/ecloud/v2/billing-metrics/{billingMetricsId}':
@@ -356,6 +358,8 @@ paths:
     $ref: 'resources/Region/collection.yaml'
   '/ecloud/v2/regions/{regionId}':
     $ref: 'resources/Region/item.yaml'
+  '/ecloud/v2/regions/{regionId}/prices':
+    $ref: 'resources/AvailabilityZone/prices-collection.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/collection.yaml'
   '/ecloud/v2/routers/{routerId}':
