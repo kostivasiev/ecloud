@@ -23,15 +23,11 @@ class IsAvailable implements Rule
             return false;
         }
 
-        $lock = Cache::lock("ip_address." . $this->network->id, 5);
-        try {
-            $lock->block(5);
-            return $this->network->ipAddresses()->where('ip_address', $value)->count() == 0;
-        } catch (LockTimeoutException $e) {
-            throw new IpAddressValidationException;
-        } finally {
-            $lock->release();
+        if ($this->network->isReservedAddress($value)) {
+            return false;
         }
+
+        return $this->network->ipAddresses()->where('ip_address', $value)->count() == 0;
     }
 
     /**

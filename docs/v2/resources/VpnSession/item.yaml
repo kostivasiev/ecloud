@@ -32,6 +32,9 @@ patch:
                   readOnly: true
                 vpn_endpoint_id:
                   readOnly: true
+                psk :
+                  type : string
+                  example : str0ngpsk
   responses:
     200:
       $ref: '../../public-openapi.yaml#/components/responses/VpnSessionIdResponse'

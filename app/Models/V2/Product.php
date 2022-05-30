@@ -31,6 +31,7 @@ class Product extends V1ModelWrapper implements Searchable
         $this->fillable([
             'product_sales_product_id',
             'product_name',
+            'product_description',
             'product_category',
             'product_subcategory',
             'product_supplier',

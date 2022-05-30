@@ -14,7 +14,7 @@ class DeleteTest extends TestCase
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
         $this->delete('/v2/ip-addresses/' . $this->ipAddress()->id)
-            ->assertStatus(204);
+            ->assertStatus(202);
     }
 
     public function testCannotDeleteWhenUsedByNic()

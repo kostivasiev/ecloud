@@ -20,3 +20,22 @@ get:
                 type: object
   tags:
     - Vpn Sessions
+put:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          allOf:
+            - type: object
+              properties:
+                psk:
+                  type: string
+                  example: str0ngpsk
+  parameters:
+    - $ref: 'parameters/vpnSessionId.yaml'
+  responses:
+    204:
+      description: success
+  tags:
+    - Vpn Sessions

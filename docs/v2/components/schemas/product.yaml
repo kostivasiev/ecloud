@@ -1,0 +1,23 @@
+properties:
+  availability_zone_id:
+    type: string
+    example: az-2b66bb79
+  name:
+    type: string
+    example: 'ram'
+  description:
+    description: Description of the product
+    type: string
+    example: '1GB RAM (upto 24GB)'
+  category:
+    description: 'Product category, one of compute / storage / networking / license / support'
+    type: string
+    example: 'compute'
+  price:
+    description: Price of this product in the stated availability zone.
+    type:
+    example: '0.958904'
+  rate:
+    description: The rate / frequency that applies to the specified price.
+    type: string
+    example: 'hour'

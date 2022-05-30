@@ -28,4 +28,12 @@ class IsAvailableTest extends TestCase
 
         $this->assertTrue($result);
     }
+
+    public function testReservedFails() {
+        $rule = new IsAvailable($this->network()->id);
+
+        $result = $rule->passes('network_id', "10.0.0.1");
+
+        $this->assertFalse($result);
+    }
 }
