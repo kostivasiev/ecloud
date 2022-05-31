@@ -14,7 +14,7 @@ class VpnEndpointResource extends UKFastResource
             'id' => $this->id,
             'name' => $this->name,
             'vpn_service_id' => $this->vpn_service_id,
-            'floating_ip_id' => ($this->floatingIp) ? $this->floatingIp->id : null,
+            'floating_ip_id' => $this->floatingIpResource()->exists() ? $this->floatingIpResource->floatingIp->id : null,
             'sync' => $this->sync,
             'vpc_id' => $this->vpnService ? $this->vpnService->router->vpc->id : null,
             'created_at' => $this->created_at === null ? null : Carbon::parse(
