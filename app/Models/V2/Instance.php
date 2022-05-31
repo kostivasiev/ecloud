@@ -180,23 +180,6 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
         return $this->hasOne(AffinityRuleMember::class, 'instance_id');
     }
 
-    public function getHostGroup(): ?HostGroup
-    {
-        $hostGroupId = $this->getHostGroupId();
-        if ($hostGroupId === null) {
-            $message = 'Hostgroup ID could not be found for instance ' . $this->id;
-            Log::info($message);
-            return null;
-        }
-        $hostGroup = HostGroup::find($hostGroupId);
-        if (!$hostGroup) {
-            $message = 'Hostgroup could not be found for instance ' . $this->id;
-            Log::info($message);
-            return null;
-        }
-        return $hostGroup;
-    }
-
     public function getHostGroupId(): ?string
     {
         if (!empty($this->host_group_id)) {
