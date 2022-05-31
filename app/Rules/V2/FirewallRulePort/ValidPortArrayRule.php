@@ -4,6 +4,7 @@ namespace App\Rules\V2\FirewallRulePort;
 
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 class ValidPortArrayRule implements Rule
@@ -12,6 +13,11 @@ class ValidPortArrayRule implements Rule
     {
         $ports = collect($value);
         foreach ($ports as $port) {
+            if (!Arr::exists($port, 'protocol') ||
+                !Arr::exists($port, 'source') ||
+                !Arr::exists($port, 'destination')) {
+                return false;
+            }
             if ($this->hasDuplicate($ports, $port)) {
                 return false;
             }
