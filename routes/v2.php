@@ -657,12 +657,12 @@ Route::group([
         Route::get('/{affinityRuleId}/members', 'AffinityRuleMemberController@index');
         Route::get('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@show');
         Route::post('/{affinityRuleId}/members', [
-            'middleware' => 'affinity-rule-member-sync',
+            'middleware' => 'affinity-rule-member-are-members-syncing',
             'uses' => 'AffinityRuleMemberController@store',
         ]);
 //        Route::patch('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@update');
         Route::delete('/{affinityRuleId}/members/{affinityRuleMemberId}', [
-            'middleware' => 'affinity-rule-member-sync',
+            'middleware' => 'affinity-rule-member-are-members-syncing',
             'uses' => 'AffinityRuleMemberController@destroy',
         ]);
     });
