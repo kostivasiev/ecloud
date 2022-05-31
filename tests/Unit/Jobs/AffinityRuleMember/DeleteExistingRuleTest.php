@@ -97,21 +97,31 @@ class DeleteExistingRuleTest extends TestCase
 
     public function testIfHostGroupIsInvalid()
     {
+        $hostGroupId = 'hg-xxxxxxxx';
+
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
                 sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
-            )->andReturnUsing(function () {
+            )->andReturnUsing(function () use ($hostGroupId) {
                 return new Response(200, [], json_encode([
-                    'hostGroupID' => 'hg-xxxxxxxx',
+                    'hostGroupID' => $hostGroupId,
                 ]));
             });
+
+        $uri = sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroupId);
+        $this->kingpinServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs($uri)
+            ->andThrow(
+                new ClientException('Not Found', new Request('GET', $uri), new Response(404))
+            );
 
         Event::fake([JobFailed::class, JobProcessed::class]);
 
         dispatch(new DeleteExistingRule($this->task));
 
-        Event::assertDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class);
     }
 
     public function testAffinityRuleDoesNotExist()
