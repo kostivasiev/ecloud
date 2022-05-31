@@ -14,10 +14,6 @@ class DeleteDestinationNat extends TaskJob
         $floatingIpResource = $this->task->resource;
         $floatingIp = $floatingIpResource->floatingIp;
 
-        if ($floatingIp->destinationNat()->exists()) {
-            $this->info('Deleting DNAT ' . $floatingIp->destinationNat->id . ' from unassigned floating IP');
-        }
-
         if (!$floatingIp->destinationNat()->exists()) {
             return;
         }
