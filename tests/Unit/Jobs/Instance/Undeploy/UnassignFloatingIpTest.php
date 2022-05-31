@@ -41,24 +41,6 @@ class UnassignFloatingIpTest extends TestCase
         });
     }
 
-    public function testFloatingIpUnassignJobIsDispatched()
-    {
-        Event::fake([JobProcessed::class, Created::class]);
-
-        $ipAddress = IpAddress::factory()->create();
-        $ipAddress->nics()->sync($this->nic());
-
-        $this->assignFloatingIp($this->floatingIp(), $ipAddress);
-
-        dispatch(new UnassignFloatingIP($this->createSyncDeleteTask($this->instanceModel())));
-
-        Event::assertNotDispatched(JobFailed::class);
-
-        Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == 'floating_ip_unassign';
-        });
-    }
-
     public function testAwaitUnassignFloatingIpTaskTaskFailed()
     {
         Event::fake([JobProcessed::class, Created::class, JobFailed::class]);
@@ -87,7 +69,7 @@ class UnassignFloatingIpTest extends TestCase
         Event::assertDispatched(JobFailed::class);
     }
 
-    public function testAwaitUnassignFloatingIpTaskTaskSucceeded()
+    public function testSuccess()
     {
         Event::fake([JobProcessed::class, Created::class, JobFailed::class]);
 
@@ -100,7 +82,12 @@ class UnassignFloatingIpTest extends TestCase
 
         dispatch(new UnassignFloatingIP($task));
 
-        // Mark the delete sync task as completed
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return $event->job->isReleased();
+        });
+
+        // Mark the delete task as completed
         $unassignTask = Event::dispatched(Created::class, function ($event) {
             return $event->model->name == Unassign::$name;
         })->first()[0];
