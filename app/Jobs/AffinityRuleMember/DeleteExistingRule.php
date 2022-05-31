@@ -16,7 +16,7 @@ class DeleteExistingRule extends TaskJob
 
     private AffinityRuleMember $model;
     private AvailabilityZone $availabilityZone;
-    public array $existingRules = [];
+    public string $existingRule;
 
     public function __construct($task)
     {
@@ -39,20 +39,20 @@ class DeleteExistingRule extends TaskJob
                 $response = $this->availabilityZone->kingpinService()->delete(
                     sprintf(KingpinService::DELETE_CONSTRAINT_URI, $hostGroupId, $this->model->affinityRule->id)
                 );
-                $this->existingRules[] = $hostGroupId;
 
                 if ($response->getStatusCode() !== 200) {
                     $message = 'Failed to delete constraint ' . $this->model->id . ' on ' . $hostGroupId;
                     $this->fail(new \Exception($message));
                     return;
                 }
+                $this->existingRule = $hostGroupId;
             } catch (\Exception $e) {
                 $this->fail($e);
                 return;
             }
         }
-        if (!empty($this->existingRules)) {
-            $this->task->updateData('existing_rules', $this->existingRules);
+        if (!empty($this->existingRule)) {
+            $this->task->updateData('existing_rule', $this->existingRule);
         }
     }
 
