@@ -2,7 +2,7 @@
 
 namespace App\Jobs\AffinityRuleMember;
 
-use App\Jobs\Job;
+use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
@@ -11,20 +11,19 @@ use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
-class CreateAffinityRule extends Job
+class CreateAffinityRule extends TaskJob
 {
     use Batchable, LoggableModelJob;
 
-    private Task $task;
     private AffinityRuleMember $model;
 
     public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
     public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
     public const GET_HOSTGROUP_URI = '/api/v2/vpc/%s/instance/%s';
 
-    public function __construct(Task $task)
+    public function __construct($task)
     {
-        $this->task = $task;
+        parent::__construct($task);
         $this->model = $this->task->resource;
     }
 
