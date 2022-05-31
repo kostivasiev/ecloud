@@ -35,15 +35,6 @@ class DeleteTest extends TestCase
         $this->asUser()
             ->delete(sprintf(static::RESOURCE_URI, $this->affinityRule->id, $this->affinityRuleMember->id))
             ->assertStatus(202);
-
-        $this->assertDatabaseMissing(
-            'affinity_rule_members',
-            [
-                'id' => $this->affinityRuleMember->id,
-                'deleted_at' => null,
-            ],
-            'ecloud'
-        );
     }
 
     public function testDeleteResourceFails()
