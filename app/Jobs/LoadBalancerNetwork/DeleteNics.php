@@ -30,7 +30,7 @@ class DeleteNics extends TaskJob
                     return false;
                 }
 
-                $this->deleteResource($nic->id);
+                $this->deleteSyncableResource($nic->id);
 
                 if ($this->job->hasFailed() || $this->job->isReleased()) {
                     return false;

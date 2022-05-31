@@ -12,8 +12,7 @@ class DeletionRulesTest extends TestCase
     {
         $this->be((new Consumer(0, [config('app.name') . '.read', config('app.name') . '.write']))->setIsAdmin(true));
 
-        $this->floatingIp()->resource()->associate($this->nic());
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $this->nic());
 
         $this->delete('/v2/nics/' . $this->nic()->id)
             ->assertJsonFragment([

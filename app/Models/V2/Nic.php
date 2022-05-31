@@ -79,9 +79,14 @@ class Nic extends Model implements Searchable, ResellerScopeable, AvailabilityZo
         return $this->morphOne(Nat::class, 'translatedable', null, 'translated_id');
     }
 
+    public function floatingIpResource()
+    {
+        return $this->hasOne(FloatingIpResource::class, 'resource_id');
+    }
+
     public function floatingIp()
     {
-        return $this->morphOne(FloatingIp::class, 'resource');
+        return $this?->floatingIpResource?->floatingIp();
     }
 
     public function availabilityZone()
@@ -133,7 +138,7 @@ class Nic extends Model implements Searchable, ResellerScopeable, AvailabilityZo
      */
     public function canDelete()
     {
-        return $this->floatingIp()->exists() == false;
+        return $this->floatingIpResource()->exists() == false;
     }
 
     /**

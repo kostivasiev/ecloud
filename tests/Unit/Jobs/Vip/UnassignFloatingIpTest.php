@@ -26,8 +26,7 @@ class UnassignFloatingIpTest extends TestCase
 
     public function testUnassignFloatingIpSuccess()
     {
-        $this->floatingIp()->resource()->associate($this->vip()->ipAddress);
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $this->vip()->ipAddress);
 
         $task = $this->createSyncDeleteTask($this->vip());
 
@@ -57,8 +56,7 @@ class UnassignFloatingIpTest extends TestCase
 
     public function testUnassignFloatingIpTaskNotCompleteIsReleased()
     {
-        $this->floatingIp()->resource()->associate($this->vip()->ipAddress);
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $this->vip()->ipAddress);
 
         $floatingIpUnassignTask = Model::withoutEvents(function () {
             $task = new Task([

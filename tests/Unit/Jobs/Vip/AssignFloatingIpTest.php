@@ -90,7 +90,7 @@ class AssignFloatingIpTest extends TestCase
 
         $clusterIp = $this->vip()->assignClusterIp();
 
-        $this->floatingIp()->resource()->associate($clusterIp)->save();
+        $this->assignFloatingIp($this->floatingIp(), $clusterIp);
 
         $task = $this->createSyncUpdateTask($this->vip(), [
             'allocate_floating_ip' => true,

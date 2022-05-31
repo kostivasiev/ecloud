@@ -3,6 +3,7 @@
 namespace Tests\V2\FloatingIp;
 
 use App\Events\V2\Task\Created;
+use App\Jobs\Tasks\FloatingIp\Unassign;
 use App\Models\V2\VpnEndpoint;
 use Illuminate\Support\Facades\Event;
 use Tests\Mocks\Resources\VipMock;
@@ -23,13 +24,13 @@ class UnassignTest extends TestCase
     {
         Event::fake([Created::class]);
 
-        $this->floatingIp()->resource()->associate($this->nic())->save();
+        $this->assignFloatingIp($this->floatingIp(), $this->ipAddress());
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/unassign')
             ->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == 'floating_ip_unassign';
+            return $event->model->name == Unassign::$name;
         });
     }
 
@@ -37,7 +38,7 @@ class UnassignTest extends TestCase
     {
         $vpnEndpoint = VpnEndpoint::factory()->create();
 
-        $this->floatingIp()->resource()->associate($vpnEndpoint)->save();
+        $this->assignFloatingIp($this->floatingIp(), $vpnEndpoint);
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/unassign', [
             'resource_id' => $this->nic()->id
@@ -49,7 +50,7 @@ class UnassignTest extends TestCase
     {
         $clusterIp = $this->vip()->assignClusterIp();
 
-        $this->floatingIp()->resource()->associate($clusterIp)->save();
+        $this->assignFloatingIp($this->floatingIp(), $clusterIp);
 
         $this->post('/v2/floating-ips/' . $this->floatingIp()->id .'/unassign', [
             'resource_id' => $this->nic()->id

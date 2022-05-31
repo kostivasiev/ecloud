@@ -27,7 +27,7 @@ class CreateNics extends TaskJob
         $loadBalancer = $loadBalancerNetwork->loadBalancer;
 
         $loadBalancer->instances->each(function ($instance) use ($loadBalancerNetwork, &$data) {
-            $this->createResource(Nic::class, [
+            $this->createSyncableResource(Nic::class, [
                 'network_id' => $loadBalancerNetwork->network_id,
                 'instance_id' => $instance->id,
             ]);

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\V2\Dhcp;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\FloatingIpResource;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\LoadBalancer;
@@ -67,6 +68,7 @@ class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             'nic' => Nic::class,
             'fip' => FloatingIp::class,
+            'fipr' => FloatingIpResource::class,
             'i' => Instance::class,
             'rtr' => Router::class,
             'vol' => Volume::class,

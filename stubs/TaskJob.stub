@@ -1,0 +1,15 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Jobs\TaskJob;
+
+class {{ name }} extends TaskJob
+{
+    public function handle()
+    {
+        $resource = $this->task->resource;
+
+
+    }
+}
