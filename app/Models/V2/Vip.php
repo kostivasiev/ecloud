@@ -58,15 +58,6 @@ class Vip extends Model implements Searchable, ResellerScopeable
         return $this->loadBalancerNetwork->loadBalancer->getResellerId();
     }
 
-//    public function getFloatingIpIdAttribute()
-//    {
-//        if ($this->ipAddress()->exists() && $this->ipAddress->floatingIp->exists()) {
-//            return $this->ipAddress->floatingIp->id;
-//        }
-//
-//        return null;
-//    }
-
     public function getLoadBalancerIdAttribute()
     {
         return $this->loadBalancerNetwork->loadBalancer->id;
@@ -95,30 +86,13 @@ class Vip extends Model implements Searchable, ResellerScopeable
             throw new \Exception('Cluster IP address already assigned to VIP');
         }
 
-        $lock = Cache::lock("ip_address." . $this->id, 60);
-        try {
-            $lock->block(60);
+        $network = $this->loadBalancerNetwork->network;
+        $ipAddress = $network->allocateIpAddress([], IpAddress::TYPE_CLUSTER);
 
-            $network = $this->loadBalancerNetwork->network;
+        $this->ipAddress()->associate($ipAddress)->save();
+        Log::info(IpAddress::TYPE_CLUSTER . ' IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to VIP ' . $this->id);
 
-            $ip = $network->getNextAvailableIp();
-
-            $ipAddress = app()->make(IpAddress::class);
-            $ipAddress->fill([
-                'ip_address' => $ip,
-                'network_id' => $network->id,
-                'type' => IpAddress::TYPE_CLUSTER
-            ]);
-            $ipAddress->save();
-
-            $this->ipAddress()->associate($ipAddress)->save();
-
-            Log::info(IpAddress::TYPE_CLUSTER . ' IP address ' . $ipAddress->id . ' (' . $ipAddress->ip_address . ') was assigned to VIP ' . $this->id);
-
-            return $ipAddress;
-        } finally {
-            $lock->release();
-        }
+        return $ipAddress;
     }
 
     public function sieve(Sieve $sieve)

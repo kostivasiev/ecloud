@@ -1461,14 +1461,6 @@ class VirtualMachineController extends BaseController
             foreach ($request->input('hdd_disks') as $hdd) {
                 $hdd = (object)$hdd;
 
-                if (!$request->user()->isAdmin()) {
-                    if ($hdd->capacity > static::HDD_MAX_SIZE_GB) {
-                        throw new Exceptions\BadRequestException(
-                            'HDD with UUID ' . $hdd->uuid . ' cannot exceed ' . static::HDD_MAX_SIZE_GB . 'GB'
-                        );
-                    }
-                }
-
                 $isExistingDisk = false;
                 if (isset($hdd->uuid)) {
                     // existing disks
@@ -1508,8 +1500,17 @@ class VirtualMachineController extends BaseController
                     }
 
                     //Non-deleted disks
+
                     if (!is_numeric($hdd->capacity)) {
                         throw new Exceptions\BadRequestException("Invalid capacity for HDD '" . $hdd->uuid . "'");
+                    }
+
+                    if (!$request->user()->isAdmin()) {
+                        if ($hdd->capacity > static::HDD_MAX_SIZE_GB) {
+                            throw new Exceptions\BadRequestException(
+                                'HDD with UUID ' . $hdd->uuid . ' cannot exceed ' . static::HDD_MAX_SIZE_GB . 'GB'
+                            );
+                        }
                     }
 
                     if ($hdd->capacity < $existingDisks[$hdd->uuid]->capacity) {

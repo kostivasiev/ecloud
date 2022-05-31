@@ -5,7 +5,6 @@ use App\Support\Resource;
 use App\Support\Sync;
 use App\Traits\V2\Syncable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 
 trait AwaitResources
 {
@@ -13,7 +12,7 @@ trait AwaitResources
 
     public $backoff = 5;
 
-    public function createResource($resourceType, $attributes = []): ?Model
+    public function createSyncableResource($resourceType, $attributes = [], $callback = null): ?Model
     {
         if (!in_array(Syncable::class, class_uses($resourceType))) {
             $this->error($this::class . ': ResourceType '. $resourceType . ' is not a Syncable resource, abort');
@@ -23,18 +22,22 @@ trait AwaitResources
 
         $resource = $resourceType::firstOrNew($attributes);
 
+        if (!empty($callback)) {
+            $callback($resource);
+        }
+
         if (!$resource->exists) {
             $resource->syncSave();
         }
 
         if ($resource->sync->status == Sync::STATUS_FAILED) {
-            Log::error(get_class($this) . ': Resource ' . $resource->id . ' in failed sync state, abort');
+            $this->error('Resource ' . $resource->id . ' in failed sync state, abort');
             $this->fail(new \Exception("Resource '" . $resource->id . "' in failed sync state"));
             return null;
         }
 
         if ($resource->sync->status != Sync::STATUS_COMPLETE) {
-            Log::warning(get_class($this) . ': Resource ' . $resource->id . ' not in sync, retrying in ' . $this->backoff . ' seconds');
+            $this->warning('Resource ' . $resource->id . ' not in sync, retrying in ' . $this->backoff . ' seconds');
             $this->release($this->backoff);
             return null;
         }
@@ -42,12 +45,14 @@ trait AwaitResources
         return $resource;
     }
 
-    public function deleteResource($id): void
+    public function deleteSyncableResource($id): void
     {
+        $this->info('Deleting Resource ' . $id);
+        
         $resourceType = Resource::classFromId($id);
 
         if (!in_array(Syncable::class, class_uses($resourceType))) {
-            $this->error($this::class . ': ResourceType '. $resourceType . ' is not a Syncable resource, abort');
+            $this->error('ResourceType '. $resourceType . ' is not a Syncable resource, abort');
             $this->fail(new \Exception('ResourceType '. $resourceType . ' is not a Syncable resource'));
             return;
         }
@@ -55,19 +60,22 @@ trait AwaitResources
         $resource = $resourceType::find($id);
 
         if (!$resource) {
+            $this->info('Resource ' . $id . ' has been deleted');
             return;
         }
 
         if ($resource->sync->status == Sync::STATUS_FAILED) {
-            Log::error(get_class($this) . ': Resource ' . $resource->id . ' in failed sync state, abort');
+            $this->error('Resource ' . $resource->id . ' in failed sync state, abort');
             $this->fail(new \Exception("Resource '" . $resource->id . "' in failed sync state"));
             return;
         }
 
         if ($resource->sync->status == Sync::STATUS_COMPLETE) {
             $resource->syncDelete();
-            $this->release($this->backoff);
         }
+
+        $this->info('Waiting for ' . $resource->id . ' to be deleted, retrying in ' . $this->backoff . ' seconds.');
+        $this->release($this->backoff);
     }
 
     protected function awaitSyncableResources(Array $resources = [])

@@ -9,6 +9,7 @@ use App\Models\V2\Credential;
 use App\Models\V2\Dhcp;
 use App\Models\V2\FirewallPolicy;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\FloatingIpResource;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Image;
@@ -165,7 +166,7 @@ abstract class TestCase extends BaseTestCase
         return $this->firewallPolicy;
     }
 
-    public function ip($id = 'ip-aaaaaaaa-dev'): IpAddress
+    public function ipAddress($id = 'ip-aaaaaaaa-dev'): IpAddress
     {
         if (!$this->ip) {
             Model::withoutEvents(function () use ($id) {
@@ -433,6 +434,17 @@ abstract class TestCase extends BaseTestCase
             ]);
         }
         return $this->floatingIp;
+    }
+
+    /**
+     * Assign a floating IP to a resource
+     * @param $floatingIp
+     * @param $resource
+     * @return mixed FloatingIpResource pivot
+     */
+    public function assignFloatingIp($floatingIp, $resource)
+    {
+        return FloatingIpResource::factory()->assignedTo($floatingIp, $resource)->create();
     }
 
     public function hostGroupDestroyMocks()

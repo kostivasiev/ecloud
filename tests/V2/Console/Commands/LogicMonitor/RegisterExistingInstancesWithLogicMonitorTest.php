@@ -2,6 +2,7 @@
 namespace Tests\V2\Console\Commands\LogicMonitor;
 
 use App\Models\V2\Credential;
+use App\Models\V2\FloatingIpResource;
 use App\Models\V2\IpAddress;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Console\Command;
@@ -23,7 +24,7 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
 
     public function testCommandDispatchesJobsForFirewallAndNetworkPolicies()
     {
-        $this->markTestSkipped();
+        $this->markTestSkipped('Script marked for removal');
         Event::fake([\App\Events\V2\Task\Created::class]);
 
         // Admin Account Client
@@ -43,6 +44,8 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
 
     public function testCommandRegistersInstancesLogicMonitorSuccess()
     {
+        $this->markTestSkipped('Script marked for removal');
+
         // Create an instance to test with
         $this->credential = $this->instanceModel()->credentials()->save(
             Credential::factory()->create([
@@ -146,6 +149,8 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
 
     public function testNoFloatingIpSkips()
     {
+        $this->markTestSkipped('Script marked for removal');
+
         // Create an instance to test with
         $this->credential = $this->instanceModel()->credentials()->save(
             Credential::factory()->create([
@@ -179,6 +184,8 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
 
     public function testCommandWorksWithSpecifiedInstance()
     {
+        $this->markTestSkipped('Script marked for removal');
+
         // Create an instance to test with
         $this->credential = $this->instanceModel()->credentials()->save(
             Credential::factory()->create([

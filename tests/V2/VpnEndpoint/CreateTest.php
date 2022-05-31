@@ -48,22 +48,18 @@ class CreateTest extends TestCase
         $vpnService = VpnService::factory()->create([
             'router_id' => $this->router()->id,
         ]);
-        $vpnEndpoint = VpnEndpoint::factory()->create([
-            'name' => 'Original Endpoint',
-            'vpn_service_id' => $this->vpnService->id,
-        ]);
-        $this->floatingIp->resource()->associate($vpnEndpoint);
-        $this->floatingIp->save();
+
+        $this->assignFloatingIp($this->floatingIp, $this->ipAddress());
+
         $data = [
             'name' => 'Create Test',
-            'vpn_service_id' => $this->vpnService->id,
+            'vpn_service_id' => $vpnService->id,
             'floating_ip_id' => $this->floatingIp->id,
         ];
         $this->post('/v2/vpn-endpoints', $data)
             ->assertJsonFragment(
                 [
-                    'title' => 'Validation Error',
-                    'detail' => 'The floating ip id is already assigned to a resource',
+                    'error' => 'The Floating IP is already assigned to a resource.',
                 ]
             )
             ->assertStatus(422);

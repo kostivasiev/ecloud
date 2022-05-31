@@ -174,20 +174,22 @@ components:
 #    ReferenceIdResponse:
 #      $ref: 'resources/References/responses/idResponse.yaml'
 paths:
-#  '/ecloud/v2/affinity-rules':
-#    $ref: 'resources/AffinityRule/collection.yaml'
-#  '/ecloud/v2/affinity-rules/{AffinityRuleId}':
-#    $ref: 'resources/AffinityRule/item.yaml'
-#  '/ecloud/v2/affinity-rules/members':
-#    $ref: 'resources/AffinityRuleMember/collection.yaml'
-#  '/ecloud/v2/affinity-rules/{AffinityRuleId}/members/{AffinityRuleMemberId}':
-#    $ref: 'resources/AffinityRuleMember/item.yaml'
+  '/ecloud/v2/affinity-rules':
+    $ref: 'resources/AffinityRule/collection.yaml'
+  '/ecloud/v2/affinity-rules/{AffinityRuleId}':
+    $ref: 'resources/AffinityRule/item.yaml'
+  '/ecloud/v2/affinity-rules/members':
+    $ref: 'resources/AffinityRuleMember/collection.yaml'
+  '/ecloud/v2/affinity-rules/{AffinityRuleId}/members/{AffinityRuleMemberId}':
+    $ref: 'resources/AffinityRuleMember/item.yaml'
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}':
     $ref: 'resources/AvailabilityZone/item.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/router-throughputs':
     $ref: 'resources/AvailabilityZone/router-throughputs-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/prices':
+    $ref: 'resources/AvailabilityZone/prices-collection.yaml'
   '/ecloud/v2/billing-metrics':
     $ref: 'resources/BillingMetric/public_collection.yaml'
   '/ecloud/v2/billing-metrics/{billingMetricsId}':
@@ -356,6 +358,8 @@ paths:
     $ref: 'resources/Region/collection.yaml'
   '/ecloud/v2/regions/{regionId}':
     $ref: 'resources/Region/item.yaml'
+  '/ecloud/v2/regions/{regionId}/prices':
+    $ref: 'resources/Region/prices-collection.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/collection.yaml'
   '/ecloud/v2/routers/{routerId}':

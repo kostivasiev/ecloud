@@ -190,4 +190,29 @@ class VpnSession extends Model implements Searchable, AvailabilityZoneable, Rese
                 'vpc_id' => $filter->wrap(new VpcIdFilter($this))->string(),
             ]);
     }
+
+    public function updatePskCredential(string $psk): Credential
+    {
+        $credential = $this?->credentials()
+            ->where('username', VpnSession::CREDENTIAL_PSK_USERNAME)
+            ->first();
+        if (!$credential) {
+            $credential = new Credential(
+                [
+                    'name' => 'Pre-shared Key for VPN Session ' . $this->id,
+                    'host' => null,
+                    'username' => VpnSession::CREDENTIAL_PSK_USERNAME,
+                    'password' => $psk,
+                    'port' => null,
+                    'is_hidden' => true,
+                ]
+            );
+        } else {
+            $credential->password = $psk;
+        }
+
+        $credential->save();
+        
+        return $credential;
+    }
 }

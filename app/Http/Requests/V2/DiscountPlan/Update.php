@@ -42,6 +42,7 @@ class Update extends FormRequest
             'term_length' => [
                 'sometimes',
                 'required',
+                'nullable',
                 'integer',
                 'min:1',
                 new CommitmentIsGreater($discountPlanId)
@@ -56,6 +57,7 @@ class Update extends FormRequest
             'term_end_date' => [
                 'sometimes',
                 'required',
+                'nullable',
                 'date',
                 'after:today',
                 new CommitmentIsGreater($discountPlanId),

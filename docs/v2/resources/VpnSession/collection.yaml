@@ -42,6 +42,11 @@ post:
         schema:
           allOf:
             - $ref: '../../public-openapi.yaml#/components/schemas/VpnSession'
+            - type : object
+              properties :
+                psk :
+                  type : string
+                  example : str0ngpsk
   responses:
     201:
       $ref: '../../public-openapi.yaml#/components/responses/VpnSessionIdResponse'

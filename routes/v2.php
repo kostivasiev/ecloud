@@ -166,6 +166,7 @@ Route::group([
         Route::post('vpn-sessions', 'VpnSessionController@create');
         Route::patch('vpn-sessions/{vpnSessionId}', 'VpnSessionController@update');
         Route::delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
+        Route::put('vpn-sessions/{vpnSessionId}/pre-shared-key', 'VpnSessionController@updatePreSharedKey');
     });
 
     /** Vpn Profiles */
