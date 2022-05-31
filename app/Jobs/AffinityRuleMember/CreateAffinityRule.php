@@ -9,6 +9,7 @@ use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 class CreateAffinityRule extends TaskJob
@@ -29,7 +30,6 @@ class CreateAffinityRule extends TaskJob
 
     public function handle()
     {
-        $hostGroups = [];
         if ($this->model->affinityRule->affinityRuleMembers()->count() <= 0) {
             Log::info('Rule has no members, skipping', [
                 'affinity_rule_id' => $this->model->id,
@@ -45,28 +45,36 @@ class CreateAffinityRule extends TaskJob
             return;
         }
 
-        $instanceIds = $this->model->affinityRule->affinityRuleMembers()->get()
-            ->pluck('instance_id')
-            ->toArray();
+        $hostGroupId = $this->model->instance->getHostGroupId();
+        $affinityRuleMembers = $this->model->affinityRule->affinityRuleMembers()->get();
+        $instanceIds = $affinityRuleMembers->filter(
+            function (AffinityRuleMember $affinityRuleMember) use ($hostGroupId) {
+                if ($affinityRuleMember->instance->id !== $this->model->instance->id) {
+                    if ($affinityRuleMember->instance->getHostGroupId() == $hostGroupId) {
+                        return $affinityRuleMember->instance->id;
+                    }
+                }
+            }
+        )->pluck('instance_id');
 
         try {
-            $hostGroup = $this->getHostGroup($this->model->instance);
-            $this->createAffinityRule($hostGroup, $instanceIds);
+            $this->createAffinityRule($hostGroupId, $instanceIds);
         } catch (\Exception $e) {
             $this->fail($e);
             return;
         }
     }
 
-    public function createAffinityRule(HostGroup $hostGroup, array $instanceIds)
+    public function createAffinityRule(string $hostGroupId, Collection $instanceIds)
     {
+        $availabilityZone = $this->model->instance->availabilityZone;
         $uriEndpoint = ($this->model->type == 'affinity') ?
             static::AFFINITY_URI :
             static::ANTI_AFFINITY_URI;
 
         try {
-            $response = $hostGroup->availabilityZone->kingpinService()->post(
-                sprintf($uriEndpoint, $hostGroup->id),
+            $response = $availabilityZone->kingpinService()->post(
+                sprintf($uriEndpoint, $hostGroupId),
                 [
                     'json' => [
                         'ruleName' => $this->model->affinityRule->id,
@@ -75,62 +83,25 @@ class CreateAffinityRule extends TaskJob
                     ],
                 ]
             );
-            if ($response->getStatusCode() == 200) {
-                $createdRules = [];
-                if (isset($this->task->data['created_rules'])) {
-                    $createdRules = $this->task->data['created_rules'];
-                }
-                $createdRules[] = $hostGroup->id;
-                $this->task->updateData('created_rules', $createdRules);
-                return true;
-            } else {
-                throw new \Exception('Failed to create rule');
-            }
         } catch (\Exception $e) {
             Log::info('Failed to create affinity rule', [
                 'affinity_rule_id' => $this->model->affinityRule->id,
-                'hostgroup_id' => $hostGroup->id,
+                'hostgroup_id' => $hostGroupId,
                 'message' => $e->getMessage(),
             ]);
             throw $e;
         }
-    }
-
-    /**
-     * @param Instance $instance
-     * @return HostGroup|null
-     * @throws \Exception
-     */
-    public function getHostGroup(Instance $instance): ?HostGroup
-    {
-        if ($instance->hostGroup !== null) {
-            return $instance->hostGroup;
+        if ($response->getStatusCode() == 200) {
+            $createdRules = [];
+            if (isset($this->task->data['created_rules'])) {
+                $createdRules = $this->task->data['created_rules'];
+            }
+            $createdRules[] = $hostGroupId;
+            $this->task->updateData('created_rules', $createdRules);
+            return true;
+        } else {
+            throw new \Exception('Failed to create rule');
         }
-
-        try {
-            $response = $instance->availabilityZone
-                ->kingpinService()
-                ->get(
-                    sprintf(static::GET_HOSTGROUP_URI, $instance->vpc->id, $instance->id)
-                );
-        } catch (\Exception $e) {
-            Log::info('Unable to retrieve hostgroup data for instance', [
-                'instance_id' => $instance->id,
-                'vpc_id' => $instance->vpc->id,
-            ]);
-            throw $e;
-        }
-        $hostGroup = HostGroup::find(
-            (json_decode($response->getBody()->getContents()))->hostGroupID
-        );
-        if (!$hostGroup) {
-            throw new \Exception(
-                sprintf(
-                    'Hostgroup %s could not be found',
-                    (json_decode($response->getBody()->getContents()))->hostGroupID
-                )
-            );
-        }
-        return $hostGroup;
+        return false;
     }
 }

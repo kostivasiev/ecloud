@@ -7,6 +7,7 @@ use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
+use App\Services\V2\KingpinService;
 use App\Support\Sync;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\RequestException;
@@ -69,6 +70,17 @@ class CreateAffinityRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->secondInstance->id)
+            )
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
+
+        $this->kingpinServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs(
                 sprintf(CreateAffinityRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
@@ -95,6 +107,17 @@ class CreateAffinityRuleTest extends TestCase
             ->withSomeOfArgs(
                 sprintf(CreateAffinityRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
+
+        $this->kingpinServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->secondInstance->id)
+            )
+            ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
                 ]));
