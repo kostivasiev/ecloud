@@ -25,7 +25,7 @@ class DeleteTest extends TestCase
     {
         $this->asUser()
             ->delete(sprintf(static::RESOURCE_URI, $this->affinityRule->id))
-            ->assertStatus(204);
+            ->assertStatus(202);
 
         $this->assertDatabaseMissing(
             'affinity_rules',
