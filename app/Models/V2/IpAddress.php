@@ -83,11 +83,6 @@ class IpAddress extends Model implements Searchable, Natable, ResellerScopeable,
         return $this->hasOne(FloatingIpResource::class, 'resource_id');
     }
 
-    public function floatingIp()
-    {
-        return $this?->floatingIpResource?->floatingIp();
-    }
-
     public function getResellerId(): int
     {
         return $this->network->getResellerId();

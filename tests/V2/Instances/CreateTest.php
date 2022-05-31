@@ -326,10 +326,7 @@ class CreateTest extends TestCase
 
     public function testAlreadyAssignedFloatingIpCausesFail()
     {
-        $this->floatingIpResource = FloatingIpResource::factory()->make();
-        $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $this->floatingIpResource->resource()->associate($this->ipAddress());
-        $this->floatingIpResource->save();
+        $this->assignFloatingIp($this->floatingIp(), $this->ipAddress());
 
         $data = [
             'vpc_id' => $this->vpc()->id,

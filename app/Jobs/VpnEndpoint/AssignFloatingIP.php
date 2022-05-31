@@ -5,7 +5,6 @@ namespace App\Jobs\VpnEndpoint;
 use App\Jobs\TaskJob;
 use App\Jobs\Tasks\FloatingIp\Assign;
 use App\Models\V2\FloatingIp;
-use App\Models\V2\Task;
 use App\Traits\V2\TaskJobs\AwaitTask;
 
 class AssignFloatingIP extends TaskJob
@@ -35,10 +34,8 @@ class AssignFloatingIP extends TaskJob
 
             $this->info('Triggered ' . Assign::$name . ' task ' . $task->id . ' for Floating IP (' . $floatingIp->id . ')');
             $this->task->updateData(Assign::$name, $task->id);
-        } else {
-            $task = Task::findOrFail($this->task->data[Assign::$name]);
         }
 
-        $this->awaitTaskWithRelease($task);
+        $this->awaitTasks([$this->task->data[Assign::$name]]);
     }
 }

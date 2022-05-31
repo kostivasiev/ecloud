@@ -25,7 +25,7 @@ class AssignFloatingIp extends TaskJob
         }
 
         if ($vip->ipAddress->floatingIpResource()->exists()) {
-            $this->info('Floating IP ' . $vip->ipAddress->floatingIp->id . ' already assigned to the VIP, skipping');
+            $this->info('Floating IP ' . $vip->ipAddress->floatingIpResource->floatingIp->id . ' already assigned to the VIP, skipping');
             return;
         }
 

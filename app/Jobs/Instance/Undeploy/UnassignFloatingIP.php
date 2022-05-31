@@ -31,11 +31,11 @@ class UnassignFloatingIP extends Job
             $instance->nics()->each(function ($nic) {
                 $nic->ipAddresses()->each(function ($ipAddress) {
                     if ($ipAddress->floatingIpResource()->exists()) {
-                        $taskIds[] = ($ipAddress->floatingIp->createTaskWithLock(
+                        $taskIds[] = ($ipAddress->floatingIpResource->floatingIp->createTaskWithLock(
                             'floating_ip_unassign',
                             \App\Jobs\Tasks\FloatingIp\Unassign::class
                         ))->id;
-                        Log::info('Triggered floating_ip_unassign task for Floating IP (' . $ipAddress->floatingIp->id . ')');
+                        Log::info('Triggered floating_ip_unassign task for Floating IP (' . $ipAddress->floatingIpResource->floatingIp->id . ')');
                         $this->task->updateData('task_ids', $taskIds);
                     }
                 });

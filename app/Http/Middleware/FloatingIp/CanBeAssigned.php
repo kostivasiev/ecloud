@@ -16,7 +16,7 @@ class CanBeAssigned
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($request->route('fipId'));
 
-        if (!empty($floatingIp->resource_id)) {
+        if ($floatingIp->floatingIpResource()->exists()) {
             return response()->json([
                 'errors' => [
                     [

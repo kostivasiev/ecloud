@@ -13,7 +13,7 @@ class IsAssigned implements Rule
     {
         $floatingIp = FloatingIp::forUser(Auth::user())->findOrFail($value);
 
-        return empty($floatingIp->resource_id);
+        return empty($floatingIp->floatingIpResource()->exists());
     }
 
     /**

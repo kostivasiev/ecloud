@@ -25,7 +25,6 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Dev\CreateExampleTask::class,
         \App\Console\Commands\Firewall\SquidUpdate::class,
         \App\Console\Commands\FirewallPolicy\ApplyDefaultRules::class,
-        \App\Console\Commands\FloatingIp\SetPolymorphicRelationship::class,
         \App\Console\Commands\FloatingIp\PopulateForIpRange::class,
         \App\Console\Commands\FloatingIp\PopulateAvailabilityZoneId::class,
         \App\Console\Commands\FloatingIp\MigratePolymorphicRelationshipToPivot::class,
