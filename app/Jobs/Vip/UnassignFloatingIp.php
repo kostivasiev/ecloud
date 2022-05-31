@@ -23,7 +23,7 @@ class UnassignFloatingIp extends TaskJob
             return;
         }
 
-        $floatingIp = $vip->ipAddress->floatingIp;
+        $floatingIp = $vip->ipAddress->floatingIpResource->floatingIp;
 
         $unassignIpTask = 'task.' . Unassign::$name . '.id';
 

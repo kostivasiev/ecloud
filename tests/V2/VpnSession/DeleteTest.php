@@ -34,10 +34,7 @@ class DeleteTest extends TestCase
         $this->vpnEndpoint = VpnEndpoint::factory()->create();
 
         // Create the pivot between a fIP and resource
-        $this->floatingIpResource = FloatingIpResource::factory()->make();
-        $this->floatingIpResource->floatingIp()->associate($this->floatingIp());
-        $this->floatingIpResource->resource()->associate($this->vpnEndpoint);
-        $this->floatingIpResource->save();
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint);
 
         $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'ike_profile_id' => 'ike-abc123xyz',

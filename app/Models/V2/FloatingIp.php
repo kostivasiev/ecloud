@@ -80,11 +80,6 @@ class FloatingIp extends Model implements Searchable, ResellerScopeable, Availab
         return $this->hasOne(FloatingIpResource::class);
     }
 
-    public function resource()
-    {
-        return $this?->floatingIpResource?->resource();
-    }
-
     public function getResourceIdAttribute()
     {
         return $this?->floatingIpResource?->resource?->id;

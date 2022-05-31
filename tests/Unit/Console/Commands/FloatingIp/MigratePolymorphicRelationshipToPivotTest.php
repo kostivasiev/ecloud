@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Console\Commands\FloatingIp;
 
-use App\Events\V2\Task\Created;
 use App\Models\V2\FloatingIpResource;
 use Tests\TestCase;
 
@@ -10,10 +9,10 @@ class MigratePolymorphicRelationshipToPivotTest extends TestCase
 {
     public function testSuccess()
     {
-        $this->markTestSkipped('marked skipped as script has already been run on production');
-        $this->floatingIp();
-        $this->floatingIp()->resource()->associate($this->ipAddress());
-        $this->floatingIp()->save();
+        $this->floatingIp()
+        ->setAttribute('resource_id', $this->ipAddress()->id)
+        ->setAttribute('resource_type', $this->ipAddress()->getMorphClass())
+        ->save();
 
         $this->assertCount(0, FloatingIpResource::all());
 
@@ -28,8 +27,6 @@ class MigratePolymorphicRelationshipToPivotTest extends TestCase
 
     public function testFloatingIpNotAssignedIgnored()
     {
-        $this->markTestSkipped('marked skipped as script has already been run on production');
-
         $this->assertCount(0, FloatingIpResource::all());
 
         $this->artisan('floating-ip:migrate-polymorphic-relationship');
@@ -39,11 +36,10 @@ class MigratePolymorphicRelationshipToPivotTest extends TestCase
 
     public function testPivotExistsSkips()
     {
-        $this->markTestSkipped('marked skipped as script has already been run on production');
-
-        $this->floatingIp();
-        $this->floatingIp()->resource()->associate($this->ipAddress());
-        $this->floatingIp()->save();
+        $this->floatingIp()
+            ->setAttribute('resource_id', $this->ipAddress()->id)
+            ->setAttribute('resource_type', $this->ipAddress()->getMorphClass())
+            ->save();
 
         $floatingIpResource = FloatingIpResource::make([
             'floating_ip_id' => $this->floatingIp()->id,

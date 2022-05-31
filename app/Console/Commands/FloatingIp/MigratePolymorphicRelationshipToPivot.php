@@ -18,15 +18,16 @@ class MigratePolymorphicRelationshipToPivot extends Command
         $skipped = 0;
 
         FloatingIp::all()->each(function ($floatingIp) use (&$updated, &$skipped) {
-            if (!is_null($floatingIp->resource)) {
+            if (!is_null($floatingIp->getRawOriginal('resource_id'))) {
                 $floatingIpResource = FloatingIpResource::firstOrNew([
-                    'floating_ip_id' => $floatingIp->id
+                    'floating_ip_id' => $floatingIp->id,
+                    'resource_id' => $floatingIp->getRawOriginal('resource_id'),
+                    'resource_type' => $floatingIp->resource_type
                 ]);
 
-                $this->info('Creating pivot for ' . $floatingIp->id . ' to resource ' . $floatingIp->resource->id);
+                $this->info('Creating pivot for ' . $floatingIp->id . ' to resource ' . $floatingIp->resource_id);
 
                 if (!$this->option('test-run')) {
-                    $floatingIpResource->resource()->associate($floatingIp->resource);
                     $floatingIpResource->save();
 
                     if ($floatingIpResource->wasRecentlyCreated) {

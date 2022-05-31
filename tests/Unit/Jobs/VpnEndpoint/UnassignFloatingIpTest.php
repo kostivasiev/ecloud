@@ -85,7 +85,7 @@ class UnassignFloatingIpTest extends TestCase
 
         $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
 
-        $this->vpnEndpoint()->floatingIp->tasks()->save($assignTask);
+        $this->vpnEndpoint()->floatingIpResource->floatingIp->tasks()->save($assignTask);
 
         $this->task->data = [
             'floatingip_detach_task_id' => $assignTask->id

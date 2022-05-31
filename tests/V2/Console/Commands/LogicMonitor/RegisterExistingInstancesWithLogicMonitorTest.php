@@ -115,8 +115,7 @@ class RegisterExistingInstancesWithLogicMonitorTest extends TestCase
         // Assign a fIP to the instance
         $ipAddress = IpAddress::factory()->create();
         $ipAddress->nics()->sync($this->nic());
-        $this->floatingIp()->resource()->associate($ipAddress);
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $ipAddress);
 
         // Create Logic Monitor credentials
         $this->kingpinServiceMock()

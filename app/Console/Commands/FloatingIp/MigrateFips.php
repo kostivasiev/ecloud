@@ -17,7 +17,7 @@ class MigrateFips extends Command
         FloatingIpResource::where('resource_type', '=', 'nic')
             ->each(function ($floatingIpResource) {
                 $this->info('Processing floating ip ' . $floatingIpResource->floatingIp->id);
-                $nic = $floatingIpResource->floatingIp->resource;
+                $nic = $floatingIpResource->resource;
                 try {
                     $ipAddress = $nic->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first();
                     if (!$this->option('test-run')) {
