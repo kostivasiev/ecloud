@@ -4,6 +4,7 @@ namespace App\Models\V2;
 
 use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
+use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
@@ -176,6 +178,43 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
     public function affinityRuleMember()
     {
         return $this->hasOne(AffinityRuleMember::class, 'instance_id');
+    }
+
+    public function getHostGroup(): ?HostGroup
+    {
+        $hostGroupId = $this->getHostGroupId();
+        if ($hostGroupId === null) {
+            $message = 'Hostgroup ID could not be found for instance ' . $this->id;
+            Log::info($message);
+            return null;
+        }
+        $hostGroup = HostGroup::find($hostGroupId);
+        if (!$hostGroup) {
+            $message = 'Hostgroup could not be found for instance ' . $this->id;
+            Log::info($message);
+            return null;
+        }
+        return $hostGroup;
+    }
+
+    public function getHostGroupId(): ?string
+    {
+        if (!empty($this->host_group_id)) {
+            return null;
+        }
+
+        try {
+            $response = $this->availabilityZone
+                ->kingpinService()
+                ->get(
+                    sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc->id, $this->id)
+                );
+        } catch (\Exception $e) {
+            $message = 'Shared hostgroup id could not be found for instance ' . $this->id;
+            Log::info($message);
+            return null;
+        }
+        return (json_decode($response->getBody()->getContents()))->hostGroupID;
     }
 
     /**

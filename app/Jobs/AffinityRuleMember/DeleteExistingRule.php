@@ -5,8 +5,8 @@ namespace App\Jobs\AffinityRuleMember;
 use App\Jobs\Job;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\HostGroup;
-use App\Models\V2\Instance;
 use App\Models\V2\Task;
+use App\Services\V2\KingpinService;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 
@@ -16,10 +16,6 @@ class DeleteExistingRule extends Job
 
     private Task $task;
     private AffinityRuleMember $model;
-
-    public const GET_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint';
-    public const DELETE_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint/%s';
-    public const GET_HOSTGROUP_URI = '/api/v2/vpc/%s/instance/%s';
     public array $existingRules = [];
 
     public function __construct(Task $task)
@@ -30,17 +26,17 @@ class DeleteExistingRule extends Job
 
     public function handle()
     {
-        try {
-            $hostGroup = $this->getHostGroup($this->model->instance);
-        } catch (\Exception $e) {
-            $this->fail($e);
+        $hostGroup = $this->model->instance->getHostGroup();
+        if (!$hostGroup) {
+            $message = 'HostGroup could not be retrieved for instance ' . $this->model->instance->id;
+            $this->fail($message);
             return;
         }
 
         if ($this->affinityRuleExists($hostGroup)) {
             try {
                 $response = $hostGroup->availabilityZone->kingpinService()->delete(
-                    sprintf(static::DELETE_CONSTRAINT_URI, $hostGroup->id, $this->model->affinityRule->id)
+                    sprintf(KingpinService::DELETE_CONSTRAINT_URI, $hostGroup->id, $this->model->affinityRule->id)
                 );
                 $this->existingRules[] = $hostGroup->id;
 
@@ -64,7 +60,7 @@ class DeleteExistingRule extends Job
         try {
             $response = $hostGroup->availabilityZone->kingpinService()
                 ->get(
-                    sprintf(static::GET_CONSTRAINT_URI, $hostGroup->id),
+                    sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroup->id),
                     [
                         'body' => [
                             'X-MOCK-RULE-NAME' => $this->model->id
@@ -77,36 +73,5 @@ class DeleteExistingRule extends Job
         return collect(json_decode($response->getBody()->getContents(), true))
                 ->where('ruleName', '=', $this->model->affinityRule->id)
                 ->count() > 0;
-    }
-
-    /**
-     * @param Instance $instance
-     * @return HostGroup|null
-     * @throws \Exception
-     */
-    public function getHostGroup(Instance $instance): ?HostGroup
-    {
-        if ($instance->hostGroup !== null) {
-            return $instance->hostGroup;
-        }
-
-        try {
-            $response = $instance->availabilityZone
-                ->kingpinService()
-                ->get(
-                    sprintf(static::GET_HOSTGROUP_URI, $instance->vpc->id, $instance->id)
-                );
-        } catch (\Exception $e) {
-            throw $e;
-        }
-        $hostGroup = HostGroup::find(
-            (json_decode($response->getBody()->getContents()))->hostGroupID
-        );
-        if (!$hostGroup) {
-            throw new \Exception(
-                sprintf('Hostgroup %s could not be found', $hostGroupId)
-            );
-        }
-        return $hostGroup;
     }
 }

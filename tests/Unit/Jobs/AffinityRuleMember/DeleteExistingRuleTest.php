@@ -6,6 +6,7 @@ use App\Jobs\AffinityRuleMember\DeleteExistingRule;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Task;
+use App\Services\V2\KingpinService;
 use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
@@ -57,7 +58,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(DeleteExistingRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -67,7 +68,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(DeleteExistingRule::GET_CONSTRAINT_URI, $this->hostGroup()->id)
+                sprintf(KingpinService::GET_CONSTRAINT_URI, $this->hostGroup()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     [
@@ -79,7 +80,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('delete')
             ->withSomeOfArgs(
-                sprintf(DeleteExistingRule::DELETE_CONSTRAINT_URI, $this->hostGroup()->id, $this->affinityRule->id)
+                sprintf(KingpinService::DELETE_CONSTRAINT_URI, $this->hostGroup()->id, $this->affinityRule->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([]));
             });
@@ -99,7 +100,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(DeleteExistingRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => 'hg-xxxxxxxx',
@@ -118,14 +119,14 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(DeleteExistingRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
                 ]));
             });
 
-        $uri = sprintf(DeleteExistingRule::GET_CONSTRAINT_URI, $this->hostGroup()->id);
+        $uri = sprintf(KingpinService::GET_CONSTRAINT_URI, $this->hostGroup()->id);
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs($uri)
@@ -148,7 +149,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(DeleteExistingRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -158,7 +159,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(DeleteExistingRule::GET_CONSTRAINT_URI, $this->hostGroup()->id)
+                sprintf(KingpinService::GET_CONSTRAINT_URI, $this->hostGroup()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     [
@@ -167,7 +168,7 @@ class DeleteExistingRuleTest extends TestCase
                 ]));
             });
 
-        $uri = sprintf(DeleteExistingRule::DELETE_CONSTRAINT_URI, $this->hostGroup()->id, $this->affinityRule->id);
+        $uri = sprintf(KingpinService::DELETE_CONSTRAINT_URI, $this->hostGroup()->id, $this->affinityRule->id);
         $this->kingpinServiceMock()
             ->expects('delete')
             ->withSomeOfArgs($uri)
