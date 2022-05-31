@@ -28,19 +28,31 @@ class UnassignFloatingIP extends Job
         $instance = $this->model;
 
         if (empty($this->task->data['task_ids'])) {
-            $instance->nics()->each(function ($nic) {
-                $nic->ipAddresses()->each(function ($ipAddress) {
-                    if ($ipAddress->floatingIpResource()->exists()) {
-                        $taskIds[] = ($ipAddress->floatingIpResource->floatingIp->createTaskWithLock(
-                            'floating_ip_unassign',
-                            \App\Jobs\Tasks\FloatingIp\Unassign::class
-                        ))->id;
-                        Log::info('Triggered floating_ip_unassign task for Floating IP (' . $ipAddress->floatingIpResource->floatingIp->id . ')');
-                        $this->task->updateData('task_ids', $taskIds);
+            $taskIds = [];
+
+            $instance->nics()->each(function ($nic) use (&$taskIds) {
+                $nic->ipAddresses()->each(function ($ipAddress) use (&$taskIds) {
+                    if (!$ipAddress->floatingIpResource()->exists()) {
+                        return;
                     }
+
+                    $task = $ipAddress->floatingIpResource->floatingIp->createTaskWithLock(
+                        'floating_ip_unassign',
+                        \App\Jobs\Tasks\FloatingIp\Unassign::class
+                    );
+
+                    $taskIds[] = $task->id;
+
+                    Log::info('Triggered floating_ip_unassign task for Floating IP (' . $ipAddress->floatingIpResource->floatingIp->id . ')');
                 });
             });
-        } else {
+
+            if (!empty($taskIds)) {
+                $this->task->updateData('task_ids', $taskIds);
+            }
+        }
+
+        if (!empty($this->task->data['task_ids'])) {
             $this->awaitTasks($this->task->data['task_ids']);
         }
     }
