@@ -67,6 +67,6 @@ class AffinityRuleMemberController extends BaseController
             ->findOrFail($affinityRuleMemberId);
 
         $task = $member->syncDelete();
-        return $this->responseTaskId($task->id, 204);
+        return $this->responseTaskId($task->id);
     }
 }
