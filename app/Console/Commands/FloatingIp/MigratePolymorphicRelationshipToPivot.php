@@ -18,7 +18,7 @@ class MigratePolymorphicRelationshipToPivot extends Command
         $skipped = 0;
 
         FloatingIp::all()->each(function ($floatingIp) use (&$updated, &$skipped) {
-            if ($floatingIp->resource != null) {
+            if (!is_null($floatingIp->resource)) {
                 $floatingIpResource = FloatingIpResource::firstOrNew([
                     'floating_ip_id' => $floatingIp->id
                 ]);
