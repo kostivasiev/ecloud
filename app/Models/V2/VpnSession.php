@@ -210,6 +210,9 @@ class VpnSession extends Model implements Searchable, AvailabilityZoneable, Rese
         } else {
             $credential->password = $psk;
         }
+
+        $credential->save();
+        
         return $credential;
     }
 }

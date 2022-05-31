@@ -35,7 +35,7 @@ put:
   parameters:
     - $ref: 'parameters/vpnSessionId.yaml'
   responses:
-    204:
-      description: success
+    202:
+      $ref: '../../public-openapi.yaml#/components/responses/VpnSessionIdResponse'
   tags:
     - Vpn Sessions

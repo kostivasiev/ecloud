@@ -166,7 +166,7 @@ class UpdateTest extends TestCase
                 'psk' => $this->preSharedKey,
             ]
         );
-        $this->assertEquals(204, $response->getStatusCode());
+        $this->assertEquals(202, $response->getStatusCode());
         Event::assertDispatched(Created::class);
 
         $this->vpnSession->refresh();
