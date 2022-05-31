@@ -15,7 +15,7 @@ class CanBeDeleted
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($request->route('fipId'));
 
-        if (!empty($floatingIp->resource_id) || $floatingIp->sourceNat()->exists() || $floatingIp->destinationNat()->exists()) {
+        if ($floatingIp->floatingIpResource()->exists() || $floatingIp->sourceNat()->exists() || $floatingIp->destinationNat()->exists()) {
             return response()->json([
                 'errors' => [
                     [
