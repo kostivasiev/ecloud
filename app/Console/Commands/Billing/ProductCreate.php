@@ -28,6 +28,10 @@ class ProductCreate extends Command
 
         $this->line($productName);
 
+        $productDescription = $this->ask('Please enter the product description');
+
+        $this->line($productDescription);
+
         $category = $this->choice(
             'Select product category',
             [
@@ -55,7 +59,7 @@ class ProductCreate extends Command
 
         switch ($insertOrSql) {
             case 'Insert Records':
-                $availabilityZones->each(function ($availabilityZone) use ($productName, $category, $price, $costPrice) {
+                $availabilityZones->each(function ($availabilityZone) use ($productName, $productDescription, $category, $price, $costPrice) {
                     $name = $availabilityZone->id . ': ' . $productName;
 
                     if ($availabilityZone
@@ -71,6 +75,7 @@ class ProductCreate extends Command
                     $product->fill([
                         'product_sales_product_id' => 0,
                         'product_name' => $name,
+                        'product_description' => $productDescription,
                         'product_category' => 'eCloud',
                         'product_subcategory' => $category,
                         'product_supplier' => 'UKFast',
@@ -94,12 +99,13 @@ class ProductCreate extends Command
                 });
                 break;
             case 'Display SQL Only':
-                $availabilityZones->each(function ($availabilityZone) use ($productName, $category, $price, $costPrice) {
+                $availabilityZones->each(function ($availabilityZone) use ($productName, $productDescription, $category, $price, $costPrice) {
                     $name = $availabilityZone->id . ': ' . $productName;
 
                     $sql = <<<EOM
 INSERT INTO `product` (product_sales_product_id,
                        product_name,
+                       product_description,
                        product_category,
                        product_subcategory,
                        product_supplier,
@@ -110,6 +116,7 @@ INSERT INTO `product` (product_sales_product_id,
                        product_cost_price)
 VALUES (0,
         '$name',
+        '$productDescription',
         'eCloud',
         '$category',
         'UKFast',

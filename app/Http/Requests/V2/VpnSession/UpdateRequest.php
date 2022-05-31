@@ -6,9 +6,10 @@ use App\Rules\V2\IsNotMaxCommaSeperatedItems;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\ValidCidrNetworkCsvString;
 use App\Rules\V2\ValidIpv4;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class UpdateRequest extends FormRequest
 {
@@ -43,6 +44,12 @@ class UpdateRequest extends FormRequest
                 'string',
                 new ValidCidrNetworkCsvString(),
                 new IsNotMaxCommaSeperatedItems(config('vpn-session.max_local_networks'))
+            ],
+            'psk' => [
+                'sometimes',
+                'required',
+                'string',
+                Password::min(8)->mixedCase()->letters()->numbers()->symbols(),
             ],
         ];
     }

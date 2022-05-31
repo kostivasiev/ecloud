@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use IPLib\Range\Subnet;
 use UKFast\Api\Auth\Consumer;
@@ -116,10 +117,37 @@ class Network extends Model implements Searchable, ResellerScopeable, Availabili
         });
     }
 
+    protected function getIpAddressLockKey()
+    {
+        return "ip_address." . $this->id;
+    }
+
+    public function withIpAddressLock($callback)
+    {
+        $lock = Cache::lock($this->getIpAddressLockKey(), 60);
+        try {
+            $lock->block(60);
+
+            return $callback($this);
+        } finally {
+            $lock->release();
+        }
+    }
+
+    public function allocateIpAddress(array $denyList = [], string $type = IpAddress::TYPE_DHCP) : IpAddress
+    {
+        $ipAddress = app()->make(IpAddress::class);
+        $ipAddress->fill([
+            'network_id' => $this->id,
+            'type' => $type
+        ]);
+        $ipAddress->allocateAddressAndSave($denyList);
+
+        return $ipAddress;
+    }
+
     public function getNextAvailableIp(array $denyList = [])
     {
-        // We need to reserve the first 4 IPs of a range, and the last (for broadcast).
-
         $subnet = Subnet::fromString($this->subnet);
         $ip = $subnet->getStartAddress();
 
