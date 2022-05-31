@@ -4,6 +4,7 @@ namespace Tests\V2\Instances;
 
 use App\Events\V2\Task\Created;
 use App\Models\V2\ApplianceVersion;
+use App\Models\V2\FloatingIpResource;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
@@ -325,8 +326,7 @@ class CreateTest extends TestCase
 
     public function testAlreadyAssignedFloatingIpCausesFail()
     {
-        $this->floatingIp()->resource_id = 'TEST';
-        $this->floatingIp()->save();
+        $this->assignFloatingIp($this->floatingIp(), $this->ipAddress());
 
         $data = [
             'vpc_id' => $this->vpc()->id,

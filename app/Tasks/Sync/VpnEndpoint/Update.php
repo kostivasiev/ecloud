@@ -2,6 +2,7 @@
 
 namespace App\Tasks\Sync\VpnEndpoint;
 
+use App\Jobs\VpnEndpoint\AssignFloatingIP;
 use App\Jobs\VpnEndpoint\CreateFloatingIp;
 use App\Jobs\VpnEndpoint\Nsx\Deploy;
 use App\Jobs\VpnEndpoint\Nsx\DeployCheck;
@@ -13,6 +14,7 @@ class Update extends Task
     {
         return [
             CreateFloatingIp::class,
+            AssignFloatingIp::class,
             Deploy::class,
             DeployCheck::class,
         ];

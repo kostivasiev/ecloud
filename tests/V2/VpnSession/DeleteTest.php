@@ -3,6 +3,7 @@ namespace Tests\V2\VpnSession;
 
 use App\Events\V2\Task\Created;
 use App\Models\V2\FloatingIp;
+use App\Models\V2\FloatingIpResource;
 use App\Models\V2\VpnEndpoint;
 use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
@@ -14,7 +15,6 @@ use UKFast\Api\Auth\Consumer;
 
 class DeleteTest extends TestCase
 {
-
     protected FloatingIp $floatingIp;
     protected VpnService $vpnService;
     protected VpnEndpoint $vpnEndpoint;
@@ -26,18 +26,15 @@ class DeleteTest extends TestCase
         parent::setUp();
 
         $this->be(new Consumer(1, [config('app.name') . '.read', config('app.name') . '.write']));
-        $this->floatingIp = FloatingIp::withoutEvents(function () {
-            return FloatingIp::factory()->create([
-                'id' => 'fip-abc123xyz',
-            ]);
-        });
+
         $this->vpnService = VpnService::factory()->create([
             'router_id' => $this->router()->id,
         ]);
 
         $this->vpnEndpoint = VpnEndpoint::factory()->create();
-        $this->floatingIp->resource()->associate($this->vpnEndpoint);
-        $this->floatingIp->save();
+
+        // Create the pivot between a fIP and resource
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint);
 
         $this->vpnProfileGroup = VpnProfileGroup::factory()->create([
             'ike_profile_id' => 'ike-abc123xyz',

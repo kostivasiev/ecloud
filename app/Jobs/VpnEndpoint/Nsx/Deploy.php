@@ -15,7 +15,7 @@ class Deploy extends TaskJob
             return;
         }
 
-        if (!$vpnEndpoint->floatingIp) {
+        if (!$vpnEndpoint->floatingIpResource()->exists()) {
             $this->fail(new \Exception('Failed to load floating IP for VPN Endpoint ' . $vpnEndpoint->id));
             return;
         }
@@ -29,8 +29,8 @@ class Deploy extends TaskJob
                     'resource_type' => 'IPSecVpnLocalEndpoint',
                     'display_name' => $vpnEndpoint->id,
                     'description' => $vpnEndpoint->name,
-                    'local_id' => $vpnEndpoint->floatingIp->ip_address,
-                    'local_address' => $vpnEndpoint->floatingIp->ip_address
+                    'local_id' => $vpnEndpoint->floatingIpResource->floatingIp->ip_address,
+                    'local_address' => $vpnEndpoint->floatingIpResource->floatingIp->ip_address
                 ]
             ]
         );

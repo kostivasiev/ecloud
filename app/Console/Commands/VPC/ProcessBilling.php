@@ -60,7 +60,10 @@ class ProcessBilling extends Command
         // First calculate discount plan values
         DiscountPlan::where('status', 'approved')
             ->where('term_start_date', '<=', $this->endDate)
-            ->where('term_end_date', '>=', $this->startDate)
+            ->where(function ($query) {
+                $query->where('term_end_date', '>=', $this->startDate)
+                    ->orWhereNull('term_end_date');
+            })
             ->where(function ($query) {
                 if ($this->optReseller) {
                     $query->where('reseller_id', '=', $this->optReseller);
@@ -94,8 +97,10 @@ class ProcessBilling extends Command
                 }
 
                 // Check if the term end date 23:59:59 is less than the billing end period
-                if ($discountPlan->term_end_date->clone()->setTime(23, 59, 59)->lt($this->endDate)) {
-                    $hoursWithinDiscountPlan -= $discountPlan->term_end_date->diffInHours($this->endDate);
+                if ($discountPlan->term_end_date != null) {
+                    if ($discountPlan->term_end_date->clone()->setTime(23, 59, 59)->lt($this->endDate)) {
+                        $hoursWithinDiscountPlan -= $discountPlan->term_end_date->diffInHours($this->endDate);
+                    }
                 }
 
                 if ($hoursWithinDiscountPlan != $this->hoursInBillingPeriod) {

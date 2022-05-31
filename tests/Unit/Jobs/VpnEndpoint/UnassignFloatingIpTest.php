@@ -52,6 +52,8 @@ class UnassignFloatingIpTest extends TestCase
             $this->task->save();
         });
 
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
+
         Event::fake([JobProcessed::class, Created::class]);
 
         dispatch(new UnassignFloatingIP($this->task));
@@ -70,10 +72,9 @@ class UnassignFloatingIpTest extends TestCase
                 'id' => 'sync-1',
                 'name' => Sync::TASK_NAME_DELETE,
             ]);
-            $this->task->resource()->associate($this->vpnEndpoint());
+            $this->task->resource()->associate($this->vpnEndpoint(false));
             $this->task->save();
         });
-
         Event::fake([JobFailed::class, Created::class]);
 
         $assignTask = new Task([
@@ -81,7 +82,10 @@ class UnassignFloatingIpTest extends TestCase
             'completed' => true,
             'name' => 'floating_ip_unassign'
         ]);
-        $this->vpnEndpoint()->floatingIp->tasks()->save($assignTask);
+
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
+
+        $this->vpnEndpoint()->floatingIpResource->floatingIp->tasks()->save($assignTask);
 
         $this->task->data = [
             'floatingip_detach_task_id' => $assignTask->id
@@ -116,6 +120,8 @@ class UnassignFloatingIpTest extends TestCase
             $task->save();
             $this->floatingIp()->refresh();
         });
+
+        $this->assignFloatingIp($this->floatingIp(), $this->vpnEndpoint());
 
         $this->assertEquals(Sync::STATUS_FAILED, $this->floatingIp()->sync->status);
 

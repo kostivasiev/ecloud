@@ -21,12 +21,12 @@ class CanBeUnassigned
 
         $detail = null;
 
-        if (!empty($floatingIp->resource_id) && $floatingIp->resource instanceof VpnEndpoint) {
+        if ($floatingIp->floatingIpResource()->exists() && $floatingIp->floatingIpResource->resource instanceof VpnEndpoint) {
             $detail = 'Floating IP\'s can not be unassigned from a VPN endpoint';
         }
 
-        if (!empty($floatingIp->resource_id) && $floatingIp->resource instanceof IpAddress) {
-            if ($floatingIp->resource->vip()->exists()) {
+        if ($floatingIp->floatingIpResource()->exists() && $floatingIp->floatingIpResource->resource instanceof IpAddress) {
+            if ($floatingIp->floatingIpResource->resource->vip()->exists()) {
                 $detail = 'Floating IP\'s can not be unassigned from a VIP';
             }
         }

@@ -25,9 +25,9 @@ class AssignToLoadBalancerCluster extends TaskJob
 
         $vipEntity->internalCidr = $vip->ipAddress->getIPAddress() . '/' . $vip->loadBalancerNetwork->network->getNetworkPrefix();
 
-        if ($vip->ipAddress->floatingIp()->exists()) {
+        if ($vip->ipAddress->floatingIpResource()->exists()) {
             // convert to CIDR format /32 is 1 IP address in subnet
-            $vipEntity->externalCidr = $vip->ipAddress->floatingIp->getIPAddress(). '/32';
+            $vipEntity->externalCidr = $vip->ipAddress->floatingIpResource->floatingIp->getIPAddress(). '/32';
         }
 
         $this->debug('Attempting to create VIP', [

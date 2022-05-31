@@ -18,12 +18,12 @@ class UnassignFloatingIp extends TaskJob
     {
         $vip = $this->task->resource;
 
-        if (!$vip->ipAddress->floatingIp()->exists()) {
+        if (!$vip->ipAddress->floatingIpResource()->exists()) {
             $this->info('No floating IP assigned to the VIP, skipping');
             return;
         }
 
-        $floatingIp = $vip->ipAddress->floatingIp;
+        $floatingIp = $vip->ipAddress->floatingIpResource->floatingIp;
 
         $unassignIpTask = 'task.' . Unassign::$name . '.id';
 

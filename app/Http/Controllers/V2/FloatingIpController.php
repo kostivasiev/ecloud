@@ -15,6 +15,8 @@ use App\Resources\V2\TaskResource;
 use App\Support\Resource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\V2\FloatingIpResource as FloatingIpResourcePivot;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class InstanceController
@@ -73,6 +75,10 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
         $resourceId = $request->resource_id;
+
+        /**
+         * @deprecated To be removed, we will want to completely prevent assignment of fips to NICS
+         */
         if (Resource::classFromId($resourceId) == Nic::class) {
             $resourceId = Nic::forUser($request->user())->findOrFail($resourceId)
                 ->ipAddresses()->withType(IpAddress::TYPE_DHCP)->first()->getKey();
@@ -91,7 +97,10 @@ class FloatingIpController extends BaseController
     {
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
-        $task = $floatingIp->createTaskWithLock(Unassign::$name, Unassign::class);
+        $task = $floatingIp->createTaskWithLock(
+            Unassign::$name,
+            Unassign::class
+        );
 
         return $this->responseIdMeta($request, $floatingIp->id, 202, $task->id);
     }

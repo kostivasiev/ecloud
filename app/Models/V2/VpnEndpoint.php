@@ -46,9 +46,9 @@ class VpnEndpoint extends Model implements Searchable, AvailabilityZoneable, Res
         return $this->hasMany(VpnSession::class);
     }
 
-    public function floatingIp()
+    public function floatingIpResource()
     {
-        return $this->morphOne(FloatingIp::class, 'resource');
+        return $this->hasOne(FloatingIpResource::class, 'resource_id');
     }
 
     public function getResellerId(): int

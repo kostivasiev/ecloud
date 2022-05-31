@@ -90,7 +90,6 @@ Route::group([
         Route::get('networks/{networkId}/tasks', 'NetworkController@tasks');
         Route::post('networks', 'NetworkController@create');
         Route::patch('networks/{networkId}', 'NetworkController@update');
-        Route::delete('networks/{networkId}', 'NetworkController@destroy');
         Route::delete('networks/{networkId}', [
             'middleware' => 'can-be-deleted:' . \App\Models\V2\Network::class   . ',networkId',
             'uses' => 'NetworkController@destroy'
@@ -167,6 +166,7 @@ Route::group([
         Route::post('vpn-sessions', 'VpnSessionController@create');
         Route::patch('vpn-sessions/{vpnSessionId}', 'VpnSessionController@update');
         Route::delete('vpn-sessions/{vpnSessionId}', 'VpnSessionController@destroy');
+        Route::put('vpn-sessions/{vpnSessionId}/pre-shared-key', 'VpnSessionController@updatePreSharedKey');
     });
 
     /** Vpn Profiles */

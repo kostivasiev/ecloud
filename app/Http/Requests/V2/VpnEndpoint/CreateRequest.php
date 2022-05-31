@@ -4,6 +4,7 @@ namespace App\Http\Requests\V2\VpnEndpoint;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\VpnService;
 use App\Rules\V2\ExistsForUser;
+use App\Rules\V2\FloatingIp\IsAssigned;
 use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsSameAvailabilityZone;
 use Illuminate\Support\Facades\Request;
@@ -27,9 +28,9 @@ class CreateRequest extends FormRequest
                 'sometimes',
                 'required',
                 Rule::exists(FloatingIp::class, 'id')->where(function ($query) {
-                    $query->whereNull('resource_id');
                     $query->whereNull('deleted_at');
                 }),
+                new IsAssigned(),
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
             ],
@@ -40,7 +41,6 @@ class CreateRequest extends FormRequest
     {
         return [
             'unique' => 'A vpn endpoint already exists for the specified :attribute',
-            'floating_ip_id.exists' => 'The :attribute is already assigned to a resource',
         ];
     }
 }

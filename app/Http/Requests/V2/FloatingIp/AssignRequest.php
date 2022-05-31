@@ -24,6 +24,7 @@ class AssignRequest extends FormRequest
                     'required',
                     'string',
                     new ExistsForUser([
+                        /** @deprecated - we need to remove assigning NICs to a fip **/
                         Nic::class,
                         FloatingIp::class,
                         IpAddress::class

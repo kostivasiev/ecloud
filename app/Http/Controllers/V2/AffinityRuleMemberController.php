@@ -6,12 +6,7 @@ use App\Http\Requests\V2\AffinityRuleMember\Create;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Resources\V2\AffinityRuleMemberResource;
-use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\IsResourceAvailable;
-use App\Support\Sync;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use UKFast\Api\Exceptions\BadRequestException;
 
 class AffinityRuleMemberController extends BaseController
 {
@@ -63,14 +58,9 @@ class AffinityRuleMemberController extends BaseController
         AffinityRule::forUser($request->user())
             ->findOrFail($affinityRuleId);
 
-        $model = AffinityRuleMember::forUser($request->user())
+        $member = AffinityRuleMember::forUser($request->user())
             ->findOrFail($affinityRuleMemberId);
-
-        $task = $model->affinityRule
-            ->withTaskLock(function () use ($model) {
-                return $model->syncDelete();
-            });
-
-        return $this->responseTaskId($task->id, 204);
+        $task = $member->syncDelete();
+        return $this->responseTaskId($task->id);
     }
 }
