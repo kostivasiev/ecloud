@@ -13,6 +13,12 @@ class ValidPortArrayRule implements Rule
     {
         $ports = collect($value);
         foreach ($ports as $port) {
+            if (Arr::exists($port, 'protocol') && $port['protocol'] == 'ICMPv4') {
+                if ($this->hasDuplicate($ports, $port)) {
+                    return false;
+                }
+                continue;
+            }
             if (!Arr::exists($port, 'protocol') ||
                 !Arr::exists($port, 'source') ||
                 !Arr::exists($port, 'destination')) {
@@ -42,6 +48,10 @@ class ValidPortArrayRule implements Rule
     {
         $matchCount = 0;
         foreach ($ports as $port) {
+            if ($item['protocol'] == 'ICMPv4' && $port['protocol'] == $item['protocol']) {
+                $matchCount++;
+                continue;
+            }
             if ($port['protocol'] == $item['protocol'] &&
                 $port['source'] == $item['source'] &&
                 $port['destination'] == $item['destination']) {
