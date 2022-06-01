@@ -47,8 +47,6 @@ trait AwaitResources
 
     public function deleteSyncableResource($id): void
     {
-        $this->info('Deleting Resource ' . $id);
-        
         $resourceType = Resource::classFromId($id);
 
         if (!in_array(Syncable::class, class_uses($resourceType))) {
@@ -71,6 +69,7 @@ trait AwaitResources
         }
 
         if ($resource->sync->status == Sync::STATUS_COMPLETE && $resource->sync->type != Sync::TASK_NAME_DELETE) {
+            $this->info('Deleting Resource ' . $id);
             $resource->syncDelete();
         }
 
