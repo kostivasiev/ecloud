@@ -1,0 +1,154 @@
+### 1. Create Policy
+POST https://{{host}}/{{version}}/firewall-policies
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+  "name": "Test Policy - Port Array",
+  "sequence": 10,
+  "router_id": "{{dev_router_id}}"
+}
+
+> {%
+client.test('Create firewall policy', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('firewall_policy_id', response.body.data.id);
+client.log('Policy ID: ' + response.body.data.id);
+%}
+
+### 2. Create Rule with duplicates in port array (should fail)
+POST https://{{host}}/v2/firewall-rules
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "sequence": 1,
+    "firewall_policy_id": "{{firewall_policy_id}}",
+    "source": "1.1.1.1",
+    "destination": "2.2.2.2",
+    "action": "ALLOW",
+    "direction": "IN_OUT",
+    "enabled": true,
+    "ports": [
+      {
+        "protocol": "TCP",
+        "source": "443",
+        "destination": "443"
+      },
+      {
+        "protocol": "TCP",
+        "source": "443",
+        "destination": "443"
+      }
+    ]
+}
+
+> {%
+client.test('Create firewall rule', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('firewall_rule_id', response.body.data.id);
+client.log('Rule ID: ' + response.body.data.id);
+%}
+
+### 3. Create Rule with no duplicates in port array
+POST https://{{host}}/v2/firewall-rules
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "sequence": 1,
+    "firewall_policy_id": "{{firewall_policy_id}}",
+    "source": "1.1.1.1",
+    "destination": "2.2.2.2",
+    "action": "ALLOW",
+    "direction": "IN_OUT",
+    "enabled": true,
+    "ports": [
+      {
+        "protocol": "TCP",
+        "source": "443",
+        "destination": "443"
+      },
+      {
+        "protocol": "UDP",
+        "source": "443",
+        "destination": "443"
+      }
+    ]
+}
+
+> {%
+client.test('Create firewall rule', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('firewall_rule_id', response.body.data.id);
+client.log('Rule ID: ' + response.body.data.id);
+%}
+
+### 4. Create a duplicate port
+POST https://{{host}}/{{version}}/firewall-rule-ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "firewall_rule_id": "{{firewall_rule_id}}",
+    "protocol": "TCP",
+    "source": "443",
+    "destination": "443"
+}
+
+> {%
+client.test('Create a duplicate port', function () {
+    client.assert(response.status === 422, '422 response not received');
+});
+%}
+
+### 5. Create a port range
+POST https://{{host}}/{{version}}/firewall-rule-ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "firewall_rule_id": "{{firewall_rule_id}}",
+    "protocol": "TCP",
+    "source": "500-510",
+    "destination": "500-510"
+}
+
+> {%
+client.test('Create a duplicate port', function () {
+    client.assert(response.status === 422, '422 response not received');
+});
+%}
+
+### 6. Create a duplicate port range - should fail
+POST https://{{host}}/{{version}}/firewall-rule-ports
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "firewall_rule_id": "{{firewall_rule_id}}",
+    "protocol": "TCP",
+    "source": "500-510",
+    "destination": "500-510"
+}
+
+> {%
+client.test('Create a duplicate port', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 7. Delete Rule
+DELETE https://{{host}}/v2/firewall-rules/{{firewall_rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
