@@ -113,8 +113,8 @@ class ProcessBilling extends Command
                     if ($this->option('debug')) {
                         $this->info('Discount plan ' . $discountPlan->id . ' starts or ends during the billing period. Calculating pro rata discount for this billing period.');
                         $this->info(
-                            'Term start: '.$discountPlan->term_start_date?->format('Y-m-d H:i:s') ?? 'N/A'
-                            . PHP_EOL . 'Term end: '.$discountPlan->term_end_date->format('Y-m-d H:i:s')
+                            'Term start: '.$discountPlan->term_start_date->format('Y-m-d H:i:s')
+                            . PHP_EOL . 'Term end: '.$discountPlan->term_end_date?->format('Y-m-d H:i:s') ?? 'N/A'
                             . PHP_EOL . round($percentHoursInBillingPeriod) . '% of Billing period discounted'
                             . PHP_EOL . 'Calculated Pro Rata Commitment Amount: £' . number_format($proRataCommitmentAmount, 2)
                             . PHP_EOL . 'Calculated Pro Rata Discount Rate: ' . $proRataDiscountRate
