@@ -217,3 +217,9 @@ DELETE https://{{host}}/v2/firewall-rules/{{firewall_rule_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
+
+### 8. Delete Policy
+DELETE https://{{host}}/v2/firewall-policies/{{firewall_policy_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
