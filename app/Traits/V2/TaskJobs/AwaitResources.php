@@ -70,7 +70,7 @@ trait AwaitResources
             return;
         }
 
-        if ($resource->sync->status == Sync::STATUS_COMPLETE) {
+        if ($resource->sync->status == Sync::STATUS_COMPLETE && $resource->sync->type != Sync::TASK_NAME_DELETE) {
             $resource->syncDelete();
         }
 
