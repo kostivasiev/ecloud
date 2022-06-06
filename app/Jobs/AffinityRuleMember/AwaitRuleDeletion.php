@@ -28,7 +28,7 @@ class AwaitRuleDeletion extends TaskJob
     {
         $hostGroupId = $this->model->instance->getHostGroupId();
         if ($this->affinityRuleExists($hostGroupId)) {
-            Log::info('Rule deletion not complete, waiting', [
+            $this->info('Rule deletion not complete, waiting', [
                 'affinity_rule_id' => $this->model->id,
                 'host_group_id' => $hostGroupId
             ]);
@@ -36,7 +36,7 @@ class AwaitRuleDeletion extends TaskJob
             return;
         }
 
-        Log::info('Rule deletion complete', [
+        $this->info('Rule deletion complete', [
             'affinity_rule_id' => $this->model->affinityRule->id,
         ]);
     }
@@ -51,16 +51,11 @@ class AwaitRuleDeletion extends TaskJob
             try {
                 $response = $hostGroup->availabilityZone->kingpinService()
                     ->get(
-                        sprintf(static::GET_CONSTRAINT_URI, $hostGroup->id),
-                        [
-                            'headers' => [
-                                'X-MOCK-RULE-MEMBER' => $this->model->id,
-                            ],
-                        ]
+                        sprintf(static::GET_CONSTRAINT_URI, $hostGroup->id)
                     );
             } catch (\Exception $e) {
-                Log::info($e->getMessage());
-                Log::info('Contraints not found for hostgroup', [
+                $this->info($e->getMessage());
+                $this->info('Contraints not found for hostgroup', [
                     'host_group_id' => $hostGroup->id,
                 ]);
                 return false;

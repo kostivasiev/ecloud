@@ -6,9 +6,12 @@ use App\Jobs\AffinityRuleMember\AwaitRuleDeletion;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Task;
+use App\Services\V2\KingpinService;
 use App\Support\Sync;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class AwaitRuleDeletionTest extends TestCase
@@ -52,7 +55,15 @@ class AwaitRuleDeletionTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Waiting');
 
-        $this->task->updateData('existing_rules', [$this->hostGroup()->id]);
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
 
         $this->job->expects('affinityRuleExists')
             ->withAnyArgs()
@@ -66,11 +77,23 @@ class AwaitRuleDeletionTest extends TestCase
 
     public function testSkipIfRuleNotPresent()
     {
-        Log::shouldReceive('info')
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+            )->andThrows(
+                new ClientException(
+                    'Not Found',
+                    new Request('GET', '/'),
+                    new Response(404)
+                )
+            );
+
+        $this->job->allows('info')
             ->with('Shared hostgroup id could not be found for instance i-test')
             ->andReturnTrue();
 
-        Log::shouldReceive('info')
+        $this->job->allows('info')
             ->with(
                 \Mockery::capture($message),
                 \Mockery::capture($affinityRule)
