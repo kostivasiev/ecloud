@@ -4,15 +4,11 @@ namespace App\Jobs\AffinityRuleMember;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 class CreateAffinityRule extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
     private AffinityRuleMember $model;
 
     public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
