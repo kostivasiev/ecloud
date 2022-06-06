@@ -61,12 +61,7 @@ class DeleteExistingRule extends TaskJob
         try {
             $response = $this->availabilityZone->kingpinService()
                 ->get(
-                    sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroupId),
-                    [
-                        'body' => [
-                            'X-MOCK-RULE-NAME' => $this->model->id
-                        ]
-                    ]
+                    sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroupId)
                 );
         } catch (\Exception $e) {
             $message = 'Failed to retrieve ' . $hostGroupId . ' : ' . $e->getMessage();
