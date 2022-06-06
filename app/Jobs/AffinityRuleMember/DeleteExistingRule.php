@@ -6,14 +6,10 @@ use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\AvailabilityZone;
 use App\Services\V2\KingpinService;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
 use Illuminate\Support\Facades\Log;
 
 class DeleteExistingRule extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
     private AffinityRuleMember $model;
     private AvailabilityZone $availabilityZone;
     public string $existingRule;
