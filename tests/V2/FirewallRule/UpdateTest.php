@@ -55,21 +55,18 @@ class UpdateTest extends TestCase
 
     public function testInvalidPortFails()
     {
-        $this->patch(
-            '/v2/firewall-rules/' . $this->firewallRule->id,
-            [
-                'name' => 'Changed',
-                'ports' => [
-                    [
-                        'source' => "ANY",
+        $this->asAdmin()
+            ->patch(
+                '/v2/firewall-rules/' . $this->firewallRule->id,
+                [
+                    'name' => 'Changed',
+                    'ports' => [
+                        [
+                            'source' => "ANY",
+                        ]
                     ]
                 ]
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )->assertStatus(422);
+            )->assertStatus(422);
     }
 
     public function testSystemPolicyAmendRuleFails()
