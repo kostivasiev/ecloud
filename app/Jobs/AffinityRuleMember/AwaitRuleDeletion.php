@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Log;
 
 class AwaitRuleDeletion extends TaskJob
 {
-    use Batchable, LoggableModelJob;
-
     public AffinityRuleMember $model;
 
     public int $backoff = 5;
