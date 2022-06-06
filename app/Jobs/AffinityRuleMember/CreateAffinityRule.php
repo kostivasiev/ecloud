@@ -4,9 +4,6 @@ namespace App\Jobs\AffinityRuleMember;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
-use App\Models\V2\HostGroup;
-use App\Models\V2\Instance;
-use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
 use Illuminate\Bus\Batchable;
 use Illuminate\Support\Collection;
