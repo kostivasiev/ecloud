@@ -67,11 +67,14 @@ class AwaitRuleDeletionTest extends TestCase
     public function testSkipIfRuleNotPresent()
     {
         Log::shouldReceive('info')
+            ->with('Shared hostgroup id could not be found for instance i-test')
+            ->andReturnTrue();
+
+        Log::shouldReceive('info')
             ->with(
                 \Mockery::capture($message),
                 \Mockery::capture($affinityRule)
             );
-        $this->task->updateData('existing_rules', [$this->hostGroup()->id]);
 
         $this->job->expects('affinityRuleExists')
             ->withAnyArgs()

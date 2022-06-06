@@ -12,7 +12,6 @@ class DeleteExistingRule extends TaskJob
 {
     private AffinityRuleMember $model;
     private AvailabilityZone $availabilityZone;
-    public string $existingRule;
 
     public function __construct($task)
     {
@@ -41,14 +40,10 @@ class DeleteExistingRule extends TaskJob
                     $this->fail(new \Exception($message));
                     return;
                 }
-                $this->existingRule = $hostGroupId;
             } catch (\Exception $e) {
                 $this->fail($e);
                 return;
             }
-        }
-        if (!empty($this->existingRule)) {
-            $this->task->updateData('existing_rule', $this->existingRule);
         }
     }
 

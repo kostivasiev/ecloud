@@ -26,30 +26,26 @@ class AwaitRuleDeletion extends TaskJob
 
     public function handle()
     {
-        if (empty($this->task->data['existing_rules'])) {
-            Log::info('No rules to delete, skipping', [
+        $hostGroupId = $this->model->instance->getHostGroupId();
+        if ($this->affinityRuleExists($hostGroupId)) {
+            Log::info('Rule deletion not complete, waiting', [
                 'affinity_rule_id' => $this->model->id,
+                'host_group_id' => $hostGroupId
             ]);
+            $this->release($this->backoff);
             return;
         }
-        $existingRules = $this->task->data['existing_rules'];
-        foreach ($existingRules as $hostGroupId) {
-            if ($this->affinityRuleExists($hostGroupId)) {
-                Log::info('Rule deletion not complete, waiting', [
-                    'affinity_rule_id' => $this->model->id,
-                    'host_group_id' => $hostGroupId
-                ]);
-                $this->release($this->backoff);
-                return;
-            }
-        }
+
         Log::info('Rule deletion complete', [
             'affinity_rule_id' => $this->model->affinityRule->id,
         ]);
     }
 
-    public function affinityRuleExists(string $hostGroupId): bool
+    public function affinityRuleExists(?string $hostGroupId): bool
     {
+        if ($hostGroupId === null) {
+            return false;
+        }
         $hostGroup = HostGroup::find($hostGroupId);
         if ($hostGroup) {
             try {
