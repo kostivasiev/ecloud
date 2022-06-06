@@ -4,16 +4,13 @@ namespace App\Jobs\AffinityRuleMember;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
+use App\Services\V2\KingpinService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 class CreateAffinityRule extends TaskJob
 {
     private AffinityRuleMember $model;
-
-    public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
-    public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
-    public const GET_HOSTGROUP_URI = '/api/v2/vpc/%s/instance/%s';
 
     public function __construct($task)
     {
@@ -62,8 +59,8 @@ class CreateAffinityRule extends TaskJob
     {
         $availabilityZone = $this->model->instance->availabilityZone;
         $uriEndpoint = ($this->model->type == 'affinity') ?
-            static::AFFINITY_URI :
-            static::ANTI_AFFINITY_URI;
+            KingpinService::AFFINITY_URI :
+            KingpinService::ANTI_AFFINITY_URI;
 
         try {
             $response = $availabilityZone->kingpinService()->post(
