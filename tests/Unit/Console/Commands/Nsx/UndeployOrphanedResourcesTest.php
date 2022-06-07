@@ -3,9 +3,11 @@
 namespace Tests\Unit\Console\Commands\Nsx;
 
 use App\Console\Commands\Nsx\UndeployOrphanedResources;
+use App\Events\V2\Task\Created;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class UndeployOrphanedResourcesTest extends TestCase
@@ -36,6 +38,7 @@ class UndeployOrphanedResourcesTest extends TestCase
         $this->command->allows('line')
             ->withAnyArgs()
             ->andReturnTrue();
+        $this->vpc()->setAttribute('reseller_id', 7052)->saveQuietly();
     }
 
     public function testRoutersAndNetworksNotFoundOnNsxDoNotGetDeleted()
@@ -76,8 +79,8 @@ class UndeployOrphanedResourcesTest extends TestCase
 
     public function testRouterHasNoParentResourceGetsDeleted()
     {
-        $deleteActionsPerformed = 0;
-        $this->createSyncUpdateTask($this->router());
+        Event::fake(Created::class);
+        $task = $this->createSyncUpdateTask($this->router());
 
         $this->vpc()->delete();
 
@@ -86,16 +89,11 @@ class UndeployOrphanedResourcesTest extends TestCase
             ->withArgs(['policy/api/v1/infra/tier-1s/' . $this->router()->id])
             ->andReturnTrue();
 
-        $this->nsxServiceMock()->expects('delete')
-            ->withSomeOfArgs('policy/api/v1/infra/tier-1s/' . $this->router()->id)
-            ->andReturnUsing(function () use (&$deleteActionsPerformed) {
-                $deleteActionsPerformed++;
-                return new Response(200);
-            });
+        $task->setAttribute('completed', true)->saveQuietly();
 
         $this->command->handle();
 
-        $this->assertEquals(1, $deleteActionsPerformed);
+        Event::assertDispatched(Created::class);
     }
 
     public function testRouterHasParentResourceDoesNotGetDeleted()

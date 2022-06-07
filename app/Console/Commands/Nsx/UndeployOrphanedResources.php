@@ -6,6 +6,7 @@ use App\Console\Commands\Command;
 use App\Models\V2\AvailabilityZoneable;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Str;
 
@@ -173,7 +174,13 @@ class UndeployOrphanedResources extends Command
                             if ($resource) {
                                 if ($resource::class == Router::class) {
                                     $resource->setAttribute('deleted_at', null)->saveQuietly();
+                                    $vpc = Vpc::withTrashed()->find($resource->vpc_id);
+                                    if ($vpc) {
+                                        $vpc->setAttribute('deleted_at', null)->saveQuietly();
+                                        $resource->refresh();
+                                    }
                                     $task = $resource->syncDelete();
+                                    $vpc->delete();
                                     $syncDeletes[] = [$resource->id, $task->id];
                                 } else {
                                     $endpoint = 'policy/api/v1/infra/tier-1s/' . $resource?->router?->id . '/segments/' . $resource->id;
