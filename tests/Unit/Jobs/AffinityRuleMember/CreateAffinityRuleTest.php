@@ -139,14 +139,19 @@ class CreateAffinityRuleTest extends TestCase
     public function testNoActionWhenNoMembers()
     {
         $this->affinityRuleMember->setAttribute('deleted_at', Carbon::now())->save();
-        $this->setExceptionExpectations('info', 'Rule has no members, skipping');
+        $this->job
+            ->allows('info')
+            ->with(\Mockery::capture($message), \Mockery::capture($params));
 
         $this->job->handle();
+        $this->assertEquals('Rule has no members, skipping', $message);
+        $this->assertEquals($this->affinityRuleMember->id, $params['affinity_rule_id']);
     }
 
     public function testNoActionWhenFewerThanTwoMembers()
     {
-        Log::shouldReceive('info')
+        $this->job
+            ->allows('info')
             ->with(
                 \Mockery::capture($message),
                 \Mockery::capture($data)

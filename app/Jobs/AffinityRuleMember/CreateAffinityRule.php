@@ -6,21 +6,20 @@ use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
 use App\Services\V2\KingpinService;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 
 class CreateAffinityRule extends TaskJob
 {
     public function handle()
     {
         if ($this->task->resource->affinityRule->affinityRuleMembers()->count() <= 0) {
-            Log::info('Rule has no members, skipping', [
+            $this->info('Rule has no members, skipping', [
                 'affinity_rule_id' => $this->task->resource->id,
             ]);
             return;
         }
 
         if ($this->task->resource->affinityRule->affinityRuleMembers()->count() < 2) {
-            Log::info('Affinity rules need at least two members', [
+            $this->info('Affinity rules need at least two members', [
                 'affinity_rule_id' => $this->task->resource->id,
                 'member_count' => $this->task->resource->affinityRule->affinityRuleMembers()->count(),
             ]);
@@ -66,7 +65,7 @@ class CreateAffinityRule extends TaskJob
                 ]
             );
         } catch (\Exception $e) {
-            Log::info('Failed to create affinity rule', [
+            $this->info('Failed to create affinity rule', [
                 'affinity_rule_id' => $this->task->resource->affinityRule->id,
                 'hostgroup_id' => $hostGroupId,
                 'message' => $e->getMessage(),
