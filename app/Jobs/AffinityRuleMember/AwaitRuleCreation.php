@@ -10,7 +10,7 @@ class AwaitRuleCreation extends AwaitRuleDeletion
     {
         if (empty($this->task->data['created_rules'])) {
             Log::info('No rules to create, skipping', [
-                'affinity_rule_id' => $this->model->affinityRule->id,
+                'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
             ]);
             return;
         }
@@ -18,7 +18,7 @@ class AwaitRuleCreation extends AwaitRuleDeletion
         foreach ($createdRules as $hostGroupId) {
             if (!$this->affinityRuleExists($hostGroupId)) {
                 Log::info('Rule creation not complete, waiting', [
-                    'affinity_rule_id' => $this->model->affinityRule->id,
+                    'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
                     'host_group_id' => $hostGroupId
                 ]);
                 $this->release($this->backoff);
@@ -26,7 +26,7 @@ class AwaitRuleCreation extends AwaitRuleDeletion
             }
         }
         Log::info('Rule creation complete', [
-            'affinity_rule_id' => $this->model->affinityRule->id,
+            'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
         ]);
     }
 }
