@@ -67,6 +67,7 @@ class UndeployOrphanedResources extends Command
 
         $skipped = [];
         $failedDeletes = [];
+        $syncDeletes = [];
 
         foreach ($resources as $resource) {
             if (str_ends_with($resource->id, 'aaaaaaaa')) {
@@ -170,17 +171,20 @@ class UndeployOrphanedResources extends Command
                             $resource = $resources->get($id);
 
                             if ($resource) {
-                                $endpoint = match ($resource::class) {
-                                    Router::class => 'policy/api/v1/infra/tier-1s/' . $resource->id,
-                                    Network::class => 'policy/api/v1/infra/tier-1s/' . $resource?->router?->id . '/segments/' . $resource->id,
-                                };
+                                if ($resource::class == Router::class) {
+                                    $resource->setAttribute('deleted_at', null)->saveQuietly();
+                                    $task = $resource->syncDelete();
+                                    $syncDeletes[] = [$resource->id, $task->id];
+                                } else {
+                                    $endpoint = 'policy/api/v1/infra/tier-1s/' . $resource?->router?->id . '/segments/' . $resource->id;
 
-                                try {
-                                    $resource->availabilityZone->nsxService()->delete($endpoint);
-                                } catch (\Exception $e) {
-                                    if ($e->hasResponse() && $e->getResponse()->getStatusCode() != 404) {
-                                        $reason = null;
-                                        $failedDeletes[] = [$resource->id, $resource->name, $e->getMessage()];
+                                    try {
+                                        $resource->availabilityZone->nsxService()->delete($endpoint);
+                                    } catch (\Exception $e) {
+                                        if ($e->hasResponse() && $e->getResponse()->getStatusCode() != 404) {
+                                            $reason = null;
+                                            $failedDeletes[] = [$resource->id, $resource->name, $e->getMessage()];
+                                        }
                                     }
                                 }
                             }
@@ -189,6 +193,13 @@ class UndeployOrphanedResources extends Command
                     }
                 }
                 $this->info('Total ' . $deleted . ' Undeploys Attempted');
+                if (count($syncDeletes) > 0) {
+                    $this->info(count($syncDeletes) . ' delete syncs in progress');
+                    $this->table(
+                        ['ID', 'Task ID'],
+                        $syncDeletes
+                    );
+                }
                 if (count($failedDeletes) > 0) {
                     $this->info(count($failedDeletes) . ' undeploys failed');
                     $this->table(
