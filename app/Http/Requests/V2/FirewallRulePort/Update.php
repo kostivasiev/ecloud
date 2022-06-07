@@ -2,15 +2,10 @@
 
 namespace App\Http\Requests\V2\FirewallRulePort;
 
-use App\Models\V2\FirewallRule;
 use App\Models\V2\FirewallRulePort;
-use App\Rules\V2\ExistsForUser;
-use App\Rules\V2\FirewallRulePort\PortWithinExistingRange;
 use App\Rules\V2\FirewallRulePort\UniquePortListRule;
-use App\Rules\V2\FirewallRulePort\UniquePortRangeRule;
 use App\Rules\V2\FirewallRulePort\UniquePortRule;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
-use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Foundation\Http\FormRequest;
 
 class Update extends FormRequest
@@ -39,8 +34,6 @@ class Update extends FormRequest
                 'nullable',
                 new ValidFirewallRulePortSourceDestination(),
                 new UniquePortRule(FirewallRulePort::class),
-                new UniquePortRangeRule(FirewallRulePort::class),
-                new PortWithinExistingRange(FirewallRulePort::class),
                 new UniquePortListRule(FirewallRulePort::class),
             ],
             'destination' => [
@@ -49,8 +42,6 @@ class Update extends FormRequest
                 'nullable',
                 new ValidFirewallRulePortSourceDestination(),
                 new UniquePortRule(FirewallRulePort::class),
-                new UniquePortRangeRule(FirewallRulePort::class),
-                new PortWithinExistingRange(FirewallRulePort::class),
                 new UniquePortListRule(FirewallRulePort::class),
             ]
         ];
