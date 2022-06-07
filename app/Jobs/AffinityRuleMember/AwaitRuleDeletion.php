@@ -17,14 +17,9 @@ class AwaitRuleDeletion extends TaskJob
 
     public int $backoff = 5;
 
-    public function __construct($task)
-    {
-        parent::__construct($task);
-        $this->affinityRuleMember = $this->task->resource;
-    }
-
     public function handle()
     {
+        $this->affinityRuleMember = $this->task->resource;
         $hostGroupId = $this->affinityRuleMember->instance->getHostGroupId();
         if ($this->affinityRuleExists($hostGroupId)) {
             $this->info('Rule deletion not complete, waiting', [

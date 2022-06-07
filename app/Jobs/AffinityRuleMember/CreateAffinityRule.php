@@ -9,28 +9,31 @@ use Illuminate\Support\Collection;
 
 class CreateAffinityRule extends TaskJob
 {
+    public AffinityRuleMember $affinityRuleMember;
+
     public function handle()
     {
-        if ($this->task->resource->affinityRule->affinityRuleMembers()->count() <= 0) {
+        $this->affinityRuleMember = $this->task->resource;
+        if ($this->affinityRuleMember->affinityRule->affinityRuleMembers()->count() <= 0) {
             $this->info('Rule has no members, skipping', [
-                'affinity_rule_id' => $this->task->resource->id,
+                'affinity_rule_id' => $this->affinityRuleMember->id,
             ]);
             return;
         }
 
-        if ($this->task->resource->affinityRule->affinityRuleMembers()->count() < 2) {
+        if ($this->affinityRuleMember->affinityRule->affinityRuleMembers()->count() < 2) {
             $this->info('Affinity rules need at least two members', [
-                'affinity_rule_id' => $this->task->resource->id,
-                'member_count' => $this->task->resource->affinityRule->affinityRuleMembers()->count(),
+                'affinity_rule_id' => $this->affinityRuleMember->id,
+                'member_count' => $this->affinityRuleMember->affinityRule->affinityRuleMembers()->count(),
             ]);
             return;
         }
 
-        $hostGroupId = $this->task->resource->instance->getHostGroupId();
-        $affinityRuleMembers = $this->task->resource->affinityRule->affinityRuleMembers()->get();
+        $hostGroupId = $this->affinityRuleMember->instance->getHostGroupId();
+        $affinityRuleMembers = $this->affinityRuleMember->affinityRule->affinityRuleMembers()->get();
         $instanceIds = $affinityRuleMembers->filter(
             function (AffinityRuleMember $affinityRuleMember) use ($hostGroupId) {
-                if ($affinityRuleMember->instance->id !== $this->task->resource->instance->id) {
+                if ($affinityRuleMember->instance->id !== $this->affinityRuleMember->instance->id) {
                     if ($affinityRuleMember->instance->getHostGroupId() == $hostGroupId) {
                         return $affinityRuleMember->instance->id;
                     }
@@ -48,8 +51,8 @@ class CreateAffinityRule extends TaskJob
 
     public function createAffinityRule(string $hostGroupId, Collection $instanceIds)
     {
-        $availabilityZone = $this->task->resource->instance->availabilityZone;
-        $uriEndpoint = ($this->task->resource->type == 'affinity') ?
+        $availabilityZone = $this->affinityRuleMember->instance->availabilityZone;
+        $uriEndpoint = ($this->affinityRuleMember->type == 'affinity') ?
             KingpinService::AFFINITY_URI :
             KingpinService::ANTI_AFFINITY_URI;
 
@@ -58,15 +61,15 @@ class CreateAffinityRule extends TaskJob
                 sprintf($uriEndpoint, $hostGroupId),
                 [
                     'json' => [
-                        'ruleName' => $this->task->resource->affinityRule->id,
-                        'vpcId' => $this->task->resource->affinityRule->vpc->id,
+                        'ruleName' => $this->affinityRuleMember->affinityRule->id,
+                        'vpcId' => $this->affinityRuleMember->affinityRule->vpc->id,
                         'instanceIds' => $instanceIds,
                     ],
                 ]
             );
         } catch (\Exception $e) {
             $this->info('Failed to create affinity rule', [
-                'affinity_rule_id' => $this->task->resource->affinityRule->id,
+                'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
                 'hostgroup_id' => $hostGroupId,
                 'message' => $e->getMessage(),
             ]);

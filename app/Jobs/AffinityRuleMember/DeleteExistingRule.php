@@ -9,21 +9,17 @@ use App\Services\V2\KingpinService;
 
 class DeleteExistingRule extends TaskJob
 {
-    private AffinityRuleMember $model;
+    private AffinityRuleMember $affinityRuleMember;
     private AvailabilityZone $availabilityZone;
-
-    public function __construct($task)
-    {
-        parent::__construct($task);
-        $this->model = $this->task->resource;
-        $this->availabilityZone = $this->model->instance->availabilityZone;
-    }
 
     public function handle()
     {
-        $hostGroupId = $this->model->instance->getHostGroupId();
+        $this->affinityRuleMember = $this->task->resource;
+        $this->availabilityZone = $this->affinityRuleMember->instance->availabilityZone;
+
+        $hostGroupId = $this->affinityRuleMember->instance->getHostGroupId();
         if (!$hostGroupId) {
-            $message = 'HostGroup could not be retrieved for instance ' . $this->model->instance->id;
+            $message = 'HostGroup could not be retrieved for instance ' . $this->affinityRuleMember->instance->id;
             $this->fail($message);
             return;
         }
@@ -31,11 +27,11 @@ class DeleteExistingRule extends TaskJob
         if ($this->affinityRuleExists($hostGroupId)) {
             try {
                 $response = $this->availabilityZone->kingpinService()->delete(
-                    sprintf(KingpinService::DELETE_CONSTRAINT_URI, $hostGroupId, $this->model->affinityRule->id)
+                    sprintf(KingpinService::DELETE_CONSTRAINT_URI, $hostGroupId, $this->affinityRuleMember->affinityRule->id)
                 );
 
                 if ($response->getStatusCode() !== 200) {
-                    $message = 'Failed to delete constraint ' . $this->model->id . ' on ' . $hostGroupId;
+                    $message = 'Failed to delete constraint ' . $this->affinityRuleMember->id . ' on ' . $hostGroupId;
                     $this->fail(new \Exception($message));
                     return;
                 }
@@ -59,7 +55,7 @@ class DeleteExistingRule extends TaskJob
             return false;
         }
         return collect(json_decode($response->getBody()->getContents(), true))
-                ->where('ruleName', '=', $this->model->affinityRule->id)
+                ->where('ruleName', '=', $this->affinityRuleMember->affinityRule->id)
                 ->count() > 0;
     }
 }
