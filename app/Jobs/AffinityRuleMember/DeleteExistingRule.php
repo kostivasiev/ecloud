@@ -6,7 +6,6 @@ use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\AvailabilityZone;
 use App\Services\V2\KingpinService;
-use Illuminate\Support\Facades\Log;
 
 class DeleteExistingRule extends TaskJob
 {
@@ -56,7 +55,7 @@ class DeleteExistingRule extends TaskJob
                 );
         } catch (\Exception $e) {
             $message = 'Failed to retrieve ' . $hostGroupId . ' : ' . $e->getMessage();
-            Log::info($message);
+            $this->info($message);
             return false;
         }
         return collect(json_decode($response->getBody()->getContents(), true))
