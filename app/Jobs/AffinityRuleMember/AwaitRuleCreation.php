@@ -6,6 +6,7 @@ class AwaitRuleCreation extends AwaitRuleDeletion
 {
     public function handle()
     {
+        $this->affinityRuleMember = $this->task->resource;
         $hostGroupId = $this->affinityRuleMember->instance->getHostGroupId();
         if (!$this->affinityRuleExists($hostGroupId)) {
             $this->info('Rule creation not complete, waiting', [
