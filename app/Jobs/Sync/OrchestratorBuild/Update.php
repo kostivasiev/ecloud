@@ -3,6 +3,7 @@
 namespace App\Jobs\Sync\OrchestratorBuild;
 
 use App\Jobs\Job;
+use App\Jobs\OrchestratorBuild\AttachVolumes;
 use App\Jobs\OrchestratorBuild\AwaitDefaultFirewallPolicies;
 use App\Jobs\OrchestratorBuild\AwaitHostGroups;
 use App\Jobs\OrchestratorBuild\AwaitHosts;
@@ -10,6 +11,8 @@ use App\Jobs\OrchestratorBuild\AwaitInstances;
 use App\Jobs\OrchestratorBuild\AwaitLoadBalancers;
 use App\Jobs\OrchestratorBuild\AwaitNetworks;
 use App\Jobs\OrchestratorBuild\AwaitRouters;
+use App\Jobs\OrchestratorBuild\AwaitVolumeAttachment;
+use App\Jobs\OrchestratorBuild\AwaitVolumes;
 use App\Jobs\OrchestratorBuild\AwaitVpcs;
 use App\Jobs\OrchestratorBuild\ConfigureDefaultFirewallPolicies;
 use App\Jobs\OrchestratorBuild\CreateHostGroups;
@@ -18,6 +21,7 @@ use App\Jobs\OrchestratorBuild\CreateInstances;
 use App\Jobs\OrchestratorBuild\CreateLoadBalancers;
 use App\Jobs\OrchestratorBuild\CreateNetworks;
 use App\Jobs\OrchestratorBuild\CreateRouters;
+use App\Jobs\OrchestratorBuild\CreateVolumes;
 use App\Jobs\OrchestratorBuild\CreateVpcs;
 use App\Jobs\OrchestratorBuild\LockConfiguration;
 use App\Models\V2\Task;
@@ -54,6 +58,10 @@ class Update extends Job
                 new AwaitHosts($this->task->resource),
                 new CreateInstances($this->task->resource),
                 new AwaitInstances($this->task->resource),
+                new CreateVolumes($this->task->resource),
+                new AwaitVolumes($this->task->resource),
+                new AttachVolumes($this->task->resource),
+                new AwaitVolumeAttachment($this->task->resource),
                 new CreateLoadBalancers($this->task->resource),
                 new AwaitLoadBalancers($this->task->resource),
             ]
