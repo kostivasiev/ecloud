@@ -14,7 +14,7 @@ use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class AffinityRule extends Model implements Searchable, AvailabilityZoneable, VpcAble
+class AffinityRule extends Model implements Searchable, AvailabilityZoneable, VpcAble, ResellerScopeable
 {
     use HasFactory, CustomKey, SoftDeletes, DefaultName, Syncable, Taskable, DeletionRules;
 
@@ -54,6 +54,11 @@ class AffinityRule extends Model implements Searchable, AvailabilityZoneable, Vp
     public function affinityRuleMembers()
     {
         return $this->hasMany(AffinityRuleMember::class);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->vpc->getResellerId();
     }
 
     /**
