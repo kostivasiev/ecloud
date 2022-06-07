@@ -117,7 +117,7 @@ class UndeployOrphanedResourcesTest extends TestCase
 
     public function testNetworkHasNoParentResourceGetsDeleted()
     {
-        $deleteActionsPerformed = 0;
+        Event::fake(Created::class);
         $this->createSyncUpdateTask($this->router());
 
         $this->router()->delete();
@@ -134,15 +134,8 @@ class UndeployOrphanedResourcesTest extends TestCase
                 new ClientException('Not Found', new Request('GET', 'test'), new Response(404))
             );
 
-        $this->nsxServiceMock()->expects('delete')
-            ->withSomeOfArgs('policy/api/v1/infra/tier-1s/' . $this->router()->id . '/segments/' . $this->network()->id)
-            ->andReturnUsing(function () use (&$deleteActionsPerformed) {
-                $deleteActionsPerformed++;
-                return new Response(200);
-            });
-
         $this->command->handle();
 
-        $this->assertEquals(1, $deleteActionsPerformed);
+        Event::assertDispatched(Created::class);
     }
 }

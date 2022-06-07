@@ -172,26 +172,23 @@ class UndeployOrphanedResources extends Command
                             $resource = $resources->get($id);
 
                             if ($resource) {
+                                $resource->setAttribute('deleted_at', null)->saveQuietly();
                                 if ($resource::class == Router::class) {
-                                    $resource->setAttribute('deleted_at', null)->saveQuietly();
                                     $vpc = Vpc::withTrashed()->find($resource->vpc_id);
                                     if ($vpc) {
                                         $vpc->setAttribute('deleted_at', null)->saveQuietly();
-                                        $resource->refresh();
                                     }
+                                    $resource->refresh();
                                     $task = $resource->syncDelete();
                                     $vpc->delete();
                                     $syncDeletes[] = [$resource->id, $task->id];
                                 } else {
-                                    $endpoint = 'policy/api/v1/infra/tier-1s/' . $resource?->router?->id . '/segments/' . $resource->id;
-
-                                    try {
-                                        $resource->availabilityZone->nsxService()->delete($endpoint);
-                                    } catch (\Exception $e) {
-                                        if ($e->hasResponse() && $e->getResponse()->getStatusCode() != 404) {
-                                            $reason = null;
-                                            $failedDeletes[] = [$resource->id, $resource->name, $e->getMessage()];
-                                        }
+                                    $router = Router::withTrashed()->find($resource->router_id);
+                                    if ($router) {
+                                        $router->setAttribute('deleted_at', null)->saveQuietly();
+                                        $task = $resource->syncDelete();
+                                        $router->delete();
+                                        $syncDeletes[] = [$resource->id, $task->id];
                                     }
                                 }
                             }
