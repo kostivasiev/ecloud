@@ -72,17 +72,9 @@ class CreateAffinityRule extends TaskJob
             ]);
             throw $e;
         }
-        if ($response->getStatusCode() == 200) {
-            $createdRules = [];
-            if (isset($this->task->data['created_rules'])) {
-                $createdRules = $this->task->data['created_rules'];
-            }
-            $createdRules[] = $hostGroupId;
-            $this->task->updateData('created_rules', $createdRules);
-            return true;
-        } else {
+        if ($response->getStatusCode() !== 200) {
             throw new \Exception('Failed to create rule');
         }
-        return false;
+        return true;
     }
 }
