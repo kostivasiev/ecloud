@@ -29,6 +29,7 @@ class DeleteExistingRule extends TaskJob
                 $response = $this->availabilityZone->kingpinService()->delete(
                     sprintf(KingpinService::DELETE_CONSTRAINT_URI, $hostGroupId, $this->affinityRuleMember->affinityRule->id)
                 );
+                $this->info('Rule ' . $this->affinityRuleMember->affinityRule->id . ' was removed from host group ' . $hostGroupId);
 
                 if ($response->getStatusCode() !== 200) {
                     $message = 'Failed to delete constraint ' . $this->affinityRuleMember->id . ' on ' . $hostGroupId;
