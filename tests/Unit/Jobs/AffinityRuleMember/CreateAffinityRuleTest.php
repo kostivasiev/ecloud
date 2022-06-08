@@ -144,7 +144,7 @@ class CreateAffinityRuleTest extends TestCase
             ->with(\Mockery::capture($message), \Mockery::capture($params));
 
         $this->job->handle();
-        $this->assertEquals('Rule has no members, skipping', $message);
+        $this->assertEquals('Affinity rules need at least two members', $message);
         $this->assertEquals($this->affinityRuleMember->id, $params['affinity_rule_id']);
     }
 
