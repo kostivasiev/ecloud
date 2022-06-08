@@ -14,13 +14,6 @@ class CreateAffinityRule extends TaskJob
     public function handle()
     {
         $this->affinityRuleMember = $this->task->resource;
-        if ($this->affinityRuleMember->affinityRule->affinityRuleMembers()->count() <= 0) {
-            $this->info('Rule has no members, skipping', [
-                'affinity_rule_id' => $this->affinityRuleMember->id,
-            ]);
-            return;
-        }
-
         if ($this->affinityRuleMember->affinityRule->affinityRuleMembers()->count() < 2) {
             $this->info('Affinity rules need at least two members', [
                 'affinity_rule_id' => $this->affinityRuleMember->id,
