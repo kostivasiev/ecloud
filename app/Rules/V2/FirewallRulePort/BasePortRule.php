@@ -14,8 +14,6 @@ abstract class BasePortRule implements Rule
     public string $class;
     public string $parentKeyColumn;
     public ?string $parentId;
-    public ?string $source;
-    public ?string $destination;
     public ?string $protocol;
 
     public function __construct(string $class)
