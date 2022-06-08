@@ -456,4 +456,27 @@ class CreateTest extends TestCase
 
         $this->post('/v2/instances', $data)->assertStatus(202);
     }
+
+    public function testRequiresFloatingIpAndFloatingIpSuppliedFails()
+    {
+        $this->asUser()
+            ->post(
+                '/v2/instances',
+                [
+                    'vpc_id' => $this->vpc()->id,
+                    'image_id' => $this->image()->id,
+                    'network_id' => $this->network()->id,
+                    'vcpu_cores' => 1,
+                    'ram_capacity' => 1024,
+                    'volume_capacity' => 40,
+                    'volume_iops' => 600,
+                    'requires_floating_ip' => true,
+                    'floating_ip_id' => $this->floatingIp()->id,
+                ]
+            )->assertJsonFragment([
+                'detail' => 'requires_floating_ip cannot be specified if floating_ip_id is provided',
+            ])->assertJsonFragment([
+                'detail' => 'floating_ip_id cannot be specified if requires_floating_ip is provided',
+            ])->assertStatus(422);
+    }
 }
