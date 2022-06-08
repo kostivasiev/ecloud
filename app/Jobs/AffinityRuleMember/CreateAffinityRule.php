@@ -50,6 +50,11 @@ class CreateAffinityRule extends TaskJob
             KingpinService::ANTI_AFFINITY_URI;
 
         try {
+            $this->info('Creating Constraint', [
+                'host_group_id' => $hostGroupId,
+                'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
+                'vpc_id' => $this->affinityRuleMember->affinityRule->vpc->id,
+            ]);
             $response = $availabilityZone->kingpinService()->post(
                 sprintf($uriEndpoint, $hostGroupId),
                 [
