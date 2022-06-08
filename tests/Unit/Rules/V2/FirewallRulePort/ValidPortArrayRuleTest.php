@@ -66,20 +66,34 @@ class ValidPortArrayRuleTest extends TestCase
         $this->assertTrue($this->rule->passes('ports', $portArray));
     }
 
-    public function testPortRangeClashSameProtocolFails()
+    public function testPortRangeWithAnyPasses()
     {
         $portArray = [
             [
                 'protocol' => 'TCP',
-                'source' => '400-500',
+                'source' => 'ANY',
                 'destination' => '800-900'
             ],
             [
-                'protocol' => 'TCP',
-                'source' => '22',
-                'destination' => '810-880'
+                'protocol' => 'UDP',
+                'source' => 'ANY',
+                'destination' => '800-900'
             ]
         ];
-        $this->assertFalse($this->rule->passes('ports', $portArray));
+        $this->assertTrue($this->rule->passes('ports', $portArray));
+
+        $portArray = [
+            [
+                'protocol' => 'TCP',
+                'destination' => 'ANY',
+                'source' => '800-900'
+            ],
+            [
+                'protocol' => 'UDP',
+                'source' => '800-900',
+                'destination' => 'ANY'
+            ]
+        ];
+        $this->assertTrue($this->rule->passes('ports', $portArray));
     }
 }
