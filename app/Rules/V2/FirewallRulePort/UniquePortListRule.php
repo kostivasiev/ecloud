@@ -2,41 +2,15 @@
 
 namespace App\Rules\V2\FirewallRulePort;
 
-use App\Models\V2\FirewallRulePort;
-use App\Models\V2\NetworkRulePort;
-use Illuminate\Contracts\Validation\Rule;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Str;
 
-class UniquePortListRule implements Rule
+class UniquePortListRule extends BasePortRule
 {
-    public FirewallRulePort|NetworkRulePort $model;
-    public string $class;
-    public string $parentKeyColumn;
-    public ?string $parentId;
-    public ?string $source;
-    public ?string $destination;
-    public ?string $protocol;
-
-    public function __construct(string $class)
-    {
-        $this->class = $class;
-        $this->model = new $class;
-        $this->parentKeyColumn = match ($class) {
-            NetworkRulePort::class => 'network_rule_id',
-            default => 'firewall_rule_id',
-        };
-        $this->parentId = Request::input($this->parentKeyColumn, null);
-        if (Request::method() == 'PATCH') {
-            $this->parentId = match ($class) {
-                NetworkRulePort::class => Request::route('networkRulePortId'),
-                default => Request::route('firewallRulePortId')
-            };
-        }
-        $this->protocol = Request::input('protocol', null);
-    }
-
     public function passes($attribute, $value)
     {
+        if (!Str::contains($value, ',')) {
+            return true;
+        }
         return $this->model->where(function ($query) use ($attribute, $value) {
             $query->where($this->parentKeyColumn, '=', $this->parentId);
             $query->where(function ($query) use ($attribute, $value) {
