@@ -116,10 +116,13 @@ class DeleteExistingRuleTest extends TestCase
 
     public function testAffinityRuleDoesNotExist()
     {
+        $instanceMock = \Mockery::mock($this->instanceModel())->makePartial();
+        $instanceMock->allows('hasAffinityRule')->withAnyArgs()->andReturnFalse();
+
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $instanceMock->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,

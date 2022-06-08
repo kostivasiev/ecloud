@@ -16,8 +16,15 @@ class AwaitRuleDeletion extends TaskJob
     public function handle()
     {
         $this->affinityRuleMember = $this->task->resource;
-        $hostGroupId = $this->affinityRuleMember->instance->getHostGroupId();
-        if ($this->affinityRuleExists($hostGroupId)) {
+        $instance = $this->affinityRuleMember->instance;
+        $hostGroupId = $instance->getHostGroupId();
+        if (!$hostGroupId) {
+            $message = 'HostGroup could not be retrieved for instance ' . $instance->id;
+            $this->fail($message);
+            return;
+        }
+
+        if ($instance->hasAffinityRule($hostGroupId, $this->affinityRuleMember->affinityRule->id)) {
             $this->info('Rule deletion not complete, waiting', [
                 'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
                 'host_group_id' => $hostGroupId

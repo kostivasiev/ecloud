@@ -12,6 +12,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class AwaitRuleDeletionTest extends TestCase
@@ -55,19 +56,33 @@ class AwaitRuleDeletionTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Waiting');
 
+        $instanceMock = \Mockery::mock($this->instanceModel())->makePartial();
+        $instanceMock->allows('hasAffinityRule')->withAnyArgs()->andReturnTrue();
+
         $this->kingpinServiceMock()
             ->allows('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $instanceMock->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
                 ]));
             });
 
-        $this->job->expects('affinityRuleExists')
-            ->withAnyArgs()
-            ->andReturnTrue();
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_CONSTRAINT_URI, $this->hostGroup()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    [
+                        'ruleName' => $this->affinityRule->id,
+                        'constraintType' => 'InstanceAffinity',
+                        'enabled' => true,
+                    ]
+                ]));
+            });
+
         $this->job->expects('release')
             ->withAnyArgs()
             ->andThrows(new \Exception('Waiting'));
@@ -77,31 +92,39 @@ class AwaitRuleDeletionTest extends TestCase
 
     public function testSkipIfRuleNotPresent()
     {
+
+        $instanceMock = \Mockery::mock($this->instanceModel())->makePartial();
+        $instanceMock->allows('hasAffinityRule')->withAnyArgs()->andReturnTrue();
+
         $this->kingpinServiceMock()
             ->allows('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
-            )->andThrows(
-                new ClientException(
-                    'Not Found',
-                    new Request('GET', '/'),
-                    new Response(404)
-                )
-            );
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $instanceMock->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
 
-        $this->job->allows('info')
-            ->with('Shared hostgroup id could not be found for instance i-test')
-            ->andReturnTrue();
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_CONSTRAINT_URI, $this->hostGroup()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    [
+                        'ruleName' => 'ar-xxxxxxxx',
+                        'constraintType' => 'InstanceAffinity',
+                        'enabled' => true,
+                    ]
+                ]));
+            });
 
         $this->job->allows('info')
             ->with(
                 \Mockery::capture($message),
                 \Mockery::capture($affinityRule)
             );
-
-        $this->job->expects('affinityRuleExists')
-            ->withAnyArgs()
-            ->andReturnFalse();
 
         $this->job->handle();
         $this->assertEquals('Rule deletion complete', $message);
