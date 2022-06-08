@@ -3,6 +3,7 @@
 namespace Tests\V2\DiscountPlan;
 
 use App\Models\V2\DiscountPlan;
+use Carbon\Carbon;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
@@ -132,5 +133,58 @@ class CreateTest extends TestCase
             'title' => 'Validation Error',
             'detail' => 'The term_end_date must be greater than the term_start_date',
         ])->assertStatus(422);
+    }
+
+
+    public function testCreateTrialScopedAdminSuccess()
+    {
+        $data = [
+            'contact_id' => 1,
+            'name' => 'test-commitment',
+            'commitment_amount' => '2000',
+            'commitment_before_discount' => '1000',
+            'discount_rate' => '5',
+            'term_length' => '24',
+            'term_start_date' => Carbon::now()->startOfMonth()->format('Y-m-d H:i:s'),
+            'term_end_date' => Carbon::now()->startOfMonth()->addMonth()->format('Y-m-d H:i:s'),
+            'is_trial' => true,
+        ];
+        $this->asAdmin(1)->post(
+            '/v2/discount-plans',
+            $data
+        )->assertStatus(201);
+
+        $this->assertDatabaseHas(
+            'discount_plans',
+            $data,
+            'ecloud'
+        );
+    }
+
+    public function testCanNotCreateTrialAsUser()
+    {
+        $data = [
+            'contact_id' => 1,
+            'name' => 'test-commitment',
+            'commitment_amount' => '2000',
+            'commitment_before_discount' => '1000',
+            'discount_rate' => '5',
+            'term_length' => '24',
+            'term_start_date' => Carbon::now()->startOfMonth()->format('Y-m-d H:i:s'),
+            'term_end_date' => Carbon::now()->startOfMonth()->addMonth()->format('Y-m-d H:i:s'),
+            'is_trial' => true,
+        ];
+        $this->asUser()->post(
+            '/v2/discount-plans',
+            $data
+        )->assertStatus(201);
+
+        $this->assertDatabaseHas(
+            'discount_plans',
+            [
+              'is_trial' => false
+            ],
+            'ecloud'
+        );
     }
 }

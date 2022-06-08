@@ -30,6 +30,7 @@ class DiscountPlanFactory extends Factory
             'term_length' => '24',
             'term_start_date' => date('Y-m-d H:i:s', strtotime('now')),
             'term_end_date' => date('Y-m-d H:i:s', strtotime('2 days')),
+            'is_trial' => false,
         ];
     }
 }

@@ -26,6 +26,7 @@ class DiscountPlanResource extends UKFastResource
             'status' => $this->status,
             'response_date' => $this->response_date ?
                 Carbon::parse($this->created_at, new \DateTimeZone(config('app.timezone')))->toIso8601String() : null,
+            'is_trial'=> $this->is_trial,
             'created_at' => Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
