@@ -55,7 +55,7 @@ class AwaitRuleDeletion extends TaskJob
                 return false;
             }
             return collect(json_decode($response->getBody()->getContents(), true))
-                    ->where('ruleName', '=', $this->affinityRuleMember->id)
+                    ->where('ruleName', '=', $this->affinityRuleMember->affinityRule->id)
                     ->count() > 0;
         }
         return false;
