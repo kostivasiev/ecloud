@@ -6,9 +6,10 @@ use App\Jobs\AffinityRuleMember\AwaitRuleCreation;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Task;
+use App\Services\V2\KingpinService;
 use App\Support\Sync;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class AwaitRuleCreationTest extends TestCase
@@ -52,8 +53,6 @@ class AwaitRuleCreationTest extends TestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Waiting');
 
-        $this->task->updateData('created_rules', [$this->hostGroup()->id]);
-
         $this->job->expects('affinityRuleExists')
             ->withAnyArgs()
             ->andReturnFalse();
@@ -61,17 +60,36 @@ class AwaitRuleCreationTest extends TestCase
             ->withAnyArgs()
             ->andThrows(new \Exception('Waiting'));
 
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
+
         $this->job->handle();
     }
 
     public function testSkipIfRulePresent()
     {
-        Log::shouldReceive('info')
+        $this->job
+            ->allows('info')
             ->with(
                 \Mockery::capture($message),
                 \Mockery::capture($affinityRule)
             );
-        $this->task->updateData('created_rules', [$this->hostGroup()->id]);
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
 
         $this->job->expects('affinityRuleExists')
             ->withAnyArgs()

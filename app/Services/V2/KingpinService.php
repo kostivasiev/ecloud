@@ -19,6 +19,8 @@ final class KingpinService
     /** Affinity Rules */
     public const GET_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint';
     public const DELETE_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint/%s';
+    public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
+    public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
 
     /**
      * @var Client

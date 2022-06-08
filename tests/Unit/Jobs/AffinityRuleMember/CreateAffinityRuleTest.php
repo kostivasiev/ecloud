@@ -62,7 +62,7 @@ class CreateAffinityRuleTest extends TestCase
         $this->createSecondaryMember()
             ->kingpinServiceMock()
             ->expects('post')
-            ->withSomeOfArgs(sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id))
+            ->withSomeOfArgs(sprintf(KingpinService::ANTI_AFFINITY_URI, $this->hostGroup()->id))
             ->andReturnUsing(function () {
                 return new Response(200);
             });
@@ -81,7 +81,7 @@ class CreateAffinityRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(CreateAffinityRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -105,7 +105,7 @@ class CreateAffinityRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(CreateAffinityRule::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -123,7 +123,7 @@ class CreateAffinityRuleTest extends TestCase
                 ]));
             });
 
-        $uri = sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id);
+        $uri = sprintf(KingpinService::ANTI_AFFINITY_URI, $this->hostGroup()->id);
         $this->kingpinServiceMock()
             ->expects('post')
             ->withSomeOfArgs($uri)
@@ -139,14 +139,19 @@ class CreateAffinityRuleTest extends TestCase
     public function testNoActionWhenNoMembers()
     {
         $this->affinityRuleMember->setAttribute('deleted_at', Carbon::now())->save();
-        $this->setExceptionExpectations('info', 'Rule has no members, skipping');
+        $this->job
+            ->allows('info')
+            ->with(\Mockery::capture($message), \Mockery::capture($params));
 
         $this->job->handle();
+        $this->assertEquals('Rule has no members, skipping', $message);
+        $this->assertEquals($this->affinityRuleMember->id, $params['affinity_rule_id']);
     }
 
     public function testNoActionWhenFewerThanTwoMembers()
     {
-        Log::shouldReceive('info')
+        $this->job
+            ->allows('info')
             ->with(
                 \Mockery::capture($message),
                 \Mockery::capture($data)

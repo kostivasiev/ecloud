@@ -7,11 +7,9 @@ use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Task;
 use App\Services\V2\KingpinService;
-use App\Support\Sync;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -39,16 +37,8 @@ class DeleteExistingRuleTest extends TestCase
             ->create([
                 'instance_id' => $this->instanceModel(),
             ]);
-        $this->task = Model::withoutEvents(function () {
-            $task = new Task([
-                'id' => 'ar-task-1',
-                'completed' => false,
-                'name' => Sync::TASK_NAME_UPDATE
-            ]);
-            $task->resource()->associate($this->affinityRuleMember);
-            $task->save();
-            return $task;
-        });
+        $this->task = $this->createSyncUpdateTask($this->affinityRuleMember);
+        $this->task->setAttribute('completed', false)->saveQuietly();
         $this->job = \Mockery::mock(DeleteExistingRule::class, [$this->task])
             ->makePartial();
     }

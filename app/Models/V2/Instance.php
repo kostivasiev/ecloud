@@ -182,8 +182,8 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
 
     public function getHostGroupId(): ?string
     {
-        if (!empty($this->host_group_id)) {
-            return null;
+        if (!empty($this->attributes['host_group_id'])) {
+            return $this->attributes['host_group_id'];
         }
 
         try {
