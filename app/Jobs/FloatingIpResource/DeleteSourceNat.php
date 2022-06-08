@@ -14,9 +14,10 @@ class DeleteSourceNat extends TaskJob
         $floatingIpResource = $this->task->resource;
         $floatingIp = $floatingIpResource->floatingIp;
 
-        if ($floatingIp->sourceNat()->exists()) {
-            $this->info('Deleting SNAT ' . $floatingIp->sourceNat->id . ' from unassigned floating IP');
-            $this->deleteSyncableResource($floatingIp->sourceNat->id);
+        if (!$floatingIp->sourceNat()->exists()) {
+            return;
         }
+
+        $this->deleteSyncableResource($floatingIp->sourceNat->id);
     }
 }

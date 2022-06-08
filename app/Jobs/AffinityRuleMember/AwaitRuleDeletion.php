@@ -5,11 +5,7 @@ namespace App\Jobs\AffinityRuleMember;
 use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\HostGroup;
-use App\Models\V2\Task;
 use App\Services\V2\KingpinService;
-use App\Traits\V2\LoggableModelJob;
-use Illuminate\Bus\Batchable;
-use Illuminate\Support\Facades\Log;
 
 class AwaitRuleDeletion extends TaskJob
 {
@@ -23,7 +19,7 @@ class AwaitRuleDeletion extends TaskJob
         $hostGroupId = $this->affinityRuleMember->instance->getHostGroupId();
         if ($this->affinityRuleExists($hostGroupId)) {
             $this->info('Rule deletion not complete, waiting', [
-                'affinity_rule_id' => $this->affinityRuleMember->id,
+                'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
                 'host_group_id' => $hostGroupId
             ]);
             $this->release($this->backoff);
