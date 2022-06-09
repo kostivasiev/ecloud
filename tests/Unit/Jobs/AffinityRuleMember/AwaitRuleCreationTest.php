@@ -18,6 +18,7 @@ class AwaitRuleCreationTest extends TestCase
     public $job;
     public AffinityRule $affinityRule;
     public AffinityRuleMember $affinityRuleMember;
+    public AffinityRuleMember $affinityRuleMember2;
 
     public function setUp(): void
     {
@@ -30,6 +31,11 @@ class AwaitRuleCreationTest extends TestCase
                 'type' => 'anti-affinity',
             ]);
         $this->affinityRuleMember = AffinityRuleMember::factory()
+            ->for($this->affinityRule)
+            ->create([
+                'instance_id' => $this->instanceModel(),
+            ]);
+        $this->affinityRuleMember2 = AffinityRuleMember::factory()
             ->for($this->affinityRule)
             ->create([
                 'instance_id' => $this->instanceModel(),
@@ -120,6 +126,16 @@ class AwaitRuleCreationTest extends TestCase
 
     public function testNoActionWhenFewerThanTwoMembers()
     {
+        $this->affinityRuleMember2->delete();
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
         $this->job
             ->allows('info')
             ->with(
