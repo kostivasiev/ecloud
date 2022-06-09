@@ -37,30 +37,4 @@ class AwaitRuleDeletion extends TaskJob
             'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
         ]);
     }
-
-    public function affinityRuleExists(?string $hostGroupId): bool
-    {
-        if ($hostGroupId === null) {
-            return false;
-        }
-        $hostGroup = HostGroup::find($hostGroupId);
-        if ($hostGroup) {
-            try {
-                $response = $hostGroup->availabilityZone->kingpinService()
-                    ->get(
-                        sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroup->id)
-                    );
-            } catch (\Exception $e) {
-                $this->info($e->getMessage());
-                $this->info('Contraints not found for hostgroup', [
-                    'host_group_id' => $hostGroup->id,
-                ]);
-                return false;
-            }
-            return collect(json_decode($response->getBody()->getContents(), true))
-                    ->where('ruleName', '=', $this->affinityRuleMember->affinityRule->id)
-                    ->count() > 0;
-        }
-        return false;
-    }
 }
