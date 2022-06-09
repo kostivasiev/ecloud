@@ -11,6 +11,7 @@ use Database\Seeders\Images\PleskImageSeeder;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 use UKFast\Admin\Account\AdminContactClient;
 
@@ -322,5 +323,43 @@ class RunApplianceBootstrapTest extends TestCase
         $this->assertEquals(8880, $credential->port);
 
         Event::assertNotDispatched(JobFailed::class);
+    }
+
+    public function testNonZeroExitCode()
+    {
+        (new PleskImageSeeder())->run();
+
+        $this->instanceModel()->credentials()->save(
+            app()->make(Credential::class)
+                ->fill([
+                    'name' => 'root',
+                    'username' => 'root',
+                    'password' => 'root'
+                ])
+        );
+
+        $this->instanceModel()
+            ->setAttribute('deploy_data', [
+                'image_data' => [
+                    'plesk_admin_email_address' => 'elmer.fudd@example.com'
+                ]
+            ])
+            ->setAttribute('image_id', 'img-plesk')
+            ->save();
+
+        $this->kingpinServiceMock()
+            ->expects('post')
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'exitCode' => 1,
+                    'output' => 'General order 66 received',
+                ]));
+            });
+
+        Event::fake([JobFailed::class]);
+
+        dispatch(new RunApplianceBootstrap($this->instanceModel()));
+
+        Event::assertDispatched(JobFailed::class);
     }
 }

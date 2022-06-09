@@ -60,7 +60,7 @@ class RunApplianceBootstrap extends Job
         );
 
         $endpoint = ($instance->platform == 'Linux') ? 'linux/script' : 'windows/script';
-        $instance->availabilityZone->kingpinService()->post(
+        $response = $instance->availabilityZone->kingpinService()->post(
             '/api/v2/vpc/' . $this->model->vpc->id . '/instance/' . $this->model->id . '/guest/' . $endpoint,
             [
                 'json' => [
@@ -73,6 +73,14 @@ class RunApplianceBootstrap extends Job
                 ],
             ]
         );
+        $response = json_decode($response?->getBody()?->getContents());
+        if ($response->exitCode !== 0) {
+            Log::info('Non-zero exit code received in response', [
+                'exit_code' => $response->exitCode,
+                'output' => $response->output,
+            ]);
+            $this->fail(new \Exception($response->output));
+        }
     }
 
     protected function getImageData()
