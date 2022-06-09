@@ -96,6 +96,23 @@ class OrchestratorBuild extends Model implements Searchable
                 }
 
                 throw new \Exception('Failed to render placeholder ' . $placeholder . ', resource was not found in the current build state.');
+            } else if (is_string($item) && preg_match('/^\{(\w+)\.(\d+)\.(\d+)\}$/', $item, $matches) === 1) {
+                list($placeholder, $resource, $index, $subindex) = $matches;
+
+                if (isset($this->state[$resource]) &&
+                    isset($this->state[$resource][$index]) &&
+                    isset($this->state[$resource][$index][$subindex])) {
+                    //Check the resource exists - not sure this belongs in here really
+                    $id = $this->state[$resource][$index][$subindex];
+                    $resource = Resource::classFromId($id)::find($id);
+                    if (empty($resource)) {
+                        throw new \Exception('Resource for placeholder ' . $placeholder .' was found in build state, but associated resource ' . $id . ' does not exist');
+                    }
+
+                    return $id;
+                }
+
+                throw new \Exception('Failed to render placeholder ' . $placeholder . ', resource was not found in the current build state.');
             }
             return $item;
         });

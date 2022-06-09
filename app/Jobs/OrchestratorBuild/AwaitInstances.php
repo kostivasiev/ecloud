@@ -30,6 +30,15 @@ class AwaitInstances extends Job
             return;
         }
 
-        $this->awaitSyncableResources($state->get('instance'));
+        $instanceIds = [];
+        foreach ($state->get('instance') as $instanceState) {
+            $instanceIds = [...$instanceIds, ...iterator_to_array(
+                new \RecursiveIteratorIterator(
+                    new \RecursiveArrayIterator($instanceState)
+                )
+            )];
+        }
+
+        $this->awaitSyncableResources($instanceIds); // need to rework this to get instance ids
     }
 }
