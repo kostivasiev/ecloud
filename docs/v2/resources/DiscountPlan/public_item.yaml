@@ -10,9 +10,5 @@ get:
             type: object
             allOf:
               - $ref: '../../components/schemas/discountPlan.yaml'
-              - type: object
-                properties:
-                  region_id:
-                    required: true
   tags:
     - Discount Plans
