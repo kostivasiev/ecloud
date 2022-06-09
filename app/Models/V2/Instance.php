@@ -215,7 +215,7 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
                     sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroupId)
                 );
         } catch (Exception $e) {
-            $message = 'Failed to retrieve ' . $hostGroupId . ' : ' . $e->getMessage();
+            $message = 'Failed to retrieve affinity rule constraint for ' . $affinityRuleId . ' : ' . $e->getMessage();
             Log::info($message);
             throw new Exception($message);
         }
