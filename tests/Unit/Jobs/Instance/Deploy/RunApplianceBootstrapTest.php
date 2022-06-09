@@ -72,7 +72,10 @@ class RunApplianceBootstrapTest extends TestCase
                 ]
             ])
             ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'exitCode' => 0,
+                    'output' => 'success',
+                ]));
             });
 
         dispatch(new RunApplianceBootstrap($this->instanceModel()));
@@ -118,7 +121,10 @@ class RunApplianceBootstrapTest extends TestCase
                 ]
             ])
             ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'exitCode' => 0,
+                    'output' => 'success',
+                ]));
             });
 
         dispatch(new RunApplianceBootstrap($this->instanceModel()));
@@ -167,7 +173,10 @@ class RunApplianceBootstrapTest extends TestCase
                 ]
             ])
             ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'exitCode' => 0,
+                    'output' => 'success',
+                ]));
             });
 
         dispatch(new RunApplianceBootstrap($this->instanceModel()));
@@ -236,7 +245,10 @@ class RunApplianceBootstrapTest extends TestCase
                 ]
             ])
             ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'exitCode' => 0,
+                    'output' => 'success',
+                ]));
             });
 
         dispatch(new RunApplianceBootstrap($this->instanceModel()));
@@ -268,7 +280,10 @@ class RunApplianceBootstrapTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('post')
             ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'exitCode' => 0,
+                    'output' => 'success',
+                ]));
             });
 
         $job = new RunApplianceBootstrap($this->instanceModel());
@@ -305,7 +320,10 @@ class RunApplianceBootstrapTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('post')
             ->andReturnUsing(function () {
-                return new Response(200);
+                return new Response(200, [], json_encode([
+                    'exitCode' => 0,
+                    'output' => 'success',
+                ]));
             });
 
         $job = new RunApplianceBootstrap($this->instanceModel());
