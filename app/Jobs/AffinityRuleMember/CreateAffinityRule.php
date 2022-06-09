@@ -26,10 +26,8 @@ class CreateAffinityRule extends TaskJob
         $affinityRuleMembers = $this->affinityRuleMember->affinityRule->affinityRuleMembers()->get();
         $instanceIds = $affinityRuleMembers->filter(
             function (AffinityRuleMember $affinityRuleMember) use ($hostGroupId) {
-                if ($affinityRuleMember->instance->id !== $this->affinityRuleMember->instance->id) {
-                    if ($affinityRuleMember->instance->getHostGroupId() == $hostGroupId) {
-                        return $affinityRuleMember->instance->id;
-                    }
+                if ($affinityRuleMember->instance->getHostGroupId() == $hostGroupId) {
+                    return $affinityRuleMember->instance->id;
                 }
             }
         )->pluck('instance_id');
@@ -61,15 +59,14 @@ class CreateAffinityRule extends TaskJob
                     'json' => [
                         'ruleName' => $this->affinityRuleMember->affinityRule->id,
                         'vpcId' => $this->affinityRuleMember->affinityRule->vpc->id,
-                        'instanceIds' => $instanceIds,
+                        'instanceIds' => $instanceIds->toArray(),
                     ],
                 ]
             );
         } catch (\Exception $e) {
-            $this->info('Failed to create affinity rule', [
+            $this->info($e->getMessage(), [
                 'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
-                'hostgroup_id' => $hostGroupId,
-                'message' => $e->getMessage(),
+                'hostgroup_id' => $hostGroupId
             ]);
             throw $e;
         }

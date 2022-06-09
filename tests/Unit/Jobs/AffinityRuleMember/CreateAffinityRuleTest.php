@@ -80,6 +80,7 @@ class CreateAffinityRuleTest extends TestCase
 
         $this->kingpinServiceMock()
             ->expects('get')
+            ->twice()
             ->withSomeOfArgs(
                 sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
@@ -104,6 +105,7 @@ class CreateAffinityRuleTest extends TestCase
 
         $this->kingpinServiceMock()
             ->expects('get')
+            ->twice()
             ->withSomeOfArgs(
                 sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
