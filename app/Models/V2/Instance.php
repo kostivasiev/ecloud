@@ -216,7 +216,7 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
                 );
         } catch (Exception $e) {
             $message = 'Failed to retrieve affinity rule constraint for ' . $affinityRuleId . ' : ' . $e->getMessage();
-            Log::info($message);
+            Log::error($message);
             throw new Exception($message);
         }
         return collect(json_decode($response->getBody()->getContents(), true))
