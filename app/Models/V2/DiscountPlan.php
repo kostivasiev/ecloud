@@ -43,6 +43,7 @@ class DiscountPlan extends Model implements Searchable
         'term_end_date',
         'status',
         'response_date',
+        'is_trial',
         'reseller_id',
     ];
 
@@ -53,6 +54,7 @@ class DiscountPlan extends Model implements Searchable
         'term_length' => 'integer',
         'term_start_date' => 'date',
         'term_end_date' => 'datetime',
+        'is_trial' => 'boolean',
     ];
 
     /**
@@ -105,6 +107,7 @@ class DiscountPlan extends Model implements Searchable
             'term_end_date' => $filter->date(),
             'status' => $filter->string(),
             'response_date' => $filter->date(),
+            'is_trial' => $filter->boolean(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
