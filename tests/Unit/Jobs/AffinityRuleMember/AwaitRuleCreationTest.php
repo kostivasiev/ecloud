@@ -117,4 +117,17 @@ class AwaitRuleCreationTest extends TestCase
         $this->assertEquals('Rule creation complete', $message);
         $this->assertEquals($this->affinityRule->id, $affinityRule['affinity_rule_id']);
     }
+
+    public function testNoActionWhenFewerThanTwoMembers()
+    {
+        $this->job
+            ->allows('info')
+            ->with(
+                \Mockery::capture($message),
+                \Mockery::capture($data)
+            );
+
+        $this->job->handle();
+        $this->assertEquals('Affinity rules need at least two members, skipping', $message);
+    }
 }
