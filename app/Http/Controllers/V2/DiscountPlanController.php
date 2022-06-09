@@ -119,11 +119,13 @@ class DiscountPlanController extends BaseController
         }
 
         // if term_length specified but no start date, then auto calculate new term_end_date based on existing start_date
-        if (!$request->has('term_start_date') && $request->has('term_length')) {
-            $discountPlan->term_end_date = $this->calculateNewEndDate(
-                $discountPlan->term_start_date,
-                $request->has('term_length')
-            );
+        if (!$request->has('term_end_date')) {
+            if (!$request->has('term_start_date') && $request->has('term_length')) {
+                $discountPlan->term_end_date = $this->calculateNewEndDate(
+                    $discountPlan->term_start_date,
+                    $request->has('term_length')
+                );
+            }
         }
 
         $discountPlan->save();

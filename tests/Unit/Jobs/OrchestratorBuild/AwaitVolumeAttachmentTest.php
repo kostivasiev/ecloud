@@ -3,7 +3,7 @@
 namespace Tests\Unit\Jobs\OrchestratorBuild;
 
 use App\Events\V2\Task\Created;
-use App\Jobs\OrchestratorBuild\AwaitInstances;
+use App\Jobs\OrchestratorBuild\AwaitVolumeAttachment;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
 use App\Models\V2\Task;
@@ -14,10 +14,9 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
-class AwaitInstancesTest extends TestCase
+class AwaitVolumeAttachmentTest extends TestCase
 {
     protected OrchestratorConfig $orchestratorConfig;
-
     protected OrchestratorBuild $orchestratorBuild;
 
     public function setUp(): void
@@ -36,7 +35,7 @@ class AwaitInstancesTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
+        $this->orchestratorBuild->updateState('instance_volume', 0, $this->instanceModel()->id);
 
         // Put the sync in-progress
         Model::withoutEvents(function () {
@@ -49,7 +48,7 @@ class AwaitInstancesTest extends TestCase
             $task->save();
         });
 
-        dispatch(new AwaitInstances($this->orchestratorBuild));
+        dispatch(new AwaitVolumeAttachment($this->orchestratorBuild));
 
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return $event->job->isReleased();
@@ -60,7 +59,7 @@ class AwaitInstancesTest extends TestCase
     {
         Event::fake(JobFailed::class);
 
-        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
+        $this->orchestratorBuild->updateState('instance_volume', 0, $this->instanceModel()->id);
 
         Model::withoutEvents(function () {
             $task = new Task([
@@ -73,7 +72,7 @@ class AwaitInstancesTest extends TestCase
             $task->save();
         });
 
-        dispatch(new AwaitInstances($this->orchestratorBuild));
+        dispatch(new AwaitVolumeAttachment($this->orchestratorBuild));
 
         Event::assertDispatched(JobFailed::class);
     }
@@ -82,7 +81,7 @@ class AwaitInstancesTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
 
-        $this->orchestratorBuild->updateState('instance', 0, $this->instanceModel()->id);
+        $this->orchestratorBuild->updateState('instance_volume', 0, $this->instanceModel()->id);
 
         Model::withoutEvents(function () {
             $task = new Task([
@@ -95,7 +94,7 @@ class AwaitInstancesTest extends TestCase
         });
 
 
-        dispatch(new AwaitInstances($this->orchestratorBuild));
+        dispatch(new AwaitVolumeAttachment($this->orchestratorBuild));
 
         Event::assertNotDispatched(JobFailed::class);
 

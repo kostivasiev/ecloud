@@ -13,7 +13,7 @@ use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class AffinityRuleMember extends Model implements Searchable
+class AffinityRuleMember extends Model implements Searchable, ResellerScopeable
 {
     use HasFactory, CustomKey, SoftDeletes, Syncable, Taskable;
 
@@ -45,6 +45,11 @@ class AffinityRuleMember extends Model implements Searchable
     public function affinityRule()
     {
         return $this->belongsTo(AffinityRule::class);
+    }
+
+    public function getResellerId(): int
+    {
+        return $this->affinityRule->getResellerId();
     }
 
     /**
