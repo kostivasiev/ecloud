@@ -4,16 +4,25 @@ namespace App\Mail;
 
 use App\Models\V2\DiscountPlan;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Str;
 
 class DiscountPlanTrialReminder extends Mailable
 {
     public int $priority = 3; // Normal
 
+    public int $daysRemaining;
+
     public function __construct(public DiscountPlan $discountPlan)
     {
-//        $this->priority(2); // 7 days
+        $this->daysRemaining = $discountPlan->term_start_date->diffInDays($discountPlan->term_end_date);
 
-//        $this->priority(1); // 0 days
+        $this->priority(
+            match (true) {
+                $this->daysRemaining > 7 => 3,
+                $this->daysRemaining <= 7 => 2,
+                $this->daysRemaining <= 1 => 1,
+            }
+        );
     }
 
     /**
@@ -21,7 +30,7 @@ class DiscountPlanTrialReminder extends Mailable
      */
     public function build()
     {
-        $this->from(config('mail.from.address'));
+//        $this->from(config('mail.from.address')); this will default to config
 
         if (config('app.env') != 'production') {
             $this->to(config('mail.to.dev'));
@@ -31,13 +40,12 @@ class DiscountPlanTrialReminder extends Mailable
 
         }
 
-        $this->subject('Your eCloud VPC trial will end in ' . $daysRemaining . ' days!');
+        $this->subject('Your eCloud VPC trial will end in ' . $this->daysRemaining . ' '. Str::plural('day', $this->daysRemaining)  . '!');
 
-        $this->priority($this->priority);
 
-        return $this->view('mail.discount_plan_trial_reminder')
-            ->with([
-                'availability_zone_id' => $this->availabilityZoneCapacity->availability_zone_id,
-            ]);
+        return $this->view('mail.discount_plan_trial_reminder');
+//            ->with([
+//                'availability_zone_id' => $this->availabilityZoneCapacity->availability_zone_id,
+//            ]);
     }
 }
