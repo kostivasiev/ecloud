@@ -61,6 +61,7 @@ class UndeployOrphanedResources extends Command
      * @param Iterable $resources
      * @param string $parent
      * @return void
+     * @throws \Exception
      */
     protected function processDeletion(iterable $resources, string $parent): void
     {
@@ -186,8 +187,11 @@ class UndeployOrphanedResources extends Command
                                     $router = Router::withTrashed()->find($resource->router_id);
                                     if ($router) {
                                         $router->setAttribute('deleted_at', null)->saveQuietly();
+                                        $vpc = Vpc::withTrashed()->find($router->vpc_id);
+                                        $vpc->setAttribute('deleted_at', null)->saveQuietly();
                                         $task = $resource->syncDelete();
                                         $router->delete();
+                                        $vpc->delete();
                                         $syncDeletes[] = [$resource->id, $task->id];
                                     }
                                 }
