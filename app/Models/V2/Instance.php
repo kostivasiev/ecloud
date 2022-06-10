@@ -4,14 +4,17 @@ namespace App\Models\V2;
 
 use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
+use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
@@ -176,6 +179,50 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
     public function affinityRuleMember()
     {
         return $this->hasOne(AffinityRuleMember::class, 'instance_id');
+    }
+
+    public function getHostGroupId(): ?string
+    {
+        if (!empty($this->attributes['host_group_id'])) {
+            return $this->attributes['host_group_id'];
+        }
+
+        try {
+            $response = $this->availabilityZone
+                ->kingpinService()
+                ->get(
+                    sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc->id, $this->id)
+                );
+        } catch (Exception $e) {
+            Log::error($e->getMessage(), [
+                'instance_id' => $this->id,
+            ]);
+            return null;
+        }
+        return (json_decode($response->getBody()->getContents()))->hostGroupID;
+    }
+
+    /**
+     * @param string $hostGroupId
+     * @param string $affinityRuleId
+     * @return bool
+     * @throws Exception
+     */
+    public function hasAffinityRule(string $hostGroupId, string $affinityRuleId): bool
+    {
+        try {
+            $response = $this->availabilityZone->kingpinService()
+                ->get(
+                    sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroupId)
+                );
+        } catch (Exception $e) {
+            $message = 'Failed to retrieve affinity rule constraint for ' . $affinityRuleId . ' : ' . $e->getMessage();
+            Log::error($message);
+            throw new Exception($message);
+        }
+        return collect(json_decode($response->getBody()->getContents(), true))
+                ->where('ruleName', '=', $affinityRuleId)
+                ->count() > 0;
     }
 
     /**

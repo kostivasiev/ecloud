@@ -96,5 +96,6 @@ class Kernel extends HttpKernel
     'can-be-deleted' => \App\Http\Middleware\CanBeDeleted::class,
     'loadbalancer-max-vip' => \App\Http\Middleware\Vips\MaxVipLimitReached::class,
     'is-managed' => \App\Http\Middleware\IsManaged::class,
+    'affinity-rule-member-are-members-syncing' => \App\Http\Middleware\AffinityRuleMember\AreMembersSyncing::class,
     ];
 }

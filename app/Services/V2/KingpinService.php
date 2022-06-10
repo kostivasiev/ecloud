@@ -14,6 +14,13 @@ final class KingpinService
     /** Endpoints; */
     public const GET_CONSOLE_SCREENSHOT = '/api/v2/vpc/%s/instance/%s/screenshot';
     public const POST_CONSOLE_SESSION = '/api/v2/vpc/%s/instance/%s/console/session';
+    public const GET_HOSTGROUP_URI = '/api/v2/vpc/%s/instance/%s';
+
+    /** Affinity Rules */
+    public const GET_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint';
+    public const DELETE_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint/%s';
+    public const ANTI_AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/separate';
+    public const AFFINITY_URI = '/api/v2/hostgroup/%s/constraint/instance/keep-together';
 
     /**
      * @var Client
