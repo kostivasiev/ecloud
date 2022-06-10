@@ -18,7 +18,7 @@ class DeleteExistingRule extends TaskJob
         $hostGroupId = $instance->getHostGroupId();
         if (!$hostGroupId) {
             $message = 'HostGroup could not be retrieved for instance ' . $instance->id;
-            $this->fail($message);
+            $this->fail(new \Exception($message));
             return;
         }
 

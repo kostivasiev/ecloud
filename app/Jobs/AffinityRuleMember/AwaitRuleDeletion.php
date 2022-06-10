@@ -20,7 +20,7 @@ class AwaitRuleDeletion extends TaskJob
         $hostGroupId = $instance->getHostGroupId();
         if (!$hostGroupId) {
             $message = 'HostGroup could not be retrieved for instance ' . $instance->id;
-            $this->fail($message);
+            $this->fail(new \Exception($message));
             return;
         }
 
@@ -36,31 +36,5 @@ class AwaitRuleDeletion extends TaskJob
         $this->info('Rule deletion complete', [
             'affinity_rule_id' => $this->affinityRuleMember->affinityRule->id,
         ]);
-    }
-
-    public function affinityRuleExists(?string $hostGroupId): bool
-    {
-        if ($hostGroupId === null) {
-            return false;
-        }
-        $hostGroup = HostGroup::find($hostGroupId);
-        if ($hostGroup) {
-            try {
-                $response = $hostGroup->availabilityZone->kingpinService()
-                    ->get(
-                        sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroup->id)
-                    );
-            } catch (\Exception $e) {
-                $this->info($e->getMessage());
-                $this->info('Contraints not found for hostgroup', [
-                    'host_group_id' => $hostGroup->id,
-                ]);
-                return false;
-            }
-            return collect(json_decode($response->getBody()->getContents(), true))
-                    ->where('ruleName', '=', $this->affinityRuleMember->affinityRule->id)
-                    ->count() > 0;
-        }
-        return false;
     }
 }

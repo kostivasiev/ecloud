@@ -194,8 +194,9 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
                     sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc->id, $this->id)
                 );
         } catch (Exception $e) {
-            $message = 'Shared hostgroup id could not be found for instance ' . $this->id;
-            Log::info($message);
+            Log::error($e->getMessage(), [
+                'instance_id' => $this->id,
+            ]);
             return null;
         }
         return (json_decode($response->getBody()->getContents()))->hostGroupID;
@@ -215,8 +216,8 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
                     sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroupId)
                 );
         } catch (Exception $e) {
-            $message = 'Failed to retrieve ' . $hostGroupId . ' : ' . $e->getMessage();
-            Log::info($message);
+            $message = 'Failed to retrieve affinity rule constraint for ' . $affinityRuleId . ' : ' . $e->getMessage();
+            Log::error($message);
             throw new Exception($message);
         }
         return collect(json_decode($response->getBody()->getContents(), true))
