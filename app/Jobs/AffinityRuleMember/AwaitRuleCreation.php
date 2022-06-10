@@ -2,12 +2,21 @@
 
 namespace App\Jobs\AffinityRuleMember;
 
+use App\Support\Sync;
+
 class AwaitRuleCreation extends AwaitRuleDeletion
 {
     public function handle()
     {
         $this->affinityRuleMember = $this->task->resource;
-        if ($this->affinityRuleMember->affinityRule->affinityRuleMembers()->count() < 2) {
+
+        $memberCount = $this->affinityRuleMember->affinityRule->affinityRuleMembers()->count();
+
+        if ($this->task->name == Sync::TASK_NAME_DELETE) {
+            $memberCount -= 1;
+        }
+
+        if ($memberCount < 2) {
             $this->info('Affinity rules need at least two members, skipping', [
                 'affinity_rule_id' => $this->affinityRuleMember->id,
                 'member_count' => $this->affinityRuleMember->affinityRule->affinityRuleMembers()->count(),

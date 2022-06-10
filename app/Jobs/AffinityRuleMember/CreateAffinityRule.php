@@ -5,6 +5,7 @@ namespace App\Jobs\AffinityRuleMember;
 use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
 use App\Services\V2\KingpinService;
+use App\Support\Sync;
 use Illuminate\Support\Collection;
 
 class CreateAffinityRule extends TaskJob
@@ -14,7 +15,14 @@ class CreateAffinityRule extends TaskJob
     public function handle()
     {
         $this->affinityRuleMember = $this->task->resource;
-        if ($this->affinityRuleMember->affinityRule->affinityRuleMembers()->count() < 2) {
+
+        $memberCount = $this->affinityRuleMember->affinityRule->affinityRuleMembers()->count();
+
+        if ($this->task->name == Sync::TASK_NAME_DELETE) {
+            $memberCount -= 1;
+        }
+
+        if ($memberCount < 2) {
             $this->info('Affinity rules need at least two members', [
                 'affinity_rule_id' => $this->affinityRuleMember->id,
                 'member_count' => $this->affinityRuleMember->affinityRule->affinityRuleMembers()->count(),
