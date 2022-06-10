@@ -3,8 +3,6 @@
 namespace App\Jobs\AffinityRuleMember;
 
 use App\Jobs\TaskJob;
-use App\Models\V2\AffinityRuleMember;
-use App\Models\V2\AvailabilityZone;
 use App\Services\V2\KingpinService;
 
 class DeleteExistingRule extends TaskJob
