@@ -56,7 +56,7 @@ class AwaitInstancesTest extends TestCase
         });
     }
 
-    function testFailedResourceFailsJob()
+    public function testFailedResourceFailsJob()
     {
         Event::fake(JobFailed::class);
 

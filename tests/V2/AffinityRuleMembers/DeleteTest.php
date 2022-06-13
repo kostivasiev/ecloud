@@ -2,8 +2,10 @@
 
 namespace Tests\V2\AffinityRuleMembers;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class DeleteTest extends TestCase
@@ -28,18 +30,11 @@ class DeleteTest extends TestCase
 
     public function testDeleteResourceAsUser()
     {
+        Event::fake([Created::class]);
+
         $this->asUser()
             ->delete(sprintf(static::RESOURCE_URI, $this->affinityRule->id, $this->affinityRuleMember->id))
             ->assertStatus(202);
-
-        $this->assertDatabaseMissing(
-            'affinity_rule_members',
-            [
-                'id' => $this->affinityRuleMember->id,
-                'deleted_at' => null,
-            ],
-            'ecloud'
-        );
     }
 
     public function testDeleteResourceFails()

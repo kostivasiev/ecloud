@@ -6,6 +6,7 @@ use App\Console\Commands\Command;
 use App\Models\V2\AvailabilityZoneable;
 use App\Models\V2\Network;
 use App\Models\V2\Router;
+use App\Models\V2\Vpc;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Str;
 
@@ -48,6 +49,7 @@ class UndeployOrphanedResources extends Command
             });
 
         if ($networks->count() > 0) {
+            $this->markedForDeletion = [];
             $this->processDeletion($networks, 'router');
         }
 
@@ -59,6 +61,7 @@ class UndeployOrphanedResources extends Command
      * @param Iterable $resources
      * @param string $parent
      * @return void
+     * @throws \Exception
      */
     protected function processDeletion(iterable $resources, string $parent): void
     {
@@ -66,6 +69,7 @@ class UndeployOrphanedResources extends Command
 
         $skipped = [];
         $failedDeletes = [];
+        $syncDeletes = [];
 
         foreach ($resources as $resource) {
             if (str_ends_with($resource->id, 'aaaaaaaa')) {
@@ -168,17 +172,28 @@ class UndeployOrphanedResources extends Command
                         if (!$this->option('test-run')) {
                             $resource = $resources->get($id);
 
-                            $endpoint = match ($resource::class) {
-                                Router::class => 'policy/api/v1/infra/tier-1s/' . $resource->id,
-                                Network::class => 'policy/api/v1/infra/tier-1s/' . $resource?->router?->id . '/segments/' . $resource->id,
-                            };
-
-                            try {
-                                $resource->availabilityZone->nsxService()->delete($endpoint);
-                            } catch (\Exception $e) {
-                                if ($e->hasResponse() && $e->getResponse()->getStatusCode() != 404) {
-                                    $reason = null;
-                                    $failedDeletes[] = [$resource->id, $resource->name, $e->getMessage()];
+                            if ($resource) {
+                                $resource->setAttribute('deleted_at', null)->saveQuietly();
+                                if ($resource::class == Router::class) {
+                                    $vpc = Vpc::withTrashed()->find($resource->vpc_id);
+                                    if ($vpc) {
+                                        $vpc->setAttribute('deleted_at', null)->saveQuietly();
+                                    }
+                                    $resource->refresh();
+                                    $task = $resource->syncDelete();
+                                    $vpc->delete();
+                                    $syncDeletes[] = [$resource->id, $task->id];
+                                } else {
+                                    $router = Router::withTrashed()->find($resource->router_id);
+                                    if ($router) {
+                                        $router->setAttribute('deleted_at', null)->saveQuietly();
+                                        $vpc = Vpc::withTrashed()->find($router->vpc_id);
+                                        $vpc->setAttribute('deleted_at', null)->saveQuietly();
+                                        $task = $resource->syncDelete();
+                                        $router->delete();
+                                        $vpc->delete();
+                                        $syncDeletes[] = [$resource->id, $task->id];
+                                    }
                                 }
                             }
                         }
@@ -186,6 +201,13 @@ class UndeployOrphanedResources extends Command
                     }
                 }
                 $this->info('Total ' . $deleted . ' Undeploys Attempted');
+                if (count($syncDeletes) > 0) {
+                    $this->info(count($syncDeletes) . ' delete syncs in progress');
+                    $this->table(
+                        ['ID', 'Task ID'],
+                        $syncDeletes
+                    );
+                }
                 if (count($failedDeletes) > 0) {
                     $this->info(count($failedDeletes) . ' undeploys failed');
                     $this->table(

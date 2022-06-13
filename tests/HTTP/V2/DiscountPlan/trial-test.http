@@ -1,0 +1,56 @@
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-Reseller-Id: 7052
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "orderform_id": "2add21ef-c30d-4086-83d5-8a5214bca003",
+    "name": "Trial Discount Plan",
+    "commitment_amount": 90,
+    "commitment_before_discount": 100,
+    "discount_rate": 10,
+    "term_length": 1,
+    "term_start_date": "2025-01-18 00:00:00",
+    "term_end_date": "2025-02-28 00:00:00",
+    "reseller_id": 7052,
+    "is_trial": true
+}
+
+> {%
+client.test('Test Trial Discount Plan', function () {
+    client.assert(response.status === 201, '201 Response not received');
+    client.global.set('discount_plan_id', response.body.data.id);
+});
+%}
+
+###
+GET https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test Discount Deleted', function () {
+    client.assert(response.status === 200, '200 Response not received');
+    client.assert(response.body.data.is_trial === true, 'is_trial flag was not returned correctly');
+});
+%}
+
+###
+DELETE https://{{host}}/{{version}}/discount-plans/{{discount_plan_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test Discount Deleted', function () {
+    client.assert(response.status === 204, '204 Response not received');
+});
+%}

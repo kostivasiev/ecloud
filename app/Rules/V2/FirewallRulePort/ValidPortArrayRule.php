@@ -13,6 +13,12 @@ class ValidPortArrayRule implements Rule
     {
         $ports = collect($value);
         foreach ($ports as $port) {
+            if (Arr::exists($port, 'protocol') && $port['protocol'] == 'ICMPv4') {
+                if ($this->hasDuplicate($ports, $port)) {
+                    return false;
+                }
+                continue;
+            }
             if (!Arr::exists($port, 'protocol') ||
                 !Arr::exists($port, 'source') ||
                 !Arr::exists($port, 'destination')) {
@@ -23,10 +29,6 @@ class ValidPortArrayRule implements Rule
             }
             if (!($this->isValidPortSourceDestination($port['source']) ||
                 $this->isValidPortSourceDestination($port['destination']))) {
-                return false;
-            }
-            if (!$this->isUniquePortRange($ports, $port, 'source') ||
-                !$this->isUniquePortRange($ports, $port, 'destination')) {
                 return false;
             }
         }
@@ -42,6 +44,10 @@ class ValidPortArrayRule implements Rule
     {
         $matchCount = 0;
         foreach ($ports as $port) {
+            if ($item['protocol'] == 'ICMPv4' && $port['protocol'] == $item['protocol']) {
+                $matchCount++;
+                continue;
+            }
             if ($port['protocol'] == $item['protocol'] &&
                 $port['source'] == $item['source'] &&
                 $port['destination'] == $item['destination']) {
@@ -55,45 +61,5 @@ class ValidPortArrayRule implements Rule
     {
         $rule = new ValidFirewallRulePortSourceDestination();
         return $rule->passes('', $port);
-    }
-
-    private function isUniquePortRange(Collection $ports, array $item, string $property): bool
-    {
-        $matchCount = 0;
-        $itemParts = explode('-', $item[$property]);
-        if (count($itemParts) < 2) {
-            return true;
-        }
-
-        foreach ($ports as $port) {
-            $destinationParts = explode('-', $port['destination']);
-            $sourceParts = explode('-', $port['source']);
-
-            if ($port['protocol'] !== $item['protocol']) {
-                return true;
-            }
-
-            if (count($destinationParts) > 1 && count($sourceParts) > 1) {
-                if ((($sourceParts[0] >= $itemParts[0] && $itemParts[1] <= $sourceParts[1]) ||
-                    ($sourceParts[0] >= $itemParts[0] && $sourceParts[1] <= $itemParts[1])) &&
-                    (($destinationParts[0] >= $itemParts[0] && $itemParts[1] <= $destinationParts[1]) ||
-                    ($destinationParts[0] >= $itemParts[0] && $destinationParts[1] <= $itemParts[1]))
-                ) {
-                    var_dump('Total Match');
-                    $matchCount++;
-                } elseif (($sourceParts[0] >= $itemParts[0] && $itemParts[0] <= $sourceParts[1]) &&
-                    ($sourceParts[0] >= $itemParts[1] && $sourceParts[1] <= $itemParts[1])
-                ) {
-                    var_dump('Source Match');
-                    $matchCount++;
-                } elseif (($destinationParts[0] >= $itemParts[0] && $itemParts[0] <= $destinationParts[1]) &&
-                    ($destinationParts[0] >= $itemParts[1] && $destinationParts[1] <= $itemParts[1])
-                ) {
-                    var_dump('Destination Match');
-                    $matchCount++;
-                }
-            }
-        }
-        return ($matchCount > 1);
     }
 }

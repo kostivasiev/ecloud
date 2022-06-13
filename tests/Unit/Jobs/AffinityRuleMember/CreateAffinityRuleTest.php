@@ -1,12 +1,13 @@
 <?php
 
-namespace Tests\Unit\Jobs\AffinityRule;
+namespace Tests\Unit\Jobs\AffinityRuleMember;
 
-use App\Jobs\AffinityRule\CreateAffinityRule;
+use App\Jobs\AffinityRuleMember\CreateAffinityRule;
 use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
+use App\Services\V2\KingpinService;
 use App\Support\Sync;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\RequestException;
@@ -25,6 +26,7 @@ class CreateAffinityRuleTest extends TestCase
     public $job;
     public AffinityRule $affinityRule;
     public AffinityRuleMember $affinityRuleMember;
+    public Instance $secondInstance;
 
     public function setUp(): void
     {
@@ -46,7 +48,7 @@ class CreateAffinityRuleTest extends TestCase
                 'completed' => false,
                 'name' => Sync::TASK_NAME_UPDATE
             ]);
-            $task->resource()->associate($this->affinityRule);
+            $task->resource()->associate($this->affinityRuleMember);
             $task->save();
             return $task;
         });
@@ -60,9 +62,31 @@ class CreateAffinityRuleTest extends TestCase
         $this->createSecondaryMember()
             ->kingpinServiceMock()
             ->expects('post')
-            ->withSomeOfArgs(sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id))
+            ->withSomeOfArgs(sprintf(KingpinService::ANTI_AFFINITY_URI, $this->hostGroup()->id))
             ->andReturnUsing(function () {
                 return new Response(200);
+            });
+
+        $this->kingpinServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->secondInstance->id)
+            )
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
+
+        $this->kingpinServiceMock()
+            ->expects('get')
+            ->twice()
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
             });
 
         Event::fake([JobFailed::class, JobProcessed::class, ]);
@@ -78,35 +102,64 @@ class CreateAffinityRuleTest extends TestCase
     public function testExceptionDuringCreation()
     {
         $this->createSecondaryMember();
-        $this->setExceptionExpectations('info', 'Failed to create affinity rule');
 
-        $uri = sprintf(CreateAffinityRule::ANTI_AFFINITY_URI, $this->hostGroup()->id);
+        $this->kingpinServiceMock()
+            ->expects('get')
+            ->twice()
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
+
+        $this->kingpinServiceMock()
+            ->expects('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->secondInstance->id)
+            )
+            ->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupID' => $this->hostGroup()->id,
+                ]));
+            });
+
+        $uri = sprintf(KingpinService::ANTI_AFFINITY_URI, $this->hostGroup()->id);
         $this->kingpinServiceMock()
             ->expects('post')
             ->withSomeOfArgs($uri)
             ->andThrow(new RequestException('Error', new Request('POST', $uri)));
 
-        $this->job->handle();
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
+        dispatch(new CreateAffinityRule($this->task));
+
+        Event::assertDispatched(JobFailed::class);
     }
 
     public function testNoActionWhenNoMembers()
     {
         $this->affinityRuleMember->setAttribute('deleted_at', Carbon::now())->save();
-        $this->setExceptionExpectations('info', 'Rule has no members, skipping');
+        $this->job
+            ->allows('info')
+            ->with(\Mockery::capture($message), \Mockery::capture($params));
 
         $this->job->handle();
+        $this->assertEquals('Affinity rules need at least two members', $message);
+        $this->assertEquals($this->affinityRuleMember->id, $params['affinity_rule_id']);
     }
 
     public function testNoActionWhenFewerThanTwoMembers()
     {
-        Log::shouldReceive('info')
+        $this->job
+            ->allows('info')
             ->with(
                 \Mockery::capture($message),
                 \Mockery::capture($data)
             );
 
         $this->job->handle();
-
         $this->assertEquals('Affinity rules need at least two members', $message);
     }
 
@@ -124,7 +177,7 @@ class CreateAffinityRuleTest extends TestCase
 
     private function createSecondaryMember(): self
     {
-        $secondInstance = Instance::withoutEvents(function () {
+        $this->secondInstance = Instance::withoutEvents(function () {
             return Instance::factory()->create([
                 'id' => 'i-test-2',
                 'vpc_id' => $this->vpc()->id,
@@ -144,7 +197,7 @@ class CreateAffinityRuleTest extends TestCase
         AffinityRuleMember::factory()
             ->for($this->affinityRule)
             ->create([
-                'instance_id' => $secondInstance,
+                'instance_id' => $this->secondInstance,
             ]);
         return $this;
     }

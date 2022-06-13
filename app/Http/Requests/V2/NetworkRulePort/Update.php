@@ -3,9 +3,7 @@
 namespace App\Http\Requests\V2\NetworkRulePort;
 
 use App\Models\V2\NetworkRulePort;
-use App\Rules\V2\FirewallRulePort\PortWithinExistingRange;
 use App\Rules\V2\FirewallRulePort\UniquePortListRule;
-use App\Rules\V2\FirewallRulePort\UniquePortRangeRule;
 use App\Rules\V2\FirewallRulePort\UniquePortRule;
 use App\Rules\V2\ValidPortReference;
 use Illuminate\Foundation\Http\FormRequest;
@@ -27,8 +25,6 @@ class Update extends FormRequest
                 'string',
                 new ValidPortReference(),
                 new UniquePortRule(NetworkRulePort::class),
-                new UniquePortRangeRule(NetworkRulePort::class),
-                new PortWithinExistingRange(NetworkRulePort::class),
                 new UniquePortListRule(NetworkRulePort::class),
             ],
             'destination' => [
@@ -36,8 +32,6 @@ class Update extends FormRequest
                 'string',
                 new ValidPortReference(),
                 new UniquePortRule(NetworkRulePort::class),
-                new UniquePortRangeRule(NetworkRulePort::class),
-                new PortWithinExistingRange(NetworkRulePort::class),
                 new UniquePortListRule(NetworkRulePort::class),
             ],
         ];

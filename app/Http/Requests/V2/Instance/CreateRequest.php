@@ -86,18 +86,18 @@ class CreateRequest extends FormRequest
                 new IsSameVpc($this->request->get('vpc_id')),
             ],
             'floating_ip_id' => [
+                'prohibits:requires_floating_ip',
                 'sometimes',
                 'string',
                 'exists:ecloud.floating_ips,id,deleted_at,NULL',
-                'required_without:requires_floating_ip',
                 new ExistsForUser(FloatingIp::class),
                 new IsResourceAvailable(FloatingIp::class),
                 new IsAssigned(),
                 new IsSameAvailabilityZone($this->request->get('network_id'))
             ],
             'requires_floating_ip' => [
+                'prohibits:floating_ip_id',
                 'sometimes',
-                'required_without:floating_ip_id',
                 'boolean',
             ],
             'user_script' => [
@@ -211,6 +211,8 @@ class CreateRequest extends FormRequest
                 . ($this->config->get('ukfast.spec.ram.min') ?? config('instance.ram_capacity.min')),
             'ram_capacity.max' => 'Specified :attribute is above the maximum of '
                 . ($this->config->get('ukfast.spec.ram.max') ?? config('instance.ram_capacity.max')),
+            'floating_ip_id.prohibits' => 'requires_floating_ip cannot be specified if floating_ip_id is provided',
+            'requires_floating_ip.prohibits' => 'floating_ip_id cannot be specified if requires_floating_ip is provided',
         ];
     }
 }

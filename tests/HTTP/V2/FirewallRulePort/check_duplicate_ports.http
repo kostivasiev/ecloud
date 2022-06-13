@@ -18,6 +18,71 @@ client.global.set('firewall_policy_id', response.body.data.id);
 client.log('Policy ID: ' + response.body.data.id);
 %}
 
+### 1a. Create rule with ICMPv4 rule
+POST https://{{host}}/v2/firewall-rules
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "sequence": 1,
+    "firewall_policy_id": "{{firewall_policy_id}}",
+    "source": "1.1.1.1",
+    "destination": "2.2.2.2",
+    "action": "ALLOW",
+    "direction": "IN_OUT",
+    "enabled": true,
+    "ports": [
+      {
+        "protocol": "ICMPv4"
+      }
+    ]
+}
+
+> {%
+client.test('Create ICMPv4 rule', function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('icmp_rule_id', response.body.data.id);
+client.log('Rule ID: ' + response.body.data.id);
+%}
+
+### 1b. Create rule with duplicate ICMPv4 rules (should fail)
+POST https://{{host}}/v2/firewall-rules
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "sequence": 1,
+    "firewall_policy_id": "{{firewall_policy_id}}",
+    "source": "1.1.1.1",
+    "destination": "2.2.2.2",
+    "action": "ALLOW",
+    "direction": "IN_OUT",
+    "enabled": true,
+    "ports": [
+      {
+        "protocol": "ICMPv4"
+      },
+      {
+        "protocol": "ICMPv4"
+      }
+    ]
+}
+
+> {%
+client.test('Create ICMPv4 rule', function () {
+    client.assert(response.status === 422, '422 response not received');
+});
+%}
+
+### 1c. Delete ICMPv4 rule
+DELETE https://{{host}}/v2/firewall-rules/{{icmp_rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
 ### 2. Create Rule with duplicates in port array (should fail)
 POST https://{{host}}/v2/firewall-rules
 X-consumer-custom-id:  0-0
@@ -149,6 +214,12 @@ client.test('Create a duplicate port', function () {
 
 ### 7. Delete Rule
 DELETE https://{{host}}/v2/firewall-rules/{{firewall_rule_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+### 8. Delete Policy
+DELETE https://{{host}}/v2/firewall-policies/{{firewall_policy_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

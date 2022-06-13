@@ -54,6 +54,11 @@ class Create extends FormRequest
                     }
                 }
             ],
+            'is_trial' => [
+                'sometimes',
+                'required',
+                'boolean'
+            ],
         ];
 
         if (Auth::user()->isAdmin()) {

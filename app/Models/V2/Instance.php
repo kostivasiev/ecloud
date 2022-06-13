@@ -9,6 +9,7 @@ use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Exception;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -192,12 +193,36 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
                 ->get(
                     sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc->id, $this->id)
                 );
-        } catch (\Exception $e) {
-            $message = 'Shared hostgroup id could not be found for instance ' . $this->id;
-            Log::info($message);
+        } catch (Exception $e) {
+            Log::error($e->getMessage(), [
+                'instance_id' => $this->id,
+            ]);
             return null;
         }
         return (json_decode($response->getBody()->getContents()))->hostGroupID;
+    }
+
+    /**
+     * @param string $hostGroupId
+     * @param string $affinityRuleId
+     * @return bool
+     * @throws Exception
+     */
+    public function hasAffinityRule(string $hostGroupId, string $affinityRuleId): bool
+    {
+        try {
+            $response = $this->availabilityZone->kingpinService()
+                ->get(
+                    sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroupId)
+                );
+        } catch (Exception $e) {
+            $message = 'Failed to retrieve affinity rule constraint for ' . $affinityRuleId . ' : ' . $e->getMessage();
+            Log::error($message);
+            throw new Exception($message);
+        }
+        return collect(json_decode($response->getBody()->getContents(), true))
+                ->where('ruleName', '=', $affinityRuleId)
+                ->count() > 0;
     }
 
     /**

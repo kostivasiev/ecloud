@@ -12,6 +12,7 @@ use App\Rules\V2\IsSameVpc;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Validation\Rule;
 
 /**
  * @property $instance_id
@@ -34,7 +35,8 @@ class Create extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.instances,id,deleted_at,NULL',
-                'not_in:ecloud.affinity_rule_members,instance_id,deleted_at,NULL',
+                Rule::unique('ecloud.affinity_rule_members', 'instance_id')
+                    ->where('deleted_at', null),
                 new IsSameVpc($vpcId),
                 new ExistsForUser(Instance::class),
                 new IsSameAvailabilityZone($availabilityZoneId),

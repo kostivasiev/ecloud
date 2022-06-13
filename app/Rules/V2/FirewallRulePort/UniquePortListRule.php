@@ -2,35 +2,29 @@
 
 namespace App\Rules\V2\FirewallRulePort;
 
-use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Str;
 
-class UniquePortListRule implements Rule
+class UniquePortListRule extends BasePortRule
 {
-    public string $class;
-
-    public function __construct(string $class)
-    {
-        $this->class = $class;
-    }
-
     public function passes($attribute, $value)
     {
-        // Check the value is a range
-        if (!Str::containsAll($value, ['-', ','])) {
+        if (!Str::contains($value, ',')) {
             return true;
         }
-
-        // value has a comma separated list of what could be single ports, ranges or a combination
-        foreach (explode(',', $value) as $item) {
-            if (!((Str::contains($item, '-')) ?
-                (app()->makeWith(UniquePortRangeRule::class, ['class' => $this->class]))->passes($attribute, $item) :
-                (app()->makeWith(UniquePortRule::class, ['class' => $this->class]))->passes($attribute, $item))) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->model->where(function ($query) use ($attribute, $value) {
+            $query->where($this->parentKeyColumn, '=', $this->parentId);
+            $query->where(function ($query) use ($attribute, $value) {
+                $iteration = 0;
+                foreach (explode(',', $value) as $item) {
+                    if ($iteration == 0) {
+                        $query->where($attribute, $item);
+                        $iteration++;
+                        continue;
+                    }
+                    $query->orWhere($attribute, $item);
+                }
+            });
+        })->count() == 0;
     }
 
     public function message()
