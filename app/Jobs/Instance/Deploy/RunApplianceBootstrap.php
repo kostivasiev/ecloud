@@ -74,7 +74,7 @@ class RunApplianceBootstrap extends Job
             ]
         );
         $response = json_decode($response?->getBody()?->getContents());
-        if ($response->exitCode !== 0) {
+        if ($response?->exitCode !== 0) {
             Log::info('Non-zero exit code received in response', [
                 'exit_code' => $response->exitCode,
                 'output' => $response->output,
