@@ -48,32 +48,43 @@ class SendReminderEmails extends Command
                     })->count() > 0) {
                         return;
                     }
+                    return $this->sendEmail($discountPlan, new DiscountPlanTrialReminder($discountPlan));
+                }
 
-                    $discountPlanTrialReminder = new DiscountPlanTrialReminder($discountPlan);
+                if ($this->now->diffInDays($discountPlan->term_end_date) <= 7) {
+                    return $this->sendEmail($discountPlan, new DiscountPlanTrialReminder($discountPlan));
+                }
 
-                    try {
-                        if (empty($discountPlan->contact_id)) {
-                            $this->info('Discount plan ' . $discountPlan->id . ' has no contact_id, retrieving from accounts API');
-                            $discountPlan->contact_id =
-                                ($this->adminClient->customers()->getById($discountPlan->reseller_id))
-                                ->primaryContactId;
-                        }
+                if ($this->now->diffInDays($discountPlan->term_end_data) == 0) {
+                    return $this->sendEmail($discountPlan, new DiscountPlanTrialReminder($discountPlan));
+                }
+                return;
+            });
+    }
 
-                        $emailAddress = $this->adminClient->contacts()->getById($discountPlan->contact_id)->emailAddress;
-                    } catch (ApiException $exception) {
-                        $message = 'Failed to retrieve contact email address from accounts API for discount plan ' . $discountPlan->id . ' : ' . print_r($exception->getErrors(), true);
-                        $this->error($message);
-                        return;
-                    }
+    private function sendEmail(DiscountPlan $discountPlan, DiscountPlanTrialReminder $discountPlanTrialReminder)
+    {
+        try {
+            if (empty($discountPlan->contact_id)) {
+                $this->info('Discount plan ' . $discountPlan->id . ' has no contact_id, retrieving from accounts API');
+                $discountPlan->contact_id =
+                    ($this->adminClient->customers()->getById($discountPlan->reseller_id))
+                        ->primaryContactId;
+            }
+
+            $emailAddress = $this->adminClient->contacts()->getById($discountPlan->contact_id)->emailAddress;
+        } catch (ApiException $exception) {
+            $message = 'Failed to retrieve contact email address from accounts API for discount plan ' .
+                $discountPlan->id . ' : ' .
+                print_r($exception->getErrors(), true);
+            $this->error($message);
+            return;
+        }
 
 //                    dd($emailAddress);
 
-                    Mail::to($emailAddress)->send($discountPlanTrialReminder);
+        Mail::to($emailAddress)->send($discountPlanTrialReminder);
 
-
-
-                    Log::info('Trial reminder email sent for discount plan ' . $discountPlan->id);
-                }
-            });
+        Log::info('Trial reminder email sent for discount plan ' . $discountPlan->id);
     }
 }

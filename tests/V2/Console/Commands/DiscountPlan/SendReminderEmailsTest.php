@@ -71,6 +71,7 @@ class SendReminderEmailsTest extends TestCase
         ]);
 
         $midpoint = Carbon::parse('January 16th 2022');
+        Carbon::setTestNow($midpoint);
 
         // Set the current day to the midpoint through the discount plan trial that would trigger the email.
         $this->command->now = $midpoint;
@@ -112,6 +113,7 @@ class SendReminderEmailsTest extends TestCase
         ]);
 
         $midpoint = Carbon::parse('January 16th 2022');
+        Carbon::setTestNow($midpoint);
 
         // Set the current day to the midpoint through the discount plan trial that would trigger the email.
         $this->command->now = $midpoint;
@@ -123,12 +125,57 @@ class SendReminderEmailsTest extends TestCase
 
     public function test7DaysToGoSendsReminder()
     {
-        
+        Mail::fake();
+
+        $discountPlan = DiscountPlan::factory()->create([
+            'is_trial' => true,
+            'status' => 'approved',
+            'term_start_date' => Carbon::parse('January 1st 2022'),
+            'term_end_date' =>  Carbon::parse('January 31st 2022'),
+        ]);
+
+        $weekBeforeEnd = $discountPlan->term_end_date->subDays(7);
+        Carbon::setTestNow($weekBeforeEnd);
+
+        // Set the current day to a week before the discount plan trial end.
+        $this->command->now = $weekBeforeEnd;
+
+        $this->command->handle();
+
+        Mail::assertSent(DiscountPlanTrialReminder::class, function ($discountPlanTrialReminder) {
+            return (
+                $discountPlanTrialReminder->priority == 2 &&
+                $discountPlanTrialReminder->subject = 'Your eCloud VPC trial will end in 7 days!' &&
+                $discountPlanTrialReminder->to = 'captain.kirk@example.com'
+            );
+        });
     }
 
     public function testEndsTodaySendsReminder()
     {
-        
+        Mail::fake();
+
+        $discountPlan = DiscountPlan::factory()->create([
+            'is_trial' => true,
+            'status' => 'approved',
+            'term_start_date' => Carbon::parse('January 1st 2022'),
+            'term_end_date' =>  Carbon::parse('January 31st 2022'),
+        ]);
+
+        Carbon::setTestNow($discountPlan->term_end_date);
+
+        // Set the current day to a week before the discount plan trial end.
+        $this->command->now = $discountPlan->term_end_date;
+
+        $this->command->handle();
+
+        Mail::assertSent(DiscountPlanTrialReminder::class, function ($discountPlanTrialReminder) {
+            return (
+                $discountPlanTrialReminder->priority == 1 &&
+                $discountPlanTrialReminder->subject = 'Your eCloud VPC trial ands at midnight!' &&
+                $discountPlanTrialReminder->to = 'captain.kirk@example.com'
+            );
+        });
     }
 
     public function testNoEmailIsSentIfDoesNotMatchCriteria()

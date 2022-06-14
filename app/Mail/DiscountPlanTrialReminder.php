@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\V2\DiscountPlan;
+use Carbon\Carbon;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Str;
 
@@ -14,15 +15,13 @@ class DiscountPlanTrialReminder extends Mailable
 
     public function __construct(public DiscountPlan $discountPlan)
     {
-        $this->daysRemaining = $discountPlan->term_start_date->diffInDays($discountPlan->term_end_date);
+        $this->daysRemaining = $discountPlan->term_end_date->diffInDays(Carbon::now());
 
-        $this->priority(
-            match (true) {
-                $this->daysRemaining > 7 => 3,
-                $this->daysRemaining <= 7 => 2,
-                $this->daysRemaining <= 1 => 1,
-            }
-        );
+        $this->priority = match (true) {
+            $this->daysRemaining <= 1 => 1,
+            $this->daysRemaining <= 7 => 2,
+            $this->daysRemaining > 7 => 3,
+        };
     }
 
     /**
@@ -36,14 +35,20 @@ class DiscountPlanTrialReminder extends Mailable
             $this->to(config('mail.to.dev'));
         } else {
             // Get the reseller email
+
         }
 
-        $this->subject('Your eCloud VPC trial will end in ' . $this->daysRemaining . ' '. Str::plural('day', $this->daysRemaining)  . '!');
+        if ($this->daysRemaining == 0) {
+            $this->subject('Your eCloud VPC trial ends at midnight!');
+        } else {
+            $this->subject('Your eCloud VPC trial will end in ' . $this->daysRemaining . ' '.
+                Str::plural('day', $this->daysRemaining)  . '!');
+        }
 
 
-        return $this->view('mail.discount_plan_trial_reminder');
-//            ->with([
-//                'availability_zone_id' => $this->availabilityZoneCapacity->availability_zone_id,
-//            ]);
+
+        return ($this->daysRemaining == 0) ?
+            $this->view('mail.discount_plan_trial_ending'):
+            $this->view('mail.discount_plan_trial_reminder');
     }
 }
