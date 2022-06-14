@@ -36,8 +36,6 @@ class DiscountPlanTrialReminder extends Mailable
             $this->to(config('mail.to.dev'));
         } else {
             // Get the reseller email
-
-
         }
 
         $this->subject('Your eCloud VPC trial will end in ' . $this->daysRemaining . ' '. Str::plural('day', $this->daysRemaining)  . '!');

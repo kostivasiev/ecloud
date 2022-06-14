@@ -44,7 +44,7 @@ class SendReminderEmails extends Command
                 if ($midpoint->isSameDay($this->now) && $this->now->diffInDays($discountPlan->term_end_date) > 7) {
                     // The customer has created resources and is using the trial, don't send reminder
                     if (BillingMetric::whereHas('vpc', function ($query) use ($discountPlan) {
-                       $query->where('reseller_id', $discountPlan->reseller_id);
+                        $query->where('reseller_id', $discountPlan->reseller_id);
                     })->count() > 0) {
                         return;
                     }
@@ -73,17 +73,7 @@ class SendReminderEmails extends Command
 
 
                     Log::info('Trial reminder email sent for discount plan ' . $discountPlan->id);
-
-
-
                 }
-
             });
-
-
-
-
     }
-
-
 }
