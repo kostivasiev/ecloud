@@ -228,7 +228,10 @@ Route::group([
         Route::put('instances/{instanceId}/lock', 'InstanceController@lock');
         Route::put('instances/{instanceId}/unlock', 'InstanceController@unlock');
         Route::post('instances/{instanceId}/create-image', 'InstanceController@createImage');
-        Route::post('instances/{instanceId}/migrate', 'InstanceController@migrate');
+        Route::post('instances/{instanceId}/migrate', [
+            'middleware' => 'instance-can-migrate',
+            'uses' => 'InstanceController@migrate'
+        ]);
 
         Route::group(['middleware' => 'instance-is-locked'], function () {
             Route::patch('instances/{instanceId}', 'InstanceController@update');

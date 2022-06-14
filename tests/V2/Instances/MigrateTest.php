@@ -3,6 +3,8 @@
 namespace Tests\V2\Instances;
 
 use App\Events\V2\Task\Created;
+use App\Models\V2\AffinityRule;
+use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use Illuminate\Support\Facades\Event;
@@ -68,5 +70,34 @@ class MigrateTest extends TestCase
                 'host_group_id' => $this->hostGroup()->id
             ],
         )->assertStatus(422);
+    }
+
+    public function testInAffinityGroupFails()
+    {
+        AffinityRuleMember::withoutEvents(function () {
+            return AffinityRuleMember::factory()
+                ->for(AffinityRule::factory()
+                    ->for($this->vpc())
+                    ->for($this->availabilityZone())
+                    ->create([
+                        'id' => 'ar-test',
+                        'name' => 'ar-test',
+                        'type' => 'anti-affinity',
+                    ]))
+                ->for($this->instanceModel())
+                ->create([
+                    'id' => 'arm-test',
+                ]);
+        });
+
+        $this->post(
+            '/v2/instances/' . $this->instanceModel()->id . '/migrate',
+            [
+                'host_group_id' => $this->hostGroup()->id
+            ],
+        )
+            ->assertSeeText('Forbidden')
+            ->assertSeeText('cannot be moved')
+            ->assertStatus(403);
     }
 }
