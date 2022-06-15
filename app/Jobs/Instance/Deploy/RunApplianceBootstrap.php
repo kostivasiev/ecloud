@@ -52,8 +52,7 @@ class RunApplianceBootstrap extends Job
         }
 
         Log::info(
-            get_class($this) . ': Appliance bootstrap on instance ' . $instance->id . ' started.' .
-            ' image_data = ' . json_encode($this->imageData),
+            get_class($this) . ': Appliance bootstrap on instance ' . $instance->id . ' started.',
             [
                 'id' => $instance->id
             ]
