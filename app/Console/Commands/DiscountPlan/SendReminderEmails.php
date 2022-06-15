@@ -24,8 +24,7 @@ class SendReminderEmails extends Command
     public function __construct(
         public int $success = 0,
         public int $failed = 0,
-    )
-    {
+    ) {
         parent::__construct();
         $this->now = Carbon::now();
     }
@@ -110,7 +109,7 @@ class SendReminderEmails extends Command
 //            return;
 //        }
 
-        Log::info('Reminder email sent for discount plan ' . $discountPlan->id,  [$discountPlanTrialReminder]);
+        Log::info('Reminder email sent for discount plan ' . $discountPlan->id, [$discountPlanTrialReminder]);
         $this->success++;
     }
 }
