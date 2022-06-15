@@ -29,6 +29,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Credentials\UpdatePleskCredentials::class,
         \App\Console\Commands\Credentials\Show::class,
         \App\Console\Commands\Dev\CreateExampleTask::class,
+        \App\Console\Commands\DiscountPlan\SendReminderEmails::class,
         \App\Console\Commands\Firewall\SquidUpdate::class,
         \App\Console\Commands\FirewallPolicy\ApplyDefaultRules::class,
         \App\Console\Commands\FloatingIp\PopulateForIpRange::class,
@@ -95,6 +96,10 @@ class Kernel extends ConsoleKernel
             $schedule->command('health:find-orphaned-nics --force')
                 ->dailyAt("09:00")
                 ->emailOutputOnFailure(config('alerts.health.to'));
+
+            $schedule->command('discount-plan:send-reminder-emails --force')
+                ->dailyAt("08:50")
+                ->emailOutputOnFailure(config('alerts.billing.to'));
         }
 
         $schedule->command('task:timeout-stuck --hours=12 --force')
