@@ -40,8 +40,6 @@ class DiscountPlanTrialReminder extends Mailable
                 Str::plural('day', $this->daysRemaining)  . '!');
         }
 
-
-
         return ($this->daysRemaining == 0) ?
             $this->view('mail.discount_plan_trial_ending'):
             $this->view('mail.discount_plan_trial_reminder');
