@@ -3,6 +3,7 @@
 namespace Database\Seeders\Tests;
 
 use App\Models\V2\DiscountPlan;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
 class DiscountPlanReminderSeeder extends Seeder
