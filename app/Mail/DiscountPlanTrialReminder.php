@@ -29,10 +29,6 @@ class DiscountPlanTrialReminder extends Mailable
      */
     public function build()
     {
-        if (config('app.env') != 'production') {
-            $this->to(config('mail.to.dev'));
-        }
-
         if ($this->daysRemaining == 0) {
             $this->subject('Your eCloud VPC trial ends at midnight!');
         } else {

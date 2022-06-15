@@ -42,6 +42,8 @@ class SendReminderEmailsTest extends TestCase
             ->shouldAllowMockingProtectedMethods()
             ->makePartial();
 
+        $this->command->success = 0;
+        $this->command->failed = 0;
         $this->command->shouldReceive('info')->andReturnTrue();
         $this->command->shouldReceive('option')->with('test-run')->andReturnFalse();
         $this->command->shouldReceive('option')->with('force')->andReturnTrue();
