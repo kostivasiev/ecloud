@@ -5,7 +5,9 @@ namespace App\Mail;
 use App\Models\V2\DiscountPlan;
 use Carbon\Carbon;
 use Illuminate\Mail\Mailable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use UKFast\Admin\Account\AdminClient;
 
 class DiscountPlanTrialReminder extends Mailable
 {
@@ -29,13 +31,8 @@ class DiscountPlanTrialReminder extends Mailable
      */
     public function build()
     {
-//        $this->from(config('mail.from.address')); this will default to config
-
         if (config('app.env') != 'production') {
             $this->to(config('mail.to.dev'));
-        } else {
-            // Get the reseller email
-
         }
 
         if ($this->daysRemaining == 0) {

@@ -71,9 +71,9 @@ class SendReminderEmailsTest extends TestCase
         ]);
 
         $midpoint = Carbon::parse('January 16th 2022');
-        Carbon::setTestNow($midpoint);
 
         // Set the current day to the midpoint through the discount plan trial that would trigger the email.
+        Carbon::setTestNow($midpoint);
         $this->command->now = $midpoint;
 
         $this->command->handle();
@@ -113,9 +113,9 @@ class SendReminderEmailsTest extends TestCase
         ]);
 
         $midpoint = Carbon::parse('January 16th 2022');
-        Carbon::setTestNow($midpoint);
 
         // Set the current day to the midpoint through the discount plan trial that would trigger the email.
+        Carbon::setTestNow($midpoint);
         $this->command->now = $midpoint;
 
         $this->command->handle();
@@ -135,9 +135,9 @@ class SendReminderEmailsTest extends TestCase
         ]);
 
         $weekBeforeEnd = $discountPlan->term_end_date->subDays(7);
-        Carbon::setTestNow($weekBeforeEnd);
 
         // Set the current day to a week before the discount plan trial end.
+        Carbon::setTestNow($weekBeforeEnd);
         $this->command->now = $weekBeforeEnd;
 
         $this->command->handle();
@@ -162,9 +162,9 @@ class SendReminderEmailsTest extends TestCase
             'term_end_date' =>  Carbon::parse('January 31st 2022'),
         ]);
 
-        Carbon::setTestNow($discountPlan->term_end_date);
 
         // Set the current day to a week before the discount plan trial end.
+        Carbon::setTestNow($discountPlan->term_end_date);
         $this->command->now = $discountPlan->term_end_date;
 
         $this->command->handle();
@@ -180,7 +180,23 @@ class SendReminderEmailsTest extends TestCase
 
     public function testNoEmailIsSentIfDoesNotMatchCriteria()
     {
+        Mail::fake();
 
+        $discountPlan = DiscountPlan::factory()->create([
+            'is_trial' => true,
+            'status' => 'approved',
+            'term_start_date' => Carbon::parse('January 1st 2022'),
+            'term_end_date' =>  Carbon::parse('January 31st 2022'),
+        ]);
+
+
+        // Set the current day to a week before the discount plan trial end.
+        Carbon::setTestNow($discountPlan->term_start_date);
+        $this->command->now = $discountPlan->term_start_date;
+
+        $this->command->handle();
+
+        Mail::assertNotSent(DiscountPlanTrialReminder::class);
     }
 
 
