@@ -80,7 +80,9 @@ class SendReminderEmails extends Command
             return;
         }
 
-        Mail::to($emailAddress)->send($discountPlanTrialReminder);
+        if (!$this->option('test-run')) {
+            Mail::to($emailAddress)->send($discountPlanTrialReminder);
+        }
 
         Log::info('Trial reminder email sent for discount plan ' . $discountPlan->id);
     }
