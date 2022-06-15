@@ -189,6 +189,8 @@ class UndeployOrphanedResources extends Command
                                         $router->setAttribute('deleted_at', null)->saveQuietly();
                                         $vpc = Vpc::withTrashed()->find($router->vpc_id);
                                         $vpc->setAttribute('deleted_at', null)->saveQuietly();
+                                        $router->load('availabilityZone');
+                                        $resource->load('router');
                                         $task = $resource->syncDelete();
                                         $router->delete();
                                         $vpc->delete();
