@@ -6,7 +6,6 @@ use App\Console\Commands\Command;
 use App\Mail\DiscountPlanTrialReminder;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\DiscountPlan;
-use App\Models\V2\Vpc;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;

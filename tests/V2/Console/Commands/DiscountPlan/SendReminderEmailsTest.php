@@ -1,21 +1,13 @@
 <?php
 namespace Tests\V2\Console\Commands\DiscountPlan;
 
-use App\Console\Commands\Command;
 use App\Console\Commands\DiscountPlan\SendReminderEmails;
-use App\Console\Commands\Orchestrator\ScheduledDeploy;
-use App\Mail\AvailabilityZoneCapacityAlert;
 use App\Mail\DiscountPlanTrialReminder;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\DiscountPlan;
-use App\Models\V2\OrchestratorBuild;
-use App\Models\V2\OrchestratorConfig;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use ReflectionProperty;
 use Tests\TestCase;
-use UKFast\Admin\Account\AdminClient;
 
 class SendReminderEmailsTest extends TestCase
 {

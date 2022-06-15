@@ -5,9 +5,7 @@ namespace App\Mail;
 use App\Models\V2\DiscountPlan;
 use Carbon\Carbon;
 use Illuminate\Mail\Mailable;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use UKFast\Admin\Account\AdminClient;
 
 class DiscountPlanTrialReminder extends Mailable
 {
