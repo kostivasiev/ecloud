@@ -43,7 +43,7 @@ class SendReminderEmailsTest extends TestCase
             ->makePartial();
 
         $this->command->shouldReceive('info')->andReturnTrue();
-        $this->command->shouldReceive('option')->with('test-run')->andReturnTrue();
+        $this->command->shouldReceive('option')->with('test-run')->andReturnFalse();
         $this->command->shouldReceive('option')->with('force')->andReturnTrue();
     }
 
