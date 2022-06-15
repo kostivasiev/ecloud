@@ -45,46 +45,53 @@ class CreateInstances extends Job
 
             $definition = $orchestratorBuild->render($definition);
 
-            $instance = app()->make(Instance::class);
-            $instance->fill(
-                $definition->only([
-                    'name',
-                    'vpc_id',
-                    'image_id',
-                    'vcpu_cores',
-                    'ram_capacity',
-                    'locked',
-                    'backup_enabled',
-                    'host_group_id',
-                    'load_balancer_id',
-                    'is_hidden'
-                ])->toArray()
-            );
+            $quantity = $definition->has('quantity') ? $definition->get('quantity') : 1;
+            $instanceIds = [];
+            for ($i=0; $i < $quantity; $i++) {
+                $instance = app()->make(Instance::class);
+                $instance->fill(
+                    $definition->only([
+                        'name',
+                        'vpc_id',
+                        'image_id',
+                        'vcpu_cores',
+                        'ram_capacity',
+                        'locked',
+                        'backup_enabled',
+                        'host_group_id',
+                        'load_balancer_id',
+                        'is_hidden'
+                    ])->toArray()
+                );
+                if ($quantity > 1) {
+                    $instance->setAttribute('name', $definition->get('name') . ' #' . ($i+1));
+                }
 
-            $instance->locked = $definition->has('locked') && $definition->get('locked') === true;
+                $instance->locked = $definition->has('locked') && $definition->get('locked') === true;
 
-            $network = Network::findOrFail($definition->get('network_id'));
-            $instance->availabilityZone()->associate($network->router->availabilityZone);
+                $network = Network::findOrFail($definition->get('network_id'));
+                $instance->availabilityZone()->associate($network->router->availabilityZone);
 
-            $image = Image::findOrFail($definition->get('image_id'));
+                $image = Image::findOrFail($definition->get('image_id'));
 
-            $instance->deploy_data = [
-                'volume_capacity' => $definition->get('volume_capacity', config('volume.capacity.' . strtolower($image->platform) . '.min')),
-                'volume_iops' => $definition->get('volume_iops', config('volume.iops.default')),
-                'network_id' => $definition->get('network_id'),
-                'floating_ip_id' => $definition->get('floating_ip_id'),
-                'requires_floating_ip' => $definition->get('requires_floating_ip', false),
-                'image_data' => $definition->get('image_data'),
-                'user_script' => $definition->get('user_script'),
-                'ssh_key_pair_ids' => $definition->get('ssh_key_pair_ids'),
-                'software_ids' => $definition->get('software_ids'),
-            ];
+                $instance->deploy_data = [
+                    'volume_capacity' => $definition->get('volume_capacity', config('volume.capacity.' . strtolower($image->platform) . '.min')),
+                    'volume_iops' => $definition->get('volume_iops', config('volume.iops.default')),
+                    'network_id' => $definition->get('network_id'),
+                    'floating_ip_id' => $definition->get('floating_ip_id'),
+                    'requires_floating_ip' => $definition->get('requires_floating_ip', false),
+                    'image_data' => $definition->get('image_data'),
+                    'user_script' => $definition->get('user_script'),
+                    'ssh_key_pair_ids' => $definition->get('ssh_key_pair_ids'),
+                    'software_ids' => $definition->get('software_ids'),
+                ];
 
-            $instance->syncSave();
+                $instance->syncSave();
 
-            Log::info(get_class($this) . ' : OrchestratorBuild created instance ' . $instance->id, ['id' => $this->model->id]);
-
-            $orchestratorBuild->updateState('instance', $index, $instance->id);
+                Log::info(get_class($this) . ' : OrchestratorBuild created instance ' . $instance->id, ['id' => $this->model->id]);
+                $instanceIds[] = $instance->id;
+            }
+            $orchestratorBuild->updateState('instance', $index, $instanceIds);
         });
     }
 }

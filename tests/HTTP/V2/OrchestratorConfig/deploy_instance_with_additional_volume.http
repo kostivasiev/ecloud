@@ -32,6 +32,7 @@ Content-Type: application/json
 {
     "instances": [
         {
+            "quantity": 2,
             "name": "Centos Test Instance",
             "vpc_id": "vpc-aaaaaaaa",
             "image_id": "img-centos-mcafee",
@@ -55,12 +56,23 @@ Content-Type: application/json
             "availability_zone_id": "az-aaaaaaaa",
             "capacity": 10,
             "iops": 300
+        },
+        {
+            "name": "Orchestrator Volume 2",
+            "vpc_id": "vpc-aaaaaaaa",
+            "availability_zone_id": "az-aaaaaaaa",
+            "capacity": 10,
+            "iops": 300
         }
     ],
     "instance_volumes": [
         {
-            "instance_id": "{instance.0}",
+            "instance_id": "{instance.0.0}",
             "volume_id": "{volume.0}"
+        },
+        {
+            "instance_id": "{instance.0.1}",
+            "volume_id": "{volume.1}"
         }
     ]
 }
@@ -71,7 +83,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### 3. Deploy Instance, Volume and Mount It
+### 3. Deploy Instances and Volumes and Mount them
 POST https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}/deploy
 Accept: */*
 Cache-Control: no-cache
@@ -88,7 +100,7 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### 4. Get the instance_id from the build
+### 4. Get the instance_ids and volume_ids from the build
 GET https://{{host}}/{{version}}/orchestrator-builds/{{orchestrator_build_id}}
 Accept: */*
 Cache-Control: no-cache
@@ -97,16 +109,22 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 > {%
-client.global.set("instance_id", response.body.data.state.instance[0]);
-client.log("instance_id: " + response.body.data.state.instance[0]);
+client.global.set("instance_id_1", response.body.data.state.instance[0][0]);
+client.log("instance_id 1: " + response.body.data.state.instance[0][0]);
+client.global.set("instance_id_2", response.body.data.state.instance[0][1]);
+client.log("instance_id 2: " + response.body.data.state.instance[0][1]);
+client.global.set("volume_id_1", response.body.data.state.volume[0]);
+client.log("volume_id 1: " + response.body.data.state.volume[0]);
+client.global.set("volume_id_2", response.body.data.state.volume[1]);
+client.log("volume_id 2: " + response.body.data.state.volume[1]);
 
 client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
 
-### 5. Get the Instance
-GET https://{{host}}/{{version}}/instances/{{instance_id}}
+### 5. Get the 1st Instance
+GET https://{{host}}/{{version}}/instances/{{instance_id_1}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_admin}}
@@ -119,8 +137,8 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### 6. Get the volumes for the instance
-GET https://{{host}}/{{version}}/instances/{{instance_id}}/volumes
+### 6. Get the 2nd Instance
+GET https://{{host}}/{{version}}/instances/{{instance_id_2}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_admin}}
@@ -133,8 +151,36 @@ client.test("Request executed successfully", function() {
 });
 %}
 
-### 7. Cleanup
-DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
+### 7. Get the volumes for the 1st instance
+GET https://{{host}}/{{version}}/instances/{{instance_id_1}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### 8. Get the volumes for the 2nd instance
+GET https://{{host}}/{{version}}/instances/{{instance_id_2}}/volumes
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+### 9. Cleanup 1st Instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id_1}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_admin}}
@@ -147,7 +193,49 @@ client.test('Request executed successfully', function () {
 });
 %}
 
-### 8. Clean Orchestrator Data
+### 10. Cleanup 2nd Instance
+DELETE https://{{host}}/{{version}}/instances/{{instance_id_2}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### 11. Cleanup 1st Volume
+DELETE https://{{host}}/{{version}}/volumes/{{volume_id_1}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### 12. Cleanup 2nd Volume
+DELETE https://{{host}}/{{version}}/volumes/{{volume_id_2}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Request executed successfully', function () {
+    client.assert(response.status === 202, "Response status is not 202");
+});
+%}
+
+### 13. Clean Orchestrator Data
 DELETE https://{{host}}/{{version}}/orchestrator-configs/{{orchestrator_config_id}}
 Accept: */*
 Cache-Control: no-cache
