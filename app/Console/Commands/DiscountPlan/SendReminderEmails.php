@@ -50,7 +50,7 @@ class SendReminderEmails extends Command
                     return $this->sendEmail($discountPlan, new DiscountPlanTrialReminder($discountPlan));
                 }
 
-                if ($this->now->diffInDays($discountPlan->term_end_date) <= 7) {
+                if ($this->now->diffInDays($discountPlan->term_end_date) == 7) {
                     return $this->sendEmail($discountPlan, new DiscountPlanTrialReminder($discountPlan));
                 }
 
