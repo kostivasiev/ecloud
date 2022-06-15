@@ -10,6 +10,13 @@ class DeleteLoadBalancerNodes extends TaskJob
 {
     use AwaitResources;
 
+    public function __construct($task)
+    {
+        parent::__construct($task);
+        // Set timeout to 20 mins per node
+        $this->tries = (240 * $this->task->resource->loadBalancerNodes->count());
+    }
+
     public function handle()
     {
         $loadBalancer = $this->task->resource;
