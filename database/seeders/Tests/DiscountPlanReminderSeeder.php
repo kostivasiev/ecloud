@@ -33,8 +33,8 @@ class DiscountPlanReminderSeeder extends Seeder
                 'contact_id' => 1,
                 'is_trial' => true,
                 'status' => 'approved',
-                'term_start_date' => Carbon::now()->subDays(7),
-                'term_end_date' => Carbon::now(),
+                'term_start_date' => Carbon::now()->subDays(23),
+                'term_end_date' => Carbon::now()->addDays(7),
             ]);
 
         // 0 days to go
@@ -44,8 +44,8 @@ class DiscountPlanReminderSeeder extends Seeder
                 'contact_id' => 1,
                 'is_trial' => true,
                 'status' => 'approved',
-                'term_start_date' => Carbon::now(),
-                'term_end_date' => Carbon::now(),
+                'term_start_date' => Carbon::now()->subDays(29),
+                'term_end_date' => Carbon::now()->addHours(12),
             ]);
 
         // Nothing to do
