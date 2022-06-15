@@ -57,7 +57,6 @@ class SendReminderEmails extends Command
                 if ($this->now->diffInDays($discountPlan->term_end_date) == 0) {
                     return $this->sendEmail($discountPlan, new DiscountPlanTrialReminder($discountPlan));
                 }
-                return;
             });
     }
 
