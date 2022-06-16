@@ -1,6 +1,6 @@
 <h2>Your eCloud VPC trial is coming to an end</h2>
 
-<p>Your eCloud VPC trial is coming to an end and will expire at midnight on {{ $discountPlan->term_end_date }}.</p>
+<p>Your eCloud VPC trial is coming to an end and will expire at midnight on {{ \Carbon\Carbon::parse($discountPlan->term_end_date)->format('l, jS F Y') }}.</p>
 
 <p>We hope that you've had a chance to create something amazing with eCloud VPC, and that you choose continue to use the platform once your trial has ended.</p>
 
