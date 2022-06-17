@@ -30,14 +30,11 @@ class DiscountPlanTrialReminder extends Mailable
     public function build()
     {
         if ($this->daysRemaining == 0) {
-            $this->subject('Your eCloud VPC trial ends at midnight!');
-        } else {
-            $this->subject('Your eCloud VPC trial will end in ' . $this->daysRemaining . ' '.
-                Str::plural('day', $this->daysRemaining)  . '!');
+            $this->subject('Your eCloud VPC trial ends at midnight');
+            return $this->view('mail.discount_plan_trial_ending');
         }
 
-        return ($this->daysRemaining == 0) ?
-            $this->view('mail.discount_plan_trial_ending'):
-            $this->view('mail.discount_plan_trial_reminder');
+        $this->subject('Your eCloud VPC trial will end in ' . $this->daysRemaining . ' days');
+        return $this->view('mail.discount_plan_trial_reminder');
     }
 }
