@@ -3,7 +3,6 @@
 namespace App\Tasks\Nic;
 
 use App\Tasks\Task;
-use \App\Jobs\Nsx\Nic\UnbindIpAddress;
 
 class DisassociateIp extends Task
 {
@@ -11,8 +10,6 @@ class DisassociateIp extends Task
 
     public function jobs()
     {
-        return [
-            UnbindIpAddress::class
-        ];
+        return [];
     }
 }

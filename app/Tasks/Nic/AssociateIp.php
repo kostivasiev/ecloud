@@ -2,7 +2,6 @@
 
 namespace App\Tasks\Nic;
 
-use App\Jobs\Nsx\Nic\BindIpAddress;
 use App\Tasks\Task;
 
 class AssociateIp extends Task
@@ -11,8 +10,6 @@ class AssociateIp extends Task
 
     public function jobs()
     {
-        return [
-            BindIpAddress::class
-        ];
+        return [];
     }
 }
