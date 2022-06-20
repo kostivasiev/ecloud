@@ -658,16 +658,14 @@ Route::group([
         ]);
 
         Route::get('/{affinityRuleId}/members', 'AffinityRuleMemberController@index');
-        Route::get('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@show');
-        Route::post('/{affinityRuleId}/members', [
-            'middleware' => 'affinity-rule-member-are-members-syncing',
-            'uses' => 'AffinityRuleMemberController@store',
-        ]);
-//        Route::patch('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@update');
-        Route::delete('/{affinityRuleId}/members/{affinityRuleMemberId}', [
-            'middleware' => 'affinity-rule-member-are-members-syncing',
-            'uses' => 'AffinityRuleMemberController@destroy',
-        ]);
+    });
+
+    Route::group(['prefix' => 'affinity-rule-members'], function () {
+        Route::get('/{affinityRuleMemberId}', 'AffinityRuleMemberController@show');
+        Route::group(['middleware' => 'affinity-rule-member-are-members-syncing'], function() {
+            Route::post('/', 'AffinityRuleMemberController@store');
+            Route::delete('/{affinityRuleMemberId}', 'AffinityRuleMemberController@destroy');
+        });
     });
 
     /** Load Balancer Network */

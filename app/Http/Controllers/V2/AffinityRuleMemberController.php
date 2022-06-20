@@ -24,21 +24,21 @@ class AffinityRuleMemberController extends BaseController
         );
     }
 
-    public function show(Request $request, string $affinityRuleId, string $affinityRuleMemberId)
+    public function show(Request $request, string $affinityRuleMemberId)
     {
-        $affinityRule = AffinityRule::forUser($request->user())
-            ->findOrFail($affinityRuleId);
+        $affinityRuleMember = AffinityRuleMember::forUser($request->user())
+            ->findOrFail($affinityRuleMemberId);
 
         return new AffinityRuleMemberResource(
-            $affinityRule->affinityRuleMembers()
-                ->findOrFail($affinityRuleMemberId)
+            $affinityRuleMember
         );
     }
 
-    public function store(Create $request, $affinityRuleId)
+    public function store(Create $request)
     {
         $model = app()->make(AffinityRuleMember::class);
         $instanceId = $request->instance_id;
+        $affinityRuleId = $request->affinity_rule_id;
 
         $model->fill([
             'instance_id' => $instanceId,
@@ -53,11 +53,8 @@ class AffinityRuleMemberController extends BaseController
         return $this->responseIdMeta($request, $model->id, 202, $task->id);
     }
 
-    public function destroy(Request $request, string $affinityRuleId, string $affinityRuleMemberId)
+    public function destroy(Request $request, string $affinityRuleMemberId)
     {
-        AffinityRule::forUser($request->user())
-            ->findOrFail($affinityRuleId);
-
         $member = AffinityRuleMember::forUser($request->user())
             ->findOrFail($affinityRuleMemberId);
         $task = $member->syncDelete();
