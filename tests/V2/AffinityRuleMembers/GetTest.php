@@ -8,7 +8,8 @@ use Tests\TestCase;
 
 class GetTest extends TestCase
 {
-    public const RESOURCE_URI = '/v2/affinity-rules/%s/members/%s';
+    public const RULE_RESOURCE_URI = '/v2/affinity-rules/%s/members';
+    public const MEMBER_RESOURCE_URI = '/v2/affinity-rule-members/%s';
 
     private AffinityRule $affinityRule;
     private AffinityRuleMember $affinityRuleMember;
@@ -32,7 +33,7 @@ class GetTest extends TestCase
     public function testGetAffinityRuleMembers()
     {
         $this->asUser()
-            ->get(sprintf($this::RESOURCE_URI, $this->affinityRule->id, ''))
+            ->get(sprintf($this::RULE_RESOURCE_URI, $this->affinityRule->id))
             ->assertJsonFragment([
                 'affinity_rule_id' => $this->affinityRule->id,
                 'instance_id' => $this->instanceModel()->id,
@@ -43,7 +44,7 @@ class GetTest extends TestCase
     public function testGetAffinityRuleMember()
     {
         $this->asUser()
-            ->get(sprintf($this::RESOURCE_URI, $this->affinityRule->id, $this->affinityRuleMember->id))
+            ->get(sprintf($this::MEMBER_RESOURCE_URI, $this->affinityRuleMember->id))
             ->assertJsonFragment([
                 'affinity_rule_id' => $this->affinityRule->id,
                 'instance_id' => $this->instanceModel()->id,

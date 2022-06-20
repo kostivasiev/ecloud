@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class DeleteTest extends TestCase
 {
-    public const RESOURCE_URI = '/v2/affinity-rules/%s/members/%s';
+    public const RESOURCE_URI = '/v2/affinity-rule-members/%s';
     public AffinityRule $affinityRule;
 
     public function setUp(): void
@@ -33,14 +33,14 @@ class DeleteTest extends TestCase
         Event::fake([Created::class]);
 
         $this->asUser()
-            ->delete(sprintf(static::RESOURCE_URI, $this->affinityRule->id, $this->affinityRuleMember->id))
+            ->delete(sprintf(static::RESOURCE_URI, $this->affinityRuleMember->id))
             ->assertStatus(202);
     }
 
     public function testDeleteResourceFails()
     {
         $this->asUser()
-            ->delete(sprintf(static::RESOURCE_URI, $this->affinityRule->id, '9999'))
+            ->delete(sprintf(static::RESOURCE_URI,  '9999'))
             ->assertStatus(404);
     }
 }
