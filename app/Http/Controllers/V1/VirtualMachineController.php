@@ -356,7 +356,7 @@ class VirtualMachineController extends BaseController
             if ($request->has('datastore_id')) {
                 $datastore = Datastore::find($request->input('datastore_id'));
             } else {
-                $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'));
+                $datastore = Datastore::getDefault($solution->getKey(), $request->input('environment'), false, $request->input('site_id'));
             }
 
             if (!in_array($request->input('environment'), ['Burst', 'GPU'])) {
