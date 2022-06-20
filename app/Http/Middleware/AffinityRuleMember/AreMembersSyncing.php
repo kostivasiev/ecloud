@@ -12,8 +12,15 @@ class AreMembersSyncing
 {
     public function handle($request, Closure $next)
     {
-        $affinityRule = AffinityRule::forUser(Auth::user())
-            ->findOrFail($request->route('affinityRuleId'));
+        if ($request->route('affinityRuleMemberId')) {
+            $affinityRuleMember = AffinityRuleMember::forUser(Auth::user())
+                ->findOrFail($request->route('affinityRuleMemberId'));
+            $affinityRule = $affinityRuleMember->affinityRule;
+        } else {
+            $affinityRule = AffinityRule::forUser(Auth::user())
+                ->findOrFail($request->get('affinity_rule_id'));
+        }
+
         $affinityRule->affinityRuleMembers
             ->each(function (AffinityRuleMember $affinityRuleMember) {
                 if ($affinityRuleMember->sync->status == Sync::STATUS_INPROGRESS) {
