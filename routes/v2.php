@@ -229,7 +229,7 @@ Route::group([
         Route::put('instances/{instanceId}/unlock', 'InstanceController@unlock');
         Route::post('instances/{instanceId}/create-image', 'InstanceController@createImage');
         Route::post('instances/{instanceId}/migrate', [
-            'middleware' => 'instance-can-migrate',
+            'middleware' => ['hostgroup-has-capacity', 'instance-can-migrate'],
             'uses' => 'InstanceController@migrate'
         ]);
 
