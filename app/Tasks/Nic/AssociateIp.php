@@ -10,6 +10,8 @@ class AssociateIp extends Task
 
     public function jobs()
     {
-        return [];
+        return [
+            \App\Jobs\Nic\AssociateIp::class,
+        ];
     }
 }
