@@ -4,8 +4,6 @@ namespace Tests\Unit\Console\Commands\Instance;
 
 use App\Console\Commands\Instance\SetHostGroupToStandard;
 use App\Models\V2\HostGroup;
-use App\Services\V2\KingpinService;
-use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 
 class SetHostGroupToStandardTest extends TestCase
