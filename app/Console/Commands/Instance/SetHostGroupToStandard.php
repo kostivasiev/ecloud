@@ -17,48 +17,84 @@ class SetHostGroupToStandard extends Command
 
     public function handle()
     {
+        // todo: start with instances...
+        Instance::where(function ($query) {
+            $query->whereNull('host_group_id');
+            $query->orWhere('host_group_id', '=', '');
+        })->each(function (Instance $instance) {
+            $hostGroupId = $instance->getHostGroupId();
+            $hostGroup = HostGroup::find($instance->getHostGroupId());
+            if (!$hostGroup) {
+                $this->info('Creating hostgroup `' . $hostGroupId . '`');
+                $hostGroup = HostGroup::withoutEvents(function () use ($instance, $hostGroupId) {
+                    HostGroup::factory()
+                        ->create([
+                            'id' => $hostGroupId,
+                            'vpc_id' => $instance->vpc->id,
+                            'availability_zone_id' => $instance->availabilityZone->id,
+                            'host_spec_id' => 'hs-test', // <--- need to determine this
+                            'windows_enabled' => '', // <--- need to determine this too, get from instance platform attribute?
+                        ]);
+                });
+            }
+        });
+
+
+
         Region::each(function ($region) {
             /** @var AvailabilityZone $availabilityZone */
             $availabilityZone = $region->availabilityZones()->first();
             $region->vpcs()->each(function (Vpc $vpc) use ($availabilityZone) {
-                try {
-                    $response = $availabilityZone->kingpinService()->get(
-                        sprintf(KingpinService::GET_VPC_INSTANCES_URI, $vpc->id)
-                    );
-                } catch (\Exception $e) {
-                    return;
-                }
-
-                // which of these hostgroups don't exist
-                $hostGroupIds = $this->findMissingHostGroupIds(array_unique(
-                    collect(
-                        json_decode($response->getBody()->getContents())
-                    )
-                        ->pluck('hostGroupID')
-                        ->toArray()
-                ));
+                $hostGroupIds = $this->getMissingHostGroupIds($availabilityZone, $vpc);
 
                 // Create the missing hostGroups
                 foreach ($hostGroupIds as $hostGroupId) {
-                    HostGroup::withoutEvents(function () use ($hostGroupId, $vpc, $availabilityZone) {
+                    $this->info('Creating hostgroup `' . $hostGroupId . '`');
+                    $hostGroup = HostGroup::withoutEvents(function () use ($hostGroupId, $vpc, $availabilityZone) {
                         HostGroup::factory()
                             ->create([
                                 'id' => $hostGroupId,
                                 'vpc_id' => $vpc->id,
                                 'availability_zone_id' => $availabilityZone->id,
-                                'host_spec_id' => '', // <--- need to determine this
+                                'host_spec_id' => 'hs-test', // <--- need to determine this
+                                'windows_enabled' => '', // <--- need to determine this too, get from instance platform attribute?
                             ]);
                     });
+//                    dd($hostGroup->getAttributes());
                 }
             });
         });
     }
 
-    public function findMissingHostGroupIds(array $hostGroupIds): array
-    {
-        return array_diff(
-            $hostGroupIds,
-            HostGroup::find($hostGroupIds)->pluck('id')->toArray()
-        );
-    }
+//    public function getMissingHostGroupIds(AvailabilityZone $availabilityZone, Vpc $vpc): array
+//    {
+//        // get hostgroup instances from nsx
+//        try {
+//            $response = $availabilityZone->kingpinService()->get(
+//                sprintf(KingpinService::GET_VPC_INSTANCES_URI, $vpc->id)
+//            );
+//        } catch (\Exception $e) {
+//            return [];
+//        }
+//
+//        // extract just the hostGroupID
+//        $hostGroupIds = array_unique(
+//            collect(
+//                json_decode($response->getBody()->getContents())
+//            )
+//                ->pluck('hostGroupID')
+//                ->toArray()
+//        );
+//
+//        // return only those ids that do not exist on the system yet
+//        return $this->extractMissingHostGroupIds($hostGroupIds);
+//    }
+//
+//    public function extractMissingHostGroupIds(array $hostGroupIds): array
+//    {
+//        return array_diff(
+//            $hostGroupIds,
+//            HostGroup::find($hostGroupIds)->pluck('id')->toArray()
+//        );
+//    }
 }

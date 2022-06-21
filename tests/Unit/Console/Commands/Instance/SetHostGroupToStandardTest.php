@@ -3,23 +3,25 @@
 namespace Tests\Unit\Console\Commands\Instance;
 
 use App\Console\Commands\Instance\SetHostGroupToStandard;
+use App\Models\V2\HostGroup;
 use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 
 class SetHostGroupToStandardTest extends TestCase
 {
-    public SetHostGroupToStandard $command;
+    public $command;
 
     public function setUp(): void
     {
         parent::setUp();
         $this->instanceModel();
-        $this->command = new SetHostGroupToStandard();
+        $this->command = \Mockery::mock(SetHostGroupToStandard::class)->makePartial();
     }
 
     public function testResults()
     {
+        $this->command->allows('info')->with(\Mockery::capture($message))->andReturnTrue();
         $this->kingpinServiceMock()->allows('get')
             ->withSomeOfArgs(
                 sprintf(KingpinService::GET_VPC_INSTANCES_URI, $this->vpc()->id)
@@ -28,6 +30,8 @@ class SetHostGroupToStandardTest extends TestCase
             });
 
         $this->command->handle();
+
+        dd(HostGroup::find(1001)->getAttributes());
     }
 
     private function getResponseJson()
