@@ -22,6 +22,7 @@ class HostSeeder extends Seeder
             $hostSpec = HostSpec::factory()
                 ->create([
                     'id' => 'hs-aaaaaaaa',
+                    'ucs_specification_name' => 'DUAL-4208--32GB',
                 ]);
             $hostGroup = HostGroup::factory()
                 ->for(Vpc::find('vpc-aaaaaaaa'))
