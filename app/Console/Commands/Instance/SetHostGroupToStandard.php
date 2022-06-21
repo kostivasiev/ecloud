@@ -41,29 +41,30 @@ class SetHostGroupToStandard extends Command
 
 
 
-        Region::each(function ($region) {
-            /** @var AvailabilityZone $availabilityZone */
-            $availabilityZone = $region->availabilityZones()->first();
-            $region->vpcs()->each(function (Vpc $vpc) use ($availabilityZone) {
-                $hostGroupIds = $this->getMissingHostGroupIds($availabilityZone, $vpc);
+//        Region::each(function ($region) {
+//            /** @var AvailabilityZone $availabilityZone */
+//            $availabilityZone = $region->availabilityZones()->first();
+//            $region->vpcs()->each(function (Vpc $vpc) use ($availabilityZone) {
+//                $hostGroupIds = $this->getMissingHostGroupIds($availabilityZone, $vpc);
+//
+//                // Create the missing hostGroups
+//                foreach ($hostGroupIds as $hostGroupId) {
+//                    $this->info('Creating hostgroup `' . $hostGroupId . '`');
+//                    $hostGroup = HostGroup::withoutEvents(function () use ($hostGroupId, $vpc, $availabilityZone) {
+//                        HostGroup::factory()
+//                            ->create([
+//                                'id' => $hostGroupId,
+//                                'vpc_id' => $vpc->id,
+//                                'availability_zone_id' => $availabilityZone->id,
+//                                'host_spec_id' => 'hs-test', // <--- need to determine this
+//                                'windows_enabled' => '', // <--- need to determine this too, get from instance platform attribute?
+//                            ]);
+//                    });
+////                    dd($hostGroup->getAttributes());
+//                }
+//            });
+//        });
 
-                // Create the missing hostGroups
-                foreach ($hostGroupIds as $hostGroupId) {
-                    $this->info('Creating hostgroup `' . $hostGroupId . '`');
-                    $hostGroup = HostGroup::withoutEvents(function () use ($hostGroupId, $vpc, $availabilityZone) {
-                        HostGroup::factory()
-                            ->create([
-                                'id' => $hostGroupId,
-                                'vpc_id' => $vpc->id,
-                                'availability_zone_id' => $availabilityZone->id,
-                                'host_spec_id' => 'hs-test', // <--- need to determine this
-                                'windows_enabled' => '', // <--- need to determine this too, get from instance platform attribute?
-                            ]);
-                    });
-//                    dd($hostGroup->getAttributes());
-                }
-            });
-        });
     }
 
 //    public function getMissingHostGroupIds(AvailabilityZone $availabilityZone, Vpc $vpc): array
