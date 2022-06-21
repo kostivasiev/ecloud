@@ -33,6 +33,7 @@ Route::group([
         Route::get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
         Route::get('availability-zones/{zoneId}/load-balancers', 'AvailabilityZoneController@loadBalancers');
         Route::get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
+        Route::get('availability-zones/{zoneId}/resource-tiers', 'AvailabilityZoneController@resourceTiers');
     });
 
     /** Availability Zone Capacities */
@@ -666,6 +667,13 @@ Route::group([
             Route::post('/', 'AffinityRuleMemberController@store');
             Route::delete('/{affinityRuleMemberId}', 'AffinityRuleMemberController@destroy');
         });
+    });
+
+    Route::group(['prefix' => 'resource-tiers', 'middleware' => 'is-admin'], function () {
+        Route::get('/', 'ResourceTierController@index');
+        Route::get('/{resourceTierId}', 'ResourceTierController@show');
+        Route::post('/', 'ResourceTierController@store');
+        Route::delete('/{resourceTierId}', 'ResourceTierController@destroy');
     });
 
     /** Load Balancer Network */
