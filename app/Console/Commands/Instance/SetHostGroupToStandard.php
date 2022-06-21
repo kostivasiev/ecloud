@@ -21,18 +21,18 @@ class SetHostGroupToStandard extends Command
             $hostGroup = HostGroup::find($instance->getHostGroupId());
             if (!$hostGroup) {
                 $this->info('Creating hostgroup `' . $hostGroupId . '`');
-                $hostGroup = HostGroup::withoutEvents(function () use ($instance, $hostGroupId) {
-                    HostGroup::factory()
-                        ->create([
-                            'id' => $hostGroupId,
-                            'vpc_id' => $instance->vpc->id,
-                            'availability_zone_id' => $instance->availabilityZone->id,
-                            'host_spec_id' => 'hs-test', // <--- need to determine this
-                            'windows_enabled' => !($instance->platform == 'Linux'),
-                        ]);
-                });
-                dd($hostGroup->getAttributes());
+                $hostGroup = new HostGroup([
+                    'id' => $hostGroupId,
+                    'vpc_id' => $instance->vpc->id,
+                    'availability_zone_id' => $instance->availabilityZone->id,
+                    'host_spec_id' => 'hs-test', // <--- need to determine this
+                    'windows_enabled' => !($instance->platform == 'Linux'),
+                ]);
+                $hostGroup->save();
             }
+            // Now we have a hostgroup, we need to attach it to the instance
+            $instance->hostGroup()->associate($hostGroup);
+            $instance->save();
         });
     }
 }
