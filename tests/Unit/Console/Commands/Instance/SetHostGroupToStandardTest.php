@@ -17,6 +17,7 @@ class SetHostGroupToStandardTest extends TestCase
         parent::setUp();
         $this->instanceModel();
         $this->command = \Mockery::mock(SetHostGroupToStandard::class)->makePartial();
+        $this->command->allows('option')->with('test-run')->andReturnFalse();
     }
 
     public function testResults()
