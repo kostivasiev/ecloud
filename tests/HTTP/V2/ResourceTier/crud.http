@@ -1,0 +1,82 @@
+### 1. Create Resource Tier
+POST https://{{host}}/{{version}}/resource-tiers
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+client.global.set('resource_tier_id', response.body.data.id);
+%}
+
+### 2. Create Resource Tier as User (Should Fail with 401)
+GET https://{{host}}/{{version}}/resource-tiers
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request failed successfully", function () {
+    client.assert(response.status === 401, '401 not received');
+});
+%}
+
+### 3. Get Resource Tier as Admin
+GET https://{{host}}/{{version}}/resource-tiers/{{resource_tier_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
+});
+%}
+
+### 4. Delete Resource As User (Should fail)
+DELETE https://{{host}}/{{version}}/resource-tiers/{{resource_tier_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 5. Delete Resource As Admin (Should Succeed)
+DELETE https://{{host}}/{{version}}/resource-tiers/{{resource_tier_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 6. Check Resource Tier is Deleted
+GET https://{{host}}/{{version}}/resource-tiers/{{resource_tier_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 404, '404 response not received');
+});
+%}
