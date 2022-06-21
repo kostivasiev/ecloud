@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Events\V2\HostGroup\Deleted;
+use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
@@ -10,6 +11,7 @@ use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
@@ -116,6 +118,34 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
+    }
+
+    public function getAvailableCapacity(): ?array
+    {
+        try {
+            $response = $this->availabilityZone->kingpinService()->get(
+                sprintf(KingpinService::GET_CAPACITY_URI, $this->vpc->id, $this->id)
+            );
+        } catch (\Exception $e) {
+            Log::error('Unable to retrieve hostgroup capacity', [
+                'message' => $e->getMessage(),
+            ]);
+            return null;
+        }
+        $response = json_decode($response->getBody()->getContents());
+
+        return [
+            'cpu' => [
+                'used' => $response->cpuUsedMHz,
+                'capacity' => $response->cpuCapacityMHz,
+                'percentage' => (int) ceil(($response->cpuUsedMHz /$response->cpuCapacityMHz) * 100),
+            ],
+            'ram' => [
+                'used' => $response->ramUsedMB,
+                'capacity' => $response->ramCapacityMB,
+                'percentage' => (int) ceil(($response->ramUsedMB /$response->ramCapacityMB) * 100),
+            ],
+        ];
     }
 
     public function getRamCapacityAttribute()
