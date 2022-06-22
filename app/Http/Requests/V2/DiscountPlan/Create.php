@@ -32,7 +32,6 @@ class Create extends FormRequest
             'discount_rate' => 'required|numeric|min:0|max:100',
             'term_length' => [
                 'sometimes',
-                'required',
                 'nullable',
                 'integer',
                 'min:1',
@@ -44,7 +43,6 @@ class Create extends FormRequest
             ],
             'term_end_date' => [
                 'sometimes',
-                'required',
                 'nullable',
                 'date',
                 'after:today',
