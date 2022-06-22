@@ -1,0 +1,18 @@
+description: Success
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: rt-3f112f25
+        meta:
+          type: object
+          properties:
+            location:
+              type: string
+              example: 'https://api.ukfast.io/ecloud/v2/resource-tiers/rt-3f112f25'
