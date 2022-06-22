@@ -59,6 +59,41 @@ client.test('Test reseller_id, contact_id or employee_id in response', function(
 %}
 
 ###
+# Update Discount Plan
+PATCH https://{{host}}/{{version}}/discount-plans/{{id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-Reseller-Id: 7052
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "term_start_date": "2022-06-19T23:59:59+01:00",
+    "term_end_date": "2022-06-20T23:59:59+01:00"
+}
+
+> {%
+client.test('Test Discount Updated', function () {
+    client.assert(response.status === 200, '200 Response not received');
+});
+%}
+
+###
+# Get Discount Plan
+GET https://{{host}}/{{version}}/discount-plans/{{id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test reseller_id, contact_id or employee_id in response', function() {
+    client.assert(response.body.data.term_length == null, 'term_length is not null');
+    client.assert(response.body.data.term_end_date == null, 'term_end_date is not null');
+});
+%}
+
+###
 # Delete Discount Plan
 DELETE https://{{host}}/{{version}}/discount-plans/{{id}}
 Accept: */*

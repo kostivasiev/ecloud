@@ -97,7 +97,7 @@ class DiscountPlanController extends BaseController
     public function update(Update $request, string $discountPlanId)
     {
         $discountPlan = DiscountPlan::forUser(Auth::user())->findOrFail($discountPlanId);
-        $discountPlan->update($request->only([
+        $discountPlan->fill($request->only([
             'name',
             'commitment_amount',
             'commitment_before_discount',
@@ -114,7 +114,7 @@ class DiscountPlanController extends BaseController
         }
 
         // if start date specified then use existing term_length or newly submitted one
-        if ($request->has('term_start_date')) {
+        if ($request->has('term_start_date') && !$request->has('term_end_date')) {
             $termLength = $request->get('term_length', $discountPlan->term_length);
             $discountPlan->term_end_date = $this->calculateNewEndDate(
                 $request->get('term_start_date'),
