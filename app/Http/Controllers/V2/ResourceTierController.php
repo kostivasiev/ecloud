@@ -36,7 +36,7 @@ class ResourceTierController extends BaseController
             'availability_zone_id',
         ]));
         $model->save();
-        return $this->responseIdMeta($request, $model->id, 202);
+        return $this->responseIdMeta($request, $model->id, 201);
     }
 
     public function destroy(string $resourceTierId)
