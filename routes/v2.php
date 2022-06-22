@@ -33,8 +33,9 @@ Route::group([
         Route::get('availability-zones/{zoneId}/instances', 'AvailabilityZoneController@instances');
         Route::get('availability-zones/{zoneId}/load-balancers', 'AvailabilityZoneController@loadBalancers');
         Route::get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
-        Route::get('availability-zones/{zoneId}/resource-tiers', 'AvailabilityZoneController@resourceTiers');
     });
+
+    Route::get('availability-zones/{zoneId}/resource-tiers', 'AvailabilityZoneController@resourceTiers');
 
     /** Availability Zone Capacities */
     Route::group(['middleware' => 'is-admin'], function () {
