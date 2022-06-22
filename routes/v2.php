@@ -509,7 +509,10 @@ Route::group([
         Route::get('host-groups/{id}/tasks', 'HostGroupController@tasks');
         Route::post('host-groups', 'HostGroupController@store');
         Route::patch('host-groups/{id}', 'HostGroupController@update');
-        Route::delete('host-groups/{id}', 'HostGroupController@destroy');
+        Route::delete('host-groups/{id}', [
+            'middleware' => 'host-group-can-be-deleted',
+            'uses' => 'HostGroupController@destroy'
+        ]);
     });
 
     /** Images */
