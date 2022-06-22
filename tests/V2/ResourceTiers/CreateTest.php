@@ -30,7 +30,7 @@ class CreateTest extends TestCase
 
         $this->asAdmin()
             ->post(static::RESOURCE_URI, $data)
-            ->assertStatus(202);
+            ->assertStatus(201);
 
         $this->assertDatabaseHas(
             'resource_tiers',
