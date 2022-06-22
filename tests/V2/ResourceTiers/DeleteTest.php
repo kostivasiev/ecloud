@@ -22,7 +22,6 @@ class DeleteTest extends TestCase
 
     public function testDeleteResourceAsAdmin()
     {
-        Event::fake([Created::class]);
 
         $this->asAdmin()
             ->delete(sprintf(static::RESOURCE_URI, $this->resourceTier->id))
