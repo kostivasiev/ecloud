@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\V2;
 
 use App\Http\Requests\V2\ResourceTier\Create;
+use App\Http\Requests\V2\ResourceTier\Update;
 use App\Models\V2\ResourceTier;
 use App\Resources\V2\ResourceTierResource;
 use Illuminate\Http\Request;
@@ -37,6 +38,16 @@ class ResourceTierController extends BaseController
         ]));
         $model->save();
         return $this->responseIdMeta($request, $model->id, 201);
+    }
+
+    public function update(Update $request, $resourceTierId)
+    {
+        $model = ResourceTier::findOrFail($resourceTierId);
+        $model->update($request->only([
+            'name',
+        ]));
+        $model->save();
+        return $this->responseIdMeta($request, $model->id, 200);
     }
 
     public function destroy(string $resourceTierId)

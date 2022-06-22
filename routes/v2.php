@@ -669,10 +669,11 @@ Route::group([
         });
     });
 
+    Route::get('/', 'ResourceTierController@index');
+    Route::get('/{resourceTierId}', 'ResourceTierController@show');
     Route::group(['prefix' => 'resource-tiers', 'middleware' => 'is-admin'], function () {
-        Route::get('/', 'ResourceTierController@index');
-        Route::get('/{resourceTierId}', 'ResourceTierController@show');
         Route::post('/', 'ResourceTierController@store');
+        Route::patch('/{resourceTierId}', 'ResourceTierController@update');
         Route::delete('/{resourceTierId}', 'ResourceTierController@destroy');
     });
 
