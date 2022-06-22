@@ -61,6 +61,16 @@ class Create extends FormRequest
 
         if (Auth::user()->isAdmin()) {
             $rules['term_start_date'] = 'required|date';
+            $rules['term_end_date'] = [
+                'sometimes',
+                'nullable',
+                'date',
+                function ($attribute, $value, $fail) {
+                    if (strtotime($value) <= strtotime($this->request->get('term_start_date'))) {
+                        $fail('The '.$attribute.' must be greater than the term_start_date');
+                    }
+                }
+            ];
             $rules['status'] = 'sometimes|required|string|in:approved,rejected';
         }
 

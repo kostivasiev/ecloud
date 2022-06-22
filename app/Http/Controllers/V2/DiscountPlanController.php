@@ -6,6 +6,7 @@ use App\Http\Requests\V2\DiscountPlan\Create;
 use App\Http\Requests\V2\DiscountPlan\Update;
 use App\Models\V2\DiscountPlan;
 use App\Resources\V2\DiscountPlanResource;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -55,7 +56,8 @@ class DiscountPlanController extends BaseController
         if ($this->isAdmin && empty($this->resellerId)) {
             throw new BadRequestException('Missing Reseller scope');
         }
-        $discountPlan = new DiscountPlan($request->only([
+        $discountPlan = new DiscountPlan();
+        $discountPlan->fill($request->only([
             'name',
             'commitment_amount',
             'commitment_before_discount',
