@@ -68,6 +68,8 @@ components:
       $ref: 'components/schemas/nic.yaml'
     Region:
       $ref: 'components/schemas/region.yaml'
+    ResourceTier :
+      $ref : 'resources/ResourceTier/schema.yaml'
     Router:
       $ref: 'components/schemas/router.yaml'
     RouterThroughput:
@@ -190,6 +192,8 @@ paths:
     $ref: 'resources/AvailabilityZone/router-throughputs-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/prices':
     $ref: 'resources/AvailabilityZone/prices-collection.yaml'
+  '/ecloud/v2/availability-zones/{AvailabilityZoneId}/resource-tiers':
+    $ref: 'resources/ResourceTier/collection.yaml'
   '/ecloud/v2/billing-metrics':
     $ref: 'resources/BillingMetric/public_collection.yaml'
   '/ecloud/v2/billing-metrics/{billingMetricsId}':
@@ -360,6 +364,10 @@ paths:
     $ref: 'resources/Region/item.yaml'
   '/ecloud/v2/regions/{regionId}/prices':
     $ref: 'resources/Region/prices-collection.yaml'
+  '/ecloud/v2/resource-tiers':
+    $ref: 'resources/ResourceTier/collection.yaml'
+  '/ecloud/v2/resource-tiers/{resourceTierId}':
+    $ref: 'resources/ResourceTier/item.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/collection.yaml'
   '/ecloud/v2/routers/{routerId}':
