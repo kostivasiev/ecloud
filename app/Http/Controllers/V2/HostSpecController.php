@@ -40,6 +40,7 @@ class HostSpecController extends BaseController
             'cpu_cores',
             'cpu_clock_speed',
             'ram_capacity',
+            'is_hidden',
         ]));
         $model->save();
 

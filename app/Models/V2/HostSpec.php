@@ -80,7 +80,7 @@ class HostSpec extends Model implements Searchable
             return $query;
         }
 
-        return $query->whereFalse('is_hidden');
+        return $query->where('is_hidden', '=', false);
     }
 
     public function sieve(Sieve $sieve)
