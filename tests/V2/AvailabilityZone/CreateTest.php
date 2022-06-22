@@ -3,9 +3,7 @@
 namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\AvailabilityZone;
-use App\Models\V2\Region;
 use Faker\Factory as Faker;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
@@ -24,16 +22,10 @@ class CreateTest extends TestCase
             'code' => 'MAN1',
             'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
-            'region_id' => $this->region()->id
+            'region_id' => $this->region()->id,
+            'default_resource_tier_id'
         ];
-        $this->post(
-            '/v2/availability-zones',
-            $data,
-            [
-                'X-consumer-custom-id' => '1-1',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->asUser()->post('/v2/availability-zones', $data)
             ->assertJsonFragment([
                 'title' => 'Unauthorized',
                 'detail' => 'Unauthorized',
@@ -47,16 +39,10 @@ class CreateTest extends TestCase
         $data = [
             'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
-            'region_id' => $this->region()->id
+            'region_id' => $this->region()->id,
+            'default_resource_tier_id',
         ];
-        $this->post(
-            '/v2/availability-zones',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->asAdmin()->post('/v2/availability-zones', $data)
             ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The code field is required',
@@ -71,16 +57,11 @@ class CreateTest extends TestCase
         $data = [
             'code' => 'MAN1',
             'datacentre_site_id' => $this->faker->randomDigit(),
-            'region_id' => $this->region()->id
+            'region_id' => $this->region()->id,
+
+            'default_resource_tier_id'
         ];
-        $this->post(
-            '/v2/availability-zones',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->asAdmin()->post('/v2/availability-zones', $data)
             ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The name field is required',
@@ -97,14 +78,7 @@ class CreateTest extends TestCase
             'name' => 'Manchester Zone 1',
             'region_id' => $this->region()->id
         ];
-        $this->post(
-            '/v2/availability-zones',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->asAdmin()->post('/v2/availability-zones', $data)
             ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The datacentre site id field is required',
@@ -122,14 +96,7 @@ class CreateTest extends TestCase
             'datacentre_site_id' => $this->faker->randomDigit(),
             'region_id' => ''
         ];
-        $this->post(
-            '/v2/availability-zones',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $this->asAdmin()->post('/v2/availability-zones', $data)
             ->assertJsonFragment([
                 'title' => 'Validation Error',
                 'detail' => 'The region id field is required',
@@ -148,14 +115,7 @@ class CreateTest extends TestCase
             'is_public' => false,
             'region_id' => $this->region()->id
         ];
-        $post = $this->post(
-            '/v2/availability-zones',
-            $data,
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
-            ]
-        )
+        $post = $this->asAdmin()->post('/v2/availability-zones', $data)
             ->assertStatus(201);
 
         $availabilityZoneId = (json_decode($post->getContent()))->data->id;

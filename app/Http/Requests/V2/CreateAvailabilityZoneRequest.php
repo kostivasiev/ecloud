@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\Software;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateAvailabilityZoneRequest extends FormRequest
 {
@@ -34,18 +36,14 @@ class CreateAvailabilityZoneRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string'
-            ]
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'code.required' => 'The :attribute field is required',
-            'name.required' => 'The :attribute field is required',
-            'datacentre_site_id.required' => 'The :attribute field is required',
-            'region_id.required' => 'The :attribute field is required',
-            'region_id.exists' => 'The specified :attribute was not found'
+            ],
+            'default_resource_tier_id' => [
+                'sometimes',
+                'required',
+                'string'
+                // TODO: add in an exists rule for resource tier when the CRUD has been deployed
+                //Rule::exists(ResourceTier::class, 'id')->whereNull('deleted_at')
+            ],
         ];
     }
 }

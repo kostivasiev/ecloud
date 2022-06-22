@@ -13,8 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::connection('ecloud')->table('availbility_zones', function (Blueprint $table) {
-            $table->string('resource_tier_id')->nullable();
+        Schema::connection('ecloud')->table('availability_zones', function (Blueprint $table) {
+            $table->string('default_resource_tier_id')->nullable();
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::connection('ecloud')->table('availbility_zones', function (Blueprint $table) {
-            $table->dropColumn(['resource_tier_id']);
+        Schema::connection('ecloud')->table('availability_zones', function (Blueprint $table) {
+            $table->dropColumn('default_resource_tier_id');
         });
     }
 };

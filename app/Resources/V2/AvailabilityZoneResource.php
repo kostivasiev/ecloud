@@ -18,7 +18,8 @@ class AvailabilityZoneResource extends UKFastResource
             'code' => $this->code,
             'name' => $this->name,
             'datacentre_site_id' => $this->datacentre_site_id,
-            'region_id' => $this->region_id
+            'region_id' => $this->region_id,
+            'default_resource_tier_id' => $this->default_resource_tier_id,
         ];
 
         if ($request->user()->isAdmin()) {

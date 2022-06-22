@@ -34,17 +34,14 @@ class UpdateAvailabilityZoneRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string'
-            ]
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'code.required' => 'The :attribute field, when specified, cannot be null',
-            'name.required' => 'The :attribute field, when specified, cannot be null',
-            'datacentre_site_id.required' => 'The :attribute field, when specified, cannot be null',
-            'region_id.exists' => 'The specified :attribute was not found'
+            ],
+            'default_resource_tier_id' => [
+                'sometimes',
+                'required',
+                'string'
+                // TODO: add in an exists rule for resource tier when the CRUD has been deployed
+                //Rule::exists(ResourceTier::class, 'id')->whereNull('deleted_at')
+            ],
         ];
     }
 }
