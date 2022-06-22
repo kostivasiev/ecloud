@@ -27,7 +27,6 @@ class CreateTest extends TestCase
             'availability_zone_id' => $this->availabilityZone()->id,
         ];
 
-        Event::fake([Created::class]);
 
         $this->asAdmin()
             ->post(static::RESOURCE_URI, $data)
