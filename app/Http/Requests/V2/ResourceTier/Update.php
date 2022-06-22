@@ -9,7 +9,7 @@ class Update extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'sometimes|string|max:255',
+            'name' => 'sometimes|required|string|max:255',
         ];
     }
 }
