@@ -53,6 +53,6 @@ class GetTest extends TestCase
     {
         $this->asUser()
             ->get(sprintf($this::AZ_RESOURCE_URI,  $this->availabilityZone()->id))
-            ->assertStatus(401);
+            ->assertStatus(200);
     }
 }
