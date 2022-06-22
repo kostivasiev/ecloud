@@ -35,7 +35,7 @@ class GetTest extends TestCase
     {
         $this->asUser()
             ->get(sprintf($this::RESOURCE_URI,  $this->resourceTier->id))
-            ->assertStatus(401);
+            ->assertStatus(200);
     }
 
     public function testGetResourceTierFromAvailabilityZoneAsAdmin()
