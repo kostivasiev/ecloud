@@ -670,10 +670,10 @@ Route::group([
     });
 
     Route::group(['prefix' => 'resource-tiers'], function () {
-        Route::post('/', 'ResourceTierController@store');
         Route::get('/', 'ResourceTierController@index');
         Route::get('/{resourceTierId}', 'ResourceTierController@show');
         Route::group(['middleware' => 'is-admin'], function() {
+            Route::post('/', 'ResourceTierController@store');
             Route::patch('/{resourceTierId}', 'ResourceTierController@update');
             Route::delete('/{resourceTierId}', 'ResourceTierController@destroy');
         });
