@@ -29,10 +29,10 @@ client.test("Request failed successfully", function () {
 });
 %}
 
-### 3. Get Resource Tier as Admin
+### 3. Get Resource Tier
 GET https://{{host}}/{{version}}/resource-tiers/{{resource_tier_id}}
 Cache-Control: no-cache
-X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -42,20 +42,7 @@ client.test("Request executed successfully", function () {
 });
 %}
 
-### 4. Get Resource Tiers from Availability Zones as Admin
-GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/resource-tiers
-Cache-Control: no-cache
-X-consumer-custom-id: {{dev_reseller_id_admin}}
-X-consumer-groups: ecloud.read, ecloud.write
-Content-Type: application/json
-
-> {%
-client.test("Request executed successfully", function () {
-    client.assert(response.status === 202, '202 response not received');
-});
-%}
-
-### 5. Get Resource Tiers from Availability Zones as User (Should Fail)
+### 4. Get Resource Tiers from Availability Zones
 GET https://{{host}}/{{version}}/availability-zones/{{dev_availability_zone_id}}/resource-tiers
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
@@ -63,12 +50,12 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 > {%
-client.test("Request failed successfully", function () {
-    client.assert(response.status === 401, '401 response not received');
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
-### 6. Delete Resource As User (Should fail)
+### 5. Delete Resource As User (Should fail)
 DELETE https://{{host}}/{{version}}/resource-tiers/{{resource_tier_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
@@ -81,7 +68,7 @@ client.test("Request executed successfully", function () {
 });
 %}
 
-### 7. Delete Resource As Admin (Should Succeed)
+### 6. Delete Resource As Admin (Should Succeed)
 DELETE https://{{host}}/{{version}}/resource-tiers/{{resource_tier_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_admin}}
@@ -94,7 +81,7 @@ client.test("Request executed successfully", function () {
 });
 %}
 
-### 8. Check Resource Tier is Deleted
+### 7. Check Resource Tier is Deleted
 GET https://{{host}}/{{version}}/resource-tiers/{{resource_tier_id}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_admin}}
