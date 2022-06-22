@@ -134,16 +134,23 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
         }
         $response = json_decode($response->getBody()->getContents());
 
+        $cpuPercentage = ($response->cpuUsedMHz > 0 && $response->cpuCapacityMHz > 0) ?
+            (int) ceil(($response->cpuUsedMHz / $response->cpuCapacityMHz) * 100):
+            0;
+        $ramPercentage = ($response->ramUsedMB > 0 && $response->ramCapacityMB > 0) ?
+            (int) ceil(($response->ramUsedMB / $response->ramCapacityMB) * 100):
+            0;
+
         return [
             'cpu' => [
                 'used' => $response->cpuUsedMHz,
                 'capacity' => $response->cpuCapacityMHz,
-                'percentage' => (int) ceil(($response->cpuUsedMHz /$response->cpuCapacityMHz) * 100),
+                'percentage' => $cpuPercentage,
             ],
             'ram' => [
                 'used' => $response->ramUsedMB,
                 'capacity' => $response->ramCapacityMB,
-                'percentage' => (int) ceil(($response->ramUsedMB /$response->ramCapacityMB) * 100),
+                'percentage' => $ramPercentage,
             ],
         ];
     }

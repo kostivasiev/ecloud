@@ -7,11 +7,11 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "name": "host group 1 for 611",
+    "name": "Capacity Check Hostgroup",
     "vpc_id": "{{dev_vpc_id}}",
     "availability_zone_id" : "{{dev_availability_zone_id}}",
     "host_spec_id" : "{{dev_host_spec_id}}",
-    "windows_enabled": true
+    "windows_enabled": false
 }
 
 > {%
@@ -22,7 +22,7 @@ client.global.set('host_group_id', response.body.data.id);
 client.log('Initial Host Group: ' + response.body.data.id);
 %}
 
-### Create a Host on this Hostgroup
+### Create a Host
 POST https://{{host}}/{{version}}/hosts
 Accept: */*
 Cache-Control: no-cache
@@ -31,8 +31,8 @@ X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
 {
-    "name": "test host 1 for 611",
-    "host_group_id" : "{{host_group_id}}"
+    "name": "Capacity Check Host",
+    "host_group_id": "{{host_group_id}}"
 }
 
 > {%
@@ -58,7 +58,7 @@ Content-Type:  application/json
     "vcpu_cores": 1,
     "ram_capacity": 1024,
     "image_id": "{{dev_image_id}}",
-    "requires_floating_ip": true,
+    "requires_floating_ip": false,
     "network_id": "{{dev_network_id}}",
     "volume_capacity": 30,
     "volume_iops": 600
@@ -76,14 +76,8 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "host_group_id": "hg-d3587fdc"
+    "host_group_id": "{{host_group_id}}"
 }
-
-### Move the instance to a PUBLIC host group
-POST https://{{host}}/{{version}}/instances/{{instance_id}}/migrate
-X-consumer-custom-id:  0-0
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
 
 
 ### Cleanup instance

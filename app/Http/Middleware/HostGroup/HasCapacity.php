@@ -22,9 +22,12 @@ class HasCapacity
             $instance = Instance::forUser($request->user())->findOrFail($request->route('instanceId'));
 
             $capacity = $hostGroup->getAvailableCapacity();
+
+            $projectedRamUse = $capacity['ram']['used'] + $instance->ram_capacity;
+            $ramCapacity = ($capacity['ram']['capacity'] > 0) ? $capacity['ram']['capacity'] : 1;
+
             if ($capacity['cpu']['percentage'] > $this->capacityThreshold ||
-                ((int)ceil((($capacity['ram']['used'] + $instance->ram_capacity) /
-                        $capacity['ram']['capacity']) / 100)) > $this->capacityThreshold) {
+                ((int)ceil(($projectedRamUse / $ramCapacity) / 100)) > $this->capacityThreshold) {
                 return response()->json([
                     'errors' => [
                         'title' => 'Conflict',
