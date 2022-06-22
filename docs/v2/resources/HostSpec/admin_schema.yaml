@@ -36,4 +36,8 @@ properties:
     required : true
     readonly : false
     example : 64
+  is_hidden :
+    type : boolean
+    readOnly : true
+    example : false
 description: 'Host Spec'
