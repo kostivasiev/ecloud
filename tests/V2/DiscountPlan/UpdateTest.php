@@ -34,7 +34,6 @@ class UpdateTest extends TestCase
             'discount_rate' => '10',
             'term_length' => '36',
             'term_start_date' => date('Y-m-d', strtotime('tomorrow')),
-            'term_end_date' => date('Y-m-d', strtotime('4 days')),
         ];
         $this->patch(
             '/v2/discount-plans/'.$this->discountPlan->id,
