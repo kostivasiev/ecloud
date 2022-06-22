@@ -3,16 +3,18 @@
 namespace App\Http\Requests\V2\HostGroup;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\HostSpec;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreRequest extends FormRequest
 {
     public function rules()
     {
-        return [
+        $rules = [
             'name' => 'nullable|string|max:255',
             'vpc_id' => [
                 'required',
@@ -31,6 +33,7 @@ class StoreRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.host_specs,id,deleted_at,NULL',
+                new ExistsForUser(HostSpec::class),
             ],
             'windows_enabled' => [
                 'sometimes',
@@ -38,5 +41,15 @@ class StoreRequest extends FormRequest
                 'boolean'
             ]
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $rules['is_hidden'] = [
+                'sometimes',
+                'required',
+                'boolean'
+            ];
+        }
+
+        return $rules;
     }
 }
