@@ -12,7 +12,7 @@ class ResourceTierController extends BaseController
 {
     public function index(Request $request)
     {
-        $collection = ResourceTier::all();
+        $collection = ResourceTier::query();
 
         return ResourceTierResource::collection(
             $collection->search()
