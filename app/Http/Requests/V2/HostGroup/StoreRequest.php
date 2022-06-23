@@ -39,7 +39,7 @@ class StoreRequest extends FormRequest
                 'sometimes',
                 'required',
                 'boolean'
-            ]
+            ],
         ];
 
         return $rules;
