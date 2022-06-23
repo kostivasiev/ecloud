@@ -33,4 +33,4 @@ get:
                               last:
                                 example: 'https://api.ukfast.io/ecloud/v2/resource-tiers?page=2'
   tags:
-    - Resource Tiers
+    - Availability Zones

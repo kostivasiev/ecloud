@@ -34,3 +34,16 @@ get:
                                 example: 'https://api.ukfast.io/ecloud/v2/resource-tiers?page=2'
   tags:
     - Resource Tiers
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../resources/ResourceTier/schema.yaml'
+  responses:
+    201:
+      description: Accepted
+      $ref: '../../resources/ResourceTier/responses/idResponse.yaml'
+  tags:
+    - Resource Tiers

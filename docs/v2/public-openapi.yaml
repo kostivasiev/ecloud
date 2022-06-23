@@ -193,7 +193,7 @@ paths:
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/prices':
     $ref: 'resources/AvailabilityZone/prices-collection.yaml'
   '/ecloud/v2/availability-zones/{AvailabilityZoneId}/resource-tiers':
-    $ref: 'resources/ResourceTier/collection.yaml'
+    $ref: 'resources/AvailabilityZone/resource-tier-collection.yaml'
   '/ecloud/v2/billing-metrics':
     $ref: 'resources/BillingMetric/public_collection.yaml'
   '/ecloud/v2/billing-metrics/{billingMetricsId}':
