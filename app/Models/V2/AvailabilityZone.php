@@ -130,6 +130,11 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
         return $this->hasMany(VpnProfileGroup::class);
     }
 
+    public function resourceTiers()
+    {
+        return $this->hasMany(ResourceTier::class);
+    }
+
     public function nsxService()
     {
         if (!$this->nsxService) {

@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SoftwareSeeder::class);
         $this->call(ImageSeeder::class);
         $this->call(LoadBalancerSeeder::class);
+        $this->call(ResourceTierSeeder::class);
 
         // Create some dev resources for test reseller 7052
         $this->call(SshKeyPairSeeder::class);
