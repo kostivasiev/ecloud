@@ -4,6 +4,7 @@ namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Region;
+use Database\Seeders\ResourceTierSeeder;
 use Faker\Factory as Faker;
 use Tests\TestCase;
 
@@ -21,24 +22,25 @@ class UpdateTest extends TestCase
         $this->faker = Faker::create();
         $region = Region::factory()->create();
         $this->availabilityZone = AvailabilityZone::factory()->create([
-            'region_id' => $region->id
+            'region_id' => $region->id,
+            'default_resource_tier_id' => 'test-resource-tier'
         ]);
         $this->region = Region::factory()->create();
+        (new ResourceTierSeeder())->run();
     }
 
     public function testValidDataIsSuccessful()
     {
-        $patch = $this->patch(
+        $this->assertEquals('test-resource-tier', $this->availabilityZone->default_resource_tier_id);
+
+        $patch = $this->asAdmin()->patch(
             '/v2/availability-zones/' . $this->availabilityZone->id,
             [
                 'code' => 'MAN2',
                 'name' => 'Manchester Zone 2',
                 'datacentre_site_id' => 2,
                 'region_id' => $this->region->id,
-            ],
-            [
-                'X-consumer-custom-id' => '0-0',
-                'X-consumer-groups' => 'ecloud.write',
+                'default_resource_tier_id' => 'rt-aaaaaaaa',
             ]
         )->assertStatus(200);
 
@@ -50,6 +52,7 @@ class UpdateTest extends TestCase
                 'name' => 'Manchester Zone 2',
                 'datacentre_site_id' => 2,
                 'region_id' => $this->region->id,
+                'default_resource_tier_id' => 'rt-aaaaaaaa',
             ],
             'ecloud'
         );
@@ -61,5 +64,7 @@ class UpdateTest extends TestCase
             = (json_decode($patch->getContent()))->meta->location;
         $this->assertTrue((substr_count($metaLocation, $availabilityZoneId)
             == 1));
+
+        $this->assertEquals('rt-aaaaaaaa', $this->availabilityZone->refresh()->default_resource_tier_id);
     }
 }

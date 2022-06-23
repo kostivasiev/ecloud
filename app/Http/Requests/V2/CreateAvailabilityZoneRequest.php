@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\ResourceTier;
 use App\Models\V2\Software;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -40,9 +41,8 @@ class CreateAvailabilityZoneRequest extends FormRequest
             'default_resource_tier_id' => [
                 'sometimes',
                 'required',
-                'string'
-                // TODO: add in an exists rule for resource tier when the CRUD has been deployed
-                //Rule::exists(ResourceTier::class, 'id')->whereNull('deleted_at')
+                'string',
+                Rule::exists(ResourceTier::class, 'id')->whereNull('deleted_at')
             ],
         ];
     }

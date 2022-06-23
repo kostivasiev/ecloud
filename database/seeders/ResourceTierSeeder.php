@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\V2\ResourceTier;
 use Illuminate\Database\Seeder;
-use Illuminate\Foundation\Testing\WithFaker;
 
 class ResourceTierSeeder extends Seeder
 {
@@ -16,7 +15,7 @@ class ResourceTierSeeder extends Seeder
     public function run()
     {
         ResourceTier::factory()->create([
-            'id' => 'rt-123456',
+            'id' => 'rt-aaaaaaaa',
             'name' => 'Dev Tier',
             'availability_zone_id' => 'az-aaaaaaaa'
         ]);
