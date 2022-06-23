@@ -3,12 +3,13 @@
 namespace App\Http\Requests\V2\HostSpec;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class Create extends FormRequest
 {
     public function rules()
     {
-        return [
+        $rules = [
             'name' => [
                 'nullable',
                 'string',
@@ -45,5 +46,14 @@ class Create extends FormRequest
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
             ]
         ];
+
+        if (Auth::user()->isAdmin()) {
+            $rules['is_hidden'] = [
+                'sometimes',
+                'boolean',
+            ];
+        }
+
+        return $rules;
     }
 }
