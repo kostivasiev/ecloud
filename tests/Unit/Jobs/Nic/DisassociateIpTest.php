@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unir\Jobs\Nic;
+namespace Tests\Unit\Jobs\Nic;
 
 use App\Jobs\Nic\DisassociateIp;
 use Tests\TestCase;
