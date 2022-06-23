@@ -57,7 +57,7 @@ class HostGroupController extends BaseController
             'vpc_id',
             'availability_zone_id',
             'host_spec_id',
-            'windows_enabled'
+            'windows_enabled',
         ]));
         $task = $model->syncSave();
 

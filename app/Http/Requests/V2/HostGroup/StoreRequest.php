@@ -14,7 +14,7 @@ class StoreRequest extends FormRequest
 {
     public function rules()
     {
-        $rules = [
+        return [
             'name' => 'nullable|string|max:255',
             'vpc_id' => [
                 'required',
@@ -39,9 +39,7 @@ class StoreRequest extends FormRequest
                 'sometimes',
                 'required',
                 'boolean'
-            ],
+            ]
         ];
-
-        return $rules;
     }
 }
