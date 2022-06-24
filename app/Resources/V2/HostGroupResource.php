@@ -10,16 +10,12 @@ class HostGroupResource extends UKFastResource
 {
     public function toArray($request)
     {
-        $hostSpecId = (!$this->hostSpec->is_hidden) ? $this->hostSpec->id : null;
-        if (Auth::user()->isAdmin()) {
-            $hostSpecId = $this->hostSpec->id;
-        }
         return [
             'id' => $this->id,
             'name' => $this->name,
             'vpc_id' => $this->vpc_id,
             'availability_zone_id' => $this->availability_zone_id,
-            'host_spec_id' => $hostSpecId,
+            'host_spec_id' => (!$this->hostSpec->is_hidden || Auth::user()->isAdmin()) ? $this->hostSpec->id : null,
             'windows_enabled' => $this->windows_enabled,
             'usage' => [
                 'hosts' => $this->hosts->count(),

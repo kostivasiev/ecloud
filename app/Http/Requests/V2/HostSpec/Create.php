@@ -44,15 +44,12 @@ class Create extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
-            ]
-        ];
-
-        if (Auth::user()->isAdmin()) {
-            $rules['is_hidden'] = [
+            ],
+            'is_hidden' => [
                 'sometimes',
                 'boolean',
-            ];
-        }
+            ]
+        ];
 
         return $rules;
     }
