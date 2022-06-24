@@ -2,8 +2,8 @@
 
 namespace App\Jobs\Tasks\Instance;
 
-use App\Jobs\Instance\Deploy\AssignSharedHostGroup;
 use App\Jobs\Job;
+use App\Jobs\Kingpin\Instance\MoveToPublicHostGroup;
 use App\Models\V2\Instance;
 use App\Models\V2\Task;
 use App\Traits\V2\LoggableModelJob;
@@ -29,7 +29,7 @@ class MigratePublic extends Job
 
         $this->updateTaskBatch([
             [
-                new AssignSharedHostGroup($this->model),
+                new MoveToPublicHostGroup($this->model),
             ]
         ], function () use ($task) {
             $task->resource->hostGroup()->dissociate();
