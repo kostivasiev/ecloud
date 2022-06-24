@@ -16,7 +16,7 @@ properties:
     type: string
     example: reg-2b66bb79
     readOnly: true
-  default_resource_tier_id:
+  resource_tier_id:
     type : string
     description: ID of the default resource tier for the availability zone
     example : "rt-abc123"
