@@ -249,4 +249,16 @@ class CrudTest extends TestCase
                 'status' => 422,
             ])->assertStatus(422);
     }
+
+    public function testDeleteFailsWhenSpecIsHidden()
+    {
+        $this->hostSpec()->setAttribute('is_hidden', true)->saveQuietly();
+        $this->hostGroup();
+        $response = $this->asUser()
+            ->delete('/v2/host-groups/hg-test')
+            ->assertJsonFragment([
+                'title' => 'Forbidden',
+                'detail' => 'This HostGroup cannot be deleted',
+            ])->assertStatus(403);
+    }
 }
