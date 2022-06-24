@@ -70,7 +70,7 @@ client.test("Request executed successfully", function() {
   client.assert(response.body.data.code === "MAN1", "Incorrect resource code returned");
   client.assert(response.body.data.datacentre_site_id === 111, "Incorrect resource datacentre_site_id returned");
   client.assert(response.body.data.region_id === "reg-aaaaaaaa", "Incorrect resource region_id returned");
-  client.assert(response.body.data.default_resource_tier_id === "rt-aaaaaaaa", "Incorrect default_resource_tier_id returned");
+  client.assert(response.body.data.resource_tier_id === "rt-aaaaaaaa", "Incorrect resource_tier_id returned");
 });
 %}
 
