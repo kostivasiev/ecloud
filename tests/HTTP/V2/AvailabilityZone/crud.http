@@ -113,7 +113,7 @@ Content-Type: application/json
   "datacentre_site_id": 112,
   "is_public": true,
   "region_id": "{{region_id_2}}",
-  "default_resource_tier_id": "{{dev_resource_tier_id}}"
+  "resource_tier_id": "{{dev_resource_tier_id}}"
 }
 
 
