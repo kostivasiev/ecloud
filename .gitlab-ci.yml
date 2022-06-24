@@ -10,3 +10,11 @@ include:
   - project: 'ukfast/api.ukfast/gitlab-ci'
     ref: master
     file: '/templates/main.yml'
+
+rndcloud_staging:
+  script:
+    - apk --update add openssh-client
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - export TARGET_FOLDER=${STAGING_PROJECT_NAME:-$CI_PROJECT_NAME-apio}
+    - ssh -o "StrictHostKeyChecking=no" -t root@web-02.staging.rnd.ukfast "cd /home/vhost/$TARGET_FOLDER ; git pull origin master ; cp .env.example .env ; $STAGING_PHP_PATH /usr/bin/composer install --no-dev ; $STAGING_PHP_PATH artisan migrate ; supervisorctl reload";
