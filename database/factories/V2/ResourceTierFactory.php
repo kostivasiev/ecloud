@@ -12,7 +12,7 @@ class ResourceTierFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'active' => true
         ];
     }
 }
