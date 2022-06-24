@@ -23,7 +23,7 @@ class UpdateTest extends TestCase
         $region = Region::factory()->create();
         $this->availabilityZone = AvailabilityZone::factory()->create([
             'region_id' => $region->id,
-            'default_resource_tier_id' => 'test-resource-tier'
+            'resource_tier_id' => 'test-resource-tier'
         ]);
         $this->region = Region::factory()->create();
         (new ResourceTierSeeder())->run();
@@ -40,7 +40,7 @@ class UpdateTest extends TestCase
                 'name' => 'Manchester Zone 2',
                 'datacentre_site_id' => 2,
                 'region_id' => $this->region->id,
-                'default_resource_tier_id' => 'rt-aaaaaaaa',
+                'resource_tier_id' => 'rt-aaaaaaaa',
             ]
         )->assertStatus(200);
 
@@ -52,7 +52,7 @@ class UpdateTest extends TestCase
                 'name' => 'Manchester Zone 2',
                 'datacentre_site_id' => 2,
                 'region_id' => $this->region->id,
-                'default_resource_tier_id' => 'rt-aaaaaaaa',
+                'resource_tier_id' => 'rt-aaaaaaaa',
             ],
             'ecloud'
         );

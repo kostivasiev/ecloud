@@ -117,7 +117,7 @@ class CreateTest extends TestCase
             'datacentre_site_id' => $this->faker->randomDigit(),
             'is_public' => false,
             'region_id' => $this->region()->id,
-            'default_resource_tier_id' => 'rt-aaaaaaaa',
+            'resource_tier_id' => 'rt-aaaaaaaa',
         ];
         $post = $this->asAdmin()->post('/v2/availability-zones', $data)
             ->assertStatus(201);
