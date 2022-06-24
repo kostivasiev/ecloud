@@ -36,12 +36,11 @@ class Deploy extends Job
             'instanceId' => $this->model->getKey(),
             'numCPU' => $this->model->vcpu_cores,
             'ramMib' => $this->model->ram_capacity,
-            'resourceTierTags' => config('instance.resource_tier_tags'),
             'backupEnabled' => $this->model->backup_enabled,
+            'hostGroupId' => $this->model->deploy_data['hostGroupId'],
         ];
 
         if (!empty($this->model->host_group_id)) {
-            unset($deployData['resourceTierTags']);
             $deployData['hostGroupId'] = $this->model->host_group_id;
         }
 
