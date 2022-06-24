@@ -242,7 +242,7 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
             'ucs_compute_name' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
-            'default_resource_tier_id' => $filter->string()
+            'resource_tier_id' => $filter->string()
         ]);
     }
 }
