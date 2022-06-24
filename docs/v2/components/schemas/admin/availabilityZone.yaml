@@ -30,7 +30,7 @@ properties:
     type : string
     example : AA-LOREM-A12-01'
     readOnly : false
-  default_resource_tier_id:
+  resource_tier_id:
     type : string
     description: ID of the default resource tier for the availability zone
     example : "rt-abc123"
