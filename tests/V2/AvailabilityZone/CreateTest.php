@@ -78,7 +78,7 @@ class CreateTest extends TestCase
             'code' => 'MAN1',
             'name' => 'Manchester Zone 1',
             'region_id' => $this->region()->id,
-            'default_resource_tier_id' => 'rt-aaaaaaaa',
+            'resource_tier_id' => 'rt-aaaaaaaa',
         ];
         $this->asAdmin()->post('/v2/availability-zones', $data)
             ->assertJsonFragment([
