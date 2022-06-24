@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\V2;
 
+use App\Models\V2\ResourceTier;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateAvailabilityZoneRequest extends FormRequest
 {
@@ -34,17 +36,13 @@ class UpdateAvailabilityZoneRequest extends FormRequest
                 'sometimes',
                 'required',
                 'string'
-            ]
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'code.required' => 'The :attribute field, when specified, cannot be null',
-            'name.required' => 'The :attribute field, when specified, cannot be null',
-            'datacentre_site_id.required' => 'The :attribute field, when specified, cannot be null',
-            'region_id.exists' => 'The specified :attribute was not found'
+            ],
+            'resource_tier_id' => [
+                'sometimes',
+                'required',
+                'string',
+                Rule::exists(ResourceTier::class, 'id')->whereNull('deleted_at')
+            ],
         ];
     }
 }

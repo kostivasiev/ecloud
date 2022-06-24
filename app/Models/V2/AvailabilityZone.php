@@ -40,6 +40,7 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
         'is_public',
         'san_name',
         'ucs_compute_name',
+        'resource_tier_id',
     ];
 
     protected $dispatchesEvents = [
@@ -241,6 +242,7 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
             'ucs_compute_name' => $filter->string(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
+            'resource_tier_id' => $filter->string()
         ]);
     }
 }
