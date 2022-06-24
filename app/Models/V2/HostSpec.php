@@ -76,10 +76,6 @@ class HostSpec extends Model implements Searchable
             return $query;
         }
 
-        if (in_array($user->resellerId(), config('reseller.internal'))) {
-            return $query;
-        }
-
         return $query->where('is_hidden', '=', false);
     }
 
