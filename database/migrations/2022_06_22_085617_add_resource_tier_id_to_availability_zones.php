@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::connection('ecloud')->table('availability_zones', function (Blueprint $table) {
-            $table->uuid('default_resource_tier_id')->nullable();
+            $table->uuid('resource_tier_id')->nullable();
         });
     }
 
