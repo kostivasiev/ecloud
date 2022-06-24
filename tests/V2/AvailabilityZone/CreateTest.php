@@ -25,7 +25,7 @@ class CreateTest extends TestCase
             'name' => 'Manchester Zone 1',
             'datacentre_site_id' => $this->faker->randomDigit(),
             'region_id' => $this->region()->id,
-            'default_resource_tier_id' => 'rt-aaaaaaaa',
+            'resource_tier_id' => 'rt-aaaaaaaa',
         ];
         $this->asUser()->post('/v2/availability-zones', $data)
             ->assertJsonFragment([
