@@ -40,7 +40,7 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
         'is_public',
         'san_name',
         'ucs_compute_name',
-        'default_resource_tier_id',
+        'resource_tier_id',
     ];
 
     protected $dispatchesEvents = [

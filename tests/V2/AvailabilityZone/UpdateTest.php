@@ -31,7 +31,7 @@ class UpdateTest extends TestCase
 
     public function testValidDataIsSuccessful()
     {
-        $this->assertEquals('test-resource-tier', $this->availabilityZone->default_resource_tier_id);
+        $this->assertEquals('test-resource-tier', $this->availabilityZone->resource_tier_id);
 
         $patch = $this->asAdmin()->patch(
             '/v2/availability-zones/' . $this->availabilityZone->id,
@@ -65,6 +65,6 @@ class UpdateTest extends TestCase
         $this->assertTrue((substr_count($metaLocation, $availabilityZoneId)
             == 1));
 
-        $this->assertEquals('rt-aaaaaaaa', $this->availabilityZone->refresh()->default_resource_tier_id);
+        $this->assertEquals('rt-aaaaaaaa', $this->availabilityZone->refresh()->resource_tier_id);
     }
 }
