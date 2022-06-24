@@ -1,0 +1,48 @@
+get:
+  parameters:
+    - $ref: '../../resources/ResourceTier/parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: '../../resources/ResourceTier/schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Resource Tiers
+patch:
+  parameters:
+    - $ref: '../../resources/ResourceTier/parameters/id.yaml'
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          allOf:
+            - $ref: '../../resources/ResourceTier/schema.yaml'
+            - type : object
+              properties :
+                name:
+                  readOnly: false
+                availability_zone_id:
+                  readOnly: true
+  responses:
+    200:
+      $ref: '../../resources/ResourceTier/responses/idResponse.yaml'
+  tags:
+    - Resource Tiers
+delete:
+  parameters:
+    - $ref: '../../resources/ResourceTier/parameters/id.yaml'
+  responses:
+    204:
+      description: Accepted
+  tags:
+    - Resource Tiers
+

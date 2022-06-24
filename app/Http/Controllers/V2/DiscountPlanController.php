@@ -6,6 +6,7 @@ use App\Http\Requests\V2\DiscountPlan\Create;
 use App\Http\Requests\V2\DiscountPlan\Update;
 use App\Models\V2\DiscountPlan;
 use App\Resources\V2\DiscountPlanResource;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -55,7 +56,8 @@ class DiscountPlanController extends BaseController
         if ($this->isAdmin && empty($this->resellerId)) {
             throw new BadRequestException('Missing Reseller scope');
         }
-        $discountPlan = new DiscountPlan($request->only([
+        $discountPlan = new DiscountPlan();
+        $discountPlan->fill($request->only([
             'name',
             'commitment_amount',
             'commitment_before_discount',
@@ -95,7 +97,7 @@ class DiscountPlanController extends BaseController
     public function update(Update $request, string $discountPlanId)
     {
         $discountPlan = DiscountPlan::forUser(Auth::user())->findOrFail($discountPlanId);
-        $discountPlan->update($request->only([
+        $discountPlan->fill($request->only([
             'name',
             'commitment_amount',
             'commitment_before_discount',
@@ -112,7 +114,7 @@ class DiscountPlanController extends BaseController
         }
 
         // if start date specified then use existing term_length or newly submitted one
-        if ($request->has('term_start_date')) {
+        if ($request->has('term_start_date') && !$request->has('term_end_date')) {
             $termLength = $request->get('term_length', $discountPlan->term_length);
             $discountPlan->term_end_date = $this->calculateNewEndDate(
                 $request->get('term_start_date'),

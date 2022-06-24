@@ -35,6 +35,8 @@ Route::group([
         Route::get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
     });
 
+    Route::get('availability-zones/{zoneId}/resource-tiers', 'AvailabilityZoneController@resourceTiers');
+
     /** Availability Zone Capacities */
     Route::group(['middleware' => 'is-admin'], function () {
         Route::get('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@index');
@@ -665,6 +667,16 @@ Route::group([
         Route::group(['middleware' => 'affinity-rule-member-are-members-syncing'], function() {
             Route::post('/', 'AffinityRuleMemberController@store');
             Route::delete('/{affinityRuleMemberId}', 'AffinityRuleMemberController@destroy');
+        });
+    });
+
+    Route::group(['prefix' => 'resource-tiers'], function () {
+        Route::get('/', 'ResourceTierController@index');
+        Route::get('/{resourceTierId}', 'ResourceTierController@show');
+        Route::group(['middleware' => 'is-admin'], function() {
+            Route::post('/', 'ResourceTierController@store');
+            Route::patch('/{resourceTierId}', 'ResourceTierController@update');
+            Route::delete('/{resourceTierId}', 'ResourceTierController@destroy');
         });
     });
 
