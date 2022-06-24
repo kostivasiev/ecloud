@@ -37,7 +37,7 @@ class UpdateAvailabilityZoneRequest extends FormRequest
                 'required',
                 'string'
             ],
-            'default_resource_tier_id' => [
+            'resource_tier_id' => [
                 'sometimes',
                 'required',
                 'string',
