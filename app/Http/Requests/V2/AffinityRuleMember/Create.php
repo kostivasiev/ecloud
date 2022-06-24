@@ -16,6 +16,7 @@ use Illuminate\Validation\Rule;
 
 /**
  * @property $instance_id
+ * @property $affinity_rule_id
  */
 class Create extends FormRequest
 {
@@ -50,16 +51,5 @@ class Create extends FormRequest
                 new IsResourceAvailable(AffinityRule::class),
             ],
         ];
-    }
-
-    // Add affinityRuleId route parameter to validation data
-    public function all($keys = null)
-    {
-        return array_merge(
-            parent::all(),
-            [
-                'affinity_rule_id' => app('request')->route('affinityRuleId')
-            ]
-        );
     }
 }

@@ -288,6 +288,10 @@ paths:
     $ref: 'resources/Region/availabilityZones.yaml'
   '/ecloud/v2/regions/{regionId}/vpcs':
     $ref: 'resources/Region/vpc-collection.yaml'
+  '/ecloud/v2/resource-tiers':
+    $ref: 'resources/ResourceTier/admin-collection.yaml'
+  '/ecloud/v2/resource-tiers/{resourceTierId}':
+    $ref: 'resources/ResourceTier/admin-item.yaml'
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':

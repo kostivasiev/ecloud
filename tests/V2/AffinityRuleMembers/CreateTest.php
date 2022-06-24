@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    public const RESOURCE_URI = '/v2/affinity-rules/%s/members/%s';
+    public const RESOURCE_URI = '/v2/affinity-rule-members';
     public AffinityRule $affinityRule;
     public AffinityRuleMember $affinityRuleMember;
 
@@ -38,7 +38,7 @@ class CreateTest extends TestCase
         Event::fake([Created::class]);
 
         $this->asUser()
-            ->post(sprintf(static::RESOURCE_URI, $this->affinityRule->id, ''), $data)
+            ->post(static::RESOURCE_URI, $data)
             ->assertStatus(202);
 
         $this->assertDatabaseHas(
@@ -93,7 +93,7 @@ class CreateTest extends TestCase
         Event::fake([Created::class]);
 
         $this->asUser()
-            ->post(sprintf(static::RESOURCE_URI, $this->affinityRule->id, ''), $data)
+            ->post(static::RESOURCE_URI, $data)
             ->assertStatus(202);
     }
 }

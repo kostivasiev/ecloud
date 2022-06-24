@@ -35,6 +35,8 @@ Route::group([
         Route::get('availability-zones/{zoneId}/capacities', 'AvailabilityZoneController@capacities');
     });
 
+    Route::get('availability-zones/{zoneId}/resource-tiers', 'AvailabilityZoneController@resourceTiers');
+
     /** Availability Zone Capacities */
     Route::group(['middleware' => 'is-admin'], function () {
         Route::get('availability-zone-capacities', 'AvailabilityZoneCapacitiesController@index');
@@ -509,7 +511,10 @@ Route::group([
         Route::get('host-groups/{id}/tasks', 'HostGroupController@tasks');
         Route::post('host-groups', 'HostGroupController@store');
         Route::patch('host-groups/{id}', 'HostGroupController@update');
-        Route::delete('host-groups/{id}', 'HostGroupController@destroy');
+        Route::delete('host-groups/{id}', [
+            'middleware' => 'host-group-can-be-deleted',
+            'uses' => 'HostGroupController@destroy'
+        ]);
     });
 
     /** Images */
@@ -658,16 +663,24 @@ Route::group([
         ]);
 
         Route::get('/{affinityRuleId}/members', 'AffinityRuleMemberController@index');
-        Route::get('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@show');
-        Route::post('/{affinityRuleId}/members', [
-            'middleware' => 'affinity-rule-member-are-members-syncing',
-            'uses' => 'AffinityRuleMemberController@store',
-        ]);
-//        Route::patch('/{affinityRuleId}/members/{affinityRuleMemberId}', 'AffinityRuleMemberController@update');
-        Route::delete('/{affinityRuleId}/members/{affinityRuleMemberId}', [
-            'middleware' => 'affinity-rule-member-are-members-syncing',
-            'uses' => 'AffinityRuleMemberController@destroy',
-        ]);
+    });
+
+    Route::group(['prefix' => 'affinity-rule-members'], function () {
+        Route::get('/{affinityRuleMemberId}', 'AffinityRuleMemberController@show');
+        Route::group(['middleware' => 'affinity-rule-member-are-members-syncing'], function() {
+            Route::post('/', 'AffinityRuleMemberController@store');
+            Route::delete('/{affinityRuleMemberId}', 'AffinityRuleMemberController@destroy');
+        });
+    });
+
+    Route::group(['prefix' => 'resource-tiers'], function () {
+        Route::get('/', 'ResourceTierController@index');
+        Route::get('/{resourceTierId}', 'ResourceTierController@show');
+        Route::group(['middleware' => 'is-admin'], function() {
+            Route::post('/', 'ResourceTierController@store');
+            Route::patch('/{resourceTierId}', 'ResourceTierController@update');
+            Route::delete('/{resourceTierId}', 'ResourceTierController@destroy');
+        });
     });
 
     /** Load Balancer Network */

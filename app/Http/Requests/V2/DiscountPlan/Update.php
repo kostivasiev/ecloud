@@ -41,7 +41,6 @@ class Update extends FormRequest
             'discount_rate' => 'sometimes|required|numeric|min:0|max:100',
             'term_length' => [
                 'sometimes',
-                'required',
                 'nullable',
                 'integer',
                 'min:1',
@@ -56,7 +55,6 @@ class Update extends FormRequest
             ],
             'term_end_date' => [
                 'sometimes',
-                'required',
                 'nullable',
                 'date',
                 'after:today',
@@ -76,6 +74,17 @@ class Update extends FormRequest
 
         if (Auth::user()->isAdmin()) {
             $rules['term_start_date'] = 'sometimes|required|date';
+            $rules['term_end_date'] = [
+                'sometimes',
+                'nullable',
+                'date',
+                new CommitmentIsGreater($discountPlanId),
+                function ($attribute, $value, $fail) {
+                    if (strtotime($value) <= strtotime($this->request->get('term_start_date'))) {
+                        $fail('The '.$attribute.' must be greater than the term_start_date');
+                    }
+                }
+            ];
             $rules['status'] = 'sometimes|required|string|in:approved,rejected';
         }
 
