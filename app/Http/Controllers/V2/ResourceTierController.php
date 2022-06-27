@@ -5,6 +5,7 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\ResourceTier\Create;
 use App\Http\Requests\V2\ResourceTier\Update;
 use App\Models\V2\ResourceTier;
+use App\Resources\V2\HostGroupResource;
 use App\Resources\V2\ResourceTierResource;
 use Illuminate\Http\Request;
 
@@ -55,5 +56,14 @@ class ResourceTierController extends BaseController
         ResourceTier::findOrFail($resourceTierId)
             ->delete();
         return response('', 204);
+    }
+
+    public function hostGroups(Request $request, string $resourceTierId)
+    {
+        $collection = ResourceTier::findOrFail($resourceTierId)->hostGroups();
+
+        return HostGroupResource::collection($collection->search()->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }
