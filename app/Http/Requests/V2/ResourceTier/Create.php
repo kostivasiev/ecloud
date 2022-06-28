@@ -15,6 +15,11 @@ class Create extends FormRequest
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
             ],
+            'active' => [
+                'sometimes',
+                'required',
+                'boolean'
+            ]
         ];
     }
 }
