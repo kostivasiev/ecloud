@@ -27,5 +27,4 @@ class Create extends FormRequest
             ]
         ];
     }
-
 }
