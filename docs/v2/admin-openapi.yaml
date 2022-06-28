@@ -62,6 +62,8 @@ components:
               required: false
               type: boolean
               example: 'true'
+    ResourceTierHostGroup:
+      $ref: 'resources/ResourceTierHostGroup/admin-schema.yaml'
     Software:
       $ref: 'resources/Software/schema.yaml'
     Task:
@@ -292,6 +294,14 @@ paths:
     $ref: 'resources/ResourceTier/admin-collection.yaml'
   '/ecloud/v2/resource-tiers/{resourceTierId}':
     $ref: 'resources/ResourceTier/admin-item.yaml'
+
+  '/ecloud/v2/resource-tier-host-groups' :
+    $ref : 'resources/ResourceTierHostGroup/admin-collection.yaml'
+  '/ecloud/v2/resource-tier-host-groups/{resourceTierHostGroupId}' :
+    $ref : 'resources/ResourceTierHostGroup/admin-item.yaml'
+  '/ecloud/v2/resource-tiers/{resourceTierId}/host-groups' :
+    $ref : 'resources/ResourceTier/host-groups-collection.yaml'
+
   '/ecloud/v2/routers':
     $ref: 'resources/Router/admin-collection.yaml'
   '/ecloud/v2/routers/{routerId}':
