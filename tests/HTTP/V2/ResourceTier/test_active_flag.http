@@ -1,0 +1,119 @@
+### 1. Create Resource Tier (active)
+POST https://{{host}}/{{version}}/resource-tiers
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "availability_zone_id": "{{dev_availability_zone_id}}",
+    "active": true
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('resource_tier_active_id', response.body.data.id);
+%}
+
+### 2. Create Resource Tier (inactive)
+POST https://{{host}}/{{version}}/resource-tiers
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "availability_zone_id": "{{dev_availability_zone_id}}",
+    "active": false
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('resource_tier_inactive_id', response.body.data.id);
+%}
+
+### 3. Get active Resource Tier (customer)
+GET https://{{host}}/{{version}}/resource-tiers/{{resource_tier_active_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.hasOwnProperty('active') === false, 'active property is not as expected');
+});
+%}
+
+### 4. Get active Resource Tier (admin)
+GET https://{{host}}/{{version}}/resource-tiers/{{resource_tier_active_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.active === true, 'active property is not as expected');
+});
+%}
+
+### 5. Get inactive Resource Tier (customer)
+GET https://{{host}}/{{version}}/resource-tiers/{{resource_tier_inactive_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 404, '404 response not received');
+});
+%}
+
+### 6. Get inactive Resource Tier (admin)
+GET https://{{host}}/{{version}}/resource-tiers/{{resource_tier_inactive_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id == client.global.get('resource_tier_inactive_id'), 'id property is not as expected');
+    client.assert(response.body.data.active === false, 'active property is not as expected');
+});
+%}
+
+### 7. Delete Resource As Admin (Should Succeed)
+DELETE https://{{host}}/{{version}}/resource-tiers/{{resource_tier_active_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}
+
+### 8. Check Resource Tier is Deleted
+DELETE https://{{host}}/{{version}}/resource-tiers/{{resource_tier_inactive_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}

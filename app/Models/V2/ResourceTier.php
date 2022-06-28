@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
@@ -28,9 +29,28 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
             'id',
             'name',
             'availability_zone_id',
+            'active',
         ]);
 
+        $this->casts = [
+            'active' => 'boolean'
+        ];
+
         parent::__construct($attributes);
+    }
+
+    /**
+     * @param $query
+     * @param Consumer $user
+     * @return mixed
+     */
+    public function scopeForUser($query, Consumer $user)
+    {
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        return $query->where('active', '=', true);
     }
 
     public function sieve(Sieve $sieve)
@@ -39,6 +59,7 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
             'id' => $filter->string(),
             'name' => $filter->string(),
             'availability_zone_id' => $filter->string(),
+            'active' => $filter->boolean(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
