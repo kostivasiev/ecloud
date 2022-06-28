@@ -19,7 +19,7 @@ class ResourceTierSeeder extends Seeder
     public function run()
     {
         ResourceTier::factory()->create([
-            'id' => 'rt-standard-cpu',
+            'id' => 'rt-aaaaaaaa',
             'name' => 'Standard CPU',
             'availability_zone_id' => 'az-aaaaaaaa'
         ]);
@@ -30,8 +30,15 @@ class ResourceTierSeeder extends Seeder
 
         ResourceTierHostGroup::factory()->create([
             'id' => 'rthg-standard-cpu',
-            'resource_tier_id' => 'rt-standard-cpu',
+            'resource_tier_id' => 'rt-aaaaaaaa',
             'host_group_id' => 'hg-standard-cpu'
         ]);
+
+//        ResourceTier::factory()->create([
+//            'id' => 'rt-high-cpu',
+//            'name' => 'High CPU',
+//            'availability_zone_id' => 'az-aaaaaaaa',
+//            'active' => false
+//        ]);
     }
 }

@@ -23,7 +23,7 @@ class ResourceTierHostGroupTest extends TestCase
 
     public function testRelationships()
     {
-        $resourceTierStandardCpu = ResourceTier::find('rt-standard-cpu');
+        $resourceTierStandardCpu = ResourceTier::find('rt-aaaaaaaa');
 
         $resourceTierHostGroup = $resourceTierStandardCpu->resourceTierHostGroups->first();
 
@@ -31,7 +31,7 @@ class ResourceTierHostGroupTest extends TestCase
         $this->assertEquals('hg-standard-cpu', $resourceTierHostGroup->hostGroup->id);
 
         // pivot -> resource tier
-        $this->assertEquals('rt-standard-cpu', $resourceTierHostGroup->resourceTier->id);
+        $this->assertEquals('rt-aaaaaaaa', $resourceTierHostGroup->resourceTier->id);
 
         // resource tier -> through pivot -> host groups
         $this->assertEquals('hg-standard-cpu', $resourceTierStandardCpu->hostGroups->first()->id);

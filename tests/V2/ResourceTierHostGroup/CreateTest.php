@@ -9,8 +9,9 @@ use Tests\TestCase;
 
 class CreateTest extends TestCase
 {
-    public const RESOURCE_URI = '/v2/resource-tier-host-groups';
+    public const COLLECTION_URI = '/v2/resource-tier-host-groups';
 
+    protected AvailabilityZone $availabilityZone;
     protected ResourceTier $resourceTier;
     protected HostGroup $hostGroup;
 
@@ -34,7 +35,6 @@ class CreateTest extends TestCase
         ]);
     }
 
-
     public function testCreateAdminPasses()
     {
         $data = [
@@ -43,7 +43,7 @@ class CreateTest extends TestCase
         ];
 
         $this->asAdmin()
-            ->post(static::RESOURCE_URI, $data)
+            ->post(static::COLLECTION_URI, $data)
             ->assertStatus(201);
 
         $this->assertDatabaseHas(
@@ -61,7 +61,7 @@ class CreateTest extends TestCase
         ];
 
         $this->asUser()
-            ->post(static::RESOURCE_URI, $data)
+            ->post(static::COLLECTION_URI, $data)
             ->assertStatus(401);
     }
 
@@ -79,7 +79,7 @@ class CreateTest extends TestCase
         ];
 
         $this->asAdmin()
-            ->post(static::RESOURCE_URI, $data)
+            ->post(static::COLLECTION_URI, $data)
             ->assertStatus(422);
     }
 }

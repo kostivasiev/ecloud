@@ -1,0 +1,12 @@
+GET https://{{host}}/{{version}}/resource-tiers/{{dev_resource_tier_id}}/host-groups
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data[0].id == "hg-standard-cpu");
+});
+%}
