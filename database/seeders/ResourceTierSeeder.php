@@ -34,11 +34,11 @@ class ResourceTierSeeder extends Seeder
             'host_group_id' => 'hg-standard-cpu'
         ]);
 
-//        ResourceTier::factory()->create([
-//            'id' => 'rt-high-cpu',
-//            'name' => 'High CPU',
-//            'availability_zone_id' => 'az-aaaaaaaa',
-//            'active' => false
-//        ]);
+        ResourceTier::factory()->create([
+            'id' => 'rt-high-cpu',
+            'name' => 'High CPU',
+            'availability_zone_id' => 'az-aaaaaaaa',
+            'active' => false
+        ]);
     }
 }
