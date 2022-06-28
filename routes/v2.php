@@ -677,10 +677,21 @@ Route::group([
         Route::get('/', 'ResourceTierController@index');
         Route::get('/{resourceTierId}', 'ResourceTierController@show');
         Route::group(['middleware' => 'is-admin'], function() {
+            Route::get('/{resourceTierId}/host-groups', 'ResourceTierController@hostGroups');
             Route::post('/', 'ResourceTierController@store');
             Route::patch('/{resourceTierId}', 'ResourceTierController@update');
             Route::delete('/{resourceTierId}', 'ResourceTierController@destroy');
         });
+    });
+
+    Route::group([
+        'prefix' => 'resource-tier-host-groups',
+        'middleware' => 'is-admin'
+    ], function () {
+        Route::get('/', 'ResourceTierHostGroupController@index');
+        Route::get('/{resourceTierHostGroupId}', 'ResourceTierHostGroupController@show');
+        Route::post('/', 'ResourceTierHostGroupController@store');
+        Route::delete('/{resourceTierHostGroupId}', 'ResourceTierHostGroupController@destroy');
     });
 
     /** Load Balancer Network */

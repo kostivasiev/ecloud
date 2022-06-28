@@ -1,0 +1,26 @@
+get:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  responses:
+    200:
+      description: success
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                $ref: 'admin-schema.yaml'
+              meta:
+                type: object
+  tags:
+    - Resource Tier Host Groups
+delete:
+  parameters:
+    - $ref: 'parameters/id.yaml'
+  responses:
+    204:
+      description: Success
+  tags:
+    - Resource Tier Host Groups
+

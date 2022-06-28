@@ -2,7 +2,9 @@
 
 namespace Tests\V2\ResourceTiers;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\ResourceTier;
+use Database\Seeders\ResourceTierSeeder;
 use Tests\TestCase;
 
 class GetTest extends TestCase
@@ -10,6 +12,7 @@ class GetTest extends TestCase
     public const RESOURCE_TIER_COLLECTION_URI = '/v2/resource-tiers';
     public const RESOURCE_TIER_ITEM_URI = '/v2/resource-tiers/%s';
     public const AZ_RESOURCE_TIER_URI = '/v2/availability-zones/%s/resource-tiers';
+    public const RT_HOST_GROUPS_URI = '/v2/resource-tiers/%s/host-groups';
 
     private ResourceTier $resourceTier;
 
@@ -119,5 +122,32 @@ class GetTest extends TestCase
                 'active' => true
             ])
             ->assertStatus(200);
+    }
+
+    public function testGetHostGroupsForResourceTierAsAdminPasses()
+    {
+        AvailabilityZone::factory()->create([
+            'id' => 'az-aaaaaaaa',
+            'region_id' => $this->region()->id,
+        ]);
+
+        (new ResourceTierSeeder())->run();
+
+        $this->asAdmin()
+        ->get(sprintf($this::RT_HOST_GROUPS_URI, 'rt-aaaaaaaa'))
+            ->assertJsonFragment([
+                'id' => 'hg-standard-cpu',
+                'name' => 'Standard CPU Host Group',
+                'availability_zone_id' => 'az-aaaaaaaa',
+                'host_spec_id' => 'hs-standard-cpu',
+            ])
+        ->assertStatus(200);
+    }
+
+    public function testGetHostGroupsForResourceTierAsUserFails()
+    {
+        $this->asUser()
+            ->get(sprintf($this::RT_HOST_GROUPS_URI, $this->resourceTier->id))
+            ->assertStatus(401);
     }
 }

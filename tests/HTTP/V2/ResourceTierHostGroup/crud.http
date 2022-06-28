@@ -1,0 +1,132 @@
+### 1. Create Resource Tier
+POST https://{{host}}/{{version}}/resource-tiers
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test Adding a Host Group",
+    "availability_zone_id": "{{dev_availability_zone_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 201, '201 response not received');
+});
+client.global.set('resource_tier_id', response.body.data.id);
+%}
+
+### 2. Create as user (should fail)
+POST https://{{host}}/{{version}}/resource-tier-host-groups
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 401, '401 response not received');
+});
+%}
+
+### 3. Create as Admin (Will need to have run the seeder to create host groups etc first)
+POST https://{{host}}/{{version}}/resource-tier-host-groups
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "resource_tier_id": "{{resource_tier_id}}",
+    "host_group_id": "{{dev_resource_tier_host_group_id}}"
+}
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('resource_tier_host_group_id', response.body.data.id);
+});
+%}
+
+
+### 4. GET collection non admin (should fail)
+GET https://{{host}}/{{version}}/resource-tier-host-groups
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 401, '401 response not received');
+});
+%}
+
+
+### 5. Get collection as admin
+GET https://{{host}}/{{version}}/resource-tier-host-groups
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 200, '200 response not received');
+});
+%}
+
+### 6. GET item non admin (should fail)
+GET https://{{host}}/{{version}}/resource-tier-host-groups/{{resource_tier_host_group_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 401, '401 response not received');
+});
+%}
+
+### 7. Get item as admin
+GET https://{{host}}/{{version}}/resource-tier-host-groups/{{resource_tier_host_group_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 200, '200 response not received');
+    client.assert(response.body.data.id == client.global.get('resource_tier_host_group_id'));
+    client.assert(response.body.data.host_group_id == "hg-standard-cpu");
+});
+%}
+
+### 8. Delete as non admin (shoud fail)
+DELETE https://{{host}}/{{version}}/resource-tier-host-groups/{{resource_tier_host_group_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_customer}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 401, '401 response not received');
+});
+%}
+
+### 9. Delete as admin
+DELETE https://{{host}}/{{version}}/resource-tier-host-groups/{{resource_tier_host_group_id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function () {
+    client.assert(response.status === 204, '204 response not received');
+});
+%}

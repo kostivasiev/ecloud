@@ -7,12 +7,13 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
-class ResourceTier extends Model implements Searchable
+class ResourceTier extends Model implements Searchable, AvailabilityZoneable
 {
     use CustomKey, SoftDeletes, DefaultName, HasFactory, DeletionRules;
 
@@ -67,5 +68,22 @@ class ResourceTier extends Model implements Searchable
     public function availabilityZone()
     {
         return $this->belongsTo(AvailabilityZone::class);
+    }
+
+    public function resourceTierHostGroups()
+    {
+        return $this->hasMany(ResourceTierHostGroup::class);
+    }
+
+    public function hostGroups(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            HostGroup::class,
+            ResourceTierHostGroup::class,
+            'resource_tier_id',
+            'id',
+            'id',
+            'host_group_id'
+        );
     }
 }
