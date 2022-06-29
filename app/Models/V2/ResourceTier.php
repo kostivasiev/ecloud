@@ -47,9 +47,4 @@ class ResourceTier extends Model implements Searchable
     {
         return $this->belongsTo(AvailabilityZone::class);
     }
-
-    public function hostGroups()
-    {
-        return $this->belongsToMany(HostGroup::class)->using(ResourceTierHostGroup::class);
-    }
 }
