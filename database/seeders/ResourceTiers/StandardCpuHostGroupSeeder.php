@@ -15,7 +15,7 @@ class StandardCpuHostGroupSeeder extends Seeder
     public function run()
     {
         HostGroup::factory()->create([
-            'id' => 'hg-standard-cpu',
+            'id' => 'hg-99f9b758', // ID to match G0 cluster / host_group_id
             'name' => 'Standard CPU Host Group',
             'availability_zone_id' => 'az-aaaaaaaa',
             'host_spec_id' => 'hs-standard-cpu',
