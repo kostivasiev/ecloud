@@ -3,10 +3,12 @@
 namespace App\Http\Requests\V2\HostGroup;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\HostSpec;
 use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\IsResourceAvailable;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreRequest extends FormRequest
 {
@@ -31,6 +33,7 @@ class StoreRequest extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.host_specs,id,deleted_at,NULL',
+                new ExistsForUser(HostSpec::class),
             ],
             'windows_enabled' => [
                 'sometimes',

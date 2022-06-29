@@ -2,13 +2,7 @@
 
 namespace Tests\V2\ResourceTiers;
 
-use App\Events\V2\Task\Created;
 use App\Models\V2\ResourceTier;
-use App\Models\V2\Instance;
-use App\Models\V2\Task;
-use App\Support\Sync;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class CreateTest extends TestCase
@@ -25,8 +19,26 @@ class CreateTest extends TestCase
     {
         $data = [
             'availability_zone_id' => $this->availabilityZone()->id,
+            'active' => true
         ];
 
+        $this->asAdmin()
+            ->post(static::RESOURCE_URI, $data)
+            ->assertStatus(201);
+
+        $this->assertDatabaseHas(
+            'resource_tiers',
+            $data,
+            'ecloud'
+        );
+    }
+
+    public function testCreateResourceTierAsAdminNotActive()
+    {
+        $data = [
+            'availability_zone_id' => $this->availabilityZone()->id,
+            'active' => false
+        ];
 
         $this->asAdmin()
             ->post(static::RESOURCE_URI, $data)
@@ -44,7 +56,6 @@ class CreateTest extends TestCase
         $data = [
             'availability_zone_id' => $this->availabilityZone()->id,
         ];
-
 
         $this->asUser()
             ->post(static::RESOURCE_URI, $data)

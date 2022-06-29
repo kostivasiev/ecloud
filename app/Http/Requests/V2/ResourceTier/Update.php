@@ -10,6 +10,11 @@ class Update extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
+            'active' => [
+                'sometimes',
+                'required',
+                'boolean'
+            ]
         ];
     }
 }

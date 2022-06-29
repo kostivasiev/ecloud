@@ -1,0 +1,69 @@
+### 1. Create Hidden Host Spec as Admin
+POST https://{{host}}/{{version}}/host-specs
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "name": "Test host spec",
+    "cpu_sockets": 2,
+    "cpu_type": "E5-2643 v3",
+    "cpu_cores": 6,
+    "cpu_clock_speed": 4000,
+    "ram_capacity": 64,
+    "ucs_specification_name": "test-spec",
+    "availability_zones": [
+        {
+            "id": "az-aaaaaaaa"
+        }
+    ],
+    "is_hidden": true
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+
+client.global.set('host_spec_id', response.body.data.id);
+client.log('host_spec_id: ' + response.body.data.id);
+%}
+
+### 2. Get hostspec as admin
+GET https://{{host}}/{{version}}/host-specs/{{host_spec_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 201, "Response status is not 200");
+});
+%}
+
+### 3. Get hostspec as user
+GET https://{{host}}/{{version}}/host-specs/{{host_spec_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 1-0
+X-consumer-groups: ecloud.read, ecloud.write
+X-Reseller-Id: 10
+Content-Type: application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 404, "Response status is not 404");
+});
+%}
+
+### 4. Delete Hostspec
+DELETE https://{{host}}/{{version}}/host-specs/{{host_spec_id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json

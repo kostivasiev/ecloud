@@ -1,0 +1,19 @@
+description: Success
+content:
+  application/json:
+    schema:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              example: rthg-3f112f25
+        meta:
+          type: object
+          properties:
+            location:
+              type: string
+              # Change path in example below
+              example: 'https://api.ukfast.io/ecloud/v2/resource-tier-host-groups/rthg-3f112f25'

@@ -13,7 +13,7 @@ get:
               data:
                 type: array
                 items:
-                  $ref: '../../resources/HostSpec/schema.yaml'
+                  $ref: '../../resources/HostSpec/admin_schema.yaml'
               meta:
                 allOf:
                   - $ref: '../../components/schemas/meta.yaml'
@@ -41,7 +41,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../resources/HostSpec/schema.yaml'
+          $ref: '../../resources/HostSpec/admin_schema.yaml'
   responses:
     201:
       $ref: '../../resources/HostSpec/responses/idResponse.yaml'

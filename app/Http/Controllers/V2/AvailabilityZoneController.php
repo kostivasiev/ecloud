@@ -68,6 +68,7 @@ class AvailabilityZoneController extends BaseController
             'region_id',
             'san_name',
             'ucs_compute_name',
+            'resource_tier_id',
         ]));
         $availabilityZone->save();
         $availabilityZone->refresh();
@@ -90,6 +91,7 @@ class AvailabilityZoneController extends BaseController
             'region_id',
             'san_name',
             'ucs_compute_name',
+            'resource_tier_id',
         ]));
         $availabilityZone->save();
         return $this->responseIdMeta($request, $availabilityZone->id, 200);
