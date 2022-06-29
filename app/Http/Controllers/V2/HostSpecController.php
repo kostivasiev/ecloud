@@ -57,11 +57,13 @@ class HostSpecController extends BaseController
         $model = HostSpec::forUser($request->user())->findOrFail($hostSpecId);
         $model->fill($request->only([
             'name',
+            'ucs_specification_name',
             'cpu_sockets',
             'cpu_type',
             'cpu_cores',
             'cpu_clock_speed',
             'ram_capacity',
+            'is_hidden',
         ]));
         $model->save();
 
