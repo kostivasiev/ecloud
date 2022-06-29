@@ -15,6 +15,11 @@ class Update extends FormRequest
                 'string',
                 'max:255'
             ],
+            'ucs_specification_name' => [
+                'sometimes',
+                'required',
+                'string'
+            ],
             'cpu_sockets' => [
                 'sometimes',
                 'required',
