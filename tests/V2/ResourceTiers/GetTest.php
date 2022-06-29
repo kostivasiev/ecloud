@@ -136,7 +136,7 @@ class GetTest extends TestCase
         $this->asAdmin()
         ->get(sprintf($this::RT_HOST_GROUPS_URI, 'rt-aaaaaaaa'))
             ->assertJsonFragment([
-                'id' => 'hg-standard-cpu',
+                'id' => 'hg-99f9b758',
                 'name' => 'Standard CPU Host Group',
                 'availability_zone_id' => 'az-aaaaaaaa',
                 'host_spec_id' => 'hs-standard-cpu',
