@@ -19,6 +19,7 @@ class StandardCpuHostGroupSeeder extends Seeder
             'name' => 'Standard CPU Host Group',
             'availability_zone_id' => 'az-aaaaaaaa',
             'host_spec_id' => 'hs-standard-cpu',
+            'vpc_id' => 'vpc-aaaaaaaa',
         ]);
     }
 }

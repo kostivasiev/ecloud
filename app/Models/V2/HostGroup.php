@@ -10,6 +10,7 @@ use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
@@ -89,6 +90,18 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
     public function instances()
     {
         return $this->hasMany(Instance::class);
+    }
+
+    public function resourceTiers(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ResourceTier::class,
+            ResourceTierHostGroup::class,
+            'host_group_id',
+            'id',
+            'id',
+            'resource_tier_id'
+        );
     }
 
     /**

@@ -212,22 +212,10 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
 
     public function getDefaultHostGroup(): HostGroup
     {
-        $defaultHostGroup = null;
-        $lastCapacity = null;
-        foreach ($this->getAvailableHostGroups() as $hostGroup) {
-            $capacity = $hostGroup->getAvailableCapacity();
-            if ($defaultHostGroup === null ||
-                ($capacity['ram']['percentage'] < $lastCapacity['ram']['percentage'] &&
-                    $capacity['cpu']['percentage'] < $lastCapacity['cpu']['percentage'])) {
-                $defaultHostGroup = $hostGroup;
-                $lastCapacity = $capacity;
-                continue;
-            }
-        }
-        return $defaultHostGroup;
+        return $this->hostGroups()->where('host_spec_id', '=', 'hs-standard-cpu')->first();
     }
 
-    public function getAvailableHostGroups(): Collection
+    public function hostGroups(): Collection
     {
         $hostGroups = [];
         $this->resourceTiers()
