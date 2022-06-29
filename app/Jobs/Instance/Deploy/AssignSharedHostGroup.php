@@ -27,10 +27,11 @@ class AssignSharedHostGroup extends Job
             Log::info(get_class($this) . ' : Host Group already assigned, skipping');
             return;
         }
-
         $hostGroup = $this->model->availabilityZone->getDefaultHostGroup();
 
-        $this->model->deploy_data['hostGroupId'] = $hostGroup->id;
+        $deployData = $this->model->deploy_data;
+        $deployData['hostGroupId'] = $hostGroup->id;
+        $this->model->deploy_data = $deployData;
         $this->model->save();
     }
 }

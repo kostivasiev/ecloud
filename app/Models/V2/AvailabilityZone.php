@@ -212,7 +212,9 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
 
     public function getDefaultHostGroup(): HostGroup
     {
-        return $this->hostGroups()->where('host_spec_id', '=', 'hs-standard-cpu')->first();
+        return $this->hostGroups()
+            ->where('host_spec_id', '=', 'hs-standard-cpu')
+            ->first();
     }
 
     public function hostGroups(): Collection
