@@ -166,7 +166,7 @@
                                                                                                                 &nbsp;
                                                                                                             </div>
                                                                                                             <div style="line-height: 20px;">
-                                                                                                                <span style="font-family: Verdana, sans-serif; font-size: 12px; color: #202e52;">ANS Limited, Archway 1, Birley Fields, Manchester.<br>M15 5QJ, United Kingdom </span>
+                                                                                                                <span style="font-family: Verdana, sans-serif; font-size: 12px; color: #202e52;">ANS Group Limited, 1 Archway, Birley Fields, Manchester, M15 5QJ, United Kingdom </span>
                                                                                                             </div>
                                                                                                         </td>
                                                                                                     </tr>
