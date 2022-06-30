@@ -3,31 +3,28 @@
 namespace App\Resources\V2;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
 use UKFast\Responses\UKFastResource;
 
-class ResourceTierResource extends UKFastResource
+class ResourceTierHostGroupResource extends UKFastResource
 {
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return array
+     */
     public function toArray($request)
     {
-        $data = [
+        return [
             'id' => $this->id,
-            'name' => $this->name,
-            'availability_zone_id' => $this->availability_zone_id,
-            'created_at' => Carbon::parse(
+            'resource_tier_id' => $this->resource_tier_id,
+            'host_group_id' => $this->host_group_id,
+            'created_at' => $this->created_at === null ? null : Carbon::parse(
                 $this->created_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
-            'updated_at' => Carbon::parse(
+            'updated_at' => $this->updated_at === null ? null : Carbon::parse(
                 $this->updated_at,
                 new \DateTimeZone(config('app.timezone'))
             )->toIso8601String(),
         ];
-
-        if (Auth::user()->isAdmin()) {
-            $data['active'] = $this->active;
-        }
-
-        return $data;
     }
 }

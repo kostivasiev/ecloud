@@ -22,6 +22,7 @@ class UpdateTest extends TestCase
         $this->faker = Faker::create();
         $region = Region::factory()->create();
         $this->availabilityZone = AvailabilityZone::factory()->create([
+            'id' => 'az-aaaaaaaa',
             'region_id' => $region->id,
             'resource_tier_id' => 'test-resource-tier'
         ]);

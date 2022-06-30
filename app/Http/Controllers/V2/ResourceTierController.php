@@ -5,14 +5,16 @@ namespace App\Http\Controllers\V2;
 use App\Http\Requests\V2\ResourceTier\Create;
 use App\Http\Requests\V2\ResourceTier\Update;
 use App\Models\V2\ResourceTier;
+use App\Resources\V2\HostGroupResource;
 use App\Resources\V2\ResourceTierResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ResourceTierController extends BaseController
 {
     public function index(Request $request)
     {
-        $collection = ResourceTier::query();
+        $collection = ResourceTier::forUser($request->user());
 
         return ResourceTierResource::collection(
             $collection->search()
@@ -22,10 +24,10 @@ class ResourceTierController extends BaseController
         );
     }
 
-    public function show(string $resourceTierId)
+    public function show(Request $request, string $resourceTierId)
     {
         return new ResourceTierResource(
-            ResourceTier::findOrFail($resourceTierId)
+            ResourceTier::forUser($request->user())->findOrFail($resourceTierId)
         );
     }
 
@@ -35,6 +37,7 @@ class ResourceTierController extends BaseController
         $model->fill($request->only([
             'name',
             'availability_zone_id',
+            'active'
         ]));
         $model->save();
         return $this->responseIdMeta($request, $model->id, 201);
@@ -42,9 +45,10 @@ class ResourceTierController extends BaseController
 
     public function update(Update $request, $resourceTierId)
     {
-        $model = ResourceTier::findOrFail($resourceTierId);
+        $model = ResourceTier::forUser(Auth::user())->findOrFail($resourceTierId);
         $model->update($request->only([
             'name',
+            'active',
         ]));
         $model->save();
         return $this->responseIdMeta($request, $model->id, 200);
@@ -52,8 +56,17 @@ class ResourceTierController extends BaseController
 
     public function destroy(string $resourceTierId)
     {
-        ResourceTier::findOrFail($resourceTierId)
+        ResourceTier::forUser(Auth::user())->findOrFail($resourceTierId)
             ->delete();
         return response('', 204);
+    }
+
+    public function hostGroups(Request $request, string $resourceTierId)
+    {
+        $collection = ResourceTier::findOrFail($resourceTierId)->hostGroups();
+
+        return HostGroupResource::collection($collection->search()->paginate(
+            $request->input('per_page', env('PAGINATION_LIMIT'))
+        ));
     }
 }

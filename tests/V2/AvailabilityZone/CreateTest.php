@@ -3,6 +3,7 @@
 namespace Tests\V2\AvailabilityZone;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\ResourceTier;
 use Database\Seeders\ResourceTierSeeder;
 use Faker\Factory as Faker;
 use Tests\TestCase;
@@ -15,7 +16,6 @@ class CreateTest extends TestCase
     {
         parent::setUp();
         $this->faker = Faker::create();
-        (new ResourceTierSeeder())->run();
     }
 
     public function testNonAdminIsDenied()
@@ -111,6 +111,12 @@ class CreateTest extends TestCase
 
     public function testValidDataSucceeds()
     {
+        ResourceTier::factory()->create([
+            'id' => 'rt-aaaaaaaa',
+            'name' => 'Standard CPU',
+            'availability_zone_id' => 'az-aaaaaaaa'
+        ]);
+
         $data = [
             'code' => 'MAN1',
             'name' => 'Manchester Zone 1',

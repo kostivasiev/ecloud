@@ -2,13 +2,7 @@
 
 namespace Tests\V2\ResourceTiers;
 
-use App\Events\V2\Task\Created;
 use App\Models\V2\ResourceTier;
-use App\Models\V2\Instance;
-use App\Models\V2\Task;
-use App\Support\Sync;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class UpdateTest extends TestCase
@@ -29,6 +23,7 @@ class UpdateTest extends TestCase
     {
         $data = [
             'name' => 'New Name',
+            'active' => false,
         ];
 
         $this->asAdmin()
@@ -47,7 +42,6 @@ class UpdateTest extends TestCase
         $data = [
             'name' => 'New Name',
         ];
-
 
         $this->asUser()
             ->patch(sprintf(static::RESOURCE_URI,$this->resourceTier->id), $data)

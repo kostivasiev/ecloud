@@ -15,6 +15,10 @@ class Create extends FormRequest
                 'string',
                 'max:255'
             ],
+            'ucs_specification_name' => [
+                'required',
+                'string'
+            ],
             'cpu_sockets' => [
                 'required',
                 'integer'
