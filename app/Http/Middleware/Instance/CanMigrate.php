@@ -4,15 +4,16 @@ namespace App\Http\Middleware\Instance;
 
 use App\Models\V2\Instance;
 use Closure;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CanMigrate
 {
     public function handle($request, Closure $next)
     {
-        $instance = Instance::forUser($request->user())->findOrFail($request->route('instanceId'));
+        $instance = Instance::forUser(Auth::user())->findOrFail($request->route('instanceId'));
 
-        if ($request->has('host_group_id') && $instance->affinityRuleMember !== null) {
+        if ($instance->affinityRuleMember !== null) {
             return response()->json([
                 'errors' => [
                     'title' => 'Forbidden',

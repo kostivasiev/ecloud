@@ -12,7 +12,7 @@ class AffinityRuleFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'type' => 'anti-affinity',
         ];
     }
 }

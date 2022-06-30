@@ -601,7 +601,10 @@ class InstanceController extends BaseController
         } else {
             $task = $instance->createTaskWithLock(
                 'instance_migrate_public',
-                \App\Jobs\Tasks\Instance\MigratePublic::class
+                \App\Jobs\Tasks\Instance\MigratePublic::class,
+                [
+                    'resource_tier_id' => $request->input('resource_tier_id', $instance->availabilityZone->resource_tier_id)
+                ]
             );
         }
 
