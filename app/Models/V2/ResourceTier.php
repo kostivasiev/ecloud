@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\ResourceTier\Deleted;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
@@ -35,10 +34,6 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
 
         $this->casts = [
             'active' => 'boolean'
-        ];
-
-        $this->dispatchesEvents = [
-            'deleted' => Deleted::class
         ];
 
         parent::__construct($attributes);

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\V2\Instance\UpdateResourceTierBilling;
 use App\Listeners\V2\ResourceTier\UpdateBilling;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -127,11 +128,6 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\V2\Region\Creating::class => [
         ],
 
-        // ResourceTier
-        \App\Events\V2\ResourceTier\Deleted::class => [
-            \App\Listeners\V2\BillingMetric\End::class,
-        ],
-
         // Router
         \App\Events\V2\Router\Creating::class => [
             \App\Listeners\V2\Router\DefaultRouterThroughput::class
@@ -168,11 +164,11 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\UpdateMsSqlLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
+            \App\Listeners\V2\Instance\UpdateResourceTierBilling::class,
             \App\Listeners\V2\Host\UpdateBilling::class,
             \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
             \App\Listeners\V2\Host\UpdateLicenseBilling::class,
             \App\Listeners\V2\FloatingIp\UpdateBilling::class,
-            \App\Listeners\V2\ResourceTier\UpdateBilling::class,
             \App\Listeners\V2\Vpc\UpdateAdvancedNetworkingBilling::class,
             \App\Listeners\V2\VpnSession\UpdateBilling::class,
             \App\Listeners\V2\LoadBalancer\UpdateBilling::class,
