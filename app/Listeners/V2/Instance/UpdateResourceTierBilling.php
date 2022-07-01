@@ -23,6 +23,7 @@ class UpdateResourceTierBilling implements Billable
      */
     public function handle(Updated $event)
     {
+        $instance = $event->model->resource;
         if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
@@ -43,15 +44,14 @@ class UpdateResourceTierBilling implements Billable
             return;
         }
 
-        if ($instance->host_group_id != 'hg-high-cpu') {
+        if ($instance->host_group_id != 'hg-high-cpu' && empty($currentActiveMetric)) {
             return;
         }
 
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == 1) {
+            if ($currentActiveMetric->value == 1 && $instance->host_group_id == 'hg-high-cpu') {
                 return;
             }
-
             $currentActiveMetric->setEndDate();
         }
 
@@ -96,6 +96,6 @@ class UpdateResourceTierBilling implements Billable
      */
     public static function getKeyName(): string
     {
-        return json_encode(['high.cpu']);
+        return 'high.cpu';
     }
 }
