@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\Tests;
 
 use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Host;
@@ -11,10 +11,9 @@ use App\Models\V2\Vpc;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class HostSeeder extends Seeder
+class ResourceTierSeeder extends Seeder
 {
     use WithoutModelEvents;
-
     /**
      * Run the database seeds.
      *
@@ -27,7 +26,7 @@ class HostSeeder extends Seeder
         $hostSpec = HostSpec::factory()
             ->create([
                 'id' => 'hs-aaaaaaaa',
-                'ucs_specification_name' => 'DUAL-4208--32GB',
+                'ucs_specification_name' => 'DUAL-E5-2620--32GB',
             ]);
         $availabilityZone->hostSpecs()->sync($hostSpec);
 
