@@ -12,7 +12,7 @@ class HostSpecController extends BaseController
 {
     public function index(Request $request)
     {
-        $collection = HostSpec::query();
+        $collection = HostSpec::forUser($request->user());
 
         return HostSpecResource::collection(
             $collection->search()
@@ -25,7 +25,7 @@ class HostSpecController extends BaseController
     public function show(Request $request, string $hostSpecId)
     {
         return new HostSpecResource(
-            HostSpec::findOrFail($hostSpecId)
+            HostSpec::forUser($request->user())->findOrFail($hostSpecId)
         );
     }
 
@@ -40,6 +40,7 @@ class HostSpecController extends BaseController
             'cpu_cores',
             'cpu_clock_speed',
             'ram_capacity',
+            'is_hidden',
         ]));
         $model->save();
 
@@ -53,14 +54,16 @@ class HostSpecController extends BaseController
 
     public function update(Update $request, string $hostSpecId)
     {
-        $model = HostSpec::findOrFail($hostSpecId);
+        $model = HostSpec::forUser($request->user())->findOrFail($hostSpecId);
         $model->fill($request->only([
             'name',
+            'ucs_specification_name',
             'cpu_sockets',
             'cpu_type',
             'cpu_cores',
             'cpu_clock_speed',
             'ram_capacity',
+            'is_hidden',
         ]));
         $model->save();
 
@@ -74,7 +77,7 @@ class HostSpecController extends BaseController
 
     public function destroy(Request $request, string $hostSpecId)
     {
-        $model = HostSpec::findOrFail($hostSpecId);
+        $model = HostSpec::forUser($request->user())->findOrFail($hostSpecId);
         // Delete from pivot table
         $model->availabilityZones()->sync([]);
         $model->delete();

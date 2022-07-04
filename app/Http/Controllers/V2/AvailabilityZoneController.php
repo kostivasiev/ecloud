@@ -14,6 +14,7 @@ use App\Resources\V2\ImageResource;
 use App\Resources\V2\InstanceResource;
 use App\Resources\V2\LoadBalancerResource;
 use App\Resources\V2\ProductResource;
+use App\Resources\V2\ResourceTierResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\RouterThroughputResource;
 use Illuminate\Http\Request;
@@ -67,6 +68,7 @@ class AvailabilityZoneController extends BaseController
             'region_id',
             'san_name',
             'ucs_compute_name',
+            'resource_tier_id',
         ]));
         $availabilityZone->save();
         $availabilityZone->refresh();
@@ -89,6 +91,7 @@ class AvailabilityZoneController extends BaseController
             'region_id',
             'san_name',
             'ucs_compute_name',
+            'resource_tier_id',
         ]));
         $availabilityZone->save();
         return $this->responseIdMeta($request, $availabilityZone->id, 200);
@@ -252,6 +255,19 @@ class AvailabilityZoneController extends BaseController
             ->images();
 
         return ImageResource::collection(
+            $collection->search()
+                ->paginate(
+                    $request->input('per_page', env('PAGINATION_LIMIT'))
+                )
+        );
+    }
+
+    public function resourceTiers(Request $request, string $zoneId)
+    {
+        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
+            ->resourceTiers();
+
+        return ResourceTierResource::collection(
             $collection->search()
                 ->paginate(
                     $request->input('per_page', env('PAGINATION_LIMIT'))

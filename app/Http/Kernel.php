@@ -90,6 +90,7 @@ class Kernel extends HttpKernel
     'floating-ip-can-be-assigned' => \App\Http\Middleware\FloatingIp\CanBeAssigned::class,
     'floating-ip-can-be-unassigned' => \App\Http\Middleware\FloatingIp\CanBeUnassigned::class,
     'floating-ip-can-be-deleted' => \App\Http\Middleware\FloatingIp\CanBeDeleted::class,
+    'host-group-can-be-deleted' => \App\Http\Middleware\HostGroup\CanBeDeleted::class,
     'volume-can-be-deleted' => \App\Http\Middleware\Volume\CanDelete::class,
     'ip-address-can-delete' => \App\Http\Middleware\IpAddress\CanDelete::class,
     'vpn-endpoint-can-delete' => \App\Http\Middleware\VpnEndpoint\CanDelete::class,

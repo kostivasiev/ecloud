@@ -2,11 +2,13 @@
 
 namespace App\Models\V2;
 
+use App\Models\Scopes\IsNotHidden;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
 
@@ -35,6 +37,7 @@ class HostSpec extends Model implements Searchable
             'cpu_cores',
             'cpu_clock_speed',
             'ram_capacity',
+            'is_hidden',
         ]);
 
         $this->casts = [
@@ -42,6 +45,11 @@ class HostSpec extends Model implements Searchable
             'cpu_cores' => 'integer',
             'cpu_clock_speed' => 'integer',
             'ram_capacity' => 'integer',
+            'is_hidden' => 'boolean',
+        ];
+
+        $this->attributes = [
+            'is_hidden' => false,
         ];
 
         parent::__construct($attributes);
@@ -55,6 +63,20 @@ class HostSpec extends Model implements Searchable
     public function availabilityZones()
     {
         return $this->belongsToMany(AvailabilityZone::class);
+    }
+
+    /**
+     * @param $query
+     * @param $user
+     * @return mixed
+     */
+    public function scopeForUser($query, Consumer $user)
+    {
+        if ($user->isAdmin()) {
+            return $query;
+        }
+
+        return $query->where('is_hidden', '=', false);
     }
 
     public function sieve(Sieve $sieve)

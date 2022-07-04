@@ -3,16 +3,21 @@
 namespace App\Http\Requests\V2\HostSpec;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class Create extends FormRequest
 {
     public function rules()
     {
-        return [
+        $rules = [
             'name' => [
                 'nullable',
                 'string',
                 'max:255'
+            ],
+            'ucs_specification_name' => [
+                'required',
+                'string'
             ],
             'cpu_sockets' => [
                 'required',
@@ -43,7 +48,13 @@ class Create extends FormRequest
                 'required',
                 'string',
                 'exists:ecloud.availability_zones,id,deleted_at,NULL',
+            ],
+            'is_hidden' => [
+                'sometimes',
+                'boolean',
             ]
         ];
+
+        return $rules;
     }
 }

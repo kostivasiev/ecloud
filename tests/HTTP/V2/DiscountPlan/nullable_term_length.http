@@ -1,0 +1,279 @@
+###
+# Get Commitment & Set some default variables
+GET https://{{host}}/{{version}}/discount-plans
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+var theDate = new Date();
+var today = theDate.toISOString().replace(/T/, ' ').replace(/\..+/, '');
+theDate.setDate(theDate.getDate() - 1);
+client.global.set('term_start_date', today);
+client.log('term_start_date = ' + today);
+
+%}
+
+###
+# Create Discount Plan - term_end_date specified
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-Reseller-Id: 7052
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "orderform_id": "PG398822",
+    "name": "398822",
+    "commitment_amount": 0,
+    "commitment_before_discount": 1000,
+    "discount_rate": 100,
+    "term_start_date": "2022-06-19T23:59:59+01:00",
+    "term_end_date": "2022-06-20T23:59:59+01:00"
+}
+
+> {%
+client.test('Test with end date', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('id', response.body.data.id);
+});
+%}
+
+###
+# Get Discount Plan
+GET https://{{host}}/{{version}}/discount-plans/{{id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test reseller_id, contact_id or employee_id in response', function() {
+    client.assert(response.body.data.term_length == null, 'term_length is not null');
+    client.assert(response.body.data.term_end_date == null, 'term_end_date is not null');
+});
+%}
+
+###
+# Update Discount Plan
+PATCH https://{{host}}/{{version}}/discount-plans/{{id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-Reseller-Id: 7052
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "term_start_date": "2022-06-19T23:59:59+01:00",
+    "term_end_date": "2022-06-20T23:59:59+01:00"
+}
+
+> {%
+client.test('Test Discount Updated', function () {
+    client.assert(response.status === 200, '200 Response not received');
+});
+%}
+
+###
+# Get Discount Plan
+GET https://{{host}}/{{version}}/discount-plans/{{id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test reseller_id, contact_id or employee_id in response', function() {
+    client.assert(response.body.data.term_length == null, 'term_length is not null');
+    client.assert(response.body.data.term_end_date == null, 'term_end_date is not null');
+});
+%}
+
+###
+# Delete Discount Plan
+DELETE https://{{host}}/{{version}}/discount-plans/{{id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test Discount Deleted', function () {
+    client.assert(response.status === 204, '204 Response not received');
+});
+%}
+
+###
+# Create Discount Plan - no end date
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-Reseller-Id: 7052
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "orderform_id": "59f38285-faa3-4be9-bab5-b0f0cf31f187",
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_start_date": "{{term_start_date}}"
+}
+
+> {%
+client.test('Test no end date', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('id', response.body.data.id);
+});
+%}
+
+###
+# Get Discount Plan
+GET https://{{host}}/{{version}}/discount-plans/{{id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test reseller_id, contact_id or employee_id in response', function() {
+    client.assert(response.body.data.term_length == null, 'term_length is not null');
+    client.assert(response.body.data.term_end_date == null, 'term_end_date is not null');
+});
+%}
+
+###
+# Delete Discount Plan
+DELETE https://{{host}}/{{version}}/discount-plans/{{id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test Discount Deleted', function () {
+    client.assert(response.status === 204, '204 Response not received');
+});
+%}
+
+###
+# Create Discount Plan - term_end_date is null
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-Reseller-Id: 7052
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "orderform_id": "59f38285-faa3-4be9-bab5-b0f0cf31f187",
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_start_date": "{{term_start_date}}",
+    "term_end_date": null
+}
+
+> {%
+client.test('Test term_end_date is null', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('id', response.body.data.id);
+});
+%}
+
+###
+# Get Discount Plan
+GET https://{{host}}/{{version}}/discount-plans/{{id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test reseller_id, contact_id or employee_id in response', function() {
+    client.assert(response.body.data.term_length == null, 'term_length is not null');
+    client.assert(response.body.data.term_end_date == null, 'term_end_date is not null');
+});
+%}
+
+###
+# Delete Discount Plan
+DELETE https://{{host}}/{{version}}/discount-plans/{{id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test Discount Deleted', function () {
+    client.assert(response.status === 204, '204 Response not received');
+});
+%}
+
+###
+# Create Discount Plan - term_length is null
+POST https://{{host}}/{{version}}/discount-plans
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-Reseller-Id: 7052
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+{
+    "contact_id": 1,
+    "orderform_id": "59f38285-faa3-4be9-bab5-b0f0cf31f187",
+    "name": "test-commitment",
+    "commitment_amount": 2000,
+    "commitment_before_discount": 1000,
+    "discount_rate": 5,
+    "term_start_date": "{{term_start_date}}",
+    "term_length": null
+}
+
+> {%
+client.test('Test term_length is null', function () {
+    client.assert(response.status === 201, '201 response not received');
+    client.global.set('id', response.body.data.id);
+});
+%}
+
+###
+# Get Discount Plan
+GET https://{{host}}/{{version}}/discount-plans/{{id}}
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test reseller_id, contact_id or employee_id in response', function() {
+    client.assert(response.body.data.term_length == null, 'term_length is not null');
+    client.assert(response.body.data.term_end_date == null, 'term_end_date is not null');
+});
+%}
+
+###
+# Delete Discount Plan
+DELETE https://{{host}}/{{version}}/discount-plans/{{id}}
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: {{dev_reseller_id_admin}}
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
+
+> {%
+client.test('Test Discount Deleted', function () {
+    client.assert(response.status === 204, '204 Response not received');
+});
+%}

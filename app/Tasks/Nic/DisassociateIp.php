@@ -10,6 +10,8 @@ class DisassociateIp extends Task
 
     public function jobs()
     {
-        return [];
+        return [
+            \App\Jobs\Nic\DisassociateIp::class,
+        ];
     }
 }
