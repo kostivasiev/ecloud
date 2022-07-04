@@ -22,32 +22,25 @@ class HostSeeder extends Seeder
      */
     public function run()
     {
-        $availabilityZone = AvailabilityZone::find('az-aaaaaaaa');
-
-        $hostSpec = HostSpec::factory()
-            ->create([
-                'id' => 'hs-aaaaaaaa',
-                'ucs_specification_name' => 'DUAL-4208--32GB',
-            ]);
-        $availabilityZone->hostSpecs()->sync($hostSpec);
-
-        $hostGroup = HostGroup::factory()
-            ->for(Vpc::find('vpc-aaaaaaaa'))
-            ->for($availabilityZone)
-            ->for($hostSpec)
-            ->create([
-                'id' => 'hg-aaaaaaaa',
-            ]);
-
-        Host::factory()
-            ->for($hostGroup)
-            ->create([
-                'id' => 'h-aaaaaaaa',
-                'name' => 'Test Host',
-                'mac_address' => '00:00:5e:00:53:af',
-            ]);
-
-        $resourceTier = ResourceTier::find('rt-123456');
-        $resourceTier->hostGroups()->attach($hostGroup);
+        HostGroup::withoutEvents(function () {
+            $hostSpec = HostSpec::factory()
+                ->create([
+                    'id' => 'hs-aaaaaaaa',
+                ]);
+            $hostGroup = HostGroup::factory()
+                ->for(Vpc::find('vpc-aaaaaaaa'))
+                ->for(AvailabilityZone::find('az-aaaaaaaa'))
+                ->for($hostSpec)
+                ->create([
+                    'id' => 'hg-aaaaaaaa',
+                ]);
+            Host::factory()
+                ->for($hostGroup)
+                ->create([
+                    'id' => 'h-aaaaaaaa',
+                    'name' => 'Test Host',
+                    'mac_address' => '00:00:5e:00:53:af',
+                ]);
+        });
     }
 }
