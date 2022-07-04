@@ -6,15 +6,11 @@ use App\Models\V2\AvailabilityZone;
 use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
-use App\Models\V2\ResourceTier;
 use App\Models\V2\Vpc;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class HostSeeder extends Seeder
 {
-    use WithoutModelEvents;
-
     /**
      * Run the database seeds.
      *
