@@ -70,14 +70,14 @@ class UpdateResourceTierBilling implements Billable
             ->first();
         if (empty($product)) {
             Log::error(
-                'Failed to load \'high.cpu\' billing product for availability zone ' . $instance->availabilityZone->id
+                'Failed to load \'' . self::getKeyName() . '\' billing product for availability zone ' . $instance->availabilityZone->id
             );
         } else {
             $billingMetric->category = $product->category;
             $billingMetric->price = 1;
         }
 
-        Log::info(get_class($this) . ' : high.cpu enabled.', ['instance' => $instance->id]);
+        Log::info(get_class($this) . ' : ' . self::getKeyName() . ' enabled.', ['instance' => $instance->id]);
         $billingMetric->save();
     }
 
