@@ -38,7 +38,6 @@ class MigrateTest extends TestCase
 
     public function testMigrateToPublic()
     {
-        $this->isWithinCapacity();
         Event::fake(Created::class);
 
         $this->post('/v2/instances/' . $this->instanceModel()->id . '/migrate')
@@ -57,6 +56,7 @@ class MigrateTest extends TestCase
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),
+                'ram_capacity' => 1024,
             ]);
         });
 
@@ -117,9 +117,8 @@ class MigrateTest extends TestCase
                 'host_group_id' => $this->hostGroup()->id
             ],
         )->assertJsonFragment([
-            'title' => 'Conflict',
-            'details' => 'There are insufficient resources to migrate to this hostgroup.',
-        ])->assertStatus(409);
+            'error' => 'There are insufficient resources to migrate to this host group.',
+        ])->assertStatus(422);
     }
 
     private function isWithinCapacity(): static
@@ -127,16 +126,16 @@ class MigrateTest extends TestCase
         $this->kingpinServiceMock()
             ->allows('get')
             ->with(
-                sprintf(KingpinService::GET_CAPACITY_URI, $this->vpc()->id, $this->hostGroup()->id)
+                sprintf(KingpinService::PRIVATE_HOST_GROUP_CAPACITY, $this->vpc()->id, $this->hostGroup()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupId' => $this->hostGroup()->id,
-                    'cpuUsage' => 0,
-                    'cpuUsedMHz' => 10,
-                    'cpuCapacityMHz' => 100,
-                    'ramUsage' => 0,
-                    'ramUsedMB' => 10,
-                    'ramCapacityMB' => 100,
+                    'cpuUsage' => 10,
+                    'cpuUsedMHz' => 1000,
+                    'cpuCapacityMHz' => 10000,
+                    'ramUsage' => 10,
+                    'ramUsedMB' => 1000,
+                    'ramCapacityMB' => 10000,
                 ]));
             });
         return $this;
@@ -147,15 +146,15 @@ class MigrateTest extends TestCase
         $this->kingpinServiceMock()
             ->allows('get')
             ->with(
-                sprintf(KingpinService::GET_CAPACITY_URI, $this->vpc()->id, $this->hostGroup()->id)
+                sprintf(KingpinService::PRIVATE_HOST_GROUP_CAPACITY, $this->vpc()->id, $this->hostGroup()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupId' => $this->hostGroup()->id,
-                    'cpuUsage' => 0,
-                    'cpuUsedMHz' => 90,
+                    'cpuUsage' => 100,
+                    'cpuUsedMHz' => 100,
                     'cpuCapacityMHz' => 100,
-                    'ramUsage' => 0,
-                    'ramUsedMB' => 90,
+                    'ramUsage' => 100,
+                    'ramUsedMB' => 100,
                     'ramCapacityMB' => 100,
                 ]));
             });

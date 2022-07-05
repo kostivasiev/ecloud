@@ -44,6 +44,13 @@ client.global.set('host_id', response.body.data.id);
 client.log('Host Group ID: ' + response.body.data.id);
 %}
 
+### Create a Host
+GET https://{{host}}/{{version}}/hosts
+Accept: */*
+Cache-Control: no-cache
+X-consumer-custom-id: 0-0
+X-consumer-groups: ecloud.read, ecloud.write
+Content-Type: application/json
 
 
 ### Create instance to test with in shared host group
