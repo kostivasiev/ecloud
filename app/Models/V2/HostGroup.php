@@ -157,7 +157,7 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
         return static::formatHostGroupCapacity($response);
     }
 
-    static function formatHostGroupCapacity(\StdClass $rawHostGroupCapacity): array
+    public static function formatHostGroupCapacity(\StdClass $rawHostGroupCapacity): array
     {
         return [
             'cpu' => [
