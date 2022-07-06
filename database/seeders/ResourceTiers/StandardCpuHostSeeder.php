@@ -14,6 +14,7 @@ class StandardCpuHostSeeder extends Seeder
      */
     public function run()
     {
+        // TODO: This is subject to change and will need to be updated
         Host::factory()->create([
             'id' => 'h-standard-cpu',
             'name' => 'Standard CPU Tier Host',

@@ -21,15 +21,15 @@ class DatabaseSeeder extends Seeder
         $this->call(SoftwareSeeder::class);
         $this->call(ImageSeeder::class);
         $this->call(LoadBalancerSeeder::class);
+        $this->call(ResourceTierSeeder::class);
+        $this->call(HostSpecSeeder::class);
 
         // Create some dev resources for test reseller 7052
         $this->call(SshKeyPairSeeder::class);
         $this->call(VpcSeeder::class);
         $this->call(RouterSeeder::class);
         $this->call(NetworkSeeder::class);
-
-        // More API Level Resources
-        $this->call(ResourceTierSeeder::class);
+//        $this->call(PrivateHostSeeder::class);
     }
 }
 

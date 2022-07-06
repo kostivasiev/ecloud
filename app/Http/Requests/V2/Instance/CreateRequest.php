@@ -12,15 +12,16 @@ use App\Models\V2\Vpc;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\FloatingIp\IsAssigned;
 use App\Rules\V2\HasHosts;
+use App\Rules\V2\HostGroup\HostGroupCanProvision;
 use App\Rules\V2\Instance\SoftwarePlatformMatchesImagePlatform;
-use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsMaxInstanceForVpc;
+use App\Rules\V2\IsResourceAvailable;
 use App\Rules\V2\IsSameAvailabilityZone;
 use App\Rules\V2\IsSameVpc;
 use App\Rules\V2\IsValidRamMultiple;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use Illuminate\Foundation\Http\FormRequest;
 
 class CreateRequest extends FormRequest
 {
@@ -73,9 +74,11 @@ class CreateRequest extends FormRequest
                 'sometimes',
                 'string',
                 'exists:ecloud.host_groups,id,deleted_at,NULL',
+                'bail',
                 new ExistsForUser(HostGroup::class),
                 new IsResourceAvailable(HostGroup::class),
                 new HasHosts(),
+                new HostGroupCanProvision($this->request->get('ram_capacity')),
             ],
             'network_id' => [
                 'required',

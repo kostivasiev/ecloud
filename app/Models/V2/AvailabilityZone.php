@@ -210,23 +210,6 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
         return $searchEdgeClusterResponse->results[0]->id;
     }
 
-    public function getDefaultHostGroup(): HostGroup
-    {
-        return $this->hostGroups()
-            ->where('host_spec_id', '=', 'hs-standard-cpu')
-            ->first();
-    }
-
-    public function hostGroups(): Collection
-    {
-        $hostGroups = [];
-        $this->resourceTiers()
-            ->each(function (ResourceTier $resourceTier) use (&$hostGroups) {
-                $hostGroups = array_merge($hostGroups, $resourceTier->hostGroups->pluck('id')->toArray());
-            });
-        return HostGroup::find($hostGroups);
-    }
-
     /**
      * @param $query
      * @param $user

@@ -31,7 +31,7 @@ class ResourceTierSeeder extends Seeder
         ResourceTierHostGroup::factory()->create([
             'id' => 'rthg-standard-cpu',
             'resource_tier_id' => 'rt-aaaaaaaa',
-            'host_group_id' => 'hg-standard-cpu'
+            'host_group_id' => 'hg-99f9b758'
         ]);
 
         ResourceTier::factory()->create([

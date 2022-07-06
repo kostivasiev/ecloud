@@ -28,12 +28,12 @@ class ResourceTierHostGroupTest extends TestCase
         $resourceTierHostGroup = $resourceTierStandardCpu->resourceTierHostGroups->first();
 
         // pivot -> host group
-        $this->assertEquals('hg-standard-cpu', $resourceTierHostGroup->hostGroup->id);
+        $this->assertEquals('hg-99f9b758', $resourceTierHostGroup->hostGroup->id);
 
         // pivot -> resource tier
         $this->assertEquals('rt-aaaaaaaa', $resourceTierHostGroup->resourceTier->id);
 
         // resource tier -> through pivot -> host groups
-        $this->assertEquals('hg-standard-cpu', $resourceTierStandardCpu->hostGroups->first()->id);
+        $this->assertEquals('hg-99f9b758', $resourceTierStandardCpu->hostGroups->first()->id);
     }
 }

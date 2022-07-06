@@ -5,7 +5,6 @@ namespace App\Jobs\Sync\Instance;
 use App\Jobs\Instance\ComputeUpdate;
 use App\Jobs\Instance\Deploy\ActivateWindows;
 use App\Jobs\Instance\Deploy\AssignFloatingIp;
-use App\Jobs\Instance\Deploy\AssignSharedHostGroup;
 use App\Jobs\Instance\Deploy\AwaitFloatingIpCreation;
 use App\Jobs\Instance\Deploy\AwaitNicSync;
 use App\Jobs\Instance\Deploy\AwaitVolumeSync;
@@ -57,7 +56,6 @@ class Update extends Job
             $this->updateTaskBatch([
                 [
                     new CheckNetworkAvailable($this->task->resource),
-                    new AssignSharedHostGroup($this->task->resource),
                     new Deploy($this->task->resource),
                     new PrepareOsDisk($this->task->resource),
                     new AwaitVolumeSync($this->task->resource),
