@@ -56,7 +56,7 @@ class FastDeskSeeder extends Seeder {
                     ]),
                 $vpnEndpointFastDeskMgmtOld = VpnEndpoint::factory()
                     ->for($fastDeskMgmt)
-                    ->make([
+                    ->create([
                         'id' => $this->addCustomKey(VpnEndpoint::class),
                         'name' => 'FastDesk Management -> Fastdesk Old'
                     ])
@@ -75,7 +75,7 @@ class FastDeskSeeder extends Seeder {
                     ]),
                 VpnEndpoint::factory()
                     ->for($fastDeskShared)
-                    ->make([
+                    ->create([
                         'id' => $this->addCustomKey(VpnEndpoint::class),
                         'name' => 'Fastdesk Shared Client - eCloud VPC'
                     ])
@@ -94,7 +94,7 @@ class FastDeskSeeder extends Seeder {
                     ]),
                 $vpnEndpointVpn34291 = VpnEndpoint::factory()
                     ->for($vpn34291)
-                    ->make([
+                    ->create([
                         'id' => $this->addCustomKey(VpnEndpoint::class),
                         'name' => 'vpne_3429_1'
                     ])
