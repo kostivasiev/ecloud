@@ -17,7 +17,7 @@ class BackfillVpn extends Command
             Artisan::call('db:seed', [
                 '--class' => FastDeskSeeder::class
             ]);
-            $this->info('Database seeding completed successfully.');
         }
+        $this->info('Database seeding completed successfully.');
     }
 }
