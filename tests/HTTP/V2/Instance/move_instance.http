@@ -103,7 +103,7 @@ Content-Type:  application/json
 
 
 ### Cleanup Host Group
-DELETE https://{{host}}/{{version}}/host-groups/{{host_group_id}}
+DELETE https://{{host}}/{{version}}/host-groups/hg-b84a9de9-dev
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json

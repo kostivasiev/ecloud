@@ -210,33 +210,6 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
         return $searchEdgeClusterResponse->results[0]->id;
     }
 
-    public function getDefaultHostGroup(): ?HostGroup
-    {
-        $defaultHostGroup = null;
-        $lastCapacity = null;
-        foreach ($this->getAvailableHostGroups() as $hostGroup) {
-            $capacity = $hostGroup->getAvailableCapacity();
-            if ($defaultHostGroup === null ||
-                ($capacity['ram']['percentage'] < $lastCapacity['ram']['percentage'] &&
-                    $capacity['cpu']['percentage'] < $lastCapacity['cpu']['percentage'])) {
-                $defaultHostGroup = $hostGroup;
-                $lastCapacity = $capacity;
-                continue;
-            }
-        }
-        return $defaultHostGroup;
-    }
-
-    public function getAvailableHostGroups(): Collection
-    {
-        $hostGroups = [];
-        $this->resourceTiers()
-            ->each(function (ResourceTier $resourceTier) use (&$hostGroups) {
-                $hostGroups = array_merge($hostGroups, $resourceTier->hostGroups->pluck('id')->toArray());
-            });
-        return HostGroup::find($hostGroups);
-    }
-
     /**
      * @param $query
      * @param $user
