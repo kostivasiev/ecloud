@@ -2,6 +2,7 @@
 
 namespace Database\Seeders\FastDesk;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\FloatingIpResource;
 use App\Models\V2\Vpc;
@@ -30,8 +31,10 @@ class FastDeskSeeder extends Seeder {
             ->assignedTo(
                 FloatingIp::factory()
                     ->for(Vpc::find('vpc-218334c3'))
+                    ->for($availabilityZone = AvailabilityZone::find('az-4c31a488'))
                     ->create([
                         'id' => 'fip-1d93e06e',
+                        'name' => 'fip-1d93e06e',
                         'ip_address' => '45.131.138.9',
                     ]),
                 VpnEndpoint::factory()
@@ -50,8 +53,10 @@ class FastDeskSeeder extends Seeder {
             ->assignedTo(
                 FloatingIp::factory()
                     ->for(Vpc::find('vpc-34fc3361'))
+                    ->for($availabilityZone)
                     ->create([
                         'id' => 'fip-727faf58',
+                        'name' => 'fip-727faf58',
                         'ip_address' => '45.131.138.5',
                     ]),
                 $vpnEndpointFastDeskMgmtOld = VpnEndpoint::factory()
@@ -69,8 +74,10 @@ class FastDeskSeeder extends Seeder {
             ->assignedTo(
                 FloatingIp::factory()
                     ->for(Vpc::find('vpc-34fc3361'))
+                    ->for($availabilityZone)
                     ->create([
                         'id' => 'fip-495722a7',
+                        'name' => 'fip-495722a7',
                         'ip_address' => '45.131.138.10',
                     ]),
                 VpnEndpoint::factory()
@@ -88,8 +95,10 @@ class FastDeskSeeder extends Seeder {
             ->assignedTo(
                 FloatingIp::factory()
                     ->for(Vpc::find('vpc-218334c3'))
+                    ->for($availabilityZone)
                     ->create([
                         'id' => 'fip-84e34f0c',
+                        'name' => 'fip-84e34f0c',
                         'ip_address' => '45.131.138.179',
                     ]),
                 $vpnEndpointVpn34291 = VpnEndpoint::factory()
@@ -347,6 +356,10 @@ class FastDeskSeeder extends Seeder {
                 'ip_address' => '192.168.68.0/25',
             ]);
         // <-- FastDesk Old - SID 86909 End -->
+
+        // VpnEndpoint to VpnService Mapping
+
+
     }
 
     public function addCustomKey(string $className): string
