@@ -9,7 +9,7 @@ use App\Models\V2\HostSpec;
 use App\Models\V2\Vpc;
 use Illuminate\Database\Seeder;
 
-class HostSeeder extends Seeder
+class PrivateHostGroupSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -19,16 +19,13 @@ class HostSeeder extends Seeder
     public function run()
     {
         HostGroup::withoutEvents(function () {
-            $hostSpec = HostSpec::factory()
-                ->create([
-                    'id' => 'hs-aaaaaaaa',
-                ]);
             $hostGroup = HostGroup::factory()
                 ->for(Vpc::find('vpc-aaaaaaaa'))
                 ->for(AvailabilityZone::find('az-aaaaaaaa'))
-                ->for($hostSpec)
+                ->for(HostSpec::find('hs-aaaaaaaa'))
                 ->create([
                     'id' => 'hg-aaaaaaaa',
+                    'name' > 'Test Private Host Group'
                 ]);
             Host::factory()
                 ->for($hostGroup)
