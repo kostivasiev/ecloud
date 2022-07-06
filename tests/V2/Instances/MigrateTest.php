@@ -7,6 +7,8 @@ use App\Models\V2\AffinityRule;
 use App\Models\V2\AffinityRuleMember;
 use App\Models\V2\Image;
 use App\Models\V2\Instance;
+use App\Services\V2\KingpinService;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -21,6 +23,7 @@ class MigrateTest extends TestCase
 
     public function testMigrateToPrivate()
     {
+        $this->isWithinCapacity();
         Event::fake(Created::class);
 
         $this->post(
@@ -45,6 +48,7 @@ class MigrateTest extends TestCase
 
     public function testIsCompatiblePlatformFails()
     {
+        $this->isWithinCapacity();
         Event::fake();
 
         $instance = Instance::withoutEvents(function () {
@@ -52,6 +56,7 @@ class MigrateTest extends TestCase
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),
+                'ram_capacity' => 1024,
             ]);
         });
 
@@ -74,6 +79,7 @@ class MigrateTest extends TestCase
 
     public function testInAffinityGroupFails()
     {
+        $this->isWithinCapacity();
         AffinityRuleMember::withoutEvents(function () {
             return AffinityRuleMember::factory()
                 ->for(AffinityRule::factory()
@@ -99,5 +105,59 @@ class MigrateTest extends TestCase
             ->assertSeeText('Forbidden')
             ->assertSeeText('cannot be moved')
             ->assertStatus(403);
+    }
+
+    public function testCapacityCheckFails()
+    {
+        $this->isOutsideCapacity();
+
+        $this->post(
+            '/v2/instances/' . $this->instanceModel()->id . '/migrate',
+            [
+                'host_group_id' => $this->hostGroup()->id
+            ],
+        )->assertJsonFragment([
+            'error' => 'There are insufficient resources to migrate to this host group.',
+        ])->assertStatus(422);
+    }
+
+    private function isWithinCapacity(): static
+    {
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->with(
+                sprintf(KingpinService::PRIVATE_HOST_GROUP_CAPACITY, $this->vpc()->id, $this->hostGroup()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupId' => $this->hostGroup()->id,
+                    'cpuUsage' => 10,
+                    'cpuUsedMHz' => 1000,
+                    'cpuCapacityMHz' => 10000,
+                    'ramUsage' => 10,
+                    'ramUsedMB' => 1000,
+                    'ramCapacityMB' => 10000,
+                ]));
+            });
+        return $this;
+    }
+
+    private function isOutsideCapacity(): static
+    {
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->with(
+                sprintf(KingpinService::PRIVATE_HOST_GROUP_CAPACITY, $this->vpc()->id, $this->hostGroup()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupId' => $this->hostGroup()->id,
+                    'cpuUsage' => 100,
+                    'cpuUsedMHz' => 100,
+                    'cpuCapacityMHz' => 100,
+                    'ramUsage' => 100,
+                    'ramUsedMB' => 100,
+                    'ramCapacityMB' => 100,
+                ]));
+            });
+        return $this;
     }
 }

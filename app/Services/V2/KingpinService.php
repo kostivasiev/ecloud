@@ -15,6 +15,8 @@ final class KingpinService
     public const GET_CONSOLE_SCREENSHOT = '/api/v2/vpc/%s/instance/%s/screenshot';
     public const POST_CONSOLE_SESSION = '/api/v2/vpc/%s/instance/%s/console/session';
     public const GET_HOSTGROUP_URI = '/api/v2/vpc/%s/instance/%s';
+    public const PRIVATE_HOST_GROUP_CAPACITY = '/api/v2/vpc/%s/hostgroup/%s/capacity';
+    public const SHARED_HOST_GROUP_CAPACITY = '/api/v2/capacity/hostgroup';
 
     /** Affinity Rules */
     public const GET_CONSTRAINT_URI = '/api/v2/hostgroup/%s/constraint';

@@ -21,6 +21,7 @@ use App\Models\V2\Network;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
 use App\Models\V2\Region;
+use App\Models\V2\ResourceTier;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
 use App\Models\V2\Task;
@@ -152,6 +153,9 @@ abstract class TestCase extends BaseTestCase
 
     /** @var FloatingIp */
     private $floatingIp;
+
+    /** @var ResourceTier */
+    private $resourceTier;
 
     public function firewallPolicy($id = 'fwp-test')
     {
@@ -298,6 +302,20 @@ abstract class TestCase extends BaseTestCase
             ]);
         }
         return $this->availabilityZone;
+    }
+
+    public function resourceTier()
+    {
+        if (!$this->resourceTier) {
+            $this->resourceTier = ResourceTier::factory()
+                ->for($this->availabilityZone())
+                ->create(
+                    [
+                        'id' => 'rt-test',
+                    ]
+                );
+        }
+        return $this->resourceTier;
     }
 
     public function instanceModel()
