@@ -16,12 +16,13 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 
-class FastDeskSeeder extends Seeder {
-
+class FastDeskSeeder extends Seeder
+{
     use WithoutModelEvents;
 
     public function run()
     {
+        (new SetupSeeder())->run();
         $fastDeskMgmt = VpnService::find('vpn-191bd289');
         $fastDeskShared = VpnService::find('vpn-47da7cbc');
         $vpn34291 = VpnService::find('vpn-890e1ab4');
