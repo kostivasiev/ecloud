@@ -7,7 +7,10 @@ use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
 use App\Models\V2\Vpc;
+use App\Models\V2\VpnProfile;
+use App\Models\V2\VpnProfileGroup;
 use App\Models\V2\VpnService;
+use App\Models\V2\VpnSession;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -126,6 +129,16 @@ class SetupSeeder extends Seeder
             )->create([
                 'id' => 'vpn-890e1ab4',
                 'name' => 'vpn_3429_1',
+            ]);
+
+        VpnProfileGroup::factory()
+            ->for($availabilityZone)
+            ->create([
+                'id' => 'vpnpg-690b45e7',
+                'name' => 'Cisco - ASA',
+                'description' => 'Cisco - ASA VPN Profile Group',
+                'ike_profile_id' => 'vpnp-29b2a70b',
+                'ipsec_profile_id' => 'vpnp-a0ffcbc6',
             ]);
     }
 }
