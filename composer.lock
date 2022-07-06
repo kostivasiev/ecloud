@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0e488b5a53e8b0644c9b2e57156db5d6",
+    "content-hash": "28fd5b41ad8134cb21d2e3af8a7e12f5",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -6843,6 +6843,62 @@
             "description": "Provides validation for lumen requests",
             "abandoned": "the alternative listed in the README",
             "time": "2022-03-04T15:18:32+00:00"
+        },
+        {
+            "name": "ukfast/artisan-runner",
+            "version": "v1.2.1",
+            "source": {
+                "type": "git",
+                "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/artisan-runner.git",
+                "reference": "df1dc45ffbfb74a52005db66ef48a67e5a86b52b"
+            },
+            "require": {
+                "ext-json": "*",
+                "illuminate/console": "^8.0|^9.0",
+                "illuminate/support": "^8.0|^9.0",
+                "php": "^7.3|^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.0|^7.0",
+                "phpunit/phpunit": "^9.0",
+                "squizlabs/php_codesniffer": "~3.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "UKFast\\ArtisanRunner\\ArtisanRunnerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "UKFast\\ArtisanRunner\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ryan Bibby",
+                    "email": "ryan.bibby@ukfast.co.uk",
+                    "role": "Author & Maintainer"
+                }
+            ],
+            "description": "A package for allowing you to run artisan commands through the API",
+            "keywords": [
+                "artisan-runner",
+                "laravel",
+                "lumen",
+                "ukfast"
+            ],
+            "time": "2022-02-16T15:10:53+00:00"
         },
         {
             "name": "ukfast/ditto",

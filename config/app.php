@@ -178,6 +178,7 @@ return [
         UKFast\ApiInternalCommunication\LoadbalancerAdminClientServiceProvider::class,
         UKFast\ApiInternalCommunication\SafeDNSAdminClientServiceProvider::class,
         UKFast\Sieve\SieveServiceProvider::class,
+        UKFast\ArtisanRunner\ArtisanRunnerServiceProvider::class,
         App\Providers\KingpinServiceProvider::class,
         App\Providers\ArtisanServiceProvider::class,
         App\Providers\EncryptionServiceProvider::class,
