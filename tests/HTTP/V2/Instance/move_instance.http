@@ -44,6 +44,7 @@ client.global.set('host_id', response.body.data.id);
 client.log('Host Group ID: ' + response.body.data.id);
 %}
 
+###
 ### Create a Host
 GET https://{{host}}/{{version}}/hosts
 Accept: */*

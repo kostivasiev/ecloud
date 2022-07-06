@@ -81,7 +81,7 @@ class AvailabilityZoneSeeder extends Seeder
             'host'=> 'https://storage-20.ecloud-service.ukfast.co.uk',
             'username'=> 'artisanapi',
             'password'=> env('ARTISAN_PASSWORD'),
-            'port'=> null,
+            'port'=> 8446,
             'is_hidden'=> false,
         ]);
 
