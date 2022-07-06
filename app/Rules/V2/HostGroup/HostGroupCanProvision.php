@@ -25,6 +25,6 @@ class HostGroupCanProvision implements Rule
      */
     public function message()
     {
-        return 'TThe specified host group has insufficient resources.';
+        return 'The specified host group has insufficient resources.';
     }
 }
