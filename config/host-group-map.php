@@ -7,7 +7,7 @@
 
 return [
     // G0
-    'hg-99f9b758' => '1001',
+    'hg-99f9b758' => '1001', // Standard CPU
 
     // MAN5 Manchester West
     'hg-9d7e6b43' => 'StandardCPU-01',
