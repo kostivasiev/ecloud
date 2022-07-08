@@ -7,6 +7,7 @@ use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\OrchestratorBuild;
+use App\Models\V2\ResourceTier;
 use App\Models\V2\Vpc;
 use App\Support\Sync;
 use App\Traits\V2\LoggableModelJob;
@@ -65,6 +66,11 @@ class CreateInstances extends Job
                 );
                 if ($quantity > 1) {
                     $instance->setAttribute('name', $definition->get('name') . ' #' . ($i+1));
+                }
+
+                if ($definition->has('resource_tier_id') && !$definition->has('host_group_id')) {
+                    $resourceTier = ResourceTier::find($definition->toArray()['resource_tier_id']);
+                    $instance->hostGroup()->associate($resourceTier->getDefaultHostGroup());
                 }
 
                 $instance->locked = $definition->has('locked') && $definition->get('locked') === true;
