@@ -1,8 +1,0 @@
-POST https://{{host}}/artisan-runner
-X-consumer-custom-id: {{dev_reseller_id_admin}}
-X-consumer-groups:  ecloud.read, ecloud.write
-Content-Type:  application/json
-
-{
-    "command": "discount-plan:send-reminder-emails"
-}
