@@ -49,7 +49,7 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
      */
     public function scopeForUser($query, Consumer $user)
     {
-        if ($user->isAdmin()) {
+        if (!$user->isScoped()) {
             return $query;
         }
 
@@ -102,7 +102,11 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
                 KingpinService::SHARED_HOST_GROUP_CAPACITY,
                 [
                     'json' => [
-                        'hostGroupIds' => $this->hostGroups->pluck('id')->toArray(),
+                        // TODO: Maps to current cluster names, replace with $this->hostGroups->pluck('id')->toArray()
+                        // when the clusters are renamed
+                        'hostGroupIds' => $this->hostGroups->pluck('id')->map(function ($id) {
+                            return HostGroup::mapId($id);
+                        })->toArray(),
                     ],
                 ]
             );
