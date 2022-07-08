@@ -5,6 +5,7 @@ namespace App\Console\Commands\Instance;
 use App\Console\Commands\Command;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
+use App\Models\V2\ResourceTier;
 
 class SetHostGroupToStandard extends Command
 {
@@ -18,8 +19,8 @@ class SetHostGroupToStandard extends Command
             $query->orWhere('host_group_id', '=', '');
         })->each(function (Instance $instance) {
             if ($instance->host_group_id === null) {
-                $hostGroup = $instance->availabilityZone->getDefaultHostGroup();
-
+                $resourceTier = ResourceTier::find($instance->availabilityZone->resource_tier_id);
+                $hostGroup = $resourceTier->getDefaultHostGroup();
                 $this->info('Assigning hostgroup ' . $hostGroup->id . ' to ' . $instance->id);
                 if (!$this->option('test-run')) {
                     $instance->hostGroup()->associate($hostGroup);
