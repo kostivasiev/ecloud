@@ -11,18 +11,17 @@ use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class HostGroupEventSubscriberTest extends TestCase
 {
-    public HostGroupEventSubscriber $subscriber;
+    public $subscriber;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->subscriber = new HostGroupEventSubscriber();
+        $this->subscriber = \Mockery::mock(HostGroupEventSubscriber::class)->shouldAllowMockingProtectedMethods()->makePartial();
 
         $resourceTier = ResourceTier::factory()->create([
             'id' => 'rt-aaaaaaaa',
@@ -61,6 +60,7 @@ class HostGroupEventSubscriberTest extends TestCase
 
         $this->kingpinServiceMock()
             ->expects('post')
+            ->zeroOrMoreTimes()
             ->withArgs([
                 KingpinService::SHARED_HOST_GROUP_CAPACITY,
                 [
@@ -108,84 +108,33 @@ class HostGroupEventSubscriberTest extends TestCase
 
     public function testHostGroupIsSelectedForInstance()
     {
-        Event::fake(Created::class);
-
         $this->instanceModel()->setAttribute('deploy_data', ['resource_tier_id' => 'rt-aaaaaaaa'])->saveQuietly();
 
         $task = $this->createSyncUpdateTask($this->instanceModel());
 
-        $subscriber = new HostGroupEventSubscriber();
+        $this->subscriber->handleTaskCreatedEvent(new Created($task));
 
-        $dispatcher = new Dispatcher();
-        $dispatcher->subscribe($subscriber);
-        $dispatcher->dispatch(new Created($task));
+        $this->instanceModel()->refresh();
 
-
-
-
-
+        $this->assertEquals('hg-standard-cpu-1', $this->instanceModel()->hostGroup->id);
     }
 
     public function testInstanceAlreadyHasHostGroupIdSkips()
     {
-        Event::fake(Created::class);
-
-        $this->instanceModel()->setAttribute('deploy_data', ['resource_tier_id' => 'rt-aaaaaaaa'])->saveQuietly();
+        $this->instanceModel()->setAttribute('host_group_id', $this->hostGroup()->id)->saveQuietly();
 
         $task = $this->createSyncUpdateTask($this->instanceModel());
-        $subscriber = new HostGroupEventSubscriber();
 
-        $dispatcher = new Dispatcher();
-        $dispatcher->subscribe($subscriber);
-        $dispatcher->dispatch(new Created($task));
+        $this->subscriber->expects('assignToInstance')->never();
 
-        // TODO: mock not run
-        
+        $this->subscriber->handleTaskCreatedEvent(new Created($task));
+
+        $this->assertEquals($this->hostGroup()->id, $this->instanceModel()->host_group_id);
     }
 
     public function testNoResourceTierInDeployDataSelectsDefaultForAz()
     {
-        $task = $this->createSyncUpdateTask($this->instanceModel());
-
-        $subscriber = new HostGroupEventSubscriber();
-
-        $dispatcher = new Dispatcher();
-        $dispatcher->subscribe($subscriber);
-        $dispatcher->dispatch(new Created($task));
+        $resourceTier = $this->subscriber->getResourceTier($this->instanceModel());
+        $this->assertEquals('rt-aaaaaaaa', $resourceTier->id);
     }
-    
-
-
-
-//    public function testSubscriberIsTriggered_()
-//    {
-//
-////        Event::fake(Created::class);
-//
-////        $this->task = $this->createSyncDeleteTask($this->floatingIpResource);
-//
-//
-//
-//        $task = new Task([
-//            'id' => 'sync-delete',
-//            'name' => Sync::TASK_NAME_UPDATE,
-//            'data' => null
-//        ]);
-//        $this->instanceModel()
-//            ->setAttribute('deploy_data', ['resource_tier_id' => 'rt-aaaaaaaa'])
-//            ->save();
-//
-//
-//        $task->resource()->associate($this->instanceModel());
-//        $task->save();
-//
-////        Event::dispatch()
-//
-//
-//        Event::assertListening(
-//            Created::class,
-//            HostGroupEventSubscriber::class
-//        );
-//
-//    }
 }

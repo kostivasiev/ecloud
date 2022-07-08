@@ -655,9 +655,6 @@ abstract class TestCase extends BaseTestCase
             // V1 hack
             \App\Events\V1\DatastoreCreatedEvent::class,
 
-            // Creating
-            \App\Events\V2\Instance\Creating::class,
-
             // Created
             \App\Events\V2\AvailabilityZone\Created::class,
             \App\Events\V2\Nat\Created::class,

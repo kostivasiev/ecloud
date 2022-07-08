@@ -112,7 +112,7 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
             );
             $response = json_decode($response->getBody()->getContents());
         } catch (\Exception $e) {
-            Log::error('Unable to retrieve host group capacities', [
+            Log::error('Unable to retrieve host group capacities for resourceTier ' . $this->id, [
                 'message' => $e->getMessage(),
             ]);
             return null;
@@ -128,10 +128,13 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
 
     /**
      * Return the least utilised host group assigned to the resource tier
-     * @return HostGroup
+     * @return ?HostGroup
      */
-    public function getDefaultHostGroup(): HostGroup
+    public function getDefaultHostGroup(): ?HostGroup
     {
+        if(empty($this->getHostGroupCapacities())) {
+            return null;
+        }
         return HostGroup::find($this->getHostGroupCapacities()->first()['id']);
     }
 }
