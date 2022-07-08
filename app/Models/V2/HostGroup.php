@@ -263,7 +263,7 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
     /**
      * Map proposed High CPU ID to existing cluster name
      * @param string $newHostgroupId
-     * @return string|null
+     * @return string|null Existing cluster name
      */
     public static function mapId(string $newHostgroupId): ?string
     {
@@ -273,7 +273,7 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
     /**
      * Map existing cluster name to a proposed HighCPU id
      * @param string $existingClusterName
-     * @return string|null
+     * @return string|null High CPU host group ID
      */
     public static function reverseMapId(string $existingClusterName): ?string
     {
