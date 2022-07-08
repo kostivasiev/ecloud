@@ -46,7 +46,7 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
      */
     public function scopeForUser($query, Consumer $user)
     {
-        if ($user->isAdmin()) {
+        if (!$user->isScoped()) {
             return $query;
         }
 
