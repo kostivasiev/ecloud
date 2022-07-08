@@ -25,6 +25,6 @@ class HostGroupCanProvision implements Rule
      */
     public function message()
     {
-        return 'There are insufficient resources to migrate to this host group.';
+        return 'The specified host group has insufficient resources.';
     }
 }
