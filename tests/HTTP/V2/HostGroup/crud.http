@@ -2,10 +2,9 @@
 POST https://{{host}}/{{version}}/host-groups
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 0-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
-X-Reseller-Id: 1
 
 {
     "name": "test host group",
@@ -28,7 +27,7 @@ client.log('Host Group ID: ' + response.body.data.id);
 GET https://{{host}}/{{version}}/host-groups
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -39,10 +38,10 @@ client.test("Request executed successfully", function() {
 %}
 
 ### show
-GET https://{{host}}/{{version}}/host-groups/h-a9241086
+GET https://{{host}}/{{version}}/host-groups/{{host_group_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -62,7 +61,7 @@ client.test("Request executed successfully", function() {
 PATCH https://{{host}}/{{version}}/host-groups/{{host_group_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -80,7 +79,7 @@ client.test("Request executed successfully", function() {
 GET https://{{host}}/{{version}}/host-groups/{{host_group_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -94,7 +93,7 @@ client.test("Request executed successfully", function() {
 DELETE https://{{host}}/{{version}}/host-groups/{{host_group_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json
 
@@ -109,6 +108,6 @@ client.test("Request executed successfully", function() {
 GET https://{{host}}/{{version}}/host-groups/{{host_group_id}}
 Accept: */*
 Cache-Control: no-cache
-X-consumer-custom-id: 1-0
+X-consumer-custom-id: {{dev_reseller_id_admin}}
 X-consumer-groups: ecloud.read, ecloud.write
 Content-Type: application/json

@@ -130,7 +130,7 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
      * Return the least utilised host group assigned to the resource tier
      * @return HostGroup
      */
-    public function getDefaultHostGroup(): HostGroup
+    public function getDefaultHostGroup(): ?HostGroup
     {
         return HostGroup::find($this->getHostGroupCapacities()->first()['id']);
     }
