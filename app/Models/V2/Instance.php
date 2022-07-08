@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
 use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
@@ -56,7 +55,6 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
     ];
 
     protected $dispatchesEvents = [
-        'creating' => Creating::class,
         'deleted' => Deleted::class,
     ];
 

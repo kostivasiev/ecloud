@@ -177,14 +177,15 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
     public static function formatHostGroupCapacity(\StdClass $rawHostGroupCapacity): array
     {
         return [
+            'id' => $rawHostGroupCapacity->hostGroupId,
             'cpu' => [
-                'used' => $rawHostGroupCapacity->cpuUsedMHz,
                 'capacity' => $rawHostGroupCapacity->cpuCapacityMHz,
+                'used' => $rawHostGroupCapacity->cpuUsedMHz,
                 'percentage' => $rawHostGroupCapacity->cpuUsage,
             ],
             'ram' => [
-                'used' => $rawHostGroupCapacity->ramUsedMB,
                 'capacity' => $rawHostGroupCapacity->ramCapacityMB,
+                'used' => $rawHostGroupCapacity->ramUsedMB,
                 'percentage' => $rawHostGroupCapacity->ramUsage,
             ],
         ];

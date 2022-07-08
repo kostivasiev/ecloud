@@ -136,6 +136,15 @@ class AvailabilityZone extends Model implements Searchable, RegionAble
         return $this->hasMany(ResourceTier::class);
     }
 
+    /**
+     * Default resource tier for the AZ
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function resourceTier()
+    {
+        return $this->belongsTo(ResourceTier::class);
+    }
+
     public function nsxService()
     {
         if (!$this->nsxService) {
