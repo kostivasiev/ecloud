@@ -157,7 +157,7 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
                     [
                         'json' => [
                             'hostGroupIds' => [
-                                $this->id
+                                static::mapId($this->id)
                             ],
                         ],
                     ]
@@ -177,7 +177,7 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
     public static function formatHostGroupCapacity(\StdClass $rawHostGroupCapacity): array
     {
         return [
-            'id' => $rawHostGroupCapacity->hostGroupId,
+            'id' => static::reverseMapId($rawHostGroupCapacity->hostGroupId),
             'cpu' => [
                 'capacity' => $rawHostGroupCapacity->cpuCapacityMHz,
                 'used' => $rawHostGroupCapacity->cpuUsedMHz,
@@ -258,5 +258,25 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
     public function getVcpuAvailableAttribute()
     {
         return $this->vcpu_capacity - $this->vcpu_used;
+    }
+
+    /**
+     * Map proposed High CPU ID to existing cluster name
+     * @param string $newHostgroupId
+     * @return string|null
+     */
+    public static function mapId(string $newHostgroupId): ?string
+    {
+        return config('host-group-map')[$newHostgroupId] ?? $newHostgroupId;
+    }
+
+    /**
+     * Map existing cluster name to a proposed HighCPU id
+     * @param string $existingClusterName
+     * @return string|null
+     */
+    public static function reverseMapId(string $existingClusterName): ?string
+    {
+        return array_flip(config('host-group-map'))[$existingClusterName] ?? $existingClusterName;
     }
 }
