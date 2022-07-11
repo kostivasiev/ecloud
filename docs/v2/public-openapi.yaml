@@ -182,7 +182,7 @@ paths:
     $ref: 'resources/AffinityRule/item.yaml'
   '/ecloud/v2/affinity-rules/members':
     $ref: 'resources/AffinityRuleMember/collection.yaml'
-  '/ecloud/v2/affinity-rules/members/{AffinityRuleMemberId}':
+  '/ecloud/v2/affinity-rule-members/{AffinityRuleMemberId}':
     $ref: 'resources/AffinityRuleMember/item.yaml'
   '/ecloud/v2/availability-zones':
     $ref: 'resources/AvailabilityZone/collection.yaml'
