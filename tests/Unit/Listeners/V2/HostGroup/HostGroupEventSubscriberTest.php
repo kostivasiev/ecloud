@@ -10,7 +10,6 @@ use App\Models\V2\ResourceTierHostGroup;
 use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Factories\Sequence;
-use Illuminate\Events\Dispatcher;
 use Tests\TestCase;
 
 class HostGroupEventSubscriberTest extends TestCase

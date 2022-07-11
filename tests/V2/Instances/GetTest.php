@@ -2,7 +2,10 @@
 
 namespace Tests\V2\Instances;
 
+use App\Models\V2\AvailabilityZone;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
+use Database\Seeders\ResourceTierSeeder;
 use GuzzleHttp\Psr7\Response;
 use Tests\TestCase;
 
@@ -72,5 +75,41 @@ class GetTest extends TestCase
                 'id' => 'fip-test',
             ])
             ->assertStatus(200);
+    }
+
+    public function testGetResourceTierInResponse()
+    {
+        AvailabilityZone::factory()->create([
+            'id' => 'az-aaaaaaaa',
+            'region_id' => $this->region()->id,
+        ]);
+
+        (new ResourceTierSeeder())->run();
+
+        $this->instanceModel()->setAttribute('host_group_id', 'hg-99f9b758')->save();
+
+        $this->asAdmin()->get('/v2/instances/' . $this->instanceModel()->id)
+            ->assertJsonFragment([
+                'resource_tier_id' => 'rt-aaaaaaaa',
+                'host_group_id' => null,
+            ])->assertStatus(200);
+    }
+
+    public function testGPrivateHostGroupReturnsNullResourceTier()
+    {
+        AvailabilityZone::factory()->create([
+            'id' => 'az-aaaaaaaa',
+            'region_id' => $this->region()->id,
+        ]);
+
+        (new ResourceTierSeeder())->run();
+
+        $this->instanceModel()->setAttribute('host_group_id', $this->hostGroup()->id)->save();
+
+        $this->asAdmin()->get('/v2/instances/' . $this->instanceModel()->id)
+            ->assertJsonFragment([
+                'resource_tier_id' => null,
+                'host_group_id' => $this->hostGroup()->id,
+            ])->assertStatus(200);
     }
 }

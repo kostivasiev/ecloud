@@ -3,6 +3,7 @@
 namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
 use GuzzleHttp\Psr7\Response;
@@ -36,14 +37,9 @@ class Deploy extends Job
             'instanceId' => $this->model->getKey(),
             'numCPU' => $this->model->vcpu_cores,
             'ramMib' => $this->model->ram_capacity,
-            'resourceTierTags' => config('instance.resource_tier_tags'),
             'backupEnabled' => $this->model->backup_enabled,
+            'hostGroupId' => HostGroup::mapId($this->model->host_group_id),
         ];
-
-        if (!empty($this->model->host_group_id)) {
-            unset($deployData['resourceTierTags']);
-            $deployData['hostGroupId'] = $this->model->host_group_id;
-        }
 
         /** @var Response $deployResponse */
         $deployResponse = $this->model->availabilityZone->kingpinService()->post(

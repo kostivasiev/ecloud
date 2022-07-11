@@ -9,6 +9,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Exception;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -107,6 +108,12 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
             $sum += $volume->capacity;
         }
         return $sum;
+    }
+
+    public function getResourceTierIdAttribute()
+    {
+        return $this->hostGroup->isPrivate() ? null :
+            $this->hostGroup->resourceTierHostGroups()->first()->resourceTier->id;
     }
 
     public function getPlatformAttribute()
