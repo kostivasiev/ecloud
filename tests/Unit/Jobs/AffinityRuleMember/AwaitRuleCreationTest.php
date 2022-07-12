@@ -82,7 +82,7 @@ class AwaitRuleCreationTest extends TestCase
         $this->kingpinServiceMock()
             ->allows('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_CONSTRAINT_URI, $this->sharedHostGroup()->id)
+                sprintf(KingpinService::GET_CONSTRAINT_URI, $this->hostGroup()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([[]]));
             });

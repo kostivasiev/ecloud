@@ -14,7 +14,8 @@ class HostGroupEventSubscriber implements ShouldQueue
      * @param $event
      * @return void
      */
-    public function handleTaskCreatedEvent($event) {
+    public function handleTaskCreatedEvent($event)
+    {
         $this->event = $event->model;
         $resource = $event->model->resource;
         if ($event->model->name == Sync::TASK_NAME_UPDATE) {
@@ -57,8 +58,7 @@ class HostGroupEventSubscriber implements ShouldQueue
             ', using default for availability zone.', [
                 'availability_zone_id' => $instance->availabilityZone->id,
                 'resource_tier_id' => $instance->availabilityZone->resourceTier->id
-            ]
-        );
+        ]);
         return $instance->availabilityZone->resourceTier;
     }
 
