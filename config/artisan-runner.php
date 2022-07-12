@@ -8,5 +8,6 @@ return [
      */
     'allowed-commands' => [
         App\Console\Commands\DiscountPlan\SendReminderEmails::class,
+        UKFast\ArtisanRunner\Commands\HotFuzzQuote::class,
     ],
 ];
