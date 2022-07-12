@@ -595,16 +595,13 @@ class InstanceController extends BaseController
     {
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
 
-        if (!$request->has('host_group_id')) {
-            $resourceTier = ResourceTier::find($request->input('resource_tier_id', $instance->availabilityZone->resource_tier_id));
-            // TODO - get host group with least used capacity (do we need to pass platform here?)
-            $hostGroup = $resourceTier->getDefaultHostGroup();
-        }
-
         $task = $instance->createTaskWithLock(
             Migrate::$name,
             Migrate::class,
-            ['host_group_id' => $request->input('host_group_id', $hostGroup->id)]
+            [
+                'host_group_id' => $request->input('host_group_id') ?? null,
+                'resource_tier_id' => $request->input('resource_tier_id') ?? null,
+            ]
         );
 
         return $this->responseTaskId($task->id);

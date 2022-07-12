@@ -3,18 +3,17 @@
 namespace App\Jobs\Instance;
 
 use App\Jobs\TaskJob;
+use App\Models\V2\ResourceTier;
+use App\Traits\V2\Jobs\Instance\ResolveHostGroup;
 
 class MigrateToHostGroup extends TaskJob
 {
+    use ResolveHostGroup;
+
     public function handle()
     {
         $instance = $this->task->resource;
-        $hostGroupId = $this->task->data['host_group_id'];
-
-        if ($instance->host_group_id == $hostGroupId) {
-            $this->info('Instance ' . $instance->id . ' is already in the host group ' . $hostGroupId . ', nothing to do');
-            return;
-        }
+        $hostGroupId = $this->resolveHostGroup();
 
         $instance->availabilityZone->kingpinService()
             ->post(
