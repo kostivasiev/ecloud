@@ -599,8 +599,8 @@ class InstanceController extends BaseController
             Migrate::$name,
             Migrate::class,
             [
-                'host_group_id' => $request->input('host_group_id') ?? null,
-                'resource_tier_id' => $request->input('resource_tier_id') ?? null,
+                'host_group_id' => $request->input('host_group_id'),
+                'resource_tier_id' => $request->input('resource_tier_id'),
             ]
         );
 

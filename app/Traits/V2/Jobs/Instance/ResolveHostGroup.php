@@ -6,7 +6,7 @@ use App\Models\V2\ResourceTier;
 
 trait ResolveHostGroup
 {
-    public function resolveHostGroup(): ?string
+    public function resolveHostGroupId(): ?string
     {
         $instance = $this->task->resource;
         $hostGroupId = $this->task->data['host_group_id'] ?? null;
@@ -19,7 +19,6 @@ trait ResolveHostGroup
         }
 
         if ($instance->host_group_id == $hostGroupId) {
-            $this->info('Instance ' . $instance->id . ' is already in the host group ' . $hostGroupId . ', nothing to do');
             return null;
         }
 
