@@ -18,14 +18,12 @@ class SetHostGroupToStandard extends Command
             $query->whereNull('host_group_id');
             $query->orWhere('host_group_id', '=', '');
         })->each(function (Instance $instance) {
-            if ($instance->host_group_id === null) {
-                $resourceTier = ResourceTier::find($instance->availabilityZone->resource_tier_id);
-                $hostGroup = $resourceTier->getDefaultHostGroup();
-                $this->info('Assigning hostgroup ' . $hostGroup->id . ' to ' . $instance->id);
-                if (!$this->option('test-run')) {
-                    $instance->hostGroup()->associate($hostGroup);
-                    $instance->save();
-                }
+            $resourceTier = ResourceTier::find($instance->availabilityZone->resource_tier_id);
+            $hostGroup = $resourceTier->getDefaultHostGroup();
+            $this->info('Assigning hostgroup ' . $hostGroup->id . ' to ' . $instance->id);
+            if (!$this->option('test-run')) {
+                $instance->hostGroup()->associate($hostGroup);
+                $instance->save();
             }
         });
     }
