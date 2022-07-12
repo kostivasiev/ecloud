@@ -34,7 +34,7 @@ class UpdateWindowsLicenseBilling implements Billable
             return;
         }
 
-        if (!empty($instance->host_group_id)) {
+        if ($instance->hostGroup->isPrivate()) {
             $instance->billingMetrics()
                 ->where('key', '=', self::getKeyName())
                 ->each(function ($billingMetric) use ($instance) {
@@ -42,7 +42,7 @@ class UpdateWindowsLicenseBilling implements Billable
                     Log::debug('End billing of `' . $billingMetric->key . '` for Instance ' . $instance->id);
                 });
             Log::warning(
-                get_class($this) . ': Instance ' . $instance->id . ' is in the host group ' .
+                get_class($this) . ': Instance ' . $instance->id . ' is in private host group ' .
                 $instance->host_group_id . ', nothing to do'
             );
             return;

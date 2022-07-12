@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Console\Commands\FastDesk\BackfillVpn;
+use App\Console\Commands\Instance\SetHostGroupToStandard;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -28,6 +29,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Health\FindOrphanedNats::class,
         \App\Console\Commands\Health\FindOrphanedNics::class,
         \App\Console\Commands\Image\Populate::class,
+        \App\Console\Commands\Instance\SetHostGroupToStandard::class,
         \App\Console\Commands\Kingpin\TestAuth::class,
         \App\Console\Commands\Make\MakeTaskJob::class,
         \App\Console\Commands\Make\MakeTest::class,

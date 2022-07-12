@@ -3,7 +3,6 @@
 namespace App\Jobs\LoadBalancerNode;
 
 use App\Jobs\TaskJob;
-use App\Models\V2\Credential;
 use App\Models\V2\Instance;
 use App\Traits\V2\TaskJobs\AwaitResources;
 use Illuminate\Support\Facades\Log;
