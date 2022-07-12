@@ -13,7 +13,9 @@ class AssociateHostGroup extends TaskJob
     public function handle()
     {
         $instance = $this->task->resource;
-        $instance->hostGroup()->associate($this->resolveHostGroup());
-        $instance->saveQuietly();
+        if ($hostGroup = $this->resolveHostGroup()) {
+            $instance->hostGroup()->associate($hostGroup);
+            $instance->saveQuietly();
+        }
     }
 }

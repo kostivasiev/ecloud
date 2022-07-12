@@ -15,16 +15,18 @@ class MigrateToHostGroup extends TaskJob
         $instance = $this->task->resource;
         $hostGroupId = $this->resolveHostGroup();
 
-        $instance->availabilityZone->kingpinService()
-            ->post(
-                '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/reschedule',
-                [
-                    'json' => [
-                        'hostGroupId' => $hostGroupId,
-                    ],
-                ]
-            );
+        if ($hostGroupId) {
+            $instance->availabilityZone->kingpinService()
+                ->post(
+                    '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/reschedule',
+                    [
+                        'json' => [
+                            'hostGroupId' => $hostGroupId,
+                        ],
+                    ]
+                );
 
-        $this->info('Instance ' . $instance->id . ' was moved to host group ' . $hostGroupId);
+            $this->info('Instance ' . $instance->id . ' was moved to host group ' . $hostGroupId);
+        }
     }
 }
