@@ -60,7 +60,7 @@ class MigrateBillingTest extends TestCase
             'start' => Carbon::now(),
         ]);
 
-        $this->instanceModel()->host_group_id = 'hg-aaabbbccc';
+        $this->instanceModel()->host_group_id = $this->hostGroup()->id;
         $this->instanceModel()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         Model::withoutEvents(function () {
@@ -92,7 +92,6 @@ class MigrateBillingTest extends TestCase
 
     public function testBillingStartsOnAPublicInstance()
     {
-        $this->instanceModel()->host_group_id = '';
         $this->instanceModel()->image->setAttribute('platform', 'Windows')->saveQuietly();
 
         Model::withoutEvents(function () {

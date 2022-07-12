@@ -3,13 +3,16 @@
 namespace App\Models\V2;
 
 use App\Events\V2\HostGroup\Deleted;
+use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
 use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Log;
 use UKFast\Api\Auth\Consumer;
 use UKFast\Sieve\Searchable;
 use UKFast\Sieve\Sieve;
@@ -89,6 +92,27 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
         return $this->hasMany(Instance::class);
     }
 
+    public function isPrivate(): bool
+    {
+        return !is_null($this->vpc_id);
+    }
+
+    public function resourceTierHostGroups()
+    {
+        return $this->hasMany(ResourceTierHostGroup::class);
+    }
+
+    public function resourceTiers(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ResourceTier::class,
+            ResourceTierHostGroup::class,
+            'host_group_id',
+            'id',
+            'id',
+            'resource_tier_id'
+        );
+    }
     /**
      * @param $query
      * @param $user
@@ -116,6 +140,89 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
+    }
+
+    public function getCapacity(): ?array
+    {
+        try {
+            if ($this->isPrivate()) {
+                $response = $this->availabilityZone->kingpinService()->get(
+                    sprintf(KingpinService::PRIVATE_HOST_GROUP_CAPACITY, $this->vpc->id, $this->id)
+                );
+
+                $response = json_decode($response->getBody()->getContents());
+            } else {
+                $response = $this->availabilityZone->kingpinService()->post(
+                    KingpinService::SHARED_HOST_GROUP_CAPACITY,
+                    [
+                        'json' => [
+                            'hostGroupIds' => [
+                                static::mapId($this->id)
+                            ],
+                        ],
+                    ]
+                );
+                $response = json_decode($response->getBody()->getContents())[0];
+            }
+        } catch (\Exception $e) {
+            Log::error('Unable to retrieve hostgroup capacity', [
+                'message' => $e->getMessage(),
+            ]);
+            return null;
+        }
+
+        return static::formatHostGroupCapacity($response);
+    }
+
+    public static function formatHostGroupCapacity(\StdClass $rawHostGroupCapacity): array
+    {
+        return [
+            'id' => static::reverseMapId($rawHostGroupCapacity->hostGroupId),
+            'cpu' => [
+                'capacity' => $rawHostGroupCapacity->cpuCapacityMHz,
+                'used' => $rawHostGroupCapacity->cpuUsedMHz,
+                'percentage' => $rawHostGroupCapacity->cpuUsage,
+            ],
+            'ram' => [
+                'capacity' => $rawHostGroupCapacity->ramCapacityMB,
+                'used' => $rawHostGroupCapacity->ramUsedMB,
+                'percentage' => $rawHostGroupCapacity->ramUsage,
+            ],
+        ];
+    }
+
+    /**
+     * Check if the host group has sufficient compute resources
+     * @param int $ram
+     * @return bool
+     */
+    public function canProvision(int $ram): bool
+    {
+        $capacityThresholdPercent = config('hostgroup.capacity.threshold');
+
+        $capacity = $this->getCapacity();
+
+        $message = 'Checking host group ' . $this->id . ' capacity';
+
+        if ($capacity['ram']['capacity'] == 0 || $capacity['cpu']['capacity'] == 0) {
+            Log::info($message . ': The host group has 0 compute capacity. It may not contain an active host.');
+            return false;
+        }
+
+        $projectedRamUse = $capacity['ram']['used'] + $ram;
+
+        $projectedRamUsePercent = (int) ceil(($projectedRamUse / $capacity['ram']['capacity']) * 100);
+
+        if ($capacity['cpu']['percentage'] > $capacityThresholdPercent ||
+            $projectedRamUsePercent > $capacityThresholdPercent) {
+            Log::info($message . ': The host group has insufficient compute capacity.', [
+                'projectedRamUsePercent' => $projectedRamUsePercent,
+                'currentCpuUsePercent' => $capacity['cpu']['percentage']
+            ]);
+            return false;
+        }
+
+        return true;
     }
 
     public function getRamCapacityAttribute()
@@ -151,5 +258,25 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
     public function getVcpuAvailableAttribute()
     {
         return $this->vcpu_capacity - $this->vcpu_used;
+    }
+
+    /**
+     * Map proposed High CPU ID to existing cluster name
+     * @param string $newHostgroupId
+     * @return string|null Existing cluster name
+     */
+    public static function mapId(string $newHostgroupId): ?string
+    {
+        return config('host-group-map')[$newHostgroupId] ?? $newHostgroupId;
+    }
+
+    /**
+     * Map existing cluster name to a proposed HighCPU id
+     * @param string $existingClusterName
+     * @return string|null High CPU host group ID
+     */
+    public static function reverseMapId(string $existingClusterName): ?string
+    {
+        return array_flip(config('host-group-map'))[$existingClusterName] ?? $existingClusterName;
     }
 }

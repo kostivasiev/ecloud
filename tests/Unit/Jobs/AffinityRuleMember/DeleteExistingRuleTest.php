@@ -45,6 +45,8 @@ class DeleteExistingRuleTest extends TestCase
 
     public function testDeleteRuleIfExists()
     {
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
@@ -88,6 +90,7 @@ class DeleteExistingRuleTest extends TestCase
     public function testIfHostGroupIsInvalid()
     {
         $hostGroupId = 'hg-xxxxxxxx';
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
 
         $this->kingpinServiceMock()
             ->expects('get')
@@ -118,6 +121,7 @@ class DeleteExistingRuleTest extends TestCase
     {
         $instanceMock = \Mockery::mock($this->instanceModel())->makePartial();
         $instanceMock->allows('hasAffinityRule')->withAnyArgs()->andReturnFalse();
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
 
         $this->kingpinServiceMock()
             ->expects('get')
@@ -149,6 +153,8 @@ class DeleteExistingRuleTest extends TestCase
 
     public function testDeleteConstraintFails()
     {
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
