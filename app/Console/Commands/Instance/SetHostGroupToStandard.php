@@ -3,7 +3,6 @@
 namespace App\Console\Commands\Instance;
 
 use App\Console\Commands\Command;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Models\V2\ResourceTier;
 
