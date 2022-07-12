@@ -103,6 +103,8 @@ class CreateAffinityRuleTest extends TestCase
     {
         $this->createSecondaryMember();
 
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
         $this->kingpinServiceMock()
             ->expects('get')
             ->twice()

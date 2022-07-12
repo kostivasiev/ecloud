@@ -22,6 +22,7 @@ use App\Models\V2\NetworkPolicy;
 use App\Models\V2\Nic;
 use App\Models\V2\Region;
 use App\Models\V2\ResourceTier;
+use App\Models\V2\ResourceTierHostGroup;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
 use App\Models\V2\Task;
@@ -135,6 +136,9 @@ abstract class TestCase extends BaseTestCase
 
     /** @var HostGroup */
     private $hostGroup;
+
+    /** @var HostGroup */
+    private $sharedHostGroup;
 
     /** @var Image */
     private $image;
@@ -312,6 +316,7 @@ abstract class TestCase extends BaseTestCase
                 ->create(
                     [
                         'id' => 'rt-test',
+                        'name' => 'Test Resource tier'
                     ]
                 );
         }
@@ -335,7 +340,8 @@ abstract class TestCase extends BaseTestCase
                         'volume_capacity' => 20,
                         'volume_iops' => 300,
                         'requires_floating_ip' => false,
-                    ]
+                    ],
+                    'host_group_id' => $this->sharedHostGroup()
                 ]);
             });
 
@@ -440,6 +446,27 @@ abstract class TestCase extends BaseTestCase
             });
         }
         return $this->hostGroup;
+    }
+
+    public function sharedHostGroup()
+    {
+        if (!$this->sharedHostGroup) {
+            $this->sharedHostGroup = HostGroup::factory()->createQuietly([
+                'id' => 'hg-shared',
+                'name' => 'hg-shared',
+                'vpc_id' => null,
+                'availability_zone_id' => $this->availabilityZone()->id,
+                'host_spec_id' => $this->hostSpec()->id
+            ]);
+
+            ResourceTierHostGroup::factory()->create([
+                'id' => 'rthg-test',
+                'resource_tier_id' => $this->resourceTier()->id,
+                'host_group_id' => $this->sharedHostGroup->id
+            ]);
+        }
+
+        return $this->sharedHostGroup;
     }
 
     public function floatingIp()

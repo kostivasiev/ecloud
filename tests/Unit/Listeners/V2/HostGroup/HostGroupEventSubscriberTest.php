@@ -107,6 +107,8 @@ class HostGroupEventSubscriberTest extends TestCase
 
     public function testHostGroupIsSelectedForInstance()
     {
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
         $this->instanceModel()->setAttribute('deploy_data', ['resource_tier_id' => 'rt-aaaaaaaa'])->saveQuietly();
 
         $task = $this->createSyncUpdateTask($this->instanceModel());

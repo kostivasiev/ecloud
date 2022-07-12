@@ -84,13 +84,9 @@ class GetTest extends TestCase
             'region_id' => $this->region()->id,
         ]);
 
-        (new ResourceTierSeeder())->run();
-
-        $this->instanceModel()->setAttribute('host_group_id', 'hg-99f9b758')->save();
-
-        $this->asAdmin()->get('/v2/instances/' . $this->instanceModel()->id)
+        $this->asUser()->get('/v2/instances/' . $this->instanceModel()->id)
             ->assertJsonFragment([
-                'resource_tier_id' => 'rt-aaaaaaaa',
+                'resource_tier_id' => $this->resourceTier()->id,
                 'host_group_id' => null,
             ])->assertStatus(200);
     }
