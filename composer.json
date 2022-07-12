@@ -9,16 +9,16 @@
     "license": "MIT",
     "require": {
         "php": "^8.1.0",
-        "fruitcake/laravel-cors": "^2.0",
-        "guzzlehttp/guzzle": "^7.0.1",
-        "laravel/framework": "^9.0",
-        "laravel/tinker": "^2.6",
-        "fzaninotto/faker": "^1.9.1",
         "cebe/php-openapi": "^1.4",
         "doctrine/dbal": "^2.9",
+        "fruitcake/laravel-cors": "^2.0",
+        "fzaninotto/faker": "^1.9.1",
+        "guzzlehttp/guzzle": "^7.0.1",
         "illuminate/mail": "^9.0",
         "illuminate/redis": "^9.0",
+        "laravel/framework": "^9.0",
         "laravel/legacy-factories": "^1.1",
+        "laravel/tinker": "^2.6",
         "mlocati/ip-lib": "^1",
         "mustache/mustache": "^2.12.0",
         "phpseclib/mcrypt_compat": "^2.0",
@@ -32,13 +32,14 @@
         "ukfast/api-internal-communication": "^1.10",
         "ukfast/api-paginator": "^2.1",
         "ukfast/api-validation": "^1.4",
+        "ukfast/artisan-runner": "^1.2",
         "ukfast/ditto": "^4.1",
         "ukfast/health-check": "^2.0",
+        "ukfast/laravel-responses": "^1.0",
         "ukfast/laravel-sieve": "^0.7",
         "ukfast/log-provider": "^3.0",
         "ukfast/responses": "~1.0",
-        "vlucas/phpdotenv": "^5.2",
-        "ukfast/laravel-responses": "^1.0"
+        "vlucas/phpdotenv": "^5.2"
     },
     "require-dev": {
         "ext-json": "*",
@@ -174,6 +175,10 @@
         {
           "type": "vcs",
           "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/paginator.git"
+        },
+        {
+          "type": "vcs",
+          "url": "git@gitlab.devops.ukfast.co.uk:ukfast/api.ukfast/packages/php/artisan-runner.git"
         }
     ]
 }
