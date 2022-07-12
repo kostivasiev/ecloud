@@ -4,20 +4,20 @@ namespace App\Jobs\Instance\Deploy;
 
 use App\Jobs\Job;
 use App\Models\V2\HostGroup;
-use App\Models\V2\Instance;
-use App\Traits\V2\LoggableModelJob;
+use App\Models\V2\Task;
+use App\Traits\V2\LoggableTaskJob;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Bus\Batchable;
 
 class Deploy extends Job
 {
-    use Batchable, LoggableModelJob;
-    
-    private $model;
+    use Batchable, LoggableTaskJob;
 
-    public function __construct(Instance $instance)
+    private Task $task;
+
+    public function __construct(Task $task)
     {
-        $this->model = $instance;
+        $this->task = $task;
     }
 
     /**
@@ -25,25 +25,27 @@ class Deploy extends Job
      */
     public function handle()
     {
-        if (empty($this->model->image)) {
+        $instance = $this->task->resource;
+
+        if (empty($instance->image)) {
             $this->fail(new \Exception(
-                'Deploy failed for ' . $this->model->id . ', Failed to load image'
+                'Deploy failed for ' . $instance->id . ', Failed to load image'
             ));
             return;
         }
 
         $deployData = [
-            'templateName' => $this->model->image->vm_template,
-            'instanceId' => $this->model->getKey(),
-            'numCPU' => $this->model->vcpu_cores,
-            'ramMib' => $this->model->ram_capacity,
-            'backupEnabled' => $this->model->backup_enabled,
-            'hostGroupId' => HostGroup::mapId($this->model->host_group_id),
+            'templateName' => $instance->image->vm_template,
+            'instanceId' => $instance->getKey(),
+            'numCPU' => $instance->vcpu_cores,
+            'ramMib' => $instance->ram_capacity,
+            'backupEnabled' => $instance->backup_enabled,
+            'hostGroupId' => HostGroup::mapId($instance->host_group_id),
         ];
 
         /** @var Response $deployResponse */
-        $deployResponse = $this->model->availabilityZone->kingpinService()->post(
-            '/api/v2/vpc/' . $this->model->vpc->id . '/instance/fromtemplate',
+        $deployResponse = $instance->availabilityZone->kingpinService()->post(
+            '/api/v2/vpc/' . $instance->vpc->id . '/instance/fromtemplate',
             [
                 'json' => $deployData
             ]
@@ -51,7 +53,7 @@ class Deploy extends Job
 
         $deployResponse = json_decode($deployResponse->getBody()->getContents());
         if (!$deployResponse) {
-            throw new \Exception('Deploy failed for ' . $this->model->id . ', could not decode response');
+            throw new \Exception('Deploy failed for ' . $instance->id . ', could not decode response');
         }
     }
 }

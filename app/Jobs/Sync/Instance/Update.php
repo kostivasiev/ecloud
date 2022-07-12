@@ -58,7 +58,7 @@ class Update extends Job
                 [
                     new CheckNetworkAvailable($this->task->resource),
                     new AwaitHostGroup($this->task->resource),
-                    new Deploy($this->task->resource),
+                    new Deploy($this->task),
                     new PrepareOsDisk($this->task->resource),
                     new AwaitVolumeSync($this->task->resource),
                     new ConfigureNics($this->task->resource),
