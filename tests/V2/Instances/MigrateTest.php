@@ -52,6 +52,7 @@ class MigrateTest extends TestCase
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),
+                'availability_zone_id' => $this->availabilityZone()->id
             ]);
         });
 
