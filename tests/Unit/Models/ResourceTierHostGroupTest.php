@@ -40,6 +40,10 @@ class ResourceTierHostGroupTest extends TestCase
 
         // resource tier -> through pivot -> host groups
         $this->assertEquals('hg-99f9b758', $resourceTierStandardCpu->hostGroups->first()->id);
+
+        // host group to resource tier
+        $hostGroup = HostGroup::find('hg-99f9b758');
+        $this->assertEquals('rt-aaaaaaaa', $hostGroup->resourceTierHostGroups()->first()->resourceTier->id);
     }
 
     public function testGetDefaultHostGroupByCapacity_NO_MAPPING()
