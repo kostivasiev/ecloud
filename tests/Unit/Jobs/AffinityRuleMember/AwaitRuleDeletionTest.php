@@ -94,9 +94,9 @@ class AwaitRuleDeletionTest extends TestCase
 
     public function testSkipIfRuleNotPresent()
     {
-
         $instanceMock = \Mockery::mock($this->instanceModel())->makePartial();
         $instanceMock->allows('hasAffinityRule')->withAnyArgs()->andReturnTrue();
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
 
         $this->kingpinServiceMock()
             ->allows('get')

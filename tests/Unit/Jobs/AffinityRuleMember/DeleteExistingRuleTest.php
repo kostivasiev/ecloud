@@ -45,6 +45,8 @@ class DeleteExistingRuleTest extends TestCase
 
     public function testDeleteRuleIfExists()
     {
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
@@ -151,6 +153,8 @@ class DeleteExistingRuleTest extends TestCase
 
     public function testDeleteConstraintFails()
     {
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(

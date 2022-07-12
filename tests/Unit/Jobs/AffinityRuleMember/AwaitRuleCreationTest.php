@@ -35,6 +35,9 @@ class AwaitRuleCreationTest extends TestCase
             ->create([
                 'instance_id' => $this->instanceModel(),
             ]);
+
+        $this->instanceModel()->setAttribute('host_group_id', $this->hostGroup()->id)->save();
+
         $this->affinityRuleMember2 = AffinityRuleMember::factory()
             ->for($this->affinityRule)
             ->create([

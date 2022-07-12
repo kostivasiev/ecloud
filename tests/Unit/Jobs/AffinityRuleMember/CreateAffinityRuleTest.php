@@ -59,6 +59,8 @@ class CreateAffinityRuleTest extends TestCase
 
     public function testSuccessfulCreation()
     {
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
         $this->createSecondaryMember()
             ->kingpinServiceMock()
             ->expects('post')

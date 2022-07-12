@@ -29,6 +29,7 @@ class AwaitHostGroupTest extends TestCase
     public function testSuccessful()
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
 
         dispatch(new AwaitHostGroup($this->instanceModel()));
 
