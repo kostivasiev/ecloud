@@ -132,7 +132,7 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
      */
     public function getDefaultHostGroup(): ?HostGroup
     {
-        if(empty($this->getHostGroupCapacities())) {
+        if (empty($this->getHostGroupCapacities())) {
             return null;
         }
         return HostGroup::find($this->getHostGroupCapacities()->first()['id']);
