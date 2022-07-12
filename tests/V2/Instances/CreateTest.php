@@ -5,6 +5,7 @@ namespace Tests\V2\Instances;
 use App\Events\V2\Task\Created;
 use App\Models\V2\ApplianceVersion;
 use App\Models\V2\FloatingIpResource;
+use App\Models\V2\Host;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\ImageMetadata;
@@ -12,16 +13,21 @@ use App\Models\V2\Network;
 use App\Models\V2\Router;
 use App\Models\V2\Task;
 use App\Models\V2\Vpc;
+use App\Services\V2\KingpinService;
 use App\Support\Sync;
 use Database\Seeders\SoftwareSeeder;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
+use Tests\Mocks\Host\Mocks;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
 class CreateTest extends TestCase
 {
+    use Mocks;
+
     protected ApplianceVersion $applianceVersion;
     protected Image $image;
 
@@ -320,6 +326,47 @@ class CreateTest extends TestCase
                 'title' => 'Validation Error',
                 'detail' => 'There are no hosts assigned to the specified host group id',
                 'source' => 'host_group_id',
+            ]
+        )->assertStatus(422);
+    }
+
+    public function testHostgroupInsufficientCapacityCausesFail()
+    {
+        $this->host();
+
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->with(
+                sprintf(KingpinService::PRIVATE_HOST_GROUP_CAPACITY, $this->vpc()->id, $this->hostGroup()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'hostGroupId' => $this->hostGroup()->id,
+                    'cpuUsage' => 1,
+                    'cpuUsedMHz' => 563,
+                    'cpuCapacityMHz' => 43184,
+                    'ramUsage' => 100,
+                    'ramUsedMB' => 100000,
+                    'ramCapacityMB' => 100000,
+                ]));
+            });
+
+        $data = [
+            'vpc_id' => $this->vpc()->id,
+            'image_id' => $this->image()->id,
+            'network_id' => $this->network()->id,
+            'host_group_id' => $this->hostGroup()->id,
+            'vcpu_cores' => 2,
+            'ram_capacity' => 1024,
+            'volume_capacity' => 30,
+            'volume_iops' => 600,
+        ];
+
+        $this->post(
+            '/v2/instances',
+            $data,
+            [
+                'X-consumer-custom-id' => '0-0',
+                'X-consumer-groups' => 'ecloud.write',
             ]
         )->assertStatus(422);
     }

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\V2\Dhcp;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\FloatingIpResource;
+use App\Models\V2\Host;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\LoadBalancer;
@@ -86,6 +87,7 @@ class AppServiceProvider extends ServiceProvider
             'lbn' => LoadBalancerNetwork::class,
             'vip' => Vip::class,
             'lb' => LoadBalancer::class,
+            'h' => Host::class,
         ]);
 
         Queue::exceptionOccurred(function (JobExceptionOccurred $event) {
