@@ -112,6 +112,10 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
 
     public function getResourceTierIdAttribute()
     {
+        if (!$this->hostGroup()->exists()) {
+            return null;
+        }
+
         return $this->hostGroup->isPrivate() ? null :
             $this->hostGroup->resourceTierHostGroups()->first()->resourceTier->id;
     }
