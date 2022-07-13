@@ -25,6 +25,7 @@ class AvailabilityZoneSeeder extends Seeder
             'san_name' => 'MCS-E-G0-3PAR-01',
             'ucs_compute_name' => 'GC-UCS-FI2-DEV-A',
             'is_public' => true,
+            'resource_tier_id' => 'rt-aaaaaaaa',
         ]);
 
         /**

@@ -43,6 +43,9 @@ class SetHostGroupToStandardTest extends TestCase
 
     public function testResults()
     {
+        $this->instanceModel()
+            ->setAttribute('host_group_id', null)
+            ->saveQuietly();
         $this->assertNull($this->instanceModel()->host_group_id);
 
         $this->command->handle();

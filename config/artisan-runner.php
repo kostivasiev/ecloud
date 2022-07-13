@@ -8,6 +8,7 @@ return [
      */
     'allowed-commands' => [
         App\Console\Commands\DiscountPlan\SendReminderEmails::class,
+        App\Console\Commands\FastDesk\BackfillVpn::class,
         UKFast\ArtisanRunner\Commands\HotFuzzQuote::class,
     ],
 ];
