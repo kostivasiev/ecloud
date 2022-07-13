@@ -45,6 +45,18 @@ class UpdateResourceTierBillingTest extends TestCase
         });
     }
 
+    public function testStandardInstanceNoHighCpuBilling()
+    {
+        $this->assertNull(BillingMetric::getActiveByKey($this->instanceModel(), UpdateResourceTierBilling::getKeyName()));
+        $this->instanceModel()->hostGroup()->associate($this->hostGroup());
+        $task = $this->createSyncUpdateTask($this->instanceModel());
+        $task->setAttribute('completed', true)->saveQuietly();
+
+        (new UpdateResourceTierBilling())->handle(new Updated($task));
+
+        $this->assertDatabaseCount(BillingMetric::class, 0, 'ecloud');
+    }
+
     public function testHighCpuHostGroupAttachedToInstance()
     {
         $this->assertNull(BillingMetric::getActiveByKey($this->instanceModel(), UpdateResourceTierBilling::getKeyName()));
