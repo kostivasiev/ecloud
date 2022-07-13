@@ -2,7 +2,6 @@
 
 namespace App\Console;
 
-use App\Console\Commands\Instance\SetHostGroupToStandard;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -23,6 +22,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\Conjurer\TestAuth::class,
         \App\Console\Commands\Credentials\Show::class,
         \App\Console\Commands\DiscountPlan\SendReminderEmails::class,
+        \App\Console\Commands\FastDesk\BackfillVpn::class,
         \App\Console\Commands\FloatingIp\PopulateForIpRange::class,
         \App\Console\Commands\Health\FindOrphanedNats::class,
         \App\Console\Commands\Health\FindOrphanedNics::class,
