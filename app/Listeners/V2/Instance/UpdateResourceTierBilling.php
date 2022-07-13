@@ -34,6 +34,13 @@ class UpdateResourceTierBilling implements Billable
 
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName());
 
+        if ($instance->hostGroup->hostSpec->id !== 'hs-high-cpu' && empty($currentActiveMetric)) {
+            Log::info(get_class($this) . ': High CPU billing does not apply to this instance, skipping', [
+                'instance' => $instance->id
+            ]);
+            return;
+        }
+
         if ($instance->hostGroup->hostSpec->id !== 'hs-high-cpu' && !empty($currentActiveMetric)) {
             $currentActiveMetric->setEndDate();
             Log::info(get_class($this) . ' : High CPU was disabled for instance', ['instance' => $instance->id]);
