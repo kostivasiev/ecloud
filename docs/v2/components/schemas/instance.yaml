@@ -54,6 +54,12 @@ properties:
     required : false
     example : hg-abc123
     readOnly : false
+  resource_tier_id :
+    type : string
+    required : false
+    example : rt-abc123
+    readOnly : false
+    description: Resource tier for the instance
   volume_group_id:
     type: string
     required: false

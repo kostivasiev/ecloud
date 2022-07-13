@@ -2,12 +2,8 @@
 
 namespace App\Providers;
 
-use App\Listeners\V2\Instance\UpdateResourceTierBilling;
-use App\Listeners\V2\ResourceTier\UpdateBilling;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
+use App\Listeners\V2\HostGroup\HostGroupEventSubscriber;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -94,9 +90,6 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         // Instance
-        \App\Events\V2\Instance\Creating::class => [
-            \App\Listeners\V2\Instance\DefaultPlatform::class,
-        ],
         \App\Events\V2\Instance\Deleted::class => [
             \App\Listeners\V2\BillingMetric\End::class,
         ],
@@ -151,7 +144,7 @@ class EventServiceProvider extends ServiceProvider
 
         // Task
         \App\Events\V2\Task\Created::class => [
-            \App\Listeners\V2\DispatchTaskJob::class
+            \App\Listeners\V2\DispatchTaskJob::class,
         ],
         \App\Events\V2\Task\Updated::class => [
             \App\Listeners\V2\DeleteSyncTaskResource::class,
@@ -175,6 +168,11 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\InstanceSoftware\UpdateBilling::class,
         ],
     ];
+
+    protected $subscribe = [
+        HostGroupEventSubscriber::class,
+    ];
+
 
     /**
      * Register any events for your application.

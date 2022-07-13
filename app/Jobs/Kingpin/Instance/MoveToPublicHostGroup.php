@@ -21,7 +21,7 @@ class MoveToPublicHostGroup extends Job
 
     public function handle()
     {
-        if (!$this->model->hostGroup) {
+        if (!$this->model->hostGroup->isPrivate()) {
             Log::warning(get_class($this) . ': Instance ' . $this->model->id . ' is already in the Public host group, nothing to do');
             return;
         }

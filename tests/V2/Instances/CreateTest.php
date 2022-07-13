@@ -368,12 +368,6 @@ class CreateTest extends TestCase
                 'X-consumer-custom-id' => '0-0',
                 'X-consumer-groups' => 'ecloud.write',
             ]
-        )->assertJsonFragment(
-            [
-                'title' => 'Validation Error',
-                'detail' => 'There are insufficient resources to migrate to this host group',
-                'source' => 'host_group_id',
-            ]
         )->assertStatus(422);
     }
 

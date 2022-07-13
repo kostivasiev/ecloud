@@ -74,6 +74,7 @@ trait LoadBalancerMock
                 ],
                 'load_balancer_id' => $this->loadBalancer()->id,
                 'is_hidden' => true,
+                'host_group_id' => $this->sharedHostGroup()->id
             ]);
         });
     }

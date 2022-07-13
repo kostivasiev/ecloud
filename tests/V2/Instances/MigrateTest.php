@@ -116,9 +116,7 @@ class MigrateTest extends TestCase
             [
                 'host_group_id' => $this->hostGroup()->id
             ],
-        )->assertJsonFragment([
-            'error' => 'There are insufficient resources to migrate to this host group.',
-        ])->assertStatus(422);
+        )->assertStatus(422);
     }
 
     private function isWithinCapacity(): static
