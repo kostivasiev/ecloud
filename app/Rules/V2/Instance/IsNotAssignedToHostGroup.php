@@ -9,7 +9,8 @@ class IsNotAssignedToHostGroup implements Rule
 {
     public function __construct(
         public Instance $instance
-    ) {}
+    ) {
+    }
 
     public function passes($attribute, $value)
     {
