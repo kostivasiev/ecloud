@@ -75,6 +75,12 @@ Content-Type:  application/json
 client.global.set("instance_id", response.body.data.id);
 %}
 
+###
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
 
 ### Move the instance to a PRIVATE host group
 POST https://{{host}}/{{version}}/instances/{{instance_id}}/migrate
