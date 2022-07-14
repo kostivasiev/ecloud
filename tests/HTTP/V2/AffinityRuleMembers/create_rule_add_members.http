@@ -126,7 +126,7 @@ client.test("Request executed successfully", function () {
 %}
 
 ### 5. Get Member
-GET https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id_1}}
+GET https://{{host}}/{{version}}/affinity-rule-members/{{affinity_rule_member_id_1}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
@@ -134,7 +134,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function () {
-    client.assert(response.status === 202, '202 response not received');
+    client.assert(response.status === 200, '200 response not received');
 });
 %}
 
@@ -152,7 +152,7 @@ client.test("Request executed successfully", function () {
 %}
 
 ### 7. Delete Member 1
-DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id_1}}
+DELETE https://{{host}}/{{version}}/affinity-rule-members/{{affinity_rule_member_id_1}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
@@ -160,12 +160,12 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
 ### 8. Delete Member 2
-DELETE https://{{host}}/{{version}}/affinity-rules/{{affinity_rule_id}}/members/{{affinity_rule_member_id_2}}
+DELETE https://{{host}}/{{version}}/affinity-rule-members/{{affinity_rule_member_id_2}}
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
@@ -173,7 +173,7 @@ Content-Type: application/json
 
 > {%
 client.test("Request executed successfully", function () {
-    client.assert(response.status === 204, '204 response not received');
+    client.assert(response.status === 202, '202 response not received');
 });
 %}
 
