@@ -72,6 +72,10 @@ Content-Type:  application/json
 }
 
 > {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
 client.global.set("instance_id", response.body.data.id);
 %}
 
@@ -91,6 +95,27 @@ Content-Type:  application/json
 {
     "host_group_id": "{{host_group_id}}"
 }
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 202, "Response status is not 202");
+});
+
+%}
+
+###
+GET https://{{host}}/{{version}}/instances/{{instance_id}}
+X-consumer-custom-id:  0-0
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.host_group_id == client.global.get('host_group_id'));
+});
+
+%}
 
 
 ### Cleanup instance
