@@ -76,7 +76,7 @@ class CreateProfile extends Job
                     $exception->getResponse()->getBody()->getContents() :
                     $exception->getMessage();
 
-                $this->fail(new \Exception('Failed to crate host profile: ' . $error));
+                $this->fail(new \Exception('Failed to create host profile: ' . $error));
                 return false;
             }
 
