@@ -2,7 +2,6 @@
 
 namespace App\Tasks\Instance;
 
-use App\Jobs\Instance\AssociateHostGroup;
 use App\Jobs\Instance\MigrateToHostGroup;
 use App\Tasks\Task;
 
@@ -14,7 +13,6 @@ class Migrate extends Task
     {
         return [
             MigrateToHostGroup::class,
-            AssociateHostGroup::class,
         ];
     }
 }

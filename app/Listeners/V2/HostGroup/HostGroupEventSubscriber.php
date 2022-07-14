@@ -2,18 +2,16 @@
 
 namespace App\Listeners\V2\HostGroup;
 
+use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Models\V2\ResourceTier;
 use App\Support\Sync;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Log;
 
 class HostGroupEventSubscriber implements ShouldQueue
 {
-    /**
-     * @param $event
-     * @return void
-     */
     public function handleTaskCreatedEvent($event)
     {
         $this->event = $event->model;
@@ -23,6 +21,11 @@ class HostGroupEventSubscriber implements ShouldQueue
                 $this->assignToInstance($resource);
             }
         }
+    }
+
+    public function handleMigrateEvent($event): void
+    {
+        $this->associate($event->instance, $event->hostGroup);
     }
 
     protected function assignToInstance(Instance $instance): void
@@ -38,8 +41,12 @@ class HostGroupEventSubscriber implements ShouldQueue
             return;
         }
 
-        Log::info($this::class . ': Assigning host group ' . $hostGroup->id . ' to instance '  .$instance->id);
+        $this->associate($instance, $hostGroup);
+    }
 
+    protected function associate(Instance $instance, HostGroup $hostGroup)
+    {
+        Log::info($this::class . ': Assigning host group ' . $hostGroup->id . ' to instance '  . $instance->id);
         $instance->hostGroup()->associate($hostGroup)->save();
     }
 
@@ -65,13 +72,14 @@ class HostGroupEventSubscriber implements ShouldQueue
     /**
      * Register the listeners for the subscriber.
      *
-     * @param  \Illuminate\Events\Dispatcher $events
+     * @param  Dispatcher $events
      * @return array
      */
-    public function subscribe($events)
+    public function subscribe(Dispatcher $events)
     {
         return [
             \App\Events\V2\Task\Created::class => 'handleTaskCreatedEvent',
+            \App\Events\V2\Instance\Migrated::class => 'handleMigrateEvent',
         ];
     }
 }

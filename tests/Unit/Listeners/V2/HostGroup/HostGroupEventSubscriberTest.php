@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Listeners\V2\HostGroup;
 
+use App\Events\V2\Instance\Migrated;
 use App\Events\V2\Task\Created;
 use App\Listeners\V2\HostGroup\HostGroupEventSubscriber;
 use App\Models\V2\HostGroup;
@@ -137,5 +138,21 @@ class HostGroupEventSubscriberTest extends TestCase
     {
         $resourceTier = $this->subscriber->getResourceTier($this->instanceModel());
         $this->assertEquals('rt-aaaaaaaa', $resourceTier->id);
+    }
+
+    public function testInstanceMigratedUpdatesHostGroupAssociation()
+    {
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
+        $this->subscriber->handleMigrateEvent(
+            new Migrated(
+                $this->instanceModel(),
+                $this->hostGroup()
+            )
+        );
+
+        $this->instanceModel()->refresh();
+
+        $this->assertEquals($this->hostGroup()->id, $this->instanceModel()->hostGroup->id);
     }
 }

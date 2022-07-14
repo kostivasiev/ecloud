@@ -44,9 +44,8 @@ client.global.set('host_id', response.body.data.id);
 client.log('Host Group ID: ' + response.body.data.id);
 %}
 
-###
-### Create a Host
-GET https://{{host}}/{{version}}/hosts
+### Check Create a Host worked (may take some time)
+GET https://{{host}}/{{version}}/hosts/{{host_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0

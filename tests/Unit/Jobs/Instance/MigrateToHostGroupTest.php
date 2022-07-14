@@ -2,14 +2,11 @@
 
 namespace Tests\Unit\Jobs\Instance;
 
+use App\Events\V2\Instance\Migrated;
 use App\Jobs\Instance\MigrateToHostGroup;
-use App\Models\V2\AvailabilityZone;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Task;
 use App\Tasks\Instance\Migrate;
-use Database\Seeders\ResourceTierSeeder;
 use GuzzleHttp\Psr7\Response;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -19,7 +16,7 @@ class MigrateToHostGroupTest extends TestCase
 {
     protected Task $task;
 
-    protected function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -39,7 +36,7 @@ class MigrateToHostGroupTest extends TestCase
 
     public function testMigrateSuccess()
     {
-        Event::fake([JobFailed::class, JobProcessed::class]);
+        Event::fake([JobFailed::class, JobProcessed::class, Migrated::class]);
 
         $this->kingpinServiceMock()->expects('post')
             ->withArgs([
@@ -61,6 +58,11 @@ class MigrateToHostGroupTest extends TestCase
         });
 
         Event::assertNotDispatched(JobFailed::class);
+
+        Event::assertDispatched(Migrated::class, function ($event) {
+            return $event->instance->id == $this->instanceModel()->id &&
+                $event->hostGroup->id == $this->hostGroup()->id;
+        });
     }
 
     public function testAlreadyInHostGroupSkips()

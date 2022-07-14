@@ -120,6 +120,18 @@ class MigrateTest extends TestCase
         )->assertStatus(422);
     }
 
+    public function testCanNotMigrateToCurrentHostGroup()
+    {
+        $this->instanceModel()->hostGroup()->associate($this->hostGroup())->save();
+
+        $this->asUser()->post(
+            '/v2/instances/' . $this->instanceModel()->id . '/migrate',
+            [
+                'host_group_id' => $this->hostGroup()->id
+            ],
+        )->assertStatus(422);
+    }
+
     private function isWithinCapacity(): static
     {
         $this->kingpinServiceMock()
