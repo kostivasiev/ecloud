@@ -12,6 +12,7 @@ class Migrated
 
     public function __construct(
         public Instance $instance,
-        public HostGroup $hostGroup) {
+        public HostGroup $hostGroup
+    ) {
     }
 }
