@@ -3,6 +3,7 @@
 namespace App\Jobs\AffinityRuleMember;
 
 use App\Jobs\TaskJob;
+use App\Models\V2\HostGroup;
 use App\Services\V2\KingpinService;
 
 class DeleteExistingRule extends TaskJob
@@ -27,7 +28,7 @@ class DeleteExistingRule extends TaskJob
                     $response = $availabilityZone->kingpinService()->delete(
                         sprintf(
                             KingpinService::DELETE_CONSTRAINT_URI,
-                            $hostGroupId,
+                            HostGroup::mapId($hostGroupId),
                             $affinityRuleMember->affinityRule->id
                         )
                     );
