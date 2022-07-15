@@ -5,13 +5,14 @@ namespace Tests\Unit\Jobs\Instance\Migrate;
 use App\Jobs\Instance\Migrate\PowerOff;
 use App\Models\V2\HostSpec;
 use App\Models\V2\Task;
+use App\Services\V2\KingpinService;
 use App\Tasks\Instance\Migrate;
+use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use App\Jobs\Instance\PowerOff as InstancePowerOff;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class PowerOffTest extends TestCase
@@ -34,6 +35,16 @@ class PowerOffTest extends TestCase
             $this->task->resource()->associate($this->instanceModel());
             $this->task->save();
         });
+
+        $this->kingpinServiceMock()
+            ->allows('get')
+            ->withSomeOfArgs(
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->instanceModel()->id)
+            )->andReturnUsing(function () {
+                return new Response(200, [], json_encode([
+                    'powerState' => KingpinService::INSTANCE_POWERSTATE_POWEREDON,
+                ]));
+            });
     }
 
     public function testDifferentHostSpecPowersOff()
@@ -55,6 +66,10 @@ class PowerOffTest extends TestCase
         Bus::assertDispatched(InstancePowerOff::class);
 
         Event::assertNotDispatched(JobFailed::class);
+
+        $this->task->refresh();
+
+        $this->assertTrue($this->task->data['requires_power_cycle']);
     }
 
     public function testSameHostSpecDoesNotPowerOff()

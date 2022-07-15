@@ -12,7 +12,6 @@ use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use App\Jobs\Instance\PowerOn as InstancePowerOn;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class PowerOnTest extends TestCase
@@ -35,12 +34,6 @@ class PowerOnTest extends TestCase
             $this->task->resource()->associate($this->instanceModel());
             $this->task->save();
         });
-    }
-
-    public function testDifferentHostSpecPowersOn()
-    {
-        Event::fake([JobFailed::class, JobProcessed::class]);
-        Bus::fake([InstancePowerOn::class]);
 
         $this->kingpinServiceMock()
             ->allows('get')
@@ -51,6 +44,14 @@ class PowerOnTest extends TestCase
                     'powerState' => KingpinService::INSTANCE_POWERSTATE_POWEREDOFF,
                 ]));
             });
+    }
+
+    public function testRequiresPowerCyclePowersOn()
+    {
+        Event::fake([JobFailed::class, JobProcessed::class]);
+        Bus::fake([InstancePowerOn::class]);
+
+        $this->task->updateData('requires_power_cycle', true);
 
         dispatch(new PowerOn($this->task));
 
@@ -63,7 +64,7 @@ class PowerOnTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
     }
 
-    public function testSameHostSpecDoesNotPowerOff()
+    public function testDoesNotRequirePowerCycleSkips()
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
         Bus::fake([InstancePowerOn::class]);

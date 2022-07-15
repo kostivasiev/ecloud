@@ -12,6 +12,10 @@ class PowerOn extends TaskJob
     {
         $instance = $this->task->resource;
 
+        if (empty($this->task->data['requires_power_cycle'])) {
+            return;
+        }
+
         $hostGroup = HostGroup::find($this->task->data['host_group_id']);
         if (!$hostGroup) {
             $this->fail(new \Exception('Failed to load host group ' . $this->task->data['host_group_id']));
