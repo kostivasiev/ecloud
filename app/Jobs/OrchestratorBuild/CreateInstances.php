@@ -7,6 +7,7 @@ use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Models\V2\Network;
 use App\Models\V2\OrchestratorBuild;
+use App\Models\V2\ResourceTier;
 use App\Models\V2\Vpc;
 use App\Support\Sync;
 use App\Traits\V2\LoggableModelJob;
@@ -84,6 +85,7 @@ class CreateInstances extends Job
                     'user_script' => $definition->get('user_script'),
                     'ssh_key_pair_ids' => $definition->get('ssh_key_pair_ids'),
                     'software_ids' => $definition->get('software_ids'),
+                    'resource_tier_id' => $definition->get('resource_tier_id')
                 ];
 
                 $instance->syncSave();

@@ -1,0 +1,14 @@
+###
+GET https://compute-20.ecloud-service.ukfast.co.uk:8444/api/v2/compute/GC-UCS-FI2-DEV-A/vpc/vpc-aaaaaaaa/host/h-a4ff4617-dev
+accept: application/json
+Authorization: Basic {{conjurer_token}}
+X-UKFast-Compute-Username: {{conjurer_username}}
+X-UKFast-Compute-Password: {{conjurer_password}}
+
+###
+GET https://compute-20.ecloud-service.ukfast.co.uk:8444/api/v2/compute/GC-UCS-FI2-DEV-A/specification/DUAL-4208--32GB/host/available
+Accept: application/json
+Authorization: Basic {{conjurer_token}}
+X-UKFast-Compute-Username: {{conjurer_username}}
+X-UKFast-Compute-Password: {{conjurer_password}}
+
