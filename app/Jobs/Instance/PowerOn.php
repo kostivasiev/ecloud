@@ -2,7 +2,6 @@
 
 namespace App\Jobs\Instance;
 
-use App\Events\V2\Instance\PoweredOn;
 use App\Jobs\Job;
 use App\Models\V2\Instance;
 use App\Traits\V2\LoggableModelJob;
