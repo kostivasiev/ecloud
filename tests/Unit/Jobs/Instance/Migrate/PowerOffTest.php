@@ -8,6 +8,7 @@ use App\Models\V2\Task;
 use App\Tasks\Instance\Migrate;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use App\Jobs\Instance\PowerOff as InstancePowerOff;
 use Illuminate\Support\Facades\Queue;
@@ -39,7 +40,7 @@ class PowerOffTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-        Queue::fake([InstancePowerOff::class]);
+        Bus::fake([InstancePowerOff::class]);
 
         $this->sharedHostGroup()->hostSpec()->associate(HostSpec::factory()->create([
             'id' => 'hs-2',
@@ -51,7 +52,7 @@ class PowerOffTest extends TestCase
             return !$event->job->isReleased();
         });
 
-        Queue::assertPushed(InstancePowerOff::class);
+        Bus::assertDispatched(InstancePowerOff::class);
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -60,7 +61,7 @@ class PowerOffTest extends TestCase
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
 
-//        Queue::fake([InstancePowerOff::class]);
+        Bus::fake([InstancePowerOff::class]);
 
         dispatch(new PowerOff($this->task));
 
@@ -68,7 +69,7 @@ class PowerOffTest extends TestCase
             return !$event->job->isReleased();
         });
 
-//        Queue::assertNotPushed(InstancePowerOff::class);
+        Bus::assertNotDispatched(InstancePowerOff::class);
 
         Event::assertNotDispatched(JobFailed::class);
     }

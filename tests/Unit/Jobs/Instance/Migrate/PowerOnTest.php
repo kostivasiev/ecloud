@@ -9,6 +9,7 @@ use App\Tasks\Instance\Migrate;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Event;
 use App\Jobs\Instance\PowerOn as InstancePowerOn;
 use Illuminate\Support\Facades\Queue;
@@ -39,7 +40,7 @@ class PowerOnTest extends TestCase
     public function testDifferentHostSpecPowersOn()
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
-        Queue::fake([InstancePowerOn::class]);
+        Bus::fake([InstancePowerOn::class]);
 
         $this->kingpinServiceMock()
             ->allows('get')
@@ -57,7 +58,7 @@ class PowerOnTest extends TestCase
             return !$event->job->isReleased();
         });
 
-        Queue::assertPushed(InstancePowerOn::class);
+        Bus::assertDispatched(InstancePowerOn::class);
 
         Event::assertNotDispatched(JobFailed::class);
     }
@@ -65,7 +66,7 @@ class PowerOnTest extends TestCase
     public function testSameHostSpecDoesNotPowerOff()
     {
         Event::fake([JobFailed::class, JobProcessed::class]);
-        Queue::fake([InstancePowerOn::class]);
+        Bus::fake([InstancePowerOn::class]);
 
         dispatch(new PowerOn($this->task));
 
@@ -73,7 +74,7 @@ class PowerOnTest extends TestCase
             return !$event->job->isReleased();
         });
 
-        Queue::assertNotPushed(InstancePowerOn::class);
+        Bus::assertNotDispatched(InstancePowerOn::class);
 
         Event::assertNotDispatched(JobFailed::class);
     }
