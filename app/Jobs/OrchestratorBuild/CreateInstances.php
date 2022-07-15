@@ -69,7 +69,7 @@ class CreateInstances extends Job
                 }
 
                 if ($definition->has('resource_tier_id') && !$definition->has('host_group_id')) {
-                    $resourceTier = ResourceTier::find($definition->toArray()['resource_tier_id']);
+                    $resourceTier = ResourceTier::find($definition->get('resource_tier_id'));
                     $instance->hostGroup()->associate($resourceTier->getDefaultHostGroup());
                 }
 
