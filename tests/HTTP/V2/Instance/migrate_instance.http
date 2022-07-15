@@ -69,7 +69,7 @@ Content-Type:  application/json
     "network_id": "{{dev_network_id}}",
     "volume_capacity": 30,
     "volume_iops": 600,
-    "resource_tier_id": {{dev_resource_tier_id}}
+    "resource_tier_id": "{{dev_resource_tier_id}}"
 }
 
 > {%
