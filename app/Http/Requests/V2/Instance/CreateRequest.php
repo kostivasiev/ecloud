@@ -6,6 +6,7 @@ use App\Models\V2\FloatingIp;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Image;
 use App\Models\V2\Network;
+use App\Models\V2\ResourceTier;
 use App\Models\V2\Software;
 use App\Models\V2\SshKeyPair;
 use App\Models\V2\Vpc;
@@ -79,6 +80,12 @@ class CreateRequest extends FormRequest
                 new IsResourceAvailable(HostGroup::class),
                 new HasHosts(),
                 new HostGroupCanProvision($this->request->get('ram_capacity')),
+            ],
+            'resource_tier_id' => [
+                'sometimes',
+                'required',
+                'string',
+                Rule::exists(ResourceTier::class, 'id')->whereNull('deleted_at')->where('active', true),
             ],
             'network_id' => [
                 'required',

@@ -4,6 +4,7 @@ namespace App\Jobs\AffinityRuleMember;
 
 use App\Jobs\TaskJob;
 use App\Models\V2\AffinityRuleMember;
+use App\Models\V2\HostGroup;
 use App\Services\V2\KingpinService;
 use App\Support\Sync;
 use Illuminate\Support\Collection;
@@ -62,7 +63,7 @@ class CreateAffinityRule extends TaskJob
                 'vpc_id' => $this->affinityRuleMember->affinityRule->vpc->id,
             ]);
             $response = $availabilityZone->kingpinService()->post(
-                sprintf($uriEndpoint, $hostGroupId),
+                sprintf($uriEndpoint, HostGroup::mapId($hostGroupId)),
                 [
                     'json' => [
                         'ruleName' => $this->affinityRuleMember->affinityRule->id,

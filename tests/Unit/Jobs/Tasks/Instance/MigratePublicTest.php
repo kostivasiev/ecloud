@@ -28,6 +28,8 @@ class MigratePublicTest extends TestCase
             $this->task->resource()->associate($this->instanceModel());
         });
 
+        $this->instanceModel()->setAttribute('host_group_id', $this->hostGroup()->id)->save();
+
         Bus::fake();
         $job = new MigratePublic($this->task);
         $job->handle();
@@ -35,8 +37,5 @@ class MigratePublicTest extends TestCase
         Bus::assertBatched(function (PendingBatch $batch) {
             return $batch->jobs->count() == 1 && count($batch->jobs->all()[0]) == 1;
         });
-
-        // Check that host_group has been disassociated
-        $this->assertNull($this->instanceModel()->host_group_id);
     }
 }

@@ -26,7 +26,6 @@ class MigratePublic extends Job
     public function handle()
     {
         $task = $this->task;
-
         $this->updateTaskBatch([
             [
                 new MoveToPublicHostGroup($this->model),

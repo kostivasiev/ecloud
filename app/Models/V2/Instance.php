@@ -2,7 +2,6 @@
 
 namespace App\Models\V2;
 
-use App\Events\V2\Instance\Creating;
 use App\Events\V2\Instance\Deleted;
 use App\Services\V2\KingpinService;
 use App\Traits\V2\CustomKey;
@@ -10,6 +9,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
 use Exception;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
@@ -56,7 +56,6 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
     ];
 
     protected $dispatchesEvents = [
-        'creating' => Creating::class,
         'deleted' => Deleted::class,
     ];
 
@@ -109,6 +108,16 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
             $sum += $volume->capacity;
         }
         return $sum;
+    }
+
+    public function getResourceTierIdAttribute()
+    {
+        if (!$this->hostGroup()->exists()) {
+            return null;
+        }
+
+        return $this->hostGroup->isPrivate() ? null :
+            $this->hostGroup->resourceTierHostGroups()->first()->resourceTier->id;
     }
 
     public function getPlatformAttribute()
@@ -213,7 +222,7 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
         try {
             $response = $this->availabilityZone->kingpinService()
                 ->get(
-                    sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroupId)
+                    sprintf(KingpinService::GET_CONSTRAINT_URI, HostGroup::mapId($hostGroupId))
                 );
         } catch (Exception $e) {
             $message = 'Failed to retrieve affinity rule constraint for ' . $affinityRuleId . ' : ' . $e->getMessage();
