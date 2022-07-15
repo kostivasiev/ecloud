@@ -7,9 +7,7 @@ use App\Jobs\OrchestratorBuild\CreateInstances;
 use App\Models\V2\Instance;
 use App\Models\V2\OrchestratorBuild;
 use App\Models\V2\OrchestratorConfig;
-use App\Services\V2\KingpinService;
 use Database\Seeders\SoftwareSeeder;
-use GuzzleHttp\Psr7\Response;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Support\Facades\Event;
@@ -197,23 +195,6 @@ class CreateInstancesTest extends TestCase
 
     public function testCreateWithResourceTierId()
     {
-        $this->kingpinServiceMock()
-            ->expects('post')
-            ->withSomeOfArgs(KingpinService::SHARED_HOST_GROUP_CAPACITY)
-            ->andReturnUsing(function () {
-                return new Response(200, [], json_encode([
-                    [
-                        'hostGroupId' => $this->hostGroup()->id,
-                        'cpuUsage' => 90,
-                        'cpuUsedMHz' => 90,
-                        'cpuCapacityMHz' => 100,
-                        'ramUsage' => 90,
-                        'ramUsedMB' => 900,
-                        'ramCapacityMB' => 1000,
-                    ]
-                ]));
-            });
-
         $this->orchestratorConfig->data = json_encode([
             'instances' => [
                 [
@@ -258,6 +239,6 @@ class CreateInstancesTest extends TestCase
 
         $this->orchestratorBuild->refresh();
         $instance = Instance::findOrFail($this->orchestratorBuild->state['instance'][0][0]);
-        $this->assertEquals($this->hostGroup()->id, $instance->host_group_id);
+        $this->assertEquals($this->resourceTier()->id, $instance->deploy_data['resource_tier_id']);
     }
 }

@@ -68,11 +68,6 @@ class CreateInstances extends Job
                     $instance->setAttribute('name', $definition->get('name') . ' #' . ($i+1));
                 }
 
-                if ($definition->has('resource_tier_id') && !$definition->has('host_group_id')) {
-                    $resourceTier = ResourceTier::find($definition->get('resource_tier_id'));
-                    $instance->hostGroup()->associate($resourceTier->getDefaultHostGroup());
-                }
-
                 $instance->locked = $definition->has('locked') && $definition->get('locked') === true;
 
                 $network = Network::findOrFail($definition->get('network_id'));
@@ -90,6 +85,7 @@ class CreateInstances extends Job
                     'user_script' => $definition->get('user_script'),
                     'ssh_key_pair_ids' => $definition->get('ssh_key_pair_ids'),
                     'software_ids' => $definition->get('software_ids'),
+                    'resource_tier_id' => $definition->get('resource_tier_id')
                 ];
 
                 $instance->syncSave();
