@@ -45,7 +45,7 @@ client.log('Host Group ID: ' + response.body.data.id);
 %}
 
 ### Check Create a Host worked (may take some time)
-GET https://{{host}}/{{version}}/hosts/h-6cd9d849-dev
+GET https://{{host}}/{{version}}/hosts/{{host_id}}
 Accept: */*
 Cache-Control: no-cache
 X-consumer-custom-id: 0-0
@@ -68,7 +68,8 @@ Content-Type:  application/json
     "requires_floating_ip": false,
     "network_id": "{{dev_network_id}}",
     "volume_capacity": 30,
-    "volume_iops": 600
+    "volume_iops": 600,
+    "resource_tier_id": {{dev_resource_tier_id}}
 }
 
 > {%
@@ -85,6 +86,13 @@ X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+  client.assert(response.body.data.resource_tier_id === "rt-aaaaaaaa");
+});
+%}
+
 
 ### Move the instance to a PRIVATE host group
 POST https://{{host}}/{{version}}/instances/{{instance_id}}/migrate
@@ -93,7 +101,7 @@ X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
 {
-    "host_group_id": "hg-e429904c-dev"
+    "host_group_id": "{{host_group_id}}"
 }
 
 > {%
@@ -116,7 +124,6 @@ client.test("Request executed successfully", function() {
 });
 
 %}
-
 
 ### Move the instance to a SHARED resource tier
 POST https://{{host}}/{{version}}/instances/{{instance_id}}/migrate
@@ -154,7 +161,7 @@ Content-Type:  application/json
 
 
 ### Cleanup Host Group
-DELETE https://{{host}}/{{version}}/host-groups/hg-b84a9de9-dev
+DELETE https://{{host}}/{{version}}/host-groups/hg-e429904c-dev
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
