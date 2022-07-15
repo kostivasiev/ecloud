@@ -37,7 +37,8 @@ class PowerOffTest extends TestCase
 
     public function testDifferentHostSpecPowersOff()
     {
-        Event::fake([JobFailed::class, JobProcessed::class, InstancePowerOff::class]);
+        Event::fake([JobFailed::class, JobProcessed::class]);
+
         Queue::fake([InstancePowerOff::class]);
 
         $this->sharedHostGroup()->hostSpec()->associate(HostSpec::factory()->create([
@@ -57,7 +58,7 @@ class PowerOffTest extends TestCase
 
     public function testSameHostSpecDoesNotPowerOff()
     {
-        Event::fake([JobFailed::class, JobProcessed::class, InstancePowerOff::class]);
+        Event::fake([JobFailed::class, JobProcessed::class]);
         Queue::fake([InstancePowerOff::class]);
 
         dispatch(new PowerOff($this->task));

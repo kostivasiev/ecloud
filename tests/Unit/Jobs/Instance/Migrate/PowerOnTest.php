@@ -39,7 +39,7 @@ class PowerOnTest extends TestCase
 
     public function testDifferentHostSpecPowersOn()
     {
-        Event::fake([JobFailed::class, JobProcessed::class, InstancePowerOn::class]);
+        Event::fake([JobFailed::class, JobProcessed::class]);
         Queue::fake([InstancePowerOn::class]);
 
         $this->kingpinServiceMock()
@@ -65,7 +65,7 @@ class PowerOnTest extends TestCase
 
     public function testSameHostSpecDoesNotPowerOff()
     {
-        Event::fake([JobFailed::class, JobProcessed::class, InstancePowerOn::class]);
+        Event::fake([JobFailed::class, JobProcessed::class]);
         Queue::fake([InstancePowerOn::class]);
 
         dispatch(new PowerOn($this->task));
