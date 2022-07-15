@@ -3,7 +3,6 @@
 namespace Tests\Unit\Jobs\Instance\Migrate;
 
 use App\Jobs\Instance\Migrate\PowerOn;
-use App\Models\V2\HostSpec;
 use App\Models\V2\Task;
 use App\Services\V2\KingpinService;
 use App\Tasks\Instance\Migrate;
