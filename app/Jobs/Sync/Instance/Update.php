@@ -13,7 +13,6 @@ use App\Jobs\Instance\Deploy\CheckNetworkAvailable;
 use App\Jobs\Instance\Deploy\ConfigureNics;
 use App\Jobs\Instance\Deploy\ConfigureWinRm;
 use App\Jobs\Instance\Deploy\CreateFloatingIp;
-use App\Jobs\Instance\Deploy\CreateLinuxAdminGroup;
 use App\Jobs\Instance\Deploy\CreateLogicMonitorAccount;
 use App\Jobs\Instance\Deploy\Deploy;
 use App\Jobs\Instance\Deploy\DeployCompleted;

@@ -2,12 +2,15 @@
 
 namespace Tests\Unit\Listeners\V2\HostGroup;
 
+use App\Events\V2\Instance\Migrated;
 use App\Events\V2\Task\Created;
 use App\Listeners\V2\HostGroup\HostGroupEventSubscriber;
 use App\Models\V2\HostGroup;
 use App\Models\V2\ResourceTier;
 use App\Models\V2\ResourceTierHostGroup;
+use App\Models\V2\Task;
 use App\Services\V2\KingpinService;
+use App\Tasks\Instance\Migrate;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Tests\TestCase;
@@ -137,5 +140,41 @@ class HostGroupEventSubscriberTest extends TestCase
     {
         $resourceTier = $this->subscriber->getResourceTier($this->instanceModel());
         $this->assertEquals('rt-aaaaaaaa', $resourceTier->id);
+    }
+
+    public function testHostGroupIsSelectedForMigrationToShared()
+    {
+        $task = Task::withoutEvents(function () {
+            $task = new Task([
+                'id' => 'test-task',
+                'name' => Migrate::$name,
+                'job' => Migrate::class,
+            ]);
+            $task->resource()->associate($this->instanceModel());
+            $task->save();
+            return $task;
+        });
+
+        $this->assertNull($task->data);
+
+        $this->subscriber->handleTaskCreatedEvent(new Created($task));
+
+        $this->assertEquals('hg-standard-cpu-1', $task->data['host_group_id']);
+    }
+
+    public function testInstanceMigratedUpdatesHostGroupAssociation()
+    {
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
+        $this->subscriber->handleMigratedEvent(
+            new Migrated(
+                $this->instanceModel(),
+                $this->hostGroup()
+            )
+        );
+
+        $this->instanceModel()->refresh();
+
+        $this->assertEquals($this->hostGroup()->id, $this->instanceModel()->hostGroup->id);
     }
 }

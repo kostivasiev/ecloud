@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\V2\AvailabilityZone;
 use App\Models\V2\ResourceTier;
 use App\Models\V2\ResourceTierHostGroup;
 use Database\Seeders\ResourceTiers\StandardCpuHostGroupSeeder;
@@ -23,6 +24,9 @@ class ResourceTierSeeder extends Seeder
             'name' => 'Standard CPU',
             'availability_zone_id' => 'az-aaaaaaaa'
         ]);
+
+        // Set the default resource tier for the az
+        AvailabilityZone::findOrFail('az-aaaaaaaa')->setAttribute('resource_tier_id', 'rt-aaaaaaaa')->saveQuietly();
 
         $this->call(StandardCpuHostSpecSeeder::class);
         $this->call(StandardCpuHostGroupSeeder::class);

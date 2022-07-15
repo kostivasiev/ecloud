@@ -16,6 +16,7 @@ use App\Models\V2\ImageParameter;
 use App\Models\V2\Instance;
 use App\Models\V2\IpAddress;
 use App\Models\V2\Network;
+use App\Models\V2\ResourceTier;
 use App\Models\V2\Volume;
 use App\Resources\V2\CredentialResource;
 use App\Resources\V2\FloatingIpResource;
@@ -26,6 +27,7 @@ use App\Resources\V2\TaskResource;
 use App\Resources\V2\VolumeResource;
 use App\Services\Kingpin\V2\KingpinEndpoints;
 use App\Services\V2\KingpinService;
+use App\Tasks\Instance\Migrate;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Http\JsonResponse;
@@ -593,18 +595,15 @@ class InstanceController extends BaseController
     public function migrate(MigrateRequest $request, $instanceId)
     {
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
-        if ($request->has('host_group_id')) {
-            $task = $instance->createTaskWithLock(
-                'instance_migrate_private',
-                \App\Jobs\Tasks\Instance\MigratePrivate::class,
-                ['host_group_id' => $request->input('host_group_id')]
-            );
-        } else {
-            $task = $instance->createTaskWithLock(
-                'instance_migrate_public',
-                \App\Jobs\Tasks\Instance\MigratePublic::class
-            );
-        }
+
+        $task = $instance->createTaskWithLock(
+            Migrate::$name,
+            Migrate::class,
+            [
+                'host_group_id' => $request->input('host_group_id'),
+                'resource_tier_id' => $request->input('resource_tier_id'),
+            ]
+        );
 
         return $this->responseTaskId($task->id);
     }
