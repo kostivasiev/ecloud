@@ -161,7 +161,7 @@ Content-Type:  application/json
 
 
 ### Cleanup Host Group
-DELETE https://{{host}}/{{version}}/host-groups/hg-e429904c-dev
+DELETE https://{{host}}/{{version}}/host-groups/{{host_group_id}}
 X-consumer-custom-id:  0-0
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
