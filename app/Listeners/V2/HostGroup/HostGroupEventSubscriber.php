@@ -5,7 +5,9 @@ namespace App\Listeners\V2\HostGroup;
 use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Models\V2\ResourceTier;
+use App\Models\V2\Task;
 use App\Support\Sync;
+use App\Tasks\Instance\Migrate;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Facades\Log;
@@ -14,18 +16,40 @@ class HostGroupEventSubscriber implements ShouldQueue
 {
     public function handleTaskCreatedEvent($event)
     {
-        $this->event = $event->model;
-        $resource = $event->model->resource;
-        if ($event->model->name == Sync::TASK_NAME_UPDATE) {
+        $task = $event->model;
+        $resource = $task->resource;
+        if ($task->name == Sync::TASK_NAME_UPDATE) {
             if ($resource instanceof Instance && empty($resource->host_group_id)) {
                 $this->assignToInstance($resource);
             }
         }
+
+        if ($task->name == Migrate::$name && empty($task->data['host_group_id'])) {
+            $this->assignToMigrateTask($task);
+        }
     }
 
-    public function handleMigrateEvent($event): void
+    public function handleMigratedEvent($event): void
     {
         $this->associate($event->instance, $event->hostGroup);
+    }
+
+    protected function assignToMigrateTask(Task $task)
+    {
+        $resourceTier = ResourceTier::find(
+            $task->data['resource_tier_id'] ??
+            $task->resource->availabilityZone->resource_tier_id
+        );
+
+        $hostGroup = $resourceTier->getDefaultHostGroup();
+
+        if (empty($hostGroup)) {
+            Log::error($this::class . ': Failed to assign host group to migrate task ' . $task->id .
+                ' - There was an error retrieving the default host group for the resource tier.');
+            return;
+        }
+
+        $task->updateData('host_group_id', $hostGroup->id);
     }
 
     protected function assignToInstance(Instance $instance): void
@@ -79,7 +103,7 @@ class HostGroupEventSubscriber implements ShouldQueue
     {
         return [
             \App\Events\V2\Task\Created::class => 'handleTaskCreatedEvent',
-            \App\Events\V2\Instance\Migrated::class => 'handleMigrateEvent',
+            \App\Events\V2\Instance\Migrated::class => 'handleMigratedEvent',
         ];
     }
 }

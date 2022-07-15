@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Jobs\Instance;
+namespace App\Jobs\Instance\Migrate;
 
 use App\Events\V2\Instance\Migrated;
 use App\Jobs\TaskJob;
 use App\Models\V2\HostGroup;
-use App\Models\V2\ResourceTier;
 
 class MigrateToHostGroup extends TaskJob
 {
@@ -13,15 +12,10 @@ class MigrateToHostGroup extends TaskJob
     {
         $instance = $this->task->resource;
 
-        if (!empty($this->task->data['host_group_id'])) {
-            $hostGroup = HostGroup::find($this->task->data['host_group_id']);
-        } else {
-            $resourceTier = ResourceTier::find(
-                $this->task->data['resource_tier_id'] ??
-                $instance->availabilityZone->resource_tier_id
-            );
-
-            $hostGroup = $resourceTier->getDefaultHostGroup();
+        $hostGroup = HostGroup::find($this->task->data['host_group_id']);
+        if (!$hostGroup) {
+            $this->fail(new \Exception('Failed to load host group ' . $this->task->data['host_group_id']));
+            return;
         }
 
         if ($hostGroup->id === $instance->host_group_id) {
@@ -39,7 +33,7 @@ class MigrateToHostGroup extends TaskJob
                 ]
             );
 
-        $this->info('Instance ' . $instance->id . ' was moved to host group ' . $hostGroup->id);
+        $this->info('Instance ' . $instance->id . ' was migrated to host group ' . $hostGroup->id);
 
         event(new Migrated($instance, $hostGroup));
     }

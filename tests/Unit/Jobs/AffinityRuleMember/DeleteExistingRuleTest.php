@@ -50,7 +50,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -95,7 +95,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () use ($hostGroupId) {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $hostGroupId,
@@ -126,7 +126,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $instanceMock->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $instanceMock->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -158,7 +158,7 @@ class DeleteExistingRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,

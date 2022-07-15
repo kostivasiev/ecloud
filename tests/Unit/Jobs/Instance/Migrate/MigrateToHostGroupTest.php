@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Unit\Jobs\Instance;
+namespace Tests\Unit\Jobs\Instance\Migrate;
 
 use App\Events\V2\Instance\Migrated;
-use App\Jobs\Instance\MigrateToHostGroup;
+use App\Jobs\Instance\Migrate\MigrateToHostGroup;
 use App\Models\V2\Task;
 use App\Tasks\Instance\Migrate;
 use GuzzleHttp\Psr7\Response;

@@ -200,7 +200,7 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
             $response = $this->availabilityZone
                 ->kingpinService()
                 ->get(
-                    sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc->id, $this->id)
+                    sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc->id, $this->id)
                 );
         } catch (Exception $e) {
             Log::error($e->getMessage(), [
