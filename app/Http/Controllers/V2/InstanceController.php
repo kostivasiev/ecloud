@@ -8,6 +8,7 @@ use App\Http\Requests\V2\Instance\MigrateRequest;
 use App\Http\Requests\V2\Instance\UpdateRequest;
 use App\Http\Requests\V2\Instance\VolumeAttachRequest;
 use App\Http\Requests\V2\Instance\VolumeDetachRequest;
+use App\Jobs\Tasks\Instance\PowerOn;
 use App\Models\V2\Credential;
 use App\Models\V2\FloatingIp;
 use App\Models\V2\Image;
@@ -257,7 +258,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $task = $instance->createTaskWithLock('power_on', \App\Jobs\Tasks\Instance\PowerOn::class);
+        $task = $instance->createTaskWithLock(PowerOn::$name, PowerOn::class);
 
         return $this->responseTaskId($task->id);
     }
