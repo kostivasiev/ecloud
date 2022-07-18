@@ -22,7 +22,6 @@ class AuditBilling extends Command
             $ram = BillingMetric::getActiveByKey($instance, 'ram.capacity');
             $ramHigh = BillingMetric::getActiveByKey($instance, 'ram.capacity.high');
             $vcpu = BillingMetric::getActiveByKey($instance, 'vcpu.count');
-
             if (empty($ram) && empty($ramHigh)) {
                 $reason[] = 'No RAM Billing';
             }
@@ -31,21 +30,23 @@ class AuditBilling extends Command
                 $reason[] = 'No vCPU Billing';
             }
 
-            try {
-                $response = $instance->availabilityZone
-                    ->kingpinService()
-                    ->get(
-                        sprintf(KingpinService::GET_INSTANCE_URI, $instance->vpc_id, $instance->id)
-                    );
-            } catch (\Exception $e) {
-                $this->error('Failed to query power state for instance ' . $instance->id . ': ' . $e->getMessage());
-                return;
-            }
-            $powerState =  (json_decode($response->getBody()->getContents()))->powerState;
+            if (!empty($reason)) {
+                try {
+                    $response = $instance->availabilityZone
+                        ->kingpinService()
+                        ->get(
+                            sprintf(KingpinService::GET_INSTANCE_URI, $instance->vpc_id, $instance->id)
+                        );
+                } catch (\Exception $e) {
+                    $this->error('Failed to query power state for instance ' . $instance->id . ': ' . $e->getMessage());
+                    return;
+                }
+                $powerState = (json_decode($response->getBody()->getContents()))->powerState;
 
-            if (!empty($reason) && $powerState === KingpinService::INSTANCE_POWERSTATE_POWEREDON) {
-                $this->line($instance->id . ': ' . implode(', ', $reason));
-                $this->total++;
+                if ($powerState === KingpinService::INSTANCE_POWERSTATE_POWEREDON) {
+                    $this->line($instance->id . ': ' . implode(', ', $reason));
+                    $this->total++;
+                }
             }
         });
 
