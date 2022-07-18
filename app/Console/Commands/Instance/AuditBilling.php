@@ -23,7 +23,7 @@ class AuditBilling extends Command
             $ramHigh = BillingMetric::getActiveByKey($instance, 'ram.capacity.high');
             $vcpu = BillingMetric::getActiveByKey($instance, 'vcpu.count');
 
-            if ((empty($ram) && empty($ramHigh))) {
+            if (empty($ram) && empty($ramHigh)) {
                 $reason[] = 'No RAM Billing';
             }
 
