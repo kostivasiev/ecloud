@@ -31,16 +31,16 @@ class AssignFloatingIpTest extends TestCase
         dispatch(new AssignFloatingIp($task));
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == Assign::$name;
+            return $event->model->name == Assign::TASK_NAME;
         });
 
         $task->refresh();
 
-        $this->assertNotNull($task->data['task.' . Assign::$name . '.ids']);
+        $this->assertNotNull($task->data['task.' . Assign::TASK_NAME . '.ids']);
 
         // Mark the fip assign task as completed
         $assignTask = Event::dispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == Assign::$name;
+            return $event->model->name == Assign::TASK_NAME;
         })->first()[0];
 
         $assignTask->model->setAttribute('completed', true)->saveQuietly();
@@ -62,7 +62,7 @@ class AssignFloatingIpTest extends TestCase
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => false,
-                'name' => Assign::$name,
+                'name' => Assign::TASK_NAME,
             ]);
             $task->resource()->associate($this->floatingIp());
             $task->save();
@@ -72,7 +72,7 @@ class AssignFloatingIpTest extends TestCase
         $task = $this->createSyncUpdateTask($this->vip(), [
             'allocate_floating_ip' => true,
             'floating_ip_id' => $this->floatingIp()->id,
-            'task.' . Assign::$name . '.ids' => [$floatingIpAssignTask->id]
+            'task.' . Assign::TASK_NAME . '.ids' => [$floatingIpAssignTask->id]
         ]);
 
         dispatch(new AssignFloatingIp($task));

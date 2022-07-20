@@ -35,13 +35,13 @@ class AssignFloatingIp extends TaskJob
             return;
         }
 
-        $assignIpTask = 'task.' . Assign::$name . '.ids';
+        $assignIpTask = 'task.' . Assign::TASK_NAME . '.ids';
 
         if (empty($this->task->data[$assignIpTask])) {
             $data = $this->task->data;
 
             $task = $floatingIp->createTaskWithLock(
-                Assign::$name,
+                Assign::TASK_NAME,
                 \App\Jobs\Tasks\FloatingIp\Assign::class,
                 ['resource_id' => $vip->ipAddress->id]
             );

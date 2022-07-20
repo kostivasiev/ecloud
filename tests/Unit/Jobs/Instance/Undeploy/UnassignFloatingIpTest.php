@@ -56,7 +56,7 @@ class UnassignFloatingIpTest extends TestCase
 
         // Mark the delete sync task as completed
         $unassignTask = Event::dispatched(Created::class, function ($event) {
-            return $event->model->name == Unassign::$name;
+            return $event->model->name == Unassign::TASK_NAME;
         })->first()[0];
 
         $unassignTask->model
@@ -89,7 +89,7 @@ class UnassignFloatingIpTest extends TestCase
 
         // Mark the delete task as completed
         $unassignTask = Event::dispatched(Created::class, function ($event) {
-            return $event->model->name == Unassign::$name;
+            return $event->model->name == Unassign::TASK_NAME;
         })->first()[0];
 
         $unassignTask->model->setAttribute('completed', true)->saveQuietly();

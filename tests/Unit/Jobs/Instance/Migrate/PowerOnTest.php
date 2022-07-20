@@ -25,7 +25,7 @@ class PowerOnTest extends TestCase
         Task::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'test-task',
-                'name' => Migrate::$name,
+                'name' => Migrate::TASK_NAME,
                 'job' => Migrate::class,
                 'data' => [
                     'host_group_id' => $this->hostGroup()->id,

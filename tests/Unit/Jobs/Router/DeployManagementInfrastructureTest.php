@@ -21,16 +21,16 @@ class DeployManagementInfrastructureTest extends TestCase
         dispatch(new DeployManagementInfrastructure($task));
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == CreateManagementInfrastructure::$name;
+            return $event->model->name == CreateManagementInfrastructure::TASK_NAME;
         });
 
         $task->refresh();
 
-        $this->assertNotNull($task->data['task.' . CreateManagementInfrastructure::$name . '.id']);
+        $this->assertNotNull($task->data['task.' . CreateManagementInfrastructure::TASK_NAME . '.id']);
 
         // Mark the task as completed
         $createManagementInfrastructureTask = Event::dispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == CreateManagementInfrastructure::$name;
+            return $event->model->name == CreateManagementInfrastructure::TASK_NAME;
         })->first()[0];
 
         $createManagementInfrastructureTask->model->setAttribute('completed', true)->saveQuietly();

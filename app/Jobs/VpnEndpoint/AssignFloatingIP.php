@@ -25,17 +25,17 @@ class AssignFloatingIP extends TaskJob
             $this->fail(new \Exception('Failed to load floating IP ' . $this->task->data['floating_ip_id']));
             return;
         }
-        if (!isset($this->task->data[Assign::$name])) {
+        if (!isset($this->task->data[Assign::TASK_NAME])) {
             $task = $floatingIp->createTaskWithLock(
-                Assign::$name,
+                Assign::TASK_NAME,
                 Assign::class,
                 ['resource_id' => $vpnEndpoint->id]
             );
 
-            $this->info('Triggered ' . Assign::$name . ' task ' . $task->id . ' for Floating IP (' . $floatingIp->id . ')');
-            $this->task->updateData(Assign::$name, $task->id);
+            $this->info('Triggered ' . Assign::TASK_NAME . ' task ' . $task->id . ' for Floating IP (' . $floatingIp->id . ')');
+            $this->task->updateData(Assign::TASK_NAME, $task->id);
         }
 
-        $this->awaitTasks([$this->task->data[Assign::$name]]);
+        $this->awaitTasks([$this->task->data[Assign::TASK_NAME]]);
     }
 }

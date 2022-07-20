@@ -25,12 +25,12 @@ class UnassignFloatingIp extends TaskJob
 
         $floatingIp = $vip->ipAddress->floatingIpResource->floatingIp;
 
-        $unassignIpTask = 'task.' . Unassign::$name . '.id';
+        $unassignIpTask = 'task.' . Unassign::TASK_NAME . '.id';
 
         if (empty($this->task->data[$unassignIpTask])) {
             $this->task->updateData(
                 $unassignIpTask,
-                ($floatingIp->createTaskWithLock(Unassign::$name, Unassign::class))->id
+                ($floatingIp->createTaskWithLock(Unassign::TASK_NAME, Unassign::class))->id
             );
 
             $this->info('Unassigning floating IP ' . $floatingIp->id . ' from cluster IP ' . $vip->ipAddress->id . ' for VIP ' . $vip->id);
