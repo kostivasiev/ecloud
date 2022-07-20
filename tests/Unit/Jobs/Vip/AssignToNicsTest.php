@@ -36,16 +36,16 @@ class AssignToNicsTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == AssociateIp::$name;
+            return $event->model->name == AssociateIp::TASK_NAME;
         });
 
         $task->refresh();
 
-        $this->assertNotNull($task->data['task.' . AssociateIp::$name . '.ids']);
+        $this->assertNotNull($task->data['task.' . AssociateIp::TASK_NAME . '.ids']);
 
         // Mark the Associate IP Task as completed
         $event = Event::dispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == AssociateIp::$name;
+            return $event->model->name == AssociateIp::TASK_NAME;
         })->first()[0];
 
         $event->model->setAttribute('completed', true)->saveQuietly();
@@ -72,12 +72,12 @@ class AssignToNicsTest extends TestCase
         dispatch(new AssignToNics($task));
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == AssociateIp::$name;
+            return $event->model->name == AssociateIp::TASK_NAME;
         });
 
         $task->refresh();
 
-        $this->assertNotNull($task->data['task.' . AssociateIp::$name . '.ids']);
+        $this->assertNotNull($task->data['task.' . AssociateIp::TASK_NAME . '.ids']);
 
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return $event->job->isReleased();
