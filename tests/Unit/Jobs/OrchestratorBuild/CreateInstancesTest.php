@@ -192,4 +192,53 @@ class CreateInstancesTest extends TestCase
 
         $this->assertEquals(2, count($this->orchestratorBuild->state['instance'][0]));
     }
+
+    public function testCreateWithResourceTierId()
+    {
+        $this->orchestratorConfig->data = json_encode([
+            'instances' => [
+                [
+                    "name" => "Builder Test Instance",
+                    "vpc_id" => "{vpc.0}",
+                    "image_id" => $this->image()->id,
+                    "vcpu_cores" => 1,
+                    "ram_capacity" => 1024,
+                    "locked" => false,
+                    "backup_enabled" => false,
+                    "network_id" => "{network.0}",
+                    "requires_floating_ip" => true,
+                    "volume_capacity" => 30,
+                    "volume_iops" => 300,
+                    "resource_tier_id" => $this->resourceTier()->id,
+                    "ssh_key_pair_ids" => [
+                        "ssh-aaaaaaaa"
+                    ],
+                    'image_data' => [
+                        "mysql_root_password" => "EnCrYpTeD-PaSsWoRd",
+                        "mysql_wordpress_user_password" => "EnCrYpTeD-PaSsWoRd",
+                        "wordpress_url" => "mydomain.com"
+                    ],
+                    "software_ids" => [
+                        "soft-aaaaaaaa",
+                    ],
+                ]
+            ]
+        ]);
+        $this->orchestratorConfig->save();
+
+        Event::fake([JobFailed::class, JobProcessed::class, Created::class]);
+
+        dispatch(new CreateInstances($this->orchestratorBuild));
+
+        Event::assertNotDispatched(JobFailed::class);
+        Event::assertDispatched(JobProcessed::class, function ($event) {
+            return !$event->job->isReleased();
+        });
+
+        Event::assertDispatched(Created::class);
+
+        $this->orchestratorBuild->refresh();
+        $instance = Instance::findOrFail($this->orchestratorBuild->state['instance'][0][0]);
+        $this->assertEquals($this->resourceTier()->id, $instance->deploy_data['resource_tier_id']);
+    }
 }

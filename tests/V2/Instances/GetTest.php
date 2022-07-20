@@ -108,4 +108,14 @@ class GetTest extends TestCase
                 'host_group_id' => $this->hostGroup()->id,
             ])->assertStatus(200);
     }
+
+    public function testGetHostGroup()
+    {
+        $this->instanceModel()->setAttribute('host_group_id', null)->save();
+
+        $this->asAdmin()->get('/v2/instances/' . $this->instanceModel()->id)
+            ->assertJsonFragment([
+                'host_group_id' => null,
+            ])->assertStatus(200);
+    }
 }

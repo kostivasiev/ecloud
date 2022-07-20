@@ -72,7 +72,7 @@ class CreateAffinityRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->secondInstance->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->secondInstance->id)
             )
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
@@ -84,7 +84,7 @@ class CreateAffinityRuleTest extends TestCase
             ->expects('get')
             ->twice()
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -111,7 +111,7 @@ class CreateAffinityRuleTest extends TestCase
             ->expects('get')
             ->twice()
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -121,7 +121,7 @@ class CreateAffinityRuleTest extends TestCase
         $this->kingpinServiceMock()
             ->expects('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->secondInstance->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->secondInstance->id)
             )
             ->andReturnUsing(function () {
                 return new Response(200, [], json_encode([

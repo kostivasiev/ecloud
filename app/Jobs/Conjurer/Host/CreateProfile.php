@@ -59,22 +59,33 @@ class CreateProfile extends Job
                 return false;
             }
 
-            $response = $availabilityZone->conjurerService()->post(
-                '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id .'/host',
-                [
-                    'json' => [
-                        'specificationName' => $hostGroup->hostSpec->ucs_specification_name,
-                        'hostId' => $this->model->id,
-                    ],
-                ]
-            );
+            try {
+                $response = $availabilityZone->conjurerService()->post(
+                    '/api/v2/compute/' . $availabilityZone->ucs_compute_name . '/vpc/' . $hostGroup->vpc->id . '/host',
+                    [
+                        'json' => [
+                            'specificationName' => $hostGroup->hostSpec->ucs_specification_name,
+                            'hostId' => $this->model->id,
+                        ],
+                    ]
+                );
+                $response = json_decode($response->getBody()->getContents());
+                $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
+            } catch (\Exception $exception) {
+                $error = ($exception instanceof RequestException && $exception->hasResponse()) ?
+                    $exception->getResponse()->getBody()->getContents() :
+                    $exception->getMessage();
 
-            $response = json_decode($response->getBody()->getContents());
-            $macAddress = collect($response->interfaces)->firstWhere('name', 'eth0')->address;
-            if (!empty($macAddress)) {
-                Log::debug('Host was created on UCS, MAC address: ' . $macAddress);
+                $this->fail(new \Exception('Failed to create host profile: ' . $error));
+                return false;
             }
 
+            if (empty($macAddress)) {
+                $this->fail(new \Exception('No MAC address returned for created host profile'));
+                return false;
+            }
+
+            Log::debug('Host was created on UCS, MAC address: ' . $macAddress);
             $this->model->mac_address = $macAddress;
             $this->model->save();
         } finally {

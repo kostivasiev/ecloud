@@ -56,6 +56,7 @@ class MigrateTest extends TestCase
                 'id' => 'i-' . uniqid(),
                 'vpc_id' => $this->vpc()->id,
                 'name' => 'Test Instance ' . uniqid(),
+                'availability_zone_id' => $this->availabilityZone()->id,
                 'ram_capacity' => 1024,
             ]);
         });
@@ -112,6 +113,18 @@ class MigrateTest extends TestCase
         $this->isOutsideCapacity();
 
         $this->post(
+            '/v2/instances/' . $this->instanceModel()->id . '/migrate',
+            [
+                'host_group_id' => $this->hostGroup()->id
+            ],
+        )->assertStatus(422);
+    }
+
+    public function testCanNotMigrateToCurrentHostGroup()
+    {
+        $this->instanceModel()->hostGroup()->associate($this->hostGroup())->save();
+
+        $this->asUser()->post(
             '/v2/instances/' . $this->instanceModel()->id . '/migrate',
             [
                 'host_group_id' => $this->hostGroup()->id

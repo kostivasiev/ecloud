@@ -13,6 +13,8 @@ class PowerOn extends Job
 {
     use TaskableBatch, Batchable, LoggableTaskJob;
 
+    public static string $name = 'power_on';
+
     private Task $task;
 
     public function __construct(Task $task)

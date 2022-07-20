@@ -3,6 +3,7 @@
 namespace App\Listeners\V2\Instance;
 
 use App\Events\V2\Task\Updated;
+use App\Jobs\Tasks\Instance\PowerOn;
 use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
@@ -25,7 +26,7 @@ class UpdateVcpuBilling implements Billable
      */
     public function handle(Updated $event)
     {
-        if (!$this->validateBillableResourceEvent($event)) {
+        if (!$this->validateBillableResourceEvent($event) && $event->model->name != PowerOn::$name) {
             return;
         }
         $instance = $event->model->resource;

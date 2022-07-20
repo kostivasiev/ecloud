@@ -15,6 +15,19 @@ get:
                 type: object
   tags:
     - Affinity Rule Members
+post:
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../resources/AffinityRuleMember/schema.yaml'
+  responses:
+    202:
+      description: Accepted
+      $ref: '../../resources/AffinityRuleMember/responses/idResponse.yaml'
+  tags:
+    - Affinity Rule Members
 delete:
   parameters:
     - $ref: '../../resources/AffinityRuleMember/parameters/id.yaml'
