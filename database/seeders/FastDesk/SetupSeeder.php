@@ -3,6 +3,7 @@
 namespace Database\Seeders\FastDesk;
 
 use App\Models\V2\AvailabilityZone;
+use App\Models\V2\FloatingIp;
 use App\Models\V2\Region;
 use App\Models\V2\Router;
 use App\Models\V2\RouterThroughput;
@@ -139,6 +140,42 @@ class SetupSeeder extends Seeder
                     'description' => 'Cisco - ASA VPN Profile Group',
                     'ike_profile_id' => 'vpnp-29b2a70b',
                     'ipsec_profile_id' => 'vpnp-a0ffcbc6',
+                ]);
+
+            FloatingIp::factory()
+                ->for($vpc = Vpc::find('vpc-218334c3'))
+                ->for($availabilityZone = AvailabilityZone::find('az-4c31a488'))
+                ->create([
+                    'id' => 'fip-1d93e06e',
+                    'name' => 'VPN IP for Fastdesk Management (eCloud VPC)',
+                    'ip_address' => '45.131.138.9',
+                ]);
+
+            FloatingIp::factory()
+                ->for($vpc)
+                ->for($availabilityZone)
+                ->create([
+                    'id' => 'fip-84e34f0c',
+                    'name' => 'VPN_IP_3429_1',
+                    'ip_address' => '45.131.138.179',
+                ]);
+
+            FloatingIp::factory()
+                ->for($vpc = Vpc::find('vpc-34fc3361'))
+                ->for($availabilityZone)
+                ->create([
+                    'id' => 'fip-727faf58',
+                    'name' => 'VPN IP for Fastdesk Old',
+                    'ip_address' => '45.131.138.5',
+                ]);
+
+            FloatingIp::factory()
+                ->for($vpc)
+                ->for($availabilityZone)
+                ->create([
+                    'id' => 'fip-495722a7',
+                    'name' => 'VPN IP for Fastdesk eCloud VPC',
+                    'ip_address' => '45.131.138.10',
                 ]);
         }
     }
