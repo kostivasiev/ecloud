@@ -13,7 +13,7 @@ class Assign extends Job
 {
     use Batchable, TaskableBatch, LoggableTaskJob;
 
-    public static string $name = 'floating_ip_assign';
+    const TASK_NAME = 'floating_ip_assign';
 
     private Task $task;
 

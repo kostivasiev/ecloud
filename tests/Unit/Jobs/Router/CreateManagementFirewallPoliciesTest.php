@@ -46,7 +46,7 @@ class CreateManagementFirewallPoliciesTest extends TestCase
 
         $task = new Task([
             'id' => 'sync-1',
-            'name' => CreateManagementInfrastructure::$name,
+            'name' => CreateManagementInfrastructure::TASK_NAME,
             'data' => [
                 'management_router_id' => $this->managementRouter->id
             ]

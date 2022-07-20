@@ -27,7 +27,7 @@ class CreateManagementRouterTest extends TestCase
 
         $task = new Task([
             'id' => 'sync-1',
-            'name' => CreateManagementInfrastructure::$name,
+            'name' => CreateManagementInfrastructure::TASK_NAME,
             'data' => [
                 'availability_zone_id' => $this->router()->availability_zone_id
             ]
@@ -68,7 +68,7 @@ class CreateManagementRouterTest extends TestCase
 
         $task = new Task([
             'id' => 'sync-1',
-            'name' => CreateManagementInfrastructure::$name,
+            'name' => CreateManagementInfrastructure::TASK_NAME,
             'data' => [
                 'availability_zone_id' => $this->router()->availability_zone_id
             ]
@@ -101,7 +101,7 @@ class CreateManagementRouterTest extends TestCase
         $task = Model::withoutEvents(function () {
             $task = new Task([
                 'id' => 'sync-1',
-                'name' => CreateManagementInfrastructure::$name,
+                'name' => CreateManagementInfrastructure::TASK_NAME,
                 'data' => []
             ]);
             $task->resource()->associate($this->vpc());

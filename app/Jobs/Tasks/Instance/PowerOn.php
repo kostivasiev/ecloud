@@ -13,7 +13,7 @@ class PowerOn extends Job
 {
     use TaskableBatch, Batchable, LoggableTaskJob;
 
-    public static string $name = 'power_on';
+    const TASK_NAME = 'power_on';
 
     private Task $task;
 

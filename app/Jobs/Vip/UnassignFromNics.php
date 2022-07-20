@@ -18,7 +18,7 @@ class UnassignFromNics extends TaskJob
     {
         $vip = $this->task->resource;
 
-        $disassociateIpTasks = 'task.' . DisassociateIp::$name . '.ids';
+        $disassociateIpTasks = 'task.' . DisassociateIp::TASK_NAME . '.ids';
 
         if (empty($this->task->data[$disassociateIpTasks])) {
             $taskIds = [];
@@ -30,7 +30,7 @@ class UnassignFromNics extends TaskJob
                     if ($nic->ipAddresses()->where('id', $vip->ipAddress->id)->exists()) {
                         $this->info('Unassigning VIP ' . $vip->id . ' from NIC ' . $nic->id);
                         $task = $nic->createTaskWithLock(
-                            DisassociateIp::$name,
+                            DisassociateIp::TASK_NAME,
                             DisassociateIp::class,
                             ['ip_address_id' => $vip->ipAddress->id]
                         );

@@ -17,11 +17,11 @@ class DeployManagementInfrastructure extends TaskJob
             return;
         }
 
-        $taskIdKey = 'task.' . CreateManagementInfrastructure::$name . '.id';
+        $taskIdKey = 'task.' . CreateManagementInfrastructure::TASK_NAME . '.id';
 
         if (empty($this->task->data[$taskIdKey])) {
             $task = $router->vpc->createTask(
-                CreateManagementInfrastructure::$name,
+                CreateManagementInfrastructure::TASK_NAME,
                 CreateManagementInfrastructure::class,
                 [
                     'availability_zone_id' => $router->availability_zone_id

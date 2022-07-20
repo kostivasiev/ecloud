@@ -27,7 +27,7 @@ class AssignFloatingIpTest extends TestCase
         dispatch(new AssignFloatingIp($task));
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == Assign::$name
+            return $event->model->name == Assign::TASK_NAME
                 && $event->model->resource instanceof FloatingIp;
         });
 
@@ -38,7 +38,7 @@ class AssignFloatingIpTest extends TestCase
 
         // Mark the task as completed
         $assignTask = Event::dispatched(Created::class, function ($event) {
-            return $event->model->name == Assign::$name;
+            return $event->model->name == Assign::TASK_NAME;
         })->first()[0];
 
         $assignTask->model->setAttribute('completed', true)->saveQuietly();
