@@ -29,14 +29,7 @@ class FastDeskSeeder extends Seeder
         // FastDesk Management - eCloud VPC
         FloatingIpResource::factory()
             ->assignedTo(
-                FloatingIp::factory()
-                    ->for(Vpc::find('vpc-218334c3'))
-                    ->for($availabilityZone = AvailabilityZone::find('az-4c31a488'))
-                    ->create([
-                        'id' => 'fip-1d93e06e',
-                        'name' => 'fip-1d93e06e',
-                        'ip_address' => '45.131.138.9',
-                    ]),
+                FloatingIp::find('fip-1d93e06e'),
                 VpnEndpoint::factory()
                     ->for($fastDeskMgmt)
                     ->create([
@@ -51,14 +44,7 @@ class FastDeskSeeder extends Seeder
         // FastDesk Management -> Fastdesk Old
         FloatingIpResource::factory()
             ->assignedTo(
-                FloatingIp::factory()
-                    ->for(Vpc::find('vpc-34fc3361'))
-                    ->for($availabilityZone)
-                    ->create([
-                        'id' => 'fip-727faf58',
-                        'name' => 'fip-727faf58',
-                        'ip_address' => '45.131.138.5',
-                    ]),
+                FloatingIp::find('fip-727faf58'),
                 $vpnEndpointFastDeskMgmtOld = VpnEndpoint::factory()
                     ->for($fastDeskMgmt)
                     ->create([
@@ -72,14 +58,7 @@ class FastDeskSeeder extends Seeder
         // Fastdesk Shared Client - eCloud VPC
         FloatingIpResource::factory()
             ->assignedTo(
-                FloatingIp::factory()
-                    ->for(Vpc::find('vpc-34fc3361'))
-                    ->for($availabilityZone)
-                    ->create([
-                        'id' => 'fip-495722a7',
-                        'name' => 'fip-495722a7',
-                        'ip_address' => '45.131.138.10',
-                    ]),
+                FloatingIp::find('fip-495722a7'),
                 VpnEndpoint::factory()
                     ->for($fastDeskShared)
                     ->create([
@@ -93,14 +72,7 @@ class FastDeskSeeder extends Seeder
         // vpne_3429_1
         FloatingIpResource::factory()
             ->assignedTo(
-                FloatingIp::factory()
-                    ->for(Vpc::find('vpc-218334c3'))
-                    ->for($availabilityZone)
-                    ->create([
-                        'id' => 'fip-84e34f0c',
-                        'name' => 'fip-84e34f0c',
-                        'ip_address' => '45.131.138.179',
-                    ]),
+                FloatingIp::find('fip-84e34f0c'),
                 $vpnEndpointVpn34291 = VpnEndpoint::factory()
                     ->for($vpn34291)
                     ->create([
@@ -358,8 +330,6 @@ class FastDeskSeeder extends Seeder
         // <-- FastDesk Old - SID 86909 End -->
 
         // VpnEndpoint to VpnService Mapping
-
-
     }
 
     public function addCustomKey(string $className): string
