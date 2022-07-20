@@ -72,7 +72,7 @@ class AwaitRuleCreationTest extends TestCase
         $this->kingpinServiceMock()
             ->allows('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $instanceMock->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $instanceMock->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -101,7 +101,7 @@ class AwaitRuleCreationTest extends TestCase
         $this->kingpinServiceMock()
             ->allows('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,
@@ -133,7 +133,7 @@ class AwaitRuleCreationTest extends TestCase
         $this->kingpinServiceMock()
             ->allows('get')
             ->withSomeOfArgs(
-                sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc()->id, $this->instanceModel()->id)
+                sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc()->id, $this->instanceModel()->id)
             )->andReturnUsing(function () {
                 return new Response(200, [], json_encode([
                     'hostGroupID' => $this->hostGroup()->id,

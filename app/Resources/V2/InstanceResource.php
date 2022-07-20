@@ -7,7 +7,6 @@ use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use UKFast\Admin\Monitoring\AdminClient;
 use UKFast\Responses\UKFastResource;
 
 class InstanceResource extends UKFastResource
@@ -31,7 +30,7 @@ class InstanceResource extends UKFastResource
             'locked' => $this->locked,
             'platform' => $this->image->platform,
             'backup_enabled' => $this->backup_enabled,
-            'host_group_id' => ($this->hostGroup->isPrivate() || Auth::user()->isAdmin()) ? $this->hostGroup->id : null,
+            'host_group_id' => ($this->hostGroup()->exists() && ($this->hostGroup->isPrivate() || Auth::user()->isAdmin())) ? $this->hostGroup->id : null,
             'resource_tier_id' => $this->resource_tier_id,
             'volume_group_id' => !empty($this->volume_group_id) ? $this->volume_group_id : null,
             'volume_capacity' => $this->volume_capacity,

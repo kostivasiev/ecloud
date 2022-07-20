@@ -112,6 +112,10 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
 
     public function getResourceTierIdAttribute()
     {
+        if (!$this->hostGroup()->exists()) {
+            return null;
+        }
+
         return $this->hostGroup->isPrivate() ? null :
             $this->hostGroup->resourceTierHostGroups()->first()->resourceTier->id;
     }
@@ -196,7 +200,7 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
             $response = $this->availabilityZone
                 ->kingpinService()
                 ->get(
-                    sprintf(KingpinService::GET_HOSTGROUP_URI, $this->vpc->id, $this->id)
+                    sprintf(KingpinService::GET_INSTANCE_URI, $this->vpc->id, $this->id)
                 );
         } catch (Exception $e) {
             Log::error($e->getMessage(), [
@@ -218,7 +222,7 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
         try {
             $response = $this->availabilityZone->kingpinService()
                 ->get(
-                    sprintf(KingpinService::GET_CONSTRAINT_URI, $hostGroupId)
+                    sprintf(KingpinService::GET_CONSTRAINT_URI, HostGroup::mapId($hostGroupId))
                 );
         } catch (Exception $e) {
             $message = 'Failed to retrieve affinity rule constraint for ' . $affinityRuleId . ' : ' . $e->getMessage();

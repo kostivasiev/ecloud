@@ -3,12 +3,16 @@
 namespace App\Http\Requests\V2\Instance;
 
 use App\Models\V2\HostGroup;
+use App\Models\V2\ResourceTier;
 use App\Models\V2\Instance;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\HostGroup\HostGroupCanProvision;
+use App\Rules\V2\Instance\IsNotAssignedToHostGroup;
 use App\Rules\V2\Instance\IsCompatiblePlatform;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\IsSameAvailabilityZone;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 
@@ -25,6 +29,7 @@ class MigrateRequest extends FormRequest
 
         return [
             'host_group_id' => [
+                'bail',
                 'sometimes',
                 'required',
                 'string',
@@ -32,7 +37,15 @@ class MigrateRequest extends FormRequest
                 new ExistsForUser(HostGroup::class),
                 new IsResourceAvailable(HostGroup::class),
                 new IsCompatiblePlatform,
+                new IsSameAvailabilityZone(app('request')->route('instanceId')),
+                new IsNotAssignedToHostGroup($instance),
                 new HostGroupCanProvision($instance->ram_capacity),
+            ],
+            'resource_tier_id' => [
+                'sometimes',
+                'required',
+                Rule::exists(ResourceTier::class, 'id')->whereNull('deleted_at')->where('active', true),
+                new IsSameAvailabilityZone(app('request')->route('instanceId')),
             ]
         ];
     }
