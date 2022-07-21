@@ -10,7 +10,6 @@ use App\Models\V2\Instance;
 use App\Support\Sync;
 use App\Traits\V2\InstanceOnlineState;
 use App\Traits\V2\Listeners\BillableListener;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class UpdateVcpuBilling implements Billable
@@ -19,6 +18,11 @@ class UpdateVcpuBilling implements Billable
 
     const RESOURCE = Instance::class;
 
+    const EVENTS = [
+        Sync::TASK_NAME_UPDATE,
+        PowerOn::TASK_NAME
+    ];
+
     /**
      * @param Updated $event
      * @return void
@@ -26,7 +30,7 @@ class UpdateVcpuBilling implements Billable
      */
     public function handle(Updated $event)
     {
-        if (!$this->validateBillableResourceEvent($event) && $event->model->name != PowerOn::$name) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
         $instance = $event->model->resource;

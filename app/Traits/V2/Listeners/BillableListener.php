@@ -10,9 +10,10 @@ trait BillableListener
 {
     protected function validateBillableResourceEvent(Updated $event): bool
     {
-        if ($event->model->name != Sync::TASK_NAME_UPDATE) {
+        if (!in_array($event->model->name, defined('static::EVENTS') ? static::EVENTS : [Sync::TASK_NAME_UPDATE])) {
             return false;
         }
+
         if (!$event->model->completed) {
             return false;
         }

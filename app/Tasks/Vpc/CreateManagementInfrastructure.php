@@ -10,7 +10,7 @@ use App\Tasks\Task;
 
 class CreateManagementInfrastructure extends Task
 {
-    public static string $name = 'create_management_infrastructure';
+    const TASK_NAME = 'create_management_infrastructure';
 
     public function jobs()
     {

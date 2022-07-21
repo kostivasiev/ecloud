@@ -49,16 +49,16 @@ class UnassignFromNicsTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == DisassociateIp::$name;
+            return $event->model->name == DisassociateIp::TASK_NAME;
         });
 
         $this->task->refresh();
 
-        $this->assertNotNull($this->task->data['task.' . DisassociateIp::$name . '.ids']);
+        $this->assertNotNull($this->task->data['task.' . DisassociateIp::TASK_NAME . '.ids']);
 
         // Mark the disassociate_ip Task as completed
         $event = Event::dispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == DisassociateIp::$name;
+            return $event->model->name == DisassociateIp::TASK_NAME;
         })->first()[0];
 
         $event->model->setAttribute('completed', true)->saveQuietly();
@@ -77,12 +77,12 @@ class UnassignFromNicsTest extends TestCase
         Event::assertNotDispatched(JobFailed::class);
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == DisassociateIp::$name;
+            return $event->model->name == DisassociateIp::TASK_NAME;
         });
 
         $this->task->refresh();
 
-        $this->assertNotNull($this->task->data['task.' . DisassociateIp::$name . '.ids']);
+        $this->assertNotNull($this->task->data['task.' . DisassociateIp::TASK_NAME . '.ids']);
 
         Event::assertDispatched(JobProcessed::class, function ($event) {
             return $event->job->isReleased();

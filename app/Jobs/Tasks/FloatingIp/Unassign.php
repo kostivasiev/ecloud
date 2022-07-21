@@ -14,7 +14,7 @@ class Unassign extends Job
 {
     use Batchable, TaskableBatch, LoggableTaskJob;
 
-    public static string $name = 'floating_ip_unassign';
+    const TASK_NAME = 'floating_ip_unassign';
 
     private Task $task;
 

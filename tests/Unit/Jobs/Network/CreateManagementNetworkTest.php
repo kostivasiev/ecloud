@@ -27,7 +27,7 @@ class CreateManagementNetworkTest extends TestCase
         Model::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'sync-1',
-                'name' => CreateManagementInfrastructure::$name,
+                'name' => CreateManagementInfrastructure::TASK_NAME,
                 'data' => [
                     'availability_zone_id' => $this->router()->availability_zone_id,
                     'management_router_id' => $this->router()->id,

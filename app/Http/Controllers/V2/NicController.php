@@ -99,7 +99,7 @@ class NicController extends BaseController
         $nic = Nic::forUser(Auth::user())->findOrFail($nicId);
 
         $task = $nic->createTaskWithLock(
-            AssociateIp::$name,
+            AssociateIp::TASK_NAME,
             AssociateIp::class,
             [
                 'ip_address_id' => $request->input('ip_address_id')
@@ -115,7 +115,7 @@ class NicController extends BaseController
         $ipAddress = IpAddress::forUser(Auth::user())->findOrFail($ipAddressId);
 
         $task = $nic->createTaskWithLock(
-            DisassociateIp::$name,
+            DisassociateIp::TASK_NAME,
             DisassociateIp::class,
             [
                 'ip_address_id' => $ipAddress->id

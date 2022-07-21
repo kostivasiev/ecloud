@@ -19,6 +19,11 @@ class UpdateRamBilling implements Billable
 
     const RESOURCE = Instance::class;
 
+    const EVENTS = [
+        Sync::TASK_NAME_UPDATE,
+        PowerOn::TASK_NAME
+    ];
+
     /**
      * @param Updated $event
      * @return void
@@ -26,7 +31,7 @@ class UpdateRamBilling implements Billable
      */
     public function handle(Updated $event)
     {
-        if (!$this->validateBillableResourceEvent($event) && $event->model->name != PowerOn::$name) {
+        if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
 

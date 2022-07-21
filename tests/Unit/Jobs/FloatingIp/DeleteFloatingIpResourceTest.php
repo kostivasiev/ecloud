@@ -26,7 +26,7 @@ class DeleteFloatingIpResourceTest extends TestCase
         Task::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'test-task',
-                'name' => Unassign::$name,
+                'name' => Unassign::TASK_NAME,
                 'job' => Unassign::class,
                 'data' => [
                     'resource_id' => $this->ipAddress()->id,

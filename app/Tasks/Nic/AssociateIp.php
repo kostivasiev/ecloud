@@ -6,7 +6,7 @@ use App\Tasks\Task;
 
 class AssociateIp extends Task
 {
-    public static string $name = 'associate_ip';
+    const TASK_NAME = 'associate_ip';
 
     public function jobs()
     {

@@ -85,7 +85,7 @@ class FloatingIpController extends BaseController
         }
 
         $task = $floatingIp->createTaskWithLock(
-            Assign::$name,
+            Assign::TASK_NAME,
             Assign::class,
             ['resource_id' => $resourceId]
         );
@@ -98,7 +98,7 @@ class FloatingIpController extends BaseController
         $floatingIp = FloatingIp::forUser($request->user())->findOrFail($fipId);
 
         $task = $floatingIp->createTaskWithLock(
-            Unassign::$name,
+            Unassign::TASK_NAME,
             Unassign::class
         );
 

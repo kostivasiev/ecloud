@@ -24,7 +24,7 @@ class CreateFloatingIpResourceTest extends TestCase
         Task::withoutEvents(function () {
             $this->task = new Task([
                 'id' => 'test-task',
-                'name' => Assign::$name,
+                'name' => Assign::TASK_NAME,
                 'job' => Assign::class,
                 'data' => [
                     'resource_id' => $this->ipAddress()->id,

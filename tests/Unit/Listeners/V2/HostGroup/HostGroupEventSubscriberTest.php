@@ -147,7 +147,7 @@ class HostGroupEventSubscriberTest extends TestCase
         $task = Task::withoutEvents(function () {
             $task = new Task([
                 'id' => 'test-task',
-                'name' => Migrate::$name,
+                'name' => Migrate::TASK_NAME,
                 'job' => Migrate::class,
             ]);
             $task->resource()->associate($this->instanceModel());

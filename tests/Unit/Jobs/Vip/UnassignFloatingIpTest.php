@@ -33,16 +33,16 @@ class UnassignFloatingIpTest extends TestCase
         dispatch(new UnassignFloatingIp($task));
 
         Event::assertDispatched(Created::class, function ($event) {
-            return $event->model->name == Unassign::$name;
+            return $event->model->name == Unassign::TASK_NAME;
         });
 
         $task->refresh();
 
-        $this->assertNotNull($task->data['task.' . Unassign::$name . '.id']);
+        $this->assertNotNull($task->data['task.' . Unassign::TASK_NAME . '.id']);
 
         // Mark the fip un-assign task as completed
         $assignTask = Event::dispatched(Created::class, function ($event) {
-            return $event->model->name == Unassign::$name;
+            return $event->model->name == Unassign::TASK_NAME;
         })->first()[0];
 
         $assignTask->model->setAttribute('completed', true)->saveQuietly();
@@ -62,7 +62,7 @@ class UnassignFloatingIpTest extends TestCase
             $task = new Task([
                 'id' => 'task-1',
                 'completed' => false,
-                'name' => Unassign::$name,
+                'name' => Unassign::TASK_NAME,
             ]);
             $task->resource()->associate($this->floatingIp());
             $task->save();
@@ -71,7 +71,7 @@ class UnassignFloatingIpTest extends TestCase
 
         $task = $this->createSyncDeleteTask(
             $this->vip(),
-            ['task.' . Unassign::$name . '.id' => $floatingIpUnassignTask->id]
+            ['task.' . Unassign::TASK_NAME . '.id' => $floatingIpUnassignTask->id]
         );
 
         dispatch(new UnassignFloatingIp($task));
