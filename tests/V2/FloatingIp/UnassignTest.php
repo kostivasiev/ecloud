@@ -30,7 +30,7 @@ class UnassignTest extends TestCase
             ->assertStatus(202);
 
         Event::assertDispatched(\App\Events\V2\Task\Created::class, function ($event) {
-            return $event->model->name == Unassign::$name;
+            return $event->model->name == Unassign::TASK_NAME;
         });
     }
 

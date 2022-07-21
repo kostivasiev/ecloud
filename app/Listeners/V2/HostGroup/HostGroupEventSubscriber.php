@@ -24,7 +24,7 @@ class HostGroupEventSubscriber implements ShouldQueue
             }
         }
 
-        if ($task->name == Migrate::$name && empty($task->data['host_group_id'])) {
+        if ($task->name == Migrate::TASK_NAME && empty($task->data['host_group_id'])) {
             $this->assignToMigrateTask($task);
         }
     }

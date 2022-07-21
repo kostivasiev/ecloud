@@ -258,7 +258,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser($request->user())
             ->findOrFail($instanceId);
 
-        $task = $instance->createTaskWithLock(PowerOn::$name, PowerOn::class);
+        $task = $instance->createTaskWithLock(PowerOn::TASK_NAME, PowerOn::class);
 
         return $this->responseTaskId($task->id);
     }
@@ -598,7 +598,7 @@ class InstanceController extends BaseController
         $instance = Instance::forUser(Auth::user())->findOrFail($instanceId);
 
         $task = $instance->createTaskWithLock(
-            Migrate::$name,
+            Migrate::TASK_NAME,
             Migrate::class,
             [
                 'host_group_id' => $request->input('host_group_id'),

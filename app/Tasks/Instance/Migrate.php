@@ -10,7 +10,7 @@ use App\Tasks\Task;
 
 class Migrate extends Task
 {
-    public static string $name = 'instance_migrate';
+    const TASK_NAME = 'instance_migrate';
 
     public function jobs()
     {
