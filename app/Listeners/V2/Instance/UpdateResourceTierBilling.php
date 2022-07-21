@@ -5,6 +5,7 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Task\Updated;
 use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
+use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Traits\V2\InstanceOnlineState;
 use App\Traits\V2\Listeners\BillableListener;
@@ -28,28 +29,23 @@ class UpdateResourceTierBilling implements Billable
             return;
         }
 
-        if (empty($instance) || $instance->isManaged()) {
-            return;
-        }
-
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName());
 
-
-        if ($instance->hostGroup->hostSpec->id !== 'hs-high-cpu' && $currentActiveMetric === null) {
+        if (!$instance->hostGroup->isHighCpu() && $currentActiveMetric === null) {
             Log::info(get_class($this) . ': High CPU billing does not apply to this instance, skipping', [
                 'instance' => $instance->id
             ]);
             return;
         }
 
-        if ($instance->hostGroup->hostSpec->id !== 'hs-high-cpu' && !empty($currentActiveMetric)) {
+        if (!$instance->hostGroup->isHighCpu() && !empty($currentActiveMetric)) {
             $currentActiveMetric->setEndDate();
             Log::info(get_class($this) . ' : High CPU was disabled for instance', ['instance' => $instance->id]);
             return;
         }
 
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == 1 && $instance->hostGroup->hostSpec->id == 'hs-high-cpu') {
+            if ($currentActiveMetric->value == 1 && $instance->hostGroup->isHighCpu()) {
                 return;
             }
             $currentActiveMetric->setEndDate();

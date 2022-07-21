@@ -37,7 +37,7 @@ class UpdateResourceTierBillingTest extends TestCase
                             'id' => 'hs-high-cpu',
                         ]))
                     ->create([
-                        'id' => 'hg-high-cpu',
+                        'id' => 'hg-cf1bae59',
                     ]))
                 ->create([
                     'id' => 'rthg-high-cpu',
@@ -47,6 +47,7 @@ class UpdateResourceTierBillingTest extends TestCase
 
     public function testStandardInstanceNoHighCpuBilling()
     {
+        $this->hostGroup()->setAttribute('id', 'hg-9d7e6b43')->saveQuietly();
         $this->assertNull(BillingMetric::getActiveByKey($this->instanceModel(), UpdateResourceTierBilling::getKeyName()));
         $this->instanceModel()->hostGroup()->associate($this->hostGroup());
         $task = $this->createSyncUpdateTask($this->instanceModel());
