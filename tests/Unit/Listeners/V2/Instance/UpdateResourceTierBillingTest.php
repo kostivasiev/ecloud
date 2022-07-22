@@ -95,7 +95,7 @@ class UpdateResourceTierBillingTest extends TestCase
             ->create([
                 'name' => UpdateResourceTierBilling::getFriendlyName(),
                 'resource_id' => $this->instanceModel()->id,
-                'key' => UpdateResourceTierBilling::getKeyName(),
+                'key' => UpdateResourceTierBilling::getKeyName() . '.' . $this->resourceTier->id,
                 'value' => 1,
             ]);
 

@@ -30,7 +30,7 @@ class UpdateResourceTierBilling implements Billable
 
         $billingMetrics = BillingMetric::where([
             ['resource_id', '=', $instance->id],
-            ['key', 'lk', self::getKeyName() . '%']
+            ['key', 'LIKE', self::getKeyName() . '%']
         ])->get();
 
         $currentActiveMetric = null;
