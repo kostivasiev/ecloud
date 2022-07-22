@@ -67,8 +67,10 @@ trait AwaitResources
             $resource->syncDelete();
         }
 
-        $this->info('Waiting for ' . $resource->id . ' to be deleted, retrying in ' . $this->backoff . ' seconds.');
-        $this->release($this->backoff);
+        if ($resource->sync->status != Sync::STATUS_COMPLETE && $resource->sync->type == Sync::TYPE_DELETE) {
+            $this->info('Waiting for ' . $resource->id . ' to be deleted, retrying in ' . $this->backoff . ' seconds.');
+            $this->release($this->backoff);
+        }
     }
 
     protected function awaitSyncableResources(Array $resources = [])
