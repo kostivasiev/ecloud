@@ -83,7 +83,10 @@ class UpdateResourceTierBillingTest extends TestCase
 
         (new UpdateResourceTierBilling())->handle(new Updated($task));
 
-        $highCpuMetric = BillingMetric::getActiveByKey($this->instanceModel(), UpdateResourceTierBilling::getKeyName());
+        $highCpuMetric = BillingMetric::getActiveByKey(
+            $this->instanceModel(),
+            UpdateResourceTierBilling::getKeyName() . '.' . $this->resourceTier->id
+        );
         $this->assertNotNull($highCpuMetric);
         $this->assertEquals(1, $highCpuMetric->value);
     }
