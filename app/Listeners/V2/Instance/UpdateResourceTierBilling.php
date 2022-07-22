@@ -5,7 +5,6 @@ namespace App\Listeners\V2\Instance;
 use App\Events\V2\Task\Updated;
 use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
-use App\Models\V2\HostGroup;
 use App\Models\V2\Instance;
 use App\Traits\V2\InstanceOnlineState;
 use App\Traits\V2\Listeners\BillableListener;
@@ -31,21 +30,28 @@ class UpdateResourceTierBilling implements Billable
 
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName());
 
-        if (!$instance->hostGroup->isHighCpu() && $currentActiveMetric === null) {
+        $productName = $instance->availabilityZone->id . ': ' . $instance->resource_tier_id;
+
+        $product = $instance->availabilityZone
+            ->products()
+            ->where('product_name', $productName)
+            ->first();
+
+        if (!$product && $currentActiveMetric === null) {
             Log::info(get_class($this) . ': High CPU billing does not apply to this instance, skipping', [
                 'instance' => $instance->id
             ]);
             return;
         }
 
-        if (!$instance->hostGroup->isHighCpu() && !empty($currentActiveMetric)) {
+        if (!$product && !empty($currentActiveMetric)) {
             $currentActiveMetric->setEndDate();
             Log::info(get_class($this) . ' : High CPU was disabled for instance', ['instance' => $instance->id]);
             return;
         }
 
         if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == 1 && $instance->hostGroup->isHighCpu()) {
+            if ($currentActiveMetric->value == 1 && !empty($product)) {
                 return;
             }
             $currentActiveMetric->setEndDate();
@@ -59,19 +65,8 @@ class UpdateResourceTierBilling implements Billable
         $billingMetric->key = self::getKeyName();
         $billingMetric->value = 1;
 
-        $productName = $instance->availabilityZone->id . ': ' . self::getKeyName();
-        $product = $instance->availabilityZone
-            ->products()
-            ->where('product_name', $productName)
-            ->first();
-        if (empty($product)) {
-            Log::error(
-                'Failed to load \'' . self::getKeyName() . '\' billing product for availability zone ' . $instance->availabilityZone->id
-            );
-        } else {
-            $billingMetric->category = $product->category;
-            $billingMetric->price = 1;
-        }
+        $billingMetric->category = $product->category;
+        $billingMetric->price = 1;
 
         Log::info(get_class($this) . ' : ' . self::getKeyName() . ' enabled.', ['instance' => $instance->id]);
         $billingMetric->save();

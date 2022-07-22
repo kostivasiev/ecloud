@@ -7,6 +7,8 @@ use App\Listeners\V2\Instance\UpdateResourceTierBilling;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\HostGroup;
 use App\Models\V2\HostSpec;
+use App\Models\V2\Product;
+use App\Models\V2\ProductPrice;
 use App\Models\V2\ResourceTier;
 use App\Models\V2\ResourceTierHostGroup;
 use Illuminate\Database\Eloquent\Model;
@@ -30,7 +32,6 @@ class UpdateResourceTierBillingTest extends TestCase
                         'name' => 'hs-high-cpu',
                     ]))
                 ->for($this->hostGroup = HostGroup::factory()
-                    ->for($this->vpc())
                     ->for($this->availabilityZone())
                     ->for(HostSpec::factory()
                         ->create([
@@ -43,6 +44,20 @@ class UpdateResourceTierBillingTest extends TestCase
                     'id' => 'rthg-high-cpu',
                 ]);
         });
+
+        Product::factory()->create([
+            'product_name' => $this->availabilityZone()->id . ': ' . $this->resourceTier->id,
+            'product_subcategory' => 'Compute',
+        ])->each(function ($product) {
+            ProductPrice::factory()->create([
+                'product_price_product_id' => $product->id,
+                'product_price_sale_price' => 0.05
+            ]);
+        });
+
+        $this->instanceModel()
+            ->hostGroup()
+            ->associate($this->hostGroup);
     }
 
     public function testStandardInstanceNoHighCpuBilling()

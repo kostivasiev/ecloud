@@ -260,11 +260,6 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
         return $this->vcpu_capacity - $this->vcpu_used;
     }
 
-    public function isHighCpu(): bool
-    {
-        return (preg_match('/HighCPU.*/i', static::mapId($this->id)));
-    }
-
     /**
      * Map proposed High CPU ID to existing cluster name
      * @param string $newHostgroupId
