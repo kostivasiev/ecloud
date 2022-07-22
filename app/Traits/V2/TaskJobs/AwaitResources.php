@@ -62,12 +62,6 @@ trait AwaitResources
             return;
         }
 
-        if ($resource->sync->status == Sync::STATUS_FAILED) {
-            $this->error('Resource ' . $resource->id . ' in failed sync state, abort');
-            $this->fail(new \Exception("Resource '" . $resource->id . "' in failed sync state"));
-            return;
-        }
-
         if ($resource->sync->status == Sync::STATUS_COMPLETE && $resource->sync->type != Sync::TYPE_DELETE) {
             $this->info('Deleting Resource ' . $id);
             $resource->syncDelete();
