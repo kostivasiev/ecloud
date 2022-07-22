@@ -28,7 +28,21 @@ class UpdateResourceTierBilling implements Billable
             return;
         }
 
-        $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName());
+        $billingMetrics = BillingMetric::where([
+            ['resource_id', '=', $instance->id],
+            ['key', 'lk', self::getKeyName() . '%']
+        ])->get();
+
+        $currentActiveMetric = null;
+        foreach ($billingMetrics as $billingMetric) {
+            // if current metric is same, then get it
+            if ($billingMetric->key == self::getKeyName() . '.' . $instance->resource_tier_id) {
+                $currentActiveMetric = $billingMetric;
+                break;
+            }
+            // otherwise it's different so end the metric
+            $billingMetric->setEndDate();
+        }
 
         $productName = $instance->availabilityZone->id . ': ' . $instance->resource_tier_id;
 
@@ -62,7 +76,7 @@ class UpdateResourceTierBilling implements Billable
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
         $billingMetric->name = $product->product_description;
-        $billingMetric->key = self::getKeyName();
+        $billingMetric->key = self::getKeyName() . '.' . $instance->resource_tier_id;
         $billingMetric->value = 1;
 
         $billingMetric->category = $product->category;
@@ -78,7 +92,7 @@ class UpdateResourceTierBilling implements Billable
      */
     public static function getFriendlyName(): string
     {
-        return 'High Cpu';
+        return 'Resource Tier';
     }
 
     /**
@@ -87,6 +101,6 @@ class UpdateResourceTierBilling implements Billable
      */
     public static function getKeyName(): string
     {
-        return 'high.cpu';
+        return 'resource.tier';
     }
 }
