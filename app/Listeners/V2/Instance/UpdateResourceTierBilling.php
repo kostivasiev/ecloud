@@ -61,7 +61,7 @@ class UpdateResourceTierBilling implements Billable
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
-        $billingMetric->name = self::getFriendlyName();
+        $billingMetric->name = $product->product_description;
         $billingMetric->key = self::getKeyName();
         $billingMetric->value = 1;
 

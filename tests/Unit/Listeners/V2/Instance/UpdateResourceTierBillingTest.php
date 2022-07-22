@@ -48,6 +48,7 @@ class UpdateResourceTierBillingTest extends TestCase
         Product::factory()->create([
             'product_name' => $this->availabilityZone()->id . ': ' . $this->resourceTier->id,
             'product_subcategory' => 'Compute',
+            'product_description' => 'High CPU Resource Tier',
         ])->each(function ($product) {
             ProductPrice::factory()->create([
                 'product_price_product_id' => $product->id,
