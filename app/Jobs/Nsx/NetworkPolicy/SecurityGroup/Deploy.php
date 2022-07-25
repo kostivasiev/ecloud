@@ -41,6 +41,12 @@ class Deploy extends Job
                                 '/infra/tier-1s/' . $router->id . '/segments/' . $network->id
                             ]
                         ]
+                    ],
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $router->vpc->id
+                        ]
                     ]
                 ]
             ]

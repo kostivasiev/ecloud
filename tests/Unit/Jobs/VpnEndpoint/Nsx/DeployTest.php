@@ -49,7 +49,8 @@ class DeployTest extends TestCase
                         'display_name' => $this->vpnEndpoint()->id,
                         'description' => $this->vpnEndpoint()->name,
                         'local_id' => $this->floatingIp()->ip_address,
-                        'local_address' => $this->floatingIp()->ip_address
+                        'local_address' => $this->floatingIp()->ip_address,
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -125,7 +126,8 @@ class DeployTest extends TestCase
                         'display_name' => $this->vpnEndpoint()->id,
                         'description' => $this->vpnEndpoint()->name,
                         'local_id' => $this->vpnEndpoint()->floatingIpResource->floatingIp->ip_address,
-                        'local_address' => $this->vpnEndpoint()->floatingIpResource->floatingIp->ip_address
+                        'local_address' => $this->vpnEndpoint()->floatingIpResource->floatingIp->ip_address,
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])

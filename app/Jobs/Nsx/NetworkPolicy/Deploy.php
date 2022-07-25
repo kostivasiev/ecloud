@@ -90,7 +90,13 @@ class Deploy extends Job
                             'ip_protocol' => 'IPV4_IPV6',
                             'disabled' => !$rule->enabled,
                         ];
-                    })->toArray()
+                    })->toArray(),
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $router->vpc->id
+                        ]
+                    ]
                 ]
             ]
         );

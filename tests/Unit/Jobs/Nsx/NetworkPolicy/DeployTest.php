@@ -30,7 +30,8 @@ class DeployTest extends TestCase
                         'scope' => [
                             '/infra/domains/default/groups/' . $this->networkPolicy()->id,
                         ],
-                        'rules' => []
+                        'rules' => [],
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -98,7 +99,8 @@ class DeployTest extends TestCase
                                 'ip_protocol' => 'IPV4_IPV6',
                                 'disabled' => false
                             ]
-                        ]
+                        ],
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])

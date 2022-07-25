@@ -47,7 +47,8 @@ class DeployTest extends TestCase
                 [
                     'json' => [
                         'resource_type' => 'IPSecVpnService',
-                        'enabled' => true
+                        'enabled' => true,
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -71,7 +72,8 @@ class DeployTest extends TestCase
                 [
                     'json' => [
                         'resource_type' => 'IPSecVpnService',
-                        'enabled' => true
+                        'enabled' => true,
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])

@@ -53,6 +53,7 @@ class DeployDiscoveryProfileTest extends TestCase
                         'some_property' => 'some-existing-property',
                         'ip_discovery_profile_path' => '/infra/ip-discovery-profiles/' . config('network.profiles.ip-discovery-profile'),
                         'mac_discovery_profile_path' => '/infra/mac-discovery-profiles/' . config('network.profiles.mac-discovery-profile'),
+                        'tags' => $this->defaultVpcTags(),
                     ],
                 ]
             ])
@@ -85,6 +86,7 @@ class DeployDiscoveryProfileTest extends TestCase
                         'id' => $this->network()->id . '-segment-discovery-profile-binding-maps',
                         'ip_discovery_profile_path' => '/infra/ip-discovery-profiles/' . config('network.profiles.ip-discovery-profile'),
                         'mac_discovery_profile_path' => '/infra/mac-discovery-profiles/' . config('network.profiles.mac-discovery-profile'),
+                        'tags' => $this->defaultVpcTags(),
                     ],
                 ]
             ])

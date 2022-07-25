@@ -53,6 +53,7 @@ class DeploySecurityProfileTest extends TestCase
                         'some_property' => 'some-existing-property',
                         'segment_security_profile_path' => '/infra/segment-security-profiles/' . config('network.profiles.segment-security-profile'),
                         'spoofguard_profile_path' => '/infra/spoofguard-profiles/' . config('network.profiles.spoofguard-profile'),
+                        'tags' => $this->defaultVpcTags(),
                     ],
                 ]
             ])
@@ -85,6 +86,7 @@ class DeploySecurityProfileTest extends TestCase
                         'id' => $this->network()->id . '-segment-security-profile-binding-maps',
                         'segment_security_profile_path' => '/infra/segment-security-profiles/' . config('network.profiles.segment-security-profile'),
                         'spoofguard_profile_path' => '/infra/spoofguard-profiles/' . config('network.profiles.spoofguard-profile'),
+                        'tags' => $this->defaultVpcTags(),
                     ],
                 ]
             ])

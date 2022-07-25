@@ -56,6 +56,12 @@ class CreateVpnSession extends TaskJob
                                 ];
                             })->toArray()
                         ]
+                    ],
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $router->vpc->id
+                        ]
                     ]
                 ]
             ]
