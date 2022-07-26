@@ -30,8 +30,11 @@ class UpdateResourceTierBilling implements Billable
 
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName() . '%', 'LIKE');
 
-        $productName = $instance->availabilityZone->id . ': ' . $instance->resource_tier_id;
+        if ($currentActiveMetric?->key == self::getKeyName() . '.' . $instance->resource_tier_id) {
+            return;
+        }
 
+        $productName = $instance->availabilityZone->id . ': ' . $instance->resource_tier_id;
         $product = $instance->availabilityZone
             ->products()
             ->where('product_name', $productName)
