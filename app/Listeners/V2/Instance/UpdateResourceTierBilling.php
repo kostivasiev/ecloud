@@ -53,13 +53,6 @@ class UpdateResourceTierBilling implements Billable
             return;
         }
 
-        if (!empty($currentActiveMetric)) {
-            if ($currentActiveMetric->value == 1 && !empty($product)) {
-                return;
-            }
-            $currentActiveMetric->setEndDate();
-        }
-
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
