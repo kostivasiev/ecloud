@@ -28,21 +28,7 @@ class UpdateResourceTierBilling implements Billable
             return;
         }
 
-        $billingMetrics = BillingMetric::where([
-            ['resource_id', '=', $instance->id],
-            ['key', 'LIKE', self::getKeyName() . '%']
-        ])->get();
-
-        $currentActiveMetric = null;
-        foreach ($billingMetrics as $billingMetric) {
-            // if current metric is same, then get it
-            if ($billingMetric->key == self::getKeyName() . '.' . $instance->resource_tier_id) {
-                $currentActiveMetric = $billingMetric;
-                break;
-            }
-            // otherwise it's different so end the metric
-            $billingMetric->setEndDate();
-        }
+        $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName() . '%', 'LIKE');
 
         $productName = $instance->availabilityZone->id . ': ' . $instance->resource_tier_id;
 
@@ -52,7 +38,7 @@ class UpdateResourceTierBilling implements Billable
             ->first();
 
         if (!$product && $currentActiveMetric === null) {
-            Log::info(get_class($this) . ': High CPU billing does not apply to this instance, skipping', [
+            Log::info(get_class($this) . ': resource tier billing does not apply to this instance, skipping', [
                 'instance' => $instance->id
             ]);
             return;
@@ -60,7 +46,7 @@ class UpdateResourceTierBilling implements Billable
 
         if (!$product && !empty($currentActiveMetric)) {
             $currentActiveMetric->setEndDate();
-            Log::info(get_class($this) . ' : High CPU was disabled for instance', ['instance' => $instance->id]);
+            Log::info(get_class($this) . ' : resource tier billing was disabled for instance', ['instance' => $instance->id]);
             return;
         }
 
