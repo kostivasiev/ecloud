@@ -2,7 +2,6 @@
 
 namespace App\Listeners\V2\Nic;
 
-use App\Models\V2\IpAddress;
 use App\Models\V2\LoadBalancerNetwork;
 use App\Models\V2\Nic;
 use App\Models\V2\Task;
@@ -27,13 +26,7 @@ class NicEventSubscriber implements ShouldQueue
 
     protected function deleteForLoadBalancerNetwork(LoadBalancerNetwork $loadBalancerNetwork)
     {
-        $loadBalancerNetwork->getNodeNics()->each(function ($nic) use ($loadBalancerNetwork) {
-            if ($nic->ipAddresses()->withType(IpAddress::TYPE_CLUSTER)->exists()) {
-                // Note, this will cause a timeout waiting for NICs to be deleted.
-                Log::error('Failed to delete NIC ' . $nic->id . ' for load balancer network ' . $loadBalancerNetwork->id . ', ' . IpAddress::TYPE_CLUSTER . ' IP detected');
-                return;
-            }
-
+        $loadBalancerNetwork->getNodeNics()->each(function ($nic) {
             $this->delete($nic);
         });
     }

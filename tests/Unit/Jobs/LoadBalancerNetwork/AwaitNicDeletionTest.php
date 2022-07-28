@@ -2,7 +2,6 @@
 
 namespace Tests\Unit\Jobs\LoadBalancerNetwork;
 
-use App\Events\V2\Task\Created;
 use App\Jobs\LoadBalancerNetwork\AwaitNicDeletion;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;

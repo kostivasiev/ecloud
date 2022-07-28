@@ -3,9 +3,7 @@
 namespace App\Jobs\LoadBalancerNetwork;
 
 use App\Jobs\TaskJob;
-use App\Models\V2\IpAddress;
 use App\Support\Sync;
-use Illuminate\Support\Facades\Log;
 
 class AwaitNicDeletion extends TaskJob
 {
@@ -18,13 +16,12 @@ class AwaitNicDeletion extends TaskJob
         $loadBalancerNetwork = $this->task->resource;
 
         if ($loadBalancerNetwork->getNodeNics()->count() > 0) {
-//            // TODO: Maybe check for failure of delete sync? or just allow to time out?
-//            foreach ($loadBalancerNetwork->getNodeNics() as $nic) {
-//                if ($nic->sync->status = Sync::STATUS_FAILED && $nic->sync->type == Sync::TYPE_DELETE) {
-//                    $this->fail(new \Exception('NIC ' . $nic->id . 'failed to delete'));
-//                    return;
-//                }
-//            }
+            foreach ($loadBalancerNetwork->getNodeNics() as $nic) {
+                if ($nic->sync->status = Sync::STATUS_FAILED && $nic->sync->type == Sync::TYPE_DELETE) {
+                    $this->fail(new \Exception('NIC ' . $nic->id . 'failed to delete'));
+                    return;
+                }
+            }
             $this->info('Awaiting NIC deletion from nodes for load balancer network ' . $loadBalancerNetwork->id);
             $this->release($this->backoff);
             return;
