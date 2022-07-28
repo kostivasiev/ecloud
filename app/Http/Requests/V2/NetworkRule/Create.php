@@ -6,9 +6,11 @@ use App\Models\V2\NetworkPolicy;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\FirewallRulePort\ValidPortArrayRule;
 use App\Rules\V2\IsResourceAvailable;
+use App\Rules\V2\ValidateIpTypesAreConsistent;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Request;
 
 class Create extends FormRequest
 {
@@ -37,12 +39,14 @@ class Create extends FormRequest
             'source' => [
                 'required',
                 'string',
-                new ValidFirewallRuleSourceDestination()
+                new ValidFirewallRuleSourceDestination(),
+                new ValidateIpTypesAreConsistent(Request::input('destination')),
             ],
             'destination' => [
                 'required',
                 'string',
-                new ValidFirewallRuleSourceDestination()
+                new ValidFirewallRuleSourceDestination(),
+                new ValidateIpTypesAreConsistent(Request::input('source')),
             ],
             'action' => [
                 'required',

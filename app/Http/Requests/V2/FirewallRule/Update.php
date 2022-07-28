@@ -3,11 +3,15 @@
 namespace App\Http\Requests\V2\FirewallRule;
 
 use App\Models\V2\FirewallPolicy;
+use App\Models\V2\FirewallRule;
 use App\Rules\V2\ExistsForUser;
 use App\Rules\V2\FirewallRulePort\ValidPortArrayRule;
+use App\Rules\V2\ValidateIpTypesAreConsistent;
 use App\Rules\V2\ValidFirewallRulePortSourceDestination;
 use App\Rules\V2\ValidFirewallRuleSourceDestination;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 
 class Update extends FormRequest
 {
@@ -16,6 +20,9 @@ class Update extends FormRequest
      */
     public function rules()
     {
+        $firewallRule = FirewallRule::foruser(Auth::user())
+            ->findOrFail(Request::route('firewallRuleId'));
+
         return [
             'name' => 'sometimes|required|string|max:255',
             'sequence' => 'sometimes|required|integer',
@@ -23,13 +30,15 @@ class Update extends FormRequest
                 'sometimes',
                 'required',
                 'string',
-                new ValidFirewallRuleSourceDestination()
+                new ValidFirewallRuleSourceDestination(),
+                new ValidateIpTypesAreConsistent(Request::input('destination', $firewallRule->destination)),
             ],
             'destination' => [
                 'sometimes',
                 'required',
                 'string',
-                new ValidFirewallRuleSourceDestination()
+                new ValidFirewallRuleSourceDestination(),
+                new ValidateIpTypesAreConsistent(Request::input('source', $firewallRule->source)),
             ],
             'action' => 'sometimes|required|string|in:ALLOW,DROP,REJECT',
             'direction' => 'sometimes|required|string|in:IN,OUT,IN_OUT',

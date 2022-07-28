@@ -282,4 +282,56 @@ class CreateTest extends TestCase
                 'enabled' => true
             ])->assertStatus(202);
     }
+
+    public function testMismatchedIpTypesFail()
+    {
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '192.168.100.1/24',
+                'destination' => '78a6:9d0e:1937:ce40:312c:6718:0f98:400f/24',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true
+            ])->assertJsonFragment([
+                'detail' => 'The source and destination attributes must be of the same IP type IPv4/IPv6',
+            ])->assertStatus(422);
+
+        Event::assertNotDispatched(Created::class);
+
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '78a6:9d0e:1937:ce40:312c:6718:0f98:400f/24',
+                'destination' => '192.168.100.1/24',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true
+            ])->assertJsonFragment([
+                'detail' => 'The source and destination attributes must be of the same IP type IPv4/IPv6',
+            ])->assertStatus(422);
+
+        Event::assertNotDispatched(Created::class);
+    }
+
+    public function testNoMismatchIfEitherSourceOrDestinationIsAny()
+    {
+        $this->asAdmin()
+            ->post('/v2/firewall-rules', [
+                'name' => 'Demo firewall rule 1',
+                'sequence' => 10,
+                'firewall_policy_id' => $this->firewallPolicy()->id,
+                'source' => '78a6:9d0e:1937:ce40:312c:6718:0f98:400f/24',
+                'destination' => 'ANY',
+                'action' => 'ALLOW',
+                'direction' => 'IN',
+                'enabled' => true
+            ])->assertStatus(202);
+
+        Event::assertDispatched(Created::class);
+    }
 }
