@@ -7,6 +7,7 @@ use App\Traits\V2\DefaultName;
 use App\Traits\V2\DeletionRules;
 use App\Traits\V2\Syncable;
 use App\Traits\V2\Taskable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -55,6 +56,17 @@ class LoadBalancerNetwork extends Model implements Searchable
     public function vips(): HasMany
     {
         return $this->hasMany(Vip::class);
+    }
+
+    /**
+     * Get the NICs from the load balancer nodes for this network
+     */
+    public function getNodeNics(): Collection
+    {
+        return Nic::where('network_id', '=', $this->network->id)
+            ->whereHas('instance.loadBalancerNode', function ($query) {
+                $query->where('load_balancer_id', '=', $this->loadbalancer->id);
+            })->get();
     }
 
 

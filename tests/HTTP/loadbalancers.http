@@ -26,3 +26,10 @@ Accept: */*
 Cache-Control: no-cache
 Authorization: myukfast
 Content-Type:  application/json
+
+### ACLs
+GET https://kong.staging.rnd.ukfast/loadbalancers/v2/acls/7267
+Accept: */*
+Cache-Control: no-cache
+Authorization: myukfast
+Content-Type:  application/json
