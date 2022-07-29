@@ -370,41 +370,6 @@ class CreateTest extends TestCase
         Event::assertNotDispatched(Created::class);
     }
 
-    public function testNoMismatchIfEitherSourceOrDestinationIsAnyWithArray()
-    {
-        $this->asAdmin()
-            ->post('/v2/firewall-rules', [
-                'name' => 'Demo firewall rule 1',
-                'sequence' => 10,
-                'firewall_policy_id' => $this->firewallPolicy()->id,
-                'source' => '78a6:9d0e:1937:ce40:312c:2355:0f98:400f,78a6:9d0e:2347:ce40:312c:6718:0f98:400f,78a6:9d0e:1937:ce40:312c:6718:0f98:400f',
-                'destination' => 'ANY',
-                'action' => 'ALLOW',
-                'direction' => 'IN',
-                'enabled' => true
-            ])->assertStatus(202);
-
-        Event::assertDispatched(Created::class);
-    }
-
-    public function testNoMismatchIfSourceHasAnArrayIPv6()
-    {
-        $this->asAdmin()
-            ->post('/v2/firewall-rules', [
-                'name' => 'Demo firewall rule 1',
-                'sequence' => 10,
-                'firewall_policy_id' => $this->firewallPolicy()->id,
-                'source' => '78a6:9d0e:1937:ce40:312c:2355:0f98:400f,78a6:9d0e:2347:ce40:312c:6718:0f98:400f, 
-                78a6:9d0e:1937:ce40:312c:6718:0f98:400f/24',
-                'destination' => '78a6:9d0e:1455:ce40:312c:2355:0f98:400f',
-                'action' => 'ALLOW',
-                'direction' => 'IN',
-                'enabled' => true
-            ])->assertStatus(202);
-
-        Event::assertDispatched(Created::class);
-    }
-
     public function testNoMismatchIfSourceHasAnArrayIPv4()
     {
         $this->asAdmin()
@@ -412,7 +377,7 @@ class CreateTest extends TestCase
                 'name' => 'Demo firewall rule 1',
                 'sequence' => 10,
                 'firewall_policy_id' => $this->firewallPolicy()->id,
-                'source' => '127.12.14.55, 127.325.14.55,127.12.123.55',
+                'source' => '192.168.100.3, 192.168.100.2, 192.168.100.1',
                 'destination' => '10.0.0.4',
                 'action' => 'ALLOW',
                 'direction' => 'IN',

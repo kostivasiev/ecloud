@@ -29,19 +29,23 @@ class ValidateIpTypesAreConsistent implements Rule
         $value = preg_replace('/\s+/', '', $value);
         $valueArray = explode(',', $value);
 
-        if (($slashPos = strpos($this->otherIpValue,'/')) > 0) {
-            $this->otherIpValue = substr($this->otherIpValue, 0, $slashPos);
-        }
+        $this->otherIpValue = preg_replace('/\s+/', '', $this->otherIpValue);
+        $otherIpArray = explode(',', $this->otherIpValue);
 
         foreach ($valueArray as $valueItem) {
-            if (($slashPos = strpos($valueItem,'/')) > 0) {
+            if (($slashPos = strpos($valueItem, '/')) > 0) {
                 $valueItem = substr($valueItem, 0, $slashPos);
             }
-            if (!($this->isIPv4Subnet($valueItem) && $this->isIPv4Subnet($this->otherIpValue)) &&
-                !($this->isIPv4($valueItem) && $this->isIPv4($this->otherIpValue)) &&
-                !($this->isIPv6($valueItem) && $this->isIPv6($this->otherIpValue))
-            ) {
-                return false;
+            foreach ($otherIpArray as $otherIp) {
+                if (($slashPos = strpos($otherIp, '/')) > 0) {
+                    $otherIp = substr($otherIp, 0, $slashPos);
+                }
+                if (!($this->isIPv4Subnet($valueItem) && $this->isIPv4Subnet($otherIp)) &&
+                    !($this->isIPv4($valueItem) && $this->isIPv4($otherIp)) &&
+                    !($this->isIPv6($valueItem) && $this->isIPv6($otherIp))
+                ) {
+                    return false;
+                }
             }
         }
 
