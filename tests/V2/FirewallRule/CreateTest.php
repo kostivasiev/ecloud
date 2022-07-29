@@ -325,7 +325,7 @@ class CreateTest extends TestCase
                 'name' => 'Demo firewall rule 1',
                 'sequence' => 10,
                 'firewall_policy_id' => $this->firewallPolicy()->id,
-                'source' => '78a6:9d0e:1937:ce40:312c:6718:0f98:400f',
+                'source' => '78a6:9d0e:1937:ce40:312c:6718:0f98:400f/24',
                 'destination' => 'ANY',
                 'action' => 'ALLOW',
                 'direction' => 'IN',
