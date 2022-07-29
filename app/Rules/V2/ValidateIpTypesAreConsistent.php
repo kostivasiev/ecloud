@@ -29,12 +29,13 @@ class ValidateIpTypesAreConsistent implements Rule
         $value = preg_replace('/\s+/', '', $value);
         $valueArray = explode(',', $value);
 
+        if (($slashPos = strpos($this->otherIpValue,'/')) > 0) {
+            $this->otherIpValue = substr($this->otherIpValue, 0, $slashPos);
+        }
+
         foreach ($valueArray as $valueItem) {
             if (($slashPos = strpos($valueItem,'/')) > 0) {
                 $valueItem = substr($valueItem, 0, $slashPos);
-            }
-            if (($slashPos = strpos($this->otherIpValue,'/')) > 0) {
-                $this->otherIpValue = substr($this->otherIpValue, 0, $slashPos);
             }
             if (!($this->isIPv4Subnet($valueItem) && $this->isIPv4Subnet($this->otherIpValue)) &&
                 !($this->isIPv4($valueItem) && $this->isIPv4($this->otherIpValue)) &&
