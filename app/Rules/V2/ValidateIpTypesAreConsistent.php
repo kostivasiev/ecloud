@@ -26,11 +26,19 @@ class ValidateIpTypesAreConsistent implements Rule
             return false;
         }
 
-        return (($this->isIPv4Subnet($value) && $this->isIPv4Subnet($this->otherIpValue)) ||
-            ($this->isIPv6Subnet($value) && $this->isIPv6Subnet($this->otherIpValue)) ||
-            ($this->isIPv4($value) && $this->isIPv4($this->otherIpValue)) ||
-            ($this->isIPv6($value) && $this->isIPv6($this->otherIpValue))
-        );
+        $value = preg_replace('/\s+/', '', $value);
+        $valueArray = explode(',', $value);
+
+        foreach ($valueArray as $valueItem) {
+            if (!($this->isIPv4Subnet($valueItem) && $this->isIPv4Subnet($this->otherIpValue)) &&
+                !($this->isIPv4($valueItem) && $this->isIPv4($this->otherIpValue)) &&
+                !($this->isIPv6($valueItem) && $this->isIPv6($this->otherIpValue))
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function message()
