@@ -19,6 +19,10 @@ class ValidateIpTypesAreConsistent implements Rule
 
     public function passes($attribute, $value)
     {
+        if (!$this->isListConsistent($value)) {
+            return false;
+        }
+
         if ($value == 'ANY' || $this->otherIpValue == 'ANY') {
             return true;
         }
@@ -102,5 +106,40 @@ class ValidateIpTypesAreConsistent implements Rule
     {
         $parts = explode('-', $ipAddressRange);
         return (count($parts) > 1) ? $parts[0] : $ipAddressRange;
+    }
+
+    public function isListConsistent($value): bool
+    {
+        $listItems = explode(',', preg_replace('/\s+/', '', $value));
+        if (count($listItems) === 1) {
+            return true;
+        }
+        $lastItemType = null;
+        foreach ($listItems as $listItem) {
+            $rangeItems = explode('-', $listItem);
+            foreach ($rangeItems as $rangeItem) {
+                if ($lastItemType === null) {
+                    $lastItemType = $this->getItemType($rangeItem);
+                    if (!$lastItemType) {
+                        return false;
+                    }
+                    continue;
+                }
+                if ($this->getItemType($rangeItem) !== $lastItemType) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private function getItemType($value): string|bool
+    {
+        if ($this->isIPv4($value)) {
+            return 'ipv4';
+        } else if ($this->isIPv6($value)) {
+            return 'ipv6';
+        }
+        return false;
     }
 }

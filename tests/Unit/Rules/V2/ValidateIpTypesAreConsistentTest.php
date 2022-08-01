@@ -114,4 +114,19 @@ class ValidateIpTypesAreConsistentTest extends TestCase
         $this->rule->otherIpValue = '192.168.10.12,192.168.10.121';
         $this->assertTrue($this->rule->passes('source', 'ANY'));
     }
+
+    public function testItemsInAListAreConsistent()
+    {
+        $this->rule->otherIpValue = 'ANY';
+        $this->assertFalse($this->rule->passes('source', '192.168.10.12,3492:e2e1:3616:951f:ddfb:295f:d6ba:ffff'));
+
+        $this->rule->otherIpValue = 'ANY';
+        $this->assertFalse($this->rule->passes('source', 'INVALID,3492:e2e1:3616:951f:ddfb:295f:d6ba:ffff'));
+
+        $this->rule->otherIpValue = 'ANY';
+        $this->assertTrue($this->rule->passes('source', '3492:e2e1:3616:951f:ddfb:295f:d6ba:1c0f,3492:e2e1:3616:951f:ddfb:295f:d6ba:ffff'));
+
+        $this->rule->otherIpValue = 'ANY';
+        $this->assertTrue($this->rule->passes('source', '192.168.10.12,192.168.10.13,192.168.10.14'));
+    }
 }
