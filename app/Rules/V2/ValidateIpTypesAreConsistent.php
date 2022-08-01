@@ -26,6 +26,7 @@ class ValidateIpTypesAreConsistent implements Rule
         if ($value == 'ANY' || $this->otherIpValue == 'ANY') {
             return true;
         }
+
         if (empty($value) || empty($this->otherIpValue)) {
             return false;
         }
@@ -36,18 +37,14 @@ class ValidateIpTypesAreConsistent implements Rule
         $otherIpArray = explode(',', $this->otherIpValue);
 
         foreach ($valueArray as $valueItem) {
-            if (($slashPos = strpos($valueItem, '/')) > 0) {
-                $valueItem = substr($valueItem, 0, $slashPos);
-            }
+            $valueItem = $this->removeSubnet($valueItem);
             $rangeItems = explode('-', $valueItem);
             foreach ($rangeItems as $rangeItem) {
                 foreach ($otherIpArray as $otherIp) {
                     $otherRangeItems = explode('-', $otherIp);
                     foreach ($otherRangeItems as $otherRangeItem) {
-                        if (($slashPos = strpos($otherRangeItem, '/')) > 0) {
-                            $otherRangeItem = substr($otherRangeItem, 0, $slashPos);
-                        }
-                        if (!($this->isIPv4Subnet($rangeItem) && $this->isIPv4Subnet($otherRangeItem)) &&
+                        $otherRangeItem = $this->removeSubnet($otherRangeItem);
+                        if (!($this->isIPv4Subnet($rangeItem) && $this->isIPv6Subnet($otherRangeItem)) &&
                             !($this->isIPv4($rangeItem) && $this->isIPv4($otherRangeItem)) &&
                             !($this->isIPv6($rangeItem) && $this->isIPv6($otherRangeItem))
                         ) {
@@ -110,14 +107,15 @@ class ValidateIpTypesAreConsistent implements Rule
 
     public function isListConsistent($value): bool
     {
-        $listItems = explode(',', preg_replace('/\s+/', '', $value));
-        if (count($listItems) === 1) {
+        if ($value == 'ANY') {
             return true;
         }
+        $listItems = explode(',', preg_replace('/\s+/', '', $value));
         $lastItemType = null;
         foreach ($listItems as $listItem) {
             $rangeItems = explode('-', $listItem);
             foreach ($rangeItems as $rangeItem) {
+                $rangeItem = $this->removeSubnet($rangeItem);
                 if ($lastItemType === null) {
                     $lastItemType = $this->getItemType($rangeItem);
                     if (!$lastItemType) {
@@ -141,5 +139,13 @@ class ValidateIpTypesAreConsistent implements Rule
             return 'ipv6';
         }
         return false;
+    }
+
+    private function removeSubnet($value): string
+    {
+        if (($slashPos = strpos($value, '/')) > 0) {
+            $value = substr($value, 0, $slashPos);
+        }
+        return $value;
     }
 }
