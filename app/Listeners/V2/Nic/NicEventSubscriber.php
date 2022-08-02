@@ -38,7 +38,7 @@ class NicEventSubscriber implements ShouldQueue
      */
     protected function delete(Nic $nic): Task
     {
-        Log::info('Deleting Nic ' . $nic->id);
+        Log::info('Deleting NIC ' . $nic->id);
         return $nic->syncDelete();
     }
 

@@ -44,7 +44,7 @@ client.log('Network ID: ' + response.body.data.id);
 %}
 
 ### Get a load balancer spec
-GET https://{{host}}/{{version}}/load-balancer-specs?name:eq=medium
+GET https://{{host}}/{{version}}/load-balancer-specs?name:eq=small
 Cache-Control: no-cache
 X-consumer-custom-id: {{dev_reseller_id_customer}}
 X-consumer-groups: ecloud.read, ecloud.write
@@ -76,9 +76,7 @@ Content-Type: application/json
   "availability_zone_id": "{{dev_availability_zone_id}}",
   "vpc_id": "{{dev_vpc_id}}",
   "load_balancer_spec_id": "{{load_balancer_spec_id}}",
-  "network_ids": [
-     "{{network_id}}"
-  ]
+  "network_id": "{{network_id}}"
 }
 
 > {%
