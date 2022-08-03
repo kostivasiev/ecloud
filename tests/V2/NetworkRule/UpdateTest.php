@@ -2,6 +2,7 @@
 
 namespace Tests\V2\NetworkRule;
 
+use App\Events\V2\Task\Created;
 use App\Models\V2\NetworkPolicy;
 use App\Models\V2\NetworkRule;
 use Illuminate\Database\Eloquent\Model;
@@ -74,5 +75,33 @@ class UpdateTest extends TestCase
         });
 
         $this->patch('/v2/network-rules/' . $dhcpNetworkRule->id)->assertStatus(403);
+    }
+
+    public function testIpTypeMismatchFails()
+    {
+        $this->networkRule->setAttribute('source', '10.0.0.1/24')->saveQuietly();
+        $this->asUser()
+            ->patch(
+                '/v2/network-rules/' . $this->networkRule->id,
+                [
+                    'destination' => '78a6:9d0e:1937:ce40:312c:6718:0f98:400f/24',
+                ]
+            )->assertJsonFragment([
+                'detail' => 'The source and destination attributes must be of the same IP type IPv4/IPv6',
+            ])->assertStatus(422);
+    }
+
+    public function testUsingAnySucceeds()
+    {
+        Event::fake([Created::class]);
+        $this->networkRule->setAttribute('source', '10.0.0.1/24')->saveQuietly();
+        $this->asUser()
+            ->patch(
+                '/v2/network-rules/' . $this->networkRule->id,
+                [
+                    'destination' => 'ANY',
+                ]
+            )->assertStatus(202);
+        Event::assertDispatched(Created::class);
     }
 }

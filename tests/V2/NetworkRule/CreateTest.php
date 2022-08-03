@@ -82,4 +82,58 @@ class CreateTest extends TestCase
             ]
         )->assertStatus(422);
     }
+
+    public function testMismatchedIpTypesFail()
+    {
+        $this->vpc()->advanced_networking = true;
+        $this->vpc()->saveQuietly();
+
+        $this->asAdmin()
+            ->post('/v2/network-rules', [
+                'network_policy_id' => $this->networkPolicy()->id,
+                'sequence' => 1,
+                'source' => '78a6:9d0e:1937:ce40:312c:6718:0f98:400f/24',
+                'destination' => '10.0.2.0/32',
+                'action' => 'ALLOW',
+                'enabled' => true,
+                'direction' => 'IN_OUT'
+            ])->assertJsonFragment([
+                'detail' => 'The source and destination attributes must be of the same IP type IPv4/IPv6',
+            ])->assertStatus(422);
+
+        Event::assertNotDispatched(Created::class);
+
+        $this->asAdmin()
+            ->post('/v2/network-rules', [
+                'network_policy_id' => $this->networkPolicy()->id,
+                'sequence' => 1,
+                'source' => '10.0.1.0/32',
+                'destination' => '78a6:9d0e:1937:ce40:312c:6718:0f98:400f/32',
+                'action' => 'ALLOW',
+                'enabled' => true,
+                'direction' => 'IN_OUT'
+            ])->assertJsonFragment([
+                'detail' => 'The source and destination attributes must be of the same IP type IPv4/IPv6',
+            ])->assertStatus(422);
+
+        Event::assertNotDispatched(Created::class);
+    }
+
+    public function testNoMismatchIfEitherSourceOrDestinationIsAny()
+    {
+        Event::fake([Created::class]);
+
+        $this->asAdmin()
+            ->post('/v2/network-rules', [
+                'network_policy_id' => $this->networkPolicy()->id,
+                'sequence' => 1,
+                'source' => 'ANY',
+                'destination' => '10.0.2.0/32',
+                'action' => 'ALLOW',
+                'enabled' => true,
+                'direction' => 'IN_OUT'
+            ])->assertStatus(202);
+
+        Event::assertDispatched(Created::class);
+    }
 }

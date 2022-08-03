@@ -7,7 +7,6 @@ use App\Listeners\V2\Nic\NicEventSubscriber;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -161,6 +160,7 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\V2\Instance\UpdateMsSqlLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateLicenseBilling::class,
             \App\Listeners\V2\Instance\UpdateBackupBilling::class,
+            \App\Listeners\V2\Instance\UpdateResourceTierBilling::class,
             \App\Listeners\V2\Host\UpdateBilling::class,
             \App\Listeners\V2\Host\ToggleHostGroupBilling::class,
             \App\Listeners\V2\Host\UpdateLicenseBilling::class,

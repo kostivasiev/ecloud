@@ -133,4 +133,32 @@ class UpdateTest extends TestCase
             )->assertStatus(202);
         Event::assertDispatched(Created::class);
     }
+
+    public function testIpTypeMismatchFails()
+    {
+        $this->firewallRule->setAttribute('source', '10.0.0.1/24')->saveQuietly();
+        $this->asUser()
+            ->patch(
+                '/v2/firewall-rules/' . $this->firewallRule->id,
+                [
+                    'destination' => '78a6:9d0e:1937:ce40:312c:6718:0f98:400f/24',
+                ]
+            )->assertJsonFragment([
+                'detail' => 'The source and destination attributes must be of the same IP type IPv4/IPv6',
+            ])->assertStatus(422);
+    }
+
+    public function testUsingAnySucceeds()
+    {
+        Event::fake([Created::class]);
+        $this->firewallRule->setAttribute('source', '10.0.0.1/24')->saveQuietly();
+        $this->asUser()
+            ->patch(
+                '/v2/firewall-rules/' . $this->firewallRule->id,
+                [
+                    'destination' => 'ANY',
+                ]
+            )->assertStatus(202);
+        Event::assertDispatched(Created::class);
+    }
 }
