@@ -75,13 +75,36 @@ X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
-### 6. Delete standard instance
+### 6. Update vcpus used by instance
+PATCH https://{{host}}/{{version}}/instances/{{high_cpu_instance_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+{
+    "vcpu_cores": 2
+}
+
+### 7. Get high cpu billing metrics
+GET https://{{host}}/{{version}}/billing-metrics?resource_id:eq={{high_cpu_instance_id}}
+X-consumer-custom-id:  {{dev_reseller_id_customer}}
+X-consumer-groups:  ecloud.read, ecloud.write
+Content-Type:  application/json
+
+> {%
+client.test('Check billing metric is for correct number of cpus', function () {
+    let numCpu = response.body.data[0].value;
+    client.assert(numCpu === 2, 'Wrong number of CPUs in billing metric');
+});
+%}
+
+### 8. Delete standard instance
 DELETE https://{{host}}/{{version}}/instances/{{instance_id}}
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
 Content-Type:  application/json
 
-### 7. Delete high cpu instance
+### 9. Delete high cpu instance
 DELETE https://{{host}}/{{version}}/instances/{{high_cpu_instance_id}}
 X-consumer-custom-id:  {{dev_reseller_id_customer}}
 X-consumer-groups:  ecloud.read, ecloud.write
