@@ -63,7 +63,7 @@ class CreateAffinityRule extends TaskJob
                 'vpc_id' => $this->affinityRuleMember->affinityRule->vpc->id,
             ]);
             $response = $availabilityZone->kingpinService()->post(
-                sprintf($uriEndpoint, HostGroup::mapId($hostGroupId)),
+                sprintf($uriEndpoint, HostGroup::mapId($availabilityZone->id, $hostGroupId)),
                 [
                     'json' => [
                         'ruleName' => $this->affinityRuleMember->affinityRule->id,

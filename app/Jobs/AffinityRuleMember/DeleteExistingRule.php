@@ -28,7 +28,7 @@ class DeleteExistingRule extends TaskJob
                     $response = $availabilityZone->kingpinService()->delete(
                         sprintf(
                             KingpinService::DELETE_CONSTRAINT_URI,
-                            HostGroup::mapId($hostGroupId),
+                            HostGroup::mapId($availabilityZone->id, $hostGroupId),
                             $affinityRuleMember->affinityRule->id
                         )
                     );

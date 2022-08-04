@@ -28,7 +28,7 @@ class MigrateToHostGroup extends TaskJob
                 '/api/v2/vpc/' . $instance->vpc_id . '/instance/' . $instance->id . '/reschedule',
                 [
                     'json' => [
-                        'hostGroupId' => HostGroup::mapId($hostGroup->id),
+                        'hostGroupId' => HostGroup::mapId($instance->availabilityZone->id, $hostGroup->id),
                     ],
                 ]
             );

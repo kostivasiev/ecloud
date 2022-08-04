@@ -105,7 +105,7 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
                         // TODO: Maps to current cluster names, replace with $this->hostGroups->pluck('id')->toArray()
                         // when the clusters are renamed
                         'hostGroupIds' => $this->hostGroups->pluck('id')->map(function ($id) {
-                            return HostGroup::mapId($id);
+                            return HostGroup::mapId($this->availabilityZone->id, $id);
                         })->toArray(),
                     ],
                 ]
@@ -120,7 +120,7 @@ class ResourceTier extends Model implements Searchable, AvailabilityZoneable
 
         // Sort by percentage used capacity
         return collect($response)->map(function ($hostGroup) {
-            return HostGroup::formatHostGroupCapacity($hostGroup);
+            return HostGroup::formatHostGroupCapacity($this->availabilityZone->id, $hostGroup);
         })->sortBy([
             fn ($a, $b) => $a['ram']['percentage'] <=> $b['ram']['percentage'],
         ]);
