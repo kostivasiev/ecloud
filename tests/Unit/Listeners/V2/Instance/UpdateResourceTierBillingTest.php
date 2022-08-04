@@ -59,6 +59,7 @@ class UpdateResourceTierBillingTest extends TestCase
         $this->instanceModel()
             ->hostGroup()
             ->associate($this->hostGroup);
+        $this->instanceModel()->setAttribute('vcpu_cores', 1)->saveQuietly();
     }
 
     public function testStandardInstanceNoHighCpuBilling()
@@ -78,6 +79,7 @@ class UpdateResourceTierBillingTest extends TestCase
     {
         $this->assertNull(BillingMetric::getActiveByKey($this->instanceModel(), UpdateResourceTierBilling::getKeyName()));
         $this->instanceModel()->hostGroup()->associate($this->hostGroup);
+        $this->instanceModel()->setAttribute('vcpu_cores', 2)->saveQuietly();
         $task = $this->createSyncUpdateTask($this->instanceModel());
         $task->setAttribute('completed', true)->saveQuietly();
 
@@ -88,7 +90,7 @@ class UpdateResourceTierBillingTest extends TestCase
             UpdateResourceTierBilling::getKeyName() . '.' . $this->resourceTier->id
         );
         $this->assertNotNull($highCpuMetric);
-        $this->assertEquals(1, $highCpuMetric->value);
+        $this->assertEquals(2, $highCpuMetric->value);
     }
 
     public function testStandardCpuHostGroupMigrationEndsHighCpuBilling()
@@ -111,5 +113,36 @@ class UpdateResourceTierBillingTest extends TestCase
 
         $originalMetric->refresh();
         $this->assertNotNull($originalMetric->end);
+    }
+
+    public function testNewMetricOnCpuUsageChange()
+    {
+        $this->instanceModel()->hostGroup()->associate($this->hostGroup);
+        $originalMetric = BillingMetric::factory()
+            ->for($this->vpc())
+            ->create([
+                'name' => UpdateResourceTierBilling::getFriendlyName(),
+                'resource_id' => $this->instanceModel()->id,
+                'key' => UpdateResourceTierBilling::getKeyName() . '.' . $this->resourceTier->id,
+                'value' => 1,
+            ]);
+        $this->instanceModel()->setAttribute('vcpu_cores', 2)->saveQuietly();
+
+        $task = $this->createSyncUpdateTask($this->instanceModel());
+        $task->setAttribute('completed', true)->saveQuietly();
+
+        (new UpdateResourceTierBilling())->handle(new Updated($task));
+
+        $newMetric = BillingMetric::where('id', '!=', $originalMetric->id)->first();
+        $originalMetric->refresh();
+
+        // check original metric is for 1 cpu and that it's ended
+        $this->assertEquals(1, $originalMetric->value);
+        $this->assertNotNull($originalMetric->end);
+
+        // Check new metric is for 2 cpu and that it's active
+        $this->assertEquals(2, $newMetric->value);
+        $this->assertEquals(UpdateResourceTierBilling::getKeyName() . '.' . $this->resourceTier->id, $newMetric->key);
+        $this->assertNull($newMetric->end);
     }
 }

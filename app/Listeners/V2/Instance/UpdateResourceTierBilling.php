@@ -6,6 +6,7 @@ use App\Events\V2\Task\Updated;
 use App\Listeners\V2\Billable;
 use App\Models\V2\BillingMetric;
 use App\Models\V2\Instance;
+use App\Models\V2\ResourceTier;
 use App\Traits\V2\InstanceOnlineState;
 use App\Traits\V2\Listeners\BillableListener;
 use Illuminate\Support\Facades\Log;
@@ -24,13 +25,15 @@ class UpdateResourceTierBilling implements Billable
     public function handle(Updated $event)
     {
         $instance = $event->model->resource;
+
         if (!$this->validateBillableResourceEvent($event)) {
             return;
         }
 
+        $usedCpu = $this->getResourceTierUsage($instance);
         $currentActiveMetric = BillingMetric::getActiveByKey($instance, self::getKeyName() . '%', 'LIKE');
 
-        if ($currentActiveMetric?->key == self::getKeyName() . '.' . $instance->resource_tier_id) {
+        if ($currentActiveMetric?->key == self::getKeyName() . '.' . $instance->resource_tier_id && $currentActiveMetric->value === $usedCpu) {
             return;
         }
 
@@ -53,19 +56,42 @@ class UpdateResourceTierBilling implements Billable
             return;
         }
 
+        // End the old metric, if there has been a change in CPU usage
+        if (!empty($currentActiveMetric) && $currentActiveMetric->value !== $usedCpu) {
+            $currentActiveMetric->setEndDate();
+            Log::info(get_class($this) . ' : current cpu usage has changed, ending old metric', ['instance' => $instance->id]);
+        }
+
         $billingMetric = app()->make(BillingMetric::class);
         $billingMetric->resource_id = $instance->id;
         $billingMetric->vpc_id = $instance->vpc->id;
         $billingMetric->reseller_id = $instance->vpc->reseller_id;
         $billingMetric->name = $product->product_description;
         $billingMetric->key = self::getKeyName() . '.' . $instance->resource_tier_id;
-        $billingMetric->value = 1;
+        $billingMetric->value = $usedCpu;
 
         $billingMetric->category = $product->category;
         $billingMetric->price = $product->getPrice($instance->vpc->reseller_id);
 
         Log::info(get_class($this) . ' : ' . self::getKeyName() . ' enabled.', ['instance' => $instance->id]);
         $billingMetric->save();
+    }
+
+    /**
+     * Gets the number of vcpu in use by all hostgroups in tier
+     * @param Instance $instance
+     * @return int
+     */
+    public function getResourceTierUsage(Instance $instance): int
+    {
+        $cpuTotal = 0;
+        $resourceTier = ResourceTier::find($instance->resource_tier_id);
+        if ($resourceTier !== null) {
+            foreach ($resourceTier->hostGroups as $hostGroup) {
+                $cpuTotal += $hostGroup->vcpu_used;
+            }
+        }
+        return $cpuTotal;
     }
 
     /**
