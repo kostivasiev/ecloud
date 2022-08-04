@@ -17,7 +17,7 @@ class AwaitNicDeletion extends TaskJob
 
         if ($loadBalancerNetwork->getNodeNics()->count() > 0) {
             foreach ($loadBalancerNetwork->getNodeNics() as $nic) {
-                if ($nic->sync->status = Sync::STATUS_FAILED && $nic->sync->type == Sync::TYPE_DELETE) {
+                if ($nic->sync->status == Sync::STATUS_FAILED && $nic->sync->type == Sync::TYPE_DELETE) {
                     $this->fail(new \Exception('NIC ' . $nic->id . 'failed to delete'));
                     return;
                 }
