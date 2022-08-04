@@ -117,9 +117,7 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
         }
 
         return $this->hostGroup->isPrivate() ? null :
-            ResourceTierHostGroup::where('host_group_id', '=', $this->host_group_id)
-                ->first()
-                ->resource_tier_id;
+            $this->hostGroup->resourceTierHostGroups->first()->resourceTier->id;
     }
 
     public function getPlatformAttribute()
