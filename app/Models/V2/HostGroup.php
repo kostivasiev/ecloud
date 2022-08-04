@@ -279,6 +279,6 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
      */
     public static function reverseMapId(string $availabilityZoneId, string $existingClusterName): ?string
     {
-        return array_flip(config('host-group-map'))[$availabilityZoneId][$existingClusterName] ?? $existingClusterName;
+        return array_flip(config('host-group-map')[$availabilityZoneId])[$existingClusterName] ?? $existingClusterName;
     }
 }
