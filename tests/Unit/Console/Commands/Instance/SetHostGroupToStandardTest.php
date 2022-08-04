@@ -5,6 +5,7 @@ namespace Tests\Unit\Console\Commands\Instance;
 use App\Console\Commands\Instance\SetHostGroupToStandard;
 use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class SetHostGroupToStandardTest extends TestCase
@@ -43,6 +44,7 @@ class SetHostGroupToStandardTest extends TestCase
 
     public function testResults()
     {
+        Config::set('host-group-map.az-test', []);
         $this->instanceModel()
             ->setAttribute('host_group_id', null)
             ->saveQuietly();

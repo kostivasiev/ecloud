@@ -4,6 +4,7 @@ namespace Tests\Unit\Models\V2;
 
 use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class HostGroupTest extends TestCase
@@ -11,6 +12,8 @@ class HostGroupTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        Config::set('host-group-map.az-test', []);
+        Config::set('hostgroup.capacity.threshold', 80);
     }
 
     public function testGetCapacityPrivateSuccess()
