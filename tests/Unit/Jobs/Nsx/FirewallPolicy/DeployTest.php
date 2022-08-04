@@ -41,6 +41,7 @@ class DeployTest extends TestCase
                         "description" => "name",
                         "sequence_number" => 10,
                         "rules" => [],
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -112,6 +113,7 @@ class DeployTest extends TestCase
                                 "ip_protocol" => "IPV4_IPV6",
                             ],
                         ],
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -198,6 +200,7 @@ class DeployTest extends TestCase
                                 "ip_protocol" => "IPV4_IPV6",
                             ],
                         ],
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])

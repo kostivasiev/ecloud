@@ -730,4 +730,14 @@ abstract class TestCase extends BaseTestCase
         return $this;
     }
 
+    public function defaultVpcTags()
+    {
+        return [
+                [
+                    'scope' => config('defaults.tag.scope'),
+                    'tag' => $this->vpc()->id
+                ]
+        ];
+    }
+
 }

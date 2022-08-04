@@ -76,7 +76,8 @@ class CreateVpnSessionTest extends TestCase
                                 'sources' => [],
                                 'destinations' => []
                             ]
-                        ]
+                        ],
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -158,7 +159,8 @@ class CreateVpnSessionTest extends TestCase
                                     ]
                                 ]
                             ]
-                        ]
+                        ],
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])

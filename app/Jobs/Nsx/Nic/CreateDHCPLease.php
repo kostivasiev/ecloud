@@ -51,7 +51,13 @@ class CreateDHCPLease extends TaskJob
                 'json' => [
                     'resource_type' => 'DhcpV4StaticBindingConfig',
                     'mac_address' => $nic->mac_address,
-                    'ip_address' => $ipAddress->ip_address
+                    'ip_address' => $ipAddress->ip_address,
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $router->vpc->id
+                        ]
+                    ]
                 ]
             ]
         );

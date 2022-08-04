@@ -74,7 +74,13 @@ class Deploy extends TaskJob
                             'tag' => '',
                             'ip_protocol' => 'IPV4_IPV6'
                         ];
-                    })->toArray()
+                    })->toArray(),
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $router->vpc->id
+                        ]
+                    ]
                 ]
             ]
         );

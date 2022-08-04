@@ -50,6 +50,7 @@ class DeployTest extends TestCase
                         "logging" => false,
                         "firewall_match" => "MATCH_EXTERNAL_ADDRESS",
                         "source_network" => "10.3.4.5",
+                        "tags" => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -86,6 +87,7 @@ class DeployTest extends TestCase
                         "logging" => false,
                         "firewall_match" => "MATCH_EXTERNAL_ADDRESS",
                         "destination_network" => "1.1.1.1",
+                        "tags" => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -132,6 +134,7 @@ class DeployTest extends TestCase
                         "enabled" => true,
                         "logging" => false,
                         "destination_network" => "2.2.2.0/24",
+                        "tags" => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -179,6 +182,7 @@ class DeployTest extends TestCase
                         "enabled" => true,
                         "logging" => false,
                         "destination_network" => "2.2.2.0/24",
+                        "tags" => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -233,6 +237,7 @@ class DeployTest extends TestCase
                         "logging" => false,
                         "destination_network" => "2.2.2.0/24",
                         "translated_network" => "3.3.3.0/24",
+                        "tags" => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -271,6 +276,7 @@ class DeployTest extends TestCase
                         "sequence_number" => 10,
                         "firewall_match" => "MATCH_EXTERNAL_ADDRESS",
                         "source_network" => "10.3.4.5",
+                        "tags" => $this->defaultVpcTags(),
                     ]
                 ]
             ])

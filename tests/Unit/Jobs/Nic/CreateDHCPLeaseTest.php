@@ -68,6 +68,7 @@ class CreateDHCPLeaseTest extends TestCase
                         "resource_type" => "DhcpV4StaticBindingConfig",
                         "mac_address" => "AA:BB:CC:DD:EE:FF",
                         "ip_address" => "10.0.0.5", // next IP .5 assigned
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])
@@ -117,6 +118,7 @@ class CreateDHCPLeaseTest extends TestCase
                         "resource_type" => "DhcpV4StaticBindingConfig",
                         "mac_address" => "AA:BB:CC:DD:EE:FF",
                         "ip_address" => "10.0.0.4", // next IP .4 assigned
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])

@@ -52,6 +52,12 @@ class PrepareCluster extends TaskJob
                     'description' => 'API created Transport Node Collection',
                     'compute_collection_id' => $computeCollection->external_id,
                     'transport_node_profile_id' => $transportNodeProfile->id,
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $hostGroup->vpc->id
+                        ]
+                    ]
                 ]
             ]
         );

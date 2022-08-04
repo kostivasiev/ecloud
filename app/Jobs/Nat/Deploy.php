@@ -47,6 +47,12 @@ class Deploy extends Job
             'action' => $this->model->action,
             'enabled' => true,
             'logging' => false,
+            'tags' => [
+                [
+                    'scope' => config('defaults.tag.scope'),
+                    'tag' => $router->vpc->id
+                ]
+            ]
         ];
 
         if ($this->model->action !== Nat::ACTION_NOSNAT) {

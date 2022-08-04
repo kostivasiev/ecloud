@@ -99,6 +99,12 @@ class CreateTransportNodeProfile extends TaskJob
                                 ]
                             ]
                         ]
+                    ],
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $hostGroup->vpc->id
+                        ]
                     ]
                 ]
             ]

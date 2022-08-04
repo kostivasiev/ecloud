@@ -27,7 +27,8 @@ class DeployTest extends TestCase
                                     '/infra/tier-1s/' . $this->router()->id . '/segments/' . $this->network()->id
                                 ]
                             ]
-                        ]
+                        ],
+                        'tags' => $this->defaultVpcTags(),
                     ]
                 ]
             ])

@@ -21,7 +21,13 @@ class Deploy extends TaskJob
             [
                 'json' => [
                     'resource_type' => 'IPSecVpnService',
-                    'enabled' => true
+                    'enabled' => true,
+                    'tags' => [
+                        [
+                            'scope' => config('defaults.tag.scope'),
+                            'tag' => $vpnService->router->vpc->id
+                        ]
+                    ]
                 ]
             ]
         );
