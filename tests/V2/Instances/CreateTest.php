@@ -334,6 +334,8 @@ class CreateTest extends TestCase
     {
         $this->host();
 
+        Config::set('host-group-map.az-test', []);
+
         $this->kingpinServiceMock()
             ->allows('get')
             ->with(
