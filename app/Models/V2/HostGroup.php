@@ -157,7 +157,7 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
                     [
                         'json' => [
                             'hostGroupIds' => [
-                                static::mapId($this->id)
+                                static::mapId($this->availabilityZone->id, $this->id)
                             ],
                         ],
                     ]
@@ -171,13 +171,13 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
             return null;
         }
 
-        return static::formatHostGroupCapacity($response);
+        return static::formatHostGroupCapacity($this->availabilityZone->id, $response);
     }
 
-    public static function formatHostGroupCapacity(\StdClass $rawHostGroupCapacity): array
+    public static function formatHostGroupCapacity(string $availabilityZoneId, \StdClass $rawHostGroupCapacity): array
     {
         return [
-            'id' => static::reverseMapId($rawHostGroupCapacity->hostGroupId),
+            'id' => static::reverseMapId($availabilityZoneId, $rawHostGroupCapacity->hostGroupId),
             'cpu' => [
                 'capacity' => $rawHostGroupCapacity->cpuCapacityMHz,
                 'used' => $rawHostGroupCapacity->cpuUsedMHz,
@@ -262,21 +262,23 @@ class HostGroup extends Model implements Searchable, ResellerScopeable, Availabi
 
     /**
      * Map proposed High CPU ID to existing cluster name
+     * @param string $availabilityZoneId
      * @param string $newHostgroupId
      * @return string|null Existing cluster name
      */
-    public static function mapId(string $newHostgroupId): ?string
+    public static function mapId(string $availabilityZoneId, string $newHostgroupId): ?string
     {
-        return config('host-group-map')[$newHostgroupId] ?? $newHostgroupId;
+        return config('host-group-map')[$availabilityZoneId][$newHostgroupId] ?? $newHostgroupId;
     }
 
     /**
      * Map existing cluster name to a proposed HighCPU id
+     * @param string $availabilityZoneId
      * @param string $existingClusterName
      * @return string|null High CPU host group ID
      */
-    public static function reverseMapId(string $existingClusterName): ?string
+    public static function reverseMapId(string $availabilityZoneId, string $existingClusterName): ?string
     {
-        return array_flip(config('host-group-map'))[$existingClusterName] ?? $existingClusterName;
+        return array_flip(config('host-group-map')[$availabilityZoneId])[$existingClusterName] ?? $existingClusterName;
     }
 }

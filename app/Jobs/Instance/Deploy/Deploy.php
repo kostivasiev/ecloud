@@ -40,7 +40,7 @@ class Deploy extends Job
             'numCPU' => $instance->vcpu_cores,
             'ramMib' => $instance->ram_capacity,
             'backupEnabled' => $instance->backup_enabled,
-            'hostGroupId' => HostGroup::mapId($instance->host_group_id),
+            'hostGroupId' => HostGroup::mapId($instance->availabilityZone->id, $instance->host_group_id),
         ];
 
         /** @var Response $deployResponse */

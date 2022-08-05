@@ -13,6 +13,7 @@ use App\Services\V2\KingpinService;
 use App\Tasks\Instance\Migrate;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Factories\Sequence;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class HostGroupEventSubscriberTest extends TestCase
@@ -110,6 +111,8 @@ class HostGroupEventSubscriberTest extends TestCase
 
     public function testHostGroupIsSelectedForInstance()
     {
+        Config::set('host-group-map.az-test', []);
+
         $this->instanceModel()->setAttribute('host_group_id', null)->save();
 
         $this->instanceModel()->setAttribute('deploy_data', ['resource_tier_id' => 'rt-aaaaaaaa'])->saveQuietly();
@@ -144,6 +147,7 @@ class HostGroupEventSubscriberTest extends TestCase
 
     public function testHostGroupIsSelectedForMigrationToShared()
     {
+        Config::set('host-group-map.az-test', []);
         $task = Task::withoutEvents(function () {
             $task = new Task([
                 'id' => 'test-task',

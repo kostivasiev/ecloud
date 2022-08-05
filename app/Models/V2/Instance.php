@@ -222,7 +222,7 @@ class Instance extends Model implements Searchable, ResellerScopeable, Availabil
         try {
             $response = $this->availabilityZone->kingpinService()
                 ->get(
-                    sprintf(KingpinService::GET_CONSTRAINT_URI, HostGroup::mapId($hostGroupId))
+                    sprintf(KingpinService::GET_CONSTRAINT_URI, HostGroup::mapId($this->availabilityZone->id, $hostGroupId))
                 );
         } catch (Exception $e) {
             $message = 'Failed to retrieve affinity rule constraint for ' . $affinityRuleId . ' : ' . $e->getMessage();

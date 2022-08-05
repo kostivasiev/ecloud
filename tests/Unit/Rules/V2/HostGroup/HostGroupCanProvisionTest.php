@@ -5,6 +5,7 @@ namespace Tests\Unit\Rules\V2\HostGroup;
 use App\Rules\V2\HostGroup\HostGroupCanProvision;
 use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
 
@@ -18,6 +19,8 @@ class HostGroupCanProvisionTest extends TestCase
 
     public function testHostGroupCanProvisionPasses()
     {
+        Config::set('host-group-map.az-test', []);
+        Config::set('hostgroup.capacity.threshold', 80);
         $this->kingpinServiceMock()
             ->allows('get')
             ->with(
@@ -40,6 +43,7 @@ class HostGroupCanProvisionTest extends TestCase
 
     public function testHostGroupCanNotProvisionFails()
     {
+        Config::set('host-group-map.az-test', []);
         $this->kingpinServiceMock()
             ->allows('get')
             ->with(

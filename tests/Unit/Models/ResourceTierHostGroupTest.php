@@ -11,6 +11,7 @@ use App\Services\V2\KingpinService;
 use Database\Seeders\ResourceTierSeeder;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Database\Eloquent\Factories\Sequence;
+use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class ResourceTierHostGroupTest extends TestCase
@@ -48,6 +49,11 @@ class ResourceTierHostGroupTest extends TestCase
 
     public function testGetDefaultHostGroupByCapacity_NO_MAPPING()
     {
+        Config::set('host-group-map', [
+            'az-test' => [
+                "hg-99f9b758" => "1001",
+            ]
+        ]);
         $resourceTier = ResourceTier::factory()->create([
             'availability_zone_id' => $this->availabilityZone()->id
         ]);
@@ -160,7 +166,7 @@ class ResourceTierHostGroupTest extends TestCase
     public function testGetDefaultHostGroupByCapacity_WITH_MAPPING()
     {
         // Mapping until we rename the clusters
-        config(['host-group-map' => [
+        Config::set(['host-group-map.az-test' => [
             'hg-1' => 'hg-1-CURRENT-CLUSTER-NAME',
             'hg-2' => 'hg-2-CURRENT-CLUSTER-NAME',
             'hg-3' => 'hg-3-CURRENT-CLUSTER-NAME',

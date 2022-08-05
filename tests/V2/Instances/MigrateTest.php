@@ -9,6 +9,7 @@ use App\Models\V2\Image;
 use App\Models\V2\Instance;
 use App\Services\V2\KingpinService;
 use GuzzleHttp\Psr7\Response;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 use UKFast\Api\Auth\Consumer;
@@ -23,7 +24,11 @@ class MigrateTest extends TestCase
 
     public function testMigrateToPrivate()
     {
+        Config::set('host-group-map.az-test', []);
+        Config::set('hostgroup.capacity.threshold', 80);
+
         $this->isWithinCapacity();
+
         Event::fake(Created::class);
 
         $this->post(
@@ -110,6 +115,7 @@ class MigrateTest extends TestCase
 
     public function testCapacityCheckFails()
     {
+        Config::set('host-group-map.az-test', []);
         $this->isOutsideCapacity();
 
         $this->post(
