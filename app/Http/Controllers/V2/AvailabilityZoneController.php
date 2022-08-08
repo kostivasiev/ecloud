@@ -242,8 +242,10 @@ class AvailabilityZoneController extends BaseController
 
     public function hostSpecs(Request $request, string $zoneId)
     {
-        $collection = AvailabilityZone::forUser($request->user())->findOrFail($zoneId)
-            ->hostSpecs();
+        $collection = AvailabilityZone::forUser($request->user())
+            ->findOrFail($zoneId)
+            ->hostSpecs()
+            ->forUser($request->user());
 
         return HostSpecResource::collection(
             $collection->search()
