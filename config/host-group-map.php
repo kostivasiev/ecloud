@@ -8,7 +8,7 @@
 return [
     // G0 Dev
     'az-aaaaaaaa' => [
-        'hg-99f9b758' => '1001', // Standard CPU
+        'hg-99f9b758' => 'StandardCPU-01', // Standard CPU
     ],
 
     // G0
