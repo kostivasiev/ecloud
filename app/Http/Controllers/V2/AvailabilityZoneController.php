@@ -17,7 +17,11 @@ use App\Resources\V2\ProductResource;
 use App\Resources\V2\ResourceTierResource;
 use App\Resources\V2\RouterResource;
 use App\Resources\V2\RouterThroughputResource;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Response;
+use Illuminate\Support\HigherOrderTapProxy;
 use UKFast\DB\Ditto\QueryTransformer;
 
 /**
@@ -29,7 +33,7 @@ class AvailabilityZoneController extends BaseController
     /**
      * Get availability zones collection
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index(Request $request)
     {
@@ -56,7 +60,7 @@ class AvailabilityZoneController extends BaseController
 
     /**
      * @param CreateAvailabilityZoneRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function create(CreateAvailabilityZoneRequest $request)
     {
@@ -78,7 +82,7 @@ class AvailabilityZoneController extends BaseController
     /**
      * @param UpdateAvailabilityZoneRequest $request
      * @param string $zoneId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(UpdateAvailabilityZoneRequest $request, string $zoneId)
     {
@@ -98,10 +102,10 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param QueryTransformer $queryTransformer
      * @param string $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function routers(Request $request, string $zoneId)
     {
@@ -117,7 +121,7 @@ class AvailabilityZoneController extends BaseController
      * @param Request $request
      * @param QueryTransformer $queryTransformer
      * @param string $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function routerThroughputs(Request $request, string $zoneId)
     {
@@ -130,9 +134,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function dhcps(Request $request, string $zoneId)
     {
@@ -148,10 +152,10 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param QueryTransformer $queryTransformer
      * @param string $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function credentials(Request $request, string $zoneId)
     {
@@ -164,9 +168,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function instances(Request $request, string $zoneId)
     {
@@ -179,9 +183,9 @@ class AvailabilityZoneController extends BaseController
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param string $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function loadBalancers(Request $request, string $zoneId)
     {
@@ -199,7 +203,7 @@ class AvailabilityZoneController extends BaseController
     /**
      * @param Request $request
      * @param string $zoneId
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection|\Illuminate\Support\HigherOrderTapProxy|mixed
+     * @return AnonymousResourceCollection|HigherOrderTapProxy|mixed
      */
     public function capacities(Request $request, string $zoneId)
     {
@@ -223,7 +227,7 @@ class AvailabilityZoneController extends BaseController
     /**
      * @param Request $request
      * @param string $zoneId
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function prices(Request $request, string $zoneId)
     {
