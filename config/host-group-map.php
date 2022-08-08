@@ -13,7 +13,7 @@ return [
 
     // G0
     'az-7e7f811e' => [
-        'hg-99f9b758' => 'StandardCPU-01', // Standard CPU
+        'hg-99f9b758' => 'StandardCPU-01',
     ],
 
     // MAN5 Manchester West
