@@ -89,6 +89,7 @@ class HostSpec extends Model implements Searchable
             'cpu_cores' => $filter->numeric(),
             'cpu_clock_speed' => $filter->numeric(),
             'ram_capacity' => $filter->numeric(),
+            'is_hidden' => $filter->boolean(),
             'created_at' => $filter->date(),
             'updated_at' => $filter->date(),
         ]);
