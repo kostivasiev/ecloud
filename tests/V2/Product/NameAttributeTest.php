@@ -28,10 +28,12 @@ class NameAttributeTest extends TestCase
     public function testReturnsFullRTName()
     {
         $name = "rt-test-cpu";
+        /** @var Product $product */
         $product = Product::factory(['product_name' => $this->availabilityZone()->id . ': ' . $name])->create();
         $this->assertEquals($product->name, $name);
 
         $name = "rt-testcpux";
+        /** @var Product $product */
         $product = Product::factory(['product_name' => $this->availabilityZone()->id . ': ' . $name])->create();
         $this->assertEquals($product->name, $name);
     }
@@ -39,10 +41,12 @@ class NameAttributeTest extends TestCase
     public function testReturnsRTDoesntExist()
     {
         $name = "rt-fake-cpu";
+        /** @var Product $product */
         $product = Product::factory(['product_name' => $this->availabilityZone()->id . ': ' . $name])->create();
         $this->assertEquals($product->name, $this->rtPrefix);
 
         $name = "rt-fakecpux";
+        /** @var Product $product */
         $product = Product::factory(['product_name' => $this->availabilityZone()->id . ': ' . $name])->create();
         $this->assertEquals($product->name, $this->rtPrefix);
     }
@@ -50,10 +54,12 @@ class NameAttributeTest extends TestCase
     public function testReturnsFullHSNameNoHyphens()
     {
         $name = "hs-testcpux";
+        /** @var Product $product */
         $product = Product::factory(['product_name' => $this->availabilityZone()->id . ': ' . $name])->create();
         $this->assertEquals($product->name, $name);
 
         $name = "hs-fail-cpu";
+        /** @var Product $product */
         $product = Product::factory(['product_name' => $this->availabilityZone()->id . ': ' . $name])->create();
         $this->assertEquals($product->name, 'hs-fail');
     }
