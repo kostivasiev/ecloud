@@ -3,6 +3,7 @@
 namespace App\Models\V2;
 
 use App\Models\V2\Filters\ProductNameFilter;
+use App\Support\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Http\Request;
@@ -132,7 +133,18 @@ class Product extends V1ModelWrapper implements Searchable
     public function getNameAttribute()
     {
         preg_match("/az-\w+[^:]:\s?(?(?=hs-)(hs-\S[^-]+)|(\S[^-]+))/", $this->attributes['product_name'], $matches);
-        return str_replace(' ', '_', array_pop($matches) ?? null);
+        $name = str_replace(' ', '_', array_pop($matches) ?? null);
+
+        $rtKeyPrefix = (new ResourceTier())->keyPrefix;
+        if ($name !== $rtKeyPrefix) {
+            return $name;
+        }
+
+        preg_match("/$rtKeyPrefix-\w+[^:]+/", $this->attributes['product_name'], $resourceTierMatches);
+
+        return Resource::getFromId($resourceTierMatches[0]) instanceof ResourceTier
+            ? $resourceTierMatches[0]
+            : $name;
     }
 
     /**
