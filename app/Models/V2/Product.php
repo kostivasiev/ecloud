@@ -135,8 +135,7 @@ class Product extends V1ModelWrapper implements Searchable
         preg_match("/az-\w+[^:]:\s?(?(?=hs-)(hs-\S[^-]+)|(\S[^-]+))/", $this->attributes['product_name'], $matches);
         $name = str_replace(' ', '_', array_pop($matches) ?? null);
 
-        $resourceTier = new ResourceTier();
-        $rtKeyPrefix = $resourceTier->keyPrefix;
+        $rtKeyPrefix = (new ResourceTier())->keyPrefix;
         if ($name !== $rtKeyPrefix) {
             return $name;
         }
