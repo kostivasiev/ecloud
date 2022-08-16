@@ -41,6 +41,8 @@ class CreateRequest extends FormRequest
         $this->config = $this->image->imageMetadata->pluck('key', 'value')->flip();
         $this->platform = strtolower($this->image->platform);
 
+        $network = Network::forUser(Auth::user())->findOrFail($this->request->get('network_id'));
+
         $rules = [
             'name' => 'nullable|string|max:255',
             'vpc_id' => [
@@ -80,12 +82,14 @@ class CreateRequest extends FormRequest
                 new IsResourceAvailable(HostGroup::class),
                 new HasHosts(),
                 new HostGroupCanProvision($this->request->get('ram_capacity')),
+                new IsSameAvailabilityZone($network->router->availabilityZone),
             ],
             'resource_tier_id' => [
                 'sometimes',
                 'required',
                 'string',
                 Rule::exists(ResourceTier::class, 'id')->whereNull('deleted_at')->where('active', true),
+                new IsSameAvailabilityZone($network->router->availabilityZone),
             ],
             'network_id' => [
                 'required',
