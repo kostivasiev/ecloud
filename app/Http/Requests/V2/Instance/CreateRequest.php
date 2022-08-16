@@ -82,14 +82,14 @@ class CreateRequest extends FormRequest
                 new IsResourceAvailable(HostGroup::class),
                 new HasHosts(),
                 new HostGroupCanProvision($this->request->get('ram_capacity')),
-                new IsSameAvailabilityZone($network->router->availabilityZone),
+                new IsSameAvailabilityZone($network->router->availabilityZone->id),
             ],
             'resource_tier_id' => [
                 'sometimes',
                 'required',
                 'string',
                 Rule::exists(ResourceTier::class, 'id')->whereNull('deleted_at')->where('active', true),
-                new IsSameAvailabilityZone($network->router->availabilityZone),
+                new IsSameAvailabilityZone($network->router->availabilityZone->id),
             ],
             'network_id' => [
                 'required',
