@@ -423,11 +423,9 @@ Route::group([
         Route::get('nics/{nicId}/ip-addresses', 'NicController@ipAddresses');
         Route::post('nics/{nicId}/ip-addresses', 'NicController@associateIpAddress');
         Route::delete('nics/{nicId}/ip-addresses/{ipAddressId}', 'NicController@disassociateIpAddress');
-        Route::group(['middleware' => 'is-admin'], function () {
-            Route::post('nics', 'NicController@create');
-            Route::patch('nics/{nicId}', 'NicController@update');
-            Route::delete('nics/{nicId}', 'NicController@destroy');
-        });
+        Route::post('nics', 'NicController@create');
+        Route::patch('nics/{nicId}', 'NicController@update');
+        Route::delete('nics/{nicId}', 'NicController@destroy');
     });
 
     /** Credentials */
