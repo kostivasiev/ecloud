@@ -10,7 +10,7 @@ return [
         'max' => env('RAM_MAX', 65536),
     ],
     'nics' => [
-        'max' => env('NICS_MAX', 5),
+        'max' => 4,
     ],
     'resource_tier_tags' => [
         'standard_cpu'
