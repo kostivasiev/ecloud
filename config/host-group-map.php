@@ -14,6 +14,7 @@ return [
     // G0
     'az-7e7f811e' => [
         'hg-99f9b758' => 'StandardCPU-01',
+        'hg-c232d7d1' => 'Staff VPC',
     ],
 
     // MAN5 Manchester West
